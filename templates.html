@@ -1,0 +1,454 @@
+<template id="adventuring-page-component">
+    <div class="content d-none" id="adventuring-container">
+        <div class="skill-info">
+          <div class="block block-rounded mb-2" id="skill-header-adventuring:Adventuring">
+            <div class="progress active mb-1 border border-top border-1x border-dark" style="height: 8px">
+              <div class="progress-bar bg-info" id="skill-progress-bar-adventuring:Adventuring" role="progressbar" style="width: 0%;"></div>
+            </div>
+            <div class="block-header text-center pt-0 pb-0">
+              <ul class="nav-main nav-main-horizontal nav-main-horizontal-override font-size-xs w-100">
+                <li class="m-1" style="min-width: 30%;">
+                  <span class="font-w600"><lang-string lang-cat="MENU_TEXT" lang-id="SKILL_LEVEL"></lang-string></span> <span class="p-1 bg-success rounded font-w600" id="skill-progress-level-adventuring:Adventuring">1 / 99</span>
+                </li>
+                <li class="m-1" style="min-width: 30%"><span class="font-w600">
+                  <lang-string lang-cat="MENU_TEXT" lang-id="SKILL XP"></lang-string></span> <span class="p-1 bg-info rounded font-w600" id="skill-progress-xp-adventuring:Adventuring">1 / 99</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div id="overview" class="row row-deck gutters-tiny mb-1"></div>
+        <div class="row row-deck gutters-tiny">
+            <div class="col-12 col-md-6">
+                <div class="block block-rounded border-top border-success border-4x bg-combat-dark p-3" id="party"></div>
+            </div>
+            <div class="col-12 col-md-6">
+                <div class="block block-rounded border-top border-danger border-4x bg-combat-dark p-3" id="subpages"></div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="adventuring-overview-component">
+    <div class="col-12">
+        <div class="block block-rounded-double text-center">
+            <div class="block-content p-1">
+                <div class="row no-gutters">
+                    <div class="combat col-12 p-1">
+                        <h5 id="status-text" class="font-w700 text-combat-smoke text-center m-0 mt-2"></h5>
+                    </div>
+                    <div class="col-12 p-1">
+                        <button id="trainer-button" class="btn btn-secondary">Trainer</button>
+                        <button id="stash-button" class="btn btn-secondary">Stash</button>
+                        <button id="crossroads-button" class="btn btn-secondary">Crossroads</button>
+                        <button id="abandon-button" class="btn btn-secondary btn-danger d-none">Abandon Dungeon</button>
+                    </div>
+                    <div id="turn-progress" class="progress active combat offset-0 col-12 offset-md-3 col-md-6 p-0 my-3" style="height: 10px">
+                        <div id="turn-progress-bar" class="progress-bar bg-secondary" role="progressbar" style="width: 0%;"></div>
+                    </div>
+                    <div id="heal-progress" class="progress active combat offset-0 col-12 offset-md-3 col-md-6 p-0 my-3" style="height: 10px">
+                        <div id="heal-progress-bar" class="progress-bar bg-secondary" role="progressbar" style="width: 0%;"></div>
+                    </div>
+                    <div id="cards" class="combat offset-0 col-12 offset-md-2 col-md-8 pb-1 d-none"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="adventuring-party-component">
+    <div id="party" class="row no-gutters"></div>
+</template>
+
+<template id="adventuring-character-component">
+    <div class="col-12 col-md-4">
+        <div class="block-content p-3">
+            <div class="block block-rounded-double bg-combat-inner-dark text-center" id="styling">
+                <div class="row no-gutters">
+                    <div class="col-12">
+                        <img class="skill-icon-xs m-0 mt-2" id="icon"></img>
+                    </div>
+                    <div class="col-12">
+                        <h5 class="font-w700 text-combat-smoke text-center m-0 mt-2" id="name"></h5>
+                    </div>
+                    <div class="col-12">
+                        <div class="text-info m-0 invisible" id="job-dropdown"></div>
+                    </div>
+                    <div class="col-12">
+                        <div class="block-content p-3">
+                            <div class="row text-center">
+                                <div class="col-12">
+                                    <div class="row m-0 position-relative">
+                                        <div class="progress active bg-danger col-12 p-0" style="height: 15px">
+                                            <div id="hitpoints-progress" class="progress-bar bg-success" role="progressbar" style="width: 0%;"></div>
+                                        </div>
+                                        <div class="font-size-sm font-w600 text-danger" id="hitpoints-splash"></div>
+                                        <div class="text-size-sm text-combat-smoke text-center mb-1 flex-row justify-content-center no-gutters col-12">
+                                            <div class="row no-gutters flex-row justify-content-center"></div>
+                                            <div>
+                                                <small class="font-w700 align-middle"><span id="hitpoints"></span>/<span id="max-hitpoints"></span> <span>HP</span></small>
+                                            </div>
+                                        </div>
+                                        <div class="progress active bg-info col-12 p-0" style="height: 15px">
+                                            <div id="energy-progress" class="progress-bar bg-warning" role="progressbar" style="width: 0%;"></div>
+                                        </div>
+                                        <div class="text-size-sm text-combat-smoke text-center mb-1 flex-row justify-content-center no-gutters col-12">
+                                            <div class="row no-gutters flex-row justify-content-center"></div>
+                                            <div>
+                                                <small class="font-w700 align-middle"><span id="energy"></span>/<span id="max-energy"></span> <span>Energy</span></small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="block block-rounded-double bg-combat-inner-dark text-center p-3" id="abilities">
+            </div>
+            <div class="block block-rounded-double bg-combat-inner-dark text-center p-3" id="levels"></div>
+            <div class="block block-rounded-double bg-combat-inner-dark text-center p-3 d-none" id="equipment"></div>
+        </div>
+    </div>
+</template>
+
+<template id="adventuring-levels-component">
+    <div class="row no-gutters">
+        <div class="col">
+            <div class="d-flex justify-content-around m-0 block block-rounded-double bg-combat-inner-dark text-center">
+                <div class="mr-1">
+                    <img class="skill-icon-xxs" src="assets/media/skills/hitpoints/hitpoints.svg">
+                </div>
+                <div class="mr-1">
+                    <small id="hitpoints">-</small>
+                </div>
+            </div>
+        </div>
+        <div class="col mx-1">
+            <div class="d-flex justify-content-around m-0 block block-rounded-double bg-combat-inner-dark text-center">
+                <div class="mr-1">
+                    <img class="skill-icon-xxs" src="assets/media/skills/defence/defence.svg">
+                </div>
+                <div class="mr-1">
+                    <small id="defence">-</small>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="d-flex justify-content-around m-0 block block-rounded-double bg-combat-inner-dark text-center">
+                <div class="mr-1">
+                    <img class="skill-icon-xxs" src="assets/media/skills/agility/agility.svg">
+                </div>
+                <div class="mr-1">
+                    <small id="agility">-</small>
+                </div>
+            </div>
+        </div>
+        <div class="w-100"></div>
+        <div class="col my-1">
+            <div class="d-flex justify-content-around m-0 block block-rounded-double bg-combat-inner-dark text-center">
+                <div class="mr-1">
+                    <img class="skill-icon-xxs" src="assets/media/skills/attack/attack.svg">
+                </div>
+                <div class="mr-1">
+                    <small id="attack">-</small>
+                </div>
+            </div>
+        </div>
+        <div class="col m-1">
+            <div class="d-flex justify-content-around m-0 block block-rounded-double bg-combat-inner-dark text-center">
+                <div class="mr-1">
+                    <img class="skill-icon-xxs" src="assets/media/skills/strength/strength.svg">
+                </div>
+                <div class="mr-1">
+                    <small id="strength">-</small>
+                </div>
+            </div>
+        </div>
+        <div class="col my-1">
+            <div class="d-flex justify-content-around m-0 block block-rounded-double bg-combat-inner-dark text-center">
+                <div class="mr-1">
+                    <img class="skill-icon-xxs" src="assets/media/skills/ranged/ranged.svg">
+                </div>
+                <div class="mr-1">
+                    <small id="ranged">-</small>
+                </div>
+            </div>
+        </div>
+        <div class="w-100"></div>
+        <div class="col">
+            <div class="d-flex justify-content-around m-0 block block-rounded-double bg-combat-inner-dark text-center">
+                <div class="mr-1">
+                    <img class="skill-icon-xxs" src="assets/media/skills/magic/magic.svg">
+                </div>
+                <div class="mr-1">
+                    <small id="magic">-</small>
+                </div>
+            </div>
+        </div>
+        <div class="col mx-1">
+            <div class="d-flex justify-content-around m-0 block block-rounded-double bg-combat-inner-dark text-center">
+                <div class="mr-1">
+                    <img class="skill-icon-xxs" src="assets/media/skills/prayer/prayer.svg">
+                </div>
+                <div class="mr-1">
+                    <small id="prayer">-</small>
+                </div>
+            </div>
+        </div>
+        <div class="col"></div>
+    </div>
+</template>
+
+<template id="adventuring-cards-component">
+    <div id="cards" class="row no-gutters"></div>
+</template>
+
+<template id="adventuring-trainer-component">
+    <div id="page" class="row no-gutters d-none">
+        <div class="col-12">
+            <h3 class="font-w700 text-combat-smoke text-center m-0 mt-2">Trainer</h3>
+        </div>
+        <div class="col-12">
+            <div class="block-content p-3">
+                <div id="jobs" class="row no-gutters"></div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="adventuring-job-details-component">
+    <div id="page" class="row no-gutters d-none">
+        <div class="col-12 text-center">
+            <img class="skill-icon-sm m-0 mt-2" id="icon"></img>
+        </div>
+        <div class="col-12">
+            <h3 id="name" class="font-w700 text-combat-smoke text-center m-0 mt-2">Name</h3>
+        </div>
+        <div class="col-6 pl-3 pt-3">
+            <div class="block-content p-3">
+                <div class="block block-rounded-double bg-combat-inner-dark text-center">
+                    <div class="row no-gutters p-3" id="generators"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 pr-3 pt-3">
+            <div class="block-content p-3">
+                <div class="block block-rounded-double bg-combat-inner-dark text-center">
+                    <div class="row no-gutters p-3" id="spenders"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="adventuring-stash-component">
+    <div id="page" class="row no-gutters d-none">
+        <div class="col-12">
+            <h3 class="font-w700 text-combat-smoke text-center m-0 mt-2">Stash</h3>
+        </div>
+        <div class="col-6 pl-3 pt-3">
+            <div class="block-content p-3">
+                <div class="block block-rounded-double bg-combat-inner-dark text-center">
+                    <div class="row no-gutters p-3" id="slots">
+                        <div id="trash" class="combat-equip-img border border-2x border-rounded-equip p-1 m-1 fishing-img pointer-enabled fa fa-trash text-danger" style="border-width: 2px!important; font-size: 26px"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 pr-3 pt-3">
+            <div class="block-content p-3">
+                <div class="block block-rounded-double bg-combat-inner-dark text-center">
+                    <div class="row no-gutters p-3" id="details">
+                        <div class="col-12">
+                            <h5 class="font-w700 text-combat-smoke text-center m-0 mt-2" id="name"></h5>
+                        </div>
+                        <div class="col-12">
+                            <div class="block text-center p-3" id="levels"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="adventuring-crossroads-component">
+    <div id="page" class="row no-gutters d-none">
+        <div class="col-12">
+            <h3 class="font-w700 text-combat-smoke text-center m-0 mt-2">Crossroads</h3>
+        </div>
+        <div class="col-12">
+            <div class="block-content p-3">
+                <div id="areas" class="row no-gutters"></div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="adventuring-dungeon-component">
+    <div id="page" class="row no-gutters d-none">
+        <div class="col-12">
+            <div class="block-content p-3">
+                <div id="dungeon" class="row no-gutters">
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="adventuring-encounter-component">
+    <div id="page" class="row no-gutters d-none">
+        <div class="col-12">
+            <div id="enemies" class="block-content p-3">
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="adventuring-equipment-component">
+    <div id="equipment-container" class="row no-gutters"></div>
+</template>
+
+<template id="adventuring-equipment-slot-component">
+    <div class="col-4">
+        <img id="icon" class="combat-equip-img border border-2x border-rounded-equip p-1 fishing-img pointer-enabled" style="border-width: 2px!important;" src="">
+    </div>
+</template>
+
+<template id="adventuring-abilities-component">
+    <div class="row no-gutters" id="container">
+    </div>
+</template>
+
+<template id="adventuring-ability-component">
+    <div class="col-4">
+        <div class="block block-rounded-double bg-combat-dark text-center px-2 mx-1 pointer-enabled" id="styling">
+            <div class="row no-gutters">
+                <div class="col-12">
+                    <small class="font-w500 text-combat-smoke align-middle m-1" id="name"></small>
+                </div>
+                <div class="col-12">
+                    <small class="font-w500 text-combat-smoke align-middle m-1 font-size-xs" id="description"></small>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="adventuring-ability-small-component">
+    <div class="col-6">
+        <div class="block block-rounded-double bg-combat-inner-dark text-center px-2 mx-1" id="styling">
+            <div class="row no-gutters">
+                <div class="col-12">
+                    <small class="font-w500 text-combat-smoke align-middle m-1 font-size-xs" id="name"></small>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="adventuring-ability-details-component">
+    <div class="col-12">
+        <div class="block block-rounded-double bg-combat-dark text-center px-2 mx-1" id="styling">
+            <div class="row no-gutters">
+                <div class="col-12">
+                    <small class="font-w500 text-combat-smoke align-middle m-1" id="name"></small>
+                </div>
+                <div class="col-12">
+                    <small class="font-w500 text-combat-smoke align-middle m-1 font-size-xs" id="description"></small>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="adventuring-job-component">
+    <div class="col-12 col-md-4">
+        <div class="block-content p-3">
+            <div id="clickable" class="block block-rounded-double bg-combat-inner-dark text-center">
+                <div class="row no-gutters">
+                    <div class="col-12">
+                        <img class="skill-icon-xs m-0 mt-2" id="icon"></img>
+                        <h5 class="font-w700 text-combat-smoke text-center m-0 mt-2"><span id="name"></span><small id="level"></small></h5>
+                    </div>
+                    <div class="col-12" id="progress-container">
+                        <div class="block-content p-3">
+                            <div class="row text-center">
+                                <div class="col-12">
+                                    <div class="row m-0 position-relative">
+                                        <div class="progress active col-12 p-0" style="height: 15px">
+                                            <div id="mastery-progress" class="progress-bar bg-info" role="progressbar" style="width: 0%;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="adventuring-stash-slot-component">
+    <img id="icon" class="combat-equip-img border border-2x border-rounded-equip p-1 m-1 fishing-img pointer-enabled" style="border-width: 2px!important;" src="">
+</template>
+
+<template id="adventuring-area-component">
+    <div class="col-12 col-md-4">
+        <div class="block-content p-3">
+            <div class="block block-rounded-double bg-combat-inner-dark text-center pointer-enabled" id="clickable">
+                <div class="row no-gutters">
+                    <div class="col-12 p-3">
+                        <img class="skill-icon-xs m-0 mt-2" id="icon"></img>
+                        <h5 class="font-w700 text-combat-smoke text-center m-0 mt-2" id="name"></h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="adventuring-card-component">
+    <div class="col">
+        <div class="block-content p-1">
+            <div class="block block-rounded-double bg-combat-inner-dark text-center" id="styling">
+                <div class="row no-gutters">
+                    <div class="col-12">
+                        <img class="skill-icon-xs m-0 mt-2" id="icon"></img>
+                    </div>
+                    <div class="col-12">
+                        <small class="font-w700 text-combat-smoke text-center m-0 mt-2" id="text"></small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="adventuring-dungeon-floor-component">
+    <div class="row no-gutters">
+        <div class="col-12">
+            <div class="block-content p-3">
+                <div id="floor" class="row no-gutters">
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="adventuring-dungeon-cell-component">
+    <div class="col">
+        <div class="block-content p-1">
+            <div class="block bg-combat-inner-dark text-center" id="styling">
+                <div class="row no-gutters">
+                    <div class="col-12">
+                        <img class="skill-icon-xs m-2" id="icon"></img>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
