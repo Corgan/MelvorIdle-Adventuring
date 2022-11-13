@@ -121,7 +121,7 @@ export class AdventuringEncounter extends AdventuringPage {
         } else if(targetType == "aoe") {
             targets = targetParty.all.filter(target => !target.dead);
         } else if(targetType == "lowest") {
-            let potentialTargets = targetParty.all.reduce((lowest, target) => {
+            let potentialTargets = targetParty.all.filter(target => !target.dead).reduce((lowest, target) => {
                 if(lowest === undefined || lowest.hitpointsPercent > target.hitpointsPercent)
                     lowest = target;
                 return lowest;
