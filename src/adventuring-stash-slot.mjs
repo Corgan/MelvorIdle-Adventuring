@@ -142,6 +142,8 @@ export class AdventuringStashSlot {
         if(reader.getBoolean()) {
             this.item = new AdventuringEquipmentItem(this.manager, this.game);
             this.item.decode(reader, version);
+            if(typeof this.item.base === "string")
+                this.item = this.manager.emptyEquipmentItem;
         }
     }
 }
