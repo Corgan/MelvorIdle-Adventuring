@@ -39,39 +39,43 @@ export class AdventuringStashSlot {
             if(this.manager.stash.selectedSlot === this)  {
                 this.manager.stash.clearSelected();
             } else {
-                //if(this.manager.stash.selectedSlot.empty && this.empty) {
-                    this.manager.stash.selectSlot(this);
-                /*} else if(!this.manager.stash.selectedSlot.empty && !this.empty) {
-                    let swapItemFrom = this.manager.stash.selectedSlot.item;
-                    let swapItemTo = this.item;
-                    this.manager.stash.selectedSlot.setItem(swapItemTo);
-                    this.setItem(swapItemFrom);
-                    this.manager.stash.clearSelected();
-                } else if(!this.manager.stash.selectedSlot.empty && this.empty) {
-                    this.setItem(this.manager.stash.selectedSlot.item);
-                    this.manager.stash.selectedSlot.setEmpty();
-                    this.manager.stash.clearSelected();
-                } else if(this.manager.stash.selectedSlot.empty && !this.empty) {
-                    this.manager.stash.selectedSlot.setItem(this.item);
-                    this.setEmpty();
-                    this.manager.stash.clearSelected();
-                }
-                */
+                this.manager.stash.selectSlot(this);
             }
         } else {
             let selectedEquipment = this.manager.party.all.map(member => member.equipment).find(member => member.selectedSlot !== undefined);
             if(selectedEquipment !== undefined && selectedEquipment.selectedSlot !== undefined) {
                 if(this.empty) {
-                    this.setItem(selectedEquipment.selectedSlot.item);
+                    let newItem = selectedEquipment.selectedSlot.item;
+                    let occupiedSlots = newItem.occupies.map(slot => selectedEquipment.slots.get(slot)).filter(slot => !slot.empty && slot.occupied)
+                    
+                    this.setItem(newItem);
+                    occupiedSlots.forEach(slot => {
+                        slot.setEmpty();
+                    });
                     selectedEquipment.selectedSlot.setEmpty();
                     selectedEquipment.clearSelected();
                 } else {
-                    let fromItem = selectedEquipment.selectedSlot.item;
-                    let toItem = this.item;
+                    let newItem = selectedEquipment.selectedSlot.item;
+                    let oldItem = this.item;
 
-                    if(toItem.validSlots.includes(selectedEquipment.selectedSlot.slot)) {
-                        selectedEquipment.selectedSlot.setEquipped(toItem);
-                        this.setItem(fromItem);
+                    let newOccupiedItems = newItem.occupies.map(slot => selectedEquipment.slots.get(slot))
+                        .filter(slot => !slot.empty && !slot.occupied).map(slot => slot.item);
+
+                    let oldOccupiedItems = oldItem.occupies.map(slot => selectedEquipment.slots.get(slot))
+                        .filter(slot => !slot.empty && !slot.occupied).map(slot => slot.item);
+
+                    if(this.manager.stash.emptyCount < oldOccupiedItems.length) {
+                        imageNotify(cdnMedia('assets/media/main/bank_header.svg'), "Your stash is full.", 'danger');
+                        return;
+                    }
+
+                    if(selectedEquipment.selectedSlot.canEquip(oldItem)) {
+                        selectedEquipment.selectedSlot.setEquipped(oldItem);
+                        this.setItem(newItem);
+
+                        oldOccupiedItems.forEach(item => {
+                            this.manager.stash.firstEmpty.setItem(item);
+                        });
                         selectedEquipment.clearSelected();
                     }
                 }

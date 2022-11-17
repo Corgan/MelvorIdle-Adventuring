@@ -29,7 +29,6 @@ class AdventuringCharacter {
 
         this.hitpoints = 0;
         this.energy = 0;
-        this.maxEnergy = 100;
         this.dead = false;
         this.highlight = false;
     }
@@ -55,23 +54,33 @@ class AdventuringCharacter {
 
     get maxHitpoints() {
         let max = 10 * this.levels.Hitpoints;
-        if(this.hitpoints > max)
-            this.hitpoints = max;
         return max;
     }
 
+    get maxEnergy() {
+        if(this.spender !== undefined && this.spender.cost > 0)
+            return this.spender.cost;
+        return 0;
+    }
+
     get hitpointsPercent() {
-        return (100 * Math.max(0, Math.min(this.maxHitpoints, this.hitpoints))) / this.maxHitpoints;
+        let pct = (Math.max(0, Math.min(this.maxHitpoints, this.hitpoints)) / this.maxHitpoints);
+        return 100 * (!isNaN(pct) ? pct : 0);
+    }
+
+    get energyPercent() {
+        let pct = (Math.max(0, Math.min(this.maxEnergy, this.energy)) / this.maxEnergy);
+        return 100 * (!isNaN(pct) ? pct : 0);
     }
 
     get action() {
-        if(this.energy >= this.maxEnergy && this.spender.id != "adventuring:none")
+        if(this.spender.cost !== undefined && this.energy >= this.spender.cost)
             return this.spender;
         return this.generator;
     }
 
     setGenerator(generator) {
-        if(generator == undefined)
+        if(generator === undefined)
             generator = this.manager.generators.getObjectByID('adventuring:none');
 
         this.generator = generator;
@@ -79,11 +88,12 @@ class AdventuringCharacter {
     }
 
     setSpender(spender) {
-        if(spender == undefined)
+        if(spender === undefined)
             spender = this.manager.spenders.getObjectByID('adventuring:none');
 
         this.spender = spender;
         this.renderQueue.spender = true;
+        this.renderQueue.energy = true;
     }
 
     applyEffect(effectType, amount) {
@@ -152,8 +162,19 @@ class AdventuringCharacter {
         this.renderQueue.energy = true;
     }
 
+    removeEnergy(amount) {
+        this.energy -= amount;
+        if(this.energy < 0)
+            this.energy = 0;
+        this.renderQueue.energy = true;
+    }
+
     setEnergy(amount) {
         this.energy = amount;
+        if(this.energy > this.maxEnergy)
+            this.energy = this.maxEnergy;
+        if(this.energy < 0)
+            this.energy = 0;
         this.renderQueue.energy = true;
     }
 

@@ -27,6 +27,9 @@ export class AdventuringJob extends MasteryAction {
 
         this.level = data.level;
         this.levelScaling = data.levelScaling;
+
+        this.allowedItems = data.allowedItems;
+        this.allowedMaterials = data.allowedMaterials;
         
         this.isMilestoneReward = data.isMilestoneReward;
         this.alwaysMultiple = data.alwaysMultiple;

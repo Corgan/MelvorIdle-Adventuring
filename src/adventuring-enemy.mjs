@@ -13,13 +13,13 @@ export class AdventuringEnemy extends AdventuringCharacter {
         super(manager, game, party);
         this.levels = {
             Hitpoints: 0,
+            Defence: 0,
+            Agility: 0,
             Attack: 0,
             Strength: 0,
-            Defence: 0,
             Ranged: 0,
             Magic: 0,
-            Prayer: 0,
-            Agility: 0,
+            Prayer: 0
         };
         this.name = "";
         this.media = cdnMedia('assets/media/main/question.svg');

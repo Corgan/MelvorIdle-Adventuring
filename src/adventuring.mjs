@@ -25,6 +25,12 @@ const { AdventuringEncounter } = await loadModule('src/adventuring-encounter.mjs
 
 const { AdventuringLootGenerator } = await loadModule('src/adventuring-loot-generator.mjs');
 
+const { AdventuringItemMaterial } = await loadModule('src/adventuring-item-material.mjs');
+const { AdventuringItemType } = await loadModule('src/adventuring-item-type.mjs');
+const { AdventuringItemPool } = await loadModule('src/adventuring-item-pool.mjs');
+const { AdventuringItemTier } = await loadModule('src/adventuring-item-tier.mjs');
+const { AdventuringItemBase } = await loadModule('src/adventuring-item-base.mjs');
+
 
 const { AdventuringPageUIComponent } = await loadModule('src/components/adventuring.mjs');
 
@@ -37,7 +43,7 @@ class AdventuringRenderQueue extends MasterySkillRenderQueue {
 export class Adventuring extends SkillWithMastery {
     constructor(namespace, game) {
         super(namespace, 'Adventuring', game);
-        this.version = 1;
+        this.version = 2;
         this.saveVersion = -1;
         this._media = 'assets/media/main/adventure.svg';
         this.renderQueue = new AdventuringRenderQueue();
@@ -51,6 +57,12 @@ export class Adventuring extends SkillWithMastery {
         this.areas = new NamespaceRegistry(this.game.registeredNamespaces);
         this.monsters = new NamespaceRegistry(this.game.registeredNamespaces);
         this.suffixes = new NamespaceRegistry(this.game.registeredNamespaces);
+
+        this.itemMaterials = new NamespaceRegistry(this.game.registeredNamespaces);
+        this.itemTypes = new NamespaceRegistry(this.game.registeredNamespaces);
+        this.itemPools = new NamespaceRegistry(this.game.registeredNamespaces);
+        this.itemTiers = new NamespaceRegistry(this.game.registeredNamespaces);
+        this.baseItems = new NamespaceRegistry(this.game.registeredNamespaces);
 
         this.component = new AdventuringPageUIComponent(this, this.game);
 
@@ -135,7 +147,7 @@ export class Adventuring extends SkillWithMastery {
     selectArea(area) {
         if(this.party.all.some(member => !member.dead)) {
             this.dungeon.setArea(area);
-            this.dungeon.startDungeon();
+            this.dungeon.start();
         }
     }
 
@@ -304,6 +316,31 @@ export class Adventuring extends SkillWithMastery {
         data.monsters.forEach(data => {
             let monster = new AdventuringMonster(namespace, data, this, this.game);
             this.monsters.registerObject(monster);
+        });
+
+        data.itemMaterials.forEach(data => {
+            let material = new AdventuringItemMaterial(namespace, data, this, this.game);
+            this.itemMaterials.registerObject(material);
+        });
+
+        data.itemTypes.forEach(data => {
+            let itemType = new AdventuringItemType(namespace, data, this, this.game);
+            this.itemTypes.registerObject(itemType);
+        });
+
+        data.itemPools.forEach(data => {
+            let pool = new AdventuringItemPool(namespace, data, this, this.game);
+            this.itemPools.registerObject(pool);
+        });
+
+        data.itemTiers.forEach(data => {
+            let itemTier = new AdventuringItemTier(namespace, data, this, this.game);
+            this.itemTiers.registerObject(itemTier);
+        });
+
+        data.baseItems.forEach(data => {
+            let item = new AdventuringItemBase(namespace, data, this, this.game);
+            this.baseItems.registerObject(item);
         });
 
         data.suffixes.forEach(data => {

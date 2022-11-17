@@ -2,6 +2,8 @@ const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringPage } = await loadModule('src/adventuring-page.mjs');
 
+const { AdventuringWeightedTable } = await loadModule('src/adventuring-utils.mjs');
+
 const { AdventuringCard } = await loadModule('src/adventuring-card.mjs');
 const { AdventuringDungeonFloor } = await loadModule('src/adventuring-dungeon-floor.mjs');
 
@@ -20,16 +22,23 @@ export class AdventuringDungeon extends AdventuringPage {
 
         this.floor.component.mount(this.component.dungeon);
 
+        this.groupGenerator = new AdventuringWeightedTable(this.manager, this.game);
+
         this.floorCards = [];
-        this.floorCount = 0;
+        this.numFloors = 0;
 
         this.treasureCount = 0;
         this.trapCount = 0;
         this.fountainCount = 0;
     }
 
+    get currentFloor() {
+        return this.area.floors[Math.max(0, Math.min(this.progress, this.numFloors))];
+    }
+
     onLoad() {
         super.onLoad();
+        this.floor.onLoad();
     }
 
     nextTurn() {
@@ -40,12 +49,18 @@ export class AdventuringDungeon extends AdventuringPage {
         }
     }
 
-    triggerEncounter(endOfFloor=false) {
-        this.manager.encounter.startEncounter(this.progress == this.area.groups.length);
+    triggerExit() {
+        this.manager.encounter.generateEncounter(true);
+        this.manager.encounter.startEncounter();
+    }
+
+    triggerEncounter() {
+        this.manager.encounter.generateEncounter();
+        this.manager.encounter.startEncounter();
     }
 
     triggerTreasure() {
-        let { min, max } = this.area.tiles.treasure.item_level;
+        let { min, max } = this.area.tiles.treasure.loot.range;
 
         this.grantLoot(min, max);
     }
@@ -73,67 +88,79 @@ export class AdventuringDungeon extends AdventuringPage {
         });
     }
 
-    grantLoot(min, max) {
-        let baseId = this.area.loot[Math.floor(Math.random() * this.area.loot.length)];
+    grantLoot(min, max, fromTreasure=false) {
+        let lootGen = fromTreasure && this.area.treasurePoolGenerator !== undefined ? this.area.treasurePoolGenerator : this.area.lootPoolGenerator;
+        
+        let poolID = lootGen.getEntry();
+        let itemPool = this.manager.itemPools.getObjectByID(poolID);
+        let itemType = itemPool.pool.getEntry();
+        let rolledLevel = Math.floor(Math.random() * (max - min + 1)) + min;
 
-        let base = this.game.items.equipment.registeredObjects.get(baseId);
-        let randomItem = this.manager.lootgen.generateFromBase(base, min, max);
+        let itemTiers = this.manager.itemTiers.allObjects.filter(tier => {
+            return rolledLevel >= tier.range.min && rolledLevel <= tier.range.max;
+        });
+        let itemTier = itemTiers[Math.floor(Math.random() * itemTiers.length)];
+
+        let baseItems = this.manager.baseItems.allObjects.filter(item => {
+            return item.tier == itemTier.id && item.type == itemType;
+        });
+        let baseItem = baseItems[Math.floor(Math.random() * baseItems.length)];
+        
+        let randomItem = this.manager.lootgen.generateFromBase(baseItem, min, max, rolledLevel);
+        
         if(randomItem)
             this.manager.stash.add(randomItem);
     }
 
     setArea(area) {
         this.area = area;
-        this.floorCount = this.area.groups.length + 1;
+        this.numFloors = this.area.floors.length;
+
+        if(this.currentFloor !== undefined)
+            this.groupGenerator.loadTable(this.currentFloor.monsters);
     }
 
     updateFloorCards() {
         this.manager.overview.cards.renderQueue.cards.clear();
 
-        for(let i=0; i < this.floorCount; i++) {
+        for(let i=0; i < this.numFloors; i++) {
             if(this.floorCards[i] == undefined)
                 this.floorCards[i] = new AdventuringCard(this.manager, this.game);
 
-            this.floorCards[i].setName(i+1 == this.floorCount ? 'Boss Floor' : `Floor ${i+1}`);
-            this.floorCards[i].setIcon(i+1 == this.floorCount ? cdnMedia('assets/media/main/hardcore.svg') : cdnMedia('assets/media/skills/combat/combat.svg'));
+            this.floorCards[i].setName(i+1 == this.numFloors ? 'Boss Floor' : `Floor ${i+1}`);
+            this.floorCards[i].setIcon(i+1 == this.numFloors ? cdnMedia('assets/media/main/hardcore.svg') : cdnMedia('assets/media/skills/combat/combat.svg'));
             this.floorCards[i].setFade(i < this.progress);
             this.floorCards[i].setHighlight(i == this.progress);
             this.manager.overview.cards.renderQueue.cards.add(this.floorCards[i]);
         }
     }
 
-    startDungeon() {
+    next() {
+        if(this.currentFloor !== undefined)
+            this.groupGenerator.loadTable(this.currentFloor.monsters);
+        this.floor.generate(this.area.height, this.area.width);
+
+        this.updateFloorCards();
+        this.manager.dungeon.go();
+    }
+
+    start() {
         this.progress = 0;
         this.treasureCount = 0;
         this.trapCount = 0;
         this.fountainCount = 0;
         this.manager.overview.renderQueue.status = true;
-
-        this.floor.generate(this.area.height, this.area.width);
-
-        this.updateFloorCards();
-        this.manager.dungeon.go();
+        this.next();
         this.manager.start();
     }
 
-    completeEncounter() {
-        this.manager.encounter.reset();
-
-        this.progress++;
-        this.manager.overview.renderQueue.status = true;
-
-        if(this.progress > this.area.groups.length) {
-            this.complete();
-        } else {
-            this.updateFloorCards();
-            this.floor.generate(this.area.height, this.area.width);
-            this.manager.dungeon.go();
-        }
-    }
-
     reset() {
+        this.area = undefined;
+        this.numFloors = 0;
         this.progress = 0;
         this.manager.overview.renderQueue.status = true;
+
+        this.groupGenerator.reset();
 
         this.floor.reset();
         this.manager.encounter.reset();
@@ -141,17 +168,16 @@ export class AdventuringDungeon extends AdventuringPage {
 
     abandon() {
         this.reset();
-        this.floorCount = 0;
-        this.area = undefined;
+
         this.manager.stop();
         this.manager.crossroads.go();
     }
 
     complete() {
-        this.grantLoot(this.area.item_level.min, this.area.item_level.max);
+        this.grantLoot(this.area.loot.range.min, this.area.loot.range.max);
 
         if(!this.manager.party.all.every(hero => hero.dead)) {
-            this.startDungeon();
+            this.start();
         } else {
             this.reset();
             this.manager.stop();

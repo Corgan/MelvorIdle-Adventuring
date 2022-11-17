@@ -2,6 +2,8 @@ const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringAreaUIComponent } = await loadModule('src/components/adventuring-area.mjs');
 
+const { AdventuringWeightedTable } = await loadModule('src/adventuring-utils.mjs');
+
 class AdventuringAreaRenderQueue {
     constructor(){
         this.name = false;
@@ -27,16 +29,22 @@ export class AdventuringArea extends NamespacedObject {
 
         this.level = data.level;
 
-        this.groups = data.groups;
-        this.boss = data.boss;
+        this.floors = data.floors;
 
         this.height = data.height;
         this.width = data.width;
 
         this.tiles = data.tiles;
 
-        this.item_level = data.item_level;
         this.loot = data.loot;
+        
+        this.lootPoolGenerator = new AdventuringWeightedTable(this.manager, this.game);
+        this.lootPoolGenerator.loadTable(this.loot.pool);
+        
+        if(this.tiles.treasure.loot) {
+            this.treasurePoolGenerator = new AdventuringWeightedTable(this.manager, this.game);
+            this.treasurePoolGenerator.loadTable(this.tiles.treasure.loot.pool);
+        }
 
         this.component.clickable.onclick = () => {
             if(this.unlocked)

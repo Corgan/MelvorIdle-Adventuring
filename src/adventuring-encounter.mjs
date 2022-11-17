@@ -5,6 +5,7 @@ const { AdventuringPage } = await loadModule('src/adventuring-page.mjs');
 const { AdventuringGenerator } = await loadModule('src/adventuring-generator.mjs');
 const { AdventuringSpender } = await loadModule('src/adventuring-spender.mjs');
 const { AdventuringCard } = await loadModule('src/adventuring-card.mjs');
+const { AdventuringDungeonFloor } = await loadModule('src/adventuring-dungeon-floor.mjs');
 
 const { AdventuringEnemy } = await loadModule('src/adventuring-enemy.mjs');
 const { AdventuringHero } = await loadModule('src/adventuring-hero.mjs');
@@ -41,8 +42,7 @@ export class AdventuringEncounter extends AdventuringPage {
         this.party.onLoad();
     }
 
-    startEncounter(boss=false) {
-        this.generateEncounter(boss);
+    startEncounter(isExit=false) {
         this.currentRound = [...this.all].filter(c => !c.dead).sort((a,b) => b.levels.Agility - a.levels.Agility);
         this.nextRound = [];
         this.roundCounter = 1;
@@ -61,13 +61,17 @@ export class AdventuringEncounter extends AdventuringPage {
         this.updateTurns();
     }
 
-    generateEncounter(boss=false) {
+    generateEncounter(isExit=false) {
         let group;
-        if(!boss) {
-            let groups = this.manager.dungeon.area.groups;
-            group = groups[Math.min(this.manager.dungeon.progress, this.manager.dungeon.area.groups.length)];
+
+        if(!isExit) {
+            group = [
+                this.manager.dungeon.groupGenerator.getEntry(),
+                this.manager.dungeon.groupGenerator.getEntry(),
+                this.manager.dungeon.groupGenerator.getEntry()
+            ];
         } else {
-            group = this.manager.dungeon.area.boss;
+            group = this.manager.dungeon.currentFloor.exit;
         }
 
         this.party.front.setMonster(group[0]);
@@ -75,12 +79,10 @@ export class AdventuringEncounter extends AdventuringPage {
         this.party.back.setMonster(group[2]);
     }
 
-    nextTurn() {
-        let currentTurn = this.currentRound.shift();
-
-        let effectType = currentTurn.action.type;
-        let amount = currentTurn.action.getAmount(currentTurn.levels);
-        let targetType = currentTurn.action.target;
+    processHit(currentTurn, currentHit) {
+        let effectType = currentHit.type;
+        let targetType = currentHit.target;
+        let amount = currentHit.getAmount(currentTurn.levels);
 
         let targetParty;
 
@@ -133,12 +135,36 @@ export class AdventuringEncounter extends AdventuringPage {
 
         if(targets.length > 0) {
             targets.forEach(t => t.applyEffect(effectType, amount));
+        }
+    }
 
-            if(currentTurn.action instanceof AdventuringGenerator && currentTurn.action.energy !== undefined) {
-                currentTurn.addEnergy(currentTurn.action.energy);
-            } else if(currentTurn.action instanceof AdventuringSpender) {
-                currentTurn.setEnergy(0);
-            }
+    complete() {
+        this.reset();
+
+        let floor = this.manager.dungeon.floor;
+
+        let [x, y, type, explored] = floor.current;
+
+        if(type == AdventuringDungeonFloor.tiles.exit && explored) {
+            floor.complete();
+        } else {
+            this.manager.dungeon.updateFloorCards();
+            this.manager.dungeon.go();
+        }
+    }
+
+    nextTurn() {
+        let currentTurn = this.currentRound.shift();
+        let currentAction = currentTurn.action;
+
+        currentAction.hits.forEach(currentHit => this.processHit(currentTurn, currentHit));
+
+        if(currentAction.cost !== undefined && currentAction.cost >= currentTurn.energy) {
+            currentTurn.removeEnergy(currentAction.cost);
+        }
+
+        if(currentAction.energy !== undefined) {
+            currentTurn.addEnergy(currentAction.energy);
         }
 
         this.nextRound.push(currentTurn);
@@ -148,7 +174,7 @@ export class AdventuringEncounter extends AdventuringPage {
         this.nextRound = this.nextRound.filter(character => character.hitpoints > 0);
 
         if(this.party.all.every(enemy => enemy.dead)) {
-            this.manager.dungeon.completeEncounter();
+            this.complete();
             return;
         }
         

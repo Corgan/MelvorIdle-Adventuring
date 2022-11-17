@@ -4,7 +4,7 @@ const { AdventuringEquipmentSlot } = await loadModule('src/adventuring-equipment
 const { AdventuringEquipmentUIComponent } = await loadModule('src/components/adventuring-equipment.mjs');
 
 export class AdventuringEquipment {
-    static validSlots = [
+    static slots = [
         'Weapon',
         'Shield',
 
@@ -29,7 +29,7 @@ export class AdventuringEquipment {
         this.locked = false;
         this.slots = new Map();
         
-        this.constructor.validSlots.forEach(slot => this.slots.set(slot, new AdventuringEquipmentSlot(this.manager, this.game, this, slot)));
+        AdventuringEquipment.slots.forEach(slot => this.slots.set(slot, new AdventuringEquipmentSlot(this.manager, this.game, this, slot)));
         
         this.slots.forEach(slot => slot.component.mount(this.component.equipmentContainer));
     }
@@ -56,26 +56,32 @@ export class AdventuringEquipment {
     selectSlot(selectedSlot) {
         if(this.selectedSlot === selectedSlot)
             return this.clearSelected();
-        
-        this.manager.party.all.forEach(character => character.equipment.clearSelected());
 
         this.selectedSlot = selectedSlot;
+        this.manager.stash.slots.forEach(slot => {
+            slot.setSelected(slot === selectedSlot);
+        });
         this.manager.party.all.forEach(character => {
-            character.equipment.slots.forEach(slot => slot.setSelected(slot === selectedSlot));
-            character.equipment.highlightSlots(selectedSlot.item.validSlots);
+            character.equipment.slots.forEach(slot => {
+                slot.setSelected(slot === selectedSlot)
+                slot.setHighlight(slot.canEquip(selectedSlot.item));
+            });
         });
         this.manager.stash.renderQueue.details = true;
     }
 
     clearSelected() {
         this.selectedSlot = undefined;
-        this.slots.forEach(slot => slot.setSelected(false));
-        this.manager.party.all.forEach(character => character.equipment.highlightSlots([]));
+        this.manager.stash.slots.forEach(slot => {
+            slot.setSelected(false);
+        });
+        this.manager.party.all.forEach(character => {
+            character.equipment.slots.forEach(slot => {
+                slot.setSelected(false);
+                slot.setHighlight(false);
+            });
+        });
         this.manager.stash.renderQueue.details = true;
-    }
-
-    highlightSlots(slots) {
-        this.slots.forEach(slot => slot.setHighlight(slots.includes(slot.slot)));
     }
 
     render() {

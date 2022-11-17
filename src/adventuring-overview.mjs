@@ -65,19 +65,21 @@ export class AdventuringOverview {
         if(!this.renderQueue.status)
             return;
 
+        let status = '';
+
         if(this.manager.isActive) {
-            if(this.manager.encounter.isFighting) {
-                if(this.manager.encounter.currentRound.length == 0 && this.manager.encounter.nextRound.length > 0) {
-                    this.component.statusText.textContent = `Round ${this.manager.encounter.roundCounter+1}`;
-                } else {
-                    this.component.statusText.textContent = `Round ${this.manager.encounter.roundCounter}`;
-                }
-            } else {
-                this.component.statusText.textContent = this.manager.dungeon.area.name;//`Floor ${this.manager.dungeon.progress+1}`;
+            if(this.manager.dungeon.area !== undefined) {
+                let floor = this.manager.dungeon.progress == this.manager.dungeon.numFloors ? "Boss Floor" : `Floor ${this.manager.dungeon.progress+1}`;
+                status += `${this.manager.dungeon.area.name} - ${floor}`;
             }
+
+            if(this.manager.encounter.isFighting)
+                status += ` - Round ${this.manager.encounter.roundCounter}`;
         } else {
-            this.component.statusText.textContent = `Town`;
+            status = `Town`;
         }
+
+        this.component.statusText.textContent = status;
 
         this.renderQueue.status = false;
     }

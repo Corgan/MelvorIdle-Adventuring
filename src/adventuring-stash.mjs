@@ -49,6 +49,14 @@ export class AdventuringStash extends AdventuringPage {
         });
     }
 
+    get firstEmpty() {
+        return this.slots.find(slot => slot.empty);
+    }
+
+    get emptyCount() {
+        return this.slots.filter(slot => slot.empty).length;
+    }
+
     add(item) {
         for(let i = 0; i < this.slots.length; i++) {
             if(this.slots[i].empty) {
@@ -94,15 +102,29 @@ export class AdventuringStash extends AdventuringPage {
             return this.clearSelected();
 
         this.selectedSlot = selectedSlot;
-        this.slots.forEach(slot => slot.setSelected(slot === selectedSlot));
-        this.manager.party.all.forEach(character => character.equipment.highlightSlots(selectedSlot.item.validSlots));
+        this.slots.forEach(slot => {
+            slot.setSelected(slot === selectedSlot);
+        });
+        this.manager.party.all.forEach(character => {
+            character.equipment.slots.forEach(slot => {
+                slot.setSelected(slot === selectedSlot);
+                slot.setHighlight(!this.selectedSlot.empty && slot.canEquip(selectedSlot.item));
+            });
+        });
         this.renderQueue.details = true;
     }
 
     clearSelected() {
         this.selectedSlot = undefined;
-        this.slots.forEach(slot => slot.setSelected(false));
-        this.manager.party.all.forEach(character => character.equipment.highlightSlots([]));
+        this.slots.forEach(slot => {
+            slot.setSelected(false);
+        });
+        this.manager.party.all.forEach(character => {
+            character.equipment.slots.forEach(slot => {
+                slot.setSelected(false);
+                slot.setHighlight(false);
+            });
+        });
         this.renderQueue.details = true;
     }
 

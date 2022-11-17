@@ -15,24 +15,24 @@ export class AdventuringHero extends AdventuringCharacter {
         super(manager, game, party);
         this.baseLevels = {
             Hitpoints: 10,
+            Defence: 1,
+            Agility: 1,
             Attack: 1,
             Strength: 1,
-            Defence: 1,
             Ranged: 1,
             Magic: 1,
-            Prayer: 1,
-            Agility: 1,
+            Prayer: 1
         };
 
         this.levels = {
             Hitpoints: 0,
+            Defence: 0,
+            Agility: 0,
             Attack: 0,
             Strength: 0,
-            Defence: 0,
             Ranged: 0,
             Magic: 0,
-            Prayer: 0,
-            Agility: 0,
+            Prayer: 0
         }
 
         this.locked = false;
@@ -83,6 +83,9 @@ export class AdventuringHero extends AdventuringCharacter {
     }
 
     calculateLevels() {
+        let shouldAdjust = true;
+        if(this.manager.isActive || this.hitpoints > this.maxHitpoints) // Loading Shenanigans
+            shouldAdjust = false;
         let hitpointPct = this.hitpoints / this.maxHitpoints;
 
         let adjustedLevels = Object.entries(this.baseLevels).map(([skill, level]) => {
@@ -96,7 +99,7 @@ export class AdventuringHero extends AdventuringCharacter {
 
         this.levels = Object.fromEntries(adjustedLevels);
 
-        if(!this.manager.isActive)
+        if(shouldAdjust)
             this.hitpoints = Math.min(this.maxHitpoints, Math.floor(this.maxHitpoints * hitpointPct));
 
         this.renderQueue.levels = true;
@@ -122,7 +125,7 @@ export class AdventuringHero extends AdventuringCharacter {
     setJob(job) {
         this.job = job;
         this.calculateLevels();
-        
+
         if(!this.generator.canEquip(this))
             this.setGenerator(this.manager.generators.getObjectByID('adventuring:slap'));
         
@@ -131,6 +134,8 @@ export class AdventuringHero extends AdventuringCharacter {
 
         this.renderQueue.name = true;
         this.renderQueue.icon = true;
+
+        this.equipment.slots.forEach(slot => slot.renderQueue.valid = true);
 
         this.card.setIcon(this.media);
 

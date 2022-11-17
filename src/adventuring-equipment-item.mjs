@@ -22,26 +22,40 @@ export class AdventuringEquipmentItem {
         return this.base !== undefined ? this.base.media : cdnMedia("assets/media/main/question.svg");
     }
 
-    get validSlots() {
-        let valid = [];
+    get type() {
         if(this.base !== undefined) {
-            valid = this.base.validSlots;
-
-            if(this.base.validSlots.includes("Quiver") && this.base.occupiesSlots.includes("Weapon"))
-                valid = valid.map(slot => slot == "Quiver" ? "Weapon" : slot);
+            let type = this.manager.itemTypes.getObjectByID(this.base.type);
+            return type
         }
-        return valid;
+        return false;
     }
 
-    get occupiesSlots() {
-        let occupies = [];
-        if(this.base !== undefined) {
-            occupies = this.base.occupiesSlots;
+    get jobs() {
+        let jobs = [];
+        if(this.base !== undefined)
+            jobs = this.base.jobs;
+        return jobs;
+    }
 
-            if(this.base.validSlots.includes("Quiver") && this.base.occupiesSlots.includes("Weapon"))
-                occupies = occupies.filter(slot => slot != "Weapon")
-        }
+    get slots() {
+        let slots = [];
+        if(this.base !== undefined)
+            slots = this.base.slots;
+        return slots;
+    }
+
+    get occupies() {
+        let occupies = [];
+        if(this.base !== undefined)
+            occupies = this.base.occupies;
         return occupies;
+    }
+
+    get pairs() {
+        let pairs = [];
+        if(this.base !== undefined)
+            pairs = this.base.pairs;
+        return pairs;
     }
 
     encode(writer) {
@@ -58,7 +72,7 @@ export class AdventuringEquipmentItem {
 
     decode(reader, version) {
         if(reader.getBoolean()) {
-            this.base = reader.getNamespacedObject(this.game.items.equipment);
+            this.base = reader.getNamespacedObject(this.manager.baseItems);
             this.name = reader.getString();
             this.levels = reader.getComplexMap((reader) => {
                 let key = reader.getString();

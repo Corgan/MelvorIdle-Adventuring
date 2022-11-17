@@ -7,6 +7,8 @@ export class AdventuringSuffix extends NamespacedObject {
         this.game = game;
         this.name = data.name;
         this.levels = data.levels;
-        this.items = data.items;
+        this.tier = data.tier;
+        this.types = data.types;
+        this.materials = data.materials;
     }
 }

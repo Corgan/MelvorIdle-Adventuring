@@ -12,6 +12,30 @@ class AdventuringAbilityRenderQueue {
     }
 }
 
+class AdventuringAbilityHit {
+    constructor(manager, game, data) {
+        this.manager = manager;
+        this.game = game;
+        this.target = data.target;
+        this.type = data.type;
+
+        if(data.scaling)
+            this.scaling = data.scaling;
+        if(data.base)
+            this.base = data.base;
+    }
+
+    getAmount(levels) {
+        let amount = this.base !== undefined ? this.base : 0;
+        if(this.scaling !== undefined)
+            amount += Object.entries(this.scaling).reduce((bonus, [skill, scale]) => {
+                let level = levels[skill] !== undefined ? levels[skill] : 0;
+                return bonus + (level * scale)
+            }, 0);
+        return Math.floor(amount);
+    }
+}
+
 export class AdventuringAbility extends NamespacedObject {
     constructor(namespace, data, manager, game) {
         super(namespace, data.id);
@@ -19,14 +43,11 @@ export class AdventuringAbility extends NamespacedObject {
         this.game = game;
         this.name = data.name;
         this.description = data.description;
-        this.target = data.target;
-        this.type = data.type;
-        if(data.energy !== undefined)
+        this.hits = data.hits.map(hit => new AdventuringAbilityHit(this.manager, this.game, hit));
+        if(data.energy)
             this.energy = data.energy;
-        if(data.base !== undefined)
-            this.base = data.base;
-        if(data.scaling !== undefined)
-            this.scaling = data.scaling;
+        if(data.cost)
+            this.cost = data.cost;
         this.isEnemy = data.isEnemy === true;
         this.requirements = data.requirements;
         this.highlight = false;
@@ -111,17 +132,14 @@ export class AdventuringAbility extends NamespacedObject {
     }
 
     getDescription(levels={}) {
-        return this.description.replace('{amount}', this.getAmount(levels));
+        return this.hits.reduce((desc, hit, i) =>  desc.replace(`{hit.${i}.amount}`, hit.getAmount(levels)), this.description);
     }
 
-    getAmount(levels) {
-        let amount = this.base;
-        if(this.scaling !== undefined)
-            amount += Object.entries(this.scaling).reduce((bonus, [skill, scale]) => {
-                let level = levels[skill] !== undefined ? levels[skill] : 0;
-                return bonus + (level * scale)
-            }, 0);
-        return Math.floor(amount);
+    selectTargets(heroes, enemies) {
+        let targets = [];
+
+
+        return targets;
     }
 
     setHighlight(highlight) {
