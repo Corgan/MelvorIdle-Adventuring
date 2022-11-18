@@ -59,9 +59,8 @@ export class AdventuringDungeonCell {
             return;
 
         if(this.icon == undefined) {
-            this.component.icon.classList.add('invisible');
+            this.component.icon.src = mod.getContext(this.manager.namespace).getResourceUrl('assets/media/empty.png');
         } else {
-            this.component.icon.classList.remove('invisible');
             this.component.icon.src = this.icon;
         }
 

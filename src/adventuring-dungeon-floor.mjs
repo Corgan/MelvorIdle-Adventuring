@@ -311,7 +311,7 @@ export class AdventuringDungeonFloor {
                         this.floorCells[i].setIcon(cdnMedia('assets/media/misc/mark_of_death.svg')); // Encounter Exit
                     }
                 } else if(type == AdventuringDungeonFloor.tiles.start) {
-                    this.floorCells[i].setIcon(cdnMedia('assets/media/main/question.svg')); // Start
+                    this.floorCells[i].setIcon(); // Start
                 } else {
                     if(explored) {
                         if(type == AdventuringDungeonFloor.tiles.empty) {
