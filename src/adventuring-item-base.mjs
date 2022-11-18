@@ -30,7 +30,7 @@ export class AdventuringItemBase extends NamespacedObject {
         let slots = [];
         let type = this.manager.itemTypes.getObjectByID(this.type);
         if(type.slots !== undefined)
-            slots = type.slots;
+            slots = type.slots.map(slotType => this.manager.itemSlots.getObjectByID(slotType));;
         return slots;
     }
 
@@ -38,7 +38,7 @@ export class AdventuringItemBase extends NamespacedObject {
         let occupies = [];
         let type = this.manager.itemTypes.getObjectByID(this.type);
         if(type.occupies !== undefined)
-            occupies = type.occupies;
+            occupies = type.occupies.map(slotType => this.manager.itemSlots.getObjectByID(slotType));
         return occupies;
     }
 

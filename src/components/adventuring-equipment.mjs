@@ -5,6 +5,6 @@ const { AdventuringUIComponent } = await loadModule('src/components/adventuring-
 export class AdventuringEquipmentUIComponent extends AdventuringUIComponent {
     constructor(manager, game) {
         super(manager, game, 'adventuring-equipment-component');
-        this.equipmentContainer = getElementFromFragment(this.$fragment, 'equipment-container', 'div');
+        this.equipment = getElementFromFragment(this.$fragment, 'equipment', 'div');
     }
 }

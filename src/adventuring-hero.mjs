@@ -226,6 +226,10 @@ export class AdventuringHero extends AdventuringCharacter {
 
         return names[Math.floor(Math.random()*names.length)];
     }
+
+    postDataRegistration() {
+        this.equipment.postDataRegistration();
+    }
     
     encode(writer) {
         super.encode(writer);

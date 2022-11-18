@@ -26,6 +26,10 @@ class AdventuringParty {
         this.front.render();
     }
 
+    postDataRegistration() {
+        
+    }
+
     encode(writer) {
         this.back.encode(writer);
         this.center.encode(writer);
@@ -51,6 +55,11 @@ class AdventuringHeroParty extends AdventuringParty {
         this.back.component.mount(this.component.party);
         this.center.component.mount(this.component.party);
         this.front.component.mount(this.component.party);
+    }
+
+    postDataRegistration() {
+        super.postDataRegistration();
+        this.all.forEach(member => member.postDataRegistration());
     }
 }
 

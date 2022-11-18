@@ -253,7 +253,7 @@ class AdventuringCharacter {
         
         this.component.energy.textContent = this.energy;
         this.component.maxEnergy.textContent = this.maxEnergy;
-        this.component.energyProgress.setFixedPosition((this.energy / this.maxEnergy) * 100);
+        this.component.energyProgress.setFixedPosition(this.energyPercent);
 
         this.renderQueue.energy = false;
     }
@@ -289,6 +289,10 @@ class AdventuringCharacter {
         this.component.spender.styling.classList.toggle('bg-combat-menu-selected', this.spender === this.action && this.highlight);
 
         this.renderQueue.spender = false;
+    }
+
+    postDataRegistration() {
+        
     }
 
     encode(writer) {

@@ -46,10 +46,10 @@ export class AdventuringStashSlot {
             if(selectedEquipment !== undefined && selectedEquipment.selectedSlot !== undefined) {
                 if(this.empty) {
                     let newItem = selectedEquipment.selectedSlot.item;
-                    let occupiedSlots = newItem.occupies.map(slot => selectedEquipment.slots.get(slot)).filter(slot => !slot.empty && slot.occupied)
+                    let newOccupiedSlots = newItem.occupies.map(slot => selectedEquipment.slots.get(slot)).filter(slot => !slot.empty && slot.occupied)
                     
                     this.setItem(newItem);
-                    occupiedSlots.forEach(slot => {
+                    newOccupiedSlots.forEach(slot => {
                         slot.setEmpty();
                     });
                     selectedEquipment.selectedSlot.setEmpty();
@@ -58,22 +58,25 @@ export class AdventuringStashSlot {
                     let newItem = selectedEquipment.selectedSlot.item;
                     let oldItem = this.item;
 
-                    let newOccupiedItems = newItem.occupies.map(slot => selectedEquipment.slots.get(slot))
-                        .filter(slot => !slot.empty && !slot.occupied).map(slot => slot.item);
+                    let newOccupiedSlots = newItem.occupies.map(slot => selectedEquipment.slots.get(slot)).filter(slot => !slot.empty && slot.occupied);
 
-                    let oldOccupiedItems = oldItem.occupies.map(slot => selectedEquipment.slots.get(slot))
-                        .filter(slot => !slot.empty && !slot.occupied).map(slot => slot.item);
+                    let oldEquippedSlotItems = oldItem.occupies.map(slot => selectedEquipment.slots.get(slot))
+                        .filter(slot => !slot.empty && !slot.occupied).map(slot => ({ slot: slot.slotType, item: slot.item }));
 
-                    if(this.manager.stash.emptyCount < oldOccupiedItems.length) {
+                    if(this.manager.stash.emptyCount < oldEquippedSlotItems.length) {
                         imageNotify(cdnMedia('assets/media/main/bank_header.svg'), "Your stash is full.", 'danger');
                         return;
                     }
 
                     if(selectedEquipment.selectedSlot.canEquip(oldItem)) {
+                        newOccupiedSlots.forEach(slot => {
+                            slot.setEmpty();
+                        });
+
                         selectedEquipment.selectedSlot.setEquipped(oldItem);
                         this.setItem(newItem);
 
-                        oldOccupiedItems.forEach(item => {
+                        oldEquippedSlotItems.forEach(({ slot, item }) => {
                             this.manager.stash.firstEmpty.setItem(item);
                         });
                         selectedEquipment.clearSelected();
@@ -115,8 +118,9 @@ export class AdventuringStashSlot {
         if(!this.renderQueue.icon)
             return;
 
-        this.component.icon.src = this.empty ? cdnMedia('assets/media/bank/passive_slot.png') : this.item.media;
-        this.component.tooltip.setContent(!this.empty ? this.item.tooltip : "Empty");
+        //cdnMedia('assets/media/bank/passive_slot.png')
+        this.component.icon.src = this.empty ? mod.getContext(this.manager.namespace).getResourceUrl('assets/media/empty.png') : this.item.media;
+        this.component.tooltip.setContent(this.empty ? "Empty" : this.item.tooltip);
 
         this.renderQueue.icon = false;
     }

@@ -25,6 +25,7 @@ const { AdventuringEncounter } = await loadModule('src/adventuring-encounter.mjs
 
 const { AdventuringLootGenerator } = await loadModule('src/adventuring-loot-generator.mjs');
 
+const { AdventuringItemSlot } = await loadModule('src/adventuring-item-slot.mjs');
 const { AdventuringItemMaterial } = await loadModule('src/adventuring-item-material.mjs');
 const { AdventuringItemType } = await loadModule('src/adventuring-item-type.mjs');
 const { AdventuringItemPool } = await loadModule('src/adventuring-item-pool.mjs');
@@ -58,6 +59,7 @@ export class Adventuring extends SkillWithMastery {
         this.monsters = new NamespaceRegistry(this.game.registeredNamespaces);
         this.suffixes = new NamespaceRegistry(this.game.registeredNamespaces);
 
+        this.itemSlots = new NamespaceRegistry(this.game.registeredNamespaces);
         this.itemMaterials = new NamespaceRegistry(this.game.registeredNamespaces);
         this.itemTypes = new NamespaceRegistry(this.game.registeredNamespaces);
         this.itemPools = new NamespaceRegistry(this.game.registeredNamespaces);
@@ -318,6 +320,11 @@ export class Adventuring extends SkillWithMastery {
             this.monsters.registerObject(monster);
         });
 
+        data.itemSlots.forEach(data => {
+            let slot = new AdventuringItemSlot(namespace, data, this, this.game);
+            this.itemSlots.registerObject(slot);
+        });
+
         data.itemMaterials.forEach(data => {
             let material = new AdventuringItemMaterial(namespace, data, this, this.game);
             this.itemMaterials.registerObject(material);
@@ -358,6 +365,7 @@ export class Adventuring extends SkillWithMastery {
     }
 
     postDataRegistration() {
+        console.log("Adventuring postDataRegistration");
         super.postDataRegistration(); // Milestones setLevel
 
         let jobMilestones = this.jobs.allObjects.filter(job => job.isMilestoneReward);
@@ -368,13 +376,14 @@ export class Adventuring extends SkillWithMastery {
         
         this.sortedMasteryActions = jobMilestones.sort((a,b)=> a.level - b.level);
 
+        this.party.postDataRegistration();
         this.trainer.postDataRegistration();
         this.stash.postDataRegistration();
         this.crossroads.postDataRegistration();
     }
 
     encode(writer) {
-        //let pre = writer.byteOffset;
+        let start = writer.byteOffset;
         super.encode(writer); // Encode default skill data
         writer.writeUint32(this.version); // Store current skill version
 
@@ -385,25 +394,34 @@ export class Adventuring extends SkillWithMastery {
         this.turnTimer.encode(writer);
         writer.writeBoolean(this.isActive);
 
-        //let post = writer.byteOffset;
+        let end = writer.byteOffset;
         //console.log(`Wrote ${post-pre} bytes for Adventuring save`);
         return writer;
     }
 
     decode(reader, version) {
-        //let pre = reader.byteOffset;
-        super.decode(reader, version); // Decode default skill data
-        this.saveVersion = reader.getUint32(); // Read save skill version
+        console.log("Adventuring save decoding");
+        let start = reader.byteOffset;
+        reader.byteOffset -= Uint32Array.BYTES_PER_ELEMENT; // Let's back up a minute and get the size of our skill data
+        let skillDataSize = reader.getUint32();
 
-        this.party.decode(reader, version);
-        this.stash.decode(reader, version);
-        this.dungeon.decode(reader, version);
-        this.encounter.decode(reader, version);
-        this.turnTimer.decode(reader, version);
-        this.isActive = reader.getBoolean();
+        try {
+            super.decode(reader, version);
+            this.saveVersion = reader.getUint32(); // Read save version
 
-        //let post = reader.byteOffset;
-        //console.log(`Read ${post-pre} bytes for Adventuring save`);
+            this.party.decode(reader, version);
+            this.stash.decode(reader, version);
+            this.dungeon.decode(reader, version);
+            this.encounter.decode(reader, version);
+            this.turnTimer.decode(reader, version);
+            this.isActive = reader.getBoolean();
+        } catch(e) { // Something's fucky, dump all progress and skip past the trash save data
+            reader.byteOffset = start;
+            reader.getFixedLengthBuffer(skillDataSize);
+        }
+
+        let end = reader.byteOffset;
+        //console.log(`Read ${end-start} bytes for Adventuring save`);
     }
 
     checkpoints = [

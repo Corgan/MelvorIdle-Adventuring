@@ -7,6 +7,8 @@ export async function setup({ gameData, patch, loadTemplates, loadModule, onInte
     game.registerSkill(game.registeredNamespaces.getNamespace('adventuring'), Adventuring); // Register skill
 
     await gameData.addPackage('data.json'); // Add skill data (page + sidebar, skillData)
+    
+    console.log('Registered Adventuring Data.');
 
     onInterfaceAvailable(async () => {
         const skill = game.skills.registeredObjects.get("adventuring:Adventuring");

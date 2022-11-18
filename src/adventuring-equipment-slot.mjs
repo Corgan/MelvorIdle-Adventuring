@@ -14,12 +14,12 @@ class AdventuringEquipmentSlotRenderQueue {
 }
 
 export class AdventuringEquipmentSlot {
-    constructor(manager, game, equipment, slot) {
+    constructor(manager, game, equipment, slotType) {
         this.game = game;
         this.manager = manager;
         this.equipment = equipment;
-        this.slot = slot;
-        this.occupiedBy = 'None';
+        this.slotType = slotType;
+        this.occupiedBy = this.manager.itemSlots.getObjectByID("adventuring:none");
         this.item = this.manager.emptyEquipmentItem;
         this.highlight = false;
         this.clickable = false;
@@ -41,23 +41,27 @@ export class AdventuringEquipmentSlot {
         this.renderQueue.valid = true;
     }
 
-    canEquip(item) {
+    canEquip(item, swapSlot=false) {
         if(item === this.manager.emptyEquipmentItem)
             return true;
-        if(!item.slots.includes(this.slot))
+        if(!item.slots.includes(this.slotType))
             return false;
         if(!item.jobs.includes(this.equipment.character.job))
             return false;
         if(item.pairs.length > 0) {
-            let pairedSlots = ["Weapon", "Shield"].filter(slot => slot !== this.slot);
-            let validPairs = pairedSlots.reduce((valid, slot) => {
-                let equipmentSlot = this.equipment.slots.get(slot);
+            if(this.slotType.pair !== undefined) {
+                let pairedSlot = this.slotType.pair;
+                let equipmentSlotType = this.manager.itemSlots.getObjectByID(pairedSlot);
+                let equipmentSlot = this.equipment.slots.get(equipmentSlotType);
+
                 if(!equipmentSlot.empty && !equipmentSlot.occupied && !item.pairs.includes(equipmentSlot.item.type))
                     return false;
-                return valid;
-            }, true);
-            return validPairs;
+            }
         }
+        //if(swapSlot && !this.empty && !this.item.slots.includes(swapSlot.slotType))
+        //    return false;
+        if(swapSlot && !swapSlot.canEquip(this.item))
+            return false;
         return true;
     }
 
@@ -69,20 +73,28 @@ export class AdventuringEquipmentSlot {
             let newItem = this.manager.stash.selectedSlot.item;
             let oldItem = this.item;
 
-            let newOccupiedItems = newItem.occupies.map(slot => this.equipment.slots.get(slot))
-                .filter(slot => !slot.empty && !slot.occupied).map(slot => slot.item);
+            let newEquippedSlotItems = newItem.occupies.map(slot => this.equipment.slots.get(slot))
+                .filter(slot => !slot.empty && !slot.occupied).map(slot => ({ slot: slot.slotType, item: slot.item }));
 
-            if(this.manager.stash.emptyCount < newOccupiedItems.length) {
+            let oldOccupiedSlots = oldItem.occupies.map(slot => this.equipment.slots.get(slot)).filter(slot => !slot.empty && slot.occupied);
+
+            if(this.manager.stash.emptyCount < newEquippedSlotItems.length) {
                 imageNotify(cdnMedia('assets/media/main/bank_header.svg'), "Your stash is full.", 'danger');
                 return;
             }
 
             if(this.canEquip(newItem)) {
+                oldOccupiedSlots.forEach(slot => {
+                    slot.setEmpty();
+                });
+
                 this.setEquipped(newItem);
                 this.manager.stash.selectedSlot.setItem(oldItem);
-                newOccupiedItems.forEach(item => {
+
+                newEquippedSlotItems.forEach(({ slot, item }) => {
                     this.manager.stash.firstEmpty.setItem(item);
                 });
+
                 this.manager.stash.clearSelected();
             }
         } else {
@@ -96,11 +108,11 @@ export class AdventuringEquipmentSlot {
 
                     let newOccupiedSlots = newItem.occupies.map(slot => selectedEquipment.slots.get(slot)).filter(slot => !slot.empty && slot.occupied);
                     let newEquippedSlotItems = newItem.occupies.map(slot => this.equipment.slots.get(slot))
-                        .filter(slot => !slot.empty && !slot.occupied).map(slot => ({ slot: slot.slot, item: slot.item }));
+                        .filter(slot => !slot.empty && !slot.occupied).map(slot => ({ slot: slot.slotType, item: slot.item }));
 
                     let oldOccupiedSlots = oldItem.occupies.map(slot => this.equipment.slots.get(slot)).filter(slot => !slot.empty && slot.occupied);
                     let oldEquippedSlotItems = oldItem.occupies.map(slot => selectedEquipment.slots.get(slot))
-                        .filter(slot => !slot.empty && !slot.occupied).map(slot => ({ slot: slot.slot, item: slot.item }));
+                        .filter(slot => !slot.empty && !slot.occupied).map(slot => ({ slot: slot.slotType, item: slot.item }));
                     
                     if(this.manager.stash.emptyCount < newEquippedSlotItems.length + oldEquippedSlotItems.length) {
                         imageNotify(cdnMedia('assets/media/main/bank_header.svg'), "Your stash is full.", 'danger');
@@ -108,15 +120,15 @@ export class AdventuringEquipmentSlot {
                     }
 
                     if(this.canEquip(newItem) && selectedEquipment.selectedSlot.canEquip(oldItem)) {
-                        this.setEquipped(newItem);
-                        selectedEquipment.selectedSlot.setEquipped(oldItem);
-
                         newOccupiedSlots.forEach(slot => {
                             slot.setEmpty();
                         });
                         oldOccupiedSlots.forEach(slot => {
                             slot.setEmpty();
                         });
+
+                        this.setEquipped(newItem);
+                        selectedEquipment.selectedSlot.setEquipped(oldItem);
 
                         oldEquippedSlotItems.forEach(({ slot, item }) => {
                             if(this.equipment.slots.get(slot).canEquip(item)) {
@@ -134,7 +146,7 @@ export class AdventuringEquipmentSlot {
                         });
                         selectedEquipment.clearSelected();
                     } else {
-                        if(!this.empty) {
+                        if(!this.empty && !this.occupied) {
                             selectedEquipment.clearSelected();
                             this.equipment.selectSlot(this);
                         }
@@ -159,10 +171,10 @@ export class AdventuringEquipmentSlot {
 
     setEquipped(item) {
         this.item = item;
-        this.occupiedBy = 'None';
+        this.occupiedBy = this.manager.itemSlots.getObjectByID("adventuring:none");
         this.item.occupies.forEach(slot => {
             let equipmentSlot = this.equipment.slots.get(slot);
-            equipmentSlot.setOccupied(this.slot);
+            equipmentSlot.setOccupied(this.slotType);
         });
         this.renderQueue.icon = true;
         this.renderQueue.valid = true;
@@ -170,7 +182,7 @@ export class AdventuringEquipmentSlot {
 
     setEmpty() {
         this.item = this.manager.emptyEquipmentItem;
-        this.occupiedBy = 'None';
+        this.occupiedBy = this.manager.itemSlots.getObjectByID("adventuring:none");
         this.renderQueue.icon = true;
         this.renderQueue.valid = true;
     }
@@ -180,7 +192,8 @@ export class AdventuringEquipmentSlot {
     }
 
     get occupied() {
-        return this.occupiedBy != 'None';
+        let emptySlot = this.manager.itemSlots.getObjectByID("adventuring:none");
+        return this.occupiedBy !== emptySlot;
     }
     
     get levels() {
@@ -228,8 +241,8 @@ export class AdventuringEquipmentSlot {
                 tooltip = this.item.tooltip;
             }
         } else {
-            media = cdnMedia(`assets/media/bank/${equipmentSlotData[this.slot].emptyMedia}.png`)
-            tooltip = "Empty";
+            media = this.slotType.media;
+            tooltip = this.slotType.name;
         }
 
         this.component.icon.src = media;
@@ -280,7 +293,7 @@ export class AdventuringEquipmentSlot {
         writer.writeBoolean(!this.empty && !this.occupied)
         if(!this.empty && !this.occupied)
             this.item.encode(writer);
-        writer.writeString(this.occupiedBy);
+        writer.writeNamespacedObject(this.occupiedBy);
         return writer;
     }
 
@@ -291,6 +304,8 @@ export class AdventuringEquipmentSlot {
             if(typeof this.item.base === "string")
                 this.item = this.manager.emptyEquipmentItem;
         }
-        this.occupiedBy = reader.getString();
+        this.occupiedBy = reader.getNamespacedObject(this.manager.itemSlots);
+        if(typeof this.occupiedBy === "string")
+            this.occupiedBy = this.manager.itemSlots.getObjectByID("adventuring:none");
     }
 }

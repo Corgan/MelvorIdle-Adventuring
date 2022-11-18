@@ -305,7 +305,7 @@ export class AdventuringDungeonFloor {
                 this.floorCells[i].setFade(explored && !(x == cX && y == cY));
 
                 if(type == AdventuringDungeonFloor.tiles.exit) {
-                    if(this.dungeon.progress == this.dungeon.numFloors) {
+                    if(this.dungeon.progress == this.dungeon.numFloors-1) {
                         this.floorCells[i].setIcon(cdnMedia('assets/media/main/hardcore.svg')); // Boss Exit
                     } else {
                         this.floorCells[i].setIcon(cdnMedia('assets/media/misc/mark_of_death.svg')); // Encounter Exit
@@ -382,12 +382,10 @@ export class AdventuringDungeonFloor {
                 writer.writeUint8(cell);
             });
         });
-        if(this.manager.version >= 2) {
-            writer.writeArray(this.forkStack, (row, writer) => {
-                writer.writeUint8(row[0]);
-                writer.writeUint8(row[1]);
-            });
-        }
+        writer.writeArray(this.forkStack, (row, writer) => {
+            writer.writeUint8(row[0]);
+            writer.writeUint8(row[1]);
+        });
         return writer;
     }
 

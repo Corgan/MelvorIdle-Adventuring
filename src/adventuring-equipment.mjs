@@ -4,21 +4,6 @@ const { AdventuringEquipmentSlot } = await loadModule('src/adventuring-equipment
 const { AdventuringEquipmentUIComponent } = await loadModule('src/components/adventuring-equipment.mjs');
 
 export class AdventuringEquipment {
-    static slots = [
-        'Weapon',
-        'Shield',
-
-        'Amulet',
-        'Ring',
-        'Cape',
-
-        'Helmet',
-        'Platebody',
-        'Platelegs',
-        'Gloves',
-        'Boots'
-    ];
-
     constructor(manager, game, character) {
         this.game = game;
         this.manager = manager;
@@ -28,10 +13,6 @@ export class AdventuringEquipment {
 
         this.locked = false;
         this.slots = new Map();
-        
-        AdventuringEquipment.slots.forEach(slot => this.slots.set(slot, new AdventuringEquipmentSlot(this.manager, this.game, this, slot)));
-        
-        this.slots.forEach(slot => slot.component.mount(this.component.equipmentContainer));
     }
     
     get levels() {
@@ -64,7 +45,7 @@ export class AdventuringEquipment {
         this.manager.party.all.forEach(character => {
             character.equipment.slots.forEach(slot => {
                 slot.setSelected(slot === selectedSlot)
-                slot.setHighlight(slot.canEquip(selectedSlot.item));
+                slot.setHighlight(slot.canEquip(selectedSlot.item, selectedSlot));
             });
         });
         this.manager.stash.renderQueue.details = true;
@@ -88,17 +69,30 @@ export class AdventuringEquipment {
         this.slots.forEach(slot => slot.render());
     }
 
+    postDataRegistration() {
+        this.manager.itemSlots.forEach(slot => {
+            if(slot.id !== "adventuring:none")
+                this.slots.set(slot, new AdventuringEquipmentSlot(this.manager, this.game, this, slot))
+        });
+        
+        this.slots.forEach(slot => {
+            let $anchor = this.component.equipment.querySelector(`[data-slot="${slot.slotType.id}"]`);
+            if($anchor)
+                slot.component.mount($anchor);
+        });
+    }
+
     encode(writer) {
         writer.writeComplexMap(this.slots, (key, value, writer) => {
-            writer.writeString(key);
+            writer.writeNamespacedObject(key);
             value.encode(writer);
         });
     }
 
     decode(reader, version) {
         reader.getComplexMap((reader) => {
-            let key = reader.getString();
-            this.slots.get(key).decode(reader, version);
+            let slot = reader.getNamespacedObject(this.manager.itemSlots);
+            this.slots.get(slot).decode(reader, version);
         });
     }
 }
