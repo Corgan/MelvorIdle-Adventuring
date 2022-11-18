@@ -204,6 +204,11 @@ export class Adventuring extends SkillWithMastery {
         if(this.turnTimer.isActive)
             this.turnTimer.stop();
 
+        if(this.isActive) {
+            this.dungeon.reset();
+            this.trainer.go();
+        }
+
         this.isActive = false;
         this.game.renderQueue.activeSkills = true;
         this.game.clearActiveAction(false);
