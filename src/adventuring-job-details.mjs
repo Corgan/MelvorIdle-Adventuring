@@ -42,7 +42,7 @@ export class AdventuringJobDetails extends AdventuringPage {
         this.renderQueue.generators = true;
         this.renderQueue.spenders = true;
         this.renderQueue.scaling = true;
-        this.renderQueue.equippable = true;
+        this.renderQueue.equipable = true;
     }
 
     postDataRegistration() {
@@ -55,7 +55,7 @@ export class AdventuringJobDetails extends AdventuringPage {
         this.renderGenerators();
         this.renderSpenders();
         this.renderScaling();
-        this.renderEquippable();
+        this.renderEquipable();
     }
 
     renderName() {
@@ -119,11 +119,11 @@ export class AdventuringJobDetails extends AdventuringPage {
         this.renderQueue.scaling = false;
     }
 
-    renderEquippable() {
-        if(!this.renderQueue.equippable)
+    renderEquipable() {
+        if(!this.renderQueue.equipable)
             return;
         
-        this.component.equippable.children.forEach($el => {
+        this.component.equipable.children.forEach($el => {
             let [ $title, $valid ] = $el.children;
             let itemSlot = $valid.dataset.slot;
             let typesForSlot = this.manager.itemTypes.filter(type => type.slots.includes(itemSlot));
@@ -131,6 +131,6 @@ export class AdventuringJobDetails extends AdventuringPage {
             $valid.textContent = typesFilteredByJob.map(type => type.name).join(', ');
         });
 
-        this.renderQueue.equippable = false;
+        this.renderQueue.equipable = false;
     }
 }
