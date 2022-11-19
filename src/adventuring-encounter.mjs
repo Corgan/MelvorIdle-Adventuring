@@ -79,7 +79,22 @@ export class AdventuringEncounter extends AdventuringPage {
         this.party.back.setMonster(group[2]);
     }
 
-    processHit(currentTurn, currentHit) {
+    complete() {
+        this.reset();
+
+        let floor = this.manager.dungeon.floor;
+
+        let [x, y, type, explored] = floor.current;
+
+        if(type == AdventuringDungeonFloor.tiles.exit && explored) {
+            floor.complete();
+        } else {
+            this.manager.dungeon.updateFloorCards();
+            this.manager.dungeon.go();
+        }
+    }
+
+    async processHit(currentTurn, currentHit) {
         let effectType = currentHit.type;
         let targetType = currentHit.target;
         let amount = currentHit.getAmount(currentTurn.levels);
@@ -133,39 +148,39 @@ export class AdventuringEncounter extends AdventuringPage {
             targets = [currentTurn];
         }
 
-        if(targets.length > 0) {
+        if(targets.length > 0)
             targets.forEach(t => t.applyEffect(effectType, amount));
-        }
-    }
 
-    complete() {
-        this.reset();
+        if(currentHit.energy !== undefined)
+            currentTurn.addEnergy(currentHit.energy);
 
-        let floor = this.manager.dungeon.floor;
-
-        let [x, y, type, explored] = floor.current;
-
-        if(type == AdventuringDungeonFloor.tiles.exit && explored) {
-            floor.complete();
-        } else {
-            this.manager.dungeon.updateFloorCards();
-            this.manager.dungeon.go();
-        }
+        if(currentHit.delay !== undefined)
+            return new Promise(r => setTimeout(r, currentHit.delay));
+        
+        return Promise.resolve();
     }
 
     nextTurn() {
         let currentTurn = this.currentRound.shift();
         let currentAction = currentTurn.action;
+        
+        currentAction.hits.reduce(async (last, currentHit) => {
+            await last;
+            if(currentHit.repeat !== undefined) {
+                return new Array(currentHit.repeat).fill(0).reduce(async (repeat, _) => {
+                    await repeat;
+                    return this.processHit(currentTurn, currentHit);
+                }, Promise.resolve());
+            }
 
-        currentAction.hits.forEach(currentHit => this.processHit(currentTurn, currentHit));
+            return this.processHit(currentTurn, currentHit);
+        }, Promise.resolve());
 
-        if(currentAction.cost !== undefined && currentAction.cost >= currentTurn.energy) {
+        if(currentAction.cost !== undefined && currentAction.cost >= currentTurn.energy)
             currentTurn.removeEnergy(currentAction.cost);
-        }
 
-        if(currentAction.energy !== undefined) {
+        if(currentAction.energy !== undefined)
             currentTurn.addEnergy(currentAction.energy);
-        }
 
         this.nextRound.push(currentTurn);
         this.nextRound.sort((a,b) => b.levels.Agility - a.levels.Agility);

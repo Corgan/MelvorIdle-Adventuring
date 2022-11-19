@@ -36,7 +36,7 @@ export class AdventuringStashSlot {
             return;
         
         if(this.manager.stash.selectedSlot !== undefined) {
-            if(this.manager.stash.selectedSlot === this)  {
+            if(this.manager.stash.selectedSlot === this || this.empty)  {
                 this.manager.stash.clearSelected();
             } else {
                 this.manager.stash.selectSlot(this);
@@ -83,7 +83,8 @@ export class AdventuringStashSlot {
                     }
                 }
             } else {
-                this.manager.stash.selectSlot(this);
+                if(!this.empty)
+                    this.manager.stash.selectSlot(this);
             }
 
             this.manager.party.all.forEach(member => member.calculateLevels());

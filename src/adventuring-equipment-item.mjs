@@ -14,6 +14,14 @@ export class AdventuringEquipmentItem {
         this.levels.forEach((level, skill) => {
             html += `<div><small>${skill} => ${level}</small></div>`;
         });
+        let validJobs = this.jobs.filter(job => job.id !== "adventuring:none");
+        if(validJobs.length > 0) {
+            html += `</br><div><small>Usable By: </small></div>`;
+            let jobList = validJobs.map(job => job.name).join(', ');
+            if(this.jobs.length == this.manager.jobs.size)
+                jobList = "Any";
+            html += `<div><small>${jobList}</small></div>`;
+        }
         html += '</div>'
         return html;
     }

@@ -21,8 +21,6 @@ export class AdventuringLootGenerator {
                     return false;
                 if(!suffix.types.includes(baseItem.type))
                     return false;
-                if(baseItem.material !== undefined && !suffix.materials.includes(baseItem.material))
-                    return false;
                 return true;
             });
             let suffix = availableSuffixes[Math.floor(Math.random() * availableSuffixes.length)];
@@ -47,7 +45,7 @@ export class AdventuringLootGenerator {
         });
 
         let toDistribute = rolledLevel !== -1 ? rolledLevel - (avg_min * levelCount) : Math.floor(Math.random() * (max - (avg_min * levelCount)));
-        
+
         while(toDistribute > 0) {
             let skill = levels[Math.floor(Math.random() * levels.length)];
             levelsMap.set(skill, levelsMap.get(skill) + 1);

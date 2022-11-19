@@ -10,6 +10,7 @@ class AdventuringJobDetailsRenderQueue {
         this.icon = false;
         this.generators = false;
         this.spenders = false;
+        this.scaling = false;
     }
 }
 
@@ -40,6 +41,8 @@ export class AdventuringJobDetails extends AdventuringPage {
         this.renderQueue.icon = true;
         this.renderQueue.generators = true;
         this.renderQueue.spenders = true;
+        this.renderQueue.scaling = true;
+        this.renderQueue.equippable = true;
     }
 
     postDataRegistration() {
@@ -51,6 +54,8 @@ export class AdventuringJobDetails extends AdventuringPage {
         this.renderIcon();
         this.renderGenerators();
         this.renderSpenders();
+        this.renderScaling();
+        this.renderEquippable();
     }
 
     renderName() {
@@ -101,5 +106,31 @@ export class AdventuringJobDetails extends AdventuringPage {
         }).flat());
 
         this.renderQueue.spenders = false;
+    }
+
+    renderScaling() {
+        if(!this.renderQueue.scaling)
+            return;
+        
+        Object.entries(this.component.scaling.skills).forEach(([skill, text]) => {
+            text.textContent = this.job.levelScaling[skill] || "-";
+        });
+
+        this.renderQueue.scaling = false;
+    }
+
+    renderEquippable() {
+        if(!this.renderQueue.equippable)
+            return;
+        
+        this.component.equippable.children.forEach($el => {
+            let [ $title, $valid ] = $el.children;
+            let itemSlot = $valid.dataset.slot;
+            let typesForSlot = this.manager.itemTypes.filter(type => type.slots.includes(itemSlot));
+            let typesFilteredByJob = typesForSlot.filter(type => this.job.allowedItems.includes(type.id));
+            $valid.textContent = typesFilteredByJob.map(type => type.name).join(', ');
+        });
+
+        this.renderQueue.equippable = false;
     }
 }

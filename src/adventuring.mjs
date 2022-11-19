@@ -26,7 +26,6 @@ const { AdventuringEncounter } = await loadModule('src/adventuring-encounter.mjs
 const { AdventuringLootGenerator } = await loadModule('src/adventuring-loot-generator.mjs');
 
 const { AdventuringItemSlot } = await loadModule('src/adventuring-item-slot.mjs');
-const { AdventuringItemMaterial } = await loadModule('src/adventuring-item-material.mjs');
 const { AdventuringItemType } = await loadModule('src/adventuring-item-type.mjs');
 const { AdventuringItemPool } = await loadModule('src/adventuring-item-pool.mjs');
 const { AdventuringItemTier } = await loadModule('src/adventuring-item-tier.mjs');
@@ -60,7 +59,6 @@ export class Adventuring extends SkillWithMastery {
         this.suffixes = new NamespaceRegistry(this.game.registeredNamespaces);
 
         this.itemSlots = new NamespaceRegistry(this.game.registeredNamespaces);
-        this.itemMaterials = new NamespaceRegistry(this.game.registeredNamespaces);
         this.itemTypes = new NamespaceRegistry(this.game.registeredNamespaces);
         this.itemPools = new NamespaceRegistry(this.game.registeredNamespaces);
         this.itemTiers = new NamespaceRegistry(this.game.registeredNamespaces);
@@ -330,11 +328,6 @@ export class Adventuring extends SkillWithMastery {
             this.itemSlots.registerObject(slot);
         });
 
-        data.itemMaterials.forEach(data => {
-            let material = new AdventuringItemMaterial(namespace, data, this, this.game);
-            this.itemMaterials.registerObject(material);
-        });
-
         data.itemTypes.forEach(data => {
             let itemType = new AdventuringItemType(namespace, data, this, this.game);
             this.itemTypes.registerObject(itemType);
@@ -385,6 +378,15 @@ export class Adventuring extends SkillWithMastery {
         this.trainer.postDataRegistration();
         this.stash.postDataRegistration();
         this.crossroads.postDataRegistration();
+
+        let capesToExclude = ["melvorF:Max_Skillcape", "melvorTotH:Superior_Max_Skillcape"];
+        let skillCapes = this.game.shop.purchases.filter(purchase => capesToExclude.includes(purchase.id));
+        skillCapes.forEach(cape => {
+            let allSkillLevelsRequirement = cape.purchaseRequirements.find(req => req.type === "AllSkillLevels");
+            if(allSkillLevelsRequirement.exceptions === undefined)
+                allSkillLevelsRequirement.exceptions = new Set();
+            allSkillLevelsRequirement.exceptions.add(this);
+        });
     }
 
     encode(writer) {

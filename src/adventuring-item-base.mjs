@@ -11,8 +11,6 @@ export class AdventuringItemBase extends NamespacedObject {
 
         this.type = data.type;
         this.tier = data.tier;
-        if(data.material)
-            this.material = data.material;
     }
 
     get media() {
@@ -21,8 +19,6 @@ export class AdventuringItemBase extends NamespacedObject {
 
     get jobs() {
         let jobs = this.manager.jobs.allObjects.filter(job => job.allowedItems.includes(this.type));
-        if(this.material !== undefined)
-            jobs = jobs.filter(job => job.allowedMaterials.includes(this.material));
         return jobs;
     }
 

@@ -98,6 +98,12 @@ export class AdventuringArea extends NamespacedObject {
             return;
 
         this.component.clickable.classList.toggle('pointer-enabled', this.unlocked);
+        
+        if(this.unlocked) {
+            this.component.tooltip.setContent(this.name);
+        } else {
+            this.component.tooltip.setContent("Locked");
+        }
 
         this.renderQueue.clickable = false;
     }

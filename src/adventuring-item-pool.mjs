@@ -8,7 +8,21 @@ export class AdventuringItemPool extends NamespacedObject {
         this.manager = manager;
         this.game = game;
 
+        this.type = data.type;
+        this.entries = data.entries;
+        
         this.pool = new AdventuringWeightedTable(this.manager, this.game);
-        this.pool.loadTable(data.types);
+        this.pool.loadTable(data.entries);
+    }
+
+    getEntry() {
+        if(this.type === "type")
+            return this.pool.getEntry();
+        
+        if(this.type == "pool") {
+            let poolID = this.pool.getEntry();
+            let itemPool = this.manager.itemPools.getObjectByID(poolID);
+            return itemPool.getEntry();
+        }
     }
 }

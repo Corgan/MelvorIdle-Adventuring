@@ -6,6 +6,7 @@ export class AdventuringItemType extends NamespacedObject {
         this.manager = manager;
         this.game = game;
 
+        this.name = data.name;
         this.slots = data.slots;
         if(data.occupies)
             this.occupies = data.occupies;

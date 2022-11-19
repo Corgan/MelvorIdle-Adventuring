@@ -9,6 +9,5 @@ export class AdventuringSuffix extends NamespacedObject {
         this.levels = data.levels;
         this.tier = data.tier;
         this.types = data.types;
-        this.materials = data.materials;
     }
 }

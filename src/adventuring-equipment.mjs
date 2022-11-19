@@ -18,9 +18,11 @@ export class AdventuringEquipment {
     get levels() {
         //['Hitpoints', 'Attack', 'Strength', 'Defence', 'Ranged', 'Magic', 'Prayer', 'Agility']
         return [...this.slots].reduce((total, [_, slot]) => {
-            [...slot.levels].forEach(([skill, level]) => {
-                total[skill] = (total[skill] !== undefined ? total[skill] + level : level);
-            });
+            if(!slot.empty && !slot.occupied && slot.canEquip(slot.item)) {
+                [...slot.levels].forEach(([skill, level]) => {
+                    total[skill] = (total[skill] !== undefined ? total[skill] + level : level);
+                });
+            }
             return total;
         }, {})
     }

@@ -18,21 +18,42 @@ class AdventuringAbilityHit {
         this.game = game;
         this.target = data.target;
         this.type = data.type;
-
-        if(data.scaling)
-            this.scaling = data.scaling;
+        
+        if(data.energy)
+            this.energy = data.energy;
         if(data.base)
             this.base = data.base;
+        if(data.scaling)
+            this.scaling = data.scaling;
+        if(data.delay)
+            this.delay = data.delay;
+        if(data.repeat)
+            this.repeat = data.repeat;
     }
 
-    getAmount(levels) {
+    getAmount(levels, isDesc=false) {
         let amount = this.base !== undefined ? this.base : 0;
-        if(this.scaling !== undefined)
-            amount += Object.entries(this.scaling).reduce((bonus, [skill, scale]) => {
-                let level = levels[skill] !== undefined ? levels[skill] : 0;
-                return bonus + (level * scale)
-            }, 0);
-        return Math.floor(amount);
+        if(isDesc) {
+            let ret = amount;
+            if(this.scaling !== undefined) {
+                let showScale = Object.keys(levels).length === 0;
+                ret += Object.entries(this.scaling).reduce((str, [skill, scale]) => {
+                    let level = levels[skill] !== undefined ? levels[skill] : 0;
+                    let value = showScale ? scale : Math.floor(level * scale);
+                    let skillLowerCase = skill.toLowerCase();
+                    let skillImg = `<img class="skill-icon-xxs" style="height: .66rem; width: .66rem; margin-top: 0;" src="assets/media/skills/${skillLowerCase}/${skillLowerCase}.svg">`
+                    return str + ` + ${value} ${skillImg}`;
+                }, '');
+            }
+            return ret;
+        } else {
+            if(this.scaling !== undefined)
+                amount += Object.entries(this.scaling).reduce((bonus, [skill, scale]) => {
+                    let level = levels[skill] !== undefined ? levels[skill] : 0;
+                    return bonus + (level * scale)
+                }, 0);
+            return Math.floor(amount);
+        }
     }
 }
 
@@ -131,8 +152,8 @@ export class AdventuringAbility extends NamespacedObject {
         }, true);
     }
 
-    getDescription(levels={}) {
-        return this.hits.reduce((desc, hit, i) =>  desc.replace(`{hit.${i}.amount}`, hit.getAmount(levels)), this.description);
+    getDescription(levels={}, isDesc=false) {
+        return this.hits.reduce((desc, hit, i) =>  desc.replace(`{hit.${i}.amount}`, hit.getAmount(levels, isDesc)), this.description);
     }
 
     selectTargets(heroes, enemies) {
@@ -176,9 +197,9 @@ export class AdventuringAbility extends NamespacedObject {
             let levels = {};
             if(this.renderQueue.descriptionCharacter)
                 levels = this.renderQueue.descriptionCharacter.levels;
-                this.component.description.textContent = this.getDescription(levels);
+                this.component.description.innerHTML = this.getDescription(levels, true);
             
-            this.details.description.textContent = this.getDescription({});
+            this.details.description.innerHTML = this.getDescription({}, true);
 
         } else {
             this.details.description.textContent = "???";

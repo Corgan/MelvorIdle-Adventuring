@@ -93,7 +93,7 @@ export class AdventuringDungeon extends AdventuringPage {
         
         let poolID = lootGen.getEntry();
         let itemPool = this.manager.itemPools.getObjectByID(poolID);
-        let itemType = itemPool.pool.getEntry();
+        let itemType = itemPool.getEntry();
         let rolledLevel = Math.floor(Math.random() * (max - min + 1)) + min;
 
         let itemTiers = this.manager.itemTiers.allObjects.filter(tier => {
