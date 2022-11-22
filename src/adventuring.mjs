@@ -451,7 +451,7 @@ export class Adventuring extends SkillWithMastery {
         writer.writeBoolean(this.isActive);
 
         let end = writer.byteOffset;
-        console.log(`Wrote ${end-start} bytes for Adventuring save`);
+        //console.log(`Wrote ${end-start} bytes for Adventuring save`);
         return writer;
     }
 
@@ -477,7 +477,7 @@ export class Adventuring extends SkillWithMastery {
         }
 
         let end = reader.byteOffset;
-        console.log(`Read ${end-start} bytes for Adventuring save`);
+        //console.log(`Read ${end-start} bytes for Adventuring save`);
     }
 
     checkpoints = [
