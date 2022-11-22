@@ -199,10 +199,8 @@ export class AdventuringEncounter extends AdventuringPage {
         if(targets.length > 0) {
             targets.forEach(t => {
                 if(t !== undefined) {
+                    this.manager.log.add(`${this.currentTurn.name} ${effectType}s ${t.name} with ${this.currentAction.name} for ${amount}`);
                     t.applyEffect(effectType, amount);
-                    this.manager.log.add(`${this.currentTurn.name} ${this.currentAction.name} ${effectType} ${t.name} for ${amount}`);
-                    if(t.dead)
-                        this.manager.log.add(`${t.name} dies.`);
                 }
             });
             this.hitHistory.push(targets);

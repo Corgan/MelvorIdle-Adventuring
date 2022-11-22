@@ -18,7 +18,6 @@ export class AdventuringMessageLog {
         this.component = new AdventuringMessageLogUIComponent(this.manager, this.game, this);
 
         this.messages = [];
-        this.lastScrollTop = -1;
     }
 
     add(body) {
@@ -45,6 +44,8 @@ export class AdventuringMessageLog {
         let scroll = this.component.$elements[0].parentElement;
 
         let atBottom = scroll.clientHeight + scroll.scrollTop + 5 >= scroll.scrollHeight;
+        let oldScrollHeight = scroll.scrollHeight;
+        let oldScrollTop = scroll.scrollTop;
 
         this.messages.forEach(message => message.render());
 
@@ -54,17 +55,14 @@ export class AdventuringMessageLog {
             let scrollToHeight = scroll.scrollHeight - scroll.clientHeight;
             scroll.scroll({
                 top: scrollToHeight,
-                left: 0,
-                behavior: 'smooth'
+                left: 0
               });
         } else {
-            let scrollByHeight = this.lastScrollTop - scroll.scrollTop;
-            scroll.scrollBy({
-                top: -scrollByHeight,
-                left: 0,
-                behavior: 'smooth'
-            });
-            this.lastScrollTop = scroll.scrollTop;
+            if(oldScrollHeight === scroll.scrollHeight)
+                scroll.scrollBy({
+                    top: scroll.scrollTop - oldScrollTop,
+                    left: 0
+                });
         }
 
         this.renderQueue.messages = false;

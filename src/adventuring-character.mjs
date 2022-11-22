@@ -194,7 +194,7 @@ class AdventuringCharacter {
     }
 
     onDeath() {
-        
+        this.manager.log.add(`${this.name} dies`);
     }
 
     render() {

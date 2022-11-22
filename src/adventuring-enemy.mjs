@@ -61,6 +61,7 @@ export class AdventuringEnemy extends AdventuringCharacter {
             this.manager.addXP(this.xp);
             this.manager.party.all.filter(member => !member.dead).forEach(member => {
                 if(member.combatJob.isMilestoneReward) {
+                    this.manager.log.add(`${member.name} gains ${this.xp} ${member.combatJob.name} xp`);
                     this.manager.addMasteryXP(member.combatJob, this.xp);
                     this.manager.addMasteryPoolXP(this.xp);
                 }

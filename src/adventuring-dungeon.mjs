@@ -51,21 +51,21 @@ export class AdventuringDungeon extends AdventuringPage {
     }
 
     triggerEmpty() {
-        this.manager.log.add(`Empty Room`);
+        //this.manager.log.add(`Empty room`);
     }
 
     triggerStart() {
-        this.manager.log.add(`Starting ${this.area.name} Floor ${this.progress+1}`);
+        this.manager.log.add(`Starting ${this.area.name} floor ${this.progress+1}`);
     }
 
     triggerExit() {
-        this.manager.log.add(`Exit Floor Encounter`);
+        this.manager.log.add(`Starting floor exit encounter`);
         this.manager.encounter.generateEncounter(true);
         this.manager.encounter.startEncounter();
     }
 
     triggerEncounter() {
-        this.manager.log.add(`Random Encounter`);
+        this.manager.log.add(`Starting random encounter`);
         this.manager.encounter.generateEncounter();
         this.manager.encounter.startEncounter();
     }
@@ -74,7 +74,11 @@ export class AdventuringDungeon extends AdventuringPage {
         let { min, max } = this.area.tiles.treasure.loot.range;
 
         let loot = this.grantLoot(min, max);
-        this.manager.log.add(`Found ${loot.name} in a treasure chest`);
+        if(loot) {
+            this.manager.log.add(`Found ${loot.name} in a treasure chest`);
+        } else {
+            this.manager.log.add(`Stash is full`);
+        }
     }
 
     triggerTrap() {
@@ -83,7 +87,7 @@ export class AdventuringDungeon extends AdventuringPage {
         this.manager.party.all.forEach(member => {
             let amount = Math.floor(member.maxHitpoints * damage);
             member.damage(amount);
-            this.manager.log.add(`Random Trap did ${amount} to ${member.name}`);
+            this.manager.log.add(`Random trap did ${amount} damage to ${member.name}`);
         });
 
         if(this.manager.party.all.every(member => member.dead)) {
@@ -197,9 +201,13 @@ export class AdventuringDungeon extends AdventuringPage {
     }
 
     complete() {
+        this.manager.log.add(`Completed ${this.area.name}`);
         let loot = this.grantLoot(this.area.loot.range.min, this.area.loot.range.max);
-        this.manager.log.add(`Completed ${this.area.name} and received ${loot.name}`);
-
+        if(loot) {
+            this.manager.log.add(`Received ${loot.name}`);
+        } else {
+            this.manager.log.add(`Stash is full`);
+        }
         if(!this.manager.party.all.every(hero => hero.dead)) {
             this.start();
         } else {
