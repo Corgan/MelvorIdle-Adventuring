@@ -1,6 +1,7 @@
 const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringPage } = await loadModule('src/adventuring-page.mjs');
+const { AdventuringStats } = await loadModule('src/adventuring-stats.mjs');
 
 const { AdventuringJobDetailsUIComponent } = await loadModule('src/components/adventuring-job-details.mjs');
 
@@ -19,7 +20,11 @@ export class AdventuringJobDetails extends AdventuringPage {
         super(manager, game);
         this.manager = manager;
         this.game = game;
-        this.component = new AdventuringJobDetailsUIComponent(this.manager, this.game);
+        this.component = new AdventuringJobDetailsUIComponent(this.manager, this.game, this);
+
+        this.scaling = new AdventuringStats(this.manager, this.game);
+        this.scaling.component.mount(this.component.scaling);
+
         this.renderQueue = new AdventuringJobDetailsRenderQueue();
     }
 
@@ -37,11 +42,17 @@ export class AdventuringJobDetails extends AdventuringPage {
 
     setJob(job) {
         this.job = job;
+
+        this.scaling.reset();
+        this.job.scaling.forEach((value, stat) => {
+            this.scaling.set(stat, value);
+        });
+        this.scaling.renderQueue.stats = true;
+
         this.renderQueue.name = true;
         this.renderQueue.icon = true;
         this.renderQueue.generators = true;
         this.renderQueue.spenders = true;
-        this.renderQueue.scaling = true;
         this.renderQueue.equipable = true;
     }
 
@@ -54,8 +65,8 @@ export class AdventuringJobDetails extends AdventuringPage {
         this.renderIcon();
         this.renderGenerators();
         this.renderSpenders();
-        this.renderScaling();
         this.renderEquipable();
+        this.scaling.render();
     }
 
     renderName() {
@@ -80,14 +91,19 @@ export class AdventuringJobDetails extends AdventuringPage {
         if(!this.renderQueue.generators)
             return;
 
-        let abilities = this.manager.generators.allObjects.filter(g => g.unlockedBy(this.job));
+        if(this.job.isPassive) {
+            this.component.generators.classList.add('d-none');
+        } else {
+            this.component.generators.classList.remove('d-none');
+            let abilities = this.manager.generators.allObjects.filter(g => g.unlockedBy(this.job));
 
-        this.component.generators.replaceChildren(...abilities.map(ability => {
-            ability.renderQueue.description = true;
-            ability.renderQueue.name = true;
-            ability.render();
-            return ability.details.$elements;
-        }).flat());
+            this.component.generators.replaceChildren(...abilities.map(ability => {
+                ability.renderQueue.description = true;
+                ability.renderQueue.name = true;
+                ability.render();
+                return ability.details.$elements;
+            }).flat());
+        }
 
         this.renderQueue.generators = false;
     }
@@ -96,40 +112,38 @@ export class AdventuringJobDetails extends AdventuringPage {
         if(!this.renderQueue.spenders)
             return;
 
-        let abilities = this.manager.spenders.allObjects.filter(g => g.unlockedBy(this.job));
+        if(this.job.isPassive) {
+            this.component.spenders.classList.add('d-none');
+        } else {
+            this.component.spenders.classList.remove('d-none');
+            let abilities = this.manager.spenders.allObjects.filter(g => g.unlockedBy(this.job));
 
-        this.component.spenders.replaceChildren(...abilities.map(ability => {
-            ability.renderQueue.description = true;
-            ability.renderQueue.name = true;
-            ability.render();
-            return ability.details.$elements;
-        }).flat());
+            this.component.spenders.replaceChildren(...abilities.map(ability => {
+                ability.renderQueue.description = true;
+                ability.renderQueue.name = true;
+                ability.render();
+                return ability.details.$elements;
+            }).flat());
+        }
 
         this.renderQueue.spenders = false;
-    }
-
-    renderScaling() {
-        if(!this.renderQueue.scaling)
-            return;
-        
-        Object.entries(this.component.scaling.skills).forEach(([skill, text]) => {
-            text.textContent = this.job.levelScaling[skill] || "-";
-        });
-
-        this.renderQueue.scaling = false;
     }
 
     renderEquipable() {
         if(!this.renderQueue.equipable)
             return;
-        
-        this.component.equipable.children.forEach($el => {
-            let [ $title, $valid ] = $el.children;
-            let itemSlot = $valid.dataset.slot;
-            let typesForSlot = this.manager.itemTypes.filter(type => type.slots.includes(itemSlot));
-            let typesFilteredByJob = typesForSlot.filter(type => this.job.allowedItems.includes(type.id));
-            $valid.textContent = typesFilteredByJob.map(type => type.name).join(', ');
-        });
+        if(this.job.isPassive) {
+            this.component.equipable.classList.add('d-none');
+        } else {
+            this.component.equipable.classList.remove('d-none');
+            this.component.equipable.children.forEach($el => {
+                let [ $title, $valid ] = $el.children;
+                let itemSlot = $valid.dataset.slot;
+                let typesForSlot = this.manager.itemTypes.filter(type => type.slots.includes(itemSlot));
+                let typesFilteredByJob = typesForSlot.filter(type => this.job.allowedItems !== undefined && this.job.allowedItems.includes(type.id));
+                $valid.textContent = typesFilteredByJob.map(type => type.name).join(', ');
+            });
+        }
 
         this.renderQueue.equipable = false;
     }

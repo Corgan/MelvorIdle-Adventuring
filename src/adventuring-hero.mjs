@@ -2,41 +2,21 @@ const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringCharacter, AdventuringCharacterRenderQueue } = await loadModule('src/adventuring-character.mjs');
 const { AdventuringEquipment } = await loadModule('src/adventuring-equipment.mjs');
+const { AdventuringStats } = await loadModule('src/adventuring-stats.mjs');
 
 class AdventuringHeroRenderQueue extends AdventuringCharacterRenderQueue {
     constructor() {
         super(...arguments);
-        this.job = false;
+        this.jobs = false;
     }
 }
 
 export class AdventuringHero extends AdventuringCharacter {
     constructor(manager, game, party) {
         super(manager, game, party);
-        this.baseLevels = {
-            Hitpoints: 10,
-            Defence: 1,
-            Agility: 1,
-            Attack: 1,
-            Strength: 1,
-            Ranged: 1,
-            Magic: 1,
-            Prayer: 1
-        };
-
-        this.levels = {
-            Hitpoints: 0,
-            Defence: 0,
-            Agility: 0,
-            Attack: 0,
-            Strength: 0,
-            Ranged: 0,
-            Magic: 0,
-            Prayer: 0
-        }
 
         this.locked = false;
-        this.equipment = new AdventuringEquipment(manager, game, this);
+        this.equipment = new AdventuringEquipment(this.manager, this.game, this);
 
         this.component.equipment.classList.remove('d-none');
         this.equipment.component.mount(this.component.equipment);
@@ -44,21 +24,34 @@ export class AdventuringHero extends AdventuringCharacter {
         this.component.generator.attachSelector(this, 'generator');
         this.component.spender.attachSelector(this, 'spender');
 
+        this.component.combatJob.attachSelector(this, 'combatJob');
+        this.component.passiveJob.attachSelector(this, 'passiveJob');
+
         this.renderQueue = new AdventuringHeroRenderQueue();
     }
 
     get media() {
-        if(this.job)
-            return this.job.media;
+        if(this.combatJob)
+            return this.combatJob.media;
         return cdnMedia('assets/media/main/question.svg');
+    }
+
+    postDataRegistration() {
+        this.manager.stats.forEach(stat => {
+            if(stat.base !== undefined)
+                this.stats.set(stat, stat.base);
+        });
+        this.equipment.postDataRegistration();
     }
 
     onLoad() {
         super.onLoad();
 
-        if(this.job === undefined) // Default to None
-            this.setJob(this.manager.jobs.getObjectByID('adventuring:none'));
-        this.renderQueue.job = true;
+        if(this.combatJob === undefined) // Default to None
+            this.setCombatJob(this.manager.jobs.getObjectByID('adventuring:none'));
+        if(this.passiveJob === undefined) // Default to None
+            this.setPassiveJob(this.manager.jobs.getObjectByID('adventuring:none'));
+        this.renderQueue.jobs = true;
 
         if(this.generator.id == 'adventuring:none')
             this.setGenerator(this.manager.generators.getObjectByID('adventuring:slap'));
@@ -68,7 +61,7 @@ export class AdventuringHero extends AdventuringCharacter {
 
         this.equipment.onLoad();
 
-        this.calculateLevels();
+        this.calculateStats();
             
         if(this.name === undefined) { // New game :)
             this.name = this.getRandomName(this.manager.party.all.map(member => member.name));
@@ -82,27 +75,38 @@ export class AdventuringHero extends AdventuringCharacter {
         this.card.setIcon(this.media);
     }
 
-    calculateLevels() {
+    calculateStats() {
         let shouldAdjust = true;
         if(this.manager.isActive || this.hitpoints > this.maxHitpoints) // Loading Shenanigans
             shouldAdjust = false;
         let hitpointPct = this.hitpoints / this.maxHitpoints;
 
-        let adjustedLevels = Object.entries(this.baseLevels).map(([skill, level]) => {
-            let adjustedLevel = level;
-            if(this.job && this.job.levels[skill] !== undefined)
-                adjustedLevel += this.job.levels[skill];
-            if(this.equipment.levels[skill] !== undefined)
-                adjustedLevel += this.equipment.levels[skill];
-            return [skill, adjustedLevel];
+        this.stats.reset();
+
+        this.manager.stats.forEach(stat => {
+            if(stat.base !== undefined)
+                this.stats.set(stat, stat.base);
         });
 
-        this.levels = Object.fromEntries(adjustedLevels);
+        if(this.combatJob !== undefined) {
+            this.combatJob.calculateStats();
+            this.combatJob.stats.forEach((value, stat) => this.stats.set(stat, this.stats.get(stat) + value));
+        }
 
+        if(this.passiveJob !== undefined) {
+            this.passiveJob.calculateStats();
+            this.passiveJob.stats.forEach((value, stat) => this.stats.set(stat, this.stats.get(stat) + value));
+        }
+        
+        if(this.equipment !== undefined) {
+            this.equipment.calculateStats();
+            this.equipment.stats.forEach((value, stat) => this.stats.set(stat, this.stats.get(stat) + value));
+        }
+        
         if(shouldAdjust)
             this.hitpoints = Math.min(this.maxHitpoints, Math.floor(this.maxHitpoints * hitpointPct));
 
-        this.renderQueue.levels = true;
+        this.stats.renderQueue.stats = true;
         this.renderQueue.hitpoints = true;
 
         this.renderQueue.generator = true;
@@ -122,9 +126,29 @@ export class AdventuringHero extends AdventuringCharacter {
         this.card.setName(this.name);
     }
 
-    setJob(job) {
-        this.job = job;
-        this.calculateLevels();
+    setCombatJob(combatJob) {
+        this.combatJob = combatJob;
+        this.calculateStats();
+
+        if(!this.generator.canEquip(this))
+            this.setGenerator(this.manager.generators.getObjectByID('adventuring:slap'));
+        
+        if(!this.spender.canEquip(this))
+            this.setSpender(this.manager.spenders.getObjectByID('adventuring:backhand'));
+
+        this.renderQueue.name = true;
+        this.renderQueue.icon = true;
+
+        this.equipment.slots.forEach(slot => slot.renderQueue.valid = true);
+
+        this.card.setIcon(this.media);
+
+        this.manager.party.all.forEach(member => member.renderQueue.jobs = true);
+    }
+
+    setPassiveJob(passiveJob) {
+        this.passiveJob = passiveJob;
+        this.calculateStats();
 
         if(!this.generator.canEquip(this))
             this.setGenerator(this.manager.generators.getObjectByID('adventuring:slap'));
@@ -158,18 +182,34 @@ export class AdventuringHero extends AdventuringCharacter {
         this.renderQueue.name = false;
     }
 
+    renderIcon() {
+        if(!this.renderQueue.icon)
+            return;
+
+        if(this.combatJob !== undefined && this.passiveJob !== undefined) {
+            this.component.icon.classList.add('d-none');
+        } else {
+            this.component.icon.classList.remove('d-none');
+            this.component.icon.firstElementChild.src = this.combatJob.media;
+        }
+
+        this.renderQueue.icon = false;
+    }
+
     renderJobs() {
         if(!this.renderQueue.jobs)
             return;
-        this.component.job.clearOptions();
-        this.manager.availableJobs.forEach(job => {
-            if(job.unlocked)
-                this.component.job.addOption([createElement('span', { text: job.name })], () => this.setJob(job));
-        });
 
-        this.component.job.setButtonText(this.job.name);
+        this.component.jobs.show();
+        this.component.combatJob.icon.src = this.combatJob.media;
+        this.component.combatJob.tooltip.setContent(this.combatJob.name);
+        this.component.combatJob.styling.classList.toggle('pointer-enabled', !this.locked);
+        this.component.combatJob.styling.classList.toggle('bg-combat-inner-dark', this.locked);
 
-        this.component.jobDropdown.classList.toggle('invisible', this.locked);
+        this.component.passiveJob.icon.src = this.passiveJob.media;
+        this.component.passiveJob.tooltip.setContent(this.passiveJob.name);
+        this.component.passiveJob.styling.classList.toggle('pointer-enabled', !this.locked);
+        this.component.passiveJob.styling.classList.toggle('bg-combat-inner-dark', this.locked);
 
         this.renderQueue.jobs = false;
     }
@@ -179,7 +219,7 @@ export class AdventuringHero extends AdventuringCharacter {
             return;
 
         this.component.generator.name.textContent = this.generator.name;
-        this.component.generator.tooltip.setContent(this.generator.getDescription(this.levels));
+        this.component.generator.tooltip.setContent(this.generator.getDescription(this.stats));
         this.component.generator.styling.classList.toggle('pointer-enabled', !this.locked);
         this.component.generator.styling.classList.toggle('bg-combat-inner-dark', this.locked);
         this.component.generator.styling.classList.toggle('bg-combat-menu-selected', this.generator === this.action && this.highlight);
@@ -192,7 +232,7 @@ export class AdventuringHero extends AdventuringCharacter {
             return;
 
         this.component.spender.name.textContent = this.spender.name;
-        this.component.spender.tooltip.setContent(this.spender.getDescription(this.levels));
+        this.component.spender.tooltip.setContent(this.spender.getDescription(this.stats));
         this.component.spender.styling.classList.toggle('pointer-enabled', !this.locked);
         this.component.spender.styling.classList.toggle('bg-combat-inner-dark', this.locked);
         this.component.spender.styling.classList.toggle('bg-combat-menu-selected', this.spender === this.action && this.highlight);
@@ -226,15 +266,12 @@ export class AdventuringHero extends AdventuringCharacter {
 
         return names[Math.floor(Math.random()*names.length)];
     }
-
-    postDataRegistration() {
-        this.equipment.postDataRegistration();
-    }
     
     encode(writer) {
         super.encode(writer);
         writer.writeString(this.name);
-        writer.writeNamespacedObject(this.job);
+        writer.writeNamespacedObject(this.combatJob);
+        writer.writeNamespacedObject(this.passiveJob);
         this.equipment.encode(writer);
         return writer;
     }
@@ -242,11 +279,18 @@ export class AdventuringHero extends AdventuringCharacter {
     decode(reader, version) {
         super.decode(reader, version);
         this.name = reader.getString();
-        const job = reader.getNamespacedObject(this.manager.jobs);
-        if (typeof job === 'string')
-            this.setJob(undefined);
+
+        const combatJob = reader.getNamespacedObject(this.manager.jobs);
+        if (typeof combatJob === 'string')
+            this.setCombatJob(undefined);
         else
-            this.setJob(job);
+            this.setCombatJob(combatJob);
+
+        const passiveJob = reader.getNamespacedObject(this.manager.jobs);
+        if (typeof passiveJob === 'string')
+            this.setPassiveJob(undefined);
+        else
+            this.setPassiveJob(passiveJob);
         this.equipment.decode(reader, version);
     }
 }

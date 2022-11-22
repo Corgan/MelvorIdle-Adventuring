@@ -11,16 +11,6 @@ class AdventuringEnemyRenderQueue extends AdventuringCharacterRenderQueue {
 export class AdventuringEnemy extends AdventuringCharacter {
     constructor(manager, game, party) {
         super(manager, game, party);
-        this.levels = {
-            Hitpoints: 0,
-            Defence: 0,
-            Agility: 0,
-            Attack: 0,
-            Strength: 0,
-            Ranged: 0,
-            Magic: 0,
-            Prayer: 0
-        };
         this.name = "";
         this.media = cdnMedia('assets/media/main/question.svg');
 
@@ -40,8 +30,11 @@ export class AdventuringEnemy extends AdventuringCharacter {
         this.renderQueue.name = true;
         this.card.setName(this.name);
 
-        this.levels = monster.levels;
-        this.renderQueue.levels = true;
+        monster.stats.forEach(({ id, value }) => {
+            this.stats.set(id, value);
+        })
+        
+        this.stats.renderQueue.stats = true;
 
         this.xp = monster.xp;
         
@@ -67,8 +60,8 @@ export class AdventuringEnemy extends AdventuringCharacter {
         if(this.xp) {
             this.manager.addXP(this.xp);
             this.manager.party.all.filter(member => !member.dead).forEach(member => {
-                if(member.job.isMilestoneReward) {
-                    this.manager.addMasteryXP(member.job, this.xp);
+                if(member.combatJob.isMilestoneReward) {
+                    this.manager.addMasteryXP(member.combatJob, this.xp);
                     this.manager.addMasteryPoolXP(this.xp);
                 }
             });

@@ -19,7 +19,7 @@ export class AdventuringOverview {
         this.game = game;
 
         this.renderQueue = new OverviewRenderQueue();
-        this.component = new AdventuringOverviewUIComponent(this.manager, this.game);
+        this.component = new AdventuringOverviewUIComponent(this.manager, this.game, this);
 
         this.component.trainerButton.onclick = () => this.manager.trainer.go();
         this.component.stashButton.onclick = () => this.manager.stash.go();
@@ -90,8 +90,12 @@ export class AdventuringOverview {
 
         this.component.turnProgress.classList.toggle('d-none', !this.manager.isActive);
 
-        if(this.manager.turnTimer.isActive) {
-            this.component.turnProgressBar.animateProgressFromTimer(this.manager.turnTimer);
+        if(this.manager.encounter.hitTimer.isActive) {
+            this.component.turnProgressBar.animateStriped();
+        } else if(this.manager.encounter.turnTimer.isActive) {
+            this.component.turnProgressBar.animateProgressFromTimer(this.manager.encounter.turnTimer);
+        } else if(this.manager.dungeon.exploreTimer.isActive) {
+            this.component.turnProgressBar.animateProgressFromTimer(this.manager.dungeon.exploreTimer);
         } else {
             this.component.turnProgressBar.stopAnimation();
         }

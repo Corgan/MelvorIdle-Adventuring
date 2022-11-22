@@ -9,7 +9,7 @@ class AdventuringParty {
         this.game = game;
         this.manager = manager;
         
-        this.component = new AdventuringPartyUIComponent(this.manager, this.game);
+        this.component = new AdventuringPartyUIComponent(this.manager, this.game, this);
     }
 
     get all() {

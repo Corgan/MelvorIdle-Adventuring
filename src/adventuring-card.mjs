@@ -23,7 +23,7 @@ export class AdventuringCard {
         this.highlight = false;
         this.fade = false;
 
-        this.component = new AdventuringCardUIComponent(this.manager, this.game);
+        this.component = new AdventuringCardUIComponent(this.manager, this.game, this);
     }
 
     setName(name) {

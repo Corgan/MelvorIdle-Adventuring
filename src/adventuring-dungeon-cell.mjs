@@ -24,7 +24,7 @@ export class AdventuringDungeonCell {
         this.fade = false;
         this.invisible = false;
 
-        this.component = new AdventuringDungeonCellUIComponent(this.manager, this.game);
+        this.component = new AdventuringDungeonCellUIComponent(this.manager, this.game, this);
     }
 
     setIcon(icon) {

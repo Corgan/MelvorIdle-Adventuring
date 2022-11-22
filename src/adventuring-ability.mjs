@@ -1,5 +1,7 @@
 const { loadModule } = mod.getContext(import.meta);
 
+const { AdventuringStats } = await loadModule('src/adventuring-stats.mjs');
+
 const { AdventuringAbilityUIComponent } = await loadModule('src/components/adventuring-ability.mjs');
 const { AdventuringAbilityDetailsUIComponent } = await loadModule('src/components/adventuring-ability-details.mjs');
 
@@ -23,34 +25,42 @@ class AdventuringAbilityHit {
             this.energy = data.energy;
         if(data.base)
             this.base = data.base;
-        if(data.scaling)
-            this.scaling = data.scaling;
+        if(data.scaling) {
+            this._scaling = data.scaling;
+            this.scaling = new AdventuringStats(this.manager, this.game);
+        }
         if(data.delay)
             this.delay = data.delay;
         if(data.repeat)
             this.repeat = data.repeat;
     }
 
-    getAmount(levels, isDesc=false) {
+    postDataRegistration() {
+        if(this._scaling !== undefined) {
+            this._scaling.forEach(({ id, value }) => {
+                this.scaling.set(id, value);
+            });
+            delete this._scaling;
+        }
+    }
+
+    getAmount(stats, isDesc=false) {
         let amount = this.base !== undefined ? this.base : 0;
         if(isDesc) {
             let ret = amount;
             if(this.scaling !== undefined) {
-                let showScale = Object.keys(levels).length === 0;
-                ret += Object.entries(this.scaling).reduce((str, [skill, scale]) => {
-                    let level = levels[skill] !== undefined ? levels[skill] : 0;
-                    let value = showScale ? scale : Math.floor(level * scale);
-                    let skillLowerCase = skill.toLowerCase();
-                    let skillImg = `<img class="skill-icon-xxs" style="height: .66rem; width: .66rem; margin-top: 0;" src="assets/media/skills/${skillLowerCase}/${skillLowerCase}.svg">`
-                    return str + ` + ${value} ${skillImg}`;
+                let showScale = !stats || stats.size === 0;
+                ret += [...this.scaling].reduce((str, [stat, scale]) => {
+                    let value = showScale ? scale : Math.floor(stats.get(stat) * scale);
+                    let statImg = `<img class="skill-icon-xxs" style="height: .66rem; width: .66rem; margin-top: 0;" src="${stat.media}">`
+                    return str + ` + ${value} ${statImg}`;
                 }, '');
             }
             return ret;
         } else {
             if(this.scaling !== undefined)
-                amount += Object.entries(this.scaling).reduce((bonus, [skill, scale]) => {
-                    let level = levels[skill] !== undefined ? levels[skill] : 0;
-                    return bonus + (level * scale)
+                amount += [...this.scaling].reduce((bonus, [stat, scale]) => {
+                    return bonus + (stats.get(stat) * scale)
                 }, 0);
             return Math.floor(amount);
         }
@@ -73,26 +83,15 @@ export class AdventuringAbility extends NamespacedObject {
         this.requirements = data.requirements;
         this.highlight = false;
 
-        this.component = new AdventuringAbilityUIComponent();
+        this.component = new AdventuringAbilityUIComponent(this.manager, this.game, this);
 
-        this.details = new AdventuringAbilityDetailsUIComponent();
-
-        this.component.styling.onclick = () => {
-            if(this.component.selectorCharacter !== undefined && this.component.selectorType !== undefined) {
-                if(this.component.selectorType == 'generator') {
-                    this.component.selectorCharacter.setGenerator(this);
-                }
-                if(this.component.selectorType == 'spender') {
-                    this.component.selectorCharacter.setSpender(this);
-                }
-
-                this.component.selectorCharacter = undefined;
-                this.component.selectorType = undefined;
-                Swal.close();
-            }
-        }
+        this.details = new AdventuringAbilityDetailsUIComponent(this.manager, this.game, this);
 
         this.renderQueue = new AdventuringAbilityRenderQueue();
+    }
+
+    postDataRegistration() {
+        this.hits.forEach(hit => hit.postDataRegistration());
     }
 
     unlockedBy(job) {
@@ -134,10 +133,15 @@ export class AdventuringAbility extends NamespacedObject {
         return this.requirements.reduce((equipable, requirement) => {
 
             if(requirement.type == "current_job_level") {
-                if(character.job.id !== requirement.job)
+                if(character.combatJob.id === requirement.job) {
+                    if(this.manager.getMasteryLevel(character.combatJob) < requirement.level)
+                        return false;
+                } else if(character.passiveJob.id === requirement.job) {
+                    if(this.manager.getMasteryLevel(character.passiveJob) < requirement.level)
+                        return false;
+                } else {
                     return false;
-                if(this.manager.getMasteryLevel(character.job) < requirement.level)
-                    return false;
+                }
             }
 
             if(requirement.type == "job_level") {
@@ -152,15 +156,8 @@ export class AdventuringAbility extends NamespacedObject {
         }, true);
     }
 
-    getDescription(levels={}, isDesc=false) {
-        return this.hits.reduce((desc, hit, i) =>  desc.replace(`{hit.${i}.amount}`, hit.getAmount(levels, isDesc)), this.description);
-    }
-
-    selectTargets(heroes, enemies) {
-        let targets = [];
-
-
-        return targets;
+    getDescription(stats, isDesc=false) {
+        return this.hits.reduce((desc, hit, i) =>  desc.replace(`{hit.${i}.amount}`, hit.getAmount(stats, isDesc)), this.description);
     }
 
     setHighlight(highlight) {
@@ -194,12 +191,13 @@ export class AdventuringAbility extends NamespacedObject {
             return;
 
         if(this.unlocked) {
-            let levels = {};
+            let stats = false;
             if(this.renderQueue.descriptionCharacter)
-                levels = this.renderQueue.descriptionCharacter.levels;
-                this.component.description.innerHTML = this.getDescription(levels, true);
+                stats = this.renderQueue.descriptionCharacter.stats;
+
+            this.component.description.innerHTML = this.getDescription(stats, true);
             
-            this.details.description.innerHTML = this.getDescription({}, true);
+            this.details.description.innerHTML = this.getDescription(false, true);
 
         } else {
             this.details.description.textContent = "???";

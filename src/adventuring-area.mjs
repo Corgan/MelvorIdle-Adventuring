@@ -12,16 +12,16 @@ class AdventuringAreaRenderQueue {
     }
 }
 
-export class AdventuringArea extends NamespacedObject {
+export class AdventuringArea extends MasteryAction {
     constructor(namespace, data, manager, game) {
         super(namespace, data.id);
         this.manager = manager;
         this.game = game;
 
-        this.component = new AdventuringAreaUIComponent(this.manager, this.game);
+        this.component = new AdventuringAreaUIComponent(this.manager, this.game, this);
         this.renderQueue = new AdventuringAreaRenderQueue();
 
-        this.name = data.name;
+        this._name = data.name;
         this.renderQueue.name = true;
 
         this._media = data.media;
@@ -53,8 +53,12 @@ export class AdventuringArea extends NamespacedObject {
         this.renderQueue.clickable = true;
     }
 
+    get name() {
+        return this.unlocked ? this._name : "???";
+    }
+
     get media() {
-        return this.getMediaURL(this._media);
+        return this.unlocked ? this.getMediaURL(this._media) : this.getMediaURL('melvor:assets/media/main/question.svg');
     }
 
     get unlocked() {

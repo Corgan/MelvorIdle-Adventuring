@@ -48,37 +48,4 @@ export class AdventuringAbilitySmallUIComponent extends AdventuringUIComponent {
             }
         });
     }
-
-    /*
-
-                    let html = '' +
-                        '<div class="corruption-mods">' +
-                        ('<div class="corruption-mod-selector"></div>'.repeat(corruptionRollerSettings[slot].length)) +
-                        '</div>' +
-                        '<div class="corruption-mods-add">Add New</div>';
-                    Swal.fire({
-                        html: html,
-                        width: 700,
-                        onBeforeOpen: () => {
-                            mods = [...$('.corruption-mod-selector')].map((el, i) => new AutoComplete(el, Object.keys(activeModifiers), corruptionRollerSettings[slot][i]));
-                            $('.corruption-mods-add')[0].addEventListener('click', (e) => {
-                                let el = document.createElement('div');
-                                el.className = 'corruption-mod-selector';
-                                $('.corruption-mods')[0].appendChild(el);
- 
-                                mods.push(new AutoComplete(el, Object.keys(activeModifiers)))
-                            });
-                        },
-                        preConfirm: () => {
-                            if (mods)
-                                return mods;
-                        }
-                    }).then(data => {
-                        if (data.isConfirmed) {
-                            corruptionRollerSettings[slot] = data.value.map(value => value.getConfig()).filter(v => v != null)
-                        }
-                    });
-
-
-    */
 }

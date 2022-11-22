@@ -13,7 +13,7 @@ export class AdventuringCards {
         this.manager = manager;
         this.game = game;
         this.renderQueue = new AdventuringCardsRenderQueue();
-        this.component = new AdventuringCardsUIComponent(this.manager, this.game);
+        this.component = new AdventuringCardsUIComponent(this.manager, this.game, this);
     }
     
     render() {

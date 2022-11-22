@@ -2,6 +2,7 @@ const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringEquipmentItem } = await loadModule('src/adventuring-equipment-item.mjs');
 
+const { AdventuringStat } = await loadModule('src/adventuring-stat.mjs');
 const { AdventuringJob } = await loadModule('src/adventuring-job.mjs');
 const { AdventuringGenerator } = await loadModule('src/adventuring-generator.mjs');
 const { AdventuringSpender } = await loadModule('src/adventuring-spender.mjs');
@@ -11,6 +12,8 @@ const { AdventuringMonster } = await loadModule('src/adventuring-monster.mjs');
 const { AdventuringSuffix } = await loadModule('src/adventuring-suffix.mjs');
 
 const { AdventuringOverview } = await loadModule('src/adventuring-overview.mjs');
+const { AdventuringMessageLog } = await loadModule('src/adventuring-message-log.mjs');
+
 const { AdventuringParty } = await loadModule('src/adventuring-party.mjs');
 const { AdventuringPages } = await loadModule('src/adventuring-pages.mjs');
 
@@ -50,6 +53,7 @@ export class Adventuring extends SkillWithMastery {
         this.isActive = false;
         this.emptyEquipmentItem = new AdventuringEquipmentItem(this, this.game);
 
+        this.stats = new NamespaceRegistry(this.game.registeredNamespaces);
         this.jobs = new NamespaceRegistry(this.game.registeredNamespaces);
         this.generators = new NamespaceRegistry(this.game.registeredNamespaces);
         this.spenders = new NamespaceRegistry(this.game.registeredNamespaces);
@@ -69,6 +73,9 @@ export class Adventuring extends SkillWithMastery {
         this.overview = new AdventuringOverview(this, this.game);
         this.overview.component.mount(this.component.overview);
 
+        this.log = new AdventuringMessageLog(this, this.game);
+        this.log.component.mount(this.overview.component.log);
+
         this.party = new AdventuringHeroParty(this, this.game);
         this.party.component.mount(this.component.party);
 
@@ -82,15 +89,24 @@ export class Adventuring extends SkillWithMastery {
         this.encounter = new AdventuringEncounter(this, this.game);
 
         this.lootgen = new AdventuringLootGenerator(this, this.game);
-        
-        this.turnTimer = new Timer('Turn', () => this.nextTurn());
-        this.turnInterval = 1500;
 
         this.healTimer = new Timer('Heal', () => this.nextHeal());
         this.healInterval = 5000;
+        console.log("Adventuring constructor done");
     }
 
+
+    // Passive Jobs
+    //  - Xp passively
+    //  - generates tiles
+    //  - main game resources
+    // Town Buildings
+    //  - Production
+    // Dunegon Mastery
+    
+
     onLoad() {
+        console.log("Adventuring onLoad");
         super.onLoad();
         this.overview.onLoad();
         this.party.onLoad();
@@ -139,7 +155,7 @@ export class Adventuring extends SkillWithMastery {
     onMasteryLevelUp(action, oldLevel, newLevel) {
         super.onMasteryLevelUp(action, oldLevel, newLevel);
         this.party.all.forEach(member => {
-            member.calculateLevels();
+            member.calculateStats();
             member.renderQueue.jobs = true;
         });
     }
@@ -182,8 +198,8 @@ export class Adventuring extends SkillWithMastery {
         this.game.renderQueue.activeSkills = true;
         this.game.activeAction = this;
 
-        if(!this.turnTimer.isActive)
-            this.turnTimer.start(this.turnInterval);
+        if(!this.dungeon.exploreTimer.isActive)
+            this.dungeon.exploreTimer.start(this.dungeon.exploreInterval);
         
         if(this.healTimer.isActive)
             this.healTimer.stop();
@@ -199,8 +215,14 @@ export class Adventuring extends SkillWithMastery {
         if (!this.canStop)
             return false;
         
-        if(this.turnTimer.isActive)
-            this.turnTimer.stop();
+        if(this.dungeon.exploreTimer.isActive)
+            this.dungeon.exploreTimer.stop();
+        
+        if(this.encounter.turnTimer.isActive)
+            this.encounter.turnTimer.stop();
+    
+        if(this.encounter.hitTimer.isActive)
+            this.encounter.hitTimer.stop();
 
         if(this.isActive) {
             this.dungeon.reset();
@@ -226,7 +248,11 @@ export class Adventuring extends SkillWithMastery {
     }
 
     activeTick() {
-        this.turnTimer.tick();
+        if(this.encounter.isFighting) {
+            this.encounter.currentTimer.tick();
+        } else {
+            this.dungeon.exploreTimer.tick();
+        }
     }
 
     passiveTick() {
@@ -238,32 +264,30 @@ export class Adventuring extends SkillWithMastery {
                 member.setEnergy(0);
         });
 
-        if(!this.healTimer.isActive && this.party.all.some(member => member.dead || member.hitpoints < member.maxHitpoints)) {
+        if(!this.healTimer.isActive) {
             this.healTimer.start(this.healInterval);
         
             this.overview.renderQueue.turnProgressBar = true;
             this.overview.renderQueue.healProgressBar = true;
         }
 
+        /*
         if(this.healTimer.isActive && this.party.all.every(member => !member.dead && member.hitpoints == member.maxHitpoints)) {
             this.healTimer.stop();
         
             this.overview.renderQueue.turnProgressBar = true;
             this.overview.renderQueue.healProgressBar = true;
         }
+        */
         
         if(this.healTimer.isActive)
             this.healTimer.tick();
     }
 
-    nextTurn() {
-        if(!this.isActive)
-            return;
-        
-        this.dungeon.nextTurn();
-
-        this.turnTimer.start(this.turnInterval);
-        this.overview.renderQueue.turnProgressBar = true;
+    getMasteryXP(action) {
+        if(!action.unlocked)
+            return -Infinity;
+        return super.getMasteryXP(action);
     }
 
     nextHeal() {
@@ -289,6 +313,8 @@ export class Adventuring extends SkillWithMastery {
         
         this.overview.render();
 
+        this.log.render();
+
         this.party.render();
 
         this.pages.render();
@@ -297,74 +323,94 @@ export class Adventuring extends SkillWithMastery {
     registerData(namespace, data) {
         super.registerData(namespace, data); // pets, rareDrops, minibar, customMilestones
 
+        console.log(`Registering ${data.stats.length} Stats`);
+        data.stats.forEach(data => {
+            let stat = new AdventuringStat(namespace, data, this, this.game);
+            this.stats.registerObject(stat);
+        });
+
+        console.log(`Registering ${data.jobs.length} Jobs`);
         data.jobs.forEach(data => {
             let job = new AdventuringJob(namespace, data, this, this.game);
             this.jobs.registerObject(job);
             this.actions.registerObject(job);
         });
+
+        console.log(`Registering ${data.generators.length} Generators`);
         data.generators.forEach(data => {
             let generator = new AdventuringGenerator(namespace, data, this, this.game);
             this.generators.registerObject(generator);
         });
+
+        console.log(`Registering ${data.spenders.length} Spenders`);
         data.spenders.forEach(data => {
             let spender = new AdventuringSpender(namespace, data, this, this.game);
             this.spenders.registerObject(spender);
         });
+
+        console.log(`Registering ${data.passives.length} Passives`);
         data.passives.forEach(data => {
             let passive = new AdventuringPassive(namespace, data, this, this.game);
             this.passives.registerObject(passive);
         });
+
+        console.log(`Registering ${data.areas.length} Areas`);
         data.areas.forEach(data => {
             let area = new AdventuringArea(namespace, data, this, this.game);
             this.areas.registerObject(area);
+            this.actions.registerObject(area);
         });
+        
+        console.log(`Registering ${data.monsters.length} Monsters`);
         data.monsters.forEach(data => {
             let monster = new AdventuringMonster(namespace, data, this, this.game);
             this.monsters.registerObject(monster);
         });
 
+        console.log(`Registering ${data.itemSlots.length} Item Slots`);
         data.itemSlots.forEach(data => {
             let slot = new AdventuringItemSlot(namespace, data, this, this.game);
             this.itemSlots.registerObject(slot);
         });
 
+        console.log(`Registering ${data.itemTypes.length} Item Types`);
         data.itemTypes.forEach(data => {
             let itemType = new AdventuringItemType(namespace, data, this, this.game);
             this.itemTypes.registerObject(itemType);
         });
 
+        console.log(`Registering ${data.itemPools.length} Item Pools`);
         data.itemPools.forEach(data => {
             let pool = new AdventuringItemPool(namespace, data, this, this.game);
             this.itemPools.registerObject(pool);
         });
 
+        console.log(`Registering ${data.itemTiers.length} Item Tiers`);
         data.itemTiers.forEach(data => {
             let itemTier = new AdventuringItemTier(namespace, data, this, this.game);
             this.itemTiers.registerObject(itemTier);
         });
 
+        console.log(`Registering ${data.baseItems.length} Base Items`);
         data.baseItems.forEach(data => {
             let item = new AdventuringItemBase(namespace, data, this, this.game);
             this.baseItems.registerObject(item);
         });
 
+        console.log(`Registering ${data.suffixes.length} Suffixes`);
         data.suffixes.forEach(data => {
             let suffix = new AdventuringSuffix(namespace, data, this, this.game);
             this.suffixes.registerObject(suffix);
         });
     }
 
-    canJobHaveMultiple(job) {
-        return job.alwaysMultiple || this.getMasteryLevel(job) >= 99;
-    }
-
-    get availableJobs() {
-        return this.jobs.allObjects.filter(job => this.canJobHaveMultiple(job) || !this.party.all.map(member => member.job).includes(job));
-    }
-
     postDataRegistration() {
         console.log("Adventuring postDataRegistration");
         super.postDataRegistration(); // Milestones setLevel
+
+        this.jobs.allObjects.forEach(job => job.postDataRegistration());
+        this.generators.allObjects.forEach(generator => generator.postDataRegistration());
+        this.spenders.allObjects.forEach(spender => spender.postDataRegistration());
 
         let jobMilestones = this.jobs.allObjects.filter(job => job.isMilestoneReward);
         let areaMilestones = this.areas.allObjects;
@@ -372,12 +418,13 @@ export class Adventuring extends SkillWithMastery {
         this.milestones.push(...jobMilestones, ...areaMilestones);
         this.sortMilestones();
         
-        this.sortedMasteryActions = jobMilestones.sort((a,b)=> a.level - b.level);
+        this.sortedMasteryActions = [...jobMilestones.sort((a,b)=> a.level - b.level), ...areaMilestones.sort((a,b)=> a.level - b.level)];
 
         this.party.postDataRegistration();
         this.trainer.postDataRegistration();
         this.stash.postDataRegistration();
         this.crossroads.postDataRegistration();
+        this.encounter.postDataRegistration();
 
         let capesToExclude = ["melvorF:Max_Skillcape", "melvorTotH:Superior_Max_Skillcape"];
         let skillCapes = this.game.shop.purchases.filter(purchase => capesToExclude.includes(purchase.id));
@@ -398,11 +445,10 @@ export class Adventuring extends SkillWithMastery {
         this.stash.encode(writer);
         this.dungeon.encode(writer);
         this.encounter.encode(writer);
-        this.turnTimer.encode(writer);
         writer.writeBoolean(this.isActive);
 
         let end = writer.byteOffset;
-        //console.log(`Wrote ${post-pre} bytes for Adventuring save`);
+        console.log(`Wrote ${end-start} bytes for Adventuring save`);
         return writer;
     }
 
@@ -420,15 +466,15 @@ export class Adventuring extends SkillWithMastery {
             this.stash.decode(reader, version);
             this.dungeon.decode(reader, version);
             this.encounter.decode(reader, version);
-            this.turnTimer.decode(reader, version);
             this.isActive = reader.getBoolean();
         } catch(e) { // Something's fucky, dump all progress and skip past the trash save data
+            console.log(e);
             reader.byteOffset = start;
             reader.getFixedLengthBuffer(skillDataSize);
         }
 
         let end = reader.byteOffset;
-        //console.log(`Read ${end-start} bytes for Adventuring save`);
+        console.log(`Read ${end-start} bytes for Adventuring save`);
     }
 
     checkpoints = [

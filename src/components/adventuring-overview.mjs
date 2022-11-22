@@ -20,5 +20,6 @@ export class AdventuringOverviewUIComponent extends AdventuringUIComponent {
         this.healProgressBar = new ProgressBar(getElementFromFragment(this.$fragment, 'heal-progress-bar', 'div'));
 
         this.cards = getElementFromFragment(this.$fragment, 'cards', 'div');
+        this.log = getElementFromFragment(this.$fragment, 'log', 'div');
     }
 }

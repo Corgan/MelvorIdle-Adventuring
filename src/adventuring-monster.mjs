@@ -7,7 +7,7 @@ export class AdventuringMonster extends NamespacedObject {
         this.game = game;
         this.name = data.name;
         this._media = data.media;
-        this.levels = data.levels;
+        this.stats = data.stats;
         this.xp = data.xp;
         this.generator = data.generator;
         this.spender = data.spender;

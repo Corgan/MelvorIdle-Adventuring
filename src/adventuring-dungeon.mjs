@@ -16,7 +16,7 @@ export class AdventuringDungeon extends AdventuringPage {
         this.game = game;
         this.progress = 0;
 
-        this.component = new AdventuringDungeonUIComponent(this.manager, this.game);
+        this.component = new AdventuringDungeonUIComponent(this.manager, this.game, this);
 
         this.floor = new AdventuringDungeonFloor(this.manager, this.game, this);
 
@@ -30,6 +30,9 @@ export class AdventuringDungeon extends AdventuringPage {
         this.treasureCount = 0;
         this.trapCount = 0;
         this.fountainCount = 0;
+        
+        this.exploreTimer = new Timer('Explore', () => this.explore());
+        this.exploreInterval = 1500;
     }
 
     get currentFloor() {
@@ -41,20 +44,28 @@ export class AdventuringDungeon extends AdventuringPage {
         this.floor.onLoad();
     }
 
-    nextTurn() {
-        if(this.manager.encounter.isFighting) {
-            this.manager.encounter.nextTurn();
-        } else {
-            this.floor.step();
-        }
+    explore() {
+        this.floor.step();
+        this.exploreTimer.start(this.exploreInterval);
+        this.manager.overview.renderQueue.turnProgressBar = true;
+    }
+
+    triggerEmpty() {
+        this.manager.log.add(`Empty Room`);
+    }
+
+    triggerStart() {
+        this.manager.log.add(`Starting ${this.area.name} Floor ${this.progress+1}`);
     }
 
     triggerExit() {
+        this.manager.log.add(`Exit Floor Encounter`);
         this.manager.encounter.generateEncounter(true);
         this.manager.encounter.startEncounter();
     }
 
     triggerEncounter() {
+        this.manager.log.add(`Random Encounter`);
         this.manager.encounter.generateEncounter();
         this.manager.encounter.startEncounter();
     }
@@ -62,14 +73,17 @@ export class AdventuringDungeon extends AdventuringPage {
     triggerTreasure() {
         let { min, max } = this.area.tiles.treasure.loot.range;
 
-        this.grantLoot(min, max);
+        let loot = this.grantLoot(min, max);
+        this.manager.log.add(`Found ${loot.name} in a treasure chest`);
     }
 
     triggerTrap() {
         let damage = this.area.tiles.trap.damage;
 
         this.manager.party.all.forEach(member => {
-            member.damage(Math.floor(member.maxHitpoints * damage));
+            let amount = Math.floor(member.maxHitpoints * damage);
+            member.damage(amount);
+            this.manager.log.add(`Random Trap did ${amount} to ${member.name}`);
         });
 
         if(this.manager.party.all.every(member => member.dead)) {
@@ -82,8 +96,11 @@ export class AdventuringDungeon extends AdventuringPage {
         this.manager.party.all.forEach(member => {
             if(member.dead) {
                 member.revive(heal);
+                this.manager.log.add(`Campfire revived ${member.name} to ${Math.floor(100 * heal)} health.`);
             } else {
-                member.heal(Math.floor(member.maxHitpoints * heal));
+                let amount = Math.floor(member.maxHitpoints * heal);
+                member.heal(amount);
+                this.manager.log.add(`Campfire healed ${member.name} for ${amount} health.`);
             }
         });
     }
@@ -108,8 +125,11 @@ export class AdventuringDungeon extends AdventuringPage {
         
         let randomItem = this.manager.lootgen.generateFromBase(baseItem, min, max, rolledLevel);
         
-        if(randomItem)
-            this.manager.stash.add(randomItem);
+        if(randomItem) {
+            if(this.manager.stash.add(randomItem));
+                return randomItem;
+        }
+        return false;
     }
 
     setArea(area) {
@@ -158,6 +178,8 @@ export class AdventuringDungeon extends AdventuringPage {
         this.area = undefined;
         this.numFloors = 0;
         this.progress = 0;
+        this.exploreTimer.stop();
+        this.manager.overview.renderQueue.turnProgressBar = true;
         this.manager.overview.renderQueue.status = true;
 
         this.groupGenerator.reset();
@@ -167,6 +189,7 @@ export class AdventuringDungeon extends AdventuringPage {
     }
 
     abandon() {
+        this.manager.log.add(`Abandoned ${this.area.name} on floor ${this.progress+1}`);
         this.reset();
 
         this.manager.stop();
@@ -174,7 +197,8 @@ export class AdventuringDungeon extends AdventuringPage {
     }
 
     complete() {
-        this.grantLoot(this.area.loot.range.min, this.area.loot.range.max);
+        let loot = this.grantLoot(this.area.loot.range.min, this.area.loot.range.max);
+        this.manager.log.add(`Completed ${this.area.name} and received ${loot.name}`);
 
         if(!this.manager.party.all.every(hero => hero.dead)) {
             this.start();
@@ -190,6 +214,7 @@ export class AdventuringDungeon extends AdventuringPage {
     }
 
     encode(writer) {
+        this.exploreTimer.encode(writer);
         this.floor.encode(writer);
         writer.writeUint32(this.progress);
         writer.writeBoolean(this.area !== undefined);
@@ -199,6 +224,7 @@ export class AdventuringDungeon extends AdventuringPage {
     }
 
     decode(reader, version) {
+        this.exploreTimer.decode(reader, version);
         this.floor.decode(reader, version);
         this.progress = reader.getUint32();
         if (reader.getBoolean()) {

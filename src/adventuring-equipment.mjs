@@ -1,5 +1,6 @@
 const { loadModule } = mod.getContext(import.meta);
 
+const { AdventuringStats } = await loadModule('src/adventuring-stats.mjs');
 const { AdventuringEquipmentSlot } = await loadModule('src/adventuring-equipment-slot.mjs');
 const { AdventuringEquipmentUIComponent } = await loadModule('src/components/adventuring-equipment.mjs');
 
@@ -9,22 +10,21 @@ export class AdventuringEquipment {
         this.manager = manager;
         this.character = character;
         
-        this.component = new AdventuringEquipmentUIComponent(this.manager, this.game);
+        this.component = new AdventuringEquipmentUIComponent(this.manager, this.game, this);
 
         this.locked = false;
         this.slots = new Map();
+        this.stats = new AdventuringStats(this.manager, this.game);
     }
     
-    get levels() {
-        //['Hitpoints', 'Attack', 'Strength', 'Defence', 'Ranged', 'Magic', 'Prayer', 'Agility']
-        return [...this.slots].reduce((total, [_, slot]) => {
-            if(!slot.empty && !slot.occupied && slot.canEquip(slot.item)) {
-                [...slot.levels].forEach(([skill, level]) => {
-                    total[skill] = (total[skill] !== undefined ? total[skill] + level : level);
-                });
-            }
-            return total;
-        }, {})
+    calculateStats() {
+        this.stats.reset();
+        this.slots.forEach((equipmentSlot, slotType) => {
+            equipmentSlot.stats.forEach((value, stat) => {
+                let old = this.stats.get(stat);
+                this.stats.set(stat, old + value);
+            });
+        });
     }
 
     onLoad() {

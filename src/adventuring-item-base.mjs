@@ -18,7 +18,7 @@ export class AdventuringItemBase extends NamespacedObject {
     }
 
     get jobs() {
-        let jobs = this.manager.jobs.allObjects.filter(job => job.allowedItems.includes(this.type));
+        let jobs = this.manager.jobs.allObjects.filter(job => job.allowedItems !== undefined && job.allowedItems.includes(this.type));
         return jobs;
     }
 

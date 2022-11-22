@@ -9,7 +9,7 @@ export class AdventuringTrainer extends AdventuringPage {
         super(manager, game);
         this.manager = manager;
         this.game = game;
-        this.component = new AdventuringTrainerUIComponent(this.manager, this.game);
+        this.component = new AdventuringTrainerUIComponent(this.manager, this.game, this);
 
         this.masteryJobs = [];
     }
@@ -27,7 +27,11 @@ export class AdventuringTrainer extends AdventuringPage {
     }
 
     postDataRegistration() {
-        this.masteryJobs = this.manager.jobs.allObjects.filter(job => job.isMilestoneReward);
+        let combatJobs = this.manager.jobs.allObjects.filter(job => job.isMilestoneReward && !job.isPassive).sort((a,b)=> a.level - b.level);
+        let passiveJobs = this.manager.jobs.allObjects.filter(job => job.isMilestoneReward && job.isPassive).sort((a,b)=> a.level - b.level);
+
+
+        this.masteryJobs = [...combatJobs, ...passiveJobs];
 
         this.masteryJobs.forEach(job => {
             job.component.mount(this.component.jobs);

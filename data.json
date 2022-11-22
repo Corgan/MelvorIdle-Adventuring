@@ -44,19 +44,84 @@
                 "masteryTokenID": "adventuring:Mastery_Token_Adventuring",
                 "masteryLevelUnlocks": [
                     {
-                        "level": 1,
-                        "description": "Check job details at the trainer in Town to see unlocks."
+                        "level": "?",
+                        "description": "Gooood question."
+                    }
+                ],
+                "stats": [
+                    {
+                        "id": "hitpoints",
+                        "name": "Hitpoints",
+                        "media": "melvor:assets/media/skills/hitpoints/hitpoints.svg",
+                        "base": 10
                     },
                     {
-                        "level": 99,
-                        "description": "Allow job to be equipped to multiple characters."
+                        "id": "defence",
+                        "name": "Defence",
+                        "media": "melvor:assets/media/skills/defence/defence.svg",
+                        "base": 0
+                    },
+                    {
+                        "id": "agility",
+                        "name": "Agility",
+                        "media": "melvor:assets/media/skills/agility/agility.svg",
+                        "base": 0
+                    },
+                    {
+                        "id": "strength",
+                        "name": "Strength",
+                        "media": "melvor:assets/media/skills/strength/strength.svg",
+                        "base": 0
+                    },
+                    {
+                        "id": "ranged",
+                        "name": "Ranged",
+                        "media": "melvor:assets/media/skills/ranged/ranged.svg",
+                        "base": 0
+                    },
+                    {
+                        "id": "magic",
+                        "name": "Magic",
+                        "media": "melvor:assets/media/skills/magic/magic.svg",
+                        "base": 0
+                    },
+                    {
+                        "id": "prayer",
+                        "name": "Prayer",
+                        "media": "melvor:assets/media/skills/prayer/prayer.svg",
+                        "base": 0
+                    },
+                    {
+                        "id": "woodcutting",
+                        "name": "Woodcutting",
+                        "media": "melvor:assets/media/skills/woodcutting/woodcutting.svg"
+                    },
+                    {
+                        "id": "fishing",
+                        "name": "Fishing",
+                        "media": "melvor:assets/media/skills/fishing/fishing.svg"
+                    },
+                    {
+                        "id": "mining",
+                        "name": "Mining",
+                        "media": "melvor:assets/media/skills/mining/mining.svg"
+                    },
+                    {
+                        "id": "cooking",
+                        "name": "Cooking",
+                        "media": "melvor:assets/media/skills/cooking/cooking.svg"
+                    },
+                    {
+                        "id": "farming",
+                        "name": "Farming",
+                        "media": "melvor:assets/media/skills/farming/farming.svg"
                     }
                 ],
                 "jobs": [
                     {
                         "id": "none",
                         "name": "None",
-                        "media": "melvor:assets/media/main/question.svg",
+                        "media": "assets/media/empty.png",
                         "level": 1,
                         "isMilestoneReward": false,
                         "alwaysMultiple": true,
@@ -101,16 +166,36 @@
                             "adventuring:quiver",
                             "adventuring:spellbook"
                         ],
-                        "levelScaling": {
-                            "Hitpoints": 0,
-                            "Defence": 0,
-                            "Agility": 0,
-                            "Attack": 0,
-                            "Strength": 0,
-                            "Ranged": 0,
-                            "Magic": 0,
-                            "Prayer": 0
-                        }
+                        "scaling": [
+                            {
+                                "id": "adventuring:hitpoints",
+                                "value": 0
+                            },
+                            {
+                                "id": "adventuring:defence",
+                                "value": 0
+                            },
+                            {
+                                "id": "adventuring:agility",
+                                "value": 0
+                            },
+                            {
+                                "id": "adventuring:strength",
+                                "value": 0
+                            },
+                            {
+                                "id": "adventuring:ranged",
+                                "value": 0
+                            },
+                            {
+                                "id": "adventuring:magic",
+                                "value": 0
+                            },
+                            {
+                                "id": "adventuring:prayer",
+                                "value": 0
+                            }
+                        ]
                     },
                     {
                         "id": "fighter",
@@ -144,13 +229,24 @@
                             "adventuring:knives", 
                             "adventuring:javelin"
                         ],
-                        "levelScaling": {
-                            "Hitpoints": 1.5,
-                            "Defence": 0.5,
-                            "Agility": 0.5,
-                            "Attack": 1.5,
-                            "Strength": 1.5
-                        }
+                        "scaling": [
+                            {
+                                "id": "adventuring:hitpoints",
+                                "value": 1.5
+                            },
+                            {
+                                "id": "adventuring:defence",
+                                "value": 0.5
+                            },
+                            {
+                                "id": "adventuring:agility",
+                                "value": 0.5
+                            },
+                            {
+                                "id": "adventuring:strength",
+                                "value": 1.5
+                            }
+                        ]
                     },
                     {
                         "id": "ranger",
@@ -176,13 +272,24 @@
                             "adventuring:shortbow", 
                             "adventuring:longbow"
                         ],
-                        "levelScaling": {
-                            "Hitpoints": 0.5,
-                            "Defence": 0.5,
-                            "Agility": 1.5,
-                            "Attack": 1.5,
-                            "Ranged": 1.5
-                        }
+                        "scaling": [
+                            {
+                                "id": "adventuring:hitpoints",
+                                "value": 0.5
+                            },
+                            {
+                                "id": "adventuring:defence",
+                                "value": 0.5
+                            },
+                            {
+                                "id": "adventuring:agility",
+                                "value": 1.5
+                            },
+                            {
+                                "id": "adventuring:ranged",
+                                "value": 1.5
+                            }
+                        ]
                     },
                     {
                         "id": "cleric",
@@ -205,13 +312,24 @@
                             "adventuring:staff",
                             "adventuring:spellbook"
                         ],
-                        "levelScaling": {
-                            "Hitpoints": 1,
-                            "Defence": 0.5,
-                            "Agility": 0.75,
-                            "Magic": 1,
-                            "Prayer": 2.25
-                        }
+                        "scaling": [
+                            {
+                                "id": "adventuring:hitpoints",
+                                "value": 1
+                            },
+                            {
+                                "id": "adventuring:defence",
+                                "value": 0.5
+                            },
+                            {
+                                "id": "adventuring:agility",
+                                "value": 0.75
+                            },
+                            {
+                                "id": "adventuring:prayer",
+                                "value": 2.25
+                            }
+                        ]
                     },
                     {
                         "id": "wizard",
@@ -234,13 +352,24 @@
                             "adventuring:staff",
                             "adventuring:spellbook"
                         ],
-                        "levelScaling": {
-                            "Hitpoints": 1,
-                            "Defence": 0.5,
-                            "Agility": 0.25,
-                            "Attack": 1.5,
-                            "Magic": 1.5
-                        }
+                        "scaling": [
+                            {
+                                "id": "adventuring:hitpoints",
+                                "value": 1
+                            },
+                            {
+                                "id": "adventuring:defence",
+                                "value": 0.5
+                            },
+                            {
+                                "id": "adventuring:agility",
+                                "value": 0.25
+                            },
+                            {
+                                "id": "adventuring:magic",
+                                "value": 1.5
+                            }
+                        ]
                     },
                     {
                         "id": "thief",
@@ -265,13 +394,24 @@
                             "adventuring:scimitar",
                             "adventuring:knives"
                         ],
-                        "levelScaling": {
-                            "Hitpoints": 1,
-                            "Defence": 0.5,
-                            "Agility": 1.75,
-                            "Attack": 1.25,
-                            "Strength": 1
-                        }
+                        "scaling": [
+                            {
+                                "id": "adventuring:hitpoints",
+                                "value": 1
+                            },
+                            {
+                                "id": "adventuring:defence",
+                                "value": 0.5
+                            },
+                            {
+                                "id": "adventuring:agility",
+                                "value": 1.75
+                            },
+                            {
+                                "id": "adventuring:strength",
+                                "value": 1.25
+                            }
+                        ]
                     },
                     {
                         "id": "paladin",
@@ -295,14 +435,83 @@
                             "adventuring:sword1h",
                             "adventuring:scimitar"
                         ],
-                        "levelScaling": {
-                            "Hitpoints": 2,
-                            "Defence": 1.5,
-                            "Agility": 0.25,
-                            "Attack": 0.5,
-                            "Strength": 0.5,
-                            "Prayer": 0.75
-                        }
+                        "scaling": [
+                            {
+                                "id": "adventuring:hitpoints",
+                                "value": 2
+                            },
+                            {
+                                "id": "adventuring:defence",
+                                "value": 1.5
+                            },
+                            {
+                                "id": "adventuring:agility",
+                                "value": 0.25
+                            },
+                            {
+                                "id": "adventuring:strength",
+                                "value": 0.5
+                            },
+                            {
+                                "id": "adventuring:prayer",
+                                "value": 0.75
+                            }
+                        ]
+                    },
+                    {
+                        "id": "lumberjack",
+                        "name": "Lumberjack",
+                        "media": "melvor:assets/media/skills/woodcutting/woodcutting.svg",
+                        "level": 5,
+                        "isMilestoneReward": true,
+                        "isPassive": true,
+                        "scaling": [
+                            { "id": "adventuring:woodcutting", "value": 1 }
+                        ]
+                    },
+                    {
+                        "id": "miner",
+                        "name": "Miner",
+                        "media": "melvor:assets/media/skills/mining/mining.svg",
+                        "level": 5,
+                        "isMilestoneReward": true,
+                        "isPassive": true,
+                        "scaling": [
+                            { "id": "adventuring:mining", "value": 1 }
+                        ]
+                    },
+                    {
+                        "id": "fisherman",
+                        "name": "Fisherman",
+                        "media": "melvor:assets/media/skills/fishing/fishing.svg",
+                        "level": 10,
+                        "isMilestoneReward": true,
+                        "isPassive": true,
+                        "scaling": [
+                            { "id": "adventuring:fishing", "value": 1 }
+                        ]
+                    },
+                    {
+                        "id": "chef",
+                        "name": "Chef",
+                        "media": "melvor:assets/media/skills/cooking/cooking.svg",
+                        "level": 10,
+                        "isMilestoneReward": true,
+                        "isPassive": true,
+                        "scaling": [
+                            { "id": "adventuring:cooking", "value": 1 }
+                        ]
+                    },
+                    {
+                        "id": "farmer",
+                        "name": "Farmer",
+                        "media": "melvor:assets/media/skills/farming/farming.svg",
+                        "level": 15,
+                        "isMilestoneReward": true,
+                        "isPassive": true,
+                        "scaling": [
+                            { "id": "adventuring:farming", "value": 1 }
+                        ]
                     }
                 ],
                 "generators": [
@@ -324,7 +533,7 @@
                                 "target": "front",
                                 "type": "damage",
                                 "base": 10,
-                                "scaling": {}
+                                "scaling": []
                             }
                         ]
                     },
@@ -341,9 +550,12 @@
                                 "target": "front",
                                 "type": "damage",
                                 "base": 10,
-                                "scaling": {
-                                    "Attack": 1
-                                }
+                                "scaling": [
+                                    {
+                                        "id": "adventuring:strength",
+                                        "value": 1
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -360,9 +572,12 @@
                                 "target": "back",
                                 "type": "damage",
                                 "base": 10,
-                                "scaling": {
-                                    "Ranged": 0.5
-                                }
+                                "scaling": [
+                                    {
+                                        "id": "adventuring:ranged",
+                                        "value": 0.5
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -379,9 +594,12 @@
                                 "target": "lowest",
                                 "type": "heal",
                                 "base": 10,
-                                "scaling": {
-                                    "Prayer": 1
-                                }
+                                "scaling": [
+                                    {
+                                        "id": "adventuring:prayer",
+                                        "value": 1
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -398,9 +616,12 @@
                                 "target": "aoe",
                                 "type": "damage",
                                 "base": 5,
-                                "scaling": {
-                                    "Magic": 0.25
-                                }
+                                "scaling": [
+                                    {
+                                        "id": "adventuring:magic",
+                                        "value": 0.25
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -417,10 +638,16 @@
                                 "target": "back",
                                 "type": "damage",
                                 "base": 10,
-                                "scaling": {
-                                    "Attack": 0.5,
-                                    "Agility": 0.5
-                                }
+                                "scaling": [
+                                    {
+                                        "id": "adventuring:strength",
+                                        "value": 0.5
+                                    },
+                                    {
+                                        "id": "adventuring:agility",
+                                        "value": 0.5
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -437,9 +664,12 @@
                                 "target": "front",
                                 "type": "damage",
                                 "base": 10,
-                                "scaling": {
-                                    "Defence": 1
-                                }
+                                "scaling": [
+                                    {
+                                        "id": "adventuring:defence",
+                                        "value": 1
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -456,9 +686,12 @@
                                 "type": "damage",
                                 "energy": 10,
                                 "base": 5,
-                                "scaling": {
-                                    "Magic": 0.25
-                                },
+                                "scaling": [
+                                    {
+                                        "id": "adventuring:magic",
+                                        "value": 0.25
+                                    }
+                                ],
                                 "delay": 250,
                                 "repeat": 3
                             }
@@ -477,19 +710,31 @@
                                 "target": "front",
                                 "type": "damage",
                                 "base": 5,
-                                "scaling": {
-                                    "Attack": 0.25,
-                                    "Agility": 0.25
-                                }
+                                "scaling": [
+                                    {
+                                        "id": "adventuring:strength",
+                                        "value": 0.25
+                                    },
+                                    {
+                                        "id": "adventuring:agility",
+                                        "value": 0.25
+                                    }
+                                ]
                             },
                             {
                                 "target": "back",
                                 "type": "damage",
                                 "base": 10,
-                                "scaling": {
-                                    "Attack": 0.35,
-                                    "Agility": 0.35
-                                }
+                                "scaling": [
+                                    {
+                                        "id": "adventuring:strength",
+                                        "value": 0.35
+                                    },
+                                    {
+                                        "id": "adventuring:agility",
+                                        "value": 0.35
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -505,9 +750,12 @@
                                 "target": "random",
                                 "type": "damage",
                                 "base": 5,
-                                "scaling": {
-                                    "Attack": 1
-                                }
+                                "scaling": [
+                                    {
+                                        "id": "adventuring:strength",
+                                        "value": 1
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -523,9 +771,12 @@
                                 "target": "front",
                                 "type": "damage",
                                 "base": 5,
-                                "scaling": {
-                                    "Attack": 1
-                                }
+                                "scaling": [
+                                    {
+                                        "id": "adventuring:strength",
+                                        "value": 1
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -541,9 +792,12 @@
                                 "target": "random",
                                 "type": "damage",
                                 "base": 5,
-                                "scaling": {
-                                    "Attack": 1
-                                }
+                                "scaling": [
+                                    {
+                                        "id": "adventuring:strength",
+                                        "value": 1
+                                    }
+                                ]
                             }
                         ]
                     }
@@ -568,7 +822,7 @@
                                 "target": "front",
                                 "type": "damage",
                                 "base": 20,
-                                "scaling": {}
+                                "scaling": []
                             }
                         ]
                     },
@@ -585,9 +839,12 @@
                                 "target": "aoe",
                                 "type": "damage",
                                 "base": 10,
-                                "scaling": {
-                                    "Attack": 0.35
-                                }
+                                "scaling": [
+                                    {
+                                        "id": "adventuring:strength",
+                                        "value": 0.35
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -604,9 +861,12 @@
                                 "target": "back",
                                 "type": "damage",
                                 "base": 20,
-                                "scaling": {
-                                    "Ranged": 1
-                                }
+                                "scaling": [
+                                    {
+                                        "id": "adventuring:ranged",
+                                        "value": 1
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -623,9 +883,12 @@
                                 "target": "aoe",
                                 "type": "heal",
                                 "base": 15,
-                                "scaling": {
-                                    "Prayer": 0.35
-                                }
+                                "scaling": [
+                                    {
+                                        "id": "adventuring:prayer",
+                                        "value": 0.35
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -642,9 +905,12 @@
                                 "target": "back",
                                 "type": "damage",
                                 "base": 20,
-                                "scaling": {
-                                    "Magic": 1
-                                }
+                                "scaling": [
+                                    {
+                                        "id": "adventuring:magic",
+                                        "value": 1
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -661,10 +927,16 @@
                                 "target": "lowest",
                                 "type": "damage",
                                 "base": 20,
-                                "scaling": {
-                                    "Attack": 1,
-                                    "Agility": 0.75
-                                }
+                                "scaling": [
+                                    {
+                                        "id": "adventuring:strength",
+                                        "value": 1
+                                    },
+                                    {
+                                        "id": "adventuring:agility",
+                                        "value": 1
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -681,9 +953,12 @@
                                 "target": "self",
                                 "type": "heal",
                                 "base": 30,
-                                "scaling": {
-                                    "Prayer": 2
-                                }
+                                "scaling": [
+                                    {
+                                        "id": "adventuring:prayer",
+                                        "value": 2
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -700,9 +975,12 @@
                                 "target": "aoe",
                                 "type": "damage",
                                 "base": 15,
-                                "scaling": {
-                                    "Magic": 0.5
-                                }
+                                "scaling": [
+                                    {
+                                        "id": "adventuring:magic",
+                                        "value": 0.5
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -718,9 +996,12 @@
                                 "target": "random",
                                 "type": "damage",
                                 "base": 15,
-                                "scaling": {
-                                    "Attack": 1.5
-                                }
+                                "scaling": [
+                                    {
+                                        "id": "adventuring:strength",
+                                        "value": 1.5
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -736,9 +1017,12 @@
                                 "target": "back",
                                 "type": "damage",
                                 "base": 20,
-                                "scaling": {
-                                    "Attack": 2
-                                }
+                                "scaling": [
+                                    {
+                                        "id": "adventuring:strength",
+                                        "value": 2
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -754,9 +1038,12 @@
                                 "target": "random",
                                 "type": "damage",
                                 "base": 20,
-                                "scaling": {
-                                    "Attack": 2
-                                }
+                                "scaling": [
+                                    {
+                                        "id": "adventuring:strength",
+                                        "value": 2
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -772,9 +1059,12 @@
                                 "target": "front",
                                 "type": "damage",
                                 "base": 20,
-                                "scaling": {
-                                    "Attack": 2
-                                }
+                                "scaling": [
+                                    {
+                                        "id": "adventuring:strength",
+                                        "value": 2
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -790,9 +1080,12 @@
                                 "target": "random",
                                 "type": "damage",
                                 "base": 20,
-                                "scaling": {
-                                    "Attack": 2
-                                }
+                                "scaling": [
+                                    {
+                                        "id": "adventuring:strength",
+                                        "value": 2
+                                    }
+                                ]
                             }
                         ]
                     }
@@ -999,16 +1292,36 @@
                         "name": "Chick",
                         "media": "melvor:assets/media/monsters/chick.png",
                         "xp": 10,
-                        "levels": {
-                            "Hitpoints": 5,
-                            "Defence": 1,
-                            "Agility": 1,
-                            "Attack": 1,
-                            "Strength": 1,
-                            "Ranged": 1,
-                            "Magic": 1,
-                            "Prayer": 1
-                        },
+                        "stats": [
+                            {
+                                "id": "adventuring:hitpoints",
+                                "value": 5
+                            },
+                            {
+                                "id": "adventuring:defence",
+                                "value": 1
+                            },
+                            {
+                                "id": "adventuring:agility",
+                                "value": 1
+                            },
+                            {
+                                "id": "adventuring:strength",
+                                "value": 1
+                            },
+                            {
+                                "id": "adventuring:ranged",
+                                "value": 1
+                            },
+                            {
+                                "id": "adventuring:magic",
+                                "value": 1
+                            },
+                            {
+                                "id": "adventuring:prayer",
+                                "value": 1
+                            }
+                        ],
                         "generator": "adventuring:cluck",
                         "spender": "adventuring:none",
                         "passives": []
@@ -1018,16 +1331,36 @@
                         "name": "Chicken",
                         "media": "melvor:assets/media/monsters/chicken.png",
                         "xp": 15,
-                        "levels": {
-                            "Hitpoints": 15,
-                            "Defence": 15,
-                            "Agility": 10,
-                            "Attack": 10,
-                            "Strength": 10,
-                            "Ranged": 1,
-                            "Magic": 1,
-                            "Prayer": 1
-                        },
+                        "stats": [
+                            {
+                                "id": "adventuring:hitpoints",
+                                "value": 15
+                            },
+                            {
+                                "id": "adventuring:defence",
+                                "value": 15
+                            },
+                            {
+                                "id": "adventuring:agility",
+                                "value": 10
+                            },
+                            {
+                                "id": "adventuring:strength",
+                                "value": 10
+                            },
+                            {
+                                "id": "adventuring:ranged",
+                                "value": 10
+                            },
+                            {
+                                "id": "adventuring:magic",
+                                "value": 10
+                            },
+                            {
+                                "id": "adventuring:prayer",
+                                "value": 10
+                            }
+                        ],
                         "generator": "adventuring:cluck",
                         "spender": "adventuring:crow",
                         "passives": []
@@ -1037,16 +1370,36 @@
                         "name": "Mumma Chicken",
                         "media": "melvor:assets/media/monsters/mumma_chicken.png",
                         "xp": 30,
-                        "levels": {
-                            "Hitpoints": 25,
-                            "Defence": 20,
-                            "Agility": 20,
-                            "Attack": 20,
-                            "Strength": 20,
-                            "Ranged": 1,
-                            "Magic": 1,
-                            "Prayer": 1
-                        },
+                        "stats": [
+                            {
+                                "id": "adventuring:hitpoints",
+                                "value": 25
+                            },
+                            {
+                                "id": "adventuring:defence",
+                                "value": 20
+                            },
+                            {
+                                "id": "adventuring:agility",
+                                "value": 20
+                            },
+                            {
+                                "id": "adventuring:strength",
+                                "value": 20
+                            },
+                            {
+                                "id": "adventuring:ranged",
+                                "value": 20
+                            },
+                            {
+                                "id": "adventuring:magic",
+                                "value": 20
+                            },
+                            {
+                                "id": "adventuring:prayer",
+                                "value": 20
+                            }
+                        ],
                         "generator": "adventuring:cluck",
                         "spender": "adventuring:crow",
                         "passives": []
@@ -1056,16 +1409,36 @@
                         "name": "Skeleton",
                         "media": "melvor:assets/media/monsters/skeleton.png",
                         "xp": 30,
-                        "levels": {
-                            "Hitpoints": 30,
-                            "Defence": 15,
-                            "Agility": 20,
-                            "Attack": 25,
-                            "Strength": 25,
-                            "Ranged": 25,
-                            "Magic": 1,
-                            "Prayer": 1
-                        },
+                        "stats": [
+                            {
+                                "id": "adventuring:hitpoints",
+                                "value": 30
+                            },
+                            {
+                                "id": "adventuring:defence",
+                                "value": 15
+                            },
+                            {
+                                "id": "adventuring:agility",
+                                "value": 20
+                            },
+                            {
+                                "id": "adventuring:strength",
+                                "value": 25
+                            },
+                            {
+                                "id": "adventuring:ranged",
+                                "value": 25
+                            },
+                            {
+                                "id": "adventuring:magic",
+                                "value": 25
+                            },
+                            {
+                                "id": "adventuring:prayer",
+                                "value": 25
+                            }
+                        ],
                         "generator": "adventuring:gnaw",
                         "spender": "adventuring:throw_rib",
                         "passives": []
@@ -1075,16 +1448,36 @@
                         "name": "Zombie Hand",
                         "media": "melvor:assets/media/monsters/zombie_hand.png",
                         "xp": 30,
-                        "levels": {
-                            "Hitpoints": 30,
-                            "Defence": 15,
-                            "Agility": 20,
-                            "Attack": 25,
-                            "Strength": 25,
-                            "Ranged": 1,
-                            "Magic": 1,
-                            "Prayer": 1
-                        },
+                        "stats": [
+                            {
+                                "id": "adventuring:hitpoints",
+                                "value": 30
+                            },
+                            {
+                                "id": "adventuring:defence",
+                                "value": 15
+                            },
+                            {
+                                "id": "adventuring:agility",
+                                "value": 20
+                            },
+                            {
+                                "id": "adventuring:strength",
+                                "value": 25
+                            },
+                            {
+                                "id": "adventuring:ranged",
+                                "value": 25
+                            },
+                            {
+                                "id": "adventuring:magic",
+                                "value": 25
+                            },
+                            {
+                                "id": "adventuring:prayer",
+                                "value": 25
+                            }
+                        ],
                         "generator": "adventuring:slap",
                         "spender": "adventuring:strangle",
                         "passives": []
@@ -1094,16 +1487,36 @@
                         "name": "Zombie",
                         "media": "melvor:assets/media/monsters/zombie.png",
                         "xp": 40,
-                        "levels": {
-                            "Hitpoints": 40,
-                            "Defence": 20,
-                            "Agility": 30,
-                            "Attack": 30,
-                            "Strength": 30,
-                            "Ranged": 1,
-                            "Magic": 1,
-                            "Prayer": 1
-                        },
+                        "stats": [
+                            {
+                                "id": "adventuring:hitpoints",
+                                "value": 40
+                            },
+                            {
+                                "id": "adventuring:defence",
+                                "value": 20
+                            },
+                            {
+                                "id": "adventuring:agility",
+                                "value": 30
+                            },
+                            {
+                                "id": "adventuring:strength",
+                                "value": 30
+                            },
+                            {
+                                "id": "adventuring:ranged",
+                                "value": 30
+                            },
+                            {
+                                "id": "adventuring:magic",
+                                "value": 30
+                            },
+                            {
+                                "id": "adventuring:prayer",
+                                "value": 30
+                            }
+                        ],
                         "generator": "adventuring:gnaw",
                         "spender": "adventuring:eat_brains",
                         "passives": []
@@ -1113,16 +1526,36 @@
                         "name": "Ghost",
                         "media": "melvor:assets/media/monsters/ghost.png",
                         "xp": 30,
-                        "levels": {
-                            "Hitpoints": 40,
-                            "Defence": 30,
-                            "Agility": 40,
-                            "Attack": 30,
-                            "Strength": 30,
-                            "Ranged": 1,
-                            "Magic": 1,
-                            "Prayer": 1
-                        },
+                        "stats": [
+                            {
+                                "id": "adventuring:hitpoints",
+                                "value": 40
+                            },
+                            {
+                                "id": "adventuring:defence",
+                                "value": 30
+                            },
+                            {
+                                "id": "adventuring:agility",
+                                "value": 40
+                            },
+                            {
+                                "id": "adventuring:strength",
+                                "value": 30
+                            },
+                            {
+                                "id": "adventuring:ranged",
+                                "value": 30
+                            },
+                            {
+                                "id": "adventuring:magic",
+                                "value": 30
+                            },
+                            {
+                                "id": "adventuring:prayer",
+                                "value": 30
+                            }
+                        ],
                         "generator": "adventuring:haunt",
                         "spender": "adventuring:possess",
                         "passives": []
@@ -1132,16 +1565,36 @@
                         "name": "Zombie Leader",
                         "media": "melvor:assets/media/monsters/zombie_leader.png",
                         "xp": 150,
-                        "levels": {
-                            "Hitpoints": 60,
-                            "Defence": 40,
-                            "Agility": 40,
-                            "Attack": 40,
-                            "Strength": 40,
-                            "Ranged": 1,
-                            "Magic": 1,
-                            "Prayer": 1
-                        },
+                        "stats": [
+                            {
+                                "id": "adventuring:hitpoints",
+                                "value": 60
+                            },
+                            {
+                                "id": "adventuring:defence",
+                                "value": 40
+                            },
+                            {
+                                "id": "adventuring:agility",
+                                "value": 40
+                            },
+                            {
+                                "id": "adventuring:strength",
+                                "value": 40
+                            },
+                            {
+                                "id": "adventuring:ranged",
+                                "value": 40
+                            },
+                            {
+                                "id": "adventuring:magic",
+                                "value": 40
+                            },
+                            {
+                                "id": "adventuring:prayer",
+                                "value": 40
+                            }
+                        ],
                         "generator": "adventuring:gnaw",
                         "spender": "adventuring:eat_brains",
                         "passives": []
@@ -1692,8 +2145,8 @@
                     {
                         "id": "hitpoints",
                         "name": "of Hitpoints",
-                        "levels": [
-                            "Hitpoints"
+                        "stats": [
+                            "adventuring:hitpoints"
                         ],
                         "tier": "adventuring:tier1",
                         "types": [
@@ -1728,8 +2181,8 @@
                     {
                         "id": "defence",
                         "name": "of Defence",
-                        "levels": [
-                            "Defence"
+                        "stats": [
+                            "adventuring:defence"
                         ],
                         "tier": "adventuring:tier1",
                         "types": [
@@ -1750,8 +2203,8 @@
                     {
                         "id": "agility",
                         "name": "of Agility",
-                        "levels": [
-                            "Agility"
+                        "stats": [
+                            "adventuring:agility"
                         ],
                         "tier": "adventuring:tier1",
                         "types": [
@@ -1785,10 +2238,10 @@
                         ]
                     },
                     {
-                        "id": "attack",
-                        "name": "of Attack",
-                        "levels": [
-                            "Attack"
+                        "id": "strength",
+                        "name": "of Strength",
+                        "stats": [
+                            "adventuring:strength"
                         ],
                         "tier": "adventuring:tier1",
                         "types": [
@@ -1799,40 +2252,6 @@
                             "adventuring:scimitar",
                             "adventuring:knives",
                             "adventuring:javelin",
-                            "adventuring:crossbow",
-                            "adventuring:shortbow",
-                            "adventuring:longbow",
-                            
-                            "adventuring:quiver",
-
-                            "adventuring:helm",
-                            "adventuring:cowl",
-
-                            "adventuring:platebody",
-                            "adventuring:vest",
-
-                            "adventuring:platelegs",
-                            "adventuring:chaps",
-
-                            "adventuring:gauntlets",
-                            "adventuring:vambraces",
-
-                            "adventuring:sabatons",
-                            "adventuring:boots",
-
-                            "adventuring:cape",
-                            "adventuring:amulet",
-                            "adventuring:ring"
-                        ]
-                    },
-                    {
-                        "id": "strength",
-                        "name": "of Strength",
-                        "levels": [
-                            "Strength"
-                        ],
-                        "tier": "adventuring:tier1",
-                        "types": [
                             "adventuring:shield",
 
                             "adventuring:helm",
@@ -1858,8 +2277,8 @@
                     {
                         "id": "ranged",
                         "name": "of Ranged",
-                        "levels": [
-                            "Ranged"
+                        "stats": [
+                            "adventuring:ranged"
                         ],
                         "tier": "adventuring:tier1",
                         "types": [
@@ -1885,8 +2304,8 @@
                     {
                         "id": "magic",
                         "name": "of Magic",
-                        "levels": [
-                            "Magic"
+                        "stats": [
+                            "adventuring:magic"
                         ],
                         "tier": "adventuring:tier1",
                         "types": [
@@ -1908,8 +2327,8 @@
                     {
                         "id": "prayer",
                         "name": "of Prayer",
-                        "levels": [
-                            "Prayer"
+                        "stats": [
+                            "adventuring:prayer"
                         ],
                         "tier": "adventuring:tier1",
                         "types": [
@@ -2086,8 +2505,8 @@
                     },
                     {
                         "id": "bronze_platelegs",
-                        "name": "Bronze Platebody",
-                        "media": "melvor:assets/media/bank/armour_platebody_bronze.png",
+                        "name": "Bronze Platelegs",
+                        "media": "melvor:assets/media/bank/armour_platelegs_bronze.png",
                         "type": "adventuring:platelegs",
                         "tier": "adventuring:tier1"
                     },

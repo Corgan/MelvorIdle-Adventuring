@@ -10,7 +10,6 @@ const { AdventuringStashUIComponent } = await loadModule('src/components/adventu
 
 class AdventuringStashRenderQueue {
     constructor() {
-        this.details = false;
         this.slots = false;
     }
 }
@@ -20,10 +19,10 @@ export class AdventuringStash extends AdventuringPage {
         super(manager, game);
         this.manager = manager;
         this.game = game;
-        this.baseSlots = 26;
+        this.baseSlots = 44;
         this.slots = new Array(this.baseSlots).fill(null).map(() => new AdventuringStashSlot(this.manager, this.game));
 
-        this.component = new AdventuringStashUIComponent(this.manager, this.game);
+        this.component = new AdventuringStashUIComponent(this.manager, this.game, this);
 
         this.component.trash.onclick = () => this.trashItem();
         this.renderQueue = new AdventuringStashRenderQueue();
@@ -111,7 +110,6 @@ export class AdventuringStash extends AdventuringPage {
                 slot.setHighlight(!this.selectedSlot.empty && slot.canEquip(selectedSlot.item));
             });
         });
-        this.renderQueue.details = true;
     }
 
     clearSelected() {
@@ -125,12 +123,10 @@ export class AdventuringStash extends AdventuringPage {
                 slot.setHighlight(false);
             });
         });
-        this.renderQueue.details = true;
     }
 
     render() {
         this.renderSlots();
-        this.renderDetails();
     }
 
     renderSlots() {
@@ -146,31 +142,6 @@ export class AdventuringStash extends AdventuringPage {
         this.component.slots.replaceChildren(...slots);
 
         this.renderQueue.slots = false;
-    }
-
-    renderDetails() {
-        if(!this.renderQueue.details)
-            return;
-
-        let selectedSlot = this.selectedSlot;
-        let selectedEquipment = this.manager.party.all.map(member => member.equipment).find(member => member.selectedSlot !== undefined);
-
-        if(selectedSlot === undefined && selectedEquipment !== undefined)
-            selectedSlot = selectedEquipment.selectedSlot;
-
-        if(selectedSlot !== undefined) {
-            this.component.name.textContent = selectedSlot.item.name;
-            Object.entries(this.component.levels.skills).forEach(([skill, text]) => {
-                text.textContent = selectedSlot.item.levels.get(skill) || "-";
-            });
-        } else {
-            this.component.name.textContent = "";
-            Object.entries(this.component.levels.skills).forEach(([skill, text]) => {
-                text.textContent = "-";
-            });
-        }
-
-        this.renderQueue.details = false;
     }
 
     encode(writer) {

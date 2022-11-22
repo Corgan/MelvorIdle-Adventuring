@@ -20,7 +20,7 @@ export class AdventuringStashSlot {
 
         this.renderQueue = new AdventuringStashSlotRenderQueue();
 
-        this.component = new AdventuringStashSlotUIComponent(this.manager, this.game);
+        this.component = new AdventuringStashSlotUIComponent(this.manager, this.game, this);
         this.component.icon.onclick = () => {
             this.slotClicked();
         }
@@ -87,7 +87,7 @@ export class AdventuringStashSlot {
                     this.manager.stash.selectSlot(this);
             }
 
-            this.manager.party.all.forEach(member => member.calculateLevels());
+            this.manager.party.all.forEach(member => member.calculateStats());
         }
     }
 

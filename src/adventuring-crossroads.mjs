@@ -9,7 +9,7 @@ export class AdventuringCrossroads extends AdventuringPage {
         super(manager, game);
         this.manager = manager;
         this.game = game;
-        this.component = new AdventuringCrossroadsUIComponent(this.manager, this.game);
+        this.component = new AdventuringCrossroadsUIComponent(this.manager, this.game, this);
 
         this.areas = [];
     }

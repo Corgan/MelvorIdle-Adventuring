@@ -21,44 +21,41 @@ export class AdventuringEncounter extends AdventuringPage {
         this.manager = manager;
         this.game = game;
         this.isFighting = false;
-        this.currentRound = [];
-        this.nextRound = [];
+        this.hitHistory = [];
+        this.currentRoundOrder = [];
+        this.nextRoundOrder = [];
         this.roundCounter = 0;
+        this.currentHit = 0;
+        this.hitRepeat = 0;
 
-        this.component = new AdventuringEncounterUIComponent(this.manager, this.game);
+        this.component = new AdventuringEncounterUIComponent(this.manager, this.game, this);
 
         this.party = new AdventuringEnemyParty(this.manager, this.game);
         this.party.component.mount(this.component.enemies);
 
         this.roundCard = new AdventuringCard(this.manager, this.game);
+        
+        this.turnTimer = new Timer('Turn', () => this.processTurn());
+        this.turnInterval = 1500;
+
+        this.hitTimer = new Timer('Hit', () => this.processHit());
+        this.hitInterval = 150;
+        this.endTurnInterval = 100;
     }
 
     get all() {
         return [...this.manager.party.all, ...this.party.all];
     }
 
+    get currentTimer() {
+        if(this.hitTimer.isActive)
+            return this.hitTimer;
+        return this.turnTimer;
+    }
+
     onLoad() {
         super.onLoad();
         this.party.onLoad();
-    }
-
-    startEncounter(isExit=false) {
-        this.currentRound = [...this.all].filter(c => !c.dead).sort((a,b) => b.levels.Agility - a.levels.Agility);
-        this.nextRound = [];
-        this.roundCounter = 1;
-        this.isFighting = true;
-        
-        this.manager.overview.renderQueue.status = true;
-        this.updateTurns();
-        this.manager.encounter.go();
-    }
-
-    reset() {
-        this.currentRound = [];
-        this.nextRound = [];
-        this.roundCounter = 0;
-        this.isFighting = false;
-        this.updateTurns();
     }
 
     generateEncounter(isExit=false) {
@@ -79,35 +76,86 @@ export class AdventuringEncounter extends AdventuringPage {
         this.party.back.setMonster(group[2]);
     }
 
-    complete() {
-        this.reset();
+    startEncounter() {
+        this.currentRoundOrder = [...this.all].filter(c => !c.dead).sort((a,b) => {
+            let agility = this.manager.stats.getObjectByID("adventuring:agility");
+            return b.stats.get(agility) - a.stats.get(agility);
+        });
+        this.nextRoundOrder = [];
+        this.roundCounter = 1;
+        this.isFighting = true;
 
-        let floor = this.manager.dungeon.floor;
-
-        let [x, y, type, explored] = floor.current;
-
-        if(type == AdventuringDungeonFloor.tiles.exit && explored) {
-            floor.complete();
-        } else {
-            this.manager.dungeon.updateFloorCards();
-            this.manager.dungeon.go();
-        }
+        this.turnTimer.start(this.turnInterval);
+        this.currentTurn = this.currentRoundOrder.shift();
+        
+        this.manager.overview.renderQueue.turnProgressBar = true;
+        this.manager.overview.renderQueue.status = true;
+        this.updateTurns();
+        this.manager.encounter.go();
     }
 
-    async processHit(currentTurn, currentHit) {
+    reset() {
+        this.currentTurn = undefined;
+        this.currentAction = undefined;
+        this.currentHit = 0;
+        this.hitRepeat = 0;
+
+        this.currentRoundOrder = [];
+        this.nextRoundOrder = [];
+        this.roundCounter = 0;
+        this.isFighting = false;
+        this.turnTimer.stop();
+        this.hitTimer.stop();
+        this.manager.overview.renderQueue.turnProgressBar = true;
+        this.updateTurns();
+    }
+
+    removeDead() {
+        this.currentRoundOrder = this.currentRoundOrder.filter(character => character.hitpoints > 0);
+        this.nextRoundOrder = this.nextRoundOrder.filter(character => character.hitpoints > 0);
+    }
+
+    nextRound() {
+        this.currentRoundOrder = this.nextRoundOrder;
+        this.nextRoundOrder = [];
+        this.roundCounter++;
+        this.manager.overview.renderQueue.status = true;
+    }
+
+    processTurn() {
+        this.currentAction = this.currentTurn.action;
+        this.currentHit = 0;
+        this.hitRepeat = 0;
+        this.hitHistory = [];
+
+        let currentHit = this.currentAction.hits[this.currentHit];
+        this.hitTimer.start(currentHit.delay !== undefined ? currentHit.delay : this.hitInterval);
+        this.manager.overview.renderQueue.turnProgressBar = true;
+
+        this.updateTurns();
+    }
+
+    processHit() {
+        if(this.currentHit >= this.currentAction.hits.length) {
+            this.endTurn();
+            return;
+        }
+        
+        let currentHit = this.currentAction.hits[this.currentHit];
+
         let effectType = currentHit.type;
         let targetType = currentHit.target;
-        let amount = currentHit.getAmount(currentTurn.levels);
+        let amount = currentHit.getAmount(this.currentTurn.stats);
 
         let targetParty;
 
-        if(currentTurn instanceof AdventuringHero) {
+        if(this.currentTurn instanceof AdventuringHero) {
             if(effectType == "heal") {
                 targetParty = this.manager.party;
             } else if(effectType == "damage") {
                 targetParty = this.party;
             }
-        } else if (currentTurn instanceof AdventuringEnemy) {
+        } else if (this.currentTurn instanceof AdventuringEnemy) {
             if(effectType == "heal") {
                 targetParty = this.party;
             } else if(effectType == "damage") {
@@ -145,48 +193,58 @@ export class AdventuringEncounter extends AdventuringPage {
             });
             targets = [potentialTargets];
         } else if(targetType == "self") {
-            targets = [currentTurn];
+            targets = [this.currentTurn];
         }
 
-        if(targets.length > 0)
-            targets.forEach(t => t.applyEffect(effectType, amount));
+        if(targets.length > 0) {
+            targets.forEach(t => {
+                if(t !== undefined) {
+                    t.applyEffect(effectType, amount);
+                    this.manager.log.add(`${this.currentTurn.name} ${this.currentAction.name} ${effectType} ${t.name} for ${amount}`);
+                    if(t.dead)
+                        this.manager.log.add(`${t.name} dies.`);
+                }
+            });
+            this.hitHistory.push(targets);
+        }
 
         if(currentHit.energy !== undefined)
-            currentTurn.addEnergy(currentHit.energy);
+            this.currentTurn.addEnergy(currentHit.energy);
 
-        if(currentHit.delay !== undefined)
-            return new Promise(r => setTimeout(r, currentHit.delay));
-        
-        return Promise.resolve();
+        if(currentHit.repeat === undefined || ++this.hitRepeat >= currentHit.repeat)
+            this.currentHit++;
+
+        let endTurnDelay = this.endTurnInterval;
+
+        let nextHit = this.currentAction.hits[this.currentHit];
+        if(nextHit !== undefined) {
+            if(nextHit.delay !== undefined)
+                endTurnDelay = nextHit.delay;
+        }
+
+        this.hitTimer.start(endTurnDelay);
+        this.manager.overview.renderQueue.turnProgressBar = true;
     }
 
-    nextTurn() {
-        let currentTurn = this.currentRound.shift();
-        let currentAction = currentTurn.action;
+    endTurn() {
+        if(this.currentAction.cost !== undefined && this.currentAction.cost >= this.currentTurn.energy)
+            this.currentTurn.removeEnergy(this.currentAction.cost);
+
+        if(this.currentAction.energy !== undefined)
+            this.currentTurn.addEnergy(this.currentAction.energy);
         
-        currentAction.hits.reduce(async (last, currentHit) => {
-            await last;
-            if(currentHit.repeat !== undefined) {
-                return new Array(currentHit.repeat).fill(0).reduce(async (repeat, _) => {
-                    await repeat;
-                    return this.processHit(currentTurn, currentHit);
-                }, Promise.resolve());
-            }
+        this.nextRoundOrder.push(this.currentTurn);
+        this.nextRoundOrder.sort((a,b) => {
+            let agility = this.manager.stats.getObjectByID("adventuring:agility");
+            b.stats.get(agility) - a.stats.get(agility);
+        });
 
-            return this.processHit(currentTurn, currentHit);
-        }, Promise.resolve());
+        this.removeDead();
+        if(this.currentRoundOrder.length === 0)
+            this.nextRound();
+        this.currentTurn = this.currentRoundOrder.shift();
 
-        if(currentAction.cost !== undefined && currentAction.cost >= currentTurn.energy)
-            currentTurn.removeEnergy(currentAction.cost);
-
-        if(currentAction.energy !== undefined)
-            currentTurn.addEnergy(currentAction.energy);
-
-        this.nextRound.push(currentTurn);
-        this.nextRound.sort((a,b) => b.levels.Agility - a.levels.Agility);
-
-        this.currentRound = this.currentRound.filter(character => character.hitpoints > 0);
-        this.nextRound = this.nextRound.filter(character => character.hitpoints > 0);
+        this.updateTurns();
 
         if(this.party.all.every(enemy => enemy.dead)) {
             this.complete();
@@ -198,37 +256,50 @@ export class AdventuringEncounter extends AdventuringPage {
             return;
         }
 
-        if(this.currentRound.length == 0) {
-            this.currentRound = this.nextRound;
-            this.nextRound = [];
-            this.roundCounter++;
-            this.manager.overview.renderQueue.status = true;
-        }
+        this.turnTimer.start(this.turnInterval);
+        this.manager.overview.renderQueue.turnProgressBar = true;
+    }
 
-        this.updateTurns();
+    complete() {
+        this.reset();
+
+        let floor = this.manager.dungeon.floor;
+
+        let [x, y, type, explored] = floor.current;
+
+        if(type == AdventuringDungeonFloor.tiles.exit && explored) {
+            floor.complete();
+        } else {
+            this.manager.dungeon.updateFloorCards();
+            this.manager.dungeon.go();
+        }
     }
 
     updateTurns() {
         this.roundCard.setIcon(cdnMedia('assets/media/main/question.svg'));
 
         let cards = [];
-        cards.push(...this.currentRound.map(c => c.card));
-        if(this.currentRound.length > 0) {
+
+        if(this.currentTurn !== undefined)
+            cards.push(this.currentTurn.card);
+
+        cards.push(...this.currentRoundOrder.map(c => c.card));
+        if(cards.length > 0) {
             this.roundCard.setName(`Round ${this.roundCounter + 1}`)
             cards.push(this.roundCard);
         }
 
-        cards.push(...this.nextRound.map(c => c.card));
-        if(this.currentRound.length === 0 && this.nextRound.length > 0) {
-            this.roundCard.setName(`Round ${this.roundCounter + 2}`)
-            cards.push(this.roundCard);
-        }
+        cards.push(...this.nextRoundOrder.map(c => c.card));
+        //if(this.currentRoundOrder.length === 0 && this.nextRoundOrder.length > 0) {
+        //    this.roundCard.setName(`Round ${this.roundCounter + 2}`)
+        //    cards.push(this.roundCard);
+        //}
         
         this.manager.overview.cards.renderQueue.cards.clear();
         
 
         this.all.forEach(character => {
-            character.setHighlight(character == this.currentRound[0]);
+            character.setHighlight(character === this.currentTurn);
         });
 
         cards.forEach((card, i) => {
@@ -245,10 +316,24 @@ export class AdventuringEncounter extends AdventuringPage {
         writer.writeBoolean(this.isFighting);
         this.party.encode(writer);
 
-        writer.writeArray(this.currentRound, (character, writer) => {
+        this.turnTimer.encode(writer);
+        this.hitTimer.encode(writer);
+
+        writer.writeUint8(this.all.indexOf(this.currentTurn));
+        writer.writeBoolean(this.currentTurn !== undefined && this.currentAction === this.currentTurn.spender);
+        writer.writeUint8(this.currentHit);
+        writer.writeUint8(this.hitRepeat);
+
+        writer.writeArray(this.hitHistory, (targets, writer) => {
+            writer.writeArray(targets, (target, writer) => {
+                writer.writeUint8(this.all.indexOf(target));
+            });
+        });
+
+        writer.writeArray(this.currentRoundOrder, (character, writer) => {
             writer.writeUint8(this.all.indexOf(character));
         });
-        writer.writeArray(this.nextRound, (character, writer) => {
+        writer.writeArray(this.nextRoundOrder, (character, writer) => {
             writer.writeUint8(this.all.indexOf(character));
         });
         return writer;
@@ -257,13 +342,31 @@ export class AdventuringEncounter extends AdventuringPage {
     decode(reader, version) {
         this.isFighting = reader.getBoolean();
         this.party.decode(reader, version);
+
+        this.turnTimer.decode(reader, version);
+        this.hitTimer.decode(reader, version);
+
+        this.currentTurn = this.all[reader.getUint8()];
+        let isSpender = reader.getBoolean();
+        if(this.currentTurn !== undefined)
+            this.currentAction = isSpender ? this.currentTurn.spender : this.currentTurn.generator;
+        this.currentHit = reader.getUint8();
+        this.hitRepeat = reader.getUint8();
+
+        this.hitHistory = reader.getArray((reader)=>{
+            return reader.getArray((reader)=>{
+                const characterIndex = reader.getUint8();
+                return this.all[characterIndex];
+            });
+        });
+
         reader.getArray((reader)=>{
             const characterIndex = reader.getUint8();
-            this.currentRound.push(this.all[characterIndex]);
+            this.currentRoundOrder.push(this.all[characterIndex]);
         });
         reader.getArray((reader)=>{
             const characterIndex = reader.getUint8();
-            this.nextRound.push(this.all[characterIndex]);
+            this.nextRoundOrder.push(this.all[characterIndex]);
         });
     }
 }

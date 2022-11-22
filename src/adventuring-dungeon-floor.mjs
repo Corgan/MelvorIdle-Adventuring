@@ -19,7 +19,8 @@ export class AdventuringDungeonFloor {
         treasure: 4,
         trap: 5,
         fountain: 6,
-        encounter: 7
+        encounter: 7,
+        noncombat: 8
     }
 
     static typeMask =     0b01111111; // 127
@@ -32,7 +33,7 @@ export class AdventuringDungeonFloor {
 
         this.renderQueue = new AdventuringDungeonFloorRenderQueue();
 
-        this.component = new AdventuringDungeonFloorUIComponent(this.manager, this.game);
+        this.component = new AdventuringDungeonFloorUIComponent(this.manager, this.game, this);
 
         this.grid = [];
 
@@ -68,9 +69,9 @@ export class AdventuringDungeonFloor {
         let shouldMove = true;
 
         if(type == AdventuringDungeonFloor.tiles.empty) {
-
+            this.dungeon.triggerEmpty();
         } else if(type == AdventuringDungeonFloor.tiles.start) {
-            
+            this.dungeon.triggerStart();
         } else if(type == AdventuringDungeonFloor.tiles.exit) {
             this.dungeon.triggerExit();
         } else if (type == AdventuringDungeonFloor.tiles.treasure) {

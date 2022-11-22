@@ -1,6 +1,7 @@
 const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringCard } = await loadModule('src/adventuring-card.mjs');
+const { AdventuringStats } = await loadModule('src/adventuring-stats.mjs');
 
 const { AdventuringCharacterUIComponent } = await loadModule('src/components/adventuring-character.mjs');
 
@@ -9,7 +10,7 @@ class AdventuringCharacterRenderQueue {
         this.name = false;
         this.hitpoints = false;
         this.energy = false;
-        this.levels = false;
+        this.stats = false;
         this.highlight = false;
         this.generator = false;
         this.spender = false;
@@ -23,7 +24,7 @@ class AdventuringCharacter {
         this.manager = manager;
         this.party = party;
 
-        this.component = new AdventuringCharacterUIComponent(this.manager, this.game);
+        this.component = new AdventuringCharacterUIComponent(this.manager, this.game, this);
 
         this.card = new AdventuringCard(this.manager, this.game);
 
@@ -31,13 +32,19 @@ class AdventuringCharacter {
         this.energy = 0;
         this.dead = false;
         this.highlight = false;
+        this.stats = new AdventuringStats(this.manager, this.game);
+        this.stats.component.mount(this.component.stats);
+    }
+
+    postDataRegistration() {
+
     }
 
     onLoad() {
         this.renderQueue.name = true;
         this.renderQueue.hitpoints = true;
         this.renderQueue.energy = true;
-        this.renderQueue.levels = true;
+        this.stats.renderQueue.stats = true;
 
         if(this.generator === undefined) // Default to None
             this.setGenerator(undefined);
@@ -53,7 +60,7 @@ class AdventuringCharacter {
     // 
 
     get maxHitpoints() {
-        let max = 10 * this.levels.Hitpoints;
+        let max = 10 * this.stats.get("adventuring:hitpoints");
         return max;
     }
 
@@ -197,7 +204,7 @@ class AdventuringCharacter {
         this.renderHitpoints();
         this.renderSplash();
         this.renderEnergy();
-        this.renderLevels();
+        this.stats.render();
         this.renderGenerator();
         this.renderSpender();
     }
@@ -215,7 +222,8 @@ class AdventuringCharacter {
         if(!this.renderQueue.icon)
             return;
 
-        this.component.icon.src = this.media;
+        this.component.icon.classList.remove('d-none');
+        this.component.icon.firstElementChild.src = this.media;
 
         this.renderQueue.icon = false;
     }
@@ -251,6 +259,9 @@ class AdventuringCharacter {
         if(!this.renderQueue.energy)
             return;
         
+        this.component.energy.parentElement.classList.toggle('invisible', this.maxEnergy === 0);
+        this.component.energyProgress.barElem.parentElement.classList.toggle('invisible', this.maxEnergy === 0);
+        
         this.component.energy.textContent = this.energy;
         this.component.maxEnergy.textContent = this.maxEnergy;
         this.component.energyProgress.setFixedPosition(this.energyPercent);
@@ -258,23 +269,12 @@ class AdventuringCharacter {
         this.renderQueue.energy = false;
     }
 
-    renderLevels() {
-        if(!this.renderQueue.levels)
-            return;
-        
-        Object.entries(this.component.levels.skills).forEach(([skill, text]) => {
-            text.textContent = this.levels[skill];
-        });
-
-        this.renderQueue.levels = false;
-    }
-
     renderGenerator() {
         if(!this.renderQueue.generator)
             return;
 
         this.component.generator.name.textContent = this.generator.name;
-        this.component.generator.tooltip.setContent(this.generator.getDescription(this.levels));
+        this.component.generator.tooltip.setContent(this.generator.getDescription(this.stats));
         this.component.generator.styling.classList.toggle('bg-combat-menu-selected', this.generator === this.action && this.highlight);
 
         this.renderQueue.generator = false;
@@ -285,14 +285,14 @@ class AdventuringCharacter {
             return;
 
         this.component.spender.name.textContent = this.spender.name;
-        this.component.spender.tooltip.setContent(this.spender.getDescription(this.levels));
+        this.component.spender.tooltip.setContent(this.spender.getDescription(this.stats));
         this.component.spender.styling.classList.toggle('bg-combat-menu-selected', this.spender === this.action && this.highlight);
 
         this.renderQueue.spender = false;
     }
 
     postDataRegistration() {
-        
+
     }
 
     encode(writer) {

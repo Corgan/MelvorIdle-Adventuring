@@ -25,33 +25,30 @@ export class AdventuringLootGenerator {
             });
             let suffix = availableSuffixes[Math.floor(Math.random() * availableSuffixes.length)];
 
-            item.name = baseItem.name;
-            if(suffix)
-                item.name = item.name + ' ' + suffix.name;
+            item.suffix = suffix;
 
-            item.levels = this.distributeLevels(suffix.levels, min, max, rolledLevel);
+            this.distributeStats(item.stats, suffix.stats, min, max, rolledLevel);
             return item;
         }
         return false;
     }
 
-    distributeLevels(levels, min, max, rolledLevel=-1) {
-        let levelCount = levels.length;
+    distributeStats(itemStats, suffixStats, min, max, rolledLevel=-1) {
+        let levelCount = suffixStats.length;
         let avg_min = Math.floor(min / levelCount);
 
-        let levelsMap = new Map();
-        levels.forEach(skill => {
-            levelsMap.set(skill, avg_min);
+        suffixStats.forEach(statID => {
+            let stat = this.manager.stats.getObjectByID(statID);
+            itemStats.set(stat, avg_min);
         });
 
         let toDistribute = rolledLevel !== -1 ? rolledLevel - (avg_min * levelCount) : Math.floor(Math.random() * (max - (avg_min * levelCount)));
 
         while(toDistribute > 0) {
-            let skill = levels[Math.floor(Math.random() * levels.length)];
-            levelsMap.set(skill, levelsMap.get(skill) + 1);
+            let statID = suffixStats[Math.floor(Math.random() * suffixStats.length)];
+            let stat = this.manager.stats.getObjectByID(statID);
+            itemStats.set(stat, itemStats.get(stat) + 1);
             toDistribute--;
         }
-        
-        return levelsMap;
     }
 }

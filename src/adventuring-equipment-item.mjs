@@ -1,29 +1,45 @@
 const { loadModule } = mod.getContext(import.meta);
 
+const { AdventuringStats } = await loadModule('src/adventuring-stats.mjs');
+
 export class AdventuringEquipmentItem {
     constructor(manager, game) {
         this.manager = manager;
         this.game = game;
-        this.name = "";
-        this.levels = new Map();
+        this.stats = new AdventuringStats(this.manager, this.game);
     }
 
     get tooltip() {
         let html = '<div>'
         html += `<div><span>${this.name}</span></div>`
-        this.levels.forEach((level, skill) => {
-            html += `<div><small>${skill} => ${level}</small></div>`;
+        this.stats.forEach((value, stat) => {
+            let statImg = `<img class="skill-icon-xxs" style="height: .66rem; width: .66rem; margin-top: 0;" src="${stat.media}">`
+            html += `<div><small>+${value}${statImg}</small></div>`;
         });
+
+        html += `</br><div><small>${this.type.name}</small></div>`;
+
         let validJobs = this.jobs.filter(job => job.id !== "adventuring:none");
         if(validJobs.length > 0) {
-            html += `</br><div><small>Usable By: </small></div>`;
+            html += `<div><small>Usable By: `;
             let jobList = validJobs.map(job => job.name).join(', ');
             if(this.jobs.length == this.manager.jobs.size)
                 jobList = "Any";
-            html += `<div><small>${jobList}</small></div>`;
+            html += `${jobList}</small></div>`;
         }
         html += '</div>'
         return html;
+    }
+
+    get name() {
+        let name = "";
+        if(this.base !== undefined) {
+            name = this.base.name;
+            if(this.suffix !== undefined) {
+                name += ' ' + this.suffix.name;
+            }
+        }
+        return name;
     }
 
     get media() {
@@ -70,10 +86,13 @@ export class AdventuringEquipmentItem {
         writer.writeBoolean(this.base !== undefined)
         if(this.base !== undefined) {
             writer.writeNamespacedObject(this.base);
-            writer.writeString(this.name);
-            writer.writeComplexMap(this.levels, (key, value, writer) => {
-                writer.writeString(key);
-                writer.writeUint32(value);
+            writer.writeBoolean(this.suffix !== undefined)
+            if(this.suffix !== undefined)
+                writer.writeNamespacedObject(this.suffix);
+
+            writer.writeComplexMap(this.stats, (key, value, writer) => {
+                writer.writeNamespacedObject(key);
+                writer.writeUint8(value);
             });
         }
     }
@@ -81,10 +100,12 @@ export class AdventuringEquipmentItem {
     decode(reader, version) {
         if(reader.getBoolean()) {
             this.base = reader.getNamespacedObject(this.manager.baseItems);
-            this.name = reader.getString();
-            this.levels = reader.getComplexMap((reader) => {
-                let key = reader.getString();
-                let value = reader.getUint32();
+            if(reader.getBoolean())
+                this.suffix = reader.getNamespacedObject(this.manager.suffixes);
+            
+            this.stats = reader.getComplexMap((reader) => {
+                let key = reader.getNamespacedObject(this.manager.stats);
+                let value = reader.getUint8();
                 return { key, value };
             });
         }

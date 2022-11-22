@@ -27,7 +27,7 @@ export class AdventuringEquipmentSlot {
 
         this.renderQueue = new AdventuringEquipmentSlotRenderQueue();
 
-        this.component = new AdventuringEquipmentSlotUIComponent(this.manager, this.game);
+        this.component = new AdventuringEquipmentSlotUIComponent(this.manager, this.game, this);
 
         this.component.icon.onclick = () => {
             this.slotClicked();
@@ -46,7 +46,7 @@ export class AdventuringEquipmentSlot {
             return true;
         if(!item.slots.includes(this.slotType))
             return false;
-        if(!item.jobs.includes(this.equipment.character.job))
+        if(!item.jobs.includes(this.equipment.character.combatJob) && !item.jobs.includes(this.equipment.character.passiveJob))
             return false;
         if(item.pairs.length > 0) {
             if(this.slotType.pair !== undefined) {
@@ -159,7 +159,7 @@ export class AdventuringEquipmentSlot {
             }
         }
 
-        this.manager.party.all.forEach(member => member.calculateLevels());
+        this.manager.party.all.forEach(member => member.calculateStats());
     }
 
     setOccupied(slot) {
@@ -196,8 +196,8 @@ export class AdventuringEquipmentSlot {
         return this.occupiedBy !== emptySlot;
     }
     
-    get levels() {
-        return !this.empty ? this.item.levels : new Map();
+    get stats() {
+        return this.item.stats;
     }
 
     setSelected(selected) {
