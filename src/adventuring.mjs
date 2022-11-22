@@ -309,6 +309,9 @@ export class Adventuring extends SkillWithMastery {
     }
 
     render() {
+        this.renderQueue.actionMastery.forEach(masteryItem => {
+            masteryItem.renderQueue.mastery = true;
+        });
         super.render();
         
         this.overview.render();

@@ -9,6 +9,7 @@ class AdventuringAreaRenderQueue {
         this.name = false;
         this.icon = false;
         this.clickable = false;
+        this.mastery = false;
     }
 }
 
@@ -69,6 +70,7 @@ export class AdventuringArea extends MasteryAction {
         this.renderName();
         this.renderIcon();
         this.renderClickable();
+        this.renderMastery();
     }
 
     renderName() {
@@ -110,5 +112,20 @@ export class AdventuringArea extends MasteryAction {
         }
 
         this.renderQueue.clickable = false;
+    }
+
+    renderMastery() {
+        if(!this.renderQueue.mastery)
+            return;
+
+        let { xp, level, percent } = this.manager.getMasteryProgress(this);
+
+        if(this.unlocked) {
+            this.component.masteryProgress.setFixedPosition(percent);
+        } else {
+            this.component.masteryProgress.setFixedPosition(0);
+        }
+
+        this.renderQueue.mastery = false;
     }
 }

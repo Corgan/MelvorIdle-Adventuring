@@ -9,6 +9,11 @@ export class AdventuringAreaUIComponent extends AdventuringUIComponent {
         this.clickable = getElementFromFragment(this.$fragment, 'clickable', 'div');
         this.icon = getElementFromFragment(this.$fragment, 'icon', 'img');
         this.name = getElementFromFragment(this.$fragment, 'name', 'h5');
+        
+        this.progressContainer = getElementFromFragment(this.$fragment, 'progress-container', 'div');
+
+        this.masteryProgress = new ProgressBar(getElementFromFragment(this.$fragment, 'mastery-progress', 'div'));
+
         this.tooltip = tippy(this.clickable, {
             content: '',
             allowHTML: true,

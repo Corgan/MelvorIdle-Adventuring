@@ -9,6 +9,7 @@ class AdventuringJobRenderQueue {
         this.name = false;
         this.icon = false;
         this.clickable = false;
+        this.mastery = false;
     }
 }
 
