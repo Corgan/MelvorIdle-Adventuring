@@ -7,6 +7,7 @@ const { AdventuringJobSummaryUIComponent } = await loadModule('src/components/ad
 class AdventuringJobRenderQueue {
     constructor(){
         this.name = false;
+        this.tooltip = false;
         this.icon = false;
         this.clickable = false;
         this.mastery = false;
@@ -24,12 +25,10 @@ export class AdventuringJob extends MasteryAction {
         this.renderQueue = new AdventuringJobRenderQueue();
 
         this._name = data.name;
-        this.renderQueue.name = true;
 
         this._media = data.media;
-        this.renderQueue.icon = true;
 
-        this.level = data.level;
+        this.requirements = data.requirements;
         this._scaling = data.scaling;
         this.scaling = new AdventuringStats(this.manager, this.game);
         
@@ -37,17 +36,16 @@ export class AdventuringJob extends MasteryAction {
 
         this.isPassive = data.isPassive === true;
 
-        if(data.allowedItems)
-            this.allowedItems = data.allowedItems;
+        if(data.allowedItems !== undefined)
+            this._allowedItems = data.allowedItems;
         
-        this.isMilestoneReward = data.isMilestoneReward;
-        this.alwaysMultiple = data.alwaysMultiple;
+        this.isMilestoneReward = data.isMilestoneReward !== undefined && data.isMilestoneReward;
+        this.alwaysMultiple = data.alwaysMultiple !== undefined && data.alwaysMultiple;
 
         this.component.clickable.onclick = () => {
             if(this.unlocked)
                 this.viewDetails();
         }
-        this.renderQueue.clickable = true;
     }
 
     get name() {
@@ -58,21 +56,59 @@ export class AdventuringJob extends MasteryAction {
         return this.unlocked ? this.getMediaURL(this._media) : this.getMediaURL('melvor:assets/media/main/question.svg');
     }
 
+    get level() {
+        return this.manager.getMasteryLevel(this);
+    }
+
     get unlocked() {
-        return this.level <= this.manager.level;
+        if(this.requirements.length == 0)
+            return true;
+        return this.requirements.reduce((equipable, requirement) => {
+            if(requirement.type == "skill_level") {
+                if(this.manager.level < requirement.level)
+                    return false;
+            }
+            if(requirement.type == "job_level") {
+                let job = this.manager.jobs.getObjectByID(requirement.job);
+                if(job === undefined)
+                    return false;
+                if(this.manager.getMasteryLevel(job) < requirement.level)
+                    return false;
+            }
+            return equipable;
+        }, true);
+    }
+
+    get tooltip() {
+        let html = '<div>';
+
+        html += `<div><span>${this.name}</span></div>`;
+        if(this.unlocked) {
+            let { xp, level, percent, nextLevelXP } = this.manager.getMasteryProgress(this);
+            html += `<div><small>Level ${level}</small></div>`;
+            html += `<div><small>${xp} / ${nextLevelXP} XP</small></div>`;
+        }
+        html += '</div>'
+        return html;
     }
 
     get allowMultiple() {
         return this.alwaysMultiple || this.manager.getMasteryLevel(this) >= 99;
     }
+
+    onLoad() {
+        this.renderQueue.name = true;
+        this.renderQueue.tooltip = true;
+        this.renderQueue.icon = true;
+        this.renderQueue.clickable = true;
+        this.renderQueue.mastery = true;
+    }
     
     calculateStats() {
         this.stats.reset();
-
-        let masteryLevel = this.manager.getMasteryLevel(this);
         
         this.scaling.forEach((value, stat) => {
-            this.stats.set(stat, Math.floor(masteryLevel * value));
+            this.stats.set(stat, Math.floor(this.level * value));
         });
     }
 
@@ -83,6 +119,22 @@ export class AdventuringJob extends MasteryAction {
             });
             delete this._scaling;
         }
+        if(this._allowedItems !== undefined) {
+            this.allowedItems = [];
+            this._allowedItems.forEach(_type => {
+                let type = this.manager.itemTypes.getObjectByID(_type);
+                this.allowedItems.push(type);
+            });
+            delete this._allowedItems;
+        }
+    }
+
+    addXP(xp) {
+        this.manager.log.add(`${this.name} gains ${xp} mastery xp`)
+        this.manager.addMasteryXP(this, xp);
+        this.manager.addMasteryPoolXP(xp);
+        this.renderQueue.tooltip = true;
+        this.manager.party.all.forEach(member => (member.renderQueue.jobs = true));
     }
 
     viewDetails() {
@@ -92,27 +144,75 @@ export class AdventuringJob extends MasteryAction {
     }
 
     render() {
-        this.component.name.textContent = this.name;
-        this.component.icon.src = this.media;
-        this.summary.name.textContent = this.name;
-        this.summary.icon.src = this.media;
+        this.renderName();
+        this.renderTooltip();
+        this.renderIcon();
+        this.renderClickable();
+        this.renderMastery();
+    }
+
+    renderName() {
+        if(!this.renderQueue.name)
+            return;
 
         if(this.unlocked) {
-            let { xp, level, percent } = this.manager.getMasteryProgress(this);
-
-            this.component.level.textContent = this.id !== "adventuring:none" ? ` (${level})` : "";
-            this.component.clickable.classList.toggle('pointer-enabled', true);
-
-            this.component.masteryProgress.setFixedPosition(percent);
-
-            this.summary.level.textContent = this.id !== "adventuring:none" ? ` (${level})` : "";
+            this.component.name.textContent = this.name;
+            this.summary.name.textContent = this.name;
+            this.component.level.textContent = ` (${this.level})`;
+            this.summary.level.textContent = ` (${this.level})`;
         } else {
+            this.component.name.textContent = "???";
             this.component.level.textContent = "";
-            this.component.clickable.classList.toggle('pointer-enabled', false);
-
-            this.component.masteryProgress.setFixedPosition(0);
-
             this.summary.level.textContent = "";
         }
+
+        this.renderQueue.name = false;
+    }
+
+    renderTooltip() {
+        if(!this.renderQueue.tooltip)
+            return;
+
+        this.component.tooltip.setContent(this.tooltip);
+
+        this.renderQueue.tooltip = false;
+    }
+
+    renderIcon() {
+        if(!this.renderQueue.icon)
+            return;
+
+        if(this.unlocked) {
+            this.component.icon.src = this.media;
+            this.summary.icon.src = this.media;
+        } else {
+            this.component.icon.src = this.getMediaURL('melvor:assets/media/main/question.svg');
+        }
+
+        this.renderQueue.icon = false;
+    }
+
+    renderClickable() {
+        if(!this.renderQueue.clickable)
+            return;
+
+        this.component.clickable.classList.toggle('pointer-enabled', this.unlocked);
+
+        this.renderQueue.clickable = false;
+    }
+
+    renderMastery() {
+        if(!this.renderQueue.mastery)
+            return;
+
+        let { xp, level, percent } = this.manager.getMasteryProgress(this);
+
+        if(this.unlocked) {
+            this.component.masteryProgress.setFixedPosition(percent);
+        } else {
+            this.component.masteryProgress.setFixedPosition(0);
+        }
+
+        this.renderQueue.mastery = false;
     }
 }

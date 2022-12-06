@@ -1,35 +1,22 @@
 const { loadModule } = mod.getContext(import.meta);
 
+const { AdventuringWeightedTable } = await loadModule('src/adventuring-utils.mjs');
 const { AdventuringDungeonCell } = await loadModule('src/adventuring-dungeon-cell.mjs');
 
 const { AdventuringDungeonFloorUIComponent } = await loadModule('src/components/adventuring-dungeon-floor.mjs');
 
 class AdventuringDungeonFloorRenderQueue {
     constructor() {
-        this.cells = new Set();
+        this.cells = false;
     }
 }
 
 export class AdventuringDungeonFloor {
-    static tiles = {
-        wall: 0,
-        empty: 1,
-        start: 2,
-        exit: 3,
-        treasure: 4,
-        trap: 5,
-        fountain: 6,
-        encounter: 7,
-        noncombat: 8
-    }
-
-    static typeMask =     0b01111111; // 127
-    static exploredFlag = 0b10000000; //+128
-
     constructor(manager, game, dungeon) {
         this.manager = manager;
         this.game = game;
         this.dungeon = dungeon;
+        this.tileMap = [];
 
         this.renderQueue = new AdventuringDungeonFloorRenderQueue();
 
@@ -46,16 +33,39 @@ export class AdventuringDungeonFloor {
 
         this.floorCells = [];
         this.cellRowEnds = [];
+        this.tileTable = new AdventuringWeightedTable(this.manager, this.game);
+        this.tileCount = new Map();
         this.hasExtra = false;
     }
 
     onLoad() {
-        if(this.grid.length > 0)
-            this.updateFloor();
+        this.renderQueue.cells = true;
+        this.grid.forEach(cell => cell.onLoad());
+    }
+
+    postDataRegistration() {
+        this.tileMap = [...this.manager.tiles.allObjects];
+        this.empty = this.manager.tiles.getObjectByID('adventuring:empty');
+        this.wall = this.manager.tiles.getObjectByID('adventuring:wall');
+        this.start = this.manager.tiles.getObjectByID('adventuring:start');
+        this.exit = this.manager.tiles.getObjectByID('adventuring:exit');
+        this.boss = this.manager.tiles.getObjectByID('adventuring:boss');
+        this.encounter = this.manager.tiles.getObjectByID('adventuring:encounter');
+    }
+
+    get current() {
+        return this.at(...this.currentPos);
     }
 
     reset() {
-        this.grid = [];
+        this.tileCount.clear();
+        this.manager.tiles.allObjects.forEach(tile => {
+            this.tileCount.set(tile, 0);
+        });
+        this.grid.forEach(cell => {
+            cell.set(this.wall);
+            cell.setCurrent(false);
+        });
         this.height = 0;
         this.width = 0;
         this.currentPos = [-1, -1];
@@ -65,33 +75,16 @@ export class AdventuringDungeonFloor {
     }
 
     step() {
-        let [oX, oY, type, explored] = this.current;
-        let shouldMove = true;
+        let current = this.current;
 
-        if(type == AdventuringDungeonFloor.tiles.empty) {
-            this.dungeon.triggerEmpty();
-        } else if(type == AdventuringDungeonFloor.tiles.start) {
-            this.dungeon.triggerStart();
-        } else if(type == AdventuringDungeonFloor.tiles.exit) {
-            this.dungeon.triggerExit();
-        } else if (type == AdventuringDungeonFloor.tiles.treasure) {
-            this.dungeon.triggerTreasure();
-        } else if (type == AdventuringDungeonFloor.tiles.trap) {
-            this.dungeon.triggerTrap();
-        } else if (type == AdventuringDungeonFloor.tiles.fountain) {
-            this.dungeon.triggerFountain();
-        } else if (type == AdventuringDungeonFloor.tiles.encounter) {
-            this.dungeon.triggerEncounter();
-        } else {
-            
-        }
+        this.dungeon.triggerTile(current);
 
-        this.set(oX, oY, type, true);
+        current.setExplored(true);
 
-        if(type == AdventuringDungeonFloor.tiles.exit)
+        if(current.type === this.exit || current.type == this.boss)
             return;
 
-        let [mX, mY] = this.getBestMove(oX, oY);
+        let [mX, mY] = this.getBestMove();
 
         if(this.canMoveTo(mX, mY)) {
             this.move(mX, mY);
@@ -108,19 +101,22 @@ export class AdventuringDungeonFloor {
         }
     }
 
-    getBestMove(x, y, fromStack=false) {
+    getBestMove(fromStack=false) {
+        let [x, y] = this.currentPos;
+        if(fromStack)
+            [x, y] = this.forkStack.shift();
         let nodes = [];
 
-        if(this.canMoveTo(x - 1, y) && !this.is(x - 1, y, AdventuringDungeonFloor.tiles.exit))
+        if(this.canMoveTo(x - 1, y) && !this.is(x - 1, y, this.exit))
             nodes.push([x - 1, y]);
 
-        if(this.canMoveTo(x + 1, y) && !this.is(x + 1, y, AdventuringDungeonFloor.tiles.exit))
+        if(this.canMoveTo(x + 1, y) && !this.is(x + 1, y, this.exit))
             nodes.push([x + 1, y]);
 
-        if(this.canMoveTo(x, y - 1) && !this.is(x, y - 1, AdventuringDungeonFloor.tiles.exit))
+        if(this.canMoveTo(x, y - 1) && !this.is(x, y - 1, this.exit))
             nodes.push([x, y - 1]);
 
-        if(this.canMoveTo(x, y + 1) && !this.is(x, y + 1, AdventuringDungeonFloor.tiles.exit))
+        if(this.canMoveTo(x, y + 1) && !this.is(x, y + 1, this.exit))
             nodes.push([x, y + 1]);
         
         if(nodes.length > 0) {
@@ -129,43 +125,41 @@ export class AdventuringDungeonFloor {
             return nodes[Math.floor(Math.random() * nodes.length)];
         } else {
             if(this.forkStack.length > 0) {
-                let [fX, fY] = this.forkStack.shift();
-                return this.getBestMove(fX, fY, true);
+                return this.getBestMove(true);
             } else {
                 return [-1, -1];
             }
         }
     }
 
-    get current() {
-        let [x, y] = this.currentPos;
-        return [x, y, ...this.at(x, y)];
-    }
-
-    generate(height=5, width=8) {
+    generate(height=5, width=4) {
         this.reset();
 
         this.height = height;
         this.width = width;
 
-        for (let y = 0; y < height; y++)
-            this.grid.push(new Array(width).fill(0));
+        if(this.grid.length < this.height * this.width)
+            for(let i = this.grid.length; i < this.height * this.width; i++)
+                this.grid.push(new AdventuringDungeonCell(this.manager, this.game, this));
 
-        let [x, y] = [Math.floor(Math.random() * width), 0];
+        if(this.grid.length > this.height * this.width)
+            for(let i = this.grid.length - (this.height * this.width); i < this.grid.length; i++)
+                this.grid[i].set();
+            
+        for(let i = 0; i < this.grid.length; i++)
+            this.grid[i].set(this.wall);
 
-
-        x = Math.max(Math.min(width - 2, x), 1);
-        this.set(x, y, AdventuringDungeonFloor.tiles.start); // start
-        this.currentPos = [x, y];
+        this.currentPos = [Math.max(Math.min(this.width - 2, Math.floor(Math.random() * this.width)), 1), 0];
+        this.current.set(this.start);
 
         let exitMade = false;
-
-        while (!exitMade) {
+        let exitRepeats = 0;
+        while (!exitMade && exitRepeats <= 5) {
             let pCount = 0;
-            for (y = 0; y < this.height; y++) {
-                for (x = 0; x < this.width; x++) {
-                    let [type, explored] = this.at(x, y);
-                    if (type != AdventuringDungeonFloor.tiles.wall) {
+            for (let y = 0; y < this.height; y++) {
+                for (let x = 0; x < this.width; x++) {
+                    let cell = this.at(x, y);
+                    if(!cell.is(this.wall)) {
                         pCount += this.makePassage(x, y, 0, 1);
                             this.makePassage(x, y, 0, -1) +
                             this.makePassage(x, y, -1, 0) +
@@ -174,10 +168,13 @@ export class AdventuringDungeonFloor {
                 }
             }
             if (pCount == 0) {
-                for (x = 0; x < this.height; x++) {
-                    let [type, explored] = this.at(x, this.height - 2);
-                    if (type != AdventuringDungeonFloor.tiles.wall) {
-                        this.set(x, this.height - 1, AdventuringDungeonFloor.tiles.exit);
+                exitRepeats++;
+                for (let x = 0; x < this.width; x++) {
+                    let cell = this.at(x, this.height - 2);
+                    if(!cell.is(this.wall)) {
+                        let exitCell = this.at(x, this.height - 1);
+                        let type = this.dungeon.progress === this.dungeon.numFloors-1 ? this.boss : this.exit;
+                        exitCell.set(type);
                         exitMade = true;
                         break;
                     }
@@ -185,17 +182,19 @@ export class AdventuringDungeonFloor {
             }
         }
 
-        this.updateFloor();
+        this.renderQueue.cells = true;
     }
 
     makePassage(x, y, i, j) {
-        if(this.is(x + i, y + j, AdventuringDungeonFloor.tiles.wall)) {
-            if(this.is(x + i + i, y + j + j, AdventuringDungeonFloor.tiles.wall) &&
-               this.is(x + i + j, y + j + i, AdventuringDungeonFloor.tiles.wall) &&
-               this.is(x + i - j, y + j - i, AdventuringDungeonFloor.tiles.wall)) {
+        if(this.is(x + i, y + j, this.wall)) {
+            if(this.is(x + i + i, y + j + j, this.wall) &&
+               this.is(x + i + j, y + j + i, this.wall) &&
+               this.is(x + i - j, y + j - i, this.wall)) {
                 if (Math.random() > 0.25) {
                     let type = this.chooseTile(x + i, y + j);
                     this.set(x + i, y + j, type);
+                    this.dungeon.tileCount.set(type, this.dungeon.tileCount.get(type) + 1);
+                    this.tileCount.set(type, this.tileCount.get(type) + 1);
                 }
                 return 1;
             }
@@ -204,140 +203,73 @@ export class AdventuringDungeonFloor {
     }
 
     chooseTile(x, y) {
-        if(this.emptyCount >= 2 && !this.hasExtra) {
-            if(this.dungeon.treasureCount < this.dungeon.area.tiles.treasure.max) {
-                if(Math.random() <= this.dungeon.area.tiles.treasure.chance) {
-                    this.dungeon.treasureCount++;
-                    this.hasExtra = true;
-                    return AdventuringDungeonFloor.tiles.treasure;
-                }
-            }
-            if(this.dungeon.fountainCount < this.dungeon.area.tiles.fountain.max) {
-                if(Math.random() <= this.dungeon.area.tiles.fountain.chance) {
-                    this.dungeon.fountainCount++;
-                    this.hasExtra = true;
-                    return AdventuringDungeonFloor.tiles.fountain;
-                }
-            }
-            if(this.dungeon.trapCount < this.dungeon.area.tiles.trap.max) {
-                if(Math.random() <= this.dungeon.area.tiles.trap.chance) {
-                    this.dungeon.trapCount++;
-                    this.hasExtra = true;
-                    return AdventuringDungeonFloor.tiles.trap;
-                }
-            }
-        }
-        this.emptyCount++;
+        let toLoad = this.manager.tiles.allObjects.filter(tile => {
+            if(tile.weight === undefined)
+                return false;
+            if(!tile.spawnable)
+                return false;
+            if(tile.dungeon_max !== undefined && tile.dungeon_max !== -1 && this.dungeon.tileCount.get(tile) >= tile.dungeon_max)
+                return false;
+            if(tile.floor_max !== undefined && tile.floor_max !== -1 && this.tileCount.get(tile) >= tile.floor_max)
+                return false;
+            return true;
+        });
+
+        let id = this.tileTable.loadTable(toLoad).getEntry().id;
+        return this.manager.tiles.getObjectByID(id);
         
-        if(this.emptyCount >= 2 && Math.random() <= this.dungeon.area.tiles.encounter.chance) {
-            if( !this.is(x + 1, y, AdventuringDungeonFloor.tiles.encounter) &&
-                !this.is(x - 1, y, AdventuringDungeonFloor.tiles.encounter) &&
-                !this.is(x, y + 1, AdventuringDungeonFloor.tiles.encounter) &&
-                !this.is(x, y - 1, AdventuringDungeonFloor.tiles.encounter))
-            return AdventuringDungeonFloor.tiles.encounter;
-        }
+        /*if(this.emptyCount >= 2 && Math.random() <= this.encounter.chance) {
+            if( !this.is(x + 1, y, this.encounter) &&
+                !this.is(x - 1, y, this.encounter) &&
+                !this.is(x, y + 1, this.encounter) &&
+                !this.is(x, y - 1, this.encounter))
+            return this.encounter;
+        }*/
 
-        return AdventuringDungeonFloor.tiles.empty;
-    }
-
-    maskon(type, explored) {
-        let value = type;
-        if(explored)
-            value |= AdventuringDungeonFloor.exploredFlag;
-        return value;
-    }
-
-    // fuck it
-    maskoff(value) {
-        let type = value & AdventuringDungeonFloor.typeMask;
-        let explored = (value & AdventuringDungeonFloor.exploredFlag) == AdventuringDungeonFloor.exploredFlag;
-        return [type, explored];
+        return this.empty;
     }
 
     canMoveTo(x, y) {
-        let [type, explored] = this.at(x, y);
-        if(type == -1 || type == AdventuringDungeonFloor.tiles.wall || explored) // We can't move to walls or explored tiles
+        let cell = this.at(x, y);
+        if(cell === false || cell.type === this.wall || cell.explored) // We can't move to walls or explored tiles
             return false;
         return this.canMoveFrom(x, y+1) || this.canMoveFrom(x, y-1) || this.canMoveFrom(x+1, y) || this.canMoveFrom(x-1, y);
     }
 
     canMoveFrom(x, y) {
-        let [type, explored] = this.at(x, y);
-        return type == AdventuringDungeonFloor.tiles.start || explored; // explored or start
+        let cell = this.at(x, y);
+        return cell !== false && (cell.type === this.start || cell.explored);
     }
     
     move(x, y) {
+        this.current.setCurrent(false);
         this.currentPos = [x, y];
-        this.updateFloor();
+        this.current.setCurrent(true);
     }
 
     at(x, y) {
-        if (this.grid[y] != undefined && this.grid[y][x] != undefined) {
-            return this.maskoff(this.grid[y][x]);
-        }
-        return [-1, false];
+        if(x >= this.width || y >= this.height || x < 0 || y < 0)
+            return false;
+        let i = x + (this.width * y);
+        if (this.grid[i] !== undefined)
+            return this.grid[i];
+        return false;
     }
 
-    is(x, y, checkType) {
-        let [type, explored] = this.at(x, y)
-        return type == checkType;
+    is(x, y, type) {
+        let cell = this.at(x, y);
+        return cell !== false && cell.type === type;
     }
 
     set(x, y, type, explored=false) {
-        if (this.grid[y] != undefined && this.grid[y][x] != undefined)
-            this.grid[y][x] = this.maskon(type, explored);
-    }
-
-    updateFloor() {
-        let [cX, cY] = this.currentPos;
-        let i = 0;
-        let rowEnds = 0;
-        for(let y = 0; y < this.height; y++) {
-            for(let x = 0; x < this.width; x++) {
-                i = x + (this.width * y);
-
-                let [type, explored] = this.at(x, y);
-
-                if(this.floorCells[i] == undefined)
-                    this.floorCells[i] = new AdventuringDungeonCell(this.manager, this.game, this);
-
-                this.floorCells[i].setInvisible(type == AdventuringDungeonFloor.tiles.wall);
-                this.floorCells[i].setHighlight(x == cX && y == cY);
-                this.floorCells[i].setFade(explored && !(x == cX && y == cY));
-
-                if(type == AdventuringDungeonFloor.tiles.exit) {
-                    if(this.dungeon.progress == this.dungeon.numFloors-1) {
-                        this.floorCells[i].setIcon(cdnMedia('assets/media/main/hardcore.svg')); // Boss Exit
-                    } else {
-                        this.floorCells[i].setIcon(cdnMedia('assets/media/misc/mark_of_death.svg')); // Encounter Exit
-                    }
-                } else if(type == AdventuringDungeonFloor.tiles.start) {
-                    this.floorCells[i].setIcon(); // Start
-                } else {
-                    if(explored) {
-                        if(type == AdventuringDungeonFloor.tiles.empty) {
-                            this.floorCells[i].setIcon(); // Explored Empty
-                        } else if (type == AdventuringDungeonFloor.tiles.treasure) {
-                            this.floorCells[i].setIcon(cdnMedia('assets/media/main/bank_header.svg'));
-                        } else if (type == AdventuringDungeonFloor.tiles.trap) {
-                            this.floorCells[i].setIcon(cdnMedia('assets/media/status/poison.svg'));
-                        } else if (type == AdventuringDungeonFloor.tiles.fountain) {
-                            this.floorCells[i].setIcon(cdnMedia('assets/media/skills/firemaking/firemaking.svg'));
-                        } else if (type == AdventuringDungeonFloor.tiles.encounter) {
-                            this.floorCells[i].setIcon(cdnMedia('assets/media/misc/mark_of_death.svg')); // Encounter
-                        }
-                    } else {
-                        this.floorCells[i].setIcon(cdnMedia('assets/media/main/question.svg')); // Unexplored
-                    }
-                }
-
-                this.renderQueue.cells.add(this.floorCells[i]);
-            }
-            if(this.cellRowEnds[rowEnds] == undefined)
-                this.cellRowEnds[rowEnds] = createElement('div', { className: 'w-100' });
-            
-            this.renderQueue.cells.add(this.cellRowEnds[rowEnds++]);
+        if(x >= this.width || y >= this.height || x < 0 || y < 0)
+            return false;
+        let i = x + (this.width * y);
+        if (this.grid[i] !== undefined) {
+            this.grid[i].set(type, explored);
+            return this.grid[i];
         }
+        return false;
     }
 
     complete() {
@@ -353,23 +285,41 @@ export class AdventuringDungeonFloor {
 
     render() {
         this.renderCells();
+
+        this.grid.forEach(cell => cell.render());
     }
 
     renderCells() {
-        if(this.renderQueue.cells.size === 0)
+        if(!this.renderQueue.cells)
             return;
 
-        let cells = [...this.renderQueue.cells];
+        let cells = [];
+        let rowEnds = 0;
+        for(let y = 0; y < this.height; y++) {
+            for(let x = 0; x < this.width; x++) {
+                let i = x + (this.width * y);
+                this.grid[i].setCurrent(this.current === this.grid[i]);
+                cells.push(this.grid[i]);
+            }
 
-        cells.filter(cell => cell instanceof AdventuringDungeonCell).forEach(cell => cell.render());
+            if(this.cellRowEnds[rowEnds] == undefined)
+                this.cellRowEnds[rowEnds] = createElement('div', { className: 'w-100' });
+        
+            cells.push(this.cellRowEnds[rowEnds++]);
+        }
+
+        cells.forEach(cell => {
+            if(cell.render !== undefined)
+                cell.render();
+        });
 
         this.component.floor.replaceChildren(...cells.map(cell => {
-            if(cell instanceof AdventuringDungeonCell)
+            if(cell.component !== undefined)
                return cell.component.$elements;
             return cell;
         }).flat());
 
-        this.renderQueue.cells.clear();
+        this.renderQueue.cells = false;
     }
 
     encode(writer) {
@@ -378,10 +328,12 @@ export class AdventuringDungeonFloor {
         writer.writeUint8(this.currentPos[0]);
         writer.writeUint8(this.currentPos[1]);
 
-        writer.writeArray(this.grid, (row, writer) => {
-            writer.writeArray(row, (cell, writer) => {
-                writer.writeUint8(cell);
-            });
+        writer.writeArray(this.tileMap, (tile, writer) => {
+            writer.writeNamespacedObject(tile);
+        });
+        let grid = this.grid.filter(cell => cell.type !== undefined);
+        writer.writeArray(grid, (cell, writer) => {
+            cell.encode(writer, this.tileMap);
         });
         writer.writeArray(this.forkStack, (row, writer) => {
             writer.writeUint8(row[0]);
@@ -394,10 +346,15 @@ export class AdventuringDungeonFloor {
         this.height = reader.getUint8();
         this.width = reader.getUint8();
         this.currentPos = [reader.getUint8(), reader.getUint8()];
+
+        let tileMap = reader.getArray((reader) => {
+            let tile = reader.getNamespacedObject(this.manager.tiles);
+            return tile;
+        });
         this.grid = reader.getArray((reader) => {
-            return reader.getArray((reader) => {
-                return reader.getUint8();
-            });
+            let cell = new AdventuringDungeonCell(this.manager, this.game, this);
+            cell.decode(reader, version, tileMap);
+            return cell;
         });
         if(this.manager.saveVersion >= 2) {
             this.forkStack = reader.getArray((reader) => {

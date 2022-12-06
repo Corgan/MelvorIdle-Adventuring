@@ -1,4 +1,4 @@
-export async function setup({ gameData, patch, loadTemplates, loadModule, onInterfaceAvailable }) {
+export async function setup({ gameData, patch, loadTemplates, loadModule, onInterfaceAvailable, onInterfaceReady }) {
     console.log("Loading Acventuring Templates");
     await loadTemplates("templates.html"); // Add templates
 
@@ -21,4 +21,8 @@ export async function setup({ gameData, patch, loadTemplates, loadModule, onInte
         console.log("Appending Adventuring Page");
         skill.component.mount(document.getElementById('main-container')); // Add skill container
     });
+
+    onInterfaceReady(async () => {
+        document.querySelector('#skill-header-adventuring\\:Adventuring > mastery-skill-options').spendMasteryButton.classList.add('d-none');
+    })
 }

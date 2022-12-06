@@ -5,35 +5,33 @@ const { AdventuringCharacter, AdventuringCharacterRenderQueue } = await loadModu
 class AdventuringEnemyRenderQueue extends AdventuringCharacterRenderQueue {
     constructor() {
         super(...arguments);
+        this.card = false;
+    }
+
+    updateAll() {
+        super.updateAll();
+        this.card = true;
     }
 }
 
 export class AdventuringEnemy extends AdventuringCharacter {
     constructor(manager, game, party) {
         super(manager, game, party);
-        this.name = "";
-        this.media = cdnMedia('assets/media/main/question.svg');
 
         this.renderQueue = new AdventuringEnemyRenderQueue();
     }
 
-    setMonster(monsterId, spawned=true) {
-        let monster = this.manager.monsters.getObjectByID(monsterId);
+    setMonster(monster, spawned=true) {
+        if(typeof monster === "string")
+            monster = this.manager.monsters.getObjectByID(monster);
 
-        this.base = monsterId;
-
-        this.media = monster.media;
-        this.renderQueue.icon = true;
-        this.card.setIcon(this.media);
-
-        this.name = monster.name;
+        this.base = monster;
         this.renderQueue.name = true;
-        this.card.setName(this.name);
+        this.renderQueue.icon = true;
 
         monster.stats.forEach(({ id, value }) => {
             this.stats.set(id, value);
         })
-        
         this.stats.renderQueue.stats = true;
 
         this.xp = monster.xp;
@@ -43,6 +41,10 @@ export class AdventuringEnemy extends AdventuringCharacter {
         this.setSpender(this.manager.spenders.getObjectByID(monster.spender));
 
         if(spawned) {
+            this.manager.bestiary.registerSeen(this.base);
+            this.renderQueue.name = true;
+            this.renderQueue.icon = true;
+            
             this.hitpoints = this.maxHitpoints;
             this.renderQueue.hitpoints = true;
 
@@ -55,17 +57,38 @@ export class AdventuringEnemy extends AdventuringCharacter {
         }
     }
 
+    get name() {
+        return this.base !== undefined ? this.base.name : "???";
+    }
+
+    get media() {
+        return this.base !== undefined ? this.base.media : this.getMediaURL('melvor:assets/media/main/question.svg');
+    }
+
     onDeath() {
         super.onDeath();
         if(this.xp) {
             this.manager.addXP(this.xp);
+
             this.manager.party.all.filter(member => !member.dead).forEach(member => {
-                if(member.combatJob.isMilestoneReward) {
-                    this.manager.log.add(`${member.combatJob.name} gains ${this.xp} mastery xp`);
-                    this.manager.addMasteryXP(member.combatJob, this.xp);
-                    this.manager.addMasteryPoolXP(this.xp);
-                }
+                let xp = this.manager.encounter.currentTurn === member ? this.xp : Math.floor(this.xp * 0.5);
+
+                if(member.combatJob.isMilestoneReward)
+                    member.combatJob.addXP(xp);
+
+                member.equipment.slots.forEach((equipmentSlot, slotType) => {
+                    if(!equipmentSlot.empty && !equipmentSlot.occupied) {
+                        equipmentSlot.item.addXP(xp);
+                    }
+                });
             });
+
+            this.manager.dungeon.area.addXP(this.xp);
+
+            this.base.addXP(this.xp);
+
+            let { id, qty } = this.base.lootGenerator.getEntry();
+            this.manager.stash.add(id, qty);
         }
     }
     
@@ -77,14 +100,14 @@ export class AdventuringEnemy extends AdventuringCharacter {
         super.encode(writer);
         writer.writeBoolean(this.base !== undefined);
         if (this.base !== undefined)
-            writer.writeString(this.base);
+            writer.writeNamespacedObject(this.base);
         return writer;
     }
 
     decode(reader, version) {
         super.decode(reader, version);
         if (reader.getBoolean()) {
-            const base = reader.getString();
+            const base = reader.getNamespacedObject(this.manager.monsters);
             this.setMonster(base, false);
         }
     }

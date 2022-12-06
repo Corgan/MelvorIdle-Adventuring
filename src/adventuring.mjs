@@ -1,7 +1,5 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { AdventuringEquipmentItem } = await loadModule('src/adventuring-equipment-item.mjs');
-
 const { AdventuringStat } = await loadModule('src/adventuring-stat.mjs');
 const { AdventuringJob } = await loadModule('src/adventuring-job.mjs');
 const { AdventuringGenerator } = await loadModule('src/adventuring-generator.mjs');
@@ -9,7 +7,7 @@ const { AdventuringSpender } = await loadModule('src/adventuring-spender.mjs');
 const { AdventuringPassive } = await loadModule('src/adventuring-passive.mjs');
 const { AdventuringArea } = await loadModule('src/adventuring-area.mjs');
 const { AdventuringMonster } = await loadModule('src/adventuring-monster.mjs');
-const { AdventuringSuffix } = await loadModule('src/adventuring-suffix.mjs');
+const { AdventuringDungeonTile } = await loadModule('src/adventuring-dungeon-tile.mjs');
 
 const { AdventuringOverview } = await loadModule('src/adventuring-overview.mjs');
 const { AdventuringMessageLog } = await loadModule('src/adventuring-message-log.mjs');
@@ -21,18 +19,17 @@ const { AdventuringHeroParty, AdventuringEnemyParty } = await loadModule('src/ad
 
 const { AdventuringTrainer } = await loadModule('src/adventuring-trainer.mjs');
 const { AdventuringJobDetails } = await loadModule('src/adventuring-job-details.mjs');
+const { AdventuringArmory } = await loadModule('src/adventuring-armory.mjs');
 const { AdventuringStash } = await loadModule('src/adventuring-stash.mjs');
+const { AdventuringBestiary } = await loadModule('src/adventuring-bestiary.mjs');
 const { AdventuringCrossroads } = await loadModule('src/adventuring-crossroads.mjs');
 const { AdventuringDungeon } = await loadModule('src/adventuring-dungeon.mjs');
 const { AdventuringEncounter } = await loadModule('src/adventuring-encounter.mjs');
 
-const { AdventuringLootGenerator } = await loadModule('src/adventuring-loot-generator.mjs');
-
 const { AdventuringItemSlot } = await loadModule('src/adventuring-item-slot.mjs');
 const { AdventuringItemType } = await loadModule('src/adventuring-item-type.mjs');
-const { AdventuringItemPool } = await loadModule('src/adventuring-item-pool.mjs');
-const { AdventuringItemTier } = await loadModule('src/adventuring-item-tier.mjs');
 const { AdventuringItemBase } = await loadModule('src/adventuring-item-base.mjs');
+const { AdventuringMaterial } = await loadModule('src/adventuring-material.mjs');
 
 
 const { AdventuringPageUIComponent } = await loadModule('src/components/adventuring.mjs');
@@ -51,7 +48,6 @@ export class Adventuring extends SkillWithMastery {
         this._media = 'assets/media/main/adventure.svg';
         this.renderQueue = new AdventuringRenderQueue();
         this.isActive = false;
-        this.emptyEquipmentItem = new AdventuringEquipmentItem(this, this.game);
 
         this.stats = new NamespaceRegistry(this.game.registeredNamespaces);
         this.jobs = new NamespaceRegistry(this.game.registeredNamespaces);
@@ -60,12 +56,12 @@ export class Adventuring extends SkillWithMastery {
         this.passives = new NamespaceRegistry(this.game.registeredNamespaces);
         this.areas = new NamespaceRegistry(this.game.registeredNamespaces);
         this.monsters = new NamespaceRegistry(this.game.registeredNamespaces);
-        this.suffixes = new NamespaceRegistry(this.game.registeredNamespaces);
+        this.tiles = new NamespaceRegistry(this.game.registeredNamespaces);
 
         this.itemSlots = new NamespaceRegistry(this.game.registeredNamespaces);
         this.itemTypes = new NamespaceRegistry(this.game.registeredNamespaces);
-        this.itemPools = new NamespaceRegistry(this.game.registeredNamespaces);
-        this.itemTiers = new NamespaceRegistry(this.game.registeredNamespaces);
+
+        this.materials = new NamespaceRegistry(this.game.registeredNamespaces);
         this.baseItems = new NamespaceRegistry(this.game.registeredNamespaces);
 
         this.component = new AdventuringPageUIComponent(this, this.game);
@@ -83,45 +79,98 @@ export class Adventuring extends SkillWithMastery {
 
         this.trainer = new AdventuringTrainer(this, this.game);
         this.jobdetails = new AdventuringJobDetails(this, this.game);
+        this.armory = new AdventuringArmory(this, this.game);
         this.stash = new AdventuringStash(this, this.game);
+        this.bestiary = new AdventuringBestiary(this, this.game);
         this.crossroads = new AdventuringCrossroads(this, this.game);
         this.dungeon = new AdventuringDungeon(this, this.game);
         this.encounter = new AdventuringEncounter(this, this.game);
-
-        this.lootgen = new AdventuringLootGenerator(this, this.game);
 
         this.healTimer = new Timer('Heal', () => this.nextHeal());
         this.healInterval = 5000;
         console.log("Adventuring constructor done");
     }
 
-
-    // Passive Jobs
-    //  - Xp passively
-    //  - generates tiles
-    //  - main game resources
-    // Town Buildings
-    //  - Production
-    // Dunegon Mastery
+/*
+    Passive Jobs
+        - Generates tiles in dungeons
+        - Mastery xp from tile events
+        - Gain adventuring materials from tile events (Unidentified Ore/Logs/etc)
+    Town Buildings (Use township assets)
+        - Town Hall
+            - Earn building plans from dungeons
+            - Upgrade buildings with melvor materials
+        - Chapel
+            - Upgrade passive healing
+        - Tavern
+            - Buffs that last X dungeon runs
+        - Lemon Stall
+            - Lemons
+        - School
+            - Teach characters how to turn materials into melvor items (Unidentified -> Bronze/Iron/etc)
+        - Slayer Board
+            - Quests
+                - Kill enemies
+                - Clear Dungeons
+                - Add quest specific event tiles in dungeons
+                - Collect and turn in materials
+    Monsters
+        - Drop adventuring materials
+        - Mastery
+            - Item drop rates
+            - Item Quantity
+    Dungeons
+        - Mastery
+            - Auto-Repeat
+            - Tile chances
+            - New tiles
+            - Unlock difficulties
+    Stats
+        - Block from Defence
+            - Temp HP
+            - Start of encounter and from abilities
+    Equipment
+        - Predetermined stat growth
+        - Mastery cap determined by upgrade level
+        - Craft/Upgrade with rare adventuring materials
+        - Unlock by clearing dungeon and/or having at least one of each material required
+        - 
+    Jobs
+        - Slayer (Blue Mage)
+            - Learn new abilities from enemies when using "ultimate"
+    Abilities
+        - Buffs
+            - Block
+        - Debuffs
+            - Burn
+            - Shock
+            - Chilled
+*/
     
 
     onLoad() {
         console.log("Adventuring onLoad");
         super.onLoad();
-        this.overview.onLoad();
-        this.party.onLoad();
+
+        this.jobs.forEach(job => job.onLoad());
+        this.areas.forEach(area => area.onLoad());
+        this.baseItems.forEach(baseItem => baseItem.onLoad());
+        this.monsters.forEach(monster => monster.onLoad());
+        this.materials.forEach(material => material.onLoad());
 
         this.pages.register(this.trainer);
         this.pages.register(this.jobdetails);
+        this.pages.register(this.armory);
         this.pages.register(this.stash);
+        this.pages.register(this.bestiary);
         this.pages.register(this.crossroads);
         this.pages.register(this.dungeon);
         this.pages.register(this.encounter);
 
         this.pages.onLoad();
 
-        this.overview.renderQueue.turnProgressBar = true;
-        this.overview.renderQueue.healProgressBar = true;
+        this.overview.onLoad();
+        this.party.onLoad();
         
         if(this.isActive) {
             if(this.encounter.isFighting) {
@@ -136,19 +185,40 @@ export class Adventuring extends SkillWithMastery {
 
     onLevelUp(oldLevel, newLevel) {
         super.onLevelUp(oldLevel, newLevel);
-        this.jobs.allObjects.forEach(job => {
-            job.renderQueue.name = true;
-            job.renderQueue.icon = true;
+        this.party.all.forEach(member => {
+            member.calculateStats();
+            member.renderQueue.jobs = true;
         });
 
-        this.areas.allObjects.forEach(area => {
+        this.jobs.forEach(job => {
+            job.renderQueue.name = true;
+            job.renderQueue.tooltip = true;
+            job.renderQueue.icon = true;
+            job.renderQueue.clickable = true;
+            job.renderQueue.mastery = true;
+        });
+
+        this.areas.forEach(area => {
             area.renderQueue.name = true;
+            area.renderQueue.tooltip = true;
             area.renderQueue.icon = true;
             area.renderQueue.clickable = true;
+            area.renderQueue.mastery = true;
         });
 
-        this.party.all.forEach(member => {
-            member.renderQueue.jobs = true;
+        this.baseItems.forEach(baseItem => {
+            baseItem.renderQueue.tooltip = true;
+            baseItem.renderQueue.upgrade = true;
+            baseItem.renderQueue.icon = true;
+            baseItem.renderQueue.upgrade = true;
+        });
+
+        this.monsters.forEach(monster => {
+            monster.renderQueue.name = true;
+            monster.renderQueue.tooltip = true;
+            monster.renderQueue.icon = true;
+            monster.renderQueue.clickable = true;
+            monster.renderQueue.mastery = true;
         });
     }
 
@@ -157,6 +227,37 @@ export class Adventuring extends SkillWithMastery {
         this.party.all.forEach(member => {
             member.calculateStats();
             member.renderQueue.jobs = true;
+        });
+
+        this.jobs.forEach(job => {
+            job.renderQueue.name = true;
+            job.renderQueue.tooltip = true;
+            job.renderQueue.icon = true;
+            job.renderQueue.clickable = true;
+            job.renderQueue.mastery = true;
+        });
+
+        this.areas.forEach(area => {
+            area.renderQueue.name = true;
+            area.renderQueue.tooltip = true;
+            area.renderQueue.icon = true;
+            area.renderQueue.clickable = true;
+            area.renderQueue.mastery = true;
+        });
+
+        this.baseItems.forEach(baseItem => {
+            baseItem.renderQueue.tooltip = true;
+            baseItem.renderQueue.upgrade = true;
+            baseItem.renderQueue.icon = true;
+            baseItem.renderQueue.upgrade = true;
+        });
+
+        this.monsters.forEach(monster => {
+            monster.renderQueue.name = true;
+            monster.renderQueue.tooltip = true;
+            monster.renderQueue.icon = true;
+            monster.renderQueue.clickable = true;
+            monster.renderQueue.mastery = true;
         });
     }
 
@@ -233,7 +334,7 @@ export class Adventuring extends SkillWithMastery {
         this.game.renderQueue.activeSkills = true;
         this.game.clearActiveAction(false);
 
-        if(!this.healTimer.isActive && this.party.all.some(member => member.dead || member.hitpoints < member.maxHitpoints))
+        if(!this.healTimer.isActive)
             this.healTimer.start(this.healInterval);
         
         this.overview.renderQueue.turnProgressBar = true;
@@ -270,23 +371,14 @@ export class Adventuring extends SkillWithMastery {
             this.overview.renderQueue.turnProgressBar = true;
             this.overview.renderQueue.healProgressBar = true;
         }
-
-        /*
-        if(this.healTimer.isActive && this.party.all.every(member => !member.dead && member.hitpoints == member.maxHitpoints)) {
-            this.healTimer.stop();
-        
-            this.overview.renderQueue.turnProgressBar = true;
-            this.overview.renderQueue.healProgressBar = true;
-        }
-        */
         
         if(this.healTimer.isActive)
             this.healTimer.tick();
     }
 
     getMasteryXP(action) {
-        if(!action.unlocked)
-            return -Infinity;
+        //if(!action.unlocked)
+        //    return -Infinity;
         return super.getMasteryXP(action);
     }
 
@@ -309,17 +401,10 @@ export class Adventuring extends SkillWithMastery {
     }
 
     render() {
-        this.renderQueue.actionMastery.forEach(masteryItem => {
-            masteryItem.renderQueue.mastery = true;
-        });
         super.render();
-        
         this.overview.render();
-
         this.log.render();
-
         this.party.render();
-
         this.pages.render();
     }
 
@@ -336,7 +421,8 @@ export class Adventuring extends SkillWithMastery {
         data.jobs.forEach(data => {
             let job = new AdventuringJob(namespace, data, this, this.game);
             this.jobs.registerObject(job);
-            this.actions.registerObject(job);
+            if(job.id !== "adventuring:none")
+                this.actions.registerObject(job);
         });
 
         console.log(`Registering ${data.generators.length} Generators`);
@@ -368,6 +454,13 @@ export class Adventuring extends SkillWithMastery {
         data.monsters.forEach(data => {
             let monster = new AdventuringMonster(namespace, data, this, this.game);
             this.monsters.registerObject(monster);
+            this.actions.registerObject(monster);
+        });
+        
+        console.log(`Registering ${data.tiles.length} Tiles`);
+        data.tiles.forEach(data => {
+            let tile = new AdventuringDungeonTile(namespace, data, this, this.game);
+            this.tiles.registerObject(tile);
         });
 
         console.log(`Registering ${data.itemSlots.length} Item Slots`);
@@ -382,28 +475,18 @@ export class Adventuring extends SkillWithMastery {
             this.itemTypes.registerObject(itemType);
         });
 
-        console.log(`Registering ${data.itemPools.length} Item Pools`);
-        data.itemPools.forEach(data => {
-            let pool = new AdventuringItemPool(namespace, data, this, this.game);
-            this.itemPools.registerObject(pool);
-        });
-
-        console.log(`Registering ${data.itemTiers.length} Item Tiers`);
-        data.itemTiers.forEach(data => {
-            let itemTier = new AdventuringItemTier(namespace, data, this, this.game);
-            this.itemTiers.registerObject(itemTier);
+        console.log(`Registering ${data.materials.length} Materials`);
+        data.materials.forEach(data => {
+            let material = new AdventuringMaterial(namespace, data, this, this.game);
+            this.materials.registerObject(material);
         });
 
         console.log(`Registering ${data.baseItems.length} Base Items`);
         data.baseItems.forEach(data => {
             let item = new AdventuringItemBase(namespace, data, this, this.game);
             this.baseItems.registerObject(item);
-        });
-
-        console.log(`Registering ${data.suffixes.length} Suffixes`);
-        data.suffixes.forEach(data => {
-            let suffix = new AdventuringSuffix(namespace, data, this, this.game);
-            this.suffixes.registerObject(suffix);
+            if(item.id !== "adventuring:none")
+                this.actions.registerObject(item);
         });
     }
 
@@ -411,22 +494,39 @@ export class Adventuring extends SkillWithMastery {
         console.log("Adventuring postDataRegistration");
         super.postDataRegistration(); // Milestones setLevel
 
-        this.jobs.allObjects.forEach(job => job.postDataRegistration());
-        this.generators.allObjects.forEach(generator => generator.postDataRegistration());
-        this.spenders.allObjects.forEach(spender => spender.postDataRegistration());
+        this.jobs.forEach(job => job.postDataRegistration());
+        this.areas.forEach(area => area.postDataRegistration());
+        this.generators.forEach(generator => generator.postDataRegistration());
+        this.spenders.forEach(spender => spender.postDataRegistration());
+        this.materials.forEach(material => material.postDataRegistration());
+        this.baseItems.forEach(baseItem => baseItem.postDataRegistration());
 
         let jobMilestones = this.jobs.allObjects.filter(job => job.isMilestoneReward);
-        let areaMilestones = this.areas.allObjects;
+        let areaMilestones = this.areas.allObjects.filter(area => area.isMilestoneReward);
 
-        this.milestones.push(...jobMilestones, ...areaMilestones);
+        let milestones = [...jobMilestones, ...areaMilestones].map(milestone => {
+            if(milestone.requirements.length === 1 && milestone.requirements[0].type === "skill_level")
+                return {
+                    get name() { return milestone.name },
+                    get media() { return milestone.media },
+                    get level() { return milestone.requirements[0].level }
+                };
+            return undefined;
+        }).filter(milestone => milestone !== undefined);
+
+        this.milestones.push(...milestones);
         this.sortMilestones();
         
-        this.sortedMasteryActions = [...jobMilestones.sort((a,b)=> a.level - b.level), ...areaMilestones.sort((a,b)=> a.level - b.level)];
+        this.sortedMasteryActions = [];
 
         this.party.postDataRegistration();
+        
         this.trainer.postDataRegistration();
+        this.armory.postDataRegistration();
         this.stash.postDataRegistration();
+        this.bestiary.postDataRegistration();
         this.crossroads.postDataRegistration();
+        this.dungeon.postDataRegistration();
         this.encounter.postDataRegistration();
 
         let capesToExclude = ["melvorF:Max_Skillcape", "melvorTotH:Superior_Max_Skillcape"];
@@ -445,7 +545,9 @@ export class Adventuring extends SkillWithMastery {
         writer.writeUint32(this.version); // Store current skill version
 
         this.party.encode(writer);
+        this.armory.encode(writer);
         this.stash.encode(writer);
+        this.bestiary.encode(writer);
         this.dungeon.encode(writer);
         this.encounter.encode(writer);
         writer.writeBoolean(this.isActive);
@@ -466,7 +568,9 @@ export class Adventuring extends SkillWithMastery {
             this.saveVersion = reader.getUint32(); // Read save version
 
             this.party.decode(reader, version);
+            this.armory.decode(reader, version);
             this.stash.decode(reader, version);
+            this.bestiary.decode(reader, version);
             this.dungeon.decode(reader, version);
             this.encounter.decode(reader, version);
             this.isActive = reader.getBoolean();

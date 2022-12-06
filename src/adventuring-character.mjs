@@ -16,6 +16,17 @@ class AdventuringCharacterRenderQueue {
         this.spender = false;
         this.splash = false;
     }
+
+    updateAll() {
+        this.name = true;
+        this.hitpoints = true;
+        this.energy = true;
+        this.stats = true;
+        this.highlight = true;
+        this.generator = true;
+        this.spender = true;
+        this.splash = true;
+    }
 }
 
 class AdventuringCharacter {
@@ -54,10 +65,6 @@ class AdventuringCharacter {
             this.setSpender(undefined);
         this.renderQueue.spender = true;
     }
-
-    // Defence gives Shield at the start of each encounter
-    // Agility determines speed and evasion
-    // 
 
     get maxHitpoints() {
         let max = 10 * this.stats.get("adventuring:hitpoints");
@@ -207,6 +214,7 @@ class AdventuringCharacter {
         this.stats.render();
         this.renderGenerator();
         this.renderSpender();
+        this.card.render();
     }
 
     renderName() {
@@ -214,6 +222,8 @@ class AdventuringCharacter {
             return;
 
         this.component.name.textContent = this.name;
+        this.card.name = this.name;
+        this.card.renderQueue.name = true;
 
         this.renderQueue.name = false;
     }
@@ -224,6 +234,8 @@ class AdventuringCharacter {
 
         this.component.icon.classList.remove('d-none');
         this.component.icon.firstElementChild.src = this.media;
+        this.card.icon = this.media;
+        this.card.renderQueue.icon = true;
 
         this.renderQueue.icon = false;
     }

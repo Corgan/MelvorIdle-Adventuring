@@ -22,7 +22,9 @@ export class AdventuringOverview {
         this.component = new AdventuringOverviewUIComponent(this.manager, this.game, this);
 
         this.component.trainerButton.onclick = () => this.manager.trainer.go();
+        this.component.armoryButton.onclick = () => this.manager.armory.go();
         this.component.stashButton.onclick = () => this.manager.stash.go();
+        this.component.bestiaryButton.onclick = () => this.manager.bestiary.go();
         this.component.crossroadsButton.onclick = () => this.manager.crossroads.go();
         this.component.abandonButton.onclick = () => this.manager.dungeon.abandon();
 
@@ -31,7 +33,12 @@ export class AdventuringOverview {
         this.cards.component.mount(this.component.cards);
     }
 
-    onLoad() { }
+    onLoad() {
+        this.renderQueue.status = true;
+        this.renderQueue.buttons = true;
+        this.renderQueue.turnProgressBar = true;
+        this.renderQueue.healProgressBar = true;
+    }
 
     render() {
         this.renderButtons();
@@ -48,8 +55,14 @@ export class AdventuringOverview {
         this.component.trainerButton.classList.toggle('d-none', this.manager.isActive);
         this.component.trainerButton.classList.toggle('btn-info', this.manager.pages.active == this.manager.trainer || this.manager.pages.active == this.manager.jobdetails);
 
+        this.component.armoryButton.classList.toggle('d-none', this.manager.isActive);
+        this.component.armoryButton.classList.toggle('btn-info', this.manager.pages.active == this.manager.armory);
+
         this.component.stashButton.classList.toggle('d-none', this.manager.isActive);
         this.component.stashButton.classList.toggle('btn-info', this.manager.pages.active == this.manager.stash);
+
+        this.component.bestiaryButton.classList.toggle('d-none', this.manager.isActive);
+        this.component.bestiaryButton.classList.toggle('btn-info', this.manager.pages.active == this.manager.bestiary);
 
         this.component.crossroadsButton.classList.toggle('d-none', this.manager.isActive);
         this.component.crossroadsButton.classList.toggle('btn-info', this.manager.pages.active == this.manager.crossroads);

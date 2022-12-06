@@ -63,9 +63,9 @@ export class AdventuringEncounter extends AdventuringPage {
 
         if(!isExit) {
             group = [
-                this.manager.dungeon.groupGenerator.getEntry(),
-                this.manager.dungeon.groupGenerator.getEntry(),
-                this.manager.dungeon.groupGenerator.getEntry()
+                this.manager.dungeon.groupGenerator.getEntry().id,
+                this.manager.dungeon.groupGenerator.getEntry().id,
+                this.manager.dungeon.groupGenerator.getEntry().id
             ];
         } else {
             group = this.manager.dungeon.currentFloor.exit;
@@ -220,7 +220,11 @@ export class AdventuringEncounter extends AdventuringPage {
                 endTurnDelay = nextHit.delay;
         }
 
-        this.hitTimer.start(endTurnDelay);
+        if(endTurnDelay === 0) {
+            this.processHit();
+        } else {
+            this.hitTimer.start(endTurnDelay);
+        }
         this.manager.overview.renderQueue.turnProgressBar = true;
     }
 
@@ -263,9 +267,9 @@ export class AdventuringEncounter extends AdventuringPage {
 
         let floor = this.manager.dungeon.floor;
 
-        let [x, y, type, explored] = floor.current;
+        let cell = floor.current;
 
-        if(type == AdventuringDungeonFloor.tiles.exit && explored) {
+        if((cell.type === floor.exit || cell.type === floor.boss) && cell.explored) {
             floor.complete();
         } else {
             this.manager.dungeon.updateFloorCards();
@@ -274,7 +278,8 @@ export class AdventuringEncounter extends AdventuringPage {
     }
 
     updateTurns() {
-        this.roundCard.setIcon(cdnMedia('assets/media/main/question.svg'));
+        this.roundCard.icon = mod.getContext(this.manager.namespace).getResourceUrl('assets/media/empty.png');
+        this.roundCard.renderQueue.icon = true
 
         let cards = [];
 
@@ -283,7 +288,8 @@ export class AdventuringEncounter extends AdventuringPage {
 
         cards.push(...this.currentRoundOrder.map(c => c.card));
         if(cards.length > 0) {
-            this.roundCard.setName(`Round ${this.roundCounter + 1}`)
+            this.roundCard.name = `Round ${this.roundCounter + 1}`
+            this.roundCard.renderQueue.name = true;
             cards.push(this.roundCard);
         }
 

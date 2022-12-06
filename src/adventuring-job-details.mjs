@@ -140,7 +140,7 @@ export class AdventuringJobDetails extends AdventuringPage {
                 let [ $title, $valid ] = $el.children;
                 let itemSlot = $valid.dataset.slot;
                 let typesForSlot = this.manager.itemTypes.filter(type => type.slots.includes(itemSlot));
-                let typesFilteredByJob = typesForSlot.filter(type => this.job.allowedItems !== undefined && this.job.allowedItems.includes(type.id));
+                let typesFilteredByJob = typesForSlot.filter(type => this.job.allowedItems !== undefined && this.job.allowedItems.includes(type));
                 $valid.textContent = typesFilteredByJob.map(type => type.name).join(', ');
             });
         }

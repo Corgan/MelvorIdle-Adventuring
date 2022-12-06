@@ -7,9 +7,18 @@ const { AdventuringWeightedTable } = await loadModule('src/adventuring-utils.mjs
 class AdventuringAreaRenderQueue {
     constructor(){
         this.name = false;
+        this.tooltip = false;
         this.icon = false;
         this.clickable = false;
         this.mastery = false;
+    }
+
+    queueAll() {
+        this.name = true;
+        this.tooltip = true;
+        this.icon = true;
+        this.clickable = true;
+        this.mastery = true;
     }
 }
 
@@ -23,12 +32,10 @@ export class AdventuringArea extends MasteryAction {
         this.renderQueue = new AdventuringAreaRenderQueue();
 
         this._name = data.name;
-        this.renderQueue.name = true;
 
         this._media = data.media;
-        this.renderQueue.icon = true;
 
-        this.level = data.level;
+        this.requirements = data.requirements;
 
         this.floors = data.floors;
 
@@ -40,12 +47,12 @@ export class AdventuringArea extends MasteryAction {
         this.loot = data.loot;
         
         this.lootPoolGenerator = new AdventuringWeightedTable(this.manager, this.game);
-        this.lootPoolGenerator.loadTable(this.loot.pool);
+        //this.lootPoolGenerator.loadTable(this.loot.pool);
         
-        if(this.tiles.treasure.loot) {
+        /*if(this.tiles.treasure.loot) {
             this.treasurePoolGenerator = new AdventuringWeightedTable(this.manager, this.game);
             this.treasurePoolGenerator.loadTable(this.tiles.treasure.loot.pool);
-        }
+        }*/
 
         this.component.clickable.onclick = () => {
             if(this.unlocked)
@@ -62,12 +69,55 @@ export class AdventuringArea extends MasteryAction {
         return this.unlocked ? this.getMediaURL(this._media) : this.getMediaURL('melvor:assets/media/main/question.svg');
     }
 
+    get level() {
+        return this.manager.getMasteryLevel(this);
+    }
+
     get unlocked() {
-        return this.level <= this.manager.level;
+        if(this.requirements.length == 0)
+            return true;
+        return this.requirements.reduce((equipable, requirement) => {
+            if(requirement.type == "skill_level") {
+                if(this.manager.level < requirement.level)
+                    return false;
+            }
+            return equipable;
+        }, true);
+    }
+
+    get tooltip() {
+        let html = '<div>';
+
+        html += `<div><span>${this.name}</span></div>`;
+        if(this.unlocked) {
+            let { xp, level, percent, nextLevelXP } = this.manager.getMasteryProgress(this);
+            html += `<div><small>${xp} / ${nextLevelXP} XP</small></div>`;
+        }
+        html += '</div>'
+        return html;
+    }
+
+    onLoad() {
+        this.renderQueue.name = true;
+        this.renderQueue.tooltip = true;
+        this.renderQueue.icon = true;
+        this.renderQueue.clickable = true;
+        this.renderQueue.mastery = true;
+    }
+
+    postDataRegistration() {
+
+    }
+
+    addXP(xp) {
+        this.manager.addMasteryXP(this, xp);
+        this.manager.addMasteryPoolXP(xp);
+        this.renderQueue.tooltip = true;
     }
 
     render() {
         this.renderName();
+        this.renderTooltip();
         this.renderIcon();
         this.renderClickable();
         this.renderMastery();
@@ -79,11 +129,22 @@ export class AdventuringArea extends MasteryAction {
 
         if(this.unlocked) {
             this.component.name.textContent = this.name;
+            this.component.level.textContent = ` (${this.level})`;
         } else {
             this.component.name.textContent = "???";
+            this.component.level.textContent = "";
         }
 
         this.renderQueue.name = false;
+    }
+
+    renderTooltip() {
+        if(!this.renderQueue.tooltip)
+            return;
+
+        this.component.tooltip.setContent(this.tooltip);
+
+        this.renderQueue.tooltip = false;
     }
 
     renderIcon() {
@@ -104,12 +165,6 @@ export class AdventuringArea extends MasteryAction {
             return;
 
         this.component.clickable.classList.toggle('pointer-enabled', this.unlocked);
-        
-        if(this.unlocked) {
-            this.component.tooltip.setContent(this.name);
-        } else {
-            this.component.tooltip.setContent("Locked");
-        }
 
         this.renderQueue.clickable = false;
     }

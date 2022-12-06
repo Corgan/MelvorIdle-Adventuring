@@ -9,7 +9,9 @@ export class AdventuringOverviewUIComponent extends AdventuringUIComponent {
         this.statusText = getElementFromFragment(this.$fragment, 'status-text', 'h5');
 
         this.trainerButton = getElementFromFragment(this.$fragment, 'trainer-button', 'button');
+        this.armoryButton = getElementFromFragment(this.$fragment, 'armory-button', 'button');
         this.stashButton = getElementFromFragment(this.$fragment, 'stash-button', 'button');
+        this.bestiaryButton = getElementFromFragment(this.$fragment, 'bestiary-button', 'button');
         this.crossroadsButton = getElementFromFragment(this.$fragment, 'crossroads-button', 'button');
         this.abandonButton = getElementFromFragment(this.$fragment, 'abandon-button', 'button');
 

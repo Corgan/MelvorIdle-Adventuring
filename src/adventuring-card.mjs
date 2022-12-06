@@ -26,16 +26,6 @@ export class AdventuringCard {
         this.component = new AdventuringCardUIComponent(this.manager, this.game, this);
     }
 
-    setName(name) {
-        this.name = name;
-        this.renderQueue.name = true;
-    }
-
-    setIcon(icon) {
-        this.icon = icon;
-        this.renderQueue.icon = true;
-    }
-
     setHighlight(highlight) {
         this.highlight = highlight;
         this.renderQueue.highlight = true;

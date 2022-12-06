@@ -39,8 +39,6 @@ export class AdventuringTrainer extends AdventuringPage {
     }
 
     render() {
-        this.masteryJobs.forEach(job => {
-            job.render();
-        });
+        this.masteryJobs.forEach(job => job.render());
     }
 }

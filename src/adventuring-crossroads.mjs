@@ -27,8 +27,6 @@ export class AdventuringCrossroads extends AdventuringPage {
     }
 
     render() {
-        this.areas.forEach(area => {
-            area.render();
-        });
+        this.areas.forEach(area => area.render());
     }
 }

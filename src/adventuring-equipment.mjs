@@ -20,6 +20,7 @@ export class AdventuringEquipment {
     calculateStats() {
         this.stats.reset();
         this.slots.forEach((equipmentSlot, slotType) => {
+            equipmentSlot.item.calculateStats();
             equipmentSlot.stats.forEach((value, stat) => {
                 let old = this.stats.get(stat);
                 this.stats.set(stat, old + value);
@@ -34,37 +35,6 @@ export class AdventuringEquipment {
     setLocked(locked) {
         this.locked = locked;
         this.slots.forEach(slot => slot.setClickable(!this.locked));
-    }
-
-    selectSlot(selectedSlot) {
-        if(this.selectedSlot === selectedSlot)
-            return this.clearSelected();
-
-        this.selectedSlot = selectedSlot;
-        this.manager.stash.slots.forEach(slot => {
-            slot.setSelected(slot === selectedSlot);
-        });
-        this.manager.party.all.forEach(character => {
-            character.equipment.slots.forEach(slot => {
-                slot.setSelected(slot === selectedSlot)
-                slot.setHighlight(slot.canEquip(selectedSlot.item, selectedSlot));
-            });
-        });
-        this.manager.stash.renderQueue.details = true;
-    }
-
-    clearSelected() {
-        this.selectedSlot = undefined;
-        this.manager.stash.slots.forEach(slot => {
-            slot.setSelected(false);
-        });
-        this.manager.party.all.forEach(character => {
-            character.equipment.slots.forEach(slot => {
-                slot.setSelected(false);
-                slot.setHighlight(false);
-            });
-        });
-        this.manager.stash.renderQueue.details = true;
     }
 
     render() {

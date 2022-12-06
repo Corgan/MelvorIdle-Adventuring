@@ -8,7 +8,7 @@ export class AdventuringItemSlot extends NamespacedObject {
 
         this.name = data.name;
         this._media = data.media;
-        if(data.pair)
+        if(data.pair !== undefined)
             this.pair = data.pair;
     }
 

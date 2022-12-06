@@ -23,13 +23,12 @@ export class AdventuringDungeon extends AdventuringPage {
         this.floor.component.mount(this.component.dungeon);
 
         this.groupGenerator = new AdventuringWeightedTable(this.manager, this.game);
+        this.tileLootGenerator = new AdventuringWeightedTable(this.manager, this.game);
 
         this.floorCards = [];
         this.numFloors = 0;
 
-        this.treasureCount = 0;
-        this.trapCount = 0;
-        this.fountainCount = 0;
+        this.tileCount = new Map();
         
         this.exploreTimer = new Timer('Explore', () => this.explore());
         this.exploreInterval = 1500;
@@ -44,96 +43,72 @@ export class AdventuringDungeon extends AdventuringPage {
         this.floor.onLoad();
     }
 
+    postDataRegistration() {
+        super.postDataRegistration();
+        this.floor.postDataRegistration();
+    }
+
     explore() {
         this.floor.step();
         this.exploreTimer.start(this.exploreInterval);
         this.manager.overview.renderQueue.turnProgressBar = true;
     }
 
-    triggerEmpty() {
-        //this.manager.log.add(`Empty room`);
-    }
-
-    triggerStart() {
-        this.manager.log.add(`Starting ${this.area.name} floor ${this.progress+1}`);
-    }
-
-    triggerExit() {
-        this.manager.log.add(`Starting floor exit encounter`);
-        this.manager.encounter.generateEncounter(true);
-        this.manager.encounter.startEncounter();
-    }
-
-    triggerEncounter() {
-        this.manager.log.add(`Starting random encounter`);
-        this.manager.encounter.generateEncounter();
-        this.manager.encounter.startEncounter();
-    }
-
-    triggerTreasure() {
-        let { min, max } = this.area.tiles.treasure.loot.range;
-
-        let loot = this.grantLoot(min, max);
-        if(loot) {
-            this.manager.log.add(`Found ${loot.name} in a treasure chest`);
-        } else {
-            this.manager.log.add(`Stash is full`);
+    triggerTile(tile) {
+        if(tile.type.id === 'adventuring:start') {
+            this.manager.log.add(`Starting ${this.area.name} floor ${this.progress+1}`);
+            return;
         }
-    }
-
-    triggerTrap() {
-        let damage = this.area.tiles.trap.damage;
-
-        this.manager.party.all.forEach(member => {
-            let amount = Math.floor(member.maxHitpoints * damage);
-            member.damage(amount);
-            this.manager.log.add(`Random trap did ${amount} damage to ${member.name}`);
-        });
-
-        if(this.manager.party.all.every(member => member.dead)) {
-            this.abandon();
+        
+        if(tile.type.id === 'adventuring:exit' || tile.type.id === 'adventuring:boss') {
+            this.manager.log.add(`Starting floor exit encounter`);
+            this.manager.encounter.generateEncounter(true);
+            this.manager.encounter.startEncounter();
+            return;
         }
-    }
 
-    triggerFountain() {
-        let heal = this.area.tiles.fountain.heal;
-        this.manager.party.all.forEach(member => {
-            if(member.dead) {
-                member.revive(heal);
-                this.manager.log.add(`Campfire revived ${member.name} to ${Math.floor(100 * heal)} health.`);
-            } else {
-                let amount = Math.floor(member.maxHitpoints * heal);
-                member.heal(amount);
-                this.manager.log.add(`Campfire healed ${member.name} for ${amount} health.`);
+        if(tile.type.id === 'adventuring:encounter') {
+            this.manager.log.add(`Starting random encounter`);
+            this.manager.encounter.generateEncounter();
+            this.manager.encounter.startEncounter();
+            return;
+        }
+        
+        if(tile.type.effect !== undefined) {
+            if(tile.type.effect.type === "damage") {
+                let damage = tile.type.effect.amount;
+        
+                this.manager.party.all.forEach(member => {
+                    let amount = Math.floor(member.maxHitpoints * damage);
+                    member.damage(amount);
+                    this.manager.log.add(`${tile.type.name} did ${amount} damage to ${member.name}`);
+                });
+        
+                if(this.manager.party.all.every(member => member.dead)) {
+                    this.abandon();
+                }
             }
-        });
-    }
 
-    grantLoot(min, max, fromTreasure=false) {
-        let lootGen = fromTreasure && this.area.treasurePoolGenerator !== undefined ? this.area.treasurePoolGenerator : this.area.lootPoolGenerator;
-        
-        let poolID = lootGen.getEntry();
-        let itemPool = this.manager.itemPools.getObjectByID(poolID);
-        let itemType = itemPool.getEntry();
-        let rolledLevel = Math.floor(Math.random() * (max - min + 1)) + min;
+            if(tile.type.effect.type === "heal") {
+                let heal = tile.type.effect.amount;
+                this.manager.party.all.forEach(member => {
+                    if(member.dead) {
+                        member.revive(heal);
+                        this.manager.log.add(`${tile.type.name} revived ${member.name} to ${Math.floor(100 * heal)} health.`);
+                    } else {
+                        let amount = Math.floor(member.maxHitpoints * heal);
+                        member.heal(amount);
+                        this.manager.log.add(`${tile.type.name} healed ${member.name} for ${amount} health.`);
+                    }
+                });
+            }
 
-        let itemTiers = this.manager.itemTiers.allObjects.filter(tier => {
-            return rolledLevel >= tier.range.min && rolledLevel <= tier.range.max;
-        });
-        let itemTier = itemTiers[Math.floor(Math.random() * itemTiers.length)];
-
-        let baseItems = this.manager.baseItems.allObjects.filter(item => {
-            return item.tier == itemTier.id && item.type == itemType;
-        });
-        let baseItem = baseItems[Math.floor(Math.random() * baseItems.length)];
-        
-        let randomItem = this.manager.lootgen.generateFromBase(baseItem, min, max, rolledLevel);
-        
-        if(randomItem) {
-            if(this.manager.stash.add(randomItem));
-                return randomItem;
+            if(tile.type.effect.type === "loot") {
+                this.tileLootGenerator.loadTable(tile.type.effect.pool);
+                let { id, qty } = this.tileLootGenerator.getEntry();
+                this.manager.stash.add(id, qty);
+            }
         }
-        return false;
     }
 
     setArea(area) {
@@ -151,10 +126,15 @@ export class AdventuringDungeon extends AdventuringPage {
             if(this.floorCards[i] == undefined)
                 this.floorCards[i] = new AdventuringCard(this.manager, this.game);
 
-            this.floorCards[i].setName(i+1 == this.numFloors ? 'Boss Floor' : `Floor ${i+1}`);
-            this.floorCards[i].setIcon(i+1 == this.numFloors ? cdnMedia('assets/media/main/hardcore.svg') : cdnMedia('assets/media/skills/combat/combat.svg'));
+            this.floorCards[i].name = (i+1 == this.numFloors ? 'Boss Floor' : `Floor ${i+1}`);
+            this.floorCards[i].renderQueue.name = true;
+
+            this.floorCards[i].icon = (i+1 == this.numFloors ? cdnMedia('assets/media/main/hardcore.svg') : cdnMedia('assets/media/skills/combat/combat.svg'));
+            this.floorCards[i].renderQueue.icon = true;
+            
             this.floorCards[i].setFade(i < this.progress);
             this.floorCards[i].setHighlight(i == this.progress);
+            
             this.manager.overview.cards.renderQueue.cards.add(this.floorCards[i]);
         }
     }
@@ -170,9 +150,12 @@ export class AdventuringDungeon extends AdventuringPage {
 
     start() {
         this.progress = 0;
-        this.treasureCount = 0;
-        this.trapCount = 0;
-        this.fountainCount = 0;
+        
+        this.tileCount.clear();
+        this.manager.tiles.allObjects.forEach(tile => {
+            this.tileCount.set(tile, 0);
+        });
+
         this.manager.overview.renderQueue.status = true;
         this.next();
         this.manager.start();
@@ -202,12 +185,7 @@ export class AdventuringDungeon extends AdventuringPage {
 
     complete() {
         this.manager.log.add(`Completed ${this.area.name}`);
-        let loot = this.grantLoot(this.area.loot.range.min, this.area.loot.range.max);
-        if(loot) {
-            this.manager.log.add(`Received ${loot.name}`);
-        } else {
-            this.manager.log.add(`Stash is full`);
-        }
+
         if(!this.manager.party.all.every(hero => hero.dead)) {
             this.start();
         } else {

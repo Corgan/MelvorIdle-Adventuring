@@ -2,14 +2,14 @@ const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringUIComponent } = await loadModule('src/components/adventuring-ui-component.mjs');
 
-export class AdventuringEquipmentSlotUIComponent extends AdventuringUIComponent {
+export class AdventuringMaterialUIComponent extends AdventuringUIComponent {
     constructor(manager, game) {
-        super(manager, game, 'adventuring-equipment-slot-component');
+        super(manager, game, 'adventuring-material-component');
 
         this.clickable = getElementFromFragment(this.$fragment, 'clickable', 'div');
         this.border = getElementFromFragment(this.$fragment, 'border', 'div');
         this.icon = getElementFromFragment(this.$fragment, 'icon', 'img');
-        this.upgrade = getElementFromFragment(this.$fragment, 'upgrade', 'small');
+        this.count = getElementFromFragment(this.$fragment, 'count', 'small');
 
         this.tooltip = tippy(this.clickable, {
             content: '',

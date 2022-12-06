@@ -19,16 +19,19 @@ class AdventuringWeightedTable {
     reset() {
         this.table = [];
         this.totalWeight = 0;
+        return this;
     }
     loadTable(data) {
         this.reset();
-        data.forEach(({ id, weight })=>{
+        data.forEach(({ id, weight, ...rest })=>{
             this.totalWeight += weight;
             this.table.push({
                 id,
                 weight,
+                ...rest
             });
         });
+        return this;
     }
     getEntry() {
         const dropRoll = Math.floor(Math.random() * this.totalWeight);
@@ -38,7 +41,7 @@ class AdventuringWeightedTable {
             return dropRoll < itemWeight;
         });
         const drop = this.table[lootIndex];
-        return drop.id;
+        return drop;
     }
 }
 

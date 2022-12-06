@@ -8,9 +8,9 @@ export class AdventuringItemType extends NamespacedObject {
 
         this.name = data.name;
         this.slots = data.slots;
-        if(data.occupies)
+        if(data.occupies !== undefined)
             this.occupies = data.occupies;
-        if(data.pairs)
+        if(data.pairs !== undefined)
             this.pairs = data.pairs;
     }
 }

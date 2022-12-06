@@ -3,15 +3,16 @@ const { loadModule } = mod.getContext(import.meta);
 const { AdventuringDungeonCellUIComponent } = await loadModule('src/components/adventuring-dungeon-cell.mjs');
 
 class AdventuringDungeonCellRenderQueue {
-    constructor(){
-        this.icon = false;
-        this.highlight = false;
-        this.fade = false;
-        this.invisible = false;
+    constructor() {
+        this.type = false;
+        this.current = false;
     }
 }
 
 export class AdventuringDungeonCell {
+    static typeMask =     0b01111111; // 127
+    static exploredFlag = 0b10000000; //+128
+
     constructor(manager, game, floor) {
         this.manager = manager;
         this.game = game;
@@ -19,78 +20,92 @@ export class AdventuringDungeonCell {
 
         this.renderQueue = new AdventuringDungeonCellRenderQueue();
 
-        this.icon = cdnMedia('assets/media/main/question.svg');
-        this.highlight = false;
-        this.fade = false;
-        this.invisible = false;
+        //this.icon = cdnMedia('assets/media/main/question.svg');
+        this.explored = false;
+        this.current = false;
 
         this.component = new AdventuringDungeonCellUIComponent(this.manager, this.game, this);
     }
 
-    setIcon(icon) {
-        this.icon = icon;
-        this.renderQueue.icon = true;
+    onLoad() {
+        this.renderQueue.type = true;
+        this.renderQueue.current = true;
     }
 
-    setHighlight(highlight) {
-        this.highlight = highlight;
-        this.renderQueue.highlight = true;
+    is(type) {
+        return this.type === type;
     }
 
-    setFade(fade) {
-        this.fade = fade;
-        this.renderQueue.fade = true;
+    set(type, explored=false) {
+        this.type = type;
+        this.explored = explored;
+        this.renderQueue.type = true;
     }
 
-    setInvisible(invisible) {
-        this.invisible = invisible;
-        this.renderQueue.invisible = true;
+    setAltIcon(alt) {
+        this.alt = true;
+        this.renderQueue.type = true;
+    }
+
+    setExplored(explored) {
+        this.explored = explored;
+        this.renderQueue.type = true;
+    }
+
+    setCurrent(current) {
+        this.current = current;
+        this.renderQueue.current = true;
     }
 
     render() {
-        this.renderIcon();
-        this.renderHighlight();
-        this.renderFade();
-        this.renderInvisible();
+        this.renderType();
+        this.renderCurrent();
     }
 
-    renderIcon() {
-        if(!this.renderQueue.icon)
+    renderType() {
+        if(!this.renderQueue.type)
             return;
 
-        if(this.icon == undefined) {
+        if(this.type === undefined) {
             this.component.icon.src = mod.getContext(this.manager.namespace).getResourceUrl('assets/media/empty.png');
         } else {
-            this.component.icon.src = this.icon;
+            if(this.explored || this.type.alwaysShowIcon) {
+                this.component.icon.src = this.type.media;
+            } else {
+                this.component.icon.src = cdnMedia('assets/media/main/question.svg');
+            }
         }
 
-        this.renderQueue.icon = false;
+        this.component.styling.classList.toggle('d-none', this.type === undefined);
+        this.component.styling.classList.toggle('opacity-40', this.explored);
+        this.component.styling.classList.toggle('invisible', this.type !== undefined && this.type === this.floor.wall);
+
+        this.renderQueue.type = false;
     }
 
-    renderHighlight() {
-        if(!this.renderQueue.highlight)
+    renderCurrent() {
+        if(!this.renderQueue.current)
             return;
 
-        this.component.styling.classList.toggle('bg-combat-menu-selected', this.highlight);
+        this.component.styling.classList.toggle('bg-combat-menu-selected', this.current);
 
-        this.renderQueue.highlight = false;
+        this.renderQueue.current = false;
     }
 
-    renderFade() {
-        if(!this.renderQueue.fade)
-            return;
-
-        this.component.styling.classList.toggle('opacity-40', this.fade);
-
-        this.renderQueue.fade = false;
+    encode(writer, tileMap) {
+        let value = tileMap.indexOf(this.type);
+        if(this.explored)
+            value |= AdventuringDungeonCell.exploredFlag;
+        writer.writeUint8(value);
+        return writer;
     }
 
-    renderInvisible() {
-        if(!this.renderQueue.invisible)
-            return;
-
-        this.component.styling.classList.toggle('invisible', this.invisible);
-
-        this.renderQueue.invisible = false;
+    decode(reader, version, tileMap) {
+        let value = reader.getUint8();
+        let mapIdx = value & AdventuringDungeonCell.typeMask;
+        let type = tileMap[mapIdx];
+        if(type !== undefined && typeof type !== "string")
+            this.type = type;
+        this.explored = (value & AdventuringDungeonCell.exploredFlag) == AdventuringDungeonCell.exploredFlag;
     }
 }

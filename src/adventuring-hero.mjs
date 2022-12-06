@@ -9,6 +9,11 @@ class AdventuringHeroRenderQueue extends AdventuringCharacterRenderQueue {
         super(...arguments);
         this.jobs = false;
     }
+
+    updateAll() {
+        super.updateAll();
+        this.jobs = true;
+    }
 }
 
 export class AdventuringHero extends AdventuringCharacter {
@@ -70,9 +75,9 @@ export class AdventuringHero extends AdventuringCharacter {
             this.hitpoints = this.maxHitpoints;
             this.renderQueue.hitpoints = true;
         }
-        
-        this.card.setName(this.name);
-        this.card.setIcon(this.media);
+
+        this.card.icon = this.media;
+        this.renderQueue.icon = true;
     }
 
     calculateStats() {
@@ -123,7 +128,6 @@ export class AdventuringHero extends AdventuringCharacter {
     setName(name) {
         this.name = name;
         this.renderQueue.name = true;
-        this.card.setName(this.name);
     }
 
     setCombatJob(combatJob) {
@@ -140,8 +144,6 @@ export class AdventuringHero extends AdventuringCharacter {
         this.renderQueue.icon = true;
 
         this.equipment.slots.forEach(slot => slot.renderQueue.valid = true);
-
-        this.card.setIcon(this.media);
 
         this.manager.party.all.forEach(member => member.renderQueue.jobs = true);
     }
@@ -161,8 +163,6 @@ export class AdventuringHero extends AdventuringCharacter {
 
         this.equipment.slots.forEach(slot => slot.renderQueue.valid = true);
 
-        this.card.setIcon(this.media);
-
         this.manager.party.all.forEach(member => member.renderQueue.jobs = true);
     }
     
@@ -178,6 +178,8 @@ export class AdventuringHero extends AdventuringCharacter {
             return;
 
         this.component.name.textContent = this.name;
+        this.card.name = this.name;
+        this.card.renderQueue.name = true;
 
         this.renderQueue.name = false;
     }
@@ -188,9 +190,13 @@ export class AdventuringHero extends AdventuringCharacter {
 
         if(this.combatJob !== undefined && this.passiveJob !== undefined) {
             this.component.icon.classList.add('d-none');
+            this.card.icon = this.combatJob.media;
+            this.card.renderQueue.icon = true;
         } else {
             this.component.icon.classList.remove('d-none');
             this.component.icon.firstElementChild.src = this.combatJob.media;
+            this.card.icon = this.combatJob.media;
+            this.card.renderQueue.icon = true;
         }
 
         this.renderQueue.icon = false;
@@ -202,12 +208,12 @@ export class AdventuringHero extends AdventuringCharacter {
 
         this.component.jobs.show();
         this.component.combatJob.icon.src = this.combatJob.media;
-        this.component.combatJob.tooltip.setContent(this.combatJob.name);
+        this.component.combatJob.tooltip.setContent(this.combatJob.tooltip);
         this.component.combatJob.styling.classList.toggle('pointer-enabled', !this.locked);
         this.component.combatJob.styling.classList.toggle('bg-combat-inner-dark', this.locked);
 
         this.component.passiveJob.icon.src = this.passiveJob.media;
-        this.component.passiveJob.tooltip.setContent(this.passiveJob.name);
+        this.component.passiveJob.tooltip.setContent(this.passiveJob.tooltip);
         this.component.passiveJob.styling.classList.toggle('pointer-enabled', !this.locked);
         this.component.passiveJob.styling.classList.toggle('bg-combat-inner-dark', this.locked);
 

@@ -6,11 +6,17 @@ const { AdventuringAbilityUIComponent } = await loadModule('src/components/adven
 const { AdventuringAbilityDetailsUIComponent } = await loadModule('src/components/adventuring-ability-details.mjs');
 
 class AdventuringAbilityRenderQueue {
-    constructor(){
+    constructor() {
         this.name = false;
         this.description = false;
         this.highlight = false;
         this.descriptionCharacter = false;
+    }
+
+    queueAll() {
+        this.name = true;
+        this.description = true;
+        this.highlight = true;
     }
 }
 
@@ -21,17 +27,17 @@ class AdventuringAbilityHit {
         this.target = data.target;
         this.type = data.type;
         
-        if(data.energy)
+        if(data.energy !== undefined)
             this.energy = data.energy;
-        if(data.base)
+        if(data.base !== undefined)
             this.base = data.base;
-        if(data.scaling) {
+        if(data.scaling !== undefined) {
             this._scaling = data.scaling;
             this.scaling = new AdventuringStats(this.manager, this.game);
         }
-        if(data.delay)
+        if(data.delay !== undefined)
             this.delay = data.delay;
-        if(data.repeat)
+        if(data.repeat !== undefined)
             this.repeat = data.repeat;
     }
 
