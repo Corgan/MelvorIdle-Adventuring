@@ -90,8 +90,9 @@ export class AdventuringEncounter extends AdventuringPage {
         
         this.manager.overview.renderQueue.turnProgressBar = true;
         this.manager.overview.renderQueue.status = true;
-        this.updateTurns();
-        this.manager.encounter.go();
+        this.updateTurnCards();
+        if(this.manager.dungeon.active)
+            this.manager.encounter.go();
     }
 
     reset() {
@@ -107,7 +108,7 @@ export class AdventuringEncounter extends AdventuringPage {
         this.turnTimer.stop();
         this.hitTimer.stop();
         this.manager.overview.renderQueue.turnProgressBar = true;
-        this.updateTurns();
+        this.updateTurnCards();
     }
 
     removeDead() {
@@ -131,8 +132,7 @@ export class AdventuringEncounter extends AdventuringPage {
         let currentHit = this.currentAction.hits[this.currentHit];
         this.hitTimer.start(currentHit.delay !== undefined ? currentHit.delay : this.hitInterval);
         this.manager.overview.renderQueue.turnProgressBar = true;
-
-        this.updateTurns();
+        this.updateTurnCards();
     }
 
     processHit() {
@@ -246,7 +246,7 @@ export class AdventuringEncounter extends AdventuringPage {
             this.nextRound();
         this.currentTurn = this.currentRoundOrder.shift();
 
-        this.updateTurns();
+        this.updateTurnCards();
 
         if(this.party.all.every(enemy => enemy.dead)) {
             this.complete();
@@ -264,6 +264,8 @@ export class AdventuringEncounter extends AdventuringPage {
 
     complete() {
         this.reset();
+        if(this.manager.dungeon.active)
+            this.manager.dungeon.go();
 
         let floor = this.manager.dungeon.floor;
 
@@ -273,11 +275,11 @@ export class AdventuringEncounter extends AdventuringPage {
             floor.complete();
         } else {
             this.manager.dungeon.updateFloorCards();
-            this.manager.dungeon.go();
         }
+        this.manager.overview.renderQueue.status = true;
     }
 
-    updateTurns() {
+    updateTurnCards() {
         this.roundCard.icon = mod.getContext(this.manager.namespace).getResourceUrl('assets/media/empty.png');
         this.roundCard.renderQueue.icon = true
 
@@ -294,10 +296,6 @@ export class AdventuringEncounter extends AdventuringPage {
         }
 
         cards.push(...this.nextRoundOrder.map(c => c.card));
-        //if(this.currentRoundOrder.length === 0 && this.nextRoundOrder.length > 0) {
-        //    this.roundCard.setName(`Round ${this.roundCounter + 2}`)
-        //    cards.push(this.roundCard);
-        //}
         
         this.manager.overview.cards.renderQueue.cards.clear();
         
@@ -310,6 +308,7 @@ export class AdventuringEncounter extends AdventuringPage {
             card.setHighlight(i == 0);
             this.manager.overview.cards.renderQueue.cards.add(card)
         });
+        this.manager.overview.cards.renderQueue.update = true;
     }
 
     render() {

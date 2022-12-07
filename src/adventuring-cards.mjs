@@ -5,6 +5,7 @@ const { AdventuringCardsUIComponent } = await loadModule('src/components/adventu
 class AdventuringCardsRenderQueue {
     constructor() {
         this.cards = new Set();
+        this.update = false;
     }
 }
 
@@ -21,7 +22,7 @@ export class AdventuringCards {
     }
 
     renderCards() {
-        if(this.renderQueue.cards.size === 0)
+        if(this.renderQueue.cards.size === 0 && !this.renderQueue.update)
             return;
 
         let cards = [...this.renderQueue.cards];
@@ -31,5 +32,6 @@ export class AdventuringCards {
         this.component.cards.replaceChildren(...cards.map(card => card.component.$elements).flat());
 
         this.renderQueue.cards.clear();
+        this.renderQueue.update = false;
     }
 }

@@ -6,6 +6,11 @@ export class AdventuringPage {
         this.game = game;
     }
 
+    get active() {
+        if(this.manager.pages.current === this)
+            return true;
+    }
+
     go() {
         this.manager.pages.go(this);
     }

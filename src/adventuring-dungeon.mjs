@@ -34,8 +34,22 @@ export class AdventuringDungeon extends AdventuringPage {
         this.exploreInterval = 1500;
     }
 
+    get active() {
+        if(this.area !== undefined && this.manager.encounter.active)
+            return true;
+        return super.active;
+    }
+
     get currentFloor() {
         return this.area.floors[Math.max(0, Math.min(this.progress, this.numFloors))];
+    }
+
+    go() {
+        if(this.manager.encounter.isFighting) {
+            this.manager.encounter.go();
+        } else {
+            super.go();
+        }
     }
 
     onLoad() {
@@ -73,40 +87,53 @@ export class AdventuringDungeon extends AdventuringPage {
             this.manager.encounter.startEncounter();
             return;
         }
-        
-        if(tile.type.effect !== undefined) {
-            if(tile.type.effect.type === "damage") {
-                let damage = tile.type.effect.amount;
-        
-                this.manager.party.all.forEach(member => {
-                    let amount = Math.floor(member.maxHitpoints * damage);
-                    member.damage(amount);
-                    this.manager.log.add(`${tile.type.name} did ${amount} damage to ${member.name}`);
-                });
-        
-                if(this.manager.party.all.every(member => member.dead)) {
-                    this.abandon();
-                }
-            }
 
-            if(tile.type.effect.type === "heal") {
-                let heal = tile.type.effect.amount;
-                this.manager.party.all.forEach(member => {
-                    if(member.dead) {
-                        member.revive(heal);
-                        this.manager.log.add(`${tile.type.name} revived ${member.name} to ${Math.floor(100 * heal)} health.`);
-                    } else {
-                        let amount = Math.floor(member.maxHitpoints * heal);
-                        member.heal(amount);
-                        this.manager.log.add(`${tile.type.name} healed ${member.name} for ${amount} health.`);
+        if(!tile.type.activatable)
+            return;
+        
+        if(tile.type.effects !== undefined) {
+            for(let effect of tile.type.effects) {
+
+                if(effect.type === "damage") {
+                    let damage = effect.amount;
+            
+                    this.manager.party.all.forEach(member => {
+                        let amount = Math.floor(member.maxHitpoints * damage);
+                        member.damage(amount);
+                        this.manager.log.add(`${tile.type.name} did ${amount} damage to ${member.name}`);
+                    });
+            
+                    if(this.manager.party.all.every(member => member.dead)) {
+                        this.abandon();
                     }
-                });
-            }
+                }
 
-            if(tile.type.effect.type === "loot") {
-                this.tileLootGenerator.loadTable(tile.type.effect.pool);
-                let { id, qty } = this.tileLootGenerator.getEntry();
-                this.manager.stash.add(id, qty);
+                if(effect.type === "heal") {
+                    let heal = effect.amount;
+                    this.manager.party.all.forEach(member => {
+                        if(member.dead) {
+                            member.revive(heal);
+                            this.manager.log.add(`${tile.type.name} revived ${member.name} to ${Math.floor(100 * heal)} health.`);
+                        } else {
+                            let amount = Math.floor(member.maxHitpoints * heal);
+                            member.heal(amount);
+                            this.manager.log.add(`${tile.type.name} healed ${member.name} for ${amount} health.`);
+                        }
+                    });
+                }
+
+                if(effect.type === "loot") { // DISABLE WHILE DEAD?
+                    this.tileLootGenerator.loadTable(effect.pool);
+                    let { id, qty } = this.tileLootGenerator.getEntry();
+                    this.manager.stash.add(id, qty);
+                }
+
+                if(effect.type === "xp") { // DISABLE WHILE DEAD?
+                    let job = this.manager.jobs.getObjectByID(effect.job);
+                    if(job !== undefined) {
+                        job.addXP(effect.amount);
+                    }
+                }
             }
         }
     }
@@ -137,6 +164,7 @@ export class AdventuringDungeon extends AdventuringPage {
             
             this.manager.overview.cards.renderQueue.cards.add(this.floorCards[i]);
         }
+        this.manager.overview.cards.renderQueue.update = true;
     }
 
     next() {
@@ -145,7 +173,6 @@ export class AdventuringDungeon extends AdventuringPage {
         this.floor.generate(this.area.height, this.area.width);
 
         this.updateFloorCards();
-        this.manager.dungeon.go();
     }
 
     start() {
@@ -168,6 +195,7 @@ export class AdventuringDungeon extends AdventuringPage {
         this.exploreTimer.stop();
         this.manager.overview.renderQueue.turnProgressBar = true;
         this.manager.overview.renderQueue.status = true;
+        this.manager.overview.renderQueue.buttons = true;
 
         this.groupGenerator.reset();
 
@@ -176,11 +204,11 @@ export class AdventuringDungeon extends AdventuringPage {
     }
 
     abandon() {
+        if(this.active)
+            this.manager.crossroads.go();
         this.manager.log.add(`Abandoned ${this.area.name} on floor ${this.progress+1}`);
-        this.reset();
-
         this.manager.stop();
-        this.manager.crossroads.go();
+        this.reset();
     }
 
     complete() {
@@ -191,7 +219,8 @@ export class AdventuringDungeon extends AdventuringPage {
         } else {
             this.reset();
             this.manager.stop();
-            this.manager.crossroads.go();
+            if(this.active)
+                this.manager.crossroads.go();
         }
     }
 

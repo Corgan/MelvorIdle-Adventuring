@@ -7,7 +7,8 @@ export class AdventuringPages {
         this.manager = manager;
         this.game = game;
         this.pages = new Set();
-        this.active = false;
+        this.byId = new Map();
+        this.current = false;
     }
 
     onLoad() {
@@ -15,7 +16,7 @@ export class AdventuringPages {
     }
 
     go(page) {
-        if(page instanceof AdventuringPage && page !== this.active) {
+        if(page instanceof AdventuringPage && page !== this.current) {
             this.pages.forEach(p => {
                 if(p !== page) {
                     p.component.hide();
@@ -23,7 +24,7 @@ export class AdventuringPages {
                 }
             });
 
-            this.active = page;
+            this.current = page;
 
             page.component.show();
             page.onShow();
@@ -33,9 +34,10 @@ export class AdventuringPages {
         this.manager.overview.renderQueue.buttons = true;
     }
 
-    register(page) {
+    register(id, page) {
         if(page instanceof AdventuringPage) {
             this.pages.add(page);
+            this.byId.set(id, page);
             page.component.mount(this.manager.component.subpages);
         }
     }

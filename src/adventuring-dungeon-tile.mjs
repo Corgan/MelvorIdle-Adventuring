@@ -18,8 +18,8 @@ export class AdventuringDungeonTile extends NamespacedObject {
             this.floor_max = data.floor_max;
         if(data.dungeon_max !== undefined)
             this.dungeon_max = data.dungeon_max;
-        if(data.effect !== undefined)
-            this.effect = data.effect;
+        if(data.effects !== undefined)
+            this.effects = data.effects;
     }
 
     get media() {
@@ -32,6 +32,18 @@ export class AdventuringDungeonTile extends NamespacedObject {
         for(let requirement of this.requirements) {
             if(requirement.type == "current_job") {
                 if(!this.manager.party.all.some(member => (member.combatJob !== undefined && member.combatJob.id === requirement.job) || (member.passiveJob !== undefined && member.passiveJob.id === requirement.job)))
+                    return false;
+            }
+        }
+        return true;
+    }
+
+    get activatable() {
+        if(this.requirements === undefined)
+            return true;
+        for(let requirement of this.requirements) {
+            if(requirement.type == "current_job") {
+                if(!this.manager.party.all.some(member => !member.dead && ((member.combatJob !== undefined && member.combatJob.id === requirement.job) || (member.passiveJob !== undefined && member.passiveJob.id === requirement.job))))
                     return false;
             }
         }

@@ -259,7 +259,7 @@ export class AdventuringItemBase extends MasteryAction {
     }
 
     slotClicked() {
-        if(this.manager.pages.active !== this.manager.armory)
+        if(!this.manager.armory.active)
             return;
 
         if(!this.unlocked)

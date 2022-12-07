@@ -87,6 +87,11 @@ export class AdventuringJob extends MasteryAction {
             let { xp, level, percent, nextLevelXP } = this.manager.getMasteryProgress(this);
             html += `<div><small>Level ${level}</small></div>`;
             html += `<div><small>${xp} / ${nextLevelXP} XP</small></div>`;
+
+            this.stats.forEach((value, stat) => {
+                let statImg = `<img class="skill-icon-xxs" style="height: .66rem; width: .66rem; margin-top: 0;" src="${stat.media}">`
+                html += `<div><small>+${value}${statImg}</small></div>`;
+            });
         }
         html += '</div>'
         return html;

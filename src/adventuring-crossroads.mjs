@@ -14,8 +14,22 @@ export class AdventuringCrossroads extends AdventuringPage {
         this.areas = [];
     }
 
+    get active() {
+        if(this.manager.dungeon.active)
+            return true;
+        return super.active;
+    }
+
     onLoad() {
         super.onLoad();
+    }
+
+    onShow() {
+        this.manager.party.all.forEach(member => member.setLocked(false));
+    }
+
+    onHide() {
+        this.manager.party.all.forEach(member => member.setLocked(true));
     }
 
     postDataRegistration() {

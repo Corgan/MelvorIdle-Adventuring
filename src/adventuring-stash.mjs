@@ -22,11 +22,11 @@ export class AdventuringStash extends AdventuringPage {
     }
 
     onShow() {
-        super.onShow();
+        this.manager.party.all.forEach(member => member.setLocked(this.manager.isActive));
     }
 
     onHide() {
-        super.onHide();
+        this.manager.party.all.forEach(member => member.setLocked(this.manager.isActive));
     }
 
     postDataRegistration() {

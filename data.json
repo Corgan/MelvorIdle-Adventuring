@@ -184,6 +184,128 @@
                         "media": "melvor:assets/media/skills/fishing/fishing.svg"
                     }
                 ],
+                "overview": {
+                    "buttons": [
+                        {
+                            "id": "town",
+                            "name": "Town",
+                            "page": "town",
+                            "media": "melvor:assets/media/skills/township/Town_Hall.svg",
+                            "states": {
+                                "active": {
+                                    "className": "d-none"
+                                }
+                            }
+                        },
+                        {
+                            "id": "abandon",
+                            "name": "Abandon",
+                            "media": "melvor:assets/media/misc/mark_of_death.svg",
+                            "page": "dungeon",
+                            "pageFn": "abandon",
+                            "states": {
+                                "passive": {
+                                    "className": "d-none"
+                                },
+                                "active": {
+                                    "className": "btn-danger"
+                                }
+                            }
+                        },
+                        {
+                            "id": "stash",
+                            "name": "Stash",
+                            "page": "stash",
+                            "media": "melvor:assets/media/main/bank_header.svg"
+                        },
+                        {
+                            "id": "bestiary",
+                            "name": "Bestiary",
+                            "page": "bestiary",
+                            "media": "melvor:assets/media/main/lore_header.svg"
+                        },
+                        {
+                            "id": "crossroads",
+                            "name": "Crossroads",
+                            "page": "crossroads",
+                            "media": "assets/media/crossroads.svg",
+                            "states": {
+                                "active": {
+                                    "className": "d-none"
+                                }
+                            }
+                        },
+                        {
+                            "id": "dungeon",
+                            "name": "Dungeon",
+                            "page": "dungeon",
+                            "media": "assets/media/crossroads.svg",
+                            "states": {
+                                "passive": {
+                                    "className": "d-none"
+                                }
+                            }
+                        }
+                    ]
+                },
+                "buildings": [
+                    {
+                        "id": "hall",
+                        "name": "Town Hall",
+                        "media": "melvor:assets/media/skills/township/Town_Hall.svg",
+                        "requirements": [],
+                        "page": "hall"
+                    },
+                    {
+                        "id": "trainer",
+                        "name": "Trainer",
+                        "media": "melvor:assets/media/skills/township/Library.svg",
+                        "requirements": [],
+                        "page": "trainer"
+                    },
+                    {
+                        "id": "armory",
+                        "name": "Armory",
+                        "media": "melvor:assets/media/skills/township/Tailor.svg",
+                        "requirements": [],
+                        "page": "armory"
+                    },
+                    {
+                        "id": "chapel",
+                        "name": "Chapel",
+                        "media": "melvor:assets/media/skills/township/Chapel.svg",
+                        "requirements": [],
+                        "page": "chapel"
+                    },
+                    {
+                        "id": "school",
+                        "name": "School",
+                        "media": "melvor:assets/media/skills/township/School.svg",
+                        "requirements": [],
+                        "page": "school"
+                    },
+                    {
+                        "id": "tavern",
+                        "name": "Tavern",
+                        "media": "melvor:assets/media/skills/township/Tavern.svg",
+                        "requirements": [],
+                        "page": "tavern"
+                    },
+                    {
+                        "id": "slayers",
+                        "name": "Slayers Lodge",
+                        "media": "melvor:assets/media/skills/township/Hunters_Lodge.svg",
+                        "requirements": [],
+                        "page": "slayers"
+                    },
+                    {
+                        "id": "lemons",
+                        "name": "Lemon Stall",
+                        "media": "melvor:assets/media/skills/township/Lemvor_Lemon_Stall.svg",
+                        "requirements": [],
+                        "page": "lemons"
+                    }
+                ],
                 "jobs": [
                     {
                         "id": "none",
@@ -1095,6 +1217,28 @@
                         "description": "Does nothing."
                     }
                 ],
+                "buffs": [
+                    {
+                        "id": "block",
+                        "name": "Block",
+                        "description": "Blocks ${amount} damage until the start of the next turn",
+                        "stackable": true
+                    }
+                ],
+                "debuffs": [
+                    {
+                        "id": "stun",
+                        "name": "Stunned",
+                        "description": "Loses their next turn",
+                        "stackable": false
+                    },
+                    {
+                        "id": "bleed",
+                        "name": "Bleeding",
+                        "description": "Loses ${amount} health and lose a stack every turn",
+                        "stackable": true
+                    }
+                ],
                 "areas": [
                     {
                         "id": "chicken_coop",
@@ -1550,16 +1694,24 @@
                         "weight": 100
                     },
                     {
+                        "id": "encounter",
+                        "name": "Encounter",
+                        "media": "melvor:assets/media/misc/mark_of_death.svg",
+                        "requirements": [],
+                        "weight": 30,
+                        "floor_max": 5,
+                        "dungeon_max": -1
+                    },
+                    {
                         "id": "trap",
                         "name": "Trap",
                         "media": "melvor:assets/media/status/poison.svg",
                         "requirements": [],
                         "weight": 10,
                         "floor_max": 1,
-                        "effect": {
-                            "type": "damage",
-                            "amount": 0.1
-                        }
+                        "effects": [
+                            { "type": "damage", "amount": 0.1 }
+                        ]
                     },
                     {
                         "id": "fountain",
@@ -1569,19 +1721,9 @@
                         "weight": 10,
                         "floor_max": 1,
                         "dungeon_max": 1,
-                        "effect": {
-                            "type": "heal",
-                            "amount": 0.2
-                        }
-                    },
-                    {
-                        "id": "encounter",
-                        "name": "Encounter",
-                        "media": "melvor:assets/media/misc/mark_of_death.svg",
-                        "requirements": [],
-                        "weight": 30,
-                        "floor_max": 5,
-                        "dungeon_max": -1
+                        "effects": [
+                            { "type": "heal", "amount": 0.2 }
+                        ]
                     },
                     {
                         "id": "forest",
@@ -1593,16 +1735,15 @@
                         "weight": 10,
                         "floor_max": 1,
                         "dungeon_max": 1,
-                        "effect": {
-                            "type": "loot",
-                            "pool": [
-                                {
-                                    "id": "adventuring:unknown_wood",
-                                    "qty": 1,
-                                    "weight": 100
-                                }
-                            ]
-                        }
+                        "effects": [
+                            { "type": "xp", "amount": 30, "job": "adventuring:lumberjack" },
+                            {
+                                "type": "loot",
+                                "pool": [
+                                    { "id": "adventuring:unknown_wood", "qty": 1, "weight": 100 }
+                                ]
+                            }
+                        ]
                     },
                     {
                         "id": "ore",
@@ -1614,16 +1755,15 @@
                         "weight": 10,
                         "floor_max": 1,
                         "dungeon_max": 1,
-                        "effect": {
-                            "type": "loot",
-                            "pool": [
-                                {
-                                    "id": "adventuring:unknown_ore",
-                                    "qty": 1,
-                                    "weight": 100
-                                }
-                            ]
-                        }
+                        "effects": [
+                            { "type": "xp", "amount": 30, "job": "adventuring:miner" },
+                            {
+                                "type": "loot",
+                                "pool": [
+                                    { "id": "adventuring:unknown_ore", "qty": 1, "weight": 100 }
+                                ]
+                            }
+                        ]
                     },
                     {
                         "id": "fish",
@@ -1635,16 +1775,15 @@
                         "weight": 10,
                         "floor_max": 1,
                         "dungeon_max": 1,
-                        "effect": {
-                            "type": "loot",
-                            "pool": [
-                                {
-                                    "id": "adventuring:unknown_fish",
-                                    "qty": 1,
-                                    "weight": 100
-                                }
-                            ]
-                        }
+                        "effects": [
+                            { "type": "xp", "amount": 30, "job": "adventuring:fisherman" },
+                            {
+                                "type": "loot",
+                                "pool": [
+                                    { "id": "adventuring:unknown_fish", "qty": 1, "weight": 100 }
+                                ]
+                            }
+                        ]
                     }
                 ],
                 "itemSlots": [

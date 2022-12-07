@@ -46,14 +46,20 @@ export class AdventuringArmory extends AdventuringPage {
     }
 
     onShow() {
-        this.manager.party.all.forEach(member => member.equipment.setLocked(false));
+        this.manager.party.all.forEach(member => {
+            member.setLocked(false);
+            member.equipment.setLocked(false);
+        });
     }
 
     onHide() {
         super.onHide();
         this.clearSelected();
 
-        this.manager.party.all.forEach(member => member.equipment.setLocked(true));
+        this.manager.party.all.forEach(member => {
+            member.setLocked(true);
+            member.equipment.setLocked(true);
+        });
     }
 
     postDataRegistration() {

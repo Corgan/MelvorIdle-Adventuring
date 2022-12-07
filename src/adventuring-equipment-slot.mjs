@@ -70,7 +70,7 @@ export class AdventuringEquipmentSlot {
     }
 
     slotClicked() {
-        if(this.manager.pages.active !== this.manager.armory)
+        if(!this.manager.armory.active)
             return;
         
         if(this.manager.armory.selectedItem !== undefined) {

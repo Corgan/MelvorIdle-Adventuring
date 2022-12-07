@@ -19,6 +19,14 @@ export class AdventuringBestiary extends AdventuringPage {
         super.onLoad();
     }
 
+    onShow() {
+        this.manager.party.all.forEach(member => member.setLocked(this.manager.isActive));
+    }
+
+    onHide() {
+        this.manager.party.all.forEach(member => member.setLocked(this.manager.isActive));
+    }
+
     postDataRegistration() {
         this.monsters = this.manager.monsters.allObjects;
 

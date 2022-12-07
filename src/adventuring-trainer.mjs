@@ -14,6 +14,12 @@ export class AdventuringTrainer extends AdventuringPage {
         this.masteryJobs = [];
     }
 
+    get active() {
+        if(this.manager.jobdetails.active)
+            return true;
+        return super.active;
+    }
+
     onLoad() {
         super.onLoad();
     }
