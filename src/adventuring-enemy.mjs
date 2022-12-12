@@ -71,14 +71,12 @@ export class AdventuringEnemy extends AdventuringCharacter {
             this.manager.addXP(this.xp);
 
             this.manager.party.all.filter(member => !member.dead).forEach(member => {
-                let xp = this.manager.encounter.currentTurn === member ? this.xp : Math.floor(this.xp * 0.5);
-
                 if(member.combatJob.isMilestoneReward)
-                    member.combatJob.addXP(xp);
+                    member.combatJob.addXP(this.xp);
 
                 member.equipment.slots.forEach((equipmentSlot, slotType) => {
                     if(!equipmentSlot.empty && !equipmentSlot.occupied) {
-                        equipmentSlot.item.addXP(xp);
+                        equipmentSlot.item.addXP(this.xp);
                     }
                 });
             });

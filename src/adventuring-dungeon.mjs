@@ -99,7 +99,7 @@ export class AdventuringDungeon extends AdventuringPage {
             
                     this.manager.party.all.forEach(member => {
                         let amount = Math.floor(member.maxHitpoints * damage);
-                        member.damage(amount);
+                        member.damage({ amount: amount });
                         this.manager.log.add(`${tile.type.name} did ${amount} damage to ${member.name}`);
                     });
             
@@ -112,11 +112,12 @@ export class AdventuringDungeon extends AdventuringPage {
                     let heal = effect.amount;
                     this.manager.party.all.forEach(member => {
                         if(member.dead) {
-                            member.revive(heal);
-                            this.manager.log.add(`${tile.type.name} revived ${member.name} to ${Math.floor(100 * heal)} health.`);
+                            let amount = Math.floor(member.maxHitpoints * heal);
+                            member.revive({ amount: amount });
+                            this.manager.log.add(`${tile.type.name} revived ${member.name} to ${amount} health.`);
                         } else {
                             let amount = Math.floor(member.maxHitpoints * heal);
-                            member.heal(amount);
+                            member.heal({ amount: amount });
                             this.manager.log.add(`${tile.type.name} healed ${member.name} for ${amount} health.`);
                         }
                     });
@@ -197,18 +198,28 @@ export class AdventuringDungeon extends AdventuringPage {
         this.manager.overview.renderQueue.status = true;
         this.manager.overview.renderQueue.buttons = true;
 
-        this.groupGenerator.reset();
-
-        this.floor.reset();
         this.manager.encounter.reset();
+        this.groupGenerator.reset();
+        this.floor.reset();
     }
 
-    abandon() {
-        if(this.active)
-            this.manager.crossroads.go();
-        this.manager.log.add(`Abandoned ${this.area.name} on floor ${this.progress+1}`);
-        this.manager.stop();
+    abandon(died=false) {
+        if(this.active) {
+            if(!died)
+                this.manager.crossroads.go();
+            if(died)
+                this.manager.town.go();
+        }
+        
+        if(this.manager.encounter.isFighting && !died)
+            this.manager.encounter.complete(true);
+        
+        if(this.area !== undefined)
+            this.manager.log.add(`Abandoned ${this.area.name} on floor ${this.progress+1}`);
+
+        
         this.reset();
+        this.manager.stop();
     }
 
     complete() {

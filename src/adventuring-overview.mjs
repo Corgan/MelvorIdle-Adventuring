@@ -17,7 +17,7 @@ class AdventuringOverviewButton {
 
     clicked() {
         if(this.data.page !== undefined) {
-            let page = this.manager.pages.byId.get(this.data.page);
+            let page = this.page;
             if(page !== undefined) {
                 if(this.data.pageFn !== undefined && page[this.data.pageFn] !== undefined) {
                     page[this.data.pageFn]();
@@ -27,10 +27,14 @@ class AdventuringOverviewButton {
             }
         }
     }
+
+    get page() {
+        return this.manager.pages.byId.get(this.data.page);
+    }
     
     get active() {
         if(this.data.page !== undefined)
-            if(this.manager.pages.byId.get(this.data.page).active)
+            if(this.page.active)
                 return true;
         return false;
     }
@@ -40,7 +44,7 @@ class AdventuringOverviewButton {
             return this.data.states.active.name;
         if(!this.manager.isActive && this.data.states !== undefined && this.data.states.passive !== undefined && this.data.states.passive.name !== undefined)
             return this.data.states.passive.name;
-        return this.data.name;
+        return this.data.name !== undefined ? this.data.name : this.page.name;
     }
 
     get media() {
@@ -48,7 +52,7 @@ class AdventuringOverviewButton {
             return getResourceUrl(this.data.states.active.media);
         if(!this.manager.isActive && this.data.states !== undefined && this.data.states.passive !== undefined && this.data.states.passive.media !== undefined)
             return getResourceUrl(this.data.states.passive.media);
-        return getResourceUrl(this.data.media);
+        return this.data.media !== undefined ? getResourceUrl(this.data.media) : this.page.media;
     }
 
     render() {
@@ -157,8 +161,8 @@ export class AdventuringOverview {
             this.component.turnProgressBar.animateProgressFromTimer(this.manager.encounter.turnTimer);
         } else if(this.manager.dungeon.exploreTimer.isActive) {
             this.component.turnProgressBar.animateProgressFromTimer(this.manager.dungeon.exploreTimer);
-        } else if(this.manager.healTimer.isActive) {
-            this.component.turnProgressBar.animateProgressFromTimer(this.manager.healTimer);
+        } else if(this.manager.townTimer.isActive) {
+            this.component.turnProgressBar.animateProgressFromTimer(this.manager.townTimer);
         } else {
             this.component.turnProgressBar.stopAnimation();
         }

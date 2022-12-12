@@ -26,6 +26,13 @@ export class AdventuringJobDetails extends AdventuringPage {
         this.scaling.component.mount(this.component.scaling);
 
         this.renderQueue = new AdventuringJobDetailsRenderQueue();
+        this.component.back.onclick = () => this.back();
+    }
+
+    back() {
+        if(this.active) {
+            this.manager.trainer.go();
+        }
     }
 
     onLoad() {

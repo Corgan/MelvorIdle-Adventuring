@@ -10,6 +10,13 @@ class AdventuringEquipmentSlotRenderQueue {
         this.selected = false;
         this.clickable = false;
     }
+    updateAll() {
+        this.icon = true;
+        this.highlight = true;
+        this.upgrade = true;
+        this.selected = true;
+        this.clickable = true;
+    }
 }
 
 export class AdventuringEquipmentSlot {

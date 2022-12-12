@@ -12,12 +12,19 @@ export class AdventuringTrainer extends AdventuringPage {
         this.component = new AdventuringTrainerUIComponent(this.manager, this.game, this);
 
         this.masteryJobs = [];
+        this.component.back.onclick = () => this.back();
     }
 
     get active() {
         if(this.manager.jobdetails.active)
             return true;
         return super.active;
+    }
+
+    back() {
+        if(this.active) {
+            this.manager.town.setBuilding(undefined);
+        }
     }
 
     onLoad() {

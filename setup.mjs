@@ -1,13 +1,13 @@
 export async function setup({ gameData, patch, loadTemplates, loadModule, onInterfaceAvailable, onInterfaceReady }) {
-    console.log("Loading Acventuring Templates");
+    console.log("Loading Adventuring Templates");
     await loadTemplates("templates.html"); // Add templates
 
     sidebar.category('Party', { before: 'Combat' }); // Create sidebar category
   
-    console.log("Loading Acventuring Module");
+    console.log("Loading Adventuring Module");
     const { Adventuring } = await loadModule('src/adventuring.mjs'); // Load skill
 
-    console.log("Registering Acventuring Skill");
+    console.log("Registering Adventuring Skill");
     game.registerSkill(game.registeredNamespaces.getNamespace('adventuring'), Adventuring); // Register skill
 
     console.log("Registering Adventuring Data");
@@ -24,5 +24,5 @@ export async function setup({ gameData, patch, loadTemplates, loadModule, onInte
 
     onInterfaceReady(async () => {
         document.querySelector('#skill-header-adventuring\\:Adventuring > mastery-skill-options').spendMasteryButton.classList.add('d-none');
-    })
+    });
 }

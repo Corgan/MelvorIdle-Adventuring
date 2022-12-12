@@ -15,6 +15,7 @@ export class AdventuringCards {
         this.game = game;
         this.renderQueue = new AdventuringCardsRenderQueue();
         this.component = new AdventuringCardsUIComponent(this.manager, this.game, this);
+        this.cards = [];
     }
     
     render() {
@@ -22,14 +23,16 @@ export class AdventuringCards {
     }
 
     renderCards() {
+        if(this.cards)
+            this.cards.forEach(card => card.render());
+
         if(this.renderQueue.cards.size === 0 && !this.renderQueue.update)
             return;
 
-        let cards = [...this.renderQueue.cards];
+        this.cards = [...this.renderQueue.cards];
+        this.cards.forEach(card => card.render());
 
-        cards.forEach(card => card.render());
-
-        this.component.cards.replaceChildren(...cards.map(card => card.component.$elements).flat());
+        this.component.cards.replaceChildren(...this.cards.map(card => card.component.$elements).flat());
 
         this.renderQueue.cards.clear();
         this.renderQueue.update = false;

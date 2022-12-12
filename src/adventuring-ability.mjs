@@ -20,43 +20,73 @@ class AdventuringAbilityRenderQueue {
     }
 }
 
-class AdventuringAbilityHit {
-    constructor(manager, game, data) {
+class AdventuringAbilityHitEffect {
+    constructor(manager, game, ability, hit, data) {
         this.manager = manager;
         this.game = game;
-        this.target = data.target;
+        this.hit = hit;
+        this.ability = ability;
         this.type = data.type;
+
+        if(data.id !== undefined)
+            this.id = data.id;
         
         if(data.energy !== undefined)
             this.energy = data.energy;
-        if(data.base !== undefined)
-            this.base = data.base;
-        if(data.scaling !== undefined) {
-            this._scaling = data.scaling;
-            this.scaling = new AdventuringStats(this.manager, this.game);
+
+        if(data.amount !== undefined) {
+            this.amount = { base: data.amount.base };
+            if(data.amount.scaling !== undefined) {
+                this.amount._scaling = data.amount.scaling;
+                this.amount.scaling = new AdventuringStats(this.manager, this.game);
+            }
         }
-        if(data.delay !== undefined)
-            this.delay = data.delay;
-        if(data.repeat !== undefined)
-            this.repeat = data.repeat;
+
+        if(data.stacks !== undefined) {
+            this.stacks = { base: data.stacks.base };
+            if(data.stacks.scaling !== undefined) {
+                this.stacks._scaling = data.stacks.scaling;
+                this.stacks.scaling = new AdventuringStats(this.manager, this.game);
+            }
+        }
     }
 
     postDataRegistration() {
-        if(this._scaling !== undefined) {
-            this._scaling.forEach(({ id, value }) => {
-                this.scaling.set(id, value);
+        if(this.amount !== undefined && this.amount._scaling !== undefined) {
+            this.amount._scaling.forEach(({ id, value }) => {
+                this.amount.scaling.set(id, value);
             });
-            delete this._scaling;
+            delete this.amount._scaling;
+        } else {
+            if(this.type === "buff" || this.type === "debuff") {
+                let aura = this.manager.auras.getObjectByID(this.id);
+                if(aura !== undefined && aura.amount !== undefined) {
+                    this.amount = { base: aura.amount };
+                }
+            }
+        }
+        if(this.stacks !== undefined && this.stacks._scaling !== undefined) {
+            this.stacks._scaling.forEach(({ id, value }) => {
+                this.stacks.scaling.set(id, value);
+            });
+            delete this.stacks._scaling;
+        } else {
+            if(this.type === "buff" || this.type === "debuff") {
+                let aura = this.manager.auras.getObjectByID(this.id);
+                if(aura !== undefined && aura.stacks !== undefined) {
+                    this.stacks = { base: aura.stacks };
+                }
+            }
         }
     }
 
     getAmount(stats, isDesc=false) {
-        let amount = this.base !== undefined ? this.base : 0;
+        let amount = this.amount !== undefined && this.amount.base !== undefined ? this.amount.base : 0;
         if(isDesc) {
             let ret = amount;
-            if(this.scaling !== undefined) {
-                let showScale = !stats || stats.size === 0;
-                ret += [...this.scaling].reduce((str, [stat, scale]) => {
+            if(this.amount !== undefined && this.amount.scaling !== undefined) {
+                let showScale = stats === undefined || stats.size === 0;
+                ret += [...this.amount.scaling].reduce((str, [stat, scale]) => {
                     let value = showScale ? scale : Math.floor(stats.get(stat) * scale);
                     let statImg = `<img class="skill-icon-xxs" style="height: .66rem; width: .66rem; margin-top: 0;" src="${stat.media}">`
                     return str + ` + ${value} ${statImg}`;
@@ -64,12 +94,55 @@ class AdventuringAbilityHit {
             }
             return ret;
         } else {
-            if(this.scaling !== undefined)
-                amount += [...this.scaling].reduce((bonus, [stat, scale]) => {
+            if(this.amount !== undefined && this.amount.scaling !== undefined && stats !== undefined)
+                amount += [...this.amount.scaling].reduce((bonus, [stat, scale]) => {
                     return bonus + (stats.get(stat) * scale)
                 }, 0);
             return Math.floor(amount);
         }
+    }
+
+    getStacks(stats, isDesc=false) {
+        let stacks = this.stacks !== undefined && this.stacks.base !== undefined ? this.stacks.base : 0;
+        if(isDesc) {
+            let ret = stacks;
+            if(this.stacks !== undefined && this.stacks.scaling !== undefined) {
+                let showScale = stats === undefined || stats.size === 0;
+                ret += [...this.stacks.scaling].reduce((str, [stat, scale]) => {
+                    let value = showScale ? scale : Math.floor(stats.get(stat) * scale);
+                    let statImg = `<img class="skill-icon-xxs" style="height: .66rem; width: .66rem; margin-top: 0;" src="${stat.media}">`
+                    return str + ` + ${value} ${statImg}`;
+                }, '');
+            }
+            return ret;
+        } else {
+            if(this.stacks !== undefined && this.stacks.scaling !== undefined && stats !== undefined)
+                stacks += [...this.stacks.scaling].reduce((bonus, [stat, scale]) => {
+                    return bonus + (stats.get(stat) * scale)
+                }, 0);
+            return Math.floor(stacks);
+        }
+    }
+}
+
+class AdventuringAbilityHit {
+    constructor(manager, game, ability, data) {
+        this.manager = manager;
+        this.game = game;
+        this.ability = ability;
+        this.target = data.target;
+        this.party = data.party;
+
+        this.effects = data.effects.map(effect => new AdventuringAbilityHitEffect(this.manager, this.game, this.ability, this, effect));
+
+        if(data.delay !== undefined)
+            this.delay = data.delay;
+        if(data.repeat !== undefined)
+            this.repeat = data.repeat;
+    }
+
+    postDataRegistration() {
+        this.effects.forEach(effect => effect.postDataRegistration());
     }
 }
 
@@ -80,7 +153,7 @@ export class AdventuringAbility extends NamespacedObject {
         this.game = game;
         this.name = data.name;
         this.description = data.description;
-        this.hits = data.hits.map(hit => new AdventuringAbilityHit(this.manager, this.game, hit));
+        this.hits = data.hits.map(hit => new AdventuringAbilityHit(this.manager, this.game, this, hit));
         if(data.energy)
             this.energy = data.energy;
         if(data.cost)
@@ -139,10 +212,10 @@ export class AdventuringAbility extends NamespacedObject {
         return this.requirements.reduce((equipable, requirement) => {
 
             if(requirement.type == "current_job_level") {
-                if(character.combatJob.id === requirement.job) {
+                if(character.combatJob !== undefined && character.combatJob.id === requirement.job) {
                     if(this.manager.getMasteryLevel(character.combatJob) < requirement.level)
                         return false;
-                } else if(character.passiveJob.id === requirement.job) {
+                } else if(character.passiveJob !== undefined && character.passiveJob.id === requirement.job) {
                     if(this.manager.getMasteryLevel(character.passiveJob) < requirement.level)
                         return false;
                 } else {
@@ -163,7 +236,13 @@ export class AdventuringAbility extends NamespacedObject {
     }
 
     getDescription(stats, isDesc=false) {
-        return this.hits.reduce((desc, hit, i) =>  desc.replace(`{hit.${i}.amount}`, hit.getAmount(stats, isDesc)), this.description);
+        return this.hits.reduce((desc, hit, i) => {
+            return hit.effects.reduce((hitDesc, effect, e) => {
+                hitDesc = hitDesc.replace(`{hit.${i}.effect.${e}.amount}`, effect.getAmount(stats, isDesc));
+                hitDesc = hitDesc.replace(`{hit.${i}.effect.${e}.stacks}`, effect.getStacks(stats, isDesc));
+                return hitDesc;
+            }, desc);
+        }, this.description);
     }
 
     setHighlight(highlight) {
@@ -197,13 +276,13 @@ export class AdventuringAbility extends NamespacedObject {
             return;
 
         if(this.unlocked) {
-            let stats = false;
+            let stats = undefined;
             if(this.renderQueue.descriptionCharacter)
                 stats = this.renderQueue.descriptionCharacter.stats;
 
             this.component.description.innerHTML = this.getDescription(stats, true);
             
-            this.details.description.innerHTML = this.getDescription(false, true);
+            this.details.description.innerHTML = this.getDescription(undefined, true);
 
         } else {
             this.details.description.textContent = "???";

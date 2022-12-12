@@ -135,7 +135,6 @@ export class AdventuringJob extends MasteryAction {
     }
 
     addXP(xp) {
-        this.manager.log.add(`${this.name} gains ${xp} mastery xp`)
         this.manager.addMasteryXP(this, xp);
         this.manager.addMasteryPoolXP(xp);
         this.renderQueue.tooltip = true;

@@ -26,6 +26,8 @@ export class AdventuringCharacterUIComponent extends AdventuringUIComponent {
         this.maxEnergy = getElementFromFragment(this.$fragment, 'max-energy', 'span');
         this.energyProgress = new ProgressBar(getElementFromFragment(this.$fragment, 'energy-progress', 'div'));
 
+        this.auras = getElementFromFragment(this.$fragment, 'auras', 'div');
+
         this.stats = getElementFromFragment(this.$fragment, 'stats', 'div');
 
         this.abilities = new AdventuringAbilitiesUIComponent(this.manager, this.game, this);

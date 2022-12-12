@@ -356,6 +356,7 @@ export class AdventuringDungeonFloor {
             cell.decode(reader, version, tileMap);
             return cell;
         });
+        
         if(this.manager.saveVersion >= 2) {
             this.forkStack = reader.getArray((reader) => {
                 return [reader.getUint8(), reader.getUint8()];

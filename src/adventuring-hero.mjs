@@ -3,6 +3,7 @@ const { loadModule } = mod.getContext(import.meta);
 const { AdventuringCharacter, AdventuringCharacterRenderQueue } = await loadModule('src/adventuring-character.mjs');
 const { AdventuringEquipment } = await loadModule('src/adventuring-equipment.mjs');
 const { AdventuringStats } = await loadModule('src/adventuring-stats.mjs');
+const { AdventuringCard } = await loadModule('src/adventuring-card.mjs');
 
 class AdventuringHeroRenderQueue extends AdventuringCharacterRenderQueue {
     constructor() {
@@ -22,6 +23,7 @@ export class AdventuringHero extends AdventuringCharacter {
 
         this.locked = false;
         this.equipment = new AdventuringEquipment(this.manager, this.game, this);
+        this.townCard = new AdventuringCard(this.manager, this.game);
 
         this.component.equipment.classList.remove('d-none');
         this.equipment.component.mount(this.component.equipment);
@@ -58,10 +60,10 @@ export class AdventuringHero extends AdventuringCharacter {
             this.setPassiveJob(this.manager.jobs.getObjectByID('adventuring:none'));
         this.renderQueue.jobs = true;
 
-        if(this.generator.id == 'adventuring:none')
+        if(this.generator === undefined)
             this.setGenerator(this.manager.generators.getObjectByID('adventuring:slap'));
 
-        if(this.spender.id == 'adventuring:none')
+        if(this.spender === undefined)
             this.setSpender(this.manager.spenders.getObjectByID('adventuring:backhand'));
 
         this.equipment.onLoad();
@@ -180,6 +182,8 @@ export class AdventuringHero extends AdventuringCharacter {
         this.component.name.textContent = this.name;
         this.card.name = this.name;
         this.card.renderQueue.name = true;
+        this.townCard.name = this.name;
+        this.townCard.renderQueue.name = true;
 
         this.renderQueue.name = false;
     }
@@ -192,11 +196,17 @@ export class AdventuringHero extends AdventuringCharacter {
             this.component.icon.classList.add('d-none');
             this.card.icon = this.combatJob.media;
             this.card.renderQueue.icon = true;
+            
+            this.townCard.icon = this.passiveJob.media;
+            this.townCard.renderQueue.icon = true;
         } else {
             this.component.icon.classList.remove('d-none');
             this.component.icon.firstElementChild.src = this.combatJob.media;
             this.card.icon = this.combatJob.media;
             this.card.renderQueue.icon = true;
+            
+            this.townCard.icon = this.passiveJob.media;
+            this.townCard.renderQueue.icon = true;
         }
 
         this.renderQueue.icon = false;

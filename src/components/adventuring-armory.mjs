@@ -7,6 +7,8 @@ export class AdventuringArmoryUIComponent extends AdventuringPageUIComponent {
         super(manager, game, 'adventuring-armory-component');
         this.items = getElementFromFragment(this.$fragment, 'items', 'div');
 
+
+        this.back = getElementFromFragment(this.$fragment, 'back', 'button');
         
         this.details = getElementFromFragment(this.$fragment, 'details', 'div');
         this.icon = getElementFromFragment(this.$fragment, 'icon', 'img');

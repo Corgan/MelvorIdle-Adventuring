@@ -242,7 +242,7 @@ export class AdventuringItemBase extends MasteryAction {
 
     getCost(material) {
         let amount = this.materials.get(material);
-        return amount !== undefined ? Math.pow(2, this.upgradeLevel) * amount : 0;
+        return amount !== undefined ? Math.pow(5, this.upgradeLevel) * amount : 0;
     }
 
     addXP(xp) {

@@ -6,6 +6,8 @@ const { AdventuringJob } = await loadModule('src/adventuring-job.mjs');
 const { AdventuringGenerator } = await loadModule('src/adventuring-generator.mjs');
 const { AdventuringSpender } = await loadModule('src/adventuring-spender.mjs');
 const { AdventuringPassive } = await loadModule('src/adventuring-passive.mjs');
+const { AdventuringBuff } = await loadModule('src/adventuring-buff.mjs');
+const { AdventuringDebuff } = await loadModule('src/adventuring-debuff.mjs');
 const { AdventuringArea } = await loadModule('src/adventuring-area.mjs');
 const { AdventuringMonster } = await loadModule('src/adventuring-monster.mjs');
 const { AdventuringDungeonTile } = await loadModule('src/adventuring-dungeon-tile.mjs');
@@ -19,9 +21,15 @@ const { AdventuringPages } = await loadModule('src/adventuring-pages.mjs');
 const { AdventuringHeroParty, AdventuringEnemyParty } = await loadModule('src/adventuring-party.mjs');
 
 const { AdventuringTown } = await loadModule('src/adventuring-town.mjs');
+
 const { AdventuringTrainer } = await loadModule('src/adventuring-trainer.mjs');
 const { AdventuringJobDetails } = await loadModule('src/adventuring-job-details.mjs');
+
 const { AdventuringArmory } = await loadModule('src/adventuring-armory.mjs');
+const { AdventuringTavern } = await loadModule('src/adventuring-tavern.mjs');
+const { AdventuringSlayers } = await loadModule('src/adventuring-slayers.mjs');
+const { AdventuringLemons } = await loadModule('src/adventuring-lemons.mjs');
+
 const { AdventuringStash } = await loadModule('src/adventuring-stash.mjs');
 const { AdventuringBestiary } = await loadModule('src/adventuring-bestiary.mjs');
 const { AdventuringCrossroads } = await loadModule('src/adventuring-crossroads.mjs');
@@ -45,7 +53,7 @@ class AdventuringRenderQueue extends MasterySkillRenderQueue {
 export class Adventuring extends SkillWithMastery {
     constructor(namespace, game) {
         super(namespace, 'Adventuring', game);
-        this.version = 2;
+        this.version = 3;
         this.saveVersion = -1;
         this._media = 'assets/media/main/adventure.svg';
         this.renderQueue = new AdventuringRenderQueue();
@@ -57,6 +65,7 @@ export class Adventuring extends SkillWithMastery {
         this.generators = new NamespaceRegistry(this.game.registeredNamespaces);
         this.spenders = new NamespaceRegistry(this.game.registeredNamespaces);
         this.passives = new NamespaceRegistry(this.game.registeredNamespaces);
+        this.auras = new NamespaceRegistry(this.game.registeredNamespaces);
         this.buffs = new NamespaceRegistry(this.game.registeredNamespaces);
         this.debuffs = new NamespaceRegistry(this.game.registeredNamespaces);
         this.areas = new NamespaceRegistry(this.game.registeredNamespaces);
@@ -88,30 +97,51 @@ export class Adventuring extends SkillWithMastery {
         this.jobdetails = new AdventuringJobDetails(this, this.game);
 
         this.armory = new AdventuringArmory(this, this.game);
+        this.tavern = new AdventuringTavern(this, this.game);
+        this.slayers = new AdventuringSlayers(this, this.game);
+        this.lemons = new AdventuringLemons(this, this.game);
+
         this.stash = new AdventuringStash(this, this.game);
         this.bestiary = new AdventuringBestiary(this, this.game);
         this.crossroads = new AdventuringCrossroads(this, this.game);
         this.dungeon = new AdventuringDungeon(this, this.game);
         this.encounter = new AdventuringEncounter(this, this.game);
 
-        this.healTimer = new Timer('Heal', () => this.nextHeal());
-        this.healInterval = 5000;
+        this.townTimer = new Timer('Town', () => this.nextTownTick());
+        this.townInterval = 5000;
         console.log("Adventuring constructor done");
     }
 
+    reset() {
+        //this.party.decode(reader, version);
+        //this.armory.decode(reader, version);
+        //this.stash.decode(reader, version);
+        //this.bestiary.decode(reader, version);
+        //this.dungeon.decode(reader, version);
+        //this.encounter.decode(reader, version);
+        //this.isActive = reader.getBoolean();
+    }
+
 /*
-    Town Buildings (Use township assets)
-        - Town Hall
-            - Earn building plans from dungeons
-            - Upgrade buildings with melvor materials
-        - Chapel
-            - Upgrade passive healing
+    General
+        - "New" indicators for bestiary/armory/etc
+
+    Town Buildings
+        - Adventurers decide what to do in town every tick
         - Tavern
-            - Buffs that last X dungeon runs
+            - Adventurer stops here for healing before doing anything else
+            - Buy drinks aka buffs that last X dungeon runs
+            - Uses coins and different monster materials
+
         - Lemon Stall
+            - Idle here randomly
             - Lemons
-        - School
-            - Teach characters how to turn materials into melvor items (Unidentified -> Bronze/Iron/etc)
+        - Smithy/Workshop/Etc
+            - Each tick consumes "Unknown" material based on conversion
+            - Stat level determines max material type
+            - Material roll weight based, stat increases weight of each material on a scale
+            - Gain xp based on rolled material
+            - Characters turn materials into melvor items (Unidentified -> Bronze/Iron/etc)
         - Slayer's Lodge
             - Quests
                 - Kill enemies
@@ -128,20 +158,11 @@ export class Adventuring extends SkillWithMastery {
             - Tile chances
             - New tiles
             - Unlock difficulties
-    Stats
-        - Block from Defence
-            - Temp HP
-            - Start of encounter and from abilities
     Jobs
         - Slayer (Blue Mage)
             - Learn new abilities from enemies when using "ultimate"
     Abilities
-        - Buffs
-            - Block
-        - Debuffs
-            - Burn
-            - Shock
-            - Chilled
+        - Buffs/Debuffs from same owner can stack?
 */
     
 
@@ -151,15 +172,22 @@ export class Adventuring extends SkillWithMastery {
 
         this.buildings.forEach(building => building.onLoad());
         this.jobs.forEach(job => job.onLoad());
+        this.auras.forEach(aura => aura.onLoad());
         this.areas.forEach(area => area.onLoad());
         this.baseItems.forEach(baseItem => baseItem.onLoad());
         this.monsters.forEach(monster => monster.onLoad());
         this.materials.forEach(material => material.onLoad());
 
         this.pages.register('town', this.town);
+
         this.pages.register('trainer', this.trainer);
         this.pages.register('jobdetails', this.jobdetails);
+
         this.pages.register('armory', this.armory);
+        this.pages.register('tavern', this.tavern);
+        this.pages.register('slayers', this.slayers);
+        this.pages.register('lemons', this.lemons);
+
         this.pages.register('stash', this.stash);
         this.pages.register('bestiary', this.bestiary);
         this.pages.register('crossroads', this.crossroads);
@@ -266,9 +294,7 @@ export class Adventuring extends SkillWithMastery {
 
     selectBuilding(building) {
         if(building.page !== undefined) {
-            if(this.pages.byId.get(building.page) !== undefined) {
-                this.pages.byId.get(building.page).go();
-            }
+            this.town.setBuilding(building);
         }
     }
 
@@ -290,6 +316,13 @@ export class Adventuring extends SkillWithMastery {
     get canStart() {
         return !this.game.idleChecker(this);
     }
+
+    computeTotalMasteryActions() {
+        this.actions.namespaceMaps.forEach((actionMap,namespace)=>{
+            this.totalMasteryActions.set(namespace, actionMap.size);
+        }
+        );
+    }
     
     getTotalUnlockedMasteryActions() {
         return this.actions.reduce(levelUnlockSum(this), 0);
@@ -306,8 +339,8 @@ export class Adventuring extends SkillWithMastery {
         if(!this.dungeon.exploreTimer.isActive)
             this.dungeon.exploreTimer.start(this.dungeon.exploreInterval);
         
-        if(this.healTimer.isActive)
-            this.healTimer.stop();
+        if(this.townTimer.isActive)
+            this.townTimer.stop();
         
         this.overview.renderQueue.turnProgressBar = true;
 
@@ -316,7 +349,7 @@ export class Adventuring extends SkillWithMastery {
     }
 
     stop() {
-        if (!this.canStop)
+        if(!this.canStop)
             return false;
         
         if(this.dungeon.exploreTimer.isActive)
@@ -328,8 +361,8 @@ export class Adventuring extends SkillWithMastery {
         if(this.encounter.hitTimer.isActive)
             this.encounter.hitTimer.stop();
 
-        if(this.isActive) {
-            this.dungeon.reset();
+        if(this.isActive && this.dungeon.area !== undefined) {
+            this.dungeon.abandon();
             if(this.dungeon.active)
                 this.town.go();
         }
@@ -338,8 +371,8 @@ export class Adventuring extends SkillWithMastery {
         this.game.renderQueue.activeSkills = true;
         this.game.clearActiveAction(false);
 
-        if(!this.healTimer.isActive)
-            this.healTimer.start(this.healInterval);
+        if(!this.townTimer.isActive)
+            this.townTimer.start(this.townInterval);
         
         this.overview.renderQueue.turnProgressBar = true;
 
@@ -365,19 +398,28 @@ export class Adventuring extends SkillWithMastery {
         if(this.isActive)
             return;
         
+        if(this.dungeon.exploreTimer.isActive)
+            this.dungeon.exploreTimer.stop();
+        
+        if(this.encounter.turnTimer.isActive)
+            this.encounter.turnTimer.stop();
+    
+        if(this.encounter.hitTimer.isActive)
+            this.encounter.hitTimer.stop();
+        
         this.party.all.forEach(member => {
             if(member.energy > 0)
                 member.setEnergy(0);
         });
 
-        if(!this.healTimer.isActive) {
-            this.healTimer.start(this.healInterval);
+        if(!this.townTimer.isActive) {
+            this.townTimer.start(this.townInterval);
         
             this.overview.renderQueue.turnProgressBar = true;
         }
         
-        if(this.healTimer.isActive)
-            this.healTimer.tick();
+        if(this.townTimer.isActive)
+            this.townTimer.tick();
     }
 
     getMasteryXP(action) {
@@ -386,21 +428,23 @@ export class Adventuring extends SkillWithMastery {
         return super.getMasteryXP(action);
     }
 
-    nextHeal() {
+    nextTownTick() {
         if(this.isActive)
             return;
         
         this.party.all.forEach(member => {
             if(member.dead) {
-                member.revive(0.10);
+                member.revive({ amount: 0.10 });
             } else if(member.hitpoints < member.maxHitpoints) {
-                member.heal(Math.floor(member.maxHitpoints * 0.05));
+                member.heal({ amount: Math.floor(member.maxHitpoints * 0.05) });
             }
             if(member.energy > 0)
                 member.setEnergy(0);
         });
+        
+        this.town.updateTownCards();
 
-        this.healTimer.start(this.healInterval);
+        this.townTimer.start(this.townInterval);
         this.overview.renderQueue.turnProgressBar = true;
     }
 
@@ -453,6 +497,20 @@ export class Adventuring extends SkillWithMastery {
         data.passives.forEach(data => {
             let passive = new AdventuringPassive(namespace, data, this, this.game);
             this.passives.registerObject(passive);
+        });
+
+        console.log(`Registering ${data.buffs.length} Buffs`);
+        data.buffs.forEach(data => {
+            let buff = new AdventuringBuff(namespace, data, this, this.game);
+            this.buffs.registerObject(buff);
+            this.auras.registerObject(buff);
+        });
+
+        console.log(`Registering ${data.debuffs.length} Debuffs`);
+        data.debuffs.forEach(data => {
+            let debuff = new AdventuringDebuff(namespace, data, this, this.game);
+            this.debuffs.registerObject(debuff);
+            this.auras.registerObject(debuff);
         });
 
         console.log(`Registering ${data.areas.length} Areas`);
@@ -511,6 +569,7 @@ export class Adventuring extends SkillWithMastery {
         this.areas.forEach(area => area.postDataRegistration());
         this.generators.forEach(generator => generator.postDataRegistration());
         this.spenders.forEach(spender => spender.postDataRegistration());
+        this.auras.forEach(aura => aura.postDataRegistration());
         this.materials.forEach(material => material.postDataRegistration());
         this.baseItems.forEach(baseItem => baseItem.postDataRegistration());
 
@@ -539,7 +598,12 @@ export class Adventuring extends SkillWithMastery {
         this.town.postDataRegistration();
         
         this.trainer.postDataRegistration();
+
         this.armory.postDataRegistration();
+        this.tavern.postDataRegistration();
+        this.slayers.postDataRegistration();
+        this.lemons.postDataRegistration();
+
         this.stash.postDataRegistration();
         this.bestiary.postDataRegistration();
         this.crossroads.postDataRegistration();
@@ -595,6 +659,7 @@ export class Adventuring extends SkillWithMastery {
             console.log(e);
             reader.byteOffset = start;
             reader.getFixedLengthBuffer(skillDataSize);
+            this.reset();
         }
 
         let end = reader.byteOffset;

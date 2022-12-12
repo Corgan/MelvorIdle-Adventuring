@@ -26,31 +26,38 @@ export class AdventuringBuilding extends NamespacedObject {
         this.renderQueue = new AdventuringBuildingRenderQueue();
 
         this._name = data.name;
+        this._description = data.description;
 
         this._media = data.media;
 
         this.requirements = data.requirements;
 
-        this.page = data.page;
+        this._page = data.page;
 
         this.component.clickable.onclick = () => {
             if(this.unlocked)
-                this.manager.selectBuilding(this);
+                this.manager.town.setBuilding(this);
         }
         this.renderQueue.clickable = true;
     }
 
     get active() {
         if(this.page !== undefined) {
-            let page = this.manager.pages.byId.get(this.page);
-            if(page !== undefined)
-                return page.active;
+            return this.page.active;
         }
         return false;
     }
 
+    get page() {
+        return this.manager.pages.byId.get(this._page);
+    }
+
     get name() {
         return this.unlocked ? this._name : "???";
+    }
+
+    get description() {
+        return this.unlocked ? this._description : "???";
     }
 
     get media() {
@@ -77,8 +84,15 @@ export class AdventuringBuilding extends NamespacedObject {
         let html = '<div>';
 
         html += `<div><span>${this.name}</span></div>`;
+        html += `<div><span>${this.description}</span></div>`;
         html += '</div>'
         return html;
+    }
+
+    go() {
+        if(this.page !== undefined) {
+            this.page.go();
+        }
     }
 
     onLoad() {

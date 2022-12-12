@@ -85,12 +85,12 @@ export class AdventuringEncounter extends AdventuringPage {
         this.roundCounter = 1;
         this.isFighting = true;
 
-        this.turnTimer.start(this.turnInterval);
-        this.currentTurn = this.currentRoundOrder.shift();
+        this.all.forEach(member => {
+            let resolvedEffects = member.trigger('encounter_start');
+        });
+
+        this.nextTurn();
         
-        this.manager.overview.renderQueue.turnProgressBar = true;
-        this.manager.overview.renderQueue.status = true;
-        this.updateTurnCards();
         if(this.manager.dungeon.active)
             this.manager.encounter.go();
     }
@@ -112,15 +112,33 @@ export class AdventuringEncounter extends AdventuringPage {
     }
 
     removeDead() {
-        this.currentRoundOrder = this.currentRoundOrder.filter(character => character.hitpoints > 0);
-        this.nextRoundOrder = this.nextRoundOrder.filter(character => character.hitpoints > 0);
+        this.currentRoundOrder = this.currentRoundOrder.filter(character => character.hitpoints > 0 && !character.dead);
+        this.nextRoundOrder = this.nextRoundOrder.filter(character => character.hitpoints > 0 && !character.dead);
     }
 
     nextRound() {
+        this.all.forEach(member => {
+            let resolvedEffects = member.trigger('round_end');
+        });
+
         this.currentRoundOrder = this.nextRoundOrder;
         this.nextRoundOrder = [];
         this.roundCounter++;
         this.manager.overview.renderQueue.status = true;
+
+        this.all.forEach(member => {
+            let resolvedEffects = member.trigger('round_start');
+        });
+    }
+
+    nextTurn() {
+        this.currentTurn = this.currentRoundOrder.shift();
+        
+        this.turnTimer.start(this.turnInterval);
+        
+        this.manager.overview.renderQueue.turnProgressBar = true;
+        this.manager.overview.renderQueue.status = true;
+        this.updateTurnCards();
     }
 
     processTurn() {
@@ -128,11 +146,22 @@ export class AdventuringEncounter extends AdventuringPage {
         this.currentHit = 0;
         this.hitRepeat = 0;
         this.hitHistory = [];
+        
+        let resolvedEffects = this.currentTurn.trigger('turn_start', { skip: false });
 
-        let currentHit = this.currentAction.hits[this.currentHit];
-        this.hitTimer.start(currentHit.delay !== undefined ? currentHit.delay : this.hitInterval);
-        this.manager.overview.renderQueue.turnProgressBar = true;
-        this.updateTurnCards();
+        if(this.currentTurn.dead || resolvedEffects.skip === true) {
+            this.endTurn();
+            return;
+        }
+
+        let currentHit = this.currentAction.hits[this.currentHit]; 
+        if(currentHit !== undefined) {
+            this.hitTimer.start(currentHit.delay !== undefined ? currentHit.delay : this.hitInterval);
+            this.manager.overview.renderQueue.turnProgressBar = true;
+            this.updateTurnCards();
+        } else {
+            this.processHit();
+        }
     }
 
     processHit() {
@@ -143,22 +172,21 @@ export class AdventuringEncounter extends AdventuringPage {
         
         let currentHit = this.currentAction.hits[this.currentHit];
 
-        let effectType = currentHit.type;
+        let effectParty = currentHit.party;
         let targetType = currentHit.target;
-        let amount = currentHit.getAmount(this.currentTurn.stats);
 
         let targetParty;
 
         if(this.currentTurn instanceof AdventuringHero) {
-            if(effectType == "heal") {
+            if(effectParty == "ally") {
                 targetParty = this.manager.party;
-            } else if(effectType == "damage") {
+            } else if(effectParty == "enemy") {
                 targetParty = this.party;
             }
         } else if (this.currentTurn instanceof AdventuringEnemy) {
-            if(effectType == "heal") {
+            if(effectParty == "ally") {
                 targetParty = this.party;
-            } else if(effectType == "damage") {
+            } else if(effectParty == "enemy") {
                 targetParty = this.manager.party;
             }
         }
@@ -197,12 +225,53 @@ export class AdventuringEncounter extends AdventuringPage {
         }
 
         if(targets.length > 0) {
-            targets.forEach(t => {
-                if(t !== undefined) {
-                    this.manager.log.add(`${this.currentTurn.name} ${effectType}s ${t.name} with ${this.currentAction.name} for ${amount}`);
-                    t.applyEffect(effectType, amount);
+            this.currentTurn.trigger('before_ability_cast', { targets: targets });
+
+            targets.forEach(target => {
+                if(target !== undefined) {
+                    this.currentTurn.trigger('before_hit_delivered', { target: target });
+                    target.trigger('before_hit_received', { attacker: this.currentTurn });
+
+                    currentHit.effects.forEach(effect => {
+                        let builtEffect = {
+                            amount: effect.getAmount(this.currentTurn.stats)
+                        };
+                        
+                        if(effect.stacks !== undefined)
+                            builtEffect.stacks = effect.getStacks(this.currentTurn.stats);
+
+                        if(effect.type === "damage" || effect.type === "heal") {
+                            if(effect.type === "damage") {
+                                builtEffect = this.currentTurn.trigger('before_damage_delivered', { target: target, ...builtEffect });
+                                builtEffect = target.trigger('before_damage_received', { attacker: this.currentTurn, ...builtEffect });
+                            } else if (effect.type === "heal") {
+                                builtEffect = this.currentTurn.trigger('before_heal_delivered', { target: target, ...builtEffect });
+                                builtEffect = target.trigger('before_heal_received', { attacker: this.currentTurn, ...builtEffect });
+                            }
+                        }
+
+                        if(effect.type === "damage" || effect.type === "heal")
+                            this.manager.log.add(`${this.currentTurn.name} ${effect.type}s ${target.name} with ${this.currentAction.name} for ${builtEffect.amount}`);
+                        
+                        target.applyEffect(effect, builtEffect, this.currentTurn);
+                        
+                        if(effect.type === "damage" || effect.type === "heal") {
+                            if(effect.type === "damage") {
+                                builtEffect = target.trigger('after_damage_received', { attacker: this.currentTurn, ...builtEffect });
+                                builtEffect = this.currentTurn.trigger('after_damage_delivered', { target: target, ...builtEffect });
+                            } else if (effect.type === "heal") {
+                                builtEffect = target.trigger('after_heal_received', { attacker: this.currentTurn, ...builtEffect });
+                                builtEffect = this.currentTurn.trigger('after_heal_delivered', { target: target, ...builtEffect });
+                            }
+                        }
+                    });
+
+                    target.trigger('after_hit_received', { attacker: this.currentTurn });
+                    this.currentTurn.trigger('after_hit_delivered', { targets: targets });
                 }
             });
+            
+            this.currentTurn.trigger('after_ability_cast', { targets: targets });
             this.hitHistory.push(targets);
         }
 
@@ -234,7 +303,9 @@ export class AdventuringEncounter extends AdventuringPage {
 
         if(this.currentAction.energy !== undefined)
             this.currentTurn.addEnergy(this.currentAction.energy);
-        
+
+        let resolvedEffects = this.currentTurn.trigger('turn_end');
+
         this.nextRoundOrder.push(this.currentTurn);
         this.nextRoundOrder.sort((a,b) => {
             let agility = this.manager.stats.getObjectByID("adventuring:agility");
@@ -242,11 +313,6 @@ export class AdventuringEncounter extends AdventuringPage {
         });
 
         this.removeDead();
-        if(this.currentRoundOrder.length === 0)
-            this.nextRound();
-        this.currentTurn = this.currentRoundOrder.shift();
-
-        this.updateTurnCards();
 
         if(this.party.all.every(enemy => enemy.dead)) {
             this.complete();
@@ -254,16 +320,27 @@ export class AdventuringEncounter extends AdventuringPage {
         }
         
         if(this.manager.party.all.every(hero => hero.dead)) {
-            this.manager.dungeon.abandon();
+            this.complete(true);
             return;
         }
 
-        this.turnTimer.start(this.turnInterval);
-        this.manager.overview.renderQueue.turnProgressBar = true;
+        if(this.currentRoundOrder.length === 0)
+            this.nextRound();
+
+        this.nextTurn();
     }
 
-    complete() {
+    complete(died=false) {
+        this.all.forEach(member => {
+            let resolvedEffects = member.trigger('encounter_end');
+        });
+
         this.reset();
+        if(died) {
+            this.manager.dungeon.abandon(died);
+            return;
+        }
+
         if(this.manager.dungeon.active)
             this.manager.dungeon.go();
 

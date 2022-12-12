@@ -80,7 +80,7 @@
                         <h5 class="font-w700 text-combat-smoke text-center m-0 mt-2" id="name"></h5>
                     </div>
                     <div class="col-12">
-                        <div class="block-content p-3">
+                        <div class="block-content px-3">
                             <div class="row text-center">
                                 <div class="col-12">
                                     <div class="row m-0 position-relative">
@@ -108,6 +108,7 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-12" id="auras"></div>
                 </div>
             </div>
             <div class="block block-rounded-double bg-combat-inner-dark text-center p-3" id="abilities"></div>
@@ -138,6 +139,7 @@
 <template id="adventuring-trainer-component">
     <div id="page" class="row no-gutters d-none">
         <div class="col-12">
+            <button id="back" class="btn btn-alt-info ml-3 mr-3 mb-3 mt-2 position-absolute" style="z-index: 10;">Back to Town</button>
             <h3 class="font-w700 text-combat-smoke text-center m-0 mt-2">Trainer</h3>
         </div>
         <div class="col-12">
@@ -150,6 +152,7 @@
 
 <template id="adventuring-job-details-component">
     <div id="page" class="row no-gutters d-none">
+        <button id="back" class="btn btn-alt-info ml-3 mr-3 mb-3 mt-2 position-absolute" style="z-index: 10;">Back to Trainer</button>
         <div class="col-12 text-center">
             <img class="skill-icon-sm m-0 mt-2" id="icon"></img>
         </div>
@@ -198,6 +201,7 @@
 <template id="adventuring-armory-component">
     <div id="page" class="row no-gutters d-none">
         <div class="col-12">
+            <button id="back" class="btn btn-alt-info ml-3 mr-3 mb-3 mt-2 position-absolute" style="z-index: 10;">Back to Town</button>
             <h3 class="font-w700 text-combat-smoke text-center m-0 mt-2">Armory</h3>
         </div>
         <div class="col-6 pt-3">
@@ -360,6 +364,36 @@
                 </div>
             </div>
         </div>
+    </div>
+</template>
+
+<template id="adventuring-auras-component">
+    <div class="block-content px-3 py-1">
+        <div class="row no-gutters w-100" style="min-height: 38px" id="auras"></div>
+    </div>
+</template>
+
+<template id="adventuring-aura-component">
+    <div class="col-4">
+        <div class="block block-rounded-double bg-combat-dark text-center px-2 mx-1 pointer-enabled" id="styling">
+            <div class="row no-gutters">
+                <div class="col-12">
+                    <small class="font-w500 text-combat-smoke align-middle m-1" id="name"></small>
+                </div>
+                <div class="col-12">
+                    <small class="font-w500 text-combat-smoke align-middle m-1 font-size-xs" id="description"></small>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="adventuring-aura-instance-component">
+    <div id="styling" class="m-1" style="position: relative;">
+        <div id="border" class="border-secondary m-0" style="border-width: 1px!important; border-style: solid!important;">
+            <img class="skill-icon-xs m-0" style="display: block" id="icon"></img>
+        </div>
+        <div class="font-size-sm text-white text-center" style="position: absolute; bottom: -6px; width: 100%;"><small id="stacks" class="badge-pill bg-secondary">-</small></div>
     </div>
 </template>
 
@@ -571,7 +605,7 @@
         </div>
         <div class="col-12">
             <div class="block-content px-0 pt-3">
-                <div id="buildings" class="row no-gutters p-2" style="overflow: hidden; width: fit-content; justify-content: space-between;"></div>
+                <div id="buildings" class="row no-gutters py-2 px-6" style="overflow: hidden; width: fit-content; justify-content: space-between;"></div>
             </div>
         </div>
     </div>
@@ -580,5 +614,47 @@
 <template id="adventuring-building-component">
     <div id="clickable" class="pointer-enabled m-1" style="position: relative; width: fit-content;">
         <img id="icon" style="height: 128px; width: 128px;" class="p-1" src="">
+    </div>
+</template>
+
+<template id="adventuring-tavern-component">
+    <div id="page" class="row no-gutters d-none">
+        <div class="col-12">
+            <button id="back" class="btn btn-alt-info ml-3 mr-3 mb-3 mt-2 position-absolute" style="z-index: 10;">Back to Town</button>
+            <h3 class="font-w700 text-combat-smoke text-center m-0 mt-2">Tavern</h3>
+        </div>
+        <div class="col-12">
+            <div class="block-content px-0 pt-3">
+                <div class="row no-gutters"></div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="adventuring-slayers-component">
+    <div id="page" class="row no-gutters d-none">
+        <div class="col-12">
+            <button id="back" class="btn btn-alt-info ml-3 mr-3 mb-3 mt-2 position-absolute" style="z-index: 10;">Back to Town</button>
+            <h3 class="font-w700 text-combat-smoke text-center m-0 mt-2">Slayer's Lodge</h3>
+        </div>
+        <div class="col-12">
+            <div class="block-content px-0 pt-3">
+                <div class="row no-gutters"></div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="adventuring-lemons-component">
+    <div id="page" class="row no-gutters d-none">
+        <div class="col-12">
+            <button id="back" class="btn btn-alt-info ml-3 mr-3 mb-3 mt-2 position-absolute" style="z-index: 10;">Back to Town</button>
+            <h3 class="font-w700 text-combat-smoke text-center m-0 mt-2">Lemon Stall</h3>
+        </div>
+        <div class="col-12">
+            <div class="block-content px-0 pt-3">
+                <div class="row no-gutters"></div>
+            </div>
+        </div>
     </div>
 </template>

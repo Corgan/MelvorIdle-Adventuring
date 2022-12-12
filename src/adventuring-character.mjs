@@ -2,6 +2,7 @@ const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringCard } = await loadModule('src/adventuring-card.mjs');
 const { AdventuringStats } = await loadModule('src/adventuring-stats.mjs');
+const { AdventuringAuras } = await loadModule('src/adventuring-auras.mjs');
 
 const { AdventuringCharacterUIComponent } = await loadModule('src/components/adventuring-character.mjs');
 
@@ -43,6 +44,10 @@ class AdventuringCharacter {
         this.energy = 0;
         this.dead = false;
         this.highlight = false;
+
+        this.auras = new AdventuringAuras(this.manager, this.game, this);
+        this.auras.component.mount(this.component.auras);
+
         this.stats = new AdventuringStats(this.manager, this.game);
         this.stats.component.mount(this.component.stats);
     }
@@ -64,6 +69,8 @@ class AdventuringCharacter {
         if(this.spender === undefined) // Default to None
             this.setSpender(undefined);
         this.renderQueue.spender = true;
+
+        this.auras.onLoad();
     }
 
     get maxHitpoints() {
@@ -110,14 +117,66 @@ class AdventuringCharacter {
         this.renderQueue.energy = true;
     }
 
-    applyEffect(effectType, amount) {
-        if(effectType == "damage")
-            this.damage(amount);
-        if(effectType == "heal")
-            this.heal(amount);
+    trigger(type, extra={}) {
+        let resolvedEffects = this.auras.trigger(type);
+        resolvedEffects.forEach(resolved => {
+
+            let builtEffect = {
+                amount: resolved.effect.getAmount(resolved.instance)
+            };
+
+            if(resolved.effect.type === "skip") {
+                extra.skip = true;
+            } else if(resolved.effect.type === "reduce_amount") {
+                let reduce_amount = Math.min(extra.amount, builtEffect.amount);
+                let reduced_amount = extra.amount - reduce_amount;
+                extra.amount -= reduced_amount;
+                if(resolved.instance.base.consume)
+                    resolved.instance.remove_stacks(reduce_amount);
+            } else if(resolved.effect.type === "damage" || resolved.effect.type === "heal") {
+                if(resolved.effect.target === "self" || resolved.effect.target === undefined) {
+                    this.applyEffect(resolved.effect, builtEffect, this);
+                } else if(resolved.effect.target === "attacker") {
+                    extra.attacker.applyEffect(resolved.effect, builtEffect, this);
+                }
+            } else if (resolved.effect.type === "remove_stack") {
+                resolved.instance.remove_stacks(1);
+            } else if (resolved.effect.type === "remove") {
+                resolved.instance.remove();
+            }
+        });
+        return extra;
     }
 
-    damage(amount) {
+    applyEffect(effect, builtEffect, character) {
+        if(effect.type == "damage")
+            this.damage(builtEffect, character);
+        if(effect.type  == "heal")
+            this.heal(builtEffect, character);
+        if(effect.type  == "revive")
+            this.revive(builtEffect, character);
+        if(effect.type  == "buff")
+            this.buff(effect.id, builtEffect, character);
+        if(effect.type  == "debuff")
+            this.debuff(effect.id, builtEffect, character);
+    }
+
+    buff(id, builtEffect, character) {
+        if(this.dead)
+            return;
+        this.auras.add(id, builtEffect, character);
+    }
+
+    debuff(id, builtEffect, character) {
+        if(this.dead)
+            return;
+        this.auras.add(id, builtEffect, character);
+    }
+
+    damage({ amount }, character) {
+        if(this.dead)
+            return;
+        
         this.hitpoints -= amount;
 
         if(!loadingOfflineProgress) {
@@ -133,13 +192,16 @@ class AdventuringCharacter {
             this.setEnergy(0);
             if(!this.dead) {
                 this.dead = true;
+
                 this.onDeath();
+
+                let resolvedEffects = this.trigger('death');
             }
         }
         this.renderQueue.hitpoints = true;
     }
 
-    heal(amount) {
+    heal({ amount }, character) {
         if(this.dead || this.hitpoints == this.maxHitpoints)
             return;
 
@@ -159,12 +221,12 @@ class AdventuringCharacter {
         this.renderQueue.hitpoints = true;
     }
 
-    revive(percent=1) {
+    revive({ amount=1 }, character) {
         if(!this.dead)
             return;
 
         this.dead = false;
-        this.hitpoints = Math.floor(this.maxHitpoints * percent);
+        this.hitpoints = Math.floor(this.maxHitpoints * amount);
         this.setEnergy(0);
         this.renderQueue.hitpoints = true;
     }
@@ -211,6 +273,7 @@ class AdventuringCharacter {
         this.renderHitpoints();
         this.renderSplash();
         this.renderEnergy();
+        this.auras.render();
         this.stats.render();
         this.renderGenerator();
         this.renderSpender();
@@ -313,6 +376,8 @@ class AdventuringCharacter {
         writer.writeUint32(this.energy);
         writer.writeNamespacedObject(this.generator);
         writer.writeNamespacedObject(this.spender);
+
+        this.auras.encode(writer);
         return writer;
     }
 
@@ -332,6 +397,9 @@ class AdventuringCharacter {
             this.setSpender(undefined);
         else
             this.setSpender(spender);
+        
+        if(this.manager.saveVersion >= 3)
+            this.auras.decode(reader, version);
     }
 }
 

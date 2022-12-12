@@ -7,6 +7,8 @@ export class AdventuringJobDetailsUIComponent extends AdventuringPageUIComponent
     constructor(manager, game) {
         super(manager, game, 'adventuring-job-details-component');
 
+        this.back = getElementFromFragment(this.$fragment, 'back', 'button');
+
         this.name = getElementFromFragment(this.$fragment, 'name', 'h3');
         this.icon = getElementFromFragment(this.$fragment, 'icon', 'img');
 

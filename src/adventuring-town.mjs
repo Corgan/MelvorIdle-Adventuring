@@ -13,10 +13,56 @@ export class AdventuringTown extends AdventuringPage {
         this.buildingLevels = new Map();
     }
 
+    get name() {
+        if(this.building !== undefined) {
+            return this.building.name;
+        }
+        return "Town";
+    }
+
+    get media() {
+        if(this.building !== undefined) {
+            return this.building.media;
+        }
+        return cdnMedia("assets/media/skills/township/Town_Hall.svg");
+    }
+
     get active() {
         if(this.buildings.some(building => building.active))
             return true;
         return super.active;
+    }
+
+    updateTownCards() {
+        this.manager.overview.cards.renderQueue.cards.clear();
+
+        let cards = [];
+        cards.push(...this.manager.party.all.map(c => c.townCard));
+        cards.forEach(card => {
+            this.manager.overview.cards.renderQueue.cards.add(card);
+        })
+
+        this.manager.overview.cards.renderQueue.update = true;
+    }
+
+    go() {
+        this.updateTownCards();
+        if(this.building !== undefined && this.building.page !== undefined) {
+            if(!this.building.active) {
+                this.building.go();
+            }
+        } else {
+            super.go();
+        }
+    }
+
+    setBuilding(building) {
+        if(typeof building === "string")
+            building = this.manager.buildings.getObjectByID(building);
+        if(building === undefined || building.page !== undefined)
+            this.building = building;
+        if(this.active)
+            this.go();
     }
 
     onShow() {

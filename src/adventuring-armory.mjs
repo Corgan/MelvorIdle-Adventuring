@@ -37,6 +37,13 @@ export class AdventuringArmory extends AdventuringPage {
         this.materialComponents = [];
 
         this.component.upgradeButton.onclick = () => this.upgradeSelected();
+        this.component.back.onclick = () => this.back();
+    }
+
+    back() {
+        if(this.active) {
+            this.manager.town.setBuilding(undefined);
+        }
     }
 
     onLoad() {
@@ -117,6 +124,8 @@ export class AdventuringArmory extends AdventuringPage {
             }
             this.upgradeLevels.set(item, this.upgradeLevels.get(item) + 1);
             item.renderQueue.updateAll();
+            if(item.currentSlot !== undefined)
+                item.currentSlot.renderQueue.updateAll();
         }
         this.renderQueue.details = true;
     }
