@@ -1,5 +1,7 @@
 const { loadModule } = mod.getContext(import.meta);
 
+const { AdventuringWorkshop } = await loadModule('src/adventuring-workshop.mjs');
+
 const { AdventuringBuildingUIComponent } = await loadModule('src/components/adventuring-building.mjs');
 
 class AdventuringBuildingRenderQueue {
@@ -31,8 +33,18 @@ export class AdventuringBuilding extends NamespacedObject {
         this._media = data.media;
 
         this.requirements = data.requirements;
+        if(data.actions !== undefined)
+            this._actions = data.actions;
 
-        this._page = data.page;
+        //this.idle = new AdventuringBuildingAction(this.manager, this.game, { status: data.idle !== undefined ? data.idle : `Loitering`, requirements: [], effects: [] }, this);
+
+        this.type = data.type;
+        if (this.type === "workshop") {
+            this.manager.pages.register(data.id, new AdventuringWorkshop(this.manager, this.game, data, this));
+            this._page = data.id;
+        } else if(this.type === "page" && data.page !== undefined) {
+            this._page = data.page;
+        }
 
         this.component.clickable.onclick = () => {
             if(this.unlocked)
@@ -64,10 +76,6 @@ export class AdventuringBuilding extends NamespacedObject {
         return this.getMediaURL(this._media);
     }
 
-    get level() {
-        return this.manager.town.buildingLevels.get(this);
-    }
-
     get unlocked() {
         if(this.requirements.length == 0)
             return true;
@@ -89,6 +97,26 @@ export class AdventuringBuilding extends NamespacedObject {
         return html;
     }
 
+    get action() {
+        return `${this.name}`
+    }
+
+    availableActions(character) {
+        if(this.actions === undefined)
+            return [];
+        if(this.type === "workshop") {
+            let hasOrders = this.page.hasWorkOrders(character);
+            if(hasOrders) {
+                let work = this.actions.find(action => action.id === "adventuring:work");
+                if(work !== undefined)
+                    return [work];
+            }
+            return [];
+        } else {
+            return this.actions.filter(action => action.canDo(character));
+        }
+    }
+
     go() {
         if(this.page !== undefined) {
             this.page.go();
@@ -102,7 +130,8 @@ export class AdventuringBuilding extends NamespacedObject {
     }
 
     postDataRegistration() {
-
+        if(this._actions !== undefined)
+            this.actions = this._actions.map(id => this.manager.townActions.getObjectByID(id));
     }
 
     render() {

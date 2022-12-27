@@ -1,6 +1,7 @@
 const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringPage } = await loadModule('src/adventuring-page.mjs');
+const { AdventuringCard } = await loadModule('src/adventuring-card.mjs');
 
 const { AdventuringTownUIComponent } = await loadModule('src/components/adventuring-town.mjs');
 
@@ -10,7 +11,9 @@ export class AdventuringTown extends AdventuringPage {
         this.manager = manager;
         this.game = game;
         this.component = new AdventuringTownUIComponent(this.manager, this.game, this);
-        this.buildingLevels = new Map();
+        this.buildings = new Set();
+        this.characterAction = new Map();
+        this.cards = new Map();
     }
 
     get name() {
@@ -28,17 +31,78 @@ export class AdventuringTown extends AdventuringPage {
     }
 
     get active() {
-        if(this.buildings.some(building => building.active))
+        if([...this.buildings].some(building => building.active))
             return true;
         return super.active;
     }
 
+    performActions() {
+        this.manager.party.all.forEach(character => this.runAction(character));
+    }
+
+    resetActions() {
+        this.manager.party.all.forEach(character => {
+            let newAction = this.findNewAction(character);
+            this.characterAction.set(character, newAction);
+            this.updateTownCards();
+        });
+    }
+
+    checkActions() {
+        this.manager.party.all.forEach(character => {
+            if(this.characterAction.get(character) === undefined) {
+                let newAction = this.findNewAction(character);
+                this.characterAction.set(character, newAction);
+                this.updateTownCards();
+            }
+        });
+    }
+
+    runAction(character) {
+        if(this.characterAction.get(character) !== undefined) {
+            let { action, building } = this.characterAction.get(character);
+            if(action !== undefined) {
+                action.execute(character, building);
+            }
+        }
+
+        let newAction = this.findNewAction(character);
+        if(newAction !== undefined)
+            this.characterAction.set(character, newAction);
+        this.updateTownCards();
+    }
+
+    findNewAction(character) {
+        let actions = [...this.buildings].flatMap(building => building.availableActions(character).map(action => ({ action, building })));
+        if(actions.length === 0) {
+            let building = [...this.buildings][Math.floor(Math.random()*this.buildings.size)];
+            let idle = this.manager.townActions.getObjectByID('adventuring:idle');
+
+            if(this.characterAction.get(character) !== idle || Math.random() > 0.85) {
+                return { building: building, action: idle };
+            }
+        }
+        return actions[0];
+    }
+    
     updateTownCards() {
         this.manager.overview.cards.renderQueue.cards.clear();
 
-        let cards = [];
-        cards.push(...this.manager.party.all.map(c => c.townCard));
-        cards.forEach(card => {
+        this.cards.forEach((card, character) => {
+            card.name = character.name;
+            card.renderQueue.name = true;
+
+            if(this.characterAction.get(character) !== undefined) {
+                let { action, building } = this.characterAction.get(character);
+
+                if(action !== undefined) {
+                    card.icon = building.media;
+                    card.renderQueue.icon = true;
+
+                    card.action = action.status;
+                    card.renderQueue.action = true;
+                }
+            }
             this.manager.overview.cards.renderQueue.cards.add(card);
         })
 
@@ -46,7 +110,6 @@ export class AdventuringTown extends AdventuringPage {
     }
 
     go() {
-        this.updateTownCards();
         if(this.building !== undefined && this.building.page !== undefined) {
             if(!this.building.active) {
                 this.building.go();
@@ -67,6 +130,7 @@ export class AdventuringTown extends AdventuringPage {
 
     onShow() {
         this.manager.party.all.forEach(member => member.setLocked(false));
+        this.updateTownCards();
     }
 
     onHide() {
@@ -75,14 +139,17 @@ export class AdventuringTown extends AdventuringPage {
 
     onLoad() {
         super.onLoad();
+        this.manager.party.all.forEach(member => {
+            this.cards.set(member, new AdventuringCard(this.manager, this.game));
+        });
+        this.updateTownCards();
     }
 
     postDataRegistration() {
         super.postDataRegistration();
         
-        this.buildings = this.manager.buildings.allObjects;
-        this.buildings.forEach(building => {
-            this.buildingLevels.set(building, 0);
+        this.manager.buildings.allObjects.forEach(building => {
+            this.buildings.add(building);
             building.component.mount(this.component.buildings);
         });
     }
@@ -90,5 +157,11 @@ export class AdventuringTown extends AdventuringPage {
     render() {
         super.render();
         this.buildings.forEach(building => building.render());
+    }
+
+    encode(writer) {
+    }
+
+    decode(reader, version) {
     }
 }

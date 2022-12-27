@@ -398,8 +398,7 @@ class AdventuringCharacter {
         else
             this.setSpender(spender);
         
-        if(this.manager.saveVersion >= 3)
-            this.auras.decode(reader, version);
+        this.auras.decode(reader, version);
     }
 }
 

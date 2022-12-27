@@ -2,6 +2,8 @@ const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringStat } = await loadModule('src/adventuring-stat.mjs');
 const { AdventuringBuilding } = await loadModule('src/adventuring-building.mjs');
+const { AdventuringTownAction } = await loadModule('src/adventuring-town-action.mjs');
+const { AdventuringProduct } = await loadModule('src/adventuring-product.mjs');
 const { AdventuringJob } = await loadModule('src/adventuring-job.mjs');
 const { AdventuringGenerator } = await loadModule('src/adventuring-generator.mjs');
 const { AdventuringSpender } = await loadModule('src/adventuring-spender.mjs');
@@ -11,6 +13,7 @@ const { AdventuringDebuff } = await loadModule('src/adventuring-debuff.mjs');
 const { AdventuringArea } = await loadModule('src/adventuring-area.mjs');
 const { AdventuringMonster } = await loadModule('src/adventuring-monster.mjs');
 const { AdventuringDungeonTile } = await loadModule('src/adventuring-dungeon-tile.mjs');
+
 
 const { AdventuringOverview } = await loadModule('src/adventuring-overview.mjs');
 const { AdventuringMessageLog } = await loadModule('src/adventuring-message-log.mjs');
@@ -53,7 +56,7 @@ class AdventuringRenderQueue extends MasterySkillRenderQueue {
 export class Adventuring extends SkillWithMastery {
     constructor(namespace, game) {
         super(namespace, 'Adventuring', game);
-        this.version = 3;
+        this.version = 4;
         this.saveVersion = -1;
         this._media = 'assets/media/main/adventure.svg';
         this.renderQueue = new AdventuringRenderQueue();
@@ -61,6 +64,8 @@ export class Adventuring extends SkillWithMastery {
 
         this.stats = new NamespaceRegistry(this.game.registeredNamespaces);
         this.buildings = new NamespaceRegistry(this.game.registeredNamespaces);
+        this.townActions = new NamespaceRegistry(this.game.registeredNamespaces);
+        this.products = new NamespaceRegistry(this.game.registeredNamespaces);
         this.jobs = new NamespaceRegistry(this.game.registeredNamespaces);
         this.generators = new NamespaceRegistry(this.game.registeredNamespaces);
         this.spenders = new NamespaceRegistry(this.game.registeredNamespaces);
@@ -107,6 +112,23 @@ export class Adventuring extends SkillWithMastery {
         this.dungeon = new AdventuringDungeon(this, this.game);
         this.encounter = new AdventuringEncounter(this, this.game);
 
+
+        this.pages.register('town', this.town);
+
+        this.pages.register('trainer', this.trainer);
+        this.pages.register('jobdetails', this.jobdetails);
+
+        this.pages.register('armory', this.armory);
+        this.pages.register('tavern', this.tavern);
+        this.pages.register('slayers', this.slayers);
+        this.pages.register('lemons', this.lemons);
+
+        this.pages.register('stash', this.stash);
+        this.pages.register('bestiary', this.bestiary);
+        this.pages.register('crossroads', this.crossroads);
+        this.pages.register('dungeon', this.dungeon);
+        this.pages.register('encounter', this.encounter);
+
         this.townTimer = new Timer('Town', () => this.nextTownTick());
         this.townInterval = 5000;
         console.log("Adventuring constructor done");
@@ -125,22 +147,21 @@ export class Adventuring extends SkillWithMastery {
 /*
     General
         - "New" indicators for bestiary/armory/etc
-
+        - "Seen" tracked in this.manager, indicator for new things
     Town Buildings
         - Adventurers decide what to do in town every tick
         - Tavern
             - Adventurer stops here for healing before doing anything else
             - Buy drinks aka buffs that last X dungeon runs
             - Uses coins and different monster materials
-
         - Lemon Stall
             - Idle here randomly
             - Lemons
         - Smithy/Workshop/Etc
             - Each tick consumes "Unknown" material based on conversion
             - Stat level determines max material type
-            - Material roll weight based, stat increases weight of each material on a scale
-            - Gain xp based on rolled material
+            - Submit work orders for x count of y material
+            - Work order slot count determined by building level
             - Characters turn materials into melvor items (Unidentified -> Bronze/Iron/etc)
         - Slayer's Lodge
             - Quests
@@ -162,7 +183,6 @@ export class Adventuring extends SkillWithMastery {
         - Slayer (Blue Mage)
             - Learn new abilities from enemies when using "ultimate"
     Abilities
-        - Buffs/Debuffs from same owner can stack?
 */
     
 
@@ -171,6 +191,8 @@ export class Adventuring extends SkillWithMastery {
         super.onLoad();
 
         this.buildings.forEach(building => building.onLoad());
+        this.townActions.forEach(townAction => townAction.onLoad());
+        this.products.forEach(product => product.onLoad());
         this.jobs.forEach(job => job.onLoad());
         this.auras.forEach(aura => aura.onLoad());
         this.areas.forEach(area => area.onLoad());
@@ -178,26 +200,12 @@ export class Adventuring extends SkillWithMastery {
         this.monsters.forEach(monster => monster.onLoad());
         this.materials.forEach(material => material.onLoad());
 
-        this.pages.register('town', this.town);
-
-        this.pages.register('trainer', this.trainer);
-        this.pages.register('jobdetails', this.jobdetails);
-
-        this.pages.register('armory', this.armory);
-        this.pages.register('tavern', this.tavern);
-        this.pages.register('slayers', this.slayers);
-        this.pages.register('lemons', this.lemons);
-
-        this.pages.register('stash', this.stash);
-        this.pages.register('bestiary', this.bestiary);
-        this.pages.register('crossroads', this.crossroads);
-        this.pages.register('dungeon', this.dungeon);
-        this.pages.register('encounter', this.encounter);
-
         this.pages.onLoad();
 
         this.overview.onLoad();
         this.party.onLoad();
+
+        this.town.checkActions();
         
         if(this.isActive) {
             this.dungeon.go();
@@ -361,11 +369,8 @@ export class Adventuring extends SkillWithMastery {
         if(this.encounter.hitTimer.isActive)
             this.encounter.hitTimer.stop();
 
-        if(this.isActive && this.dungeon.area !== undefined) {
+        if(this.isActive && this.dungeon.area !== undefined)
             this.dungeon.abandon();
-            if(this.dungeon.active)
-                this.town.go();
-        }
 
         this.isActive = false;
         this.game.renderQueue.activeSkills = true;
@@ -373,6 +378,8 @@ export class Adventuring extends SkillWithMastery {
 
         if(!this.townTimer.isActive)
             this.townTimer.start(this.townInterval);
+        
+        this.town.resetActions();
         
         this.overview.renderQueue.turnProgressBar = true;
 
@@ -414,6 +421,8 @@ export class Adventuring extends SkillWithMastery {
 
         if(!this.townTimer.isActive) {
             this.townTimer.start(this.townInterval);
+
+            this.town.resetActions();
         
             this.overview.renderQueue.turnProgressBar = true;
         }
@@ -428,21 +437,15 @@ export class Adventuring extends SkillWithMastery {
         return super.getMasteryXP(action);
     }
 
+    onPageChange() {
+        this.overview.renderQueue.turnProgressBar = true;
+    }
+
     nextTownTick() {
         if(this.isActive)
             return;
-        
-        this.party.all.forEach(member => {
-            if(member.dead) {
-                member.revive({ amount: 0.10 });
-            } else if(member.hitpoints < member.maxHitpoints) {
-                member.heal({ amount: Math.floor(member.maxHitpoints * 0.05) });
-            }
-            if(member.energy > 0)
-                member.setEnergy(0);
-        });
-        
-        this.town.updateTownCards();
+            
+        this.town.performActions();
 
         this.townTimer.start(this.townInterval);
         this.overview.renderQueue.turnProgressBar = true;
@@ -471,6 +474,18 @@ export class Adventuring extends SkillWithMastery {
         data.buildings.forEach(data => {
             let building = new AdventuringBuilding(namespace, data, this, this.game);
             this.buildings.registerObject(building);
+        });
+
+        console.log(`Registering ${data.townActions.length} Town Actions`);
+        data.townActions.forEach(data => {
+            let townAction = new AdventuringTownAction(namespace, data, this, this.game);
+            this.townActions.registerObject(townAction);
+        });
+
+        console.log(`Registering ${data.products.length} Products`);
+        data.products.forEach(data => {
+            let product = new AdventuringProduct(namespace, data, this, this.game);
+            this.products.registerObject(product);
         });
 
         console.log(`Registering ${data.jobs.length} Jobs`);
@@ -565,6 +580,8 @@ export class Adventuring extends SkillWithMastery {
         super.postDataRegistration(); // Milestones setLevel
 
         this.buildings.forEach(building => building.postDataRegistration());
+        this.townActions.forEach(townAction => townAction.postDataRegistration());
+        this.products.forEach(product => product.postDataRegistration());
         this.jobs.forEach(job => job.postDataRegistration());
         this.areas.forEach(area => area.postDataRegistration());
         this.generators.forEach(generator => generator.postDataRegistration());
@@ -595,20 +612,7 @@ export class Adventuring extends SkillWithMastery {
 
         this.party.postDataRegistration();
 
-        this.town.postDataRegistration();
-        
-        this.trainer.postDataRegistration();
-
-        this.armory.postDataRegistration();
-        this.tavern.postDataRegistration();
-        this.slayers.postDataRegistration();
-        this.lemons.postDataRegistration();
-
-        this.stash.postDataRegistration();
-        this.bestiary.postDataRegistration();
-        this.crossroads.postDataRegistration();
-        this.dungeon.postDataRegistration();
-        this.encounter.postDataRegistration();
+        this.pages.postDataRegistration();
 
         let capesToExclude = ["melvorF:Max_Skillcape", "melvorTotH:Superior_Max_Skillcape"];
         let skillCapes = this.game.shop.purchases.filter(purchase => capesToExclude.includes(purchase.id));
@@ -626,15 +630,11 @@ export class Adventuring extends SkillWithMastery {
         writer.writeUint32(this.version); // Store current skill version
 
         this.party.encode(writer);
-        this.armory.encode(writer);
-        this.stash.encode(writer);
-        this.bestiary.encode(writer);
-        this.dungeon.encode(writer);
-        this.encounter.encode(writer);
+        this.pages.encode(writer);
         writer.writeBoolean(this.isActive);
 
         let end = writer.byteOffset;
-        //console.log(`Wrote ${end-start} bytes for Adventuring save`);
+        console.log(`Wrote ${end-start} bytes for Adventuring save`);
         return writer;
     }
 
@@ -647,23 +647,20 @@ export class Adventuring extends SkillWithMastery {
         try {
             super.decode(reader, version);
             this.saveVersion = reader.getUint32(); // Read save version
+            if(this.saveVersion < this.version)
+                throw new Error("Old Save Version");
 
             this.party.decode(reader, version);
-            this.armory.decode(reader, version);
-            this.stash.decode(reader, version);
-            this.bestiary.decode(reader, version);
-            this.dungeon.decode(reader, version);
-            this.encounter.decode(reader, version);
+            this.pages.decode(reader, version);
             this.isActive = reader.getBoolean();
         } catch(e) { // Something's fucky, dump all progress and skip past the trash save data
             console.log(e);
             reader.byteOffset = start;
             reader.getFixedLengthBuffer(skillDataSize);
-            this.reset();
         }
 
         let end = reader.byteOffset;
-        //console.log(`Read ${end-start} bytes for Adventuring save`);
+        console.log(`Read ${end-start} bytes for Adventuring save`);
     }
 
     checkpoints = [

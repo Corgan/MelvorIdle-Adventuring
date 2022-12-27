@@ -5,9 +5,17 @@ const { AdventuringCardUIComponent } = await loadModule('src/components/adventur
 class AdventuringCardRenderQueue {
     constructor(){
         this.name = false;
+        this.action = false;
         this.icon = false;
         this.highlight = false;
         this.fade = false;
+    }
+    updateAll() {
+        this.name = true;
+        this.action = true;
+        this.icon = true;
+        this.highlight = true;
+        this.fade = true;
     }
 }
 
@@ -38,6 +46,7 @@ export class AdventuringCard {
 
     render() {
         this.renderName();
+        this.renderAction();
         this.renderIcon();
         this.renderHighlight();
         this.renderFade();
@@ -59,6 +68,16 @@ export class AdventuringCard {
         this.component.icon.src = this.icon;
 
         this.renderQueue.icon = false;
+    }
+
+    renderAction() {
+        if(!this.renderQueue.action)
+            return;
+
+        this.component.action.classList.toggle('d-none', this.action === undefined);
+        this.component.action.textContent = this.action;
+
+        this.renderQueue.action = false;
     }
 
     renderHighlight() {

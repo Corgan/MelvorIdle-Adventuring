@@ -9,5 +9,6 @@ export class AdventuringCardUIComponent extends AdventuringUIComponent {
         this.styling = getElementFromFragment(this.$fragment, 'styling', 'div');
         this.icon = getElementFromFragment(this.$fragment, 'icon', 'img');
         this.name = getElementFromFragment(this.$fragment, 'text', 'small');
+        this.action = getElementFromFragment(this.$fragment, 'action', 'small');
     }
 }

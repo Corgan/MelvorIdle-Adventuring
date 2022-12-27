@@ -15,6 +15,10 @@ export class AdventuringPages {
         this.pages.forEach(p => p.onLoad());
     }
 
+    postDataRegistration() {
+        this.pages.forEach(p => p.postDataRegistration());
+    }
+
     go(page) {
         if(page instanceof AdventuringPage && page !== this.current) {
             this.pages.forEach(p => {
@@ -44,5 +48,21 @@ export class AdventuringPages {
 
     render() {
         this.pages.forEach(p => p.render());
+    }
+
+    encode(writer) {
+        writer.writeComplexMap(this.byId, (key, value, writer) => {
+            writer.writeString(key);
+            value.encode(writer);
+        });
+        return writer;
+    }
+
+    decode(reader, version) {
+        reader.getComplexMap((reader) => {
+            let key = reader.getString();
+            let page = this.byId.get(key);
+            page.decode(reader, version);
+        });
     }
 }

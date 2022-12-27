@@ -136,7 +136,7 @@ export class AdventuringAuras {
         reader.getSet((reader) => {
             let aura = new AdventuringAuraInstance(this.manager, this.game, this);
             aura.decode(reader, version);
-            this.auras.add(instance);
+            this.auras.add(aura);
         });
         this.buildEffects();
     }

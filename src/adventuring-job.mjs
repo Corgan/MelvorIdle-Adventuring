@@ -83,7 +83,7 @@ export class AdventuringJob extends MasteryAction {
         let html = '<div>';
 
         html += `<div><span>${this.name}</span></div>`;
-        if(this.unlocked) {
+        if(this.unlocked && this.isMilestoneReward) {
             let { xp, level, percent, nextLevelXP } = this.manager.getMasteryProgress(this);
             html += `<div><small>Level ${level}</small></div>`;
             html += `<div><small>${xp} / ${nextLevelXP} XP</small></div>`;

@@ -35,7 +35,7 @@ export class AdventuringDungeon extends AdventuringPage {
     }
 
     get active() {
-        if(this.area !== undefined && this.manager.encounter.active)
+        if(this.manager.encounter.active)
             return true;
         return super.active;
     }
@@ -193,33 +193,31 @@ export class AdventuringDungeon extends AdventuringPage {
         this.area = undefined;
         this.numFloors = 0;
         this.progress = 0;
-        this.exploreTimer.stop();
+        
         this.manager.overview.renderQueue.turnProgressBar = true;
         this.manager.overview.renderQueue.status = true;
         this.manager.overview.renderQueue.buttons = true;
 
-        this.manager.encounter.reset();
         this.groupGenerator.reset();
         this.floor.reset();
     }
 
-    abandon(died=false) {
-        if(this.active) {
-            if(!died)
-                this.manager.crossroads.go();
-            if(died)
-                this.manager.town.go();
+    abandon() {
+        if(this.manager.encounter.isFighting) {
+            this.manager.encounter.all.forEach(member => {
+                let resolvedEffects = member.trigger('encounter_end');
+            });
+            this.manager.encounter.reset();
         }
-        
-        if(this.manager.encounter.isFighting && !died)
-            this.manager.encounter.complete(true);
         
         if(this.area !== undefined)
             this.manager.log.add(`Abandoned ${this.area.name} on floor ${this.progress+1}`);
 
-        
         this.reset();
         this.manager.stop();
+
+        if(this.active)
+            this.manager.town.go();
     }
 
     complete() {

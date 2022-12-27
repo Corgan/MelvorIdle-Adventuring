@@ -39,23 +39,24 @@ class AdventuringAuraEffect {
     }
 
     postDataRegistration() {
-
+        
     }
 
     getAmount(instance) {
-        let amount = this.aura.amount !== undefined ? this.aura.amount : 1;
+        let min = this.aura.amount !== undefined ? this.aura.amount : 1;
+        let amount = min;
 
-        if(instance.amount !== undefined)
+        if(instance.amount !== undefined) {
             amount = instance.amount;
-
-        if(this.stack) {
-            amount = Math.floor(amount * instance.stacks);
         }
+
+        if(this.stack)
+            amount = Math.floor(amount * instance.stacks);
 
         if(this.split) {
             amount = Math.ceil(amount / instance.stacks);
             if(instance.amount !== undefined)
-                instance.amount = Math.max(0, instance.amount - amount);
+                instance.amount = Math.max(min * instance.stacks, instance.amount - amount);
         }
 
         return amount;

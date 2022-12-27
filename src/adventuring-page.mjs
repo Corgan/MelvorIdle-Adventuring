@@ -28,4 +28,10 @@ export class AdventuringPage {
     render() {
 
     }
+
+    encode(writer) {
+    }
+
+    decode(reader, version) {
+    }
 }

@@ -23,7 +23,6 @@ export class AdventuringHero extends AdventuringCharacter {
 
         this.locked = false;
         this.equipment = new AdventuringEquipment(this.manager, this.game, this);
-        this.townCard = new AdventuringCard(this.manager, this.game);
 
         this.component.equipment.classList.remove('d-none');
         this.equipment.component.mount(this.component.equipment);
@@ -70,7 +69,7 @@ export class AdventuringHero extends AdventuringCharacter {
 
         this.calculateStats();
             
-        if(this.name === undefined) { // New game :)
+        if(this.name === undefined || this.name === "") { // Oh No
             this.name = this.getRandomName(this.manager.party.all.map(member => member.name));
             this.renderQueue.name = true;
 
@@ -182,8 +181,6 @@ export class AdventuringHero extends AdventuringCharacter {
         this.component.name.textContent = this.name;
         this.card.name = this.name;
         this.card.renderQueue.name = true;
-        this.townCard.name = this.name;
-        this.townCard.renderQueue.name = true;
 
         this.renderQueue.name = false;
     }
@@ -196,17 +193,11 @@ export class AdventuringHero extends AdventuringCharacter {
             this.component.icon.classList.add('d-none');
             this.card.icon = this.combatJob.media;
             this.card.renderQueue.icon = true;
-            
-            this.townCard.icon = this.passiveJob.media;
-            this.townCard.renderQueue.icon = true;
         } else {
             this.component.icon.classList.remove('d-none');
             this.component.icon.firstElementChild.src = this.combatJob.media;
             this.card.icon = this.combatJob.media;
             this.card.renderQueue.icon = true;
-            
-            this.townCard.icon = this.passiveJob.media;
-            this.townCard.renderQueue.icon = true;
         }
 
         this.renderQueue.icon = false;

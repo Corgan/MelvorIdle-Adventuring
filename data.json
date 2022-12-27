@@ -187,6 +187,11 @@
                         "id": "unknown_fish",
                         "name": "Unknown Fish",
                         "media": "melvor:assets/media/skills/fishing/fishing.svg"
+                    },
+                    {
+                        "id": "unknown_bar",
+                        "name": "Unknown Bar",
+                        "media": "melvor:assets/media/bank/steel_bar.png"
                     }
                 ],
                 "overview": {
@@ -253,44 +258,224 @@
                 },
                 "buildings": [
                     {
-                        "id": "trainer",
-                        "name": "Trainer",
-                        "description": "Unlock and level up jobs",
-                        "media": "melvor:assets/media/skills/township/Library.svg",
-                        "requirements": [],
-                        "page": "trainer"
-                    },
-                    {
-                        "id": "armory",
-                        "name": "Armory",
-                        "description": "Craft and Upgrade weapons",
-                        "media": "melvor:assets/media/skills/township/Tailor.svg",
-                        "requirements": [],
-                        "page": "armory"
-                    },
-                    {
                         "id": "tavern",
+                        "type": "page",
                         "name": "Tavern",
                         "description": "Rest and buy a drink here.",
                         "media": "melvor:assets/media/skills/township/Tavern.svg",
                         "requirements": [],
-                        "page": "tavern"
+                        "page": "tavern",
+                        "idle": ["Getting Tipsy", "Eating a hearty meal"],
+                        "actions": [
+                            "adventuring:revive",
+                            "adventuring:rest"
+                        ]
+                    },
+                    {
+                        "id": "trainer",
+                        "type": "page",
+                        "name": "Training Tower",
+                        "description": "Unlock and level up jobs",
+                        "media": "melvor:assets/media/skills/township/Library.svg",
+                        "requirements": [],
+                        "page": "trainer",
+                        "idle": ["Trying new maneuvers", "Sparring with a Dummy"]
+                    },
+                    {
+                        "id": "armory",
+                        "type": "page",
+                        "name": "Armory",
+                        "description": "Craft and upgrade weapons",
+                        "media": "melvor:assets/media/skills/township/Tailor.svg",
+                        "requirements": [],
+                        "page": "armory",
+                        "idle": ["Polishing Equipment", "Tinkering with Materials"]
                     },
                     {
                         "id": "slayers",
+                        "type": "page",
                         "name": "Slayers' Lodge",
                         "description": "Accept tasks from the Slayers",
                         "media": "melvor:assets/media/skills/township/Hunters_Lodge.svg",
                         "requirements": [],
-                        "page": "slayers"
+                        "page": "slayers",
+                        "idle": ["Pestering the Slayers", "Admiring Trophies"]
                     },
                     {
                         "id": "lemons",
+                        "type": "page",
                         "name": "Lemon Stall",
-                        "description": "Have some lemonade",
+                        "description": "Grab a glass of lemonade",
                         "media": "melvor:assets/media/skills/township/Lemvor_Lemon_Stall.svg",
                         "requirements": [],
-                        "page": "lemons"
+                        "page": "lemons",
+                        "idle": ["Drinking Lemonade", "Eating a Lemon"]
+                    },
+                    {
+                        "id": "forge",
+                        "type": "workshop",
+                        "name": "Forge",
+                        "description": "Create work orders for Smiths. Converts Unknown Bars to complete orders.",
+                        "media": "melvor:assets/media/skills/township/Blacksmiths_Smithy.svg",
+                        "requirements": [],
+                        "idle": ["Playing with fire", "Bugging the Smiths"],
+                        "actions": ["adventuring:work"],
+                        "products": [
+                            "adventuring:bronze_bar"
+                        ]
+                    },
+                    {
+                        "id": "mine",
+                        "type": "workshop",
+                        "name": "Mine",
+                        "description": "Create work orders for Miners. Converts Unknown Ore to complete orders.",
+                        "media": "melvor:assets/media/skills/township/Miners_Field.svg",
+                        "requirements": [],
+                        "idle": ["Hittin' rocks", "Digging for gold"],
+                        "actions": ["adventuring:work"],
+                        "products": [
+                            "adventuring:copper_ore",
+                            "adventuring:tin_ore",
+                            "adventuring:iron_ore"
+                        ]
+                    },
+                    {
+                        "id": "dock",
+                        "type": "workshop",
+                        "name": "Dock",
+                        "description": "Create work orders for Fishermen. Converts Unknown Fish to complete orders.",
+                        "media": "melvor:assets/media/skills/township/Fishermans_Dock.svg",
+                        "requirements": [],
+                        "idle": ["Hanging feet in the water", "Going for a swim"],
+                        "actions": ["adventuring:work"],
+                        "products": [
+                            "adventuring:raw_shrimp"
+                        ]
+                    },
+                    {
+                        "id": "lumberyard",
+                        "type": "workshop",
+                        "name": "Lumberyard",
+                        "description": "Create work orders for Lumberjacks. Converts Unknown Wood to complete orders.",
+                        "media": "melvor:assets/media/skills/township/Woodcutters_Camp.svg",
+                        "requirements": [],
+                        "idle": ["Stealing some firewood", "Lifting Logs"],
+                        "actions": ["adventuring:work"],
+                        "products": [
+                            "adventuring:normal_logs"
+                        ]
+                    }
+                ],
+                "townActions": [
+                    {
+                        "id": "idle",
+                        "status": "Chillin'",
+                        "requirements": [],
+                        "effects": []
+                    },
+                    {
+                        "id": "revive",
+                        "status": "Reviving",
+                        "requirements": [
+                            { "type": "dead" }
+                        ],
+                        "effects": [
+                            { "type": "revive", "amount": 0.1 }
+                        ]
+                    },
+                    {
+                        "id": "rest",
+                        "status": "Resting",
+                        "requirements": [
+                            { "type": "comparison", "operand": "hitpoint_pct", "operator": "lt", "amount": 100 }
+                        ],
+                        "effects": [
+                            { "type": "heal", "amount": 0.05 }
+                        ]
+                    },
+                    {
+                        "id": "work",
+                        "status": "Working",
+                        "requirements": [
+                            { "type": "comparison", "operand": "hitpoint_pct", "operator": "eq", "amount": 100 }
+                        ],
+                        "effects": [
+                            { "type": "work" }
+                        ]
+                    }
+                ],
+                "products": [
+                    {
+                        "id": "bronze_bar",
+                        "item": "melvorD:Bronze_Bar",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:smith" },
+                            { "type": "job_level", "job": "adventuring:smith", "level": 1 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:unknown_ore", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "copper_ore",
+                        "item": "melvorD:Copper_Ore",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:miner" },
+                            { "type": "job_level", "job": "adventuring:miner", "level": 1 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:unknown_ore", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "tin_ore",
+                        "item": "melvorD:Tin_Ore",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:miner" },
+                            { "type": "job_level", "job": "adventuring:miner", "level": 1 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:unknown_ore", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "iron_ore",
+                        "item": "melvorD:Iron_Ore",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:miner" },
+                            { "type": "job_level", "job": "adventuring:miner", "level": 1 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:unknown_ore", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "raw_shrimp",
+                        "item": "melvorD:Raw_Shrimp",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:fisherman" },
+                            { "type": "job_level", "job": "adventuring:fisherman", "level": 1 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:unknown_fish", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "normal_logs",
+                        "item": "melvorD:Normal_Logs",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:lumberjack" },
+                            { "type": "job_level", "job": "adventuring:lumberjack", "level": 1 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:unknown_wood", "count": 1 }
+                        ]
                     }
                 ],
                 "jobs": [
@@ -1559,7 +1744,7 @@
                         "description": "Regenerate {effect.0.amount} health at the start of the turn and remove a stack",
                         "overwrite": true,
                         "refresh": true,
-                        "amount": 10,
+                        "amount": 1,
                         "stacks": 3,
                         "effects": [
                             {
@@ -1648,7 +1833,7 @@
                         "description": "Lose {effect.0.amount} health at the end of the turn and remove a stack",
                         "refresh": true,
                         "accumulate": true,
-                        "amount": 5,
+                        "amount": 1,
                         "stacks": 3,
                         "effects": [
                             {
@@ -1678,7 +1863,7 @@
                         "description": "Lose {effect.0.amount} health at the beginning of the turn and remove a stack",
                         "refresh": true,
                         "accumulate": true,
-                        "amount": 5,
+                        "amount": 1,
                         "stacks": 3,
                         "effects": [
                             {
@@ -2854,6 +3039,22 @@
                         ],
                         "scaling": [
                             { "id": "adventuring:magic", "value": 1 }
+                        ]
+                    },
+                    {
+                        "id": "healing_staff",
+                        "name": "Healing Staff",
+                        "media": "melvor:assets/media/bank/natures_call_staff.png",
+                        "type": "adventuring:staff",
+                         "materials": [
+                            { "id": "adventuring:currency", "qty": 50 },
+                            { "id": "adventuring:parts", "qty": 2 }
+                        ],
+                        "base": [
+                            { "id": "adventuring:prayer", "value": 8 }
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:prayer", "value": 1 }
                         ]
                     },
                     {

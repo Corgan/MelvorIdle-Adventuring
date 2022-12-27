@@ -320,7 +320,7 @@ export class AdventuringEncounter extends AdventuringPage {
         }
         
         if(this.manager.party.all.every(hero => hero.dead)) {
-            this.complete(true);
+            this.dungeon.abandon();
             return;
         }
 
@@ -330,16 +330,12 @@ export class AdventuringEncounter extends AdventuringPage {
         this.nextTurn();
     }
 
-    complete(died=false) {
+    complete() {
         this.all.forEach(member => {
             let resolvedEffects = member.trigger('encounter_end');
         });
 
         this.reset();
-        if(died) {
-            this.manager.dungeon.abandon(died);
-            return;
-        }
 
         if(this.manager.dungeon.active)
             this.manager.dungeon.go();
@@ -350,7 +346,6 @@ export class AdventuringEncounter extends AdventuringPage {
 
         if((cell.type === floor.exit || cell.type === floor.boss) && cell.explored) {
             floor.complete();
-        } else {
             this.manager.dungeon.updateFloorCards();
         }
         this.manager.overview.renderQueue.status = true;
