@@ -179,6 +179,9 @@ class AdventuringCharacter {
         
         this.hitpoints -= amount;
 
+        if(isNaN(this.hitpoints))
+            this.hitpoints = 0;
+
         if(!loadingOfflineProgress) {
             this.component.splash.add({
                 source: 'Attack',
@@ -206,6 +209,9 @@ class AdventuringCharacter {
             return;
 
         this.hitpoints += amount;
+        
+        if(isNaN(this.hitpoints))
+            this.hitpoints = 0;
 
         if(!loadingOfflineProgress) {
             this.component.splash.add({
@@ -227,6 +233,10 @@ class AdventuringCharacter {
 
         this.dead = false;
         this.hitpoints = Math.floor(this.maxHitpoints * amount);
+        
+        if(isNaN(this.hitpoints))
+            this.hitpoints = this.maxHitpoints;
+            
         this.setEnergy(0);
         this.renderQueue.hitpoints = true;
     }

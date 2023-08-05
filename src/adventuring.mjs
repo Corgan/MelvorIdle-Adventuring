@@ -58,7 +58,7 @@ export class Adventuring extends SkillWithMastery {
         super(namespace, 'Adventuring', game);
         this.version = 4;
         this.saveVersion = -1;
-        this._media = 'assets/media/main/adventure.svg';
+        this._media = 'melvor:assets/media/main/adventure.svg';
         this.renderQueue = new AdventuringRenderQueue();
         this.isActive = false;
 
@@ -183,6 +183,8 @@ export class Adventuring extends SkillWithMastery {
         - Slayer (Blue Mage)
             - Learn new abilities from enemies when using "ultimate"
     Abilities
+        - Mastery
+            - "Talent" tree for modifying abilities
 */
     
 
@@ -634,12 +636,12 @@ export class Adventuring extends SkillWithMastery {
         writer.writeBoolean(this.isActive);
 
         let end = writer.byteOffset;
-        console.log(`Wrote ${end-start} bytes for Adventuring save`);
+        //console.log(`Wrote ${end-start} bytes for Adventuring save`);
         return writer;
     }
 
     decode(reader, version) {
-        console.log("Adventuring save decoding");
+        //console.log("Adventuring save decoding");
         let start = reader.byteOffset;
         reader.byteOffset -= Uint32Array.BYTES_PER_ELEMENT; // Let's back up a minute and get the size of our skill data
         let skillDataSize = reader.getUint32();
@@ -660,7 +662,7 @@ export class Adventuring extends SkillWithMastery {
         }
 
         let end = reader.byteOffset;
-        console.log(`Read ${end-start} bytes for Adventuring save`);
+        //console.log(`Read ${end-start} bytes for Adventuring save`);
     }
 
     checkpoints = [

@@ -320,7 +320,7 @@ export class AdventuringEncounter extends AdventuringPage {
         }
         
         if(this.manager.party.all.every(hero => hero.dead)) {
-            this.dungeon.abandon();
+            this.manager.dungeon.abandon();
             return;
         }
 
@@ -346,8 +346,8 @@ export class AdventuringEncounter extends AdventuringPage {
 
         if((cell.type === floor.exit || cell.type === floor.boss) && cell.explored) {
             floor.complete();
-            this.manager.dungeon.updateFloorCards();
         }
+        this.manager.dungeon.updateFloorCards();
         this.manager.overview.renderQueue.status = true;
     }
 
