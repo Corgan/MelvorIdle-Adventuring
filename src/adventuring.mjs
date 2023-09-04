@@ -464,117 +464,152 @@ export class Adventuring extends SkillWithMastery {
     registerData(namespace, data) {
         super.registerData(namespace, data); // pets, rareDrops, minibar, customMilestones
 
-        this.overview.registerData(data.overview);
+        if(data.overview !== undefined)
+            this.overview.registerData(data.overview);
 
-        console.log(`Registering ${data.stats.length} Stats`);
-        data.stats.forEach(data => {
-            let stat = new AdventuringStat(namespace, data, this, this.game);
-            this.stats.registerObject(stat);
-        });
+        if(data.stats !== undefined) {
+            console.log(`Registering ${data.stats.length} Stats`);
+            data.stats.forEach(data => {
+                let stat = new AdventuringStat(namespace, data, this, this.game);
+                this.stats.registerObject(stat);
+            });
+        }
 
-        console.log(`Registering ${data.buildings.length} Buildings`);
-        data.buildings.forEach(data => {
-            let building = new AdventuringBuilding(namespace, data, this, this.game);
-            this.buildings.registerObject(building);
-        });
+        if(data.buildings !== undefined) {
+            console.log(`Registering ${data.buildings.length} Buildings`);
+            data.buildings.forEach(data => {
+                let building = new AdventuringBuilding(namespace, data, this, this.game);
+                this.buildings.registerObject(building);
+            });
+        }
 
-        console.log(`Registering ${data.townActions.length} Town Actions`);
-        data.townActions.forEach(data => {
-            let townAction = new AdventuringTownAction(namespace, data, this, this.game);
-            this.townActions.registerObject(townAction);
-        });
+        if(data.townActions !== undefined) {
+            console.log(`Registering ${data.townActions.length} Town Actions`);
+            data.townActions.forEach(data => {
+                let townAction = new AdventuringTownAction(namespace, data, this, this.game);
+                this.townActions.registerObject(townAction);
+            });
+        }
 
-        console.log(`Registering ${data.products.length} Products`);
-        data.products.forEach(data => {
-            let product = new AdventuringProduct(namespace, data, this, this.game);
-            this.products.registerObject(product);
-        });
+        if(data.products !== undefined) {
+            console.log(`Registering ${data.products.length} Products`);
+            data.products.forEach(data => {
+                let product = new AdventuringProduct(namespace, data, this, this.game);
+                this.products.registerObject(product);
+            });
+        }
 
-        console.log(`Registering ${data.jobs.length} Jobs`);
-        data.jobs.forEach(data => {
-            let job = new AdventuringJob(namespace, data, this, this.game);
-            this.jobs.registerObject(job);
-            if(job.id !== "adventuring:none")
-                this.actions.registerObject(job);
-        });
+        if(data.jobs !== undefined) {
+            console.log(`Registering ${data.jobs.length} Jobs`);
+            data.jobs.forEach(data => {
+                let job = new AdventuringJob(namespace, data, this, this.game);
+                this.jobs.registerObject(job);
+                if(job.id !== "adventuring:none")
+                    this.actions.registerObject(job);
+            });
+        }
 
-        console.log(`Registering ${data.generators.length} Generators`);
-        data.generators.forEach(data => {
-            let generator = new AdventuringGenerator(namespace, data, this, this.game);
-            this.generators.registerObject(generator);
-        });
+        if(data.generators !== undefined) {
+            console.log(`Registering ${data.generators.length} Generators`);
+            data.generators.forEach(data => {
+                let generator = new AdventuringGenerator(namespace, data, this, this.game);
+                this.generators.registerObject(generator);
+            });
+        }
 
-        console.log(`Registering ${data.spenders.length} Spenders`);
-        data.spenders.forEach(data => {
-            let spender = new AdventuringSpender(namespace, data, this, this.game);
-            this.spenders.registerObject(spender);
-        });
+        if(data.spenders !== undefined) {
+            console.log(`Registering ${data.spenders.length} Spenders`);
+            data.spenders.forEach(data => {
+                let spender = new AdventuringSpender(namespace, data, this, this.game);
+                this.spenders.registerObject(spender);
+            });
+        }
 
-        console.log(`Registering ${data.passives.length} Passives`);
-        data.passives.forEach(data => {
-            let passive = new AdventuringPassive(namespace, data, this, this.game);
-            this.passives.registerObject(passive);
-        });
+        if(data.passives !== undefined) {
+            console.log(`Registering ${data.passives.length} Passives`);
+            data.passives.forEach(data => {
+                let passive = new AdventuringPassive(namespace, data, this, this.game);
+                this.passives.registerObject(passive);
+            });
+        }
 
-        console.log(`Registering ${data.buffs.length} Buffs`);
-        data.buffs.forEach(data => {
-            let buff = new AdventuringBuff(namespace, data, this, this.game);
-            this.buffs.registerObject(buff);
-            this.auras.registerObject(buff);
-        });
+        if(data.buffs !== undefined) {
+            console.log(`Registering ${data.buffs.length} Buffs`);
+            data.buffs.forEach(data => {
+                let buff = new AdventuringBuff(namespace, data, this, this.game);
+                this.buffs.registerObject(buff);
+                this.auras.registerObject(buff);
+            });
+        }
 
-        console.log(`Registering ${data.debuffs.length} Debuffs`);
-        data.debuffs.forEach(data => {
-            let debuff = new AdventuringDebuff(namespace, data, this, this.game);
-            this.debuffs.registerObject(debuff);
-            this.auras.registerObject(debuff);
-        });
+        if(data.debuffs !== undefined) {
+            console.log(`Registering ${data.debuffs.length} Debuffs`);
+            data.debuffs.forEach(data => {
+                let debuff = new AdventuringDebuff(namespace, data, this, this.game);
+                this.debuffs.registerObject(debuff);
+                this.auras.registerObject(debuff);
+            });
+        }
 
-        console.log(`Registering ${data.areas.length} Areas`);
-        data.areas.forEach(data => {
-            let area = new AdventuringArea(namespace, data, this, this.game);
-            this.areas.registerObject(area);
-            this.actions.registerObject(area);
-        });
+        if(data.areas !== undefined) {
+            console.log(`Registering ${data.areas.length} Areas`);
+            data.areas.forEach(data => {
+                let area = new AdventuringArea(namespace, data, this, this.game);
+                this.areas.registerObject(area);
+                this.actions.registerObject(area);
+            });
+        }
         
-        console.log(`Registering ${data.monsters.length} Monsters`);
-        data.monsters.forEach(data => {
-            let monster = new AdventuringMonster(namespace, data, this, this.game);
-            this.monsters.registerObject(monster);
-            this.actions.registerObject(monster);
-        });
+        if(data.monsters !== undefined) {
+            console.log(`Registering ${data.monsters.length} Monsters`);
+            data.monsters.forEach(data => {
+                let monster = new AdventuringMonster(namespace, data, this, this.game);
+                this.monsters.registerObject(monster);
+                this.actions.registerObject(monster);
+            });
+        }
         
-        console.log(`Registering ${data.tiles.length} Tiles`);
-        data.tiles.forEach(data => {
-            let tile = new AdventuringDungeonTile(namespace, data, this, this.game);
-            this.tiles.registerObject(tile);
-        });
+        if(data.tiles !== undefined) {
+            console.log(`Registering ${data.tiles.length} Tiles`);
+            data.tiles.forEach(data => {
+                let tile = new AdventuringDungeonTile(namespace, data, this, this.game);
+                this.tiles.registerObject(tile);
+            });
+        }
 
-        console.log(`Registering ${data.itemSlots.length} Item Slots`);
-        data.itemSlots.forEach(data => {
-            let slot = new AdventuringItemSlot(namespace, data, this, this.game);
-            this.itemSlots.registerObject(slot);
-        });
+        if(data.itemSlots !== undefined) {
+            console.log(`Registering ${data.itemSlots.length} Item Slots`);
+            data.itemSlots.forEach(data => {
+                let slot = new AdventuringItemSlot(namespace, data, this, this.game);
+                this.itemSlots.registerObject(slot);
+            });
+        }
 
-        console.log(`Registering ${data.itemTypes.length} Item Types`);
-        data.itemTypes.forEach(data => {
-            let itemType = new AdventuringItemType(namespace, data, this, this.game);
-            this.itemTypes.registerObject(itemType);
-        });
+        if(data.itemTypes !== undefined) {
+            console.log(`Registering ${data.itemTypes.length} Item Types`);
+            data.itemTypes.forEach(data => {
+                let itemType = new AdventuringItemType(namespace, data, this, this.game);
+                this.itemTypes.registerObject(itemType);
+            });
+        }
 
-        console.log(`Registering ${data.materials.length} Materials`);
-        data.materials.forEach(data => {
-            let material = new AdventuringMaterial(namespace, data, this, this.game);
-            this.materials.registerObject(material);
-        });
+        if(data.materials !== undefined) {
+            console.log(`Registering ${data.materials.length} Materials`);
+            data.materials.forEach(data => {
+                let material = new AdventuringMaterial(namespace, data, this, this.game);
+                this.materials.registerObject(material);
+            });
+        }
 
-        console.log(`Registering ${data.baseItems.length} Base Items`);
-        data.baseItems.forEach(data => {
-            let item = new AdventuringItemBase(namespace, data, this, this.game);
-            this.baseItems.registerObject(item);
-            if(item.id !== "adventuring:none")
-                this.actions.registerObject(item);
-        });
+        if(data.baseItems !== undefined) {
+            console.log(`Registering ${data.baseItems.length} Base Items`);
+            data.baseItems.forEach(data => {
+                let item = new AdventuringItemBase(namespace, data, this, this.game);
+                this.baseItems.registerObject(item);
+                if(item.id !== "adventuring:none")
+                    this.actions.registerObject(item);
+            });
+        }
     }
 
     postDataRegistration() {
@@ -678,11 +713,11 @@ export class Adventuring extends SkillWithMastery {
             const checkpointXP = Math.floor((this.baseMasteryPoolCap * percentRequired) / 100);
             let checkPointStatus = '';
             if (isActive) {
-                checkPointStatus = templateLangString('MENU_TEXT', 'CHECKPOINT_ACTIVE', {
+                checkPointStatus = templateLangString('MENU_TEXT_CHECKPOINT_ACTIVE', {
                     xp: numberWithCommas(checkpointXP),
                 });
             } else {
-                checkPointStatus = templateLangString('MENU_TEXT', 'XP_REMAINING', {
+                checkPointStatus = templateLangString('MENU_TEXT_XP_REMAINING', {
                     xpLeft: numberWithCommas(Math.ceil(checkpointXP - this.masteryPoolXP)),
                     xp: numberWithCommas(checkpointXP),
                 });
