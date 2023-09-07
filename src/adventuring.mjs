@@ -655,9 +655,11 @@ export class Adventuring extends SkillWithMastery {
         let skillCapes = this.game.shop.purchases.filter(purchase => capesToExclude.includes(purchase.id));
         skillCapes.forEach(cape => {
             let allSkillLevelsRequirement = cape.purchaseRequirements.find(req => req.type === "AllSkillLevels");
-            if(allSkillLevelsRequirement.exceptions === undefined)
-                allSkillLevelsRequirement.exceptions = new Set();
-            allSkillLevelsRequirement.exceptions.add(this);
+            if(allSkillLevelsRequirement !== undefined) {
+                if(allSkillLevelsRequirement.exceptions === undefined)
+                    allSkillLevelsRequirement.exceptions = new Set();
+                allSkillLevelsRequirement.exceptions.add(this);
+            }
         });
     }
 
