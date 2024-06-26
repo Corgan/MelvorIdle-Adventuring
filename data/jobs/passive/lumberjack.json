@@ -1,0 +1,92 @@
+{
+    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+    "namespace": "adventuring",
+    "data": {
+        "skillData": [{
+            "skillID": "adventuring:Adventuring",
+            "data": {
+                "stats": [
+                    {
+                        "id": "woodcutting",
+                        "name": "Woodcutting",
+                        "media": "melvor:assets/media/skills/woodcutting/woodcutting.svg"
+                    }
+                ],
+                "jobs": [
+                    {
+                        "id": "lumberjack",
+                        "name": "Lumberjack",
+                        "media": "melvor:assets/media/skills/woodcutting/woodcutting.svg",
+                        "requirements": [
+                            { "type": "skill_level", "level": 5 }
+                        ],
+                        "isMilestoneReward": true,
+                        "isPassive": true,
+                        "scaling": [
+                            { "id": "adventuring:woodcutting", "value": 1 },
+                            { "id": "adventuring:strength", "value": 0.25 }
+                        ]
+                    }
+                ],
+                "materials": [
+                    {
+                        "id": "unknown_wood",
+                        "name": "Unknown Wood",
+                        "media": "melvor:assets/media/skills/township/wood.svg"
+                    }
+                ],
+                "buildings": [
+                    {
+                        "id": "lumberyard",
+                        "type": "workshop",
+                        "name": "Lumberyard",
+                        "description": "Create work orders for Lumberjacks. Converts Unknown Wood to complete orders.",
+                        "media": "melvor:assets/media/skills/township/Woodcutters_Camp.svg",
+                        "requirements": [],
+                        "idle": ["Stealing some firewood", "Lifting Logs"],
+                        "actions": ["adventuring:work"],
+                        "products": [
+                            "adventuring:normal_logs"
+                        ]
+                    }
+                ],
+                "products": [
+                    {
+                        "id": "normal_logs",
+                        "item": "melvorD:Normal_Logs",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:lumberjack" },
+                            { "type": "job_level", "job": "adventuring:lumberjack", "level": 1 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:unknown_wood", "count": 1 }
+                        ]
+                    }
+                ],
+                "tiles": [
+                    {
+                        "id": "forest",
+                        "name": "Forest",
+                        "media": "melvor:assets/media/skills/woodcutting/normal_tree.svg",
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:lumberjack" }
+                        ],
+                        "weight": 10,
+                        "floor_max": 1,
+                        "dungeon_max": 1,
+                        "effects": [
+                            { "type": "xp", "amount": 30, "job": "adventuring:lumberjack" },
+                            {
+                                "type": "loot",
+                                "pool": [
+                                    { "id": "adventuring:unknown_wood", "qty": 1, "weight": 100 }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        }]
+    }
+}

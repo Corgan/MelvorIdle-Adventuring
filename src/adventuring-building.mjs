@@ -38,6 +38,8 @@ export class AdventuringBuilding extends NamespacedObject {
 
         //this.idle = new AdventuringBuildingAction(this.manager, this.game, { status: data.idle !== undefined ? data.idle : `Loitering`, requirements: [], effects: [] }, this);
 
+        if(data.itemSlotOrder !== undefined)
+            this.itemSlotOrder = data.itemSlotOrder;
         this.type = data.type;
         if (this.type === "workshop") {
             this.manager.pages.register(data.id, new AdventuringWorkshop(this.manager, this.game, data, this));

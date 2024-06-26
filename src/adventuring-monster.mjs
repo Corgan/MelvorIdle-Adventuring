@@ -23,7 +23,7 @@ class AdventuringMonsterRenderQueue {
 }
 export class AdventuringMonster extends MasteryAction {
     constructor(namespace, data, manager, game) {
-        super(namespace, data.id);
+        super(namespace, data, game);
         this.manager = manager;
         this.game = game;
         this._name = data.name;

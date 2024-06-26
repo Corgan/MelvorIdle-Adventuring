@@ -13,7 +13,7 @@ export class AdventuringMonsterUIComponent extends AdventuringUIComponent {
         
         this.progressContainer = getElementFromFragment(this.$fragment, 'progress-container', 'div');
 
-        this.masteryProgress = new ProgressBar(getElementFromFragment(this.$fragment, 'mastery-progress', 'div'));
+        this.masteryProgress = getElementFromFragment(this.$fragment, 'mastery-progress', 'progress-bar');
 
         this.tooltip = tippy(this.clickable, {
             content: '',

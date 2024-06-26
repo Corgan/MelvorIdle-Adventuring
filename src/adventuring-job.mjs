@@ -16,7 +16,7 @@ class AdventuringJobRenderQueue {
 
 export class AdventuringJob extends MasteryAction {
     constructor(namespace, data, manager, game) {
-        super(namespace, data.id);
+        super(namespace, data, game);
         this.manager = manager;
         this.game = game;
 
@@ -211,10 +211,12 @@ export class AdventuringJob extends MasteryAction {
 
         let { xp, level, percent } = this.manager.getMasteryProgress(this);
 
-        if(this.unlocked) {
-            this.component.masteryProgress.setFixedPosition(percent);
-        } else {
-            this.component.masteryProgress.setFixedPosition(0);
+        if(this.id !== 'adventuring:none') {
+            if(this.unlocked) {
+                this.component.masteryProgress.setFixedPosition(percent);
+            } else {
+                this.component.masteryProgress.setFixedPosition(0);
+            }
         }
 
         this.renderQueue.mastery = false;

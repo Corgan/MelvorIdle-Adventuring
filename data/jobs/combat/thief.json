@@ -1,0 +1,150 @@
+{
+    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+    "namespace": "adventuring",
+    "data": {
+        "skillData": [{
+            "skillID": "adventuring:Adventuring",
+            "data": {
+                "jobs": [
+                    {
+                        "id": "thief",
+                        "name": "Thief",
+                        "media": "melvor:assets/media/skills/thieving/thieving.svg",
+                        "requirements": [
+                            { "type": "skill_level", "level": 10 }
+                        ],
+                        "isMilestoneReward": true,
+                        "allowedItems": [
+                            "adventuring:cowl",
+                            "adventuring:vest",
+                            "adventuring:chaps",
+                            "adventuring:vambraces",
+                            "adventuring:boots",
+
+                            "adventuring:amulet",
+                            "adventuring:ring",
+                            "adventuring:cape",
+
+                            "adventuring:buckler",
+                            "adventuring:dagger",
+                            "adventuring:sword1h",
+                            "adventuring:scimitar",
+                            "adventuring:knives"
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:hitpoints", "value": 1 },
+                            { "id": "adventuring:defence", "value": 0.5 },
+                            { "id": "adventuring:agility", "value": 1.75 },
+                            { "id": "adventuring:strength", "value": 1.25 }
+                        ]
+                    }
+                ],
+                "generators": [
+                    {
+                        "id": "stab",
+                        "name": "Stab",
+                        "description": "Deal {hit.0.effect.0.amount} damage to the back target.",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:thief", "level": 1 }
+                        ],
+                        "energy": 20,
+                        "hits": [
+                            {
+                                "target": "back",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 10,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.25 },
+                                                { "id": "adventuring:agility", "value": 0.25 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "twin_strike",
+                        "name": "Twin Strike",
+                        "description": "Deal {hit.0.effect.0.amount} damage to the front target and {hit.1.effect.0.amount} to the back target.",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:thief", "level": 10 }
+                        ],
+                        "energy": 20,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 5,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.25 },
+                                                { "id": "adventuring:agility", "value": 0.25 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "target": "back",
+                                "party": "enemy",
+                                "delay": 0,
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 10,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.35 },
+                                                { "id": "adventuring:agility", "value": 0.35 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "spenders": [
+                    {
+                        "id": "eviscerate",
+                        "name": "Eviscerate",
+                        "description": "Deal {hit.0.effect.0.amount} damage to the lowest enemy.",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:thief", "level": 5 }
+                        ],
+                        "cost": 100,
+                        "hits": [
+                            {
+                                "target": "lowest",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 20,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 1 },
+                                                { "id": "adventuring:agility", "value": 1 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "passives": [
+
+                ]
+            }
+        }]
+    }
+}

@@ -69,7 +69,7 @@ export class AdventuringWorkshop extends AdventuringPage {
     }
 
     selectProduct(product) {
-        this.component.product.setButtonText(product.name);
+        this.component.productButton.textContent = product.name;
         this.selectedProduct = product;
         this.renderQueue.products = true;
     }
@@ -142,24 +142,24 @@ export class AdventuringWorkshop extends AdventuringPage {
             return;
 
         let existing = [...this.workOrders.keys()].filter(order => order.active).map(order => order.product);
-        this.component.product.clearOptions();
+        this.component.productRecipeOptions.textContent = '';
         this.products.forEach(product => {
             let productContainer = this.dropdownOptions.get(product);
             if(productContainer === undefined) {
                 productContainer = createElement('div', {
                     classList: ['row', 'gutters-tiny'],
+                    parent: this.component.productRecipeOptions,
                     children: [createElement('img', { classList: ['skill-icon-xs'] }), createElement('span', { classList: ['col'] })]
                 });
+                productContainer.onclick = () => this.selectProduct(product);
                 this.dropdownOptions.set(product, productContainer);
             }
             let [ icon, name ] = productContainer.children;
             icon.src = product.media;
             name.textContent = product.name;
-            if(!existing.includes(product))
-                this.component.product.addOption([productContainer], () => this.selectProduct(product));
         });
         if(this.selectedProduct === undefined)
-            this.component.product.setButtonText('Select Product');
+            this.component.productButton.textContent = 'Select Product';
 
         this.renderQueue.products = false;
     }

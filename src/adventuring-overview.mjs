@@ -155,6 +155,9 @@ export class AdventuringOverview {
         if(!this.renderQueue.turnProgressBar)
             return;
 
+        if(this.component.turnProgressBar.currentStyle !== 'bg-warning')
+            this.component.turnProgressBar.setStyle('bg-warning');
+
         if(this.manager.encounter.hitTimer.isActive) {
             this.component.turnProgressBar.animateStriped();
         } else if(this.manager.encounter.turnTimer.isActive) {

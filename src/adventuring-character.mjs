@@ -135,12 +135,22 @@ class AdventuringCharacter {
                     resolved.instance.remove_stacks(reduce_amount);
             } else if(resolved.effect.type === "damage" || resolved.effect.type === "heal") {
                 if(resolved.effect.target === "self" || resolved.effect.target === undefined) {
+                    this.manager.log.add(`${this.name} receives ${builtEffect.amount} ${resolved.effect.type} from ${resolved.instance.base.name}`);
                     this.applyEffect(resolved.effect, builtEffect, this);
                 } else if(resolved.effect.target === "attacker") {
+                    this.manager.log.add(`${extra.attacker.name} receives ${builtEffect.amount} ${resolved.effect.type} from ${resolved.instance.base.name}`);
                     extra.attacker.applyEffect(resolved.effect, builtEffect, this);
                 }
-            } else if (resolved.effect.type === "remove_stack") {
-                resolved.instance.remove_stacks(1);
+            } else if (resolved.effect.type === "remove_stacks") {
+                let count = 1;
+                if(resolved.effect.count !== undefined) {
+                    if(resolved.effect.count < 1) {
+                        count = Math.ceil(resolved.instance.stacks * resolved.effect.count);
+                    } else {
+                        count = resolved.effect.count;
+                    }
+                }
+                resolved.instance.remove_stacks(count);
             } else if (resolved.effect.type === "remove") {
                 resolved.instance.remove();
             }
@@ -335,6 +345,10 @@ class AdventuringCharacter {
         
         this.component.hitpoints.textContent = this.hitpoints;
         this.component.maxHitpoints.textContent = this.maxHitpoints;
+        if(this.component.hitpointsProgress.currentStyle !== 'bg-success') {
+            this.component.hitpointsProgress.outerBar.classList.add('bg-danger')
+            this.component.hitpointsProgress.setStyle('bg-success');
+        }
         this.component.hitpointsProgress.setFixedPosition(this.hitpointsPercent);
 
         this.renderQueue.hitpoints = false;
@@ -345,10 +359,13 @@ class AdventuringCharacter {
             return;
         
         this.component.energy.parentElement.classList.toggle('invisible', this.maxEnergy === 0);
-        this.component.energyProgress.barElem.parentElement.classList.toggle('invisible', this.maxEnergy === 0);
+        this.component.energyProgress.classList.toggle('invisible', this.maxEnergy === 0);
         
         this.component.energy.textContent = this.energy;
         this.component.maxEnergy.textContent = this.maxEnergy;
+
+        if(this.component.hitpointsProgress.currentStyle !== 'bg-info')
+            this.component.energyProgress.setStyle('bg-info');
         this.component.energyProgress.setFixedPosition(this.energyPercent);
 
         this.renderQueue.energy = false;

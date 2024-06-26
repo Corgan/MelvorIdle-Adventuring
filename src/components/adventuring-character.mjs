@@ -20,11 +20,11 @@ export class AdventuringCharacterUIComponent extends AdventuringUIComponent {
         
         this.hitpoints = getElementFromFragment(this.$fragment, 'hitpoints', 'span');
         this.maxHitpoints = getElementFromFragment(this.$fragment, 'max-hitpoints', 'span');
-        this.hitpointsProgress = new ProgressBar(getElementFromFragment(this.$fragment, 'hitpoints-progress', 'div'));
+        this.hitpointsProgress = getElementFromFragment(this.$fragment, 'hitpoints-progress', 'progress-bar');
 
         this.energy = getElementFromFragment(this.$fragment, 'energy', 'span');
         this.maxEnergy = getElementFromFragment(this.$fragment, 'max-energy', 'span');
-        this.energyProgress = new ProgressBar(getElementFromFragment(this.$fragment, 'energy-progress', 'div'));
+        this.energyProgress = getElementFromFragment(this.$fragment, 'energy-progress', 'progress-bar');
 
         this.auras = getElementFromFragment(this.$fragment, 'auras', 'div');
 

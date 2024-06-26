@@ -1,0 +1,91 @@
+{
+    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+    "namespace": "adventuring",
+    "data": {
+        "skillData": [{
+            "skillID": "adventuring:Adventuring",
+            "data": {
+                "stats": [
+                    {
+                        "id": "fishing",
+                        "name": "Fishing",
+                        "media": "melvor:assets/media/skills/fishing/fishing.svg"
+                    }
+                ],
+                "jobs": [
+                    {
+                        "id": "fisherman",
+                        "name": "Fisherman",
+                        "media": "melvor:assets/media/skills/fishing/fishing.svg",
+                        "requirements": [
+                            { "type": "skill_level", "level": 10 }
+                        ],
+                        "isMilestoneReward": true,
+                        "isPassive": true,
+                        "scaling": [
+                            { "id": "adventuring:fishing", "value": 1 }
+                        ]
+                    }
+                ],
+                "materials": [
+                    {
+                        "id": "unknown_fish",
+                        "name": "Unknown Fish",
+                        "media": "melvor:assets/media/skills/fishing/fishing.svg"
+                    }
+                ],
+                "buildings": [
+                    {
+                        "id": "dock",
+                        "type": "workshop",
+                        "name": "Dock",
+                        "description": "Create work orders for Fishermen. Converts Unknown Fish to complete orders.",
+                        "media": "melvor:assets/media/skills/township/Fishermans_Dock.svg",
+                        "requirements": [],
+                        "idle": ["Hanging feet in the water", "Going for a swim"],
+                        "actions": ["adventuring:work"],
+                        "products": [
+                            "adventuring:raw_shrimp"
+                        ]
+                    }
+                ],
+                "products": [
+                    {
+                        "id": "raw_shrimp",
+                        "item": "melvorD:Raw_Shrimp",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:fisherman" },
+                            { "type": "job_level", "job": "adventuring:fisherman", "level": 1 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:unknown_fish", "count": 1 }
+                        ]
+                    }
+                ],
+                "tiles": [
+                    {
+                        "id": "fish",
+                        "name": "Fish",
+                        "media": "melvor:assets/media/shop/fishing_iron.svg",
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:fisherman" }
+                        ],
+                        "weight": 10,
+                        "floor_max": 1,
+                        "dungeon_max": 1,
+                        "effects": [
+                            { "type": "xp", "amount": 30, "job": "adventuring:fisherman" },
+                            {
+                                "type": "loot",
+                                "pool": [
+                                    { "id": "adventuring:unknown_fish", "qty": 1, "weight": 100 }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        }]
+    }
+}

@@ -24,7 +24,7 @@ class AdventuringAreaRenderQueue {
 
 export class AdventuringArea extends MasteryAction {
     constructor(namespace, data, manager, game) {
-        super(namespace, data.id);
+        super(namespace, data, game);
         this.manager = manager;
         this.game = game;
 

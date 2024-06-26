@@ -1,0 +1,122 @@
+{
+    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+    "namespace": "adventuring",
+    "data": {
+        "skillData": [{
+            "skillID": "adventuring:Adventuring",
+            "data": {
+                "jobs": [
+                    {
+                        "id": "paladin",
+                        "name": "Paladin",
+                        "media": "melvor:assets/media/skills/defence/defence.svg",
+                        "requirements": [
+                            { "type": "skill_level", "level": 15 }
+                        ],
+                        "isMilestoneReward": true,
+                        "allowedItems": [
+                            "adventuring:helm",
+                            "adventuring:platebody",
+                            "adventuring:platelegs",
+                            "adventuring:gauntlets",
+                            "adventuring:sabatons",
+
+                            "adventuring:amulet",
+                            "adventuring:ring",
+                            "adventuring:cape",
+
+                            "adventuring:buckler",
+                            "adventuring:shield",
+                            "adventuring:sword1h",
+                            "adventuring:scimitar"
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:hitpoints", "value": 2 },
+                            { "id": "adventuring:defence", "value": 1.5 },
+                            { "id": "adventuring:agility", "value": 0.25 },
+                            { "id": "adventuring:strength", "value": 0.5 },
+                            { "id": "adventuring:prayer", "value": 0.75 }
+                        ]
+                    }
+                ],
+                "generators": [
+                    {
+                        "id": "bash",
+                        "name": "Bash",
+                        "description": "Deal {hit.0.effect.0.amount} damage to the front target.",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:paladin", "level": 1 }
+                        ],
+                        "energy": 20,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 10,
+                                            "scaling": [
+                                                { "id": "adventuring:defence", "value": 0.25 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "spenders": [
+                    {
+                        "id": "lay_on_hands",
+                        "name": "Lay on Hands",
+                        "description": "Heal {hit.0.effect.0.amount} to self.",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:paladin", "level": 5 }
+                        ],
+                        "cost": 100,
+                        "hits": [
+                            {
+                                "target": "self",
+                                "party": "ally",
+                                "effects": [
+                                    {
+                                        "type": "heal",
+                                        "amount": {
+                                            "base": 30,
+                                            "scaling": [
+                                                { "id": "adventuring:prayer", "value": 2 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "passives": [
+                    {
+                        "id": "sentinel",
+                        "name": "Sentinel",
+                        "description": "Adds {effect.0.stacks} Block stacks at the start of every round.",
+                        "effects": [
+                            {
+                                "trigger": "round_start",
+                                "type": "buff",
+                                "target": "self",
+                                "id": "adventuring:block",
+                                "stacks": {
+                                    "base": 1,
+                                    "scaling": [
+                                        { "id": "adventuring:defence", "value": 0.5 }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        }]
+    }
+}

@@ -21,10 +21,12 @@ export class AdventuringEquipment {
         this.stats.reset();
         this.slots.forEach((equipmentSlot, slotType) => {
             equipmentSlot.item.calculateStats();
-            equipmentSlot.stats.forEach((value, stat) => {
-                let old = this.stats.get(stat);
-                this.stats.set(stat, old + value);
-            });
+            if(equipmentSlot.canEquip(equipmentSlot.item)) {
+                equipmentSlot.stats.forEach((value, stat) => {
+                    let old = this.stats.get(stat);
+                    this.stats.set(stat, old + value);
+                });
+            }
         });
     }
 

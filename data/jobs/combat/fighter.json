@@ -1,0 +1,135 @@
+{
+    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+    "namespace": "adventuring",
+    "data": {
+        "skillData": [{
+            "skillID": "adventuring:Adventuring",
+            "data": {
+                "jobs": [
+                    {
+                        "id": "fighter",
+                        "name": "Fighter",
+                        "media": "melvor:assets/media/skills/attack/attack.svg",
+                        "requirements": [
+                            { "type": "skill_level", "level": 1 }
+                        ],
+                        "isMilestoneReward": true,
+                        "allowedItems": [
+                            "adventuring:helm",
+                            "adventuring:platebody",
+                            "adventuring:platelegs",
+                            "adventuring:gauntlets",
+                            "adventuring:sabatons",
+
+                            "adventuring:cowl",
+                            "adventuring:vest",
+                            "adventuring:chaps",
+                            "adventuring:vambraces",
+                            "adventuring:boots",
+
+                            "adventuring:amulet",
+                            "adventuring:ring",
+                            "adventuring:cape",
+                            
+                            "adventuring:shield",
+                            "adventuring:dagger", 
+                            "adventuring:sword1h", 
+                            "adventuring:sword2h", 
+                            "adventuring:axe", 
+                            "adventuring:scimitar", 
+                            "adventuring:knives", 
+                            "adventuring:javelin"
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:hitpoints", "value": 1.5 },
+                            { "id": "adventuring:defence", "value": 0.5 },
+                            { "id": "adventuring:agility", "value": 0.5 },
+                            { "id": "adventuring:strength", "value": 1.5 }
+                        ]
+                    }
+                ],
+                "generators": [
+                    {
+                        "id": "slash",
+                        "name": "Slash",
+                        "description": "Deal {hit.0.effect.0.amount} damage to the front target and apply {hit.0.effect.1.stacks} Bleed.",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:fighter", "level": 1 }
+                        ],
+                        "energy": 20,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 10,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.25 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:bleed",
+                                        "stacks": {
+                                            "base": 1,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.025 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "spenders": [
+                    {
+                        "id": "whirlwind",
+                        "name": "Whirlwind",
+                        "description": "Deal {hit.0.effect.0.amount} damage to all enemies and apply {hit.0.effect.1.stacks} Bleed twice.",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:fighter", "level": 5 }
+                        ],
+                        "cost": 100,
+                        "hits": [
+                            {
+                                "target": "aoe",
+                                "party": "enemy",
+                                "delay": 200,
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 5,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.15 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:bleed",
+                                        "stacks": {
+                                            "base": 1,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.025 }
+                                            ]
+                                        }
+                                    }
+                                ],
+                                "repeat": 2
+                            }
+                        ]
+                    }
+                ],
+                "passives": [
+
+                ]
+            }
+        }]
+    }
+}

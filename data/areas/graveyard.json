@@ -1,0 +1,337 @@
+{
+    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+    "namespace": "adventuring",
+    "data": {
+        "skillData": [{
+            "skillID": "adventuring:Adventuring",
+            "data": {
+                "areas": [
+                    {
+                        "id": "graveyard",
+                        "name": "Graveyard",
+                        "media": "melvor:assets/media/skills/combat/death.svg",
+                        "requirements": [
+                            { "type": "skill_level", "level": 20 }
+                        ],
+                        "height": 8,
+                        "width": 6,
+                        "floors": [
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:skeleton", "weight": 75 },
+                                    { "id": "adventuring:ghost", "weight": 25 }
+                                ],
+                                "exit": ["adventuring:skeleton", "adventuring:skeleton", "adventuring:ghost"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:skeleton", "weight": 50 },
+                                    { "id": "adventuring:ghost", "weight": 25 },
+                                    { "id": "adventuring:zombie_hand", "weight": 25 }
+                                ],
+                                "exit": ["adventuring:skeleton", "adventuring:ghost", "adventuring:zombie_hand"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:skeleton", "weight": 20 },
+                                    { "id": "adventuring:ghost", "weight": 30 },
+                                    { "id": "adventuring:zombie_hand", "weight": 40 },
+                                    { "id": "adventuring:zombie", "weight": 10 }
+                                ],
+                                "exit": ["adventuring:ghost", "adventuring:zombie_hand", "adventuring:zombie"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:ghost", "weight": 30 },
+                                    { "id": "adventuring:zombie_hand", "weight": 40 },
+                                    { "id": "adventuring:zombie", "weight": 30 }
+                                ],
+                                "exit": ["adventuring:zombie_hand", "adventuring:zombie", "adventuring:zombie"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:zombie_hand", "weight": 30 },
+                                    { "id": "adventuring:zombie", "weight": 70 }
+                                ],
+                                "exit": ["adventuring:zombie", "adventuring:zombie", "adventuring:zombie"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:zombie_hand", "weight": 20 },
+                                    { "id": "adventuring:zombie", "weight": 80 }
+                                ],
+                                "exit": ["adventuring:zombie", "adventuring:zombie", "adventuring:zombie_leader"]
+                            }
+                        ]
+                    }
+                ],
+                "monsters": [
+                    {
+                        "id": "skeleton",
+                        "name": "Skeleton",
+                        "media": "melvor:assets/media/monsters/skeleton.png",
+                        "xp": 30,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 30 },
+                            { "id": "adventuring:defence", "value": 15 },
+                            { "id": "adventuring:agility", "value": 20 },
+                            { "id": "adventuring:strength", "value": 25 },
+                            { "id": "adventuring:ranged", "value": 25 },
+                            { "id": "adventuring:magic", "value": 25 },
+                            { "id": "adventuring:prayer", "value": 25 }
+                        ],
+                        "generator": "adventuring:gnaw",
+                        "spender": "adventuring:throw_rib",
+                        "passives": [],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 2, "weight": 100 },
+                            { "id": "adventuring:parts", "qty": 1, "weight": 10 }
+                        ]
+                    },
+                    {
+                        "id": "zombie_hand",
+                        "name": "Zombie Hand",
+                        "media": "melvor:assets/media/monsters/zombie_hand.png",
+                        "xp": 30,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 30 },
+                            { "id": "adventuring:defence", "value": 15 },
+                            { "id": "adventuring:agility", "value": 20 },
+                            { "id": "adventuring:strength", "value": 25 },
+                            { "id": "adventuring:ranged", "value": 25 },
+                            { "id": "adventuring:magic", "value": 25 },
+                            { "id": "adventuring:prayer", "value": 25 }
+                        ],
+                        "generator": "adventuring:slap",
+                        "spender": "adventuring:strangle",
+                        "passives": [],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 2, "weight": 100 },
+                            { "id": "adventuring:parts", "qty": 1, "weight": 10 }
+                        ]
+                    },
+                    {
+                        "id": "zombie",
+                        "name": "Zombie",
+                        "media": "melvor:assets/media/monsters/zombie.png",
+                        "xp": 40,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 40 },
+                            { "id": "adventuring:defence", "value": 20 },
+                            { "id": "adventuring:agility", "value": 30 },
+                            { "id": "adventuring:strength", "value": 30 },
+                            { "id": "adventuring:ranged", "value": 30 },
+                            { "id": "adventuring:magic", "value": 30 },
+                            { "id": "adventuring:prayer", "value": 30 }
+                        ],
+                        "generator": "adventuring:gnaw",
+                        "spender": "adventuring:eat_brains",
+                        "passives": [],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 2, "weight": 100 },
+                            { "id": "adventuring:parts", "qty": 1, "weight": 10 }
+                        ]
+                    },
+                    {
+                        "id": "ghost",
+                        "name": "Ghost",
+                        "media": "melvor:assets/media/monsters/ghost.png",
+                        "xp": 30,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 40 },
+                            { "id": "adventuring:defence", "value": 30 },
+                            { "id": "adventuring:agility", "value": 40 },
+                            { "id": "adventuring:strength", "value": 30 },
+                            { "id": "adventuring:ranged", "value": 30 },
+                            { "id": "adventuring:magic", "value": 30 },
+                            { "id": "adventuring:prayer", "value": 30 }
+                        ],
+                        "generator": "adventuring:haunt",
+                        "spender": "adventuring:possess",
+                        "passives": [],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 2, "weight": 100 },
+                            { "id": "adventuring:parts", "qty": 1, "weight": 10 }
+                        ]
+                    },
+                    {
+                        "id": "zombie_leader",
+                        "name": "Zombie Leader",
+                        "media": "melvor:assets/media/monsters/zombie_leader.png",
+                        "xp": 150,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 60 },
+                            { "id": "adventuring:defence", "value": 40 },
+                            { "id": "adventuring:agility", "value": 40 },
+                            { "id": "adventuring:strength", "value": 40 },
+                            { "id": "adventuring:ranged", "value": 40 },
+                            { "id": "adventuring:magic", "value": 40 },
+                            { "id": "adventuring:prayer", "value": 40 }
+                        ],
+                        "generator": "adventuring:gnaw",
+                        "spender": "adventuring:eat_brains",
+                        "passives": [],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 2, "weight": 100 },
+                            { "id": "adventuring:parts", "qty": 1, "weight": 10 }
+                        ]
+                    }
+                ],
+                "generators": [
+                    {
+                        "id": "gnaw",
+                        "name": "Gnaw",
+                        "description": "Deal {hit.0.effect.0.amount} damage to the front target.",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "energy": 50,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 5,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 1 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "haunt",
+                        "name": "Haunt",
+                        "description": "Deal {hit.0.effect.0.amount} damage to a random target.",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "energy": 50,
+                        "hits": [
+                            {
+                                "target": "random",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 5,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 1 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "spenders": [
+                    {
+                        "id": "throw_rib",
+                        "name": "Throw Rib",
+                        "description": "Deal {hit.0.effect.0.amount} damage to the back target.",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "cost": 100,
+                        "hits": [
+                            {
+                                "target": "back",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 20,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 2 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "strangle",
+                        "name": "Strangle",
+                        "description": "Deal {hit.0.effect.0.amount} damage to a random target.",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "cost": 100,
+                        "hits": [
+                            {
+                                "target": "random",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 20,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 2 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "eat_brains",
+                        "name": "Eat Brains",
+                        "description": "Deal {hit.0.effect.0.amount} damage to the front target.",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "cost": 100,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 20,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 2 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "possess",
+                        "name": "Possess",
+                        "description": "Deal {hit.0.effect.0.amount} damage to a random target.",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "cost": 100,
+                        "hits": [
+                            {
+                                "target": "random",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 20,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 2 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        }]
+    }
+}

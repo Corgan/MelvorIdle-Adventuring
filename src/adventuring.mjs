@@ -311,6 +311,7 @@ export class Adventuring extends SkillWithMastery {
     get name() { return "Adventuring"; }
     get isCombat() { return true; }
     get hasMinibar() { return true; }
+    get hasMastery() { return false; }
 
     get activeSkills() {
         if (!this.isActive)
@@ -327,9 +328,17 @@ export class Adventuring extends SkillWithMastery {
         return !this.game.idleChecker(this);
     }
 
+    isMasteryActionUnlocked(action) {
+        return action.unlocked;
+    }
+
     computeTotalMasteryActions() {
         this.actions.namespaceMaps.forEach((actionMap,namespace)=>{
             this.totalMasteryActions.set(namespace, actionMap.size);
+        }
+        );
+        this.actions.forEach((action)=>{
+            this.totalMasteryActionsInRealm.inc(action.realm);
         }
         );
     }

@@ -1,0 +1,118 @@
+{
+    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+    "namespace": "adventuring",
+    "data": {
+        "skillData": [{
+            "skillID": "adventuring:Adventuring",
+            "data": {
+                "stats": [
+                    {
+                        "id": "mining",
+                        "name": "Mining",
+                        "media": "melvor:assets/media/skills/mining/mining.svg"
+                    }
+                ],
+                "jobs": [
+                    {
+                        "id": "miner",
+                        "name": "Miner",
+                        "media": "melvor:assets/media/skills/mining/mining.svg",
+                        "requirements": [
+                            { "type": "skill_level", "level": 5 }
+                        ],
+                        "isMilestoneReward": true,
+                        "isPassive": true,
+                        "scaling": [
+                            { "id": "adventuring:mining", "value": 1 },
+                            { "id": "adventuring:hitpoints", "value": 0.25 }
+                        ]
+                    }
+                ],
+                "materials": [
+                    {
+                        "id": "unknown_ore",
+                        "name": "Unknown Ore",
+                        "media": "melvor:assets/media/skills/mining/rock_iron.svg"
+                    }
+                ],
+                "buildings": [
+                    {
+                        "id": "mine",
+                        "type": "workshop",
+                        "name": "Mine",
+                        "description": "Create work orders for Miners. Converts Unknown Ore to complete orders.",
+                        "media": "melvor:assets/media/skills/township/Miners_Field.svg",
+                        "requirements": [],
+                        "idle": ["Hittin' rocks", "Digging for gold"],
+                        "actions": ["adventuring:work"],
+                        "products": [
+                            "adventuring:copper_ore",
+                            "adventuring:tin_ore",
+                            "adventuring:iron_ore"
+                        ]
+                    }
+                ],
+                "products": [
+                    {
+                        "id": "copper_ore",
+                        "item": "melvorD:Copper_Ore",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:miner" },
+                            { "type": "job_level", "job": "adventuring:miner", "level": 1 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:unknown_ore", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "tin_ore",
+                        "item": "melvorD:Tin_Ore",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:miner" },
+                            { "type": "job_level", "job": "adventuring:miner", "level": 1 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:unknown_ore", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "iron_ore",
+                        "item": "melvorD:Iron_Ore",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:miner" },
+                            { "type": "job_level", "job": "adventuring:miner", "level": 1 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:unknown_ore", "count": 1 }
+                        ]
+                    }
+                ],
+                "tiles": [
+                    {
+                        "id": "ore",
+                        "name": "Ore",
+                        "media": "melvor:assets/media/skills/mining/rock_copper.svg",
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:miner" }
+                        ],
+                        "weight": 10,
+                        "floor_max": 1,
+                        "dungeon_max": 1,
+                        "effects": [
+                            { "type": "xp", "amount": 30, "job": "adventuring:miner" },
+                            {
+                                "type": "loot",
+                                "pool": [
+                                    { "id": "adventuring:unknown_ore", "qty": 1, "weight": 100 }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        }]
+    }
+}

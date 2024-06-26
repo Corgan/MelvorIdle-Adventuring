@@ -84,7 +84,11 @@ export class AdventuringArmory extends AdventuringPage {
             }
         });
 
-        this.itemsBySlot.forEach((baseItems, slot) => {
+        let building = this.manager.buildings.getObjectByID('adventuring:armory');
+
+        building.itemSlotOrder.forEach((slotID) => {
+            let slot = this.manager.itemSlots.getObjectByID(slotID);
+            let baseItems = this.itemsBySlot.get(slot);
             this.component.items.appendChild(createElement('div', { className: 'p-1 w-100', text: slot.name }));
             baseItems.forEach(baseItem => {
                 baseItem.component.mount(this.component.items);

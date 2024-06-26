@@ -29,6 +29,9 @@ class AdventuringAuraEffect {
         this.consume = data.consume === true; // Remove stacks by amount
         this.stack = data.stack === true; // Amount multiplied by stack count
         this.split = data.split === true; // Amount divided by stack count
+        
+        if(data.modifier !== undefined)
+           this.modifier = data.modifier;
 
         if(data.target !== undefined)
             this.target = data.target;
@@ -50,16 +53,31 @@ class AdventuringAuraEffect {
             amount = instance.amount;
         }
 
+        let stacks = this.getStacks(instance);
+
         if(this.stack)
-            amount = Math.floor(amount * instance.stacks);
+            amount = Math.ceil(amount * stacks);
 
         if(this.split) {
-            amount = Math.ceil(amount / instance.stacks);
+            amount = Math.ceil(amount / stacks);
             if(instance.amount !== undefined)
-                instance.amount = Math.max(min * instance.stacks, instance.amount - amount);
+                instance.amount = Math.max(min * stacks, instance.amount - amount);
+        }
+
+        if(this.modifier) {
+            amount = Math.ceil(amount * modifier);
         }
 
         return amount;
+    }
+
+    getStacks(instance) {
+        let stacks = instance.stacks;
+
+        if(this.count)
+            stacks = Math.ceil(stacks * this.count);
+
+        return stacks;
     }
 }
 
@@ -105,7 +123,11 @@ export class AdventuringAura extends NamespacedObject {
     }
 
     getDescription(instance) {
-        return this.effects.reduce((desc, effect, i) => desc.replace(`{effect.${i}.amount}`, effect.getAmount(instance)), this.description);
+        return this.effects.reduce((desc, effect, i) => {
+            desc = desc.replace(`{effect.${i}.amount}`, effect.getAmount(instance));
+            desc = desc.replace(`{effect.${i}.stacks}`, effect.getStacks(instance));
+            return desc;
+        }, this.description);
     }
 
     setHighlight(highlight) {

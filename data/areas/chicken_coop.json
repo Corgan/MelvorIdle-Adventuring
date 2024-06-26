@@ -1,0 +1,181 @@
+{
+    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+    "namespace": "adventuring",
+    "data": {
+        "skillData": [{
+            "skillID": "adventuring:Adventuring",
+            "data": {
+                "areas": [
+                    {
+                        "id": "chicken_coop",
+                        "name": "Chicken Coop",
+                        "media": "melvor:assets/media/monsters/mumma_chicken.svg",
+                        "requirements": [
+                            { "type": "skill_level", "level": 1 }
+                        ],
+                        "height": 6,
+                        "width": 5,
+                        "floors": [
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:chick", "weight": 100 }
+                                ],
+                                "exit": ["adventuring:chick", "adventuring:chick", "adventuring:chick"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:chick", "weight": 75 },
+                                    { "id": "adventuring:chicken", "weight": 25 }
+                                ],
+                                "exit": ["adventuring:chick", "adventuring:chick", "adventuring:chicken"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:chick", "weight": 50 },
+                                    { "id": "adventuring:chicken", "weight": 50 }
+                                ],
+                                "exit": ["adventuring:chick", "adventuring:chicken", "adventuring:chicken"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:chick", "weight": 25 },
+                                    { "id": "adventuring:chicken", "weight": 75 }
+                                ],
+                                "exit": ["adventuring:chicken", "adventuring:chicken", "adventuring:chicken"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:chicken", "weight": 100 }
+                                ],
+                                "exit": ["adventuring:chick", "adventuring:chicken", "adventuring:mumma_chicken"]
+                            }
+                        ]
+                    }
+                ],
+                "monsters": [
+                    {
+                        "id": "chick",
+                        "name": "Chick",
+                        "media": "melvor:assets/media/monsters/chick.png",
+                        "xp": 10,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 5 },
+                            { "id": "adventuring:defence", "value": 1 },
+                            { "id": "adventuring:agility", "value": 1 },
+                            { "id": "adventuring:strength", "value": 1 },
+                            { "id": "adventuring:ranged", "value": 1 },
+                            { "id": "adventuring:magic", "value": 1 },
+                            { "id": "adventuring:prayer", "value": 1 }
+                        ],
+                        "generator": "adventuring:cluck",
+                        "spender": "adventuring:none",
+                        "passives": [],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 2, "weight": 100 },
+                            { "id": "adventuring:parts", "qty": 1, "weight": 10 }
+                        ]
+                    },
+                    {
+                        "id": "chicken",
+                        "name": "Chicken",
+                        "media": "melvor:assets/media/monsters/chicken.png",
+                        "xp": 15,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 15 },
+                            { "id": "adventuring:defence", "value": 15 },
+                            { "id": "adventuring:agility", "value": 10 },
+                            { "id": "adventuring:strength", "value": 10 },
+                            { "id": "adventuring:ranged", "value": 10 },
+                            { "id": "adventuring:magic", "value": 10 },
+                            { "id": "adventuring:prayer", "value": 10 }
+                        ],
+                        "generator": "adventuring:cluck",
+                        "spender": "adventuring:crow",
+                        "passives": [],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 5, "weight": 100 },
+                            { "id": "adventuring:parts", "qty": 2, "weight": 10 }
+                        ]
+                    },
+                    {
+                        "id": "mumma_chicken",
+                        "name": "Mumma Chicken",
+                        "media": "melvor:assets/media/monsters/mumma_chicken.png",
+                        "xp": 30,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 25 },
+                            { "id": "adventuring:defence", "value": 20 },
+                            { "id": "adventuring:agility", "value": 20 },
+                            { "id": "adventuring:strength", "value": 20 },
+                            { "id": "adventuring:ranged", "value": 20 },
+                            { "id": "adventuring:magic", "value": 20 },
+                            { "id": "adventuring:prayer", "value": 20 }
+                        ],
+                        "generator": "adventuring:cluck",
+                        "spender": "adventuring:crow",
+                        "passives": [],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 2, "weight": 100 },
+                            { "id": "adventuring:parts", "qty": 5, "weight": 30 },
+                            { "id": "adventuring:big_parts", "qty": 1, "weight": 10 }
+                        ]
+                    }
+                ],
+                "generators": [
+                    {
+                        "id": "cluck",
+                        "name": "Cluck",
+                        "description": "Deal {hit.0.effect.0.amount} damage to a random target.",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "energy": 35,
+                        "hits": [
+                            {
+                                "target": "random",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 5,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 1 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "spenders": [
+                    {
+                        "id": "crow",
+                        "name": "Crow",
+                        "description": "Deal {hit.0.effect.0.amount} damage to a random target.",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "cost": 70,
+                        "hits": [
+                            {
+                                "target": "random",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 15,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 1.5 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        }]
+    }
+}

@@ -1,0 +1,756 @@
+{
+    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+    "namespace": "adventuring",
+    "data": {
+        "pages": [{
+            "id": "Adventuring",
+            "media": "melvor:assets/media/main/adventure.svg",
+            "containerID": "adventuring-container",
+            "headerBgClass": "bg-combat",
+            "hasGameGuide": false,
+            "canBeDefault": true,
+            "customName": "Adventuring",
+            "action": "adventuring:Adventuring",
+            "skillSidebarCategoryID": "Party",
+            "skills": [
+                "adventuring:Adventuring"
+            ]
+        }],
+        "skillData": [{
+            "skillID": "adventuring:Adventuring",
+            "data": {
+                "stats": [
+                    {
+                        "id": "hitpoints",
+                        "name": "Hitpoints",
+                        "media": "melvor:assets/media/skills/hitpoints/hitpoints.svg",
+                        "base": 10
+                    },
+                    {
+                        "id": "defence",
+                        "name": "Defence",
+                        "media": "melvor:assets/media/skills/defence/defence.svg",
+                        "base": 0
+                    },
+                    {
+                        "id": "agility",
+                        "name": "Agility",
+                        "media": "melvor:assets/media/skills/agility/agility.svg",
+                        "base": 0
+                    },
+                    {
+                        "id": "strength",
+                        "name": "Strength",
+                        "media": "melvor:assets/media/skills/strength/strength.svg",
+                        "base": 0
+                    },
+                    {
+                        "id": "ranged",
+                        "name": "Ranged",
+                        "media": "melvor:assets/media/skills/ranged/ranged.svg",
+                        "base": 0
+                    },
+                    {
+                        "id": "magic",
+                        "name": "Magic",
+                        "media": "melvor:assets/media/skills/magic/magic.svg",
+                        "base": 0
+                    },
+                    {
+                        "id": "prayer",
+                        "name": "Prayer",
+                        "media": "melvor:assets/media/skills/prayer/prayer.svg",
+                        "base": 0
+                    }
+                ],
+                "overview": {
+                    "buttons": [
+                        {
+                            "id": "town",
+                            "page": "town",
+                            "states": {
+                                "active": {
+                                    "className": "d-none"
+                                }
+                            }
+                        },
+                        {
+                            "id": "abandon",
+                            "name": "Abandon",
+                            "media": "melvor:assets/media/misc/mark_of_death.svg",
+                            "page": "dungeon",
+                            "pageFn": "abandon",
+                            "states": {
+                                "passive": {
+                                    "className": "d-none"
+                                },
+                                "active": {
+                                    "className": "btn-danger"
+                                }
+                            }
+                        },
+                        {
+                            "id": "stash",
+                            "name": "Stash",
+                            "page": "stash",
+                            "media": "melvor:assets/media/main/bank_header.svg"
+                        },
+                        {
+                            "id": "bestiary",
+                            "name": "Bestiary",
+                            "page": "bestiary",
+                            "media": "melvor:assets/media/main/lore_header.svg"
+                        },
+                        {
+                            "id": "crossroads",
+                            "name": "Crossroads",
+                            "page": "crossroads",
+                            "media": "assets/media/crossroads.svg",
+                            "states": {
+                                "active": {
+                                    "className": "d-none"
+                                }
+                            }
+                        },
+                        {
+                            "id": "dungeon",
+                            "name": "Dungeon",
+                            "page": "dungeon",
+                            "media": "assets/media/crossroads.svg",
+                            "states": {
+                                "passive": {
+                                    "className": "d-none"
+                                }
+                            }
+                        }
+                    ]
+                },
+                "materials": [
+                    {
+                        "id": "currency",
+                        "name": "Adventuring Coins",
+                        "media": "melvor:assets/media/main/gp.svg"
+                    },
+                    {
+                        "id": "parts",
+                        "name": "Monster Parts",
+                        "media": "melvor:assets/media/bank/leather.png"
+                    },
+                    {
+                        "id": "big_parts",
+                        "name": "Big Monster Parts",
+                        "media": "melvor:assets/media/bank/dragonhide_green.png"
+                    }
+                ],
+                "buildings": [
+                    {
+                        "id": "tavern",
+                        "type": "page",
+                        "name": "Tavern",
+                        "description": "Rest and buy a drink here. (Not yet implemented)",
+                        "media": "melvor:assets/media/skills/township/Tavern.svg",
+                        "requirements": [],
+                        "page": "tavern",
+                        "idle": ["Getting Tipsy", "Eating a hearty meal"],
+                        "actions": [
+                            "adventuring:revive",
+                            "adventuring:rest"
+                        ]
+                    },
+                    {
+                        "id": "trainer",
+                        "type": "page",
+                        "name": "Training Tower",
+                        "description": "View details about unlocked jobs",
+                        "media": "melvor:assets/media/skills/township/Library.svg",
+                        "requirements": [],
+                        "page": "trainer",
+                        "idle": ["Trying new maneuvers", "Sparring with a Dummy"]
+                    },
+                    {
+                        "id": "armory",
+                        "type": "page",
+                        "name": "Armory",
+                        "description": "Craft and upgrade weapons",
+                        "media": "melvor:assets/media/skills/township/Tailor.svg",
+                        "requirements": [],
+                        "page": "armory",
+                        "idle": ["Polishing Equipment", "Tinkering with Materials"],
+                        "itemSlotOrder": [
+                            "adventuring:weapon",
+                            "adventuring:offhand",
+                            "adventuring:head",
+                            "adventuring:body",
+                            "adventuring:hands",
+                            "adventuring:legs",
+                            "adventuring:feet",
+                            "adventuring:amulet",
+                            "adventuring:ring1",
+                            "adventuring:cape"
+                        ]
+                    },
+                    {
+                        "id": "slayers",
+                        "type": "page",
+                        "name": "Slayers' Lodge",
+                        "description": "Accept tasks from the Slayers (Not yet implemented)",
+                        "media": "melvor:assets/media/skills/township/Hunters_Lodge.svg",
+                        "requirements": [],
+                        "page": "slayers",
+                        "idle": ["Pestering the Slayers", "Admiring Trophies"]
+                    },
+                    {
+                        "id": "lemons",
+                        "type": "page",
+                        "name": "Lemon Stall",
+                        "description": "Grab a glass of lemonade (Not yet implemented)",
+                        "media": "melvor:assets/media/skills/township/Lemvor_Lemon_Stall.svg",
+                        "requirements": [],
+                        "page": "lemons",
+                        "idle": ["Drinking Lemonade", "Eating a Lemon"]
+                    }
+                ],
+                "townActions": [
+                    {
+                        "id": "idle",
+                        "status": "Chillin'",
+                        "requirements": [],
+                        "effects": []
+                    },
+                    {
+                        "id": "revive",
+                        "status": "Reviving",
+                        "requirements": [
+                            { "type": "dead" }
+                        ],
+                        "effects": [
+                            { "type": "revive", "amount": 0.1 }
+                        ]
+                    },
+                    {
+                        "id": "rest",
+                        "status": "Resting",
+                        "requirements": [
+                            { "type": "comparison", "operand": "hitpoint_pct", "operator": "lt", "amount": 100 }
+                        ],
+                        "effects": [
+                            { "type": "heal", "amount": 0.05 }
+                        ]
+                    },
+                    {
+                        "id": "work",
+                        "status": "Working",
+                        "requirements": [
+                            { "type": "comparison", "operand": "hitpoint_pct", "operator": "eq", "amount": 100 }
+                        ],
+                        "effects": [
+                            { "type": "work" }
+                        ]
+                    }
+                ],
+                "products": [
+                ],
+                "jobs": [
+                    {
+                        "id": "none",
+                        "name": "None",
+                        "media": "assets/media/empty.png",
+                        "isMilestoneReward": false,
+                        "alwaysMultiple": true,
+                        "allowedItems": [],
+                        "requirements": [],
+                        "scaling": [
+                            { "id": "adventuring:hitpoints", "value": 0 },
+                            { "id": "adventuring:defence", "value": 0 },
+                            { "id": "adventuring:agility", "value": 0 },
+                            { "id": "adventuring:strength", "value": 0 },
+                            { "id": "adventuring:ranged", "value": 0 },
+                            { "id": "adventuring:magic", "value": 0 },
+                            { "id": "adventuring:prayer", "value": 0 }
+                        ]
+                    }
+                ],
+                "generators": [
+                    {
+                        "id": "none",
+                        "name": "None",
+                        "description": "Do nothing.",
+                        "requirements": [],
+                        "hits": []
+                    },
+                    {
+                        "id": "slap",
+                        "name": "Slap",
+                        "description": "Deal {hit.0.effect.0.amount} damage to the front target.",
+                        "requirements": [],
+                        "energy": 10,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 10,
+                                            "scaling": []
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "spenders": [
+                    {
+                        "id": "none",
+                        "name": "None",
+                        "type": "none",
+                        "description": "Do nothing.",
+                        "requirements": [],
+                        "hits": []
+                    },
+                    {
+                        "id": "backhand",
+                        "name": "Backhand",
+                        "description": "Deal {hit.0.effect.0.amount} damage to the front target.",
+                        "requirements": [],
+                        "cost": 100,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 20,
+                                            "scaling": []
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "passives": [
+                    {
+                        "id": "none",
+                        "name": "None",
+                        "description": "Does nothing."
+                    }
+                ],
+                "buffs": [
+                    {
+                        "id": "block",
+                        "name": "Block",
+                        "media": "melvor:assets/media/status/evasion_increase.svg",
+                        "description": "Blocks {effect.0.amount} direct damage. Remove all stacks at the end of the round",
+                        "combine": true,
+                        "stack": true,
+                        "amount": 1,
+                        "stacks": 1,
+                        "effects": [
+                            {
+                                "trigger": "before_damage_received",
+                                "type": "reduce_amount",
+                                "consume": true,
+                                "stack": true
+                            },
+                            {
+                                "trigger": "round_end",
+                                "type": "remove"
+                            },
+                            {
+                                "trigger": "encounter_end",
+                                "type": "remove"
+                            },
+                            {
+                                "trigger": "death",
+                                "type": "remove"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "regen",
+                        "name": "Regen",
+                        "media": "melvor:assets/media/status/regen_increase.svg",
+                        "description": "At the start of the turn, {effect.1.stacks} stacks are removed healing for {effect.0.amount}",
+                        "stack": true,
+                        "combine": true,
+                        "amount": 5,
+                        "stacks": 1,
+                        "effects": [
+                            {
+                                "trigger": "turn_start",
+                                "type": "heal",
+                                "stack": true,
+                                "target": "self",
+                                "count": 0.5
+                            },
+                            {
+                                "trigger": "turn_start",
+                                "type": "remove_stacks",
+                                "count": 0.5
+                            },
+                            {
+                                "trigger": "encounter_end",
+                                "type": "remove"
+                            },
+                            {
+                                "trigger": "death",
+                                "type": "remove"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "thorns",
+                        "name": "Thorns",
+                        "media": "melvor:assets/media/skills/magic/fury_iii.svg",
+                        "description": "Deal {effect.0.amount} damage to attackers upon receiving damage and remove all stacks",
+                        "amount": 5,
+                        "stacks": 1,
+                        "stack": true,
+                        "combine": true,
+                        "effects": [
+                            {
+                                "trigger": "after_damage_received",
+                                "type": "damage",
+                                "target": "attacker",
+                                "stack": true
+                            },
+                            {
+                                "trigger": "after_damage_received",
+                                "type": "remove_stacks"
+                            },
+                            {
+                                "trigger": "encounter_end",
+                                "type": "remove"
+                            },
+                            {
+                                "trigger": "death",
+                                "type": "remove"
+                            }
+                        ]
+                    }
+                ],
+                "debuffs": [
+                    {
+                        "id": "stun",
+                        "name": "Stunned",
+                        "media": "melvor:assets/media/status/stunned.svg",
+                        "description": "Lose the next turn",
+                        "combine": true,
+                        "stack": false,
+                        "amount": 1,
+                        "stacks": 1,
+                        "effects": [
+                            {
+                                "trigger": "turn_start",
+                                "type": "skip"
+                            },
+                            {
+                                "trigger": "turn_end",
+                                "type": "remove"
+                            },
+                            {
+                                "trigger": "encounter_end",
+                                "type": "remove"
+                            },
+                            {
+                                "trigger": "death",
+                                "type": "remove"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "bleed",
+                        "name": "Bleeding",
+                        "media": "melvor:assets/media/misc/blood.svg",
+                        "description": "At the end of the turn, {effect.1.stacks} stacks are removed dealing {effect.0.amount} damage",
+                        "stack": true,
+                        "combine": true,
+                        "amount": 5,
+                        "stacks": 1,
+                        "effects": [
+                            {
+                                "trigger": "turn_end",
+                                "type": "damage",
+                                "stack": true,
+                                "target": "self",
+                                "count": 0.5
+                            },
+                            {
+                                "trigger": "turn_end",
+                                "type": "remove_stacks",
+                                "count": 0.5
+                            },
+                            {
+                                "trigger": "encounter_end",
+                                "type": "remove"
+                            },
+                            {
+                                "trigger": "death",
+                                "type": "remove"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "burn",
+                        "name": "Burning",
+                        "media": "melvor:assets/media/main/burn.svg",
+                        "description": "At the start of the turn, {effect.1.stacks} stacks are removed dealing {effect.0.amount} damage",
+                        "stack": true,
+                        "combine": true,
+                        "amount": 5,
+                        "stacks": 1,
+                        "effects": [
+                            {
+                                "trigger": "turn_start",
+                                "type": "damage",
+                                "target": "self",
+                                "stack": true,
+                                "count": 0.5
+                            },
+                            {
+                                "trigger": "turn_start",
+                                "type": "remove_stacks",
+                                "count": 0.5
+                            },
+                            {
+                                "trigger": "encounter_end",
+                                "type": "remove"
+                            },
+                            {
+                                "trigger": "death",
+                                "type": "remove"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "shock",
+                        "name": "Shocked",
+                        "media": "melvor:assets/media/skills/magic/surge_iii.svg",
+                        "description": "Lose {effect.0.amount} health after using an ability and remove all stacks",
+                        "amount": 5,
+                        "stacks": 1,
+                        "stack": true,
+                        "combine": true,
+                        "effects": [
+                            {
+                                "trigger": "after_ability_cast",
+                                "type": "damage",
+                                "target": "self",
+                                "stack": true
+                            },
+                            {
+                                "trigger": "after_ability_cast",
+                                "type": "remove"
+                            },
+                            {
+                                "trigger": "encounter_end",
+                                "type": "remove"
+                            },
+                            {
+                                "trigger": "death",
+                                "type": "remove"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "chill",
+                        "name": "Chilled",
+                        "media": "melvor:assets/media/status/frozen.svg",
+                        "description": "Reduces Agility by {effect.0.amount}% per stack",
+                        "amount": 1,
+                        "stacks": 1,
+                        "combine": true,
+                        "stack": true,
+                        "effects": [
+                            {
+                                "trigger": "stats",
+                                "type": "reduce_stat_percent",
+                                "id": "adventuring:agility",
+                                "stack": true
+                            },
+                            {
+                                "trigger": "encounter_end",
+                                "type": "remove"
+                            },
+                            {
+                                "trigger": "death",
+                                "type": "remove"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "atonement",
+                        "name": "Atonement",
+                        "media": "melvor:assets/media/skills/prayer/prayer.svg",
+                        "description": "Recover {effect.0.amount} health after dealing direct damage to this enemy",
+                        "amount": 5,
+                        "stacks": 1,
+                        "stack": true,
+                        "combine": true,
+                        "effects": [
+                            {
+                                "trigger": "after_damage_received",
+                                "type": "heal",
+                                "target": "attacker",
+                                "stack": true
+                            },
+                            {
+                                "trigger": "after_damage_received",
+                                "type": "remove"
+                            },
+                            {
+                                "trigger": "encounter_end",
+                                "type": "remove"
+                            },
+                            {
+                                "trigger": "death",
+                                "type": "remove"
+                            }
+                        ]
+                    }
+                ],
+                "tiles": [
+                    {
+                        "id": "wall",
+                        "name": "Wall",
+                        "media": "assets/media/empty.png"
+                    },
+                    {
+                        "id": "start",
+                        "name": "Start",
+                        "media": "assets/media/empty.png",
+                        "alwaysShowIcon": true
+                    },
+                    {
+                        "id": "exit",
+                        "name": "Floor Exit",
+                        "media": "melvor:assets/media/skills/combat/combat.svg",
+                        "alwaysShowIcon": true
+                    },
+                    {
+                        "id": "boss",
+                        "name": "Boss",
+                        "media": "melvor:assets/media/main/hardcore.svg",
+                        "alwaysShowIcon": true
+                    },
+                    {
+                        "id": "empty",
+                        "name": "Empty",
+                        "media": "assets/media/empty.png",
+                        "requirements": [],
+                        "weight": 100
+                    },
+                    {
+                        "id": "encounter",
+                        "name": "Encounter",
+                        "media": "melvor:assets/media/misc/mark_of_death.svg",
+                        "requirements": [],
+                        "weight": 30,
+                        "floor_max": 5,
+                        "dungeon_max": -1
+                    },
+                    {
+                        "id": "trap",
+                        "name": "Trap",
+                        "media": "melvor:assets/media/status/poison.svg",
+                        "requirements": [],
+                        "weight": 10,
+                        "floor_max": 1,
+                        "effects": [
+                            { "type": "damage", "amount": 0.1 }
+                        ]
+                    },
+                    {
+                        "id": "fountain",
+                        "name": "Fountain",
+                        "media": "melvor:assets/media/skills/firemaking/firemaking.svg",
+                        "requirements": [],
+                        "weight": 10,
+                        "floor_max": 1,
+                        "dungeon_max": 1,
+                        "effects": [
+                            { "type": "heal", "amount": 0.2 }
+                        ]
+                    }
+                ],
+                "itemSlots": [
+                    {
+                        "id": "none",
+                        "name": "",
+                        "media": "melvor:assets/media/main/question.svg"
+                    },
+                    {
+                        "id": "weapon",
+                        "name": "Weapon",
+                        "media": "melvor:assets/media/bank/weapon_sword.png",
+                        "pair": "adventuring:offhand"
+                    },
+                    {
+                        "id": "offhand",
+                        "name": "Offhand",
+                        "media": "melvor:assets/media/bank/armour_shield.png",
+                        "pair": "adventuring:weapon"
+                    },
+                    {
+                        "id": "head",
+                        "name": "Head",
+                        "media": "melvor:assets/media/bank/armour_helmet.png"
+                    },
+                    {
+                        "id": "body",
+                        "name": "Body",
+                        "media": "melvor:assets/media/bank/armour_platebody.png"
+                    },
+                    {
+                        "id": "legs",
+                        "name": "Legs",
+                        "media": "melvor:assets/media/bank/armour_platelegs.png"
+                    },
+                    {
+                        "id": "hands",
+                        "name": "Hands",
+                        "media": "melvor:assets/media/bank/armour_gloves.png"
+                    },
+                    {
+                        "id": "feet",
+                        "name": "Feet",
+                        "media": "melvor:assets/media/bank/armour_boots.png"
+                    },
+                    {
+                        "id": "amulet",
+                        "name": "Neck",
+                        "media": "melvor:assets/media/bank/misc_amulet.png"
+                    },
+                    {
+                        "id": "cape",
+                        "name": "Cape",
+                        "media": "melvor:assets/media/bank/armour_cape.png"
+                    },
+                    {
+                        "id": "ring1",
+                        "name": "Ring",
+                        "media": "melvor:assets/media/bank/misc_ring.png"
+                    },
+                    {
+                        "id": "ring2",
+                        "name": "Ring",
+                        "media": "melvor:assets/media/bank/misc_ring.png"
+                    }
+                ],
+                "baseItems": [
+                    {
+                        "id": "none",
+                        "name": "",
+                        "media": "melvor:assets/media/main/question.svg",
+                        "type": "adventuring:none"
+                    }
+                ]
+            }
+        }]
+    }
+}

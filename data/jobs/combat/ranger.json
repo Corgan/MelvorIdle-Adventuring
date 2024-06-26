@@ -1,0 +1,120 @@
+{
+    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+    "namespace": "adventuring",
+    "data": {
+        "skillData": [{
+            "skillID": "adventuring:Adventuring",
+            "data": {
+                "jobs": [
+                    {
+                        "id": "ranger",
+                        "name": "Ranger",
+                        "media": "melvor:assets/media/skills/ranged/ranged.svg",
+                        "requirements": [
+                            { "type": "skill_level", "level": 1 }
+                        ],
+                        "isMilestoneReward": true,
+                        "allowedItems": [
+                            "adventuring:cowl",
+                            "adventuring:vest",
+                            "adventuring:chaps",
+                            "adventuring:vambraces",
+                            "adventuring:boots",
+
+                            "adventuring:amulet",
+                            "adventuring:ring",
+                            "adventuring:cape",
+                            
+                            "adventuring:buckler",
+                            "adventuring:quiver",
+                            "adventuring:javelin", 
+                            "adventuring:crossbow", 
+                            "adventuring:shortbow", 
+                            "adventuring:longbow"
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:hitpoints", "value": 0.5 },
+                            { "id": "adventuring:defence", "value": 0.5 },
+                            { "id": "adventuring:agility", "value": 1.5 },
+                            { "id": "adventuring:ranged", "value": 1.5 }
+                        ]
+                    }
+                ],
+                "generators": [
+                    {
+                        "id": "shoot",
+                        "name": "Shoot",
+                        "description": "Deal {hit.0.effect.0.amount} damage to the back enemy and apply {hit.0.effect.1.stacks} Bleed.",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:ranger", "level": 1 }
+                        ],
+                        "energy": 20,
+                        "hits": [
+                            {
+                                "target": "back",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 10,
+                                            "scaling": [
+                                                { "id": "adventuring:ranged", "value": 0.25 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:bleed",
+                                        "stacks": {
+                                            "base": 1,
+                                            "scaling": [
+                                                { "id": "adventuring:ranged", "value": 0.025 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "spenders": [
+                    {
+                        "id": "snipe",
+                        "name": "Snipe",
+                        "description": "Deal {hit.0.effect.0.amount} damage to and stun the back enemy.",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:ranger", "level": 5 }
+                        ],
+                        "cost": 100,
+                        "hits": [
+                            {
+                                "target": "back",
+                                "party": "enemy",
+                                "delay": 500,
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 20,
+                                            "scaling": [
+                                                { "id": "adventuring:ranged", "value": 1 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:stun"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "passives": [
+
+                ]
+            }
+        }]
+    }
+}

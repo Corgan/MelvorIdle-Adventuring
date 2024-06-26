@@ -9,7 +9,9 @@ export class AdventuringWorkshopUIComponent extends AdventuringPageUIComponent {
         this.orders = getElementFromFragment(this.$fragment, 'orders', 'div');
         this.store = getElementFromFragment(this.$fragment, 'store', 'div');
 
-        this.product = new DropDown(getElementFromFragment(this.$fragment, 'product', 'div'), undefined, ['btn-sm', 'btn-primary'], ['font-size-sm'], true, 60);
+        this.productDropdown = getElementFromFragment(this.$fragment, 'product-drop-down-container', 'div');
+        this.productButton = getElementFromFragment(this.$fragment, 'product-button', 'button');
+        this.productRecipeOptions = getElementFromFragment(this.$fragment, 'product-recipe-options-container', 'div');
         this.count = getElementFromFragment(this.$fragment, 'count', 'input');
         this.submit = getElementFromFragment(this.$fragment, 'submit', 'button');
 

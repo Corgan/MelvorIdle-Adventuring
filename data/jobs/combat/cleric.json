@@ -1,0 +1,184 @@
+{
+    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+    "namespace": "adventuring",
+    "data": {
+        "skillData": [{
+            "skillID": "adventuring:Adventuring",
+            "data": {
+                "jobs": [
+                    {
+                        "id": "cleric",
+                        "name": "Cleric",
+                        "media": "melvor:assets/media/skills/prayer/prayer.svg",
+                        "requirements": [
+                            { "type": "skill_level", "level": 1 }
+                        ],
+                        "isMilestoneReward": true,
+                        "allowedItems": [
+                            "adventuring:hat",
+                            "adventuring:robes",
+                            "adventuring:bottoms",
+                            "adventuring:mitts",
+                            "adventuring:slippers",
+
+                            "adventuring:amulet",
+                            "adventuring:ring",
+                            "adventuring:cape",
+                            
+                            "adventuring:wand", 
+                            "adventuring:staff",
+                            "adventuring:spellbook"
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:hitpoints", "value": 1 },
+                            { "id": "adventuring:defence", "value": 0.5 },
+                            { "id": "adventuring:agility", "value": 0.75 },
+                            { "id": "adventuring:prayer", "value": 2.25 }
+                        ]
+                    }
+                ],
+                "generators": [
+                    {
+                        "id": "holy_fire",
+                        "name": "Holy Fire",
+                        "description": "Deal {hit.0.effect.0.amount} damage to a random enemy and apply {hit.0.effect.1.stacks} Burn.",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:cleric", "level": 1 }
+                        ],
+                        "energy": 20,
+                        "hits": [
+                            {
+                                "target": "random",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 10,
+                                            "scaling": [
+                                                { "id": "adventuring:prayer", "value": 0.25 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:burn",
+                                        "stacks": {
+                                            "base": 1,
+                                            "scaling": [
+                                                { "id": "adventuring:prayer", "value": 0.025 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "pray",
+                        "name": "Pray",
+                        "description": "Heal {hit.0.effect.0.amount} hitpoints to the lowest hero and apply {hit.0.effect.1.stacks} Regen.",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:cleric", "level": 10 }
+                        ],
+                        "energy": 20,
+                        "hits": [
+                            {
+                                "target": "lowest",
+                                "party": "ally",
+                                "effects": [
+                                    {
+                                        "type": "heal",
+                                        "amount": {
+                                            "base": 10,
+                                            "scaling": [
+                                                { "id": "adventuring:prayer", "value": 0.2 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:regen",
+                                        "stacks": {
+                                            "base": 1,
+                                            "scaling": [
+                                                { "id": "adventuring:prayer", "value": 0.05 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "spenders": [
+                    {
+                        "id": "divine_heal",
+                        "name": "Divine Heal",
+                        "description": "Heal {hit.0.effect.0.amount} hitpoints to all heroes.",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:cleric", "level": 5 }
+                        ],
+                        "cost": 100,
+                        "hits": [
+                            {
+                                "target": "aoe",
+                                "party": "ally",
+                                "effects": [
+                                    {
+                                        "type": "heal",
+                                        "amount": {
+                                            "base": 15,
+                                            "scaling": [
+                                                { "id": "adventuring:prayer", "value": 0.35 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "consecrate",
+                        "name": "Consecrate",
+                        "description": "Deal {hit.0.effect.0.amount} damage to all enemies and apply {hit.0.effect.1.stacks} stacks of Atonement.",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:cleric", "level": 15 }
+                        ],
+                        "cost": 100,
+                        "hits": [
+                            {
+                                "target": "aoe",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 15,
+                                            "scaling": [
+                                                { "id": "adventuring:prayer", "value": 0.25 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:atonement",
+                                        "stacks": {
+                                            "base": 1,
+                                            "scaling": [
+                                                { "id": "adventuring:prayer", "value": 0.05 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "passives": [
+
+                ]
+            }
+        }]
+    }
+}

@@ -1,0 +1,72 @@
+{
+    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+    "namespace": "adventuring",
+    "data": {
+        "skillData": [{
+            "skillID": "adventuring:Adventuring",
+            "data": {
+                "stats": [
+                    {
+                        "id": "smithing",
+                        "name": "Smithing",
+                        "media": "melvor:assets/media/skills/smithing/smithing.svg"
+                    }
+                ],
+                "jobs": [
+                    {
+                        "id": "smith",
+                        "name": "Smith",
+                        "media": "melvor:assets/media/skills/smithing/smithing.svg",
+                        "requirements": [
+                            { "type": "skill_level", "level": 5 }
+                        ],
+                        "isMilestoneReward": true,
+                        "isPassive": true,
+                        "scaling": [
+                            { "id": "adventuring:smithing", "value": 1 }
+                        ]
+                    }
+                ],
+                "materials": [
+                    {
+                        "id": "unknown_bar",
+                        "name": "Unknown Bar",
+                        "media": "melvor:assets/media/bank/steel_bar.png"
+                    }
+                ],
+                "buildings": [
+                    {
+                        "id": "forge",
+                        "type": "workshop",
+                        "name": "Forge",
+                        "description": "Create work orders for Smiths. Converts Unknown Bars to complete orders.",
+                        "media": "melvor:assets/media/skills/township/Blacksmiths_Smithy.svg",
+                        "requirements": [],
+                        "idle": ["Playing with fire", "Bugging the Smiths"],
+                        "actions": ["adventuring:work"],
+                        "products": [
+                            "adventuring:bronze_bar"
+                        ]
+                    }
+                ],
+                "products": [
+                    {
+                        "id": "bronze_bar",
+                        "item": "melvorD:Bronze_Bar",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:smith" },
+                            { "type": "job_level", "job": "adventuring:smith", "level": 1 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:unknown_ore", "count": 1 }
+                        ]
+                    }
+                ],
+                "tiles": [
+                    
+                ]
+            }
+        }]
+    }
+}

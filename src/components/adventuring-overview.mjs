@@ -11,7 +11,7 @@ export class AdventuringOverviewUIComponent extends AdventuringUIComponent {
         this.buttons = getElementFromFragment(this.$fragment, 'buttons', 'div');
 
         this.turnProgress = getElementFromFragment(this.$fragment, 'turn-progress', 'div');
-        this.turnProgressBar = new ProgressBar(getElementFromFragment(this.$fragment, 'turn-progress-bar', 'div'));
+        this.turnProgressBar = getElementFromFragment(this.$fragment, 'turn-progress-bar', 'progress-bar');
 
         this.cards = getElementFromFragment(this.$fragment, 'cards', 'div');
         this.log = getElementFromFragment(this.$fragment, 'log', 'div');
