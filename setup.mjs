@@ -52,6 +52,37 @@ export async function setup({ gameData, patch, loadTemplates, loadModule, onInte
     await gameData.addPackage('data/areas/graveyard.json');
     await gameData.addPackage('data/areas/hall_of_wizards.json');
 
+    if(cloudManager.hasAoDEntitlementAndIsEnabled) {
+        await gameData.addPackage('data/data-aod.json');
+
+        const levelCapIncreases = ['adventuring:Pre99Dungeons', 'adventuring:ImpendingDarknessSet100'];
+
+        if(cloudManager.hasTotHEntitlementAndIsEnabled) {
+            levelCapIncreases.push(...['adventuring:Post99Dungeons', 'adventuring:ThroneOfTheHeraldSet120']);
+        }
+
+        await gameData.addPackage({
+            $schema: '',
+            namespace: 'adventuring',
+            modifications: {
+                gamemodes: [
+                    {
+                        id: 'melvorAoD:AncientRelics',
+                        levelCapIncreases: {
+                            add: levelCapIncreases
+                        }
+                    }
+                ]
+            }
+        });
+    }
+    
+    patch(EventManager, 'loadEvents').after(() => {
+        if(game.currentGamemode.startingSkills !== undefined && game.currentGamemode.startingSkills.has(game.adventuring)) {
+            game.adventuring.setUnlock(true);
+        }
+    });
+
     console.log('Registered Adventuring Data.');
 
     onInterfaceAvailable(async () => {
