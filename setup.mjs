@@ -1,4 +1,4 @@
-export async function setup({ gameData, patch, loadTemplates, loadModule, onInterfaceAvailable, onInterfaceReady }) {
+export async function setup({ gameData, patch, loadTemplates, loadModule, onModsLoaded, onInterfaceAvailable, onInterfaceReady }) {
     console.log("Loading Adventuring Templates");
     await loadTemplates("templates.html"); // Add templates
 
@@ -51,39 +51,57 @@ export async function setup({ gameData, patch, loadTemplates, loadModule, onInte
     await gameData.addPackage('data/areas/chicken_coop.json');
     await gameData.addPackage('data/areas/graveyard.json');
     await gameData.addPackage('data/areas/hall_of_wizards.json');
-
-    if(cloudManager.hasAoDEntitlementAndIsEnabled) {
+    
+    if(cloudManager.hasAoDEntitlementAndIsEnabled)
         await gameData.addPackage('data/data-aod.json');
 
-        const levelCapIncreases = ['adventuring:Pre99Dungeons', 'adventuring:ImpendingDarknessSet100'];
+    console.log('Registered Adventuring Data.');
 
-        if(cloudManager.hasTotHEntitlementAndIsEnabled) {
-            levelCapIncreases.push(...['adventuring:Post99Dungeons', 'adventuring:ThroneOfTheHeraldSet120']);
-        }
+    onModsLoaded(async () => {
+        if(cloudManager.hasAoDEntitlementAndIsEnabled) {
+            const levelCapIncreases = ['adventuring:Pre99Dungeons', 'adventuring:ImpendingDarknessSet100'];
 
-        await gameData.addPackage({
-            $schema: '',
-            namespace: 'adventuring',
-            modifications: {
-                gamemodes: [
-                    {
-                        id: 'melvorAoD:AncientRelics',
+            if(cloudManager.hasTotHEntitlementAndIsEnabled) {
+                levelCapIncreases.push(...['adventuring:Post99Dungeons', 'adventuring:ThroneOfTheHeraldSet120']);
+            }
+
+            const gamemodes = game.gamemodes.filter(gamemode => gamemode.defaultInitialLevelCap !== undefined && gamemode.levelCapIncreases.length > 0 && gamemode.useDefaultSkillUnlockRequirements === true && gamemode.allowSkillUnlock === false);
+
+            await gameData.addPackage({
+                $schema: '',
+                namespace: 'adventuring',
+                modifications: {
+                    gamemodes: gamemodes.map(gamemode => ({
+                        id: gamemode.id,
                         levelCapIncreases: {
                             add: levelCapIncreases
-                        }
-                    }
-                ]
+                        },
+                        startingSkills: {
+                            add: ['adventuring:Adventuring']
+                        },
+                        skillUnlockRequirements: [
+                            {
+                                skillID: 'adventuring:Adventuring',
+                                requirements: [
+                                    {
+                                        type: 'SkillLevel',
+                                        skillID: 'melvorD:Attack',
+                                        level: 1
+                                    }
+                                ]
+                            }
+                        ]
+                    }))
+                }
+            });
+        }
+    
+        patch(EventManager, 'loadEvents').after(() => {
+            if(game.currentGamemode.startingSkills !== undefined && game.currentGamemode.startingSkills.has(game.adventuring)) {
+                game.adventuring.setUnlock(true);
             }
         });
-    }
-    
-    patch(EventManager, 'loadEvents').after(() => {
-        if(game.currentGamemode.startingSkills !== undefined && game.currentGamemode.startingSkills.has(game.adventuring)) {
-            game.adventuring.setUnlock(true);
-        }
     });
-
-    console.log('Registered Adventuring Data.');
 
     onInterfaceAvailable(async () => {
         console.log("Appending Adventuring Page");
