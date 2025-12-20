@@ -1,11 +1,12 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { AdventuringPageUIComponent } = await loadModule('src/components/adventuring-page.mjs');
+const { AdventuringSubpageElement } = await loadModule('src/components/adventuring-page.mjs');
 
-export class AdventuringCrossroadsUIComponent extends AdventuringPageUIComponent {
-    constructor(manager, game) {
-        super(manager, game, 'adventuring-crossroads-component');
+export class AdventuringCrossroadsElement extends AdventuringSubpageElement {
+    constructor() {
+        super('adventuring-crossroads-template');
         
-        this.areas = getElementFromFragment(this.$fragment, 'areas', 'div');
+        this.areas = getElementFromFragment(this._content, 'areas', 'div');
     }
 }
+window.customElements.define('adventuring-crossroads', AdventuringCrossroadsElement);

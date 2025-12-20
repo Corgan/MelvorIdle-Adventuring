@@ -2,14 +2,14 @@ const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringHero } = await loadModule('src/adventuring-hero.mjs');
 const { AdventuringEnemy } = await loadModule('src/adventuring-enemy.mjs');
-const { AdventuringPartyUIComponent } = await loadModule('src/components/adventuring-party.mjs');
+const { AdventuringPartyElement } = await loadModule('src/components/adventuring-party.mjs');
 
 class AdventuringParty {
     constructor(manager, game) {
         this.game = game;
         this.manager = manager;
         
-        this.component = new AdventuringPartyUIComponent(this.manager, this.game, this);
+        this.component = createElement('adventuring-party');
     }
 
     get all() {

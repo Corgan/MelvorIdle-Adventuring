@@ -1,6 +1,6 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { AdventuringEquipmentSlotUIComponent } = await loadModule('src/components/adventuring-equipment-slot.mjs');
+const { AdventuringEquipmentSlotElement } = await loadModule('src/components/adventuring-equipment-slot.mjs');
 
 class AdventuringEquipmentSlotRenderQueue {
     constructor() {
@@ -33,7 +33,7 @@ export class AdventuringEquipmentSlot {
 
         this.renderQueue = new AdventuringEquipmentSlotRenderQueue();
 
-        this.component = new AdventuringEquipmentSlotUIComponent(this.manager, this.game, this);
+        this.component = createElement('adventuring-equipment-slot');
 
         this.component.clickable.onclick = () => {
             this.slotClicked();

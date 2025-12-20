@@ -2,7 +2,7 @@ const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringStats } = await loadModule('src/adventuring-stats.mjs');
 
-const { AdventuringAuraUIComponent } = await loadModule('src/components/adventuring-aura.mjs');
+const { AdventuringAuraElement } = await loadModule('src/components/adventuring-aura.mjs');
 
 class AdventuringAuraRenderQueue {
     constructor() {

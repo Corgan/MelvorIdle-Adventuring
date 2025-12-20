@@ -1,6 +1,6 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { AdventuringItemBaseUIComponent } = await loadModule('src/components/adventuring-item-base.mjs');
+const { AdventuringItemBaseElement } = await loadModule('src/components/adventuring-item-base.mjs');
 
 const { AdventuringStats } = await loadModule('src/adventuring-stats.mjs');
 
@@ -41,7 +41,7 @@ export class AdventuringItemBase extends MasteryAction {
         this.base = new AdventuringStats(this.manager, this.game);
         this.stats = new AdventuringStats(this.manager, this.game);
 
-        this.component = new AdventuringItemBaseUIComponent(this.manager, this.game, this);
+        this.component = createElement('adventuring-item-base');
         this.renderQueue = new AdventuringItemBaseRenderQueue();
 
         if(data.materials !== undefined) {

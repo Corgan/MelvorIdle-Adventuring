@@ -1,8 +1,8 @@
 const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringStats } = await loadModule('src/adventuring-stats.mjs');
-const { AdventuringJobUIComponent } = await loadModule('src/components/adventuring-job.mjs');
-const { AdventuringJobSummaryUIComponent } = await loadModule('src/components/adventuring-job-summary.mjs');
+const { AdventuringJobElement } = await loadModule('src/components/adventuring-job.mjs');
+const { AdventuringJobSummaryElement } = await loadModule('src/components/adventuring-job-summary.mjs');
 
 class AdventuringJobRenderQueue {
     constructor(){
@@ -20,8 +20,8 @@ export class AdventuringJob extends MasteryAction {
         this.manager = manager;
         this.game = game;
 
-        this.component = new AdventuringJobUIComponent(this.manager, this.game, this);
-        this.summary = new AdventuringJobSummaryUIComponent(this.manager, this.game, this);
+        this.component = createElement('adventuring-job');
+        this.summary = createElement('adventuring-job-summary');
         this.renderQueue = new AdventuringJobRenderQueue();
 
         this._name = data.name;

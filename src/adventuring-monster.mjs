@@ -2,7 +2,7 @@ const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringWeightedTable } = await loadModule('src/adventuring-utils.mjs');
 
-const { AdventuringMonsterUIComponent } = await loadModule('src/components/adventuring-monster.mjs');
+const { AdventuringMonsterElement } = await loadModule('src/components/adventuring-monster.mjs');
 
 class AdventuringMonsterRenderQueue {
     constructor(){
@@ -34,7 +34,7 @@ export class AdventuringMonster extends MasteryAction {
         this.spender = data.spender;
         this.passives = data.passives;
 
-        this.component = new AdventuringMonsterUIComponent(this.manager, this.game, this);
+        this.component = createElement('adventuring-monster');
         this.renderQueue = new AdventuringMonsterRenderQueue();
 
         this.lootGenerator = new AdventuringWeightedTable(this.manager, this.game);

@@ -1,18 +1,27 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { AdventuringUIComponent } = await loadModule('src/components/adventuring-ui-component.mjs');
+export class AdventuringWorkOrderElement extends HTMLElement {
+    constructor() {
+        super();
+        this._content = new DocumentFragment();
+        this._content.append(getTemplateNode('adventuring-work-order-template'));
 
-export class AdventuringWorkOrderUIComponent extends AdventuringUIComponent {
-    constructor(manager, game) {
-        super(manager, game, 'adventuring-work-order-component');
+        this.styling = getElementFromFragment(this._content, 'style', 'div');
+        this.active = getElementFromFragment(this._content, 'active', 'div');
+        this.inactive = getElementFromFragment(this._content, 'inactive', 'div');
+        this.icon = getElementFromFragment(this._content, 'icon', 'img');
+        this.nameText = getElementFromFragment(this._content, 'name', 'span');
+        this.completed = getElementFromFragment(this._content, 'completed', 'span');
+        this.count = getElementFromFragment(this._content, 'count', 'span');
+        this.cancel = getElementFromFragment(this._content, 'cancel', 'button');
+    }
 
-        this.style = getElementFromFragment(this.$fragment, 'style', 'div');
-        this.active = getElementFromFragment(this.$fragment, 'active', 'div');
-        this.inactive = getElementFromFragment(this.$fragment, 'inactive', 'div');
-        this.icon = getElementFromFragment(this.$fragment, 'icon', 'img');
-        this.name = getElementFromFragment(this.$fragment, 'name', 'span');
-        this.completed = getElementFromFragment(this.$fragment, 'completed', 'span');
-        this.count = getElementFromFragment(this.$fragment, 'count', 'span');
-        this.cancel = getElementFromFragment(this.$fragment, 'cancel', 'button');
+    mount(parent) {
+        parent.append(this);
+    }
+
+    connectedCallback() {
+        this.appendChild(this._content);
     }
 }
+window.customElements.define('adventuring-work-order', AdventuringWorkOrderElement);

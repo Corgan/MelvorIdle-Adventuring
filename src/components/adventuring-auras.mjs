@@ -1,11 +1,20 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { AdventuringUIComponent } = await loadModule('src/components/adventuring-ui-component.mjs');
+export class AdventuringAurasElement extends HTMLElement {
+    constructor() {
+        super();
+        this._content = new DocumentFragment();
+        this._content.append(getTemplateNode('adventuring-auras-template'));
 
-export class AdventuringAurasUIComponent extends AdventuringUIComponent {
-    constructor(manager, game,) {
-        super(manager, game, 'adventuring-auras-component');
+        this.auras = getElementFromFragment(this._content, 'auras', 'div');
+    }
 
-        this.auras = getElementFromFragment(this.$fragment, 'auras', 'div');
+    mount(parent) {
+        parent.append(this);
+    }
+
+    connectedCallback() {
+        this.appendChild(this._content);
     }
 }
+window.customElements.define('adventuring-auras', AdventuringAurasElement);

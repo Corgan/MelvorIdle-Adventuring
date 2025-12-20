@@ -2,15 +2,15 @@ const { loadModule, getResourceUrl } = mod.getContext(import.meta);
 
 const { AdventuringCards } = await loadModule('src/adventuring-cards.mjs');
 
-const { AdventuringOverviewUIComponent } = await loadModule('src/components/adventuring-overview.mjs');
-const { AdventuringOverviewButtonUIComponent } = await loadModule('src/components/adventuring-overview-button.mjs');
+const { AdventuringOverviewElement } = await loadModule('src/components/adventuring-overview.mjs');
+const { AdventuringOverviewButtonElement } = await loadModule('src/components/adventuring-overview-button.mjs');
 
 class AdventuringOverviewButton {
     constructor(manager, game, data) {
         this.manager = manager;
         this.game = game;
         this.data = data;
-        this.component = new AdventuringOverviewButtonUIComponent(this.manager, this.game, this);
+        this.component = createElement('adventuring-overview-button');
 
         this.component.button.onclick = () => this.clicked();
     }
@@ -81,7 +81,7 @@ export class AdventuringOverview {
         this.game = game;
 
         this.renderQueue = new OverviewRenderQueue();
-        this.component = new AdventuringOverviewUIComponent(this.manager, this.game, this);
+        this.component = createElement('adventuring-overview');
 
         this.buttons = new Set();
 

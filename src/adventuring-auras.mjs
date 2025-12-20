@@ -2,7 +2,7 @@ const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringAuraInstance } = await loadModule('src/adventuring-aura-instance.mjs');
 
-const { AdventuringAurasUIComponent } = await loadModule('src/components/adventuring-auras.mjs');
+const { AdventuringAurasElement } = await loadModule('src/components/adventuring-auras.mjs');
 
 class AdventuringAurasRenderQueue {
     constructor() {
@@ -20,7 +20,7 @@ export class AdventuringAuras {
 
         this.effectByType = new Map();
 
-        this.component = new AdventuringAurasUIComponent(this.manager, this.game);
+        this.component = createElement('adventuring-auras');
 
         this.renderQueue = new AdventuringAurasRenderQueue();
     }

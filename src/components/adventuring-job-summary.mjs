@@ -1,25 +1,30 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { AdventuringUIComponent } = await loadModule('src/components/adventuring-ui-component.mjs');
+export class AdventuringJobSummaryElement extends HTMLElement {
+    constructor() {
+        super();
+        this._content = new DocumentFragment();
+        this._content.append(getTemplateNode('adventuring-job-summary-template'));
 
-export class AdventuringJobSummaryUIComponent extends AdventuringUIComponent {
-    constructor(manager, game, refObj) {
-        super(manager, game, 'adventuring-job-summary-component');
-        this.refObj = refObj;
+        this.styling = getElementFromFragment(this._content, 'styling', 'div');
+        this.icon = getElementFromFragment(this._content, 'icon', 'img');
+        this.nameText = getElementFromFragment(this._content, 'name', 'span');
+        this.level = getElementFromFragment(this._content, 'level', 'small');
+    }
 
-        this.styling = getElementFromFragment(this.$fragment, 'styling', 'div');
+    connectedCallback() {
+        this.appendChild(this._content);
+    }
 
-        this.icon = getElementFromFragment(this.$fragment, 'icon', 'img');
-        this.name = getElementFromFragment(this.$fragment, 'name', 'span');
-        this.level = getElementFromFragment(this.$fragment, 'level', 'small');
-
+    setJob(job) {
+        this.job = job;
         this.styling.onclick = () => {
             if(this.selectorCharacter !== undefined && this.selectorType !== undefined) {
                 if(this.selectorType == 'combatJob') {
-                    this.selectorCharacter.setCombatJob(this.refObj);
+                    this.selectorCharacter.setCombatJob(this.job);
                 }
                 if(this.selectorType == 'passiveJob') {
-                    this.selectorCharacter.setPassiveJob(this.refObj);
+                    this.selectorCharacter.setPassiveJob(this.job);
                 }
 
                 this.selectorCharacter = undefined;
@@ -37,4 +42,9 @@ export class AdventuringJobSummaryUIComponent extends AdventuringUIComponent {
         this.selectorCharacter = character;
         this.selectorType = type;
     }
+
+    mount(parent) {
+        parent.appendChild(this);
+    }
 }
+window.customElements.define('adventuring-job-summary', AdventuringJobSummaryElement);

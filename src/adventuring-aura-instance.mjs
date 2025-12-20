@@ -4,7 +4,7 @@ const { AdventuringStats } = await loadModule('src/adventuring-stats.mjs');
 const { AdventuringBuff } = await loadModule('src/adventuring-buff.mjs');
 const { AdventuringDebuff } = await loadModule('src/adventuring-debuff.mjs');
 
-const { AdventuringAuraInstanceUIComponent } = await loadModule('src/components/adventuring-aura-instance.mjs');
+const { AdventuringAuraInstanceElement } = await loadModule('src/components/adventuring-aura-instance.mjs');
 
 class AdventuringAuraInstanceRenderQueue {
     constructor() {
@@ -28,7 +28,7 @@ export class AdventuringAuraInstance {
         this.source = source;
         this.stacks = 0;
 
-        this.component = new AdventuringAuraInstanceUIComponent(this.manager, this.game, this);
+        this.component = createElement('adventuring-aura-instance');
 
         this.renderQueue = new AdventuringAuraInstanceRenderQueue();
     }

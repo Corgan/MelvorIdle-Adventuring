@@ -1,19 +1,25 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { AdventuringUIComponent } = await loadModule('src/components/adventuring-ui-component.mjs');
+export class AdventuringOverviewElement extends HTMLElement {
+    constructor() {
+        super();
+        this._content = new DocumentFragment();
+        this._content.append(getTemplateNode('adventuring-overview-template'));
 
-export class AdventuringOverviewUIComponent extends AdventuringUIComponent {
-    constructor(manager, game) {
-        super(manager, game, 'adventuring-overview-component');
+        this.statusText = getElementFromFragment(this._content, 'status-text', 'h5');
+        this.buttons = getElementFromFragment(this._content, 'buttons', 'div');
+        this.turnProgress = getElementFromFragment(this._content, 'turn-progress', 'div');
+        this.turnProgressBar = getElementFromFragment(this._content, 'turn-progress-bar', 'progress-bar');
+        this.cards = getElementFromFragment(this._content, 'cards', 'div');
+        this.log = getElementFromFragment(this._content, 'log', 'div');
+    }
 
-        this.statusText = getElementFromFragment(this.$fragment, 'status-text', 'h5');
+    mount(parent) {
+        parent.append(this);
+    }
 
-        this.buttons = getElementFromFragment(this.$fragment, 'buttons', 'div');
-
-        this.turnProgress = getElementFromFragment(this.$fragment, 'turn-progress', 'div');
-        this.turnProgressBar = getElementFromFragment(this.$fragment, 'turn-progress-bar', 'progress-bar');
-
-        this.cards = getElementFromFragment(this.$fragment, 'cards', 'div');
-        this.log = getElementFromFragment(this.$fragment, 'log', 'div');
+    connectedCallback() {
+        this.appendChild(this._content);
     }
 }
+window.customElements.define('adventuring-overview', AdventuringOverviewElement);

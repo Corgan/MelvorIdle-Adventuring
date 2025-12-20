@@ -1,20 +1,35 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { AdventuringUIComponent } = await loadModule('src/components/adventuring-ui-component.mjs');
+export class AdventuringEquipmentSlotElement extends HTMLElement {
+    constructor() {
+        super();
+        this._content = new DocumentFragment();
+        this._content.append(getTemplateNode('adventuring-equipment-slot-template'));
 
-export class AdventuringEquipmentSlotUIComponent extends AdventuringUIComponent {
-    constructor(manager, game) {
-        super(manager, game, 'adventuring-equipment-slot-component');
+        this.clickable = getElementFromFragment(this._content, 'clickable', 'div');
+        this.border = getElementFromFragment(this._content, 'border', 'div');
+        this.icon = getElementFromFragment(this._content, 'icon', 'img');
+        this.upgrade = getElementFromFragment(this._content, 'upgrade', 'small');
+    }
 
-        this.clickable = getElementFromFragment(this.$fragment, 'clickable', 'div');
-        this.border = getElementFromFragment(this.$fragment, 'border', 'div');
-        this.icon = getElementFromFragment(this.$fragment, 'icon', 'img');
-        this.upgrade = getElementFromFragment(this.$fragment, 'upgrade', 'small');
+    mount(parent) {
+        parent.append(this);
+    }
 
+    connectedCallback() {
+        this.appendChild(this._content);
         this.tooltip = tippy(this.clickable, {
             content: '',
             allowHTML: true,
             hideOnClick: false
         });
     }
+
+    disconnectedCallback() {
+        if (this.tooltip !== undefined) {
+            this.tooltip.destroy();
+            this.tooltip = undefined;
+        }
+    }
 }
+window.customElements.define('adventuring-equipment-slot', AdventuringEquipmentSlotElement);

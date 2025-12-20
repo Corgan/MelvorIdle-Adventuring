@@ -1,11 +1,20 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { AdventuringUIComponent } = await loadModule('src/components/adventuring-ui-component.mjs');
-
-export class AdventuringPartyUIComponent extends AdventuringUIComponent {
-    constructor(manager, game) {
-        super(manager, game, 'adventuring-party-component');
+export class AdventuringPartyElement extends HTMLElement {
+    constructor() {
+        super();
+        this._content = new DocumentFragment();
+        this._content.append(getTemplateNode('adventuring-party-template'));
         
-        this.party = getElementFromFragment(this.$fragment, 'party', 'div');
+        this.party = getElementFromFragment(this._content, 'party', 'div');
+    }
+
+    mount(parent) {
+        parent.append(this);
+    }
+
+    connectedCallback() {
+        this.appendChild(this._content);
     }
 }
+window.customElements.define('adventuring-party', AdventuringPartyElement);

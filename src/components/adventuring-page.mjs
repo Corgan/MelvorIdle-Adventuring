@@ -1,11 +1,27 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { AdventuringUIComponent } = await loadModule('src/components/adventuring-ui-component.mjs');
+export class AdventuringSubpageElement extends HTMLElement {
+    constructor(template) {
+        super();
+        this._content = new DocumentFragment();
+        this._content.append(getTemplateNode(template));
 
-export class AdventuringPageUIComponent extends AdventuringUIComponent {
-    constructor(manager, game, template) {
-        super(manager, game, template);
+        this.page = getElementFromFragment(this._content, 'page', 'div');
+    }
 
-        this.page = getElementFromFragment(this.$fragment, 'page', 'div');
+    connectedCallback() {
+        this.appendChild(this._content);
+    }
+
+    mount(parent) {
+        parent.append(this);
+    }
+
+    show() {
+        showElement(this.page);
+    }
+
+    hide() {
+        hideElement(this.page);
     }
 }

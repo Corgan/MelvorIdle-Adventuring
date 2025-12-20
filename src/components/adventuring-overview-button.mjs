@@ -1,13 +1,22 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { AdventuringUIComponent } = await loadModule('src/components/adventuring-ui-component.mjs');
+export class AdventuringOverviewButtonElement extends HTMLElement {
+    constructor() {
+        super();
+        this._content = new DocumentFragment();
+        this._content.append(getTemplateNode('adventuring-overview-button-template'));
 
-export class AdventuringOverviewButtonUIComponent extends AdventuringUIComponent {
-    constructor(manager, game) {
-        super(manager, game, 'adventuring-overview-button-component');
+        this.button = getElementFromFragment(this._content, 'button', 'button');
+        this.nameText = getElementFromFragment(this._content, 'name', 'span');
+        this.icon = getElementFromFragment(this._content, 'icon', 'img');
+    }
 
-        this.button = getElementFromFragment(this.$fragment, 'button', 'button');
-        this.name = getElementFromFragment(this.$fragment, 'name', 'span');
-        this.icon = getElementFromFragment(this.$fragment, 'icon', 'img');
+    mount(parent) {
+        parent.append(this);
+    }
+
+    connectedCallback() {
+        this.appendChild(this._content);
     }
 }
+window.customElements.define('adventuring-overview-button', AdventuringOverviewButtonElement);

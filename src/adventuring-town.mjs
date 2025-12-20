@@ -3,14 +3,14 @@ const { loadModule } = mod.getContext(import.meta);
 const { AdventuringPage } = await loadModule('src/adventuring-page.mjs');
 const { AdventuringCard } = await loadModule('src/adventuring-card.mjs');
 
-const { AdventuringTownUIComponent } = await loadModule('src/components/adventuring-town.mjs');
+const { AdventuringTownElement } = await loadModule('src/components/adventuring-town.mjs');
 
 export class AdventuringTown extends AdventuringPage {
     constructor(manager, game) {
         super(manager, game);
         this.manager = manager;
         this.game = game;
-        this.component = new AdventuringTownUIComponent(this.manager, this.game, this);
+        this.component = createElement('adventuring-town');
         this.buildings = new Set();
         this.characterAction = new Map();
         this.cards = new Map();

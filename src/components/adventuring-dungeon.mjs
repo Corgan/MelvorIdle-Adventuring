@@ -1,11 +1,12 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { AdventuringPageUIComponent } = await loadModule('src/components/adventuring-page.mjs');
+const { AdventuringSubpageElement } = await loadModule('src/components/adventuring-page.mjs');
 
-export class AdventuringDungeonUIComponent extends AdventuringPageUIComponent {
-    constructor(manager, game) {
-        super(manager, game, 'adventuring-dungeon-component');
+export class AdventuringDungeonElement extends AdventuringSubpageElement {
+    constructor() {
+        super('adventuring-dungeon-template');
         
-        this.dungeon = getElementFromFragment(this.$fragment, 'dungeon', 'div');
+        this.dungeon = getElementFromFragment(this._content, 'dungeon', 'div');
     }
 }
+window.customElements.define('adventuring-dungeon', AdventuringDungeonElement);

@@ -1,21 +1,36 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { AdventuringUIComponent } = await loadModule('src/components/adventuring-ui-component.mjs');
+export class AdventuringItemBaseElement extends HTMLElement {
+    constructor() {
+        super();
+        this._content = new DocumentFragment();
+        this._content.append(getTemplateNode('adventuring-item-base-template'));
+        
+        this.clickable = getElementFromFragment(this._content, 'clickable', 'div');
+        this.border = getElementFromFragment(this._content, 'border', 'div');
+        this.lock = getElementFromFragment(this._content, 'lock', 'div');
+        this.icon = getElementFromFragment(this._content, 'icon', 'img');
+        this.upgrade = getElementFromFragment(this._content, 'upgrade', 'small');
+    }
 
-export class AdventuringItemBaseUIComponent extends AdventuringUIComponent {
-    constructor(manager, game) {
-        super(manager, game, 'adventuring-item-base-component');
-        
-        this.clickable = getElementFromFragment(this.$fragment, 'clickable', 'div');
-        this.border = getElementFromFragment(this.$fragment, 'border', 'div');
-        this.lock = getElementFromFragment(this.$fragment, 'lock', 'div');
-        this.icon = getElementFromFragment(this.$fragment, 'icon', 'img');
-        this.upgrade = getElementFromFragment(this.$fragment, 'upgrade', 'small');
-        
+    connectedCallback() {
+        this.appendChild(this._content);
         this.tooltip = tippy(this.clickable, {
             content: '',
             allowHTML: true,
             hideOnClick: false
         });
     }
+
+    disconnectedCallback() {
+        if (this.tooltip !== undefined) {
+            this.tooltip.destroy();
+            this.tooltip = undefined;
+        }
+    }
+
+    mount(parent) {
+        parent.appendChild(this);
+    }
 }
+window.customElements.define('adventuring-item-base', AdventuringItemBaseElement);

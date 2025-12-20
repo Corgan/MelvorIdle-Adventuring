@@ -3,8 +3,8 @@ const { loadModule } = mod.getContext(import.meta);
 const { AdventuringPage } = await loadModule('src/adventuring-page.mjs');
 const { AdventuringWorkOrder } = await loadModule('src/adventuring-work-order.mjs');
 
-const { AdventuringWorkshopUIComponent } = await loadModule('src/components/adventuring-workshop.mjs');
-const { AdventuringStoredItemUIComponent } = await loadModule('src/components/adventuring-stored-item.mjs');
+const { AdventuringWorkshopElement } = await loadModule('src/components/adventuring-workshop.mjs');
+const { AdventuringStoredItemElement } = await loadModule('src/components/adventuring-stored-item.mjs');
 
 class AdventuringWorkshopRenderQueue {
     constructor() {
@@ -21,7 +21,7 @@ export class AdventuringWorkshop extends AdventuringPage {
         this.game = game;
         this.building = building;
         
-        this.component = new AdventuringWorkshopUIComponent(this.manager, this.game, this);
+        this.component = createElement('adventuring-workshop');
         this.component.name.textContent = data.name;
         
         if(data.products !== undefined)
@@ -197,7 +197,7 @@ export class AdventuringWorkshop extends AdventuringPage {
         for(let item of this.storedItems.keys()) {
             let component = this.itemComponents[componentCount];
             if(component === undefined) {
-                component = new AdventuringStoredItemUIComponent(this.manager, this.game, this);
+                component = createElement('adventuring-stored-item');
                 this.itemComponents[componentCount] = component;
             }
 

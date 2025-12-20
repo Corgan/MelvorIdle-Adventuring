@@ -45,7 +45,7 @@ const { AdventuringItemBase } = await loadModule('src/adventuring-item-base.mjs'
 const { AdventuringMaterial } = await loadModule('src/adventuring-material.mjs');
 
 
-const { AdventuringPageUIComponent } = await loadModule('src/components/adventuring.mjs');
+const { AdventuringPageElement } = await loadModule('src/components/adventuring.mjs');
 
 class AdventuringRenderQueue extends MasterySkillRenderQueue {
     constructor() {
@@ -83,7 +83,7 @@ export class Adventuring extends SkillWithMastery {
         this.materials = new NamespaceRegistry(this.game.registeredNamespaces);
         this.baseItems = new NamespaceRegistry(this.game.registeredNamespaces);
 
-        this.component = new AdventuringPageUIComponent(this, this.game);
+        this.component = createElement('adventuring-page');
 
         this.overview = new AdventuringOverview(this, this.game);
         this.overview.component.mount(this.component.overview);

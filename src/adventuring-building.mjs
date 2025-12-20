@@ -2,7 +2,7 @@ const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringWorkshop } = await loadModule('src/adventuring-workshop.mjs');
 
-const { AdventuringBuildingUIComponent } = await loadModule('src/components/adventuring-building.mjs');
+const { AdventuringBuildingElement } = await loadModule('src/components/adventuring-building.mjs');
 
 class AdventuringBuildingRenderQueue {
     constructor(){
@@ -24,7 +24,7 @@ export class AdventuringBuilding extends NamespacedObject {
         this.manager = manager;
         this.game = game;
 
-        this.component = new AdventuringBuildingUIComponent(this.manager, this.game, this);
+        this.component = createElement('adventuring-building');
         this.renderQueue = new AdventuringBuildingRenderQueue();
 
         this._name = data.name;

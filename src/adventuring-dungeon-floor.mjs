@@ -3,7 +3,7 @@ const { loadModule } = mod.getContext(import.meta);
 const { AdventuringWeightedTable } = await loadModule('src/adventuring-utils.mjs');
 const { AdventuringDungeonCell } = await loadModule('src/adventuring-dungeon-cell.mjs');
 
-const { AdventuringDungeonFloorUIComponent } = await loadModule('src/components/adventuring-dungeon-floor.mjs');
+const { AdventuringDungeonFloorElement } = await loadModule('src/components/adventuring-dungeon-floor.mjs');
 
 class AdventuringDungeonFloorRenderQueue {
     constructor() {
@@ -20,7 +20,7 @@ export class AdventuringDungeonFloor {
 
         this.renderQueue = new AdventuringDungeonFloorRenderQueue();
 
-        this.component = new AdventuringDungeonFloorUIComponent(this.manager, this.game, this);
+        this.component = createElement('adventuring-dungeon-floor');
 
         this.grid = [];
 

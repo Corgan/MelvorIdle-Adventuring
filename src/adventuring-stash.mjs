@@ -4,7 +4,7 @@ const { loadModule } = mod.getContext(import.meta);
 const { AdventuringPage } = await loadModule('src/adventuring-page.mjs');
 
 const { AdventuringEquipment } = await loadModule('src/adventuring-equipment.mjs');
-const { AdventuringStashUIComponent } = await loadModule('src/components/adventuring-stash.mjs');
+const { AdventuringStashElement } = await loadModule('src/components/adventuring-stash.mjs');
 
 export class AdventuringStash extends AdventuringPage {
     constructor(manager, game) {
@@ -14,7 +14,7 @@ export class AdventuringStash extends AdventuringPage {
         this.materialCounts = new Map();
         this.unlocked = new Map();
 
-        this.component = new AdventuringStashUIComponent(this.manager, this.game, this);
+        this.component = createElement('adventuring-stash');
     }
 
     onLoad() {

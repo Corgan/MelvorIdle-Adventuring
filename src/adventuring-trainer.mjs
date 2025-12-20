@@ -2,14 +2,14 @@ const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringPage } = await loadModule('src/adventuring-page.mjs');
 
-const { AdventuringTrainerUIComponent } = await loadModule('src/components/adventuring-trainer.mjs');
+const { AdventuringTrainerElement } = await loadModule('src/components/adventuring-trainer.mjs');
 
 export class AdventuringTrainer extends AdventuringPage {
     constructor(manager, game) {
         super(manager, game);
         this.manager = manager;
         this.game = game;
-        this.component = new AdventuringTrainerUIComponent(this.manager, this.game, this);
+        this.component = createElement('adventuring-trainer');
 
         this.masteryJobs = [];
         this.component.back.onclick = () => this.back();

@@ -1,22 +1,19 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { AdventuringPageUIComponent } = await loadModule('src/components/adventuring-page.mjs');
-const { AdventuringStatsUIComponent } = await loadModule('src/components/adventuring-stats.mjs');
+const { AdventuringSubpageElement } = await loadModule('src/components/adventuring-page.mjs');
+const { AdventuringStatsElement } = await loadModule('src/components/adventuring-stats.mjs');
 
-export class AdventuringJobDetailsUIComponent extends AdventuringPageUIComponent {
-    constructor(manager, game) {
-        super(manager, game, 'adventuring-job-details-component');
+export class AdventuringJobDetailsElement extends AdventuringSubpageElement {
+    constructor() {
+        super('adventuring-job-details-template');
 
-        this.back = getElementFromFragment(this.$fragment, 'back', 'button');
-
-        this.name = getElementFromFragment(this.$fragment, 'name', 'h3');
-        this.icon = getElementFromFragment(this.$fragment, 'icon', 'img');
-
-        this.scaling = getElementFromFragment(this.$fragment, 'scaling', 'div');
-
-        this.equipable = getElementFromFragment(this.$fragment, 'equipable', 'div');
-
-        this.generators = getElementFromFragment(this.$fragment, 'generators', 'div');
-        this.spenders = getElementFromFragment(this.$fragment, 'spenders', 'div');
+        this.back = getElementFromFragment(this._content, 'back', 'button');
+        this.nameText = getElementFromFragment(this._content, 'name', 'h3');
+        this.icon = getElementFromFragment(this._content, 'icon', 'img');
+        this.scaling = getElementFromFragment(this._content, 'scaling', 'div');
+        this.equipable = getElementFromFragment(this._content, 'equipable', 'div');
+        this.generators = getElementFromFragment(this._content, 'generators', 'div');
+        this.spenders = getElementFromFragment(this._content, 'spenders', 'div');
     }
 }
+window.customElements.define('adventuring-job-details', AdventuringJobDetailsElement);

@@ -4,8 +4,8 @@ const { AdventuringPage } = await loadModule('src/adventuring-page.mjs');
 const { AdventuringStats } = await loadModule('src/adventuring-stats.mjs');
 
 const { AdventuringEquipment } = await loadModule('src/adventuring-equipment.mjs');
-const { AdventuringArmoryUIComponent } = await loadModule('src/components/adventuring-armory.mjs');
-const { AdventuringMaterialUIComponent } = await loadModule('src/components/adventuring-material.mjs');
+const { AdventuringArmoryElement } = await loadModule('src/components/adventuring-armory.mjs');
+const { AdventuringMaterialElement } = await loadModule('src/components/adventuring-material.mjs');
 
 class AdventuringArmoryRenderQueue {
     constructor(){
@@ -25,7 +25,7 @@ export class AdventuringArmory extends AdventuringPage {
         this.itemsBySlot = new Map();
         this.unlocked = new Map();
 
-        this.component = new AdventuringArmoryUIComponent(this.manager, this.game, this);
+        this.component = createElement('adventuring-armory');
         this.renderQueue = new AdventuringArmoryRenderQueue();
 
         this.base = new AdventuringStats(this.manager, this.game);
@@ -200,7 +200,7 @@ export class AdventuringArmory extends AdventuringPage {
             for(let material of this.selectedItem.materials.keys()) {
                 let component = this.materialComponents[componentCount];
                 if(component === undefined) {
-                    component = new AdventuringMaterialUIComponent(this.manager, this.game, this);
+                    component = createElement('adventuring-material');
                     this.materialComponents[componentCount] = component;
                 }
 

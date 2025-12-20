@@ -1,6 +1,6 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { AdventuringMaterialUIComponent } = await loadModule('src/components/adventuring-material.mjs');
+const { AdventuringMaterialElement } = await loadModule('src/components/adventuring-material.mjs');
 
 const { AdventuringWeightedTable } = await loadModule('src/adventuring-utils.mjs');
 
@@ -24,7 +24,7 @@ export class AdventuringMaterial extends NamespacedObject {
         this.manager = manager;
         this.game = game;
 
-        this.component = new AdventuringMaterialUIComponent(this.manager, this.game, this);
+        this.component = createElement('adventuring-material');
         this.renderQueue = new AdventuringMaterialRenderQueue();
 
         this._name = data.name;

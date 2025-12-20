@@ -1,6 +1,6 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { AdventuringMessageLogUIComponent } = await loadModule('src/components/adventuring-message-log.mjs');
+const { AdventuringMessageLogElement } = await loadModule('src/components/adventuring-message-log.mjs');
 
 const { AdventuringMessage } = await loadModule('src/adventuring-message.mjs');
 
@@ -15,7 +15,7 @@ export class AdventuringMessageLog {
         this.manager = manager;
         this.game = game;
         this.renderQueue = new AdventuringMessageLogRenderQueue();
-        this.component = new AdventuringMessageLogUIComponent(this.manager, this.game, this);
+        this.component = createElement('adventuring-message-log');
 
         this.messages = [];
     }

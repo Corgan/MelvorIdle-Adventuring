@@ -2,8 +2,8 @@ const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringStats } = await loadModule('src/adventuring-stats.mjs');
 
-const { AdventuringAbilityUIComponent } = await loadModule('src/components/adventuring-ability.mjs');
-const { AdventuringAbilityDetailsUIComponent } = await loadModule('src/components/adventuring-ability-details.mjs');
+const { AdventuringAbilityElement } = await loadModule('src/components/adventuring-ability.mjs');
+const { AdventuringAbilityDetailsElement } = await loadModule('src/components/adventuring-ability-details.mjs');
 
 class AdventuringAbilityRenderQueue {
     constructor() {
@@ -162,9 +162,9 @@ export class AdventuringAbility extends NamespacedObject {
         this.requirements = data.requirements;
         this.highlight = false;
 
-        this.component = new AdventuringAbilityUIComponent(this.manager, this.game, this);
+        this.component = createElement('adventuring-ability');
 
-        this.details = new AdventuringAbilityDetailsUIComponent(this.manager, this.game, this);
+        this.details = createElement('adventuring-ability-details');
 
         this.renderQueue = new AdventuringAbilityRenderQueue();
     }

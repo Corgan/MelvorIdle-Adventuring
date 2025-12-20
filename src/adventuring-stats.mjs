@@ -1,6 +1,6 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { AdventuringStatsUIComponent } = await loadModule('src/components/adventuring-stats.mjs');
+const { AdventuringStatsElement } = await loadModule('src/components/adventuring-stats.mjs');
 
 class AdventuringStatsRenderQueue {
     constructor() {
@@ -14,7 +14,7 @@ export class AdventuringStats extends Map {
         this.manager = manager;
         this.game = game;
 
-        this.component = new AdventuringStatsUIComponent(this.manager, this.game, this);
+        this.component = createElement('adventuring-stats');
 
         this.renderQueue = new AdventuringStatsRenderQueue();
     }

@@ -4,7 +4,7 @@ const { AdventuringCard } = await loadModule('src/adventuring-card.mjs');
 const { AdventuringStats } = await loadModule('src/adventuring-stats.mjs');
 const { AdventuringAuras } = await loadModule('src/adventuring-auras.mjs');
 
-const { AdventuringCharacterUIComponent } = await loadModule('src/components/adventuring-character.mjs');
+const { AdventuringCharacterElement } = await loadModule('src/components/adventuring-character.mjs');
 
 class AdventuringCharacterRenderQueue {
     constructor() {
@@ -36,7 +36,7 @@ class AdventuringCharacter {
         this.manager = manager;
         this.party = party;
 
-        this.component = new AdventuringCharacterUIComponent(this.manager, this.game, this);
+        this.component = createElement('adventuring-character');
 
         this.card = new AdventuringCard(this.manager, this.game);
 

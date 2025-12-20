@@ -1,12 +1,21 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { AdventuringUIComponent } = await loadModule('src/components/adventuring-ui-component.mjs');
+export class AdventuringDungeonCellElement extends HTMLElement {
+    constructor() {
+        super();
+        this._content = new DocumentFragment();
+        this._content.append(getTemplateNode('adventuring-dungeon-cell-template'));
 
-export class AdventuringDungeonCellUIComponent extends AdventuringUIComponent {
-    constructor(manager, game) {
-        super(manager, game, 'adventuring-dungeon-cell-component');
+        this.styling = getElementFromFragment(this._content, 'styling', 'div');
+        this.icon = getElementFromFragment(this._content, 'icon', 'img');
+    }
 
-        this.styling = getElementFromFragment(this.$fragment, 'styling', 'div');
-        this.icon = getElementFromFragment(this.$fragment, 'icon', 'img');
+    mount(parent) {
+        parent.append(this);
+    }
+
+    connectedCallback() {
+        this.appendChild(this._content);
     }
 }
+window.customElements.define('adventuring-dungeon-cell', AdventuringDungeonCellElement);

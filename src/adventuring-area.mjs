@@ -1,6 +1,6 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { AdventuringAreaUIComponent } = await loadModule('src/components/adventuring-area.mjs');
+const { AdventuringAreaElement } = await loadModule('src/components/adventuring-area.mjs');
 
 const { AdventuringWeightedTable } = await loadModule('src/adventuring-utils.mjs');
 
@@ -28,7 +28,7 @@ export class AdventuringArea extends MasteryAction {
         this.manager = manager;
         this.game = game;
 
-        this.component = new AdventuringAreaUIComponent(this.manager, this.game, this);
+        this.component = createElement('adventuring-area');
         this.renderQueue = new AdventuringAreaRenderQueue();
 
         this._name = data.name;

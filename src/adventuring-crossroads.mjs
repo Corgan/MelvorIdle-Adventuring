@@ -2,14 +2,14 @@ const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringPage } = await loadModule('src/adventuring-page.mjs');
 
-const { AdventuringCrossroadsUIComponent } = await loadModule('src/components/adventuring-crossroads.mjs');
+const { AdventuringCrossroadsElement } = await loadModule('src/components/adventuring-crossroads.mjs');
 
 export class AdventuringCrossroads extends AdventuringPage {
     constructor(manager, game) {
         super(manager, game);
         this.manager = manager;
         this.game = game;
-        this.component = new AdventuringCrossroadsUIComponent(this.manager, this.game, this);
+        this.component = createElement('adventuring-crossroads');
 
         this.areas = [];
     }

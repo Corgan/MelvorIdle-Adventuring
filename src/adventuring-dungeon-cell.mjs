@@ -1,6 +1,6 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { AdventuringDungeonCellUIComponent } = await loadModule('src/components/adventuring-dungeon-cell.mjs');
+const { AdventuringDungeonCellElement } = await loadModule('src/components/adventuring-dungeon-cell.mjs');
 
 class AdventuringDungeonCellRenderQueue {
     constructor() {
@@ -24,7 +24,7 @@ export class AdventuringDungeonCell {
         this.explored = false;
         this.current = false;
 
-        this.component = new AdventuringDungeonCellUIComponent(this.manager, this.game, this);
+        this.component = createElement('adventuring-dungeon-cell');
     }
 
     onLoad() {

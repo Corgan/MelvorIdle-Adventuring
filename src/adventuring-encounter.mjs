@@ -12,8 +12,8 @@ const { AdventuringHero } = await loadModule('src/adventuring-hero.mjs');
 
 const { AdventuringHeroParty, AdventuringEnemyParty } = await loadModule('src/adventuring-party.mjs');
 
-const { AdventuringEncounterUIComponent } = await loadModule('src/components/adventuring-encounter.mjs');
-const { AdventuringPartyUIComponent } = await loadModule('src/components/adventuring-party.mjs');
+const { AdventuringEncounterElement } = await loadModule('src/components/adventuring-encounter.mjs');
+const { AdventuringPartyElement } = await loadModule('src/components/adventuring-party.mjs');
 
 export class AdventuringEncounter extends AdventuringPage {
     constructor(manager, game) {
@@ -28,7 +28,7 @@ export class AdventuringEncounter extends AdventuringPage {
         this.currentHit = 0;
         this.hitRepeat = 0;
 
-        this.component = new AdventuringEncounterUIComponent(this.manager, this.game, this);
+        this.component = createElement('adventuring-encounter');
 
         this.party = new AdventuringEnemyParty(this.manager, this.game);
         this.party.component.mount(this.component.enemies);

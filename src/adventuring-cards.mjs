@@ -1,6 +1,6 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { AdventuringCardsUIComponent } = await loadModule('src/components/adventuring-cards.mjs');
+const { AdventuringCardsElement } = await loadModule('src/components/adventuring-cards.mjs');
 
 class AdventuringCardsRenderQueue {
     constructor() {
@@ -14,7 +14,7 @@ export class AdventuringCards {
         this.manager = manager;
         this.game = game;
         this.renderQueue = new AdventuringCardsRenderQueue();
-        this.component = new AdventuringCardsUIComponent(this.manager, this.game, this);
+        this.component = createElement('adventuring-cards');
         this.cards = [];
     }
     

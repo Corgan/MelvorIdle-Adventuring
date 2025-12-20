@@ -1,54 +1,73 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { AdventuringUIComponent } = await loadModule('src/components/adventuring-ui-component.mjs');
+const { AdventuringAbilitiesElement } = await loadModule('src/components/adventuring-abilities.mjs');
+const { AdventuringAbilitySmallElement } = await loadModule('src/components/adventuring-ability-small.mjs');
 
-const { AdventuringAbilitiesUIComponent } = await loadModule('src/components/adventuring-abilities.mjs');
-const { AdventuringAbilitySmallUIComponent } = await loadModule('src/components/adventuring-ability-small.mjs');
+const { AdventuringJobsElement } = await loadModule('src/components/adventuring-jobs.mjs');
+const { AdventuringJobSmallElement } = await loadModule('src/components/adventuring-job-small.mjs');
 
-const { AdventuringJobsUIComponent } = await loadModule('src/components/adventuring-jobs.mjs');
-const { AdventuringJobSmallUIComponent } = await loadModule('src/components/adventuring-job-small.mjs');
+export class AdventuringCharacterElement extends HTMLElement {
+    constructor() {
+        super();
+        this._content = new DocumentFragment();
+        this._content.append(getTemplateNode('adventuring-character-template'));
 
-export class AdventuringCharacterUIComponent extends AdventuringUIComponent {
-    constructor(manager, game) {
-        super(manager, game, 'adventuring-character-component');
+        this.styling = getElementFromFragment(this._content, 'styling', 'div');
+        this.nameText = getElementFromFragment(this._content, 'name', 'h5');
+        this.icon = getElementFromFragment(this._content, 'icon', 'div');
 
-        this.styling = getElementFromFragment(this.$fragment, 'styling', 'div');
-        this.name = getElementFromFragment(this.$fragment, 'name', 'h5');
-        this.icon = getElementFromFragment(this.$fragment, 'icon', 'div');
-
-        this.splash = new SplashManager(getElementFromFragment(this.$fragment, 'hitpoints-splash', 'div'));
+        this.hitpointsSplash = getElementFromFragment(this._content, 'hitpoints-splash', 'div');
         
-        this.hitpoints = getElementFromFragment(this.$fragment, 'hitpoints', 'span');
-        this.maxHitpoints = getElementFromFragment(this.$fragment, 'max-hitpoints', 'span');
-        this.hitpointsProgress = getElementFromFragment(this.$fragment, 'hitpoints-progress', 'progress-bar');
+        this.hitpoints = getElementFromFragment(this._content, 'hitpoints', 'span');
+        this.maxHitpoints = getElementFromFragment(this._content, 'max-hitpoints', 'span');
+        this.hitpointsProgress = getElementFromFragment(this._content, 'hitpoints-progress', 'progress-bar');
 
-        this.energy = getElementFromFragment(this.$fragment, 'energy', 'span');
-        this.maxEnergy = getElementFromFragment(this.$fragment, 'max-energy', 'span');
-        this.energyProgress = getElementFromFragment(this.$fragment, 'energy-progress', 'progress-bar');
+        this.energy = getElementFromFragment(this._content, 'energy', 'span');
+        this.maxEnergy = getElementFromFragment(this._content, 'max-energy', 'span');
+        this.energyProgress = getElementFromFragment(this._content, 'energy-progress', 'progress-bar');
 
-        this.auras = getElementFromFragment(this.$fragment, 'auras', 'div');
+        this.auras = getElementFromFragment(this._content, 'auras', 'div');
+        this.stats = getElementFromFragment(this._content, 'stats', 'div');
 
-        this.stats = getElementFromFragment(this.$fragment, 'stats', 'div');
+        this.abilitiesContainer = getElementFromFragment(this._content, 'abilities', 'div');
+        this.abilities = createElement('adventuring-abilities');
 
-        this.abilities = new AdventuringAbilitiesUIComponent(this.manager, this.game, this);
-        this.abilities.mount(getElementFromFragment(this.$fragment, 'abilities', 'div'));
+        this.generator = createElement('adventuring-ability-small');
+        this.spender = createElement('adventuring-ability-small');
 
-        this.generator = new AdventuringAbilitySmallUIComponent(this.manager, this.game, this);
-        this.generator.mount(this.abilities.container);
+        this.jobsContainer = getElementFromFragment(this._content, 'jobs', 'div');
+        this.jobs = createElement('adventuring-jobs');
 
-        this.spender = new AdventuringAbilitySmallUIComponent(this.manager, this.game, this);
-        this.spender.mount(this.abilities.container);
+        this.combatJob = createElement('adventuring-job-small');
+        this.passiveJob = createElement('adventuring-job-small');
+        
+        this.equipment = getElementFromFragment(this._content, 'equipment', 'div');
+    }
 
-        this.jobs = new AdventuringJobsUIComponent(this.manager, this.game, this);
-        this.jobs.mount(getElementFromFragment(this.$fragment, 'jobs', 'div'));
+    mount(parent) {
+        parent.append(this);
+    }
+
+    connectedCallback() {
+        this.appendChild(this._content);
+        this.splash = new SplashManager(this.hitpointsSplash);
+        
+        this.abilitiesContainer.appendChild(this.abilities);
+        this.abilities.container.appendChild(this.generator);
+        this.abilities.container.appendChild(this.spender);
+
+        this.jobsContainer.appendChild(this.jobs);
+        this.jobs.container.appendChild(this.combatJob);
+        this.jobs.container.appendChild(this.passiveJob);
         this.jobs.hide();
+    }
 
-        this.combatJob = new AdventuringJobSmallUIComponent(this.manager, this.game, this);
-        this.combatJob.mount(this.jobs.container);
-
-        this.passiveJob = new AdventuringJobSmallUIComponent(this.manager, this.game, this);
-        this.passiveJob.mount(this.jobs.container);
-        
-        this.equipment = getElementFromFragment(this.$fragment, 'equipment', 'div');
+    setSkill(skill) {
+        this.skill = skill;
+        this.generator.setSkill(skill);
+        this.spender.setSkill(skill);
+        this.combatJob.setSkill(skill);
+        this.passiveJob.setSkill(skill);
     }
 }
+window.customElements.define('adventuring-character', AdventuringCharacterElement);

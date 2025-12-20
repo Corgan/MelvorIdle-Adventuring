@@ -1,10 +1,20 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { AdventuringUIComponent } = await loadModule('src/components/adventuring-ui-component.mjs');
+export class AdventuringDungeonFloorElement extends HTMLElement {
+    constructor() {
+        super();
+        this._content = new DocumentFragment();
+        this._content.append(getTemplateNode('adventuring-dungeon-floor-template'));
 
-export class AdventuringDungeonFloorUIComponent extends AdventuringUIComponent {
-    constructor(manager, game) {
-        super(manager, game, 'adventuring-dungeon-floor-component');
-        this.floor = getElementFromFragment(this.$fragment, 'floor', 'div');
+        this.floor = getElementFromFragment(this._content, 'floor', 'div');
+    }
+
+    mount(parent) {
+        parent.append(this);
+    }
+
+    connectedCallback() {
+        this.appendChild(this._content);
     }
 }
+window.customElements.define('adventuring-dungeon-floor', AdventuringDungeonFloorElement);

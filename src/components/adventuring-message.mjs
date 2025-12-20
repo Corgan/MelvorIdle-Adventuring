@@ -1,12 +1,21 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { AdventuringUIComponent } = await loadModule('src/components/adventuring-ui-component.mjs');
+export class AdventuringMessageElement extends HTMLElement {
+    constructor() {
+        super();
+        this._content = new DocumentFragment();
+        this._content.append(getTemplateNode('adventuring-message-template'));
 
-export class AdventuringMessageUIComponent extends AdventuringUIComponent {
-    constructor(manager, game) {
-        super(manager, game, 'adventuring-message-component');
+        this.body = getElementFromFragment(this._content, 'body', 'small');
+        this.ts = getElementFromFragment(this._content, 'ts', 'small');
+    }
 
-        this.body = getElementFromFragment(this.$fragment, 'body', 'small');
-        this.ts = getElementFromFragment(this.$fragment, 'ts', 'small');
+    mount(parent) {
+        parent.append(this);
+    }
+
+    connectedCallback() {
+        this.appendChild(this._content);
     }
 }
+window.customElements.define('adventuring-message', AdventuringMessageElement);

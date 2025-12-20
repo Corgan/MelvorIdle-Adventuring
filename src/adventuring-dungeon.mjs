@@ -7,7 +7,7 @@ const { AdventuringWeightedTable } = await loadModule('src/adventuring-utils.mjs
 const { AdventuringCard } = await loadModule('src/adventuring-card.mjs');
 const { AdventuringDungeonFloor } = await loadModule('src/adventuring-dungeon-floor.mjs');
 
-const { AdventuringDungeonUIComponent } = await loadModule('src/components/adventuring-dungeon.mjs');
+const { AdventuringDungeonElement } = await loadModule('src/components/adventuring-dungeon.mjs');
 
 export class AdventuringDungeon extends AdventuringPage {
     constructor(manager, game) {
@@ -16,7 +16,7 @@ export class AdventuringDungeon extends AdventuringPage {
         this.game = game;
         this.progress = 0;
 
-        this.component = new AdventuringDungeonUIComponent(this.manager, this.game, this);
+        this.component = createElement('adventuring-dungeon');
 
         this.floor = new AdventuringDungeonFloor(this.manager, this.game, this);
 

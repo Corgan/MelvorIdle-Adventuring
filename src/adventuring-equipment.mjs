@@ -2,7 +2,7 @@ const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringStats } = await loadModule('src/adventuring-stats.mjs');
 const { AdventuringEquipmentSlot } = await loadModule('src/adventuring-equipment-slot.mjs');
-const { AdventuringEquipmentUIComponent } = await loadModule('src/components/adventuring-equipment.mjs');
+const { AdventuringEquipmentElement } = await loadModule('src/components/adventuring-equipment.mjs');
 
 export class AdventuringEquipment {
     constructor(manager, game, character) {
@@ -10,7 +10,7 @@ export class AdventuringEquipment {
         this.manager = manager;
         this.character = character;
         
-        this.component = new AdventuringEquipmentUIComponent(this.manager, this.game, this);
+        this.component = createElement('adventuring-equipment');
 
         this.locked = false;
         this.slots = new Map();

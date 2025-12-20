@@ -2,14 +2,14 @@ const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringPage } = await loadModule('src/adventuring-page.mjs');
 
-const { AdventuringBestiaryUIComponent } = await loadModule('src/components/adventuring-bestiary.mjs');
+const { AdventuringBestiaryElement } = await loadModule('src/components/adventuring-bestiary.mjs');
 
 export class AdventuringBestiary extends AdventuringPage {
     constructor(manager, game) {
         super(manager, game);
         this.manager = manager;
         this.game = game;
-        this.component = new AdventuringBestiaryUIComponent(this.manager, this.game, this);
+        this.component = createElement('adventuring-bestiary');
         this.seen = new Map();
 
         this.monsters = [];

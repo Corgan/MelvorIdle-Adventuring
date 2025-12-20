@@ -1,18 +1,37 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { AdventuringUIComponent } = await loadModule('src/components/adventuring-ui-component.mjs');
+export class AdventuringJobSmallElement extends HTMLElement {
+    constructor() {
+        super();
+        this._content = new DocumentFragment();
+        this._content.append(getTemplateNode('adventuring-job-small-template'));
 
-export class AdventuringJobSmallUIComponent extends AdventuringUIComponent {
-    constructor(manager, game) {
-        super(manager, game, 'adventuring-job-small-component');
+        this.styling = getElementFromFragment(this._content, 'styling', 'div');
+        this.icon = getElementFromFragment(this._content, 'icon', 'img');
+    }
 
-        this.styling = getElementFromFragment(this.$fragment, 'styling', 'div');
-        this.icon = getElementFromFragment(this.$fragment, 'icon', 'img');
+    mount(parent) {
+        parent.append(this);
+    }
+
+    connectedCallback() {
+        this.appendChild(this._content);
         this.tooltip = tippy(this.styling, {
             content: '',
             allowHTML: true,
             hideOnClick: false
         });
+    }
+
+    disconnectedCallback() {
+        if (this.tooltip !== undefined) {
+            this.tooltip.destroy();
+            this.tooltip = undefined;
+        }
+    }
+
+    setSkill(skill) {
+        this.skill = skill;
     }
 
     attachSelector(character, type) {
@@ -29,13 +48,13 @@ export class AdventuringJobSmallUIComponent extends AdventuringUIComponent {
             willOpen: ($el) => {
                 let jobs;
                 if(this.selectorType == 'combatJob') {
-                    jobs = this.manager.jobs.allObjects.filter(job => job.unlocked && (job.id == "adventuring:none" || !job.isPassive));
-                    jobs = jobs.filter(job => this.selectorCharacter.combatJob === job || job.allowMultiple || !this.manager.party.all.map(member => member.combatJob).includes(job));
+                    jobs = this.skill.jobs.allObjects.filter(job => job.unlocked && (job.id == "adventuring:none" || !job.isPassive));
+                    jobs = jobs.filter(job => this.selectorCharacter.combatJob === job || job.allowMultiple || !this.skill.party.all.map(member => member.combatJob).includes(job));
                 }
 
                 if(this.selectorType == 'passiveJob') {
-                    jobs = this.manager.jobs.allObjects.filter(job => job.unlocked && (job.id == "adventuring:none" || job.isPassive));
-                    jobs = jobs.filter(job => this.selectorCharacter.passiveJob === job || job.allowMultiple || !this.manager.party.all.map(member => member.passiveJob).includes(job));
+                    jobs = this.skill.jobs.allObjects.filter(job => job.unlocked && (job.id == "adventuring:none" || job.isPassive));
+                    jobs = jobs.filter(job => this.selectorCharacter.passiveJob === job || job.allowMultiple || !this.skill.party.all.map(member => member.passiveJob).includes(job));
                 }
 
                 
@@ -52,3 +71,4 @@ export class AdventuringJobSmallUIComponent extends AdventuringUIComponent {
         });
     }
 }
+window.customElements.define('adventuring-job-small', AdventuringJobSmallElement);

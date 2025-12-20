@@ -1,6 +1,6 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { AdventuringWorkOrderUIComponent } = await loadModule('src/components/adventuring-work-order.mjs');
+const { AdventuringWorkOrderElement } = await loadModule('src/components/adventuring-work-order.mjs');
 
 class AdventuringWorkOrderRenderQueue {
     constructor() {
@@ -14,7 +14,7 @@ export class AdventuringWorkOrder {
         this.game = game;
         this.workshop = workshop;
 
-        this.component = new AdventuringWorkOrderUIComponent(this.manager, this.game, this);
+        this.component = createElement('adventuring-work-order');
 
         this.renderQueue = new AdventuringWorkOrderRenderQueue();
 

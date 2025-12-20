@@ -1,24 +1,29 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { AdventuringUIComponent } = await loadModule('src/components/adventuring-ui-component.mjs');
+export class AdventuringAbilityElement extends HTMLElement {
+    constructor() {
+        super();
+        this._content = new DocumentFragment();
+        this._content.append(getTemplateNode('adventuring-ability-template'));
 
-export class AdventuringAbilityUIComponent extends AdventuringUIComponent {
-    constructor(manager, game, refObj) {
-        super(manager, game, 'adventuring-ability-component');
+        this.styling = getElementFromFragment(this._content, 'styling', 'div');
+        this.nameText = getElementFromFragment(this._content, 'name', 'small');
+        this.description = getElementFromFragment(this._content, 'description', 'small');
+    }
 
-        this.refObj = refObj;
+    connectedCallback() {
+        this.appendChild(this._content);
+    }
 
-        this.styling = getElementFromFragment(this.$fragment, 'styling', 'div');
-        this.name = getElementFromFragment(this.$fragment, 'name', 'small');
-        this.description = getElementFromFragment(this.$fragment, 'description', 'small');
-
+    setAbility(ability) {
+        this.ability = ability;
         this.styling.onclick = () => {
             if(this.selectorCharacter !== undefined && this.selectorType !== undefined) {
                 if(this.selectorType == 'generator') {
-                    this.selectorCharacter.setGenerator(this.refObj);
+                    this.selectorCharacter.setGenerator(this.ability);
                 }
                 if(this.selectorType == 'spender') {
-                    this.selectorCharacter.setSpender(this.refObj);
+                    this.selectorCharacter.setSpender(this.ability);
                 }
 
                 this.selectorCharacter = undefined;
@@ -32,4 +37,9 @@ export class AdventuringAbilityUIComponent extends AdventuringUIComponent {
         this.selectorCharacter = character;
         this.selectorType = type;
     }
+
+    mount(parent) {
+        parent.appendChild(this);
+    }
 }
+window.customElements.define('adventuring-ability', AdventuringAbilityElement);

@@ -3,7 +3,7 @@ const { loadModule } = mod.getContext(import.meta);
 const { AdventuringPage } = await loadModule('src/adventuring-page.mjs');
 const { AdventuringStats } = await loadModule('src/adventuring-stats.mjs');
 
-const { AdventuringJobDetailsUIComponent } = await loadModule('src/components/adventuring-job-details.mjs');
+const { AdventuringJobDetailsElement } = await loadModule('src/components/adventuring-job-details.mjs');
 
 class AdventuringJobDetailsRenderQueue {
     constructor() {
@@ -20,7 +20,7 @@ export class AdventuringJobDetails extends AdventuringPage {
         super(manager, game);
         this.manager = manager;
         this.game = game;
-        this.component = new AdventuringJobDetailsUIComponent(this.manager, this.game, this);
+        this.component = createElement('adventuring-job-details');
 
         this.scaling = new AdventuringStats(this.manager, this.game);
         this.scaling.component.mount(this.component.scaling);

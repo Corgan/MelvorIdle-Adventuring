@@ -1,10 +1,28 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { AdventuringUIComponent } = await loadModule('src/components/adventuring-ui-component.mjs');
+export class AdventuringJobsElement extends HTMLElement {
+    constructor() {
+        super();
+        this._content = new DocumentFragment();
+        this._content.append(getTemplateNode('adventuring-jobs-template'));
 
-export class AdventuringJobsUIComponent extends AdventuringUIComponent {
-    constructor(manager, game) {
-        super(manager, game, 'adventuring-jobs-component');
-        this.container = getElementFromFragment(this.$fragment, 'container', 'div');
+        this.container = getElementFromFragment(this._content, 'container', 'div');
+    }
+
+    mount(parent) {
+        parent.append(this);
+    }
+
+    connectedCallback() {
+        this.appendChild(this._content);
+    }
+
+    show() {
+        showElement(this);
+    }
+
+    hide() {
+        hideElement(this);
     }
 }
+window.customElements.define('adventuring-jobs', AdventuringJobsElement);

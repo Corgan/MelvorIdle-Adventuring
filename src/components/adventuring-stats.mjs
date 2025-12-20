@@ -1,25 +1,37 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { AdventuringUIComponent } = await loadModule('src/components/adventuring-ui-component.mjs');
-const { AdventuringStatUIComponent } = await loadModule('src/components/adventuring-stat.mjs');
+const { AdventuringStatElement } = await loadModule('src/components/adventuring-stat.mjs');
 
-export class AdventuringStatsUIComponent extends AdventuringUIComponent {
-    constructor(manager, game) {
-        super(manager, game, 'adventuring-stats-component');
+export class AdventuringStatsElement extends HTMLElement {
+    constructor() {
+        super();
+        this._content = new DocumentFragment();
+        this._content.append(getTemplateNode('adventuring-stats-template'));
 
-        this.stats = getElementFromFragment(this.$fragment, 'stats', 'div');
-
+        this.stats = getElementFromFragment(this._content, 'stats', 'div');
         this.statsMap = new Map();
+    }
+
+    mount(parent) {
+        parent.append(this);
+    }
+
+    connectedCallback() {
+        this.appendChild(this._content);
+    }
+
+    setSkill(skill) {
+        this.skill = skill;
     }
 
     update(stat, value) {
         if(typeof stat === "string")
-            stat = this.manager.stats.getObjectByID(stat);
+            stat = this.skill.stats.getObjectByID(stat);
         let component = this.statsMap.get(stat);
         if(component === undefined) {
-            component = new AdventuringStatUIComponent(this.manager, this.game, this);
+            component = createElement('adventuring-stat');
             component.icon.src = stat.media;
-            component.mount(this.stats);
+            this.stats.appendChild(component);
             this.statsMap.set(stat, component);
         }
         if(value !== 0 || stat.base !== undefined) {
@@ -34,10 +46,11 @@ export class AdventuringStatsUIComponent extends AdventuringUIComponent {
 
     delete(stat) {
         if(typeof stat === "string")
-            stat = this.manager.stats.getObjectByID(stat);
+            stat = this.skill.stats.getObjectByID(stat);
         let component = this.statsMap.get(stat);
         if(component !== undefined) {
             component.hide();
         }
     }
 }
+window.customElements.define('adventuring-stats', AdventuringStatsElement);

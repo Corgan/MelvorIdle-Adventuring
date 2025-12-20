@@ -1,18 +1,37 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { AdventuringUIComponent } = await loadModule('src/components/adventuring-ui-component.mjs');
+export class AdventuringAbilitySmallElement extends HTMLElement {
+    constructor() {
+        super();
+        this._content = new DocumentFragment();
+        this._content.append(getTemplateNode('adventuring-ability-small-template'));
 
-export class AdventuringAbilitySmallUIComponent extends AdventuringUIComponent {
-    constructor(manager, game) {
-        super(manager, game, 'adventuring-ability-small-component');
+        this.styling = getElementFromFragment(this._content, 'styling', 'div');
+        this.name = getElementFromFragment(this._content, 'name', 'small');
+    }
 
-        this.styling = getElementFromFragment(this.$fragment, 'styling', 'div');
-        this.name = getElementFromFragment(this.$fragment, 'name', 'small');
+    mount(parent) {
+        parent.append(this);
+    }
+
+    connectedCallback() {
+        this.appendChild(this._content);
         this.tooltip = tippy(this.styling, {
             content: '',
             allowHTML: true,
             hideOnClick: false
         });
+    }
+
+    disconnectedCallback() {
+        if (this.tooltip !== undefined) {
+            this.tooltip.destroy();
+            this.tooltip = undefined;
+        }
+    }
+
+    setSkill(skill) {
+        this.skill = skill;
     }
 
     attachSelector(character, type) {
@@ -29,9 +48,9 @@ export class AdventuringAbilitySmallUIComponent extends AdventuringUIComponent {
             willOpen: ($el) => {
                 let abilities;
                 if(this.selectorType == 'generator')
-                    abilities = this.manager.generators.allObjects.filter(g => g.canEquip(this.selectorCharacter));
+                    abilities = this.skill.generators.allObjects.filter(g => g.canEquip(this.selectorCharacter));
                 if(this.selectorType == 'spender')
-                    abilities = this.manager.spenders.allObjects.filter(s => s.canEquip(this.selectorCharacter));
+                    abilities = this.skill.spenders.allObjects.filter(s => s.canEquip(this.selectorCharacter));
                 
                 let $root = Swal.getHtmlContainer().firstElementChild;
                 abilities.forEach(ability => {
@@ -49,3 +68,4 @@ export class AdventuringAbilitySmallUIComponent extends AdventuringUIComponent {
         });
     }
 }
+window.customElements.define('adventuring-ability-small', AdventuringAbilitySmallElement);

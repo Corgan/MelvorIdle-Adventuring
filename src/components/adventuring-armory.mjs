@@ -1,21 +1,21 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { AdventuringPageUIComponent } = await loadModule('src/components/adventuring-page.mjs');
+const { AdventuringSubpageElement } = await loadModule('src/components/adventuring-page.mjs');
 
-export class AdventuringArmoryUIComponent extends AdventuringPageUIComponent {
-    constructor(manager, game) {
-        super(manager, game, 'adventuring-armory-component');
-        this.items = getElementFromFragment(this.$fragment, 'items', 'div');
+export class AdventuringArmoryElement extends AdventuringSubpageElement {
+    constructor() {
+        super('adventuring-armory-template');
 
-
-        this.back = getElementFromFragment(this.$fragment, 'back', 'button');
+        this.items = getElementFromFragment(this._content, 'items', 'div');
+        this.back = getElementFromFragment(this._content, 'back', 'button');
         
-        this.details = getElementFromFragment(this.$fragment, 'details', 'div');
-        this.icon = getElementFromFragment(this.$fragment, 'icon', 'img');
-        this.name = getElementFromFragment(this.$fragment, 'name', 'h5');
-        this.base = getElementFromFragment(this.$fragment, 'base', 'div');
-        this.scaling = getElementFromFragment(this.$fragment, 'scaling', 'div');
-        this.materials = getElementFromFragment(this.$fragment, 'materials', 'div');
-        this.upgradeButton = getElementFromFragment(this.$fragment, 'upgrade-button', 'button');
+        this.details = getElementFromFragment(this._content, 'details', 'div');
+        this.icon = getElementFromFragment(this._content, 'icon', 'img');
+        this.nameText = getElementFromFragment(this._content, 'name', 'h5');
+        this.base = getElementFromFragment(this._content, 'base', 'div');
+        this.scaling = getElementFromFragment(this._content, 'scaling', 'div');
+        this.materials = getElementFromFragment(this._content, 'materials', 'div');
+        this.upgradeButton = getElementFromFragment(this._content, 'upgrade-button', 'button');
     }
 }
+window.customElements.define('adventuring-armory', AdventuringArmoryElement);
