@@ -120,7 +120,7 @@ export class AdventuringAuras {
 
         let auras = [...this.auras.values()].filter(aura => aura.base !== undefined && aura.stacks > 0).sort((a,b) => b.stacks - a.stacks);
 
-        this.component.auras.replaceChildren(...auras.map(aura => aura.component.$elements).flat());
+        this.component.auras.replaceChildren(...auras.map(aura => aura.component));
 
         this.renderQueue.auras = false;
     }

@@ -108,8 +108,8 @@ export class AdventuringJobDetails extends AdventuringPage {
                 ability.renderQueue.description = true;
                 ability.renderQueue.name = true;
                 ability.render();
-                return ability.details.$elements;
-            }).flat());
+                return ability.details;
+            }));
         }
 
         this.renderQueue.generators = false;
@@ -129,8 +129,8 @@ export class AdventuringJobDetails extends AdventuringPage {
                 ability.renderQueue.description = true;
                 ability.renderQueue.name = true;
                 ability.render();
-                return ability.details.$elements;
-            }).flat());
+                return ability.details;
+            }));
         }
 
         this.renderQueue.spenders = false;

@@ -315,9 +315,9 @@ export class AdventuringDungeonFloor {
 
         this.component.floor.replaceChildren(...cells.map(cell => {
             if(cell.component !== undefined)
-               return cell.component.$elements;
+               return cell.component;
             return cell;
-        }).flat());
+        }));
 
         this.renderQueue.cells = false;
     }

@@ -7,7 +7,7 @@ export class AdventuringAbilitySmallElement extends HTMLElement {
         this._content.append(getTemplateNode('adventuring-ability-small-template'));
 
         this.styling = getElementFromFragment(this._content, 'styling', 'div');
-        this.name = getElementFromFragment(this._content, 'name', 'small');
+        this.nameText = getElementFromFragment(this._content, 'name', 'small');
     }
 
     mount(parent) {

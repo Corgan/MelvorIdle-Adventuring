@@ -41,7 +41,7 @@ export class AdventuringMessageLog {
         if(!this.renderQueue.messages)
             return;
 
-        let scroll = this.component.$elements[0].parentElement;
+        let scroll = this.component.parentElement;
 
         let atBottom = scroll.clientHeight + scroll.scrollTop + 5 >= scroll.scrollHeight;
         let oldScrollHeight = scroll.scrollHeight;
@@ -49,7 +49,7 @@ export class AdventuringMessageLog {
 
         this.messages.forEach(message => message.render());
 
-        this.component.messages.replaceChildren(...this.messages.map(message => message.component.$elements).flat());
+        this.component.messages.replaceChildren(...this.messages.map(message => message.component));
 
         if(atBottom) {
             let scrollToHeight = scroll.scrollHeight - scroll.clientHeight;

@@ -225,7 +225,7 @@ export class AdventuringHero extends AdventuringCharacter {
         if(!this.renderQueue.generator)
             return;
 
-        this.component.generator.name.textContent = this.generator.name;
+        this.component.generator.nameText.textContent = this.generator.name;
         this.component.generator.tooltip.setContent(this.generator.getDescription(this.stats));
         this.component.generator.styling.classList.toggle('pointer-enabled', !this.locked);
         this.component.generator.styling.classList.toggle('bg-combat-inner-dark', this.locked);
@@ -238,7 +238,7 @@ export class AdventuringHero extends AdventuringCharacter {
         if(!this.renderQueue.spender)
             return;
 
-        this.component.spender.name.textContent = this.spender.name;
+        this.component.spender.nameText.textContent = this.spender.name;
         this.component.spender.tooltip.setContent(this.spender.getDescription(this.stats));
         this.component.spender.styling.classList.toggle('pointer-enabled', !this.locked);
         this.component.spender.styling.classList.toggle('bg-combat-inner-dark', this.locked);

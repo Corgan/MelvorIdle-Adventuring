@@ -375,7 +375,7 @@ class AdventuringCharacter {
         if(!this.renderQueue.generator)
             return;
 
-        this.component.generator.name.textContent = this.generator.name;
+        this.component.generator.nameText.textContent = this.generator.name;
         this.component.generator.tooltip.setContent(this.generator.getDescription(this.stats));
         this.component.generator.styling.classList.toggle('bg-combat-menu-selected', this.generator === this.action && this.highlight);
 
@@ -386,7 +386,7 @@ class AdventuringCharacter {
         if(!this.renderQueue.spender)
             return;
 
-        this.component.spender.name.textContent = this.spender.name;
+        this.component.spender.nameText.textContent = this.spender.name;
         this.component.spender.tooltip.setContent(this.spender.getDescription(this.stats));
         this.component.spender.styling.classList.toggle('bg-combat-menu-selected', this.spender === this.action && this.highlight);
 

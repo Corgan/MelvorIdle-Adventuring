@@ -32,7 +32,7 @@ export class AdventuringCards {
         this.cards = [...this.renderQueue.cards];
         this.cards.forEach(card => card.render());
 
-        this.component.cards.replaceChildren(...this.cards.map(card => card.component.$elements).flat());
+        this.component.cards.replaceChildren(...this.cards.map(card => card.component));
 
         this.renderQueue.cards.clear();
         this.renderQueue.update = false;
