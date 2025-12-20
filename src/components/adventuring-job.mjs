@@ -1,5 +1,3 @@
-const { loadModule } = mod.getContext(import.meta);
-
 export class AdventuringJobElement extends HTMLElement {
     constructor() {
         super();
