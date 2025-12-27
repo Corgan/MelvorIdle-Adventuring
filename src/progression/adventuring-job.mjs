@@ -1,0 +1,305 @@
+const { loadModule } = mod.getContext(import.meta);
+
+const { AdventuringStats } = await loadModule('src/core/adventuring-stats.mjs');
+const { AdventuringJobElement } = await loadModule('src/progression/components/adventuring-job.mjs');
+const { AdventuringJobSummaryElement } = await loadModule('src/progression/components/adventuring-job-summary.mjs');
+const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
+const { addMasteryXPWithBonus, RequirementsChecker } = await loadModule('src/core/adventuring-utils.mjs');
+
+class AdventuringJobRenderQueue {
+    constructor(){
+        this.name = false;
+        this.tooltip = false;
+        this.icon = false;
+        this.clickable = false;
+        this.mastery = false;
+    }
+}
+
+export class AdventuringJob extends MasteryAction {
+    constructor(namespace, data, manager, game) {
+        super(namespace, data, game);
+        this.manager = manager;
+        this.game = game;
+
+        this.component = createElement('adventuring-job');
+        this.summary = createElement('adventuring-job-summary');
+        this.summary.setJob(this);
+        this.renderQueue = new AdventuringJobRenderQueue();
+
+        this._name = data.name;
+
+        this._media = data.media;
+
+        this.requirements = data.requirements || [];
+        this._scaling = data.scaling;
+        this.scaling = new AdventuringStats(this.manager, this.game);
+        
+        this.stats = new AdventuringStats(this.manager, this.game);
+
+        this.isPassive = data.isPassive === true;
+        
+        // Job tier (0-5+ for combat jobs, used for categorization)
+        // If not specified, defaults to 0 for passive jobs, or detected by requirements
+        this.tier = data.tier ?? (this.isPassive ? 0 : this.detectTierFromRequirements(data.requirements));
+
+        if(data.allowedItems !== undefined)
+            this._allowedItems = data.allowedItems;
+        
+        this.isMilestoneReward = data.isMilestoneReward !== undefined && data.isMilestoneReward;
+        this.alwaysMultiple = data.alwaysMultiple !== undefined && data.alwaysMultiple;
+
+        this.component.clickable.onclick = () => {
+            if(this.unlocked)
+                this.viewDetails();
+        }
+        
+        // Mastery effects cache - rebuilt on level up
+        this._masteryEffectsCache = null;
+        this._masteryCacheLevel = -1;
+    }
+
+    /**
+     * Get the mastery category for jobs
+     */
+    get masteryCategory() {
+        return this.manager.masteryCategories.getObjectByID('adventuring:jobs');
+    }
+
+    /**
+     * Get cached mastery effects for this job's current level.
+     * Rebuilds cache if level changed.
+     */
+    get masteryEffects() {
+        const currentLevel = this.level;
+        if (this._masteryEffectsCache === null || this._masteryCacheLevel !== currentLevel) {
+            this._rebuildMasteryCache();
+        }
+        return this._masteryEffectsCache;
+    }
+
+    /**
+     * Rebuild the mastery effects cache from the category milestones
+     */
+    _rebuildMasteryCache() {
+        const category = this.masteryCategory;
+        this._masteryCacheLevel = this.level;
+        this._masteryEffectsCache = category ? category.getEffectsAtLevel(this.level) : [];
+    }
+
+    /**
+     * Invalidate mastery cache (called on level up)
+     */
+    invalidateMasteryCache() {
+        this._masteryEffectsCache = null;
+        this._masteryCacheLevel = -1;
+    }
+
+    /**
+     * Check if this job has a specific mastery effect type
+     * @param {string} effectType - The effect type to check for
+     * @returns {boolean}
+     */
+    hasMasteryEffect(effectType) {
+        return this.masteryEffects.some(e => e.type === effectType);
+    }
+
+    /**
+     * Get the total value of a specific mastery effect type
+     * @param {string} effectType - The effect type to sum
+     * @returns {number}
+     */
+    getMasteryEffectValue(effectType) {
+        return this.masteryEffects
+            .filter(e => e.type === effectType)
+            .reduce((sum, e) => sum + (e.value || 0), 0);
+    }
+
+    get name() {
+        return this.unlocked ? this._name : "???";
+    }
+
+    get media() {
+        return this.unlocked ? this.getMediaURL(this._media) : this.getMediaURL('melvor:assets/media/main/question.png');
+    }
+
+    get level() {
+        return this.manager.getMasteryLevel(this);
+    }
+
+    get unlocked() {
+        return this._reqChecker?.check() ?? true;
+    }
+
+    /**
+     * Detect job tier based on requirements when not explicitly specified
+     * Tier 0: No job requirements
+     * Tier 1: Requires 1 job at low level
+     * Tier 2: Requires 2+ jobs or 1 job at high level
+     * Tier 3+: Requires tier 2+ jobs (detected later)
+     */
+    detectTierFromRequirements(requirements) {
+        if(!requirements || requirements.length === 0) return 0;
+        
+        const jobReqs = requirements.filter(r => r.type === 'job_level');
+        if(jobReqs.length === 0) return 0;
+        if(jobReqs.length === 1 && (jobReqs[0].level || 0) <= 25) return 1;
+        if(jobReqs.length >= 2 || (jobReqs[0].level || 0) > 25) return 2;
+        return 1;
+    }
+
+    get category() {
+        return this.manager.categories.getObjectByID('adventuring:Jobs');
+    }
+
+    get tooltip() {
+        const tooltip = TooltipBuilder.create()
+            .header(this.name, this.media);
+
+        if(this.unlocked && this.isMilestoneReward) {
+            tooltip.masteryProgressFor(this.manager, this);
+            
+            tooltip.stats(this.stats);
+            
+            // Next milestone
+            tooltip.nextMilestone(this.manager, this);
+        } else if(!this.unlocked) {
+            // Show unlock requirements for locked jobs
+            tooltip.unlockRequirements(this.requirements, this.manager);
+        }
+        
+        return tooltip.build();
+    }
+
+    get allowMultiple() {
+        return this.alwaysMultiple || this.hasMasteryEffect('unlock_multi_job_assignment');
+    }
+
+    onLoad() {
+        this.renderQueue.name = true;
+        this.renderQueue.tooltip = true;
+        this.renderQueue.icon = true;
+        this.renderQueue.clickable = true;
+        this.renderQueue.mastery = true;
+    }
+    
+    calculateStats() {
+        this.stats.reset();
+        
+        // Get stat bonus from modifier system (includes Melvor mastery + other sources)
+        const statBonus = this.manager.modifiers.getJobStatBonus(this);
+        
+        this.scaling.forEach((value, stat) => {
+            const baseValue = Math.floor(this.level * value);
+            this.stats.set(stat, Math.floor(baseValue * (1 + statBonus)));
+        });
+    }
+
+    postDataRegistration() {
+        this._reqChecker = new RequirementsChecker(this.manager, this.requirements);
+        
+        if(this._scaling !== undefined) {
+            this._scaling.forEach(({ id, value }) => {
+                this.scaling.set(id, value);
+            });
+            delete this._scaling;
+        }
+        if(this._allowedItems !== undefined) {
+            this.allowedItems = [];
+            this._allowedItems.forEach(_type => {
+                let type = this.manager.itemTypes.getObjectByID(_type);
+                this.allowedItems.push(type);
+            });
+            delete this._allowedItems;
+        }
+    }
+
+    addXP(xp) {
+        addMasteryXPWithBonus(this.manager, this, xp);
+        this.manager.party.all.forEach(member => (member.renderQueue.jobs = true));
+    }
+
+    viewDetails() {
+        this.manager.jobdetails.setJob(this);
+        this.manager.jobdetails.render();
+        this.manager.jobdetails.go();
+    }
+
+    render() {
+        this.renderName();
+        this.renderTooltip();
+        this.renderIcon();
+        this.renderClickable();
+        this.renderMastery();
+    }
+
+    renderName() {
+        if(!this.renderQueue.name)
+            return;
+
+        if(this.unlocked) {
+            this.component.nameText.textContent = this.name;
+            this.summary.nameText.textContent = this.name;
+            this.component.level.textContent = ` (${this.level})`;
+            this.summary.level.textContent = ` (${this.level})`;
+        } else {
+            this.component.nameText.textContent = "???";
+            this.component.level.textContent = "";
+            this.summary.level.textContent = "";
+        }
+
+        this.renderQueue.name = false;
+    }
+
+    renderTooltip() {
+        if(!this.renderQueue.tooltip)
+            return;
+
+        if(this.component.tooltip === undefined)
+            return;
+
+        this.component.tooltip.setContent(this.tooltip);
+
+        this.renderQueue.tooltip = false;
+    }
+
+    renderIcon() {
+        if(!this.renderQueue.icon)
+            return;
+
+        if(this.unlocked) {
+            this.component.icon.src = this.media;
+            this.summary.icon.src = this.media;
+        } else {
+            this.component.icon.src = this.getMediaURL('melvor:assets/media/main/question.png');
+        }
+
+        this.renderQueue.icon = false;
+    }
+
+    renderClickable() {
+        if(!this.renderQueue.clickable)
+            return;
+
+        this.component.clickable.classList.toggle('pointer-enabled', this.unlocked);
+
+        this.renderQueue.clickable = false;
+    }
+
+    renderMastery() {
+        if(!this.renderQueue.mastery)
+            return;
+
+        let { xp, level, percent } = this.manager.getMasteryProgress(this);
+
+        if(this.id !== 'adventuring:none') {
+            if(this.unlocked) {
+                this.component.masteryProgress.setFixedPosition(percent);
+            } else {
+                this.component.masteryProgress.setFixedPosition(0);
+            }
+        }
+
+        this.renderQueue.mastery = false;
+    }
+}

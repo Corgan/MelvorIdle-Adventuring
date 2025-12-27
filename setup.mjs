@@ -42,7 +42,7 @@ export async function setup({ gameData, patch, loadTemplates, loadModule, loadSt
     sidebar.category('Party', { before: 'Combat' });
   
     console.log("Loading Adventuring Module");
-    const { Adventuring } = await loadModule('src/adventuring.mjs');
+    const { Adventuring } = await loadModule('src/core/adventuring.mjs');
 
     console.log("Registering Adventuring Skill");
     game.adventuring = game.registerSkill(game.registeredNamespaces.getNamespace('adventuring'), Adventuring);
@@ -314,7 +314,7 @@ export async function setup({ gameData, patch, loadTemplates, loadModule, loadSt
         
         // Load and mount the game guide
         console.log("[Adventuring] Loading game guide component...");
-        await loadModule('src/components/adventuring-game-guide.mjs');
+        await loadModule('src/ui/components/adventuring-game-guide.mjs');
         const gameGuide = document.createElement('adventuring-game-guide');
         const gameGuideContainer = document.querySelector('#modal-game-guide .block-content.block-content-full');
         console.log("[Adventuring] Game guide container found:", gameGuideContainer);
