@@ -67,7 +67,7 @@ export class Adventuring extends SkillWithMastery {
         super(namespace, 'Adventuring', game);
         this.version = 4;
         this.saveVersion = -1;
-        this._media = 'melvor:assets/media/main/adventure.png';
+        this._media = 'melvor:assets/media/main/adventure.svg';
         this.renderQueue = new AdventuringRenderQueue();
         this.isActive = false;
         this.timersPaused = false; // Used by tutorial system to pause exploration/combat

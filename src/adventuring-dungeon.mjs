@@ -515,7 +515,7 @@ export class AdventuringDungeon extends AdventuringPage {
             const statMult = Math.round(this.getEndlessStatMultiplier() * 100);
             this.floorCards[0].name = `Wave ${this.endlessWave + 1} (${statMult}%)`;
             this.floorCards[0].renderQueue.name = true;
-            this.floorCards[0].icon = cdnMedia('assets/media/main/hardcore.png');
+            this.floorCards[0].icon = cdnMedia('assets/media/main/hardcore.svg');
             this.floorCards[0].renderQueue.icon = true;
             this.floorCards[0].setFade(false);
             this.floorCards[0].setHighlight(true);
@@ -528,7 +528,7 @@ export class AdventuringDungeon extends AdventuringPage {
             const bestStreak = this.area ? this.area.bestEndlessStreak : 0;
             this.floorCards[1].name = `Best: ${bestStreak} waves`;
             this.floorCards[1].renderQueue.name = true;
-            this.floorCards[1].icon = cdnMedia('assets/media/bank/Golden_Star.png');
+            this.floorCards[1].icon = cdnMedia('assets/media/main/mastery_header.svg');
             this.floorCards[1].renderQueue.icon = true;
             this.floorCards[1].setFade(false);
             this.floorCards[1].setHighlight(false);
@@ -545,7 +545,7 @@ export class AdventuringDungeon extends AdventuringPage {
             this.floorCards[i].name = (i+1 === this.numFloors ? 'Boss Floor' : `Floor ${i+1}`);
             this.floorCards[i].renderQueue.name = true;
 
-            this.floorCards[i].icon = (i+1 === this.numFloors ? cdnMedia('assets/media/main/hardcore.png') : cdnMedia('assets/media/skills/combat/combat.png'));
+            this.floorCards[i].icon = (i+1 === this.numFloors ? cdnMedia('assets/media/main/hardcore.svg') : cdnMedia('assets/media/skills/combat/combat.svg'));
             this.floorCards[i].renderQueue.icon = true;
             
             this.floorCards[i].setFade(i < this.progress);

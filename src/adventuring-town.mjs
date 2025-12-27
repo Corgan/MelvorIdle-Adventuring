@@ -27,7 +27,7 @@ export class AdventuringTown extends AdventuringPage {
         if(this.building !== undefined) {
             return this.building.media;
         }
-        return cdnMedia("assets/media/bank/skillcape_township.png");
+        return cdnMedia("assets/media/skills/township/Town_Hall.svg");
     }
 
     get active() {
