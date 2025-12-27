@@ -218,10 +218,10 @@ export class AdventuringArea extends MasteryAction {
     }
 
     /**
-     * Get difficulties unlocked for this area based on mastery level
+     * Get difficulties unlocked for this area based on mastery effects
      */
     getAvailableDifficulties() {
-        return this.getAllDifficulties().filter(d => d.isUnlocked(this.level));
+        return this.getAllDifficulties().filter(d => d.isUnlocked(this));
     }
 
     /**
@@ -271,10 +271,11 @@ export class AdventuringArea extends MasteryAction {
     }
 
     /**
-     * Check if endless mode is unlocked for this dungeon
+     * Check if endless difficulty is unlocked for this dungeon
      */
     get endlessModeUnlocked() {
-        return this.hasMasteryEffect('unlock_mode');
+        const endlessDifficulty = this.manager.difficulties.getObjectByID('adventuring:endless');
+        return endlessDifficulty ? endlessDifficulty.isUnlocked(this) : false;
     }
 
     /**

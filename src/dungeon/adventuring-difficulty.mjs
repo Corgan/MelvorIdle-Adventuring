@@ -105,10 +105,18 @@ export class AdventuringDifficulty extends NamespacedObject {
     }
 
     /**
-     * Check if this difficulty is unlocked for a given area mastery level
+     * Check if this difficulty is unlocked for a given area
+     * Normal difficulty is always unlocked, others require unlock_difficulty mastery effect
+     * @param {AdventuringArea} area - The area to check unlock status for
      */
-    isUnlocked(masteryLevel) {
-        return masteryLevel >= this.unlockLevel;
+    isUnlocked(area) {
+        // Normal difficulty (unlockLevel 0) is always available
+        if (this.unlockLevel === 0) return true;
+        
+        // Check if area has the unlock_difficulty effect for this difficulty
+        return area.masteryEffects.some(e => 
+            e.type === 'unlock_difficulty' && e.difficultyID === this.id
+        );
     }
 
     /**

@@ -64,16 +64,6 @@ export class AdventuringModifiers {
         
         return total;
     }
-    getBonus(effectType, context = {}) {
-        let total = this.effectCache.getBonus(effectType);
-        
-        // Add mastery effects if an action is provided
-        if (context.action && typeof context.action.getMasteryEffectValue === 'function') {
-            total += context.action.getMasteryEffectValue(effectType);
-        }
-        
-        return total;
-    }
 
     // ========================================================================
     // Effect Source Getters

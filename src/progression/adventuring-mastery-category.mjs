@@ -34,6 +34,7 @@ export class AdventuringMasteryCategory extends NamespacedObject {
     /**
      * Get all effects that are active at the given mastery level.
      * For non-scaling effects with the same type, only the highest level milestone applies.
+     * Exception: unlock effects (unlock_difficulty, etc.) accumulate since each unlocks something different.
      * For scaling effects, the value is multiplied by the current level.
      * @param {number} level - Current mastery level
      * @returns {Array} Array of effect objects
@@ -42,6 +43,7 @@ export class AdventuringMasteryCategory extends NamespacedObject {
         // Map to track highest-level effect for each type (non-scaling only)
         const effectsByType = new Map();
         const scalingEffects = [];
+        const accumulatedEffects = []; // Effects that accumulate (unlock_difficulty, etc.)
         
         for (const milestone of this.milestones) {
             if (level >= milestone.level) {
@@ -53,6 +55,9 @@ export class AdventuringMasteryCategory extends NamespacedObject {
                                 ...effect,
                                 value: effect.value * level
                             });
+                        } else if (effect.type === 'unlock_difficulty') {
+                            // Unlock effects accumulate - each unlocks something different
+                            accumulatedEffects.push(effect);
                         } else {
                             // Non-scaling: track by type, keep highest level's effect
                             const existing = effectsByType.get(effect.type);
@@ -68,8 +73,8 @@ export class AdventuringMasteryCategory extends NamespacedObject {
             }
         }
         
-        // Combine: all scaling effects + one per type for non-scaling
-        const results = [...scalingEffects];
+        // Combine: all scaling effects + accumulated unlocks + one per type for non-scaling
+        const results = [...scalingEffects, ...accumulatedEffects];
         for (const entry of effectsByType.values()) {
             results.push(entry.effect);
         }
