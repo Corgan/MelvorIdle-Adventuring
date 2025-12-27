@@ -1,0 +1,363 @@
+{
+    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+    "namespace": "adventuring",
+    "data": {
+        "skillData": [{
+            "skillID": "adventuring:Adventuring",
+            "data": {
+                "jobs": [
+                    {
+                        "id": "nightblade",
+                        "tier": 4,
+                        "name": "Nightblade",
+                        "media": "melvor:assets/media/bank/potion_thieving_i.png#tint=blue",
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:shadowblade", "level": 25 },
+                            { "type": "job_level", "job": "adventuring:reaper", "level": 20 },
+                            { "type": "area_mastery", "area": "adventuring:pirate_cove", "level": 50 }
+                        ],
+                        "isMilestoneReward": true,
+                        "allowedItems": [
+                            "adventuring:cowl",
+                            "adventuring:vest",
+                            "adventuring:chaps",
+                            "adventuring:vambraces",
+                            "adventuring:boots",
+                            "adventuring:amulet",
+                            "adventuring:ring",
+                            "adventuring:cape",
+                            "adventuring:dagger",
+                            "adventuring:wand",
+                            "adventuring:bow"
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:hitpoints", "value": 0.75 },
+                            { "id": "adventuring:defence", "value": 0.25 },
+                            { "id": "adventuring:agility", "value": 3.0 },
+                            { "id": "adventuring:magic", "value": 1.25 }
+                        ]
+                    }
+                ],
+                "generators": [
+                    {
+                        "id": "shadow_assault",
+                        "name": "Shadow Assault",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:nightblade", "level": 1 }
+                        ],
+                        "energy": 30,
+                        "hits": [
+                            {
+                                "target": "back",
+                                "party": "enemy",
+                                "delay": 100,
+                                "repeat": 2,
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 15,
+                                            "scaling": [
+                                                { "id": "adventuring:agility", "value": 0.4 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "venomous_blade",
+                        "name": "Venomous Blade",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:nightblade", "level": 20 }
+                        ],
+                        "energy": 32,
+                        "hits": [
+                            {
+                                "target": "lowest",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 20,
+                                            "scaling": [
+                                                { "id": "adventuring:agility", "value": 0.5 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:poison",
+                                        "stacks": {
+                                            "base": 4,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 0.15 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:marked",
+                                        "stacks": {
+                                            "base": 4,
+                                            "scaling": [
+                                                { "id": "adventuring:agility", "value": 0.15 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "spenders": [
+                    {
+                        "id": "shadow_storm",
+                        "name": "Shadow Storm",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:nightblade", "level": 10 }
+                        ],
+                        "cost": 150,
+                        "hits": [
+                            {
+                                "target": "aoe",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 20,
+                                            "scaling": [
+                                                { "id": "adventuring:agility", "value": 0.55 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:poison",
+                                        "stacks": {
+                                            "base": 3,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 0.1 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "fatal_mark",
+                        "name": "Fatal Mark",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:nightblade", "level": 15 }
+                        ],
+                        "cost": 160,
+                        "hits": [
+                            {
+                                "target": "back",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 50,
+                                            "scaling": [
+                                                { "id": "adventuring:agility", "value": 1.2 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:marked",
+                                        "stacks": {
+                                            "base": 4,
+                                            "scaling": [
+                                                { "id": "adventuring:agility", "value": 0.15 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:vulnerability",
+                                        "stacks": {
+                                            "base": 3,
+                                            "scaling": [
+                                                { "id": "adventuring:agility", "value": 0.1 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "venom_flurry",
+                        "name": "Venom Flurry",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:nightblade", "level": 20 }
+                        ],
+                        "cost": 170,
+                        "hits": [
+                            {
+                                "target": "random",
+                                "party": "enemy",
+                                "delay": 75,
+                                "repeat": 6,
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 15,
+                                            "scaling": [
+                                                { "id": "adventuring:agility", "value": 0.4 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:poison",
+                                        "stacks": {
+                                            "base": 1,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 0.05 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "perfect_stealth",
+                        "name": "Perfect Stealth",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:nightblade", "level": 25 }
+                        ],
+                        "cost": 120,
+                        "hits": [
+                            {
+                                "target": "self",
+                                "party": "ally",
+                                "effects": [
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:invisibility",
+                                        "stacks": {
+                                            "base": 3,
+                                            "scaling": []
+                                        }
+                                    },
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:haste",
+                                        "stacks": {
+                                            "base": 5,
+                                            "scaling": [
+                                                { "id": "adventuring:agility", "value": 0.15 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "death_from_shadows",
+                        "name": "Death from Shadows",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:nightblade", "level": 40 }
+                        ],
+                        "cost": 220,
+                        "hits": [
+                            {
+                                "target": "lowest",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 120,
+                                            "scaling": [
+                                                { "id": "adventuring:agility", "value": 3.5 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "passives": [
+                    {
+                        "id": "phantom_presence",
+                        "name": "Phantom Presence",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:nightblade", "level": 30 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "encounter_start",
+                                "type": "buff",
+                                "target": "self",
+                                "id": "adventuring:invisibility",
+                                "stacks": {
+                                    "base": 2,
+                                    "scaling": []
+                                }
+                            },
+                            {
+                                "trigger": "encounter_start",
+                                "type": "buff",
+                                "target": "self",
+                                "id": "adventuring:haste",
+                                "stacks": {
+                                    "base": 4,
+                                    "scaling": [
+                                        { "id": "adventuring:agility", "value": 0.2 }
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "lethal_instinct",
+                        "name": "Lethal Instinct",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:nightblade", "level": 25 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "encounter_start",
+                                "type": "buff",
+                                "target": "self",
+                                "id": "adventuring:might",
+                                "stacks": {
+                                    "base": 4,
+                                    "scaling": [
+                                        { "id": "adventuring:agility", "value": 0.2 }
+                                    ]
+                                }
+                            },
+                            {
+                                "trigger": "encounter_start",
+                                "type": "debuff",
+                                "target": "lowest",
+                                "party": "enemy",
+                                "id": "adventuring:marked",
+                                "stacks": {
+                                    "base": 5,
+                                    "scaling": [
+                                        { "id": "adventuring:agility", "value": 0.25 }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        }]
+    }
+}

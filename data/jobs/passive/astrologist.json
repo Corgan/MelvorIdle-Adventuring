@@ -9,14 +9,14 @@
                     {
                         "id": "astrology",
                         "name": "Astrology",
-                        "media": "melvor:assets/media/skills/astrology/astrology.svg"
+                        "media": "melvor:assets/media/bank/potion_astrology_i.png"
                     }
                 ],
                 "jobs": [
                     {
                         "id": "astrologist",
                         "name": "Astrologist",
-                        "media": "melvor:assets/media/skills/astrology/astrology.svg",
+                        "media": "melvor:assets/media/bank/potion_astrology_i.png",
                         "requirements": [
                             { "type": "skill_level", "level": 5 }
                         ],
@@ -28,18 +28,254 @@
                     }
                 ],
                 "materials": [
-
+                    {
+                        "id": "crude_stardust",
+                        "name": "Crude Stardust",
+                        "media": "melvor:assets/media/bank/potion_astrology_i.png",
+                        "category": "adventuring:salvage"
+                    },
+                    {
+                        "id": "refined_stardust",
+                        "name": "Refined Stardust",
+                        "media": "melvor:assets/media/bank/stardust.png",
+                        "tier": 2,
+                        "category": "adventuring:salvage",
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:master_astrologist", "level": 1 }
+                        ]
+                    },
+                    {
+                        "id": "immaculate_stardust",
+                        "name": "Immaculate Stardust",
+                        "media": "melvor:assets/media/bank/golden_stardust.png",
+                        "tier": 3,
+                        "category": "adventuring:salvage",
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:grandmaster_astrologist", "level": 1 }
+                        ]
+                    },
+                    {
+                        "id": "transcendent_stardust",
+                        "name": "Transcendent Stardust",
+                        "media": "melvor:assets/media/bank/logs_elderwood.png",
+                        "tier": 4,
+                        "category": "adventuring:salvage",
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:legendary_astrologist", "level": 1 }
+                        ]
+                    }
                 ],
                 "buildings": [
-
+                    {
+                        "id": "observatory",
+                        "type": "workshop",
+                        "name": "Observatory",
+                        "description": "Study the stars and gather celestial materials. Astrologists craft blessings and wards from stardust.",
+                        "media": "melvor:assets/media/skills/township/Academy.png",
+                        "requirements": [],
+                        "idle": ["Stargazing", "Charting constellations"],
+                        "actions": ["adventuring:work"],
+                        "products": [
+                            "adventuring:stardust",
+                            "adventuring:golden_stardust",
+                            "adventuring:starlight_blessing",
+                            "adventuring:celestial_ward"
+                        ]
+                    }
                 ],
                 "products": [
-                    
+                    {
+                        "id": "stardust",
+                        "item": "melvorF:Stardust",
+                        "outputType": "item",
+                        "count": 5,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:astrologist" },
+                            { "type": "job_level", "job": "adventuring:astrologist", "level": 1 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_stardust", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "golden_stardust",
+                        "item": "melvorF:Golden_Stardust",
+                        "outputType": "item",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:astrologist" },
+                            { "type": "job_level", "job": "adventuring:astrologist", "level": 30 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_stardust", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "starlight_blessing",
+                        "consumable": "adventuring:starlight_blessing",
+                        "outputType": "consumable",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:astrologist" },
+                            { "type": "job_level", "job": "adventuring:astrologist", "level": 15 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_stardust", "count": 3 }
+                        ]
+                    },
+                    {
+                        "id": "celestial_ward",
+                        "consumable": "adventuring:celestial_ward",
+                        "outputType": "consumable",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:astrologist" },
+                            { "type": "job_level", "job": "adventuring:astrologist", "level": 20 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_stardust", "count": 2 }
+                        ]
+                    },
+                    {
+                        "id": "convert_crude_stardust_to_refined",
+                        "material": "adventuring:refined_stardust",
+                        "outputType": "material",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:master_astrologist", "level": 10 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_stardust", "count": 5 }
+                        ]
+                    },
+                    {
+                        "id": "convert_refined_stardust_to_immaculate",
+                        "material": "adventuring:immaculate_stardust",
+                        "outputType": "material",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:grandmaster_astrologist", "level": 10 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:refined_stardust", "count": 5 }
+                        ]
+                    },
+                    {
+                        "id": "convert_immaculate_stardust_to_transcendent",
+                        "material": "adventuring:transcendent_stardust",
+                        "outputType": "material",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:legendary_astrologist", "level": 10 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:immaculate_stardust", "count": 5 }
+                        ]
+                    },
+                    {
+                        "id": "refined_stardust",
+                        "item": "melvorF:Stardust",
+                        "outputType": "item",
+                        "count": 30,
+                        "requirements": [
+                            { "type": "skill_level", "level": 25 },
+                            { "type": "current_job", "job": "adventuring:master_astrologist" },
+                            { "type": "job_level", "job": "adventuring:master_astrologist", "level": 1 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:refined_stardust", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "refined_golden_stardust",
+                        "item": "melvorF:Golden_Stardust",
+                        "outputType": "item",
+                        "count": 3,
+                        "requirements": [
+                            { "type": "skill_level", "level": 25 },
+                            { "type": "current_job", "job": "adventuring:master_astrologist" },
+                            { "type": "job_level", "job": "adventuring:master_astrologist", "level": 30 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:refined_stardust", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "immaculate_golden_stardust",
+                        "item": "melvorF:Golden_Stardust",
+                        "outputType": "item",
+                        "count": 8,
+                        "requirements": [
+                            { "type": "skill_level", "level": 50 },
+                            { "type": "current_job", "job": "adventuring:grandmaster_astrologist" },
+                            { "type": "job_level", "job": "adventuring:grandmaster_astrologist", "level": 1 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:immaculate_stardust", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "transcendent_golden_stardust",
+                        "item": "melvorF:Golden_Stardust",
+                        "outputType": "item",
+                        "count": 20,
+                        "requirements": [
+                            { "type": "skill_level", "level": 75 },
+                            { "type": "current_job", "job": "adventuring:legendary_astrologist" },
+                            { "type": "job_level", "job": "adventuring:legendary_astrologist", "level": 1 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:transcendent_stardust", "count": 1 }
+                        ]
+                    }
                 ],
                 "tiles": [
-                    
+                    {
+                        "id": "fallen_star",
+                        "name": "Fallen Star",
+                        "media": "melvor:assets/media/bank/potion_astrology_i.png",
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:astrologist" }
+                        ],
+                        "weight": 10,
+                        "floor_max": 1,
+                        "dungeon_max": 1,
+                        "effects": [
+                            { "type": "xp", "amount": 30, "job": "adventuring:astrologist" },
+                            {
+                                "type": "loot",
+                                "pool": [
+                                    { "id": "adventuring:crude_stardust", "qty": 1, "weight": 100 }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "celestial_observatory",
+                        "name": "Celestial Observatory",
+                        "media": "melvor:assets/media/bank/potion_astrology_i.png",
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:master_astrologist", "level": 1 }
+                        ],
+                        "weight": 8,
+                        "floor_max": 1,
+                        "dungeon_max": 2,
+                        "effects": [
+                            { "type": "xp", "amount": 100, "job": "adventuring:astrologist" },
+                            { "type": "xp", "amount": 50, "job": "adventuring:master_astrologist" },
+                            {
+                                "type": "loot",
+                                "pool": [
+                                    { "id": "adventuring:crude_stardust", "qty": 3, "weight": 60 },
+                                    { "id": "adventuring:refined_stardust", "qty": 2, "weight": 35 },
+                                    { "id": "adventuring:immaculate_stardust", "qty": 1, "weight": 5 }
+                                ]
+                            }
+                        ]
+                    }
                 ]
             }
         }]
     }
 }
+

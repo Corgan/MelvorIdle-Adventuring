@@ -9,8 +9,9 @@ export class AdventuringWorkOrderElement extends HTMLElement {
         this.inactive = getElementFromFragment(this._content, 'inactive', 'div');
         this.icon = getElementFromFragment(this._content, 'icon', 'img');
         this.nameText = getElementFromFragment(this._content, 'name', 'span');
-        this.completed = getElementFromFragment(this._content, 'completed', 'span');
-        this.count = getElementFromFragment(this._content, 'count', 'span');
+        this.progressText = getElementFromFragment(this._content, 'progress-text', 'div');
+        this.progressBar = getElementFromFragment(this._content, 'progress-bar', 'div');
+        this.craftableBy = getElementFromFragment(this._content, 'craftable-by', 'div');
         this.cancel = getElementFromFragment(this._content, 'cancel', 'button');
     }
 

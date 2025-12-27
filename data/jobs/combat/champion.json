@@ -1,0 +1,402 @@
+{
+    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+    "namespace": "adventuring",
+    "data": {
+        "skillData": [{
+            "skillID": "adventuring:Adventuring",
+            "data": {
+                "jobs": [
+                    {
+                        "id": "champion",
+                        "tier": 4,
+                        "name": "Champion",
+                        "media": "melvor:assets/media/bank/potion_attack_i.png#tint=yellow",
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:warlord", "level": 25 },
+                            { "type": "job_level", "job": "adventuring:battlemage", "level": 20 },
+                            { "type": "area_mastery", "area": "adventuring:dragons_lair", "level": 50 }
+                        ],
+                        "isMilestoneReward": true,
+                        "allowedItems": [
+                            "adventuring:helm",
+                            "adventuring:platebody",
+                            "adventuring:platelegs",
+                            "adventuring:gauntlets",
+                            "adventuring:sabatons",
+                            "adventuring:amulet",
+                            "adventuring:ring",
+                            "adventuring:cape",
+                            "adventuring:shield",
+                            "adventuring:sword1h",
+                            "adventuring:sword2h",
+                            "adventuring:axe",
+                            "adventuring:mace"
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:hitpoints", "value": 2.0 },
+                            { "id": "adventuring:defence", "value": 1.5 },
+                            { "id": "adventuring:agility", "value": 1.0 },
+                            { "id": "adventuring:strength", "value": 2.5 },
+                            { "id": "adventuring:prayer", "value": 0.5 }
+                        ]
+                    }
+                ],
+                "generators": [
+                    {
+                        "id": "champion_strike",
+                        "name": "Champion's Strike",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:champion", "level": 1 }
+                        ],
+                        "energy": 30,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 25,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.6 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "inspiring_blow",
+                        "name": "Inspiring Blow",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:champion", "level": 20 }
+                        ],
+                        "energy": 35,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 20,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.5 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "target": "aoe",
+                                "party": "ally",
+                                "effects": [
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:might",
+                                        "stacks": {
+                                            "base": 1,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.05 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "spenders": [
+                    {
+                        "id": "heroic_leap",
+                        "name": "Heroic Leap",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:champion", "level": 10 }
+                        ],
+                        "cost": 160,
+                        "hits": [
+                            {
+                                "target": "aoe",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 25,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.7 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:fear",
+                                        "stacks": {
+                                            "base": 2,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.05 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "valor_strike",
+                        "name": "Valor Strike",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:champion", "level": 15 }
+                        ],
+                        "cost": 150,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "delay": 100,
+                                "repeat": 2,
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 25,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.55 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:bleed",
+                                        "stacks": {
+                                            "base": 3,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.1 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "battlefield_commander",
+                        "name": "Battlefield Commander",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:champion", "level": 20 }
+                        ],
+                        "cost": 170,
+                        "hits": [
+                            {
+                                "target": "aoe",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 22,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.6 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "target": "aoe",
+                                "party": "ally",
+                                "effects": [
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:might",
+                                        "stacks": {
+                                            "base": 2,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.1 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:haste",
+                                        "stacks": {
+                                            "base": 2,
+                                            "scaling": [
+                                                { "id": "adventuring:agility", "value": 0.1 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "rallying_banner",
+                        "name": "Rallying Banner",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:champion", "level": 25 }
+                        ],
+                        "cost": 180,
+                        "hits": [
+                            {
+                                "target": "aoe",
+                                "party": "ally",
+                                "effects": [
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:might",
+                                        "stacks": {
+                                            "base": 4,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.2 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:haste",
+                                        "stacks": {
+                                            "base": 2,
+                                            "scaling": [
+                                                { "id": "adventuring:agility", "value": 0.1 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:block",
+                                        "stacks": {
+                                            "base": 3,
+                                            "scaling": [
+                                                { "id": "adventuring:defence", "value": 0.2 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "legendary_strike",
+                        "name": "Legendary Strike",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:champion", "level": 40 }
+                        ],
+                        "cost": 220,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 100,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 3.0 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:bleed",
+                                        "stacks": {
+                                            "base": 6,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.2 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:weaken",
+                                        "stacks": {
+                                            "base": 4,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.15 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "passives": [
+                    {
+                        "id": "legendary_presence",
+                        "name": "Legendary Presence",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:champion", "level": 30 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "encounter_start",
+                                "type": "buff",
+                                "target": "aoe",
+                                "party": "ally",
+                                "id": "adventuring:might",
+                                "stacks": {
+                                    "base": 4,
+                                    "scaling": [
+                                        { "id": "adventuring:strength", "value": 0.2 }
+                                    ]
+                                }
+                            },
+                            {
+                                "trigger": "encounter_start",
+                                "type": "buff",
+                                "target": "aoe",
+                                "party": "ally",
+                                "id": "adventuring:block",
+                                "stacks": {
+                                    "base": 3,
+                                    "scaling": [
+                                        { "id": "adventuring:defence", "value": 0.15 }
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "indomitable_will",
+                        "name": "Indomitable Will",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:champion", "level": 25 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "encounter_start",
+                                "type": "buff",
+                                "target": "self",
+                                "id": "adventuring:barrier",
+                                "stacks": {
+                                    "base": 5,
+                                    "scaling": [
+                                        { "id": "adventuring:defence", "value": 0.3 }
+                                    ]
+                                }
+                            },
+                            {
+                                "trigger": "encounter_start",
+                                "type": "debuff",
+                                "target": "aoe",
+                                "party": "enemy",
+                                "id": "adventuring:weaken",
+                                "stacks": {
+                                    "base": 2,
+                                    "scaling": [
+                                        { "id": "adventuring:strength", "value": 0.1 }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        }]
+    }
+}

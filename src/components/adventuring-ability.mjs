@@ -7,6 +7,7 @@ export class AdventuringAbilityElement extends HTMLElement {
         this.styling = getElementFromFragment(this._content, 'styling', 'div');
         this.nameText = getElementFromFragment(this._content, 'name', 'small');
         this.description = getElementFromFragment(this._content, 'description', 'small');
+        this.newBadge = getElementFromFragment(this._content, 'new-badge', 'span');
     }
 
     connectedCallback() {
@@ -17,10 +18,10 @@ export class AdventuringAbilityElement extends HTMLElement {
         this.ability = ability;
         this.styling.onclick = () => {
             if(this.selectorCharacter !== undefined && this.selectorType !== undefined) {
-                if(this.selectorType == 'generator') {
+                if(this.selectorType === 'generator') {
                     this.selectorCharacter.setGenerator(this.ability);
                 }
-                if(this.selectorType == 'spender') {
+                if(this.selectorType === 'spender') {
                     this.selectorCharacter.setSpender(this.ability);
                 }
 

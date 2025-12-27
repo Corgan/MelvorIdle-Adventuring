@@ -1,0 +1,482 @@
+{
+    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+    "namespace": "adventuring",
+    "data": {
+        "skillData": [{
+            "skillID": "adventuring:Adventuring",
+            "data": {
+                "passives": [
+                    {
+                        "id": "vampiric_regeneration",
+                        "name": "Vampiric Regeneration",
+                        "effects": [
+                            {
+                                "trigger": "round_start",
+                                "type": "heal",
+                                "target": "self",
+                                "amount": { "base": 5, "scaling": [{ "id": "adventuring:prayer", "value": 0.15 }] },
+                                "stacks": { "base": 1, "scaling": [] }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "vampiric_thralls",
+                        "name": "Vampiric Thralls",
+                        "effects": [
+                            {
+                                "trigger": "encounter_start",
+                                "type": "summon",
+                                "monster": "adventuring:vampiric_bat"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "lord_of_darkness",
+                        "name": "Lord of Darkness",
+                        "effects": [
+                            {
+                                "trigger": "round_start",
+                                "type": "immunity",
+                                "duration": 1,
+                                "hpThreshold": 25
+                            }
+                        ]
+                    }
+                ],
+                "areas": [
+                    {
+                        "id": "vampire_crypt",
+                        "name": "Vampire Crypt",
+                        "media": "melvor:assets/media/monsters/vampire.png",
+                        "requirements": [
+                            { "type": "skill_level", "level": 60 }
+                        ],
+                        "height": 8,
+                        "width": 7,
+                        "floors": [
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:vampire_bat", "weight": 100 }
+                                ],
+                                "exit": ["adventuring:vampire_bat", "adventuring:vampire_bat", "adventuring:vampire_bat"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:vampire_bat", "weight": 60 },
+                                    { "id": "adventuring:thrall", "weight": 40 }
+                                ],
+                                "exit": ["adventuring:vampire_bat", "adventuring:vampire_bat", "adventuring:thrall"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:thrall", "weight": 70 },
+                                    { "id": "adventuring:vampire_bat", "weight": 30 }
+                                ],
+                                "exit": ["adventuring:thrall", "adventuring:thrall", "adventuring:thrall"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:thrall", "weight": 60 },
+                                    { "id": "adventuring:vampire", "weight": 40 }
+                                ],
+                                "exit": ["adventuring:thrall", "adventuring:thrall", "adventuring:vampire"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:thrall", "weight": 40 },
+                                    { "id": "adventuring:vampire", "weight": 60 }
+                                ],
+                                "exit": ["adventuring:thrall", "adventuring:vampire", "adventuring:vampire"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:vampire", "weight": 80 },
+                                    { "id": "adventuring:thrall", "weight": 20 }
+                                ],
+                                "exit": ["adventuring:vampire", "adventuring:vampire", "adventuring:vampire"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:vampire", "weight": 100 }
+                                ],
+                                "exit": ["adventuring:vampire", "adventuring:vampire", "adventuring:vampire"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:vampire", "weight": 100 }
+                                ],
+                                "exit": ["adventuring:vampire", "adventuring:vampire", "adventuring:vampire"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:vampire", "weight": 100 }
+                                ],
+                                "exit": ["adventuring:vampire", "adventuring:vampire", "adventuring:elder_vampire"]
+                            }
+                        ]
+                    }
+                ],
+                "monsters": [
+                    {
+                        "id": "vampire_bat",
+                        "name": "Vampire Bat",
+                        "media": "melvor:assets/media/monsters/bat_big.png",
+                        "tags": ["beast", "flying"],
+                        "xp": 88,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 49 },
+                            { "id": "adventuring:defence", "value": 29 },
+                            { "id": "adventuring:agility", "value": 65 },
+                            { "id": "adventuring:strength", "value": 33 },
+                            { "id": "adventuring:ranged", "value": 26 },
+                            { "id": "adventuring:magic", "value": 29 },
+                            { "id": "adventuring:prayer", "value": 40 }
+                        ],
+                        "generator": "adventuring:vampiric_bite",
+                        "spender": "adventuring:blood_siphon",
+                        "passives": [],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 48, "weight": 100 },
+                            { "id": "adventuring:parts", "qty": 15, "weight": 40 },
+                            { "id": "adventuring:bat_wing", "qty": 2, "weight": 35 }
+                        ]
+                    },
+                    {
+                        "id": "thrall",
+                        "name": "Thrall",
+                        "media": "melvor:assets/media/monsters/zombie_hand.png",
+                        "tags": ["undead"],
+                        "xp": 98,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 57 },
+                            { "id": "adventuring:defence", "value": 34 },
+                            { "id": "adventuring:agility", "value": 35 },
+                            { "id": "adventuring:strength", "value": 39 },
+                            { "id": "adventuring:ranged", "value": 20 },
+                            { "id": "adventuring:magic", "value": 23 },
+                            { "id": "adventuring:prayer", "value": 45 }
+                        ],
+                        "generator": "adventuring:undead_grasp",
+                        "spender": "adventuring:mindless_fury",
+                        "passives": [],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 52, "weight": 100 },
+                            { "id": "adventuring:parts", "qty": 16, "weight": 42 },
+                            { "id": "adventuring:bone_fragment", "qty": 2, "weight": 40 }
+                        ]
+                    },
+                    {
+                        "id": "vampire",
+                        "name": "Vampire",
+                        "media": "melvor:assets/media/monsters/vampire.png",
+                        "tags": ["undead", "vampire"],
+                        "xp": 120,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 68 },
+                            { "id": "adventuring:defence", "value": 40 },
+                            { "id": "adventuring:agility", "value": 58 },
+                            { "id": "adventuring:strength", "value": 44 },
+                            { "id": "adventuring:ranged", "value": 29 },
+                            { "id": "adventuring:magic", "value": 47 },
+                            { "id": "adventuring:prayer", "value": 55 }
+                        ],
+                        "generator": "adventuring:vampiric_bite",
+                        "spender": "adventuring:crimson_rite",
+                        "passives": [],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 65, "weight": 100 },
+                            { "id": "adventuring:parts", "qty": 20, "weight": 48 },
+                            { "id": "adventuring:big_parts", "qty": 5, "weight": 32 },
+                            { "id": "adventuring:vampire_fang", "qty": 1, "weight": 28 }
+                        ]
+                    },
+                    {
+                        "id": "elder_vampire",
+                        "name": "Elder Vampire",
+                        "media": "melvor:assets/media/monsters/vampire.png",
+                        "tags": ["boss", "undead", "vampire"],
+                        "xp": 250,
+                        "isBoss": true,
+                        "enrageThreshold": 20,
+                        "enrageBuff": {
+                            "damage": 0.6,
+                            "speed": 0.4
+                        },
+                        "phases": [
+                            {
+                                "name": "Lord of Darkness"
+                            },
+                            {
+                                "name": "Blood Frenzy",
+                                "hpThreshold": 60,
+                                "spender": "adventuring:crimson_rite",
+                                "statBuffs": [
+                                    { "id": "adventuring:strength", "value": 0.25 }
+                                ]
+                            },
+                            {
+                                "name": "Eternal Night",
+                                "hpThreshold": 30,
+                                "spender": "adventuring:eternal_night",
+                                "healPercent": 15,
+                                "statBuffs": [
+                                    { "id": "adventuring:agility", "value": 0.4 },
+                                    { "id": "adventuring:magic", "value": 0.3 }
+                                ]
+                            }
+                        ],
+                        "passives": ["adventuring:vampiric_regeneration", "adventuring:vampiric_thralls", "adventuring:lord_of_darkness"],
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 117 },
+                            { "id": "adventuring:defence", "value": 52 },
+                            { "id": "adventuring:agility", "value": 70 },
+                            { "id": "adventuring:strength", "value": 55 },
+                            { "id": "adventuring:ranged", "value": 36 },
+                            { "id": "adventuring:magic", "value": 62 },
+                            { "id": "adventuring:prayer", "value": 70 }
+                        ],
+                        "generator": "adventuring:vampiric_bite",
+                        "spender": "adventuring:eternal_night",
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 140, "weight": 100 },
+                            { "id": "adventuring:parts", "qty": 30, "weight": 60 },
+                            { "id": "adventuring:big_parts", "qty": 14, "weight": 50 },
+                            { "id": "adventuring:vampire_fang", "qty": 3, "weight": 65 }
+                        ]
+                    },
+                    {
+                        "id": "vampiric_bat",
+                        "name": "Vampiric Bat",
+                        "media": "melvor:assets/media/monsters/bat.png",
+                        "tags": ["beast", "flying"],
+                        "xp": 30,
+                        "isSummon": true,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 35 },
+                            { "id": "adventuring:defence", "value": 18 },
+                            { "id": "adventuring:agility", "value": 35 },
+                            { "id": "adventuring:strength", "value": 25 },
+                            { "id": "adventuring:ranged", "value": 15 },
+                            { "id": "adventuring:magic", "value": 20 },
+                            { "id": "adventuring:prayer", "value": 18 }
+                        ],
+                        "generator": "adventuring:vampiric_bite",
+                        "spender": "adventuring:blood_drain",
+                        "passives": ["adventuring:vampiric_regeneration"],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 12, "weight": 100 }
+                        ]
+                    }
+                ],
+                "generators": [
+                    {
+                        "id": "vampiric_bite",
+                        "name": "Vampiric Bite",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "energy": 55,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 14,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 1.2 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "target": "self",
+                                "party": "ally",
+                                "effects": [
+                                    {
+                                        "type": "heal",
+                                        "amount": {
+                                            "base": 6,
+                                            "scaling": [
+                                                { "id": "adventuring:prayer", "value": 0.6 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "undead_grasp",
+                        "name": "Undead Grasp",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "energy": 50,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 15,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 1.4 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "spenders": [
+                    {
+                        "id": "blood_siphon",
+                        "name": "Blood Siphon",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "cost": 90,
+                        "hits": [
+                            {
+                                "target": "random",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 28,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 1.6 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "target": "self",
+                                "party": "ally",
+                                "effects": [
+                                    {
+                                        "type": "heal",
+                                        "amount": {
+                                            "base": 15,
+                                            "scaling": [
+                                                { "id": "adventuring:prayer", "value": 1.2 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "mindless_fury",
+                        "name": "Mindless Fury",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "cost": 85,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 35,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 2.2 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "crimson_rite",
+                        "name": "Crimson Rite",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "cost": 100,
+                        "hits": [
+                            {
+                                "target": "all",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 25,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 2 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "target": "self",
+                                "party": "ally",
+                                "effects": [
+                                    {
+                                        "type": "heal",
+                                        "amount": {
+                                            "base": 20,
+                                            "scaling": [
+                                                { "id": "adventuring:prayer", "value": 1.5 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "eternal_night",
+                        "name": "Eternal Night",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "cost": 100,
+                        "hits": [
+                            {
+                                "target": "all",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 40,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 2.5 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "target": "self",
+                                "party": "ally",
+                                "effects": [
+                                    {
+                                        "type": "heal",
+                                        "amount": {
+                                            "base": 35,
+                                            "scaling": [
+                                                { "id": "adventuring:prayer", "value": 2 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        }]
+    }
+}

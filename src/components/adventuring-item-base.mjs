@@ -9,6 +9,7 @@ export class AdventuringItemBaseElement extends HTMLElement {
         this.lock = getElementFromFragment(this._content, 'lock', 'div');
         this.icon = getElementFromFragment(this._content, 'icon', 'img');
         this.upgrade = getElementFromFragment(this._content, 'upgrade', 'small');
+        this.newBadge = getElementFromFragment(this._content, 'new-badge', 'span');
     }
 
     connectedCallback() {

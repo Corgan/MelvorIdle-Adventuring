@@ -9,14 +9,14 @@
                     {
                         "id": "fletching",
                         "name": "Fletching",
-                        "media": "melvor:assets/media/skills/fletching/fletching.svg"
+                        "media": "melvor:assets/media/bank/potion_fletching_i.png"
                     }
                 ],
                 "jobs": [
                     {
                         "id": "fletcher",
                         "name": "Fletcher",
-                        "media": "melvor:assets/media/skills/fletching/fletching.svg",
+                        "media": "melvor:assets/media/bank/potion_fletching_i.png",
                         "requirements": [
                             { "type": "skill_level", "level": 5 }
                         ],
@@ -28,18 +28,352 @@
                     }
                 ],
                 "materials": [
-
+                    {
+                        "id": "crude_shaft",
+                        "name": "Crude Shaft",
+                        "media": "melvor:assets/media/bank/potion_fletching_i.png",
+                        "category": "adventuring:salvage"
+                    },
+                    {
+                        "id": "refined_shaft",
+                        "name": "Refined Shaft",
+                        "media": "melvor:assets/media/bank/yew_shortbow_u.png",
+                        "tier": 2,
+                        "category": "adventuring:salvage",
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:master_fletcher", "level": 1 }
+                        ]
+                    },
+                    {
+                        "id": "immaculate_shaft",
+                        "name": "Immaculate Shaft",
+                        "media": "melvor:assets/media/bank/redwood_shortbow_u.png",
+                        "tier": 3,
+                        "category": "adventuring:salvage",
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:grandmaster_fletcher", "level": 1 }
+                        ]
+                    },
+                    {
+                        "id": "transcendent_shaft",
+                        "name": "Transcendent Shaft",
+                        "media": "melvor:assets/media/bank/logs_elderwood.png",
+                        "tier": 4,
+                        "category": "adventuring:salvage",
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:legendary_fletcher", "level": 1 }
+                        ]
+                    }
                 ],
                 "buildings": [
-
+                    {
+                        "id": "bowyer",
+                        "type": "workshop",
+                        "name": "Bowyer",
+                        "description": "Craft arrows and longbows from wood and feathers. Fletchers supply ammunition for ranged combat.",
+                        "media": "melvor:assets/media/skills/township/Carpenters_Workshop.png",
+                        "requirements": [],
+                        "idle": ["Sharpening arrowheads", "Sorting feathers"],
+                        "actions": ["adventuring:work"],
+                        "products": [
+                            "adventuring:feathers",
+                            "adventuring:headless_arrows",
+                            "adventuring:bronze_arrows",
+                            "adventuring:iron_arrows",
+                            "adventuring:steel_arrows",
+                            "adventuring:mithril_arrows",
+                            "adventuring:adamant_arrows",
+                            "adventuring:rune_arrows",
+                            "adventuring:dragon_arrows",
+                            "adventuring:steady_aim_tonic",
+                            "adventuring:piercing_oil"
+                        ]
+                    }
                 ],
                 "products": [
-                    
+                    {
+                        "id": "feathers",
+                        "item": "melvorD:Feathers",
+                        "outputType": "item",
+                        "count": 10,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:fletcher" },
+                            { "type": "job_level", "job": "adventuring:fletcher", "level": 1 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_shaft", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "headless_arrows",
+                        "item": "melvorD:Headless_Arrows",
+                        "outputType": "item",
+                        "count": 15,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:fletcher" },
+                            { "type": "job_level", "job": "adventuring:fletcher", "level": 1 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_shaft", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "bronze_arrows",
+                        "item": "melvorD:Bronze_Arrows",
+                        "outputType": "item",
+                        "count": 15,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:fletcher" },
+                            { "type": "job_level", "job": "adventuring:fletcher", "level": 5 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_shaft", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "iron_arrows",
+                        "item": "melvorD:Iron_Arrows",
+                        "outputType": "item",
+                        "count": 15,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:fletcher" },
+                            { "type": "job_level", "job": "adventuring:fletcher", "level": 10 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_shaft", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "steel_arrows",
+                        "item": "melvorD:Steel_Arrows",
+                        "outputType": "item",
+                        "count": 15,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:fletcher" },
+                            { "type": "job_level", "job": "adventuring:fletcher", "level": 20 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_shaft", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "mithril_arrows",
+                        "item": "melvorD:Mithril_Arrows",
+                        "outputType": "item",
+                        "count": 15,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:fletcher" },
+                            { "type": "job_level", "job": "adventuring:fletcher", "level": 30 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_shaft", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "adamant_arrows",
+                        "item": "melvorD:Adamant_Arrows",
+                        "outputType": "item",
+                        "count": 15,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:fletcher" },
+                            { "type": "job_level", "job": "adventuring:fletcher", "level": 40 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_shaft", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "rune_arrows",
+                        "item": "melvorD:Rune_Arrows",
+                        "outputType": "item",
+                        "count": 15,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:fletcher" },
+                            { "type": "job_level", "job": "adventuring:fletcher", "level": 50 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_shaft", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "dragon_arrows",
+                        "item": "melvorD:Dragon_Arrows",
+                        "outputType": "item",
+                        "count": 15,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:fletcher" },
+                            { "type": "job_level", "job": "adventuring:fletcher", "level": 60 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_shaft", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "steady_aim_tonic",
+                        "consumable": "adventuring:steady_aim_tonic",
+                        "outputType": "consumable",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:fletcher" },
+                            { "type": "job_level", "job": "adventuring:fletcher", "level": 15 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_shaft", "count": 2 }
+                        ]
+                    },
+                    {
+                        "id": "piercing_oil",
+                        "consumable": "adventuring:piercing_oil",
+                        "outputType": "consumable",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:fletcher" },
+                            { "type": "job_level", "job": "adventuring:fletcher", "level": 25 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_shaft", "count": 3 }
+                        ]
+                    },
+                    {
+                        "id": "convert_crude_shaft_to_refined",
+                        "material": "adventuring:refined_shaft",
+                        "outputType": "material",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:master_fletcher", "level": 10 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_shaft", "count": 5 }
+                        ]
+                    },
+                    {
+                        "id": "convert_refined_shaft_to_immaculate",
+                        "material": "adventuring:immaculate_shaft",
+                        "outputType": "material",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:grandmaster_fletcher", "level": 10 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:refined_shaft", "count": 5 }
+                        ]
+                    },
+                    {
+                        "id": "convert_immaculate_shaft_to_transcendent",
+                        "material": "adventuring:transcendent_shaft",
+                        "outputType": "material",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:legendary_fletcher", "level": 10 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:immaculate_shaft", "count": 5 }
+                        ]
+                    },
+                    {
+                        "id": "refined_yew_longbow",
+                        "item": "melvorF:Yew_Longbow",
+                        "outputType": "item",
+                        "count": 2,
+                        "requirements": [
+                            { "type": "skill_level", "level": 25 },
+                            { "type": "current_job", "job": "adventuring:master_fletcher" },
+                            { "type": "job_level", "job": "adventuring:master_fletcher", "level": 1 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:refined_shaft", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "refined_magic_longbow",
+                        "item": "melvorD:Magic_Longbow",
+                        "outputType": "item",
+                        "count": 2,
+                        "requirements": [
+                            { "type": "skill_level", "level": 25 },
+                            { "type": "current_job", "job": "adventuring:master_fletcher" },
+                            { "type": "job_level", "job": "adventuring:master_fletcher", "level": 20 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:refined_shaft", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "immaculate_redwood_longbow",
+                        "item": "melvorD:Redwood_Longbow",
+                        "outputType": "item",
+                        "count": 5,
+                        "requirements": [
+                            { "type": "skill_level", "level": 50 },
+                            { "type": "current_job", "job": "adventuring:grandmaster_fletcher" },
+                            { "type": "job_level", "job": "adventuring:grandmaster_fletcher", "level": 1 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:immaculate_shaft", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "transcendent_redwood_longbow",
+                        "item": "melvorD:Redwood_Longbow",
+                        "outputType": "item",
+                        "count": 12,
+                        "requirements": [
+                            { "type": "skill_level", "level": 75 },
+                            { "type": "current_job", "job": "adventuring:legendary_fletcher" },
+                            { "type": "job_level", "job": "adventuring:legendary_fletcher", "level": 1 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:transcendent_shaft", "count": 1 }
+                        ]
+                    }
                 ],
                 "tiles": [
-                    
+                    {
+                        "id": "arrow_cache",
+                        "name": "Arrow Cache",
+                        "media": "melvor:assets/media/bank/potion_fletching_i.png",
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:fletcher" }
+                        ],
+                        "weight": 10,
+                        "floor_max": 1,
+                        "dungeon_max": 1,
+                        "effects": [
+                            { "type": "xp", "amount": 30, "job": "adventuring:fletcher" },
+                            {
+                                "type": "loot",
+                                "pool": [
+                                    { "id": "adventuring:crude_shaft", "qty": 1, "weight": 100 }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "fletchers_range",
+                        "name": "Fletcher's Range",
+                        "media": "melvor:assets/media/bank/potion_fletching_i.png",
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:master_fletcher", "level": 1 }
+                        ],
+                        "weight": 8,
+                        "floor_max": 1,
+                        "dungeon_max": 2,
+                        "effects": [
+                            { "type": "xp", "amount": 100, "job": "adventuring:fletcher" },
+                            { "type": "xp", "amount": 50, "job": "adventuring:master_fletcher" },
+                            {
+                                "type": "loot",
+                                "pool": [
+                                    { "id": "adventuring:crude_shaft", "qty": 3, "weight": 60 },
+                                    { "id": "adventuring:refined_shaft", "qty": 2, "weight": 35 },
+                                    { "id": "adventuring:immaculate_shaft", "qty": 1, "weight": 5 }
+                                ]
+                            }
+                        ]
+                    }
                 ]
             }
         }]
     }
 }
+

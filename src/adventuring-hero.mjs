@@ -4,16 +4,19 @@ const { AdventuringCharacter, AdventuringCharacterRenderQueue } = await loadModu
 const { AdventuringEquipment } = await loadModule('src/adventuring-equipment.mjs');
 const { AdventuringStats } = await loadModule('src/adventuring-stats.mjs');
 const { AdventuringCard } = await loadModule('src/adventuring-card.mjs');
+const { TooltipBuilder } = await loadModule('src/adventuring-tooltip.mjs');
 
 class AdventuringHeroRenderQueue extends AdventuringCharacterRenderQueue {
     constructor() {
         super(...arguments);
         this.jobs = false;
+        this.passiveAbilities = false;
     }
 
     updateAll() {
         super.updateAll();
         this.jobs = true;
+        this.passiveAbilities = true;
     }
 }
 
@@ -27,6 +30,8 @@ export class AdventuringHero extends AdventuringCharacter {
         this.component.equipment.classList.remove('d-none');
         this.equipment.component.mount(this.component.equipment);
 
+        this.component.setSkill(this.manager);
+
         this.component.generator.attachSelector(this, 'generator');
         this.component.spender.attachSelector(this, 'spender');
 
@@ -39,7 +44,11 @@ export class AdventuringHero extends AdventuringCharacter {
     get media() {
         if(this.combatJob)
             return this.combatJob.media;
-        return cdnMedia('assets/media/main/question.svg');
+        return cdnMedia('assets/media/main/question.png');
+    }
+
+    get isHero() {
+        return true;
     }
 
     postDataRegistration() {
@@ -108,6 +117,8 @@ export class AdventuringHero extends AdventuringCharacter {
             this.equipment.calculateStats();
             this.equipment.stats.forEach((value, stat) => this.stats.set(stat, this.stats.get(stat) + value));
         }
+
+        // Tavern drink bonuses are now applied in getEffectiveStat()
         
         if(shouldAdjust)
             this.hitpoints = Math.min(this.maxHitpoints, Math.floor(this.maxHitpoints * hitpointPct));
@@ -118,12 +129,52 @@ export class AdventuringHero extends AdventuringCharacter {
         this.renderQueue.generator = true;
         this.renderQueue.spender = true;
     }
+    
+    /**
+     * Override to register hero-specific effect sources.
+     */
+    initEffectCache() {
+        super.initEffectCache();
+        
+        // Register equipment as an effect source
+        this.effectCache.registerSource('equipment', () => this.equipment.getEffects());
+        
+        // Register consumables (tavern drinks apply to all heroes)
+        this.effectCache.registerSource('consumables', () => 
+            this.manager.consumables ? this.manager.consumables.getEffects() : []
+        );
+        
+        // Register Melvor modifiers as an effect source
+        this.effectCache.registerSource('modifiers', () => 
+            this.manager.modifiers ? this.manager.modifiers.getEffects() : []
+        );
+    }
 
     setLocked(locked) {
         this.locked = locked;
         this.renderQueue.jobs = true;
         this.renderQueue.generator = true;
         this.renderQueue.spender = true;
+    }
+
+    // Override trigger to also check equipment effects
+    trigger(type, extra={}) {
+        // First call parent trigger for auras
+        extra = super.trigger(type, extra);
+        
+        // Then check equipment for item effects
+        if(this.equipment) {
+            let itemEffects = this.equipment.trigger(type, extra);
+            itemEffects.forEach(({ item, effect, amount, chance }) => {
+                // Roll for chance-based effects
+                if(Math.random() * 100 > chance) return;
+                
+                // Use the shared effect processor
+                extra = this.processTriggeredEffect(effect, amount, extra, item.name);
+            });
+        }
+        
+        return extra;
     }
 
     setName(name) {
@@ -143,6 +194,8 @@ export class AdventuringHero extends AdventuringCharacter {
 
         this.renderQueue.name = true;
         this.renderQueue.icon = true;
+        this.renderQueue.passiveAbilities = true;
+        this.stats.renderQueue.stats = true;
 
         this.equipment.slots.forEach(slot => slot.renderQueue.valid = true);
 
@@ -161,6 +214,8 @@ export class AdventuringHero extends AdventuringCharacter {
 
         this.renderQueue.name = true;
         this.renderQueue.icon = true;
+        this.renderQueue.passiveAbilities = true;
+        this.stats.renderQueue.stats = true;
 
         this.equipment.slots.forEach(slot => slot.renderQueue.valid = true);
 
@@ -170,6 +225,7 @@ export class AdventuringHero extends AdventuringCharacter {
     render() {
         super.render();
         this.renderJobs();
+        this.renderPassiveAbilities();
 
         this.equipment.render();
     }
@@ -178,7 +234,7 @@ export class AdventuringHero extends AdventuringCharacter {
         if(!this.renderQueue.name)
             return;
 
-        this.component.name.textContent = this.name;
+        this.component.nameText.textContent = this.name;
         this.card.name = this.name;
         this.card.renderQueue.name = true;
 
@@ -209,16 +265,89 @@ export class AdventuringHero extends AdventuringCharacter {
 
         this.component.jobs.show();
         this.component.combatJob.icon.src = this.combatJob.media;
-        this.component.combatJob.tooltip.setContent(this.combatJob.tooltip);
+        if(this.component.combatJob.tooltip !== undefined)
+            this.component.combatJob.tooltip.setContent(this.combatJob.tooltip);
         this.component.combatJob.styling.classList.toggle('pointer-enabled', !this.locked);
         this.component.combatJob.styling.classList.toggle('bg-combat-inner-dark', this.locked);
 
         this.component.passiveJob.icon.src = this.passiveJob.media;
-        this.component.passiveJob.tooltip.setContent(this.passiveJob.tooltip);
+        if(this.component.passiveJob.tooltip !== undefined)
+            this.component.passiveJob.tooltip.setContent(this.passiveJob.tooltip);
         this.component.passiveJob.styling.classList.toggle('pointer-enabled', !this.locked);
         this.component.passiveJob.styling.classList.toggle('bg-combat-inner-dark', this.locked);
 
+        // Trigger passive abilities update when jobs change
+        this.renderQueue.passiveAbilities = true;
+
         this.renderQueue.jobs = false;
+    }
+
+    /**
+     * Render active passive abilities for this character
+     */
+    renderPassiveAbilities() {
+        if(!this.renderQueue.passiveAbilities)
+            return;
+
+        // Get passive abilities that this character has from their jobs
+        const activePassives = [];
+        
+        // Get passives from combatJob
+        if(this.combatJob && this.combatJob.id !== 'adventuring:none') {
+            const combatPassives = this.manager.passives.allObjects.filter(p => 
+                p.canEquip(this) && p.unlockedBy(this.combatJob)
+            );
+            activePassives.push(...combatPassives);
+        }
+        
+        // Get passives from passiveJob (if different)
+        if(this.passiveJob && this.passiveJob !== this.combatJob && this.passiveJob.id !== 'adventuring:none') {
+            const passiveJobPassives = this.manager.passives.allObjects.filter(p => 
+                p.canEquip(this) && p.unlockedBy(this.passiveJob) && !activePassives.includes(p)
+            );
+            activePassives.push(...passiveJobPassives);
+        }
+
+        // Update UI
+        if(activePassives.length === 0) {
+            this.component.passiveAbilitiesContainer.classList.add('d-none');
+        } else {
+            this.component.passiveAbilitiesContainer.classList.remove('d-none');
+            this.component.passiveAbilitiesList.replaceChildren();
+            
+            activePassives.forEach(passive => {
+                const badge = document.createElement('div');
+                badge.className = 'bg-dark rounded p-1 px-2 m-1 d-flex align-items-center pointer-enabled';
+                badge.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+                badge.innerHTML = `<small class="text-warning font-w600">${passive.name}</small>`;
+                
+                // Build tooltip using TooltipBuilder
+                const tooltip = new TooltipBuilder();
+                tooltip.header(passive.name, passive.media);
+                tooltip.separator();
+                tooltip.info(passive.getDescription(this));
+                
+                // Show which job provides this passive
+                const sourceJob = passive.requirements.find(r => r.type === 'current_job_level');
+                if(sourceJob) {
+                    const job = this.manager.jobs.getObjectByID(sourceJob.job);
+                    if(job) {
+                        tooltip.separator();
+                        tooltip.text(`From: <img class="skill-icon-xxs mx-1" src="${job.media}">${job.name} Lv.${sourceJob.level}`, 'text-muted text-center');
+                    }
+                }
+                
+                tippy(badge, {
+                    content: tooltip.build(),
+                    allowHTML: true,
+                    placement: 'top'
+                });
+                
+                this.component.passiveAbilitiesList.appendChild(badge);
+            });
+        }
+
+        this.renderQueue.passiveAbilities = false;
     }
 
     renderGenerator() {
@@ -226,7 +355,8 @@ export class AdventuringHero extends AdventuringCharacter {
             return;
 
         this.component.generator.nameText.textContent = this.generator.name;
-        this.component.generator.tooltip.setContent(this.generator.getDescription(this.stats));
+        if(this.component.generator.tooltip !== undefined)
+            this.component.generator.tooltip.setContent(this.component.generator.buildAbilityTooltip(this.generator));
         this.component.generator.styling.classList.toggle('pointer-enabled', !this.locked);
         this.component.generator.styling.classList.toggle('bg-combat-inner-dark', this.locked);
         this.component.generator.styling.classList.toggle('bg-combat-menu-selected', this.generator === this.action && this.highlight);
@@ -239,7 +369,8 @@ export class AdventuringHero extends AdventuringCharacter {
             return;
 
         this.component.spender.nameText.textContent = this.spender.name;
-        this.component.spender.tooltip.setContent(this.spender.getDescription(this.stats));
+        if(this.component.spender.tooltip !== undefined)
+            this.component.spender.tooltip.setContent(this.component.spender.buildAbilityTooltip(this.spender));
         this.component.spender.styling.classList.toggle('pointer-enabled', !this.locked);
         this.component.spender.styling.classList.toggle('bg-combat-inner-dark', this.locked);
         this.component.spender.styling.classList.toggle('bg-combat-menu-selected', this.spender === this.action && this.highlight);

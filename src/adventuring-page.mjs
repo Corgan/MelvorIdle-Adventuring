@@ -21,12 +21,24 @@ export class AdventuringPage {
 
     onLoad() { }
 
+    onPageChange() {
+        // Called when the main game page changes - override in subclasses if needed
+    }
+
     postDataRegistration() {
 
     }
 
     render() {
 
+    }
+
+    reset() {
+        // Override in subclasses to reset state
+    }
+
+    getErrorLog() {
+        return '';
     }
 
     encode(writer) {

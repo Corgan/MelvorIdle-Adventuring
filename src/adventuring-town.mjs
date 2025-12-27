@@ -27,7 +27,7 @@ export class AdventuringTown extends AdventuringPage {
         if(this.building !== undefined) {
             return this.building.media;
         }
-        return cdnMedia("assets/media/skills/township/Town_Hall.svg");
+        return cdnMedia("assets/media/bank/skillcape_township.png");
     }
 
     get active() {
@@ -37,7 +37,24 @@ export class AdventuringTown extends AdventuringPage {
     }
 
     performActions() {
+        // Check if auto-repeat dungeon should start (party at full HP)
+        if(this.manager.autoRepeatArea && this.checkAutoRepeatReady()) {
+            this.manager.log.add(`Auto-run: Starting ${this.manager.autoRepeatArea.name}...`);
+            this.manager.selectArea(this.manager.autoRepeatArea);
+            return;
+        }
+
         this.manager.party.all.forEach(character => this.runAction(character));
+    }
+
+    /**
+     * Check if conditions are met to auto-start the repeat dungeon
+     * Requires all party members to be alive and at full HP
+     */
+    checkAutoRepeatReady() {
+        return this.manager.party.all.every(member => 
+            !member.dead && member.hitpoints >= member.maxHitpoints
+        );
     }
 
     resetActions() {

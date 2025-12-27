@@ -1,0 +1,443 @@
+{
+    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+    "namespace": "adventuring",
+    "data": {
+        "skillData": [{
+            "skillID": "adventuring:Adventuring",
+            "data": {
+                "slayerTaskTypes": [
+                    {
+                        "id": "kill",
+                        "name": "Slay Monsters",
+                        "descriptionTemplate": "Slay ${required} ${targetName}",
+                        "progressVerb": "slain",
+                        "targetType": "monster",
+                        "baseRequirements": [5, 10, 20, 35, 50],
+                        "requirementVariance": [2, 5, 10, 15, 20],
+                        "baseRewards": {
+                            "currency": [50, 150, 350, 600, 1000],
+                            "currencyVariance": [20, 50, 100, 150, 250],
+                            "xp": [25, 75, 175, 350, 600],
+                            "xpVariance": [10, 25, 50, 100, 150]
+                        },
+                        "materialRewardChance": [0, 0.4, 0.5, 0.6, 0.7],
+                        "consumableRewardChance": [0, 0.1, 0.2, 0.3, 0.4]
+                    },
+                    {
+                        "id": "collect",
+                        "name": "Collect Materials",
+                        "descriptionTemplate": "Collect ${required} ${targetName}",
+                        "progressVerb": "collected",
+                        "targetType": "material",
+                        "baseRequirements": [3, 8, 15, 25, 40],
+                        "requirementVariance": [2, 4, 8, 12, 15],
+                        "baseRewards": {
+                            "currency": [50, 150, 350, 600, 1000],
+                            "currencyVariance": [20, 50, 100, 150, 250],
+                            "xp": [25, 75, 175, 350, 600],
+                            "xpVariance": [10, 25, 50, 100, 150]
+                        },
+                        "materialRewardChance": [0, 0.4, 0.5, 0.6, 0.7],
+                        "consumableRewardChance": [0, 0.15, 0.25, 0.35, 0.45]
+                    },
+                    {
+                        "id": "clear",
+                        "name": "Clear Dungeons",
+                        "descriptionTemplate": "Clear ${targetName} ${required} times",
+                        "progressVerb": "cleared",
+                        "targetType": "area",
+                        "baseRequirements": [1, 2, 3, 4, 5],
+                        "requirementVariance": [0, 0, 0, 1, 1],
+                        "baseRewards": {
+                            "currency": [75, 200, 450, 750, 1200],
+                            "currencyVariance": [25, 60, 120, 180, 300],
+                            "xp": [40, 100, 225, 450, 750],
+                            "xpVariance": [15, 35, 75, 125, 200]
+                        },
+                        "materialRewardChance": [0.2, 0.5, 0.6, 0.7, 0.8],
+                        "consumableRewardChance": [0.1, 0.2, 0.3, 0.4, 0.5]
+                    },
+                    {
+                        "id": "kill_undead",
+                        "name": "Hunt Undead",
+                        "descriptionTemplate": "Slay ${required} undead creatures",
+                        "progressVerb": "slain",
+                        "targetType": "monster_tag",
+                        "targetTag": "undead",
+                        "baseRequirements": [8, 15, 30, 50, 75],
+                        "requirementVariance": [3, 5, 10, 15, 25],
+                        "baseRewards": {
+                            "currency": [60, 175, 400, 700, 1100],
+                            "currencyVariance": [25, 60, 120, 175, 280],
+                            "xp": [30, 90, 200, 400, 650],
+                            "xpVariance": [12, 30, 60, 120, 180]
+                        },
+                        "materialRewardChance": [0.1, 0.45, 0.55, 0.65, 0.75],
+                        "consumableRewardChance": [0.05, 0.15, 0.25, 0.35, 0.45]
+                    },
+                    {
+                        "id": "kill_beasts",
+                        "name": "Hunt Beasts",
+                        "descriptionTemplate": "Slay ${required} beasts",
+                        "progressVerb": "slain",
+                        "targetType": "monster_tag",
+                        "targetTag": "beast",
+                        "baseRequirements": [8, 15, 30, 50, 75],
+                        "requirementVariance": [3, 5, 10, 15, 25],
+                        "baseRewards": {
+                            "currency": [55, 160, 375, 650, 1050],
+                            "currencyVariance": [22, 55, 110, 160, 260],
+                            "xp": [28, 85, 190, 380, 620],
+                            "xpVariance": [11, 28, 55, 110, 165]
+                        },
+                        "materialRewardChance": [0.1, 0.45, 0.55, 0.65, 0.75],
+                        "consumableRewardChance": [0.05, 0.15, 0.25, 0.35, 0.45]
+                    },
+                    {
+                        "id": "kill_dragons",
+                        "name": "Dragonslayer",
+                        "descriptionTemplate": "Slay ${required} dragons",
+                        "progressVerb": "slain",
+                        "targetType": "monster_tag",
+                        "targetTag": "dragon",
+                        "baseRequirements": [2, 5, 10, 18, 30],
+                        "requirementVariance": [1, 2, 4, 6, 10],
+                        "baseRewards": {
+                            "currency": [100, 275, 600, 1000, 1600],
+                            "currencyVariance": [40, 100, 180, 300, 450],
+                            "xp": [50, 140, 300, 550, 900],
+                            "xpVariance": [20, 45, 90, 160, 250]
+                        },
+                        "materialRewardChance": [0.25, 0.55, 0.65, 0.75, 0.85],
+                        "consumableRewardChance": [0.15, 0.25, 0.35, 0.45, 0.55]
+                    },
+                    {
+                        "id": "kill_elementals",
+                        "name": "Elemental Purge",
+                        "descriptionTemplate": "Slay ${required} elementals",
+                        "progressVerb": "slain",
+                        "targetType": "monster_tag",
+                        "targetTag": "elemental",
+                        "baseRequirements": [5, 12, 25, 40, 60],
+                        "requirementVariance": [2, 4, 8, 12, 18],
+                        "baseRewards": {
+                            "currency": [70, 190, 425, 725, 1150],
+                            "currencyVariance": [28, 65, 130, 190, 290],
+                            "xp": [35, 95, 215, 425, 680],
+                            "xpVariance": [14, 32, 65, 125, 190]
+                        },
+                        "materialRewardChance": [0.15, 0.5, 0.6, 0.7, 0.8],
+                        "consumableRewardChance": [0.1, 0.2, 0.3, 0.4, 0.5]
+                    },
+                    {
+                        "id": "kill_humanoid",
+                        "name": "Bandit Hunt",
+                        "descriptionTemplate": "Slay ${required} humanoids",
+                        "progressVerb": "slain",
+                        "targetType": "monster_tag",
+                        "targetTag": "humanoid",
+                        "baseRequirements": [8, 15, 30, 50, 75],
+                        "requirementVariance": [3, 5, 10, 15, 25],
+                        "baseRewards": {
+                            "currency": [65, 180, 410, 710, 1120],
+                            "currencyVariance": [26, 62, 125, 180, 285],
+                            "xp": [32, 92, 205, 415, 665],
+                            "xpVariance": [13, 31, 62, 122, 185]
+                        },
+                        "materialRewardChance": [0.1, 0.45, 0.55, 0.65, 0.75],
+                        "consumableRewardChance": [0.05, 0.15, 0.25, 0.35, 0.45]
+                    },
+                    {
+                        "id": "kill_spiders",
+                        "name": "Exterminate Spiders",
+                        "descriptionTemplate": "Slay ${required} spiders",
+                        "progressVerb": "slain",
+                        "targetType": "monster_tag",
+                        "targetTag": "spider",
+                        "baseRequirements": [6, 12, 25, 40, 60],
+                        "requirementVariance": [2, 4, 8, 12, 18],
+                        "baseRewards": {
+                            "currency": [55, 160, 370, 640, 1030],
+                            "currencyVariance": [22, 55, 110, 165, 260],
+                            "xp": [28, 82, 185, 370, 605],
+                            "xpVariance": [11, 27, 55, 110, 165]
+                        },
+                        "materialRewardChance": [0.1, 0.45, 0.55, 0.65, 0.75],
+                        "consumableRewardChance": [0.05, 0.15, 0.25, 0.35, 0.45]
+                    },
+                    {
+                        "id": "kill_giants",
+                        "name": "Giant Slayer",
+                        "descriptionTemplate": "Slay ${required} giants",
+                        "progressVerb": "slain",
+                        "targetType": "monster_tag",
+                        "targetTag": "giant",
+                        "baseRequirements": [3, 6, 12, 20, 35],
+                        "requirementVariance": [1, 2, 4, 6, 10],
+                        "baseRewards": {
+                            "currency": [80, 220, 480, 820, 1320],
+                            "currencyVariance": [32, 75, 145, 215, 340],
+                            "xp": [40, 110, 240, 460, 770],
+                            "xpVariance": [16, 38, 72, 135, 215]
+                        },
+                        "materialRewardChance": [0.2, 0.5, 0.6, 0.7, 0.8],
+                        "consumableRewardChance": [0.1, 0.2, 0.3, 0.4, 0.5]
+                    },
+                    {
+                        "id": "kill_goblins",
+                        "name": "Goblin Raid",
+                        "descriptionTemplate": "Slay ${required} goblins",
+                        "progressVerb": "slain",
+                        "targetType": "monster_tag",
+                        "targetTag": "goblin",
+                        "baseRequirements": [10, 20, 40, 65, 100],
+                        "requirementVariance": [4, 8, 15, 25, 35],
+                        "baseRewards": {
+                            "currency": [45, 130, 300, 520, 850],
+                            "currencyVariance": [18, 45, 90, 135, 215],
+                            "xp": [22, 65, 150, 300, 500],
+                            "xpVariance": [9, 22, 45, 90, 140]
+                        },
+                        "materialRewardChance": [0, 0.35, 0.45, 0.55, 0.65],
+                        "consumableRewardChance": [0, 0.1, 0.2, 0.3, 0.4]
+                    },
+                    {
+                        "id": "kill_demons",
+                        "name": "Demon Purge",
+                        "descriptionTemplate": "Slay ${required} demons",
+                        "progressVerb": "slain",
+                        "targetType": "monster_tag",
+                        "targetTag": "demon",
+                        "baseRequirements": [3, 7, 15, 25, 40],
+                        "requirementVariance": [1, 3, 5, 8, 12],
+                        "baseRewards": {
+                            "currency": [90, 250, 550, 920, 1480],
+                            "currencyVariance": [36, 85, 165, 240, 380],
+                            "xp": [45, 125, 275, 510, 850],
+                            "xpVariance": [18, 42, 82, 150, 235]
+                        },
+                        "materialRewardChance": [0.2, 0.55, 0.65, 0.75, 0.85],
+                        "consumableRewardChance": [0.12, 0.22, 0.32, 0.42, 0.52]
+                    },
+                    {
+                        "id": "kill_bosses",
+                        "name": "Boss Hunter",
+                        "descriptionTemplate": "Defeat ${required} bosses",
+                        "progressVerb": "defeated",
+                        "targetType": "monster_tag",
+                        "targetTag": "boss",
+                        "baseRequirements": [1, 2, 3, 5, 8],
+                        "requirementVariance": [0, 0, 1, 1, 2],
+                        "baseRewards": {
+                            "currency": [150, 400, 800, 1400, 2200],
+                            "currencyVariance": [50, 120, 240, 400, 600],
+                            "xp": [75, 200, 400, 750, 1200],
+                            "xpVariance": [25, 60, 120, 220, 350]
+                        },
+                        "materialRewardChance": [0.4, 0.65, 0.75, 0.85, 0.95],
+                        "consumableRewardChance": [0.2, 0.35, 0.45, 0.55, 0.65]
+                    },
+                    {
+                        "id": "clear_heroic",
+                        "name": "Heroic Challenge",
+                        "descriptionTemplate": "Clear any dungeon on Heroic ${required} times",
+                        "progressVerb": "cleared",
+                        "targetType": "difficulty",
+                        "targetDifficulty": "heroic",
+                        "baseRequirements": [1, 2, 3, 4, 6],
+                        "requirementVariance": [0, 0, 1, 1, 2],
+                        "baseRewards": {
+                            "currency": [100, 280, 600, 1000, 1600],
+                            "currencyVariance": [40, 95, 180, 300, 450],
+                            "xp": [55, 150, 325, 575, 925],
+                            "xpVariance": [20, 50, 100, 170, 260]
+                        },
+                        "materialRewardChance": [0.3, 0.55, 0.65, 0.75, 0.85],
+                        "consumableRewardChance": [0.15, 0.28, 0.38, 0.48, 0.58]
+                    },
+                    {
+                        "id": "clear_mythic",
+                        "name": "Mythic Challenge",
+                        "descriptionTemplate": "Clear any dungeon on Mythic ${required} times",
+                        "progressVerb": "cleared",
+                        "targetType": "difficulty",
+                        "targetDifficulty": "mythic",
+                        "baseRequirements": [1, 1, 2, 3, 5],
+                        "requirementVariance": [0, 0, 0, 1, 1],
+                        "baseRewards": {
+                            "currency": [150, 400, 850, 1400, 2200],
+                            "currencyVariance": [60, 135, 255, 420, 620],
+                            "xp": [80, 210, 450, 780, 1250],
+                            "xpVariance": [28, 70, 135, 230, 350]
+                        },
+                        "materialRewardChance": [0.4, 0.65, 0.75, 0.85, 0.95],
+                        "consumableRewardChance": [0.2, 0.35, 0.45, 0.55, 0.65]
+                    },
+                    {
+                        "id": "endless_waves",
+                        "name": "Endless Warrior",
+                        "descriptionTemplate": "Reach wave ${required} in Endless mode",
+                        "progressVerb": "reached",
+                        "targetType": "endless_wave",
+                        "baseRequirements": [5, 10, 15, 25, 40],
+                        "requirementVariance": [2, 3, 5, 8, 12],
+                        "baseRewards": {
+                            "currency": [80, 220, 480, 820, 1320],
+                            "currencyVariance": [32, 75, 145, 215, 340],
+                            "xp": [42, 115, 250, 480, 780],
+                            "xpVariance": [16, 40, 75, 140, 220]
+                        },
+                        "materialRewardChance": [0.2, 0.5, 0.6, 0.7, 0.8],
+                        "consumableRewardChance": [0.1, 0.22, 0.32, 0.42, 0.52]
+                    },
+                    {
+                        "id": "deal_damage",
+                        "name": "Damage Dealer",
+                        "descriptionTemplate": "Deal ${required} total damage",
+                        "progressVerb": "dealt",
+                        "targetType": "stat",
+                        "targetStat": "damage_dealt",
+                        "baseRequirements": [500, 1500, 4000, 8000, 15000],
+                        "requirementVariance": [100, 400, 1000, 2000, 4000],
+                        "baseRewards": {
+                            "currency": [60, 170, 380, 660, 1060],
+                            "currencyVariance": [24, 58, 115, 175, 275],
+                            "xp": [30, 85, 190, 380, 620],
+                            "xpVariance": [12, 29, 57, 115, 175]
+                        },
+                        "materialRewardChance": [0.05, 0.4, 0.5, 0.6, 0.7],
+                        "consumableRewardChance": [0, 0.12, 0.22, 0.32, 0.42]
+                    },
+                    {
+                        "id": "healing_done",
+                        "name": "Healer's Duty",
+                        "descriptionTemplate": "Heal ${required} total HP",
+                        "progressVerb": "healed",
+                        "targetType": "stat",
+                        "targetStat": "healing_done",
+                        "baseRequirements": [200, 600, 1500, 3000, 6000],
+                        "requirementVariance": [50, 150, 400, 800, 1500],
+                        "baseRewards": {
+                            "currency": [55, 160, 360, 630, 1020],
+                            "currencyVariance": [22, 55, 108, 165, 260],
+                            "xp": [28, 82, 182, 365, 600],
+                            "xpVariance": [11, 28, 55, 110, 170]
+                        },
+                        "materialRewardChance": [0.05, 0.4, 0.5, 0.6, 0.7],
+                        "consumableRewardChance": [0, 0.15, 0.25, 0.35, 0.45]
+                    },
+                    {
+                        "id": "apply_debuffs",
+                        "name": "Debilitator",
+                        "descriptionTemplate": "Apply ${required} debuffs to enemies",
+                        "progressVerb": "applied",
+                        "targetType": "stat",
+                        "targetStat": "debuffs_applied",
+                        "baseRequirements": [10, 30, 75, 150, 300],
+                        "requirementVariance": [4, 10, 25, 50, 100],
+                        "baseRewards": {
+                            "currency": [50, 145, 335, 585, 950],
+                            "currencyVariance": [20, 50, 100, 155, 245],
+                            "xp": [25, 74, 170, 340, 560],
+                            "xpVariance": [10, 25, 51, 102, 158]
+                        },
+                        "materialRewardChance": [0, 0.38, 0.48, 0.58, 0.68],
+                        "consumableRewardChance": [0, 0.1, 0.2, 0.3, 0.4]
+                    },
+                    {
+                        "id": "apply_buffs",
+                        "name": "Supporter",
+                        "descriptionTemplate": "Apply ${required} buffs to allies",
+                        "progressVerb": "applied",
+                        "targetType": "stat",
+                        "targetStat": "buffs_applied",
+                        "baseRequirements": [10, 30, 75, 150, 300],
+                        "requirementVariance": [4, 10, 25, 50, 100],
+                        "baseRewards": {
+                            "currency": [50, 145, 335, 585, 950],
+                            "currencyVariance": [20, 50, 100, 155, 245],
+                            "xp": [25, 74, 170, 340, 560],
+                            "xpVariance": [10, 25, 51, 102, 158]
+                        },
+                        "materialRewardChance": [0, 0.38, 0.48, 0.58, 0.68],
+                        "consumableRewardChance": [0, 0.1, 0.2, 0.3, 0.4]
+                    },
+                    {
+                        "id": "earn_gold",
+                        "name": "Treasure Hunter",
+                        "descriptionTemplate": "Earn ${required} gold from dungeons",
+                        "progressVerb": "earned",
+                        "targetType": "stat",
+                        "targetStat": "gold_earned",
+                        "baseRequirements": [200, 600, 1500, 3500, 7000],
+                        "requirementVariance": [50, 150, 400, 900, 1800],
+                        "baseRewards": {
+                            "currency": [40, 120, 280, 500, 820],
+                            "currencyVariance": [16, 40, 85, 135, 220],
+                            "xp": [20, 62, 145, 295, 490],
+                            "xpVariance": [8, 21, 44, 89, 140]
+                        },
+                        "materialRewardChance": [0, 0.35, 0.45, 0.55, 0.65],
+                        "consumableRewardChance": [0, 0.08, 0.18, 0.28, 0.38]
+                    },
+                    {
+                        "id": "explore_floors",
+                        "name": "Dungeon Delver",
+                        "descriptionTemplate": "Explore ${required} dungeon floors",
+                        "progressVerb": "explored",
+                        "targetType": "stat",
+                        "targetStat": "floors_explored",
+                        "baseRequirements": [5, 15, 35, 60, 100],
+                        "requirementVariance": [2, 5, 10, 18, 30],
+                        "baseRewards": {
+                            "currency": [55, 160, 365, 635, 1025],
+                            "currencyVariance": [22, 55, 110, 170, 265],
+                            "xp": [28, 82, 185, 370, 605],
+                            "xpVariance": [11, 28, 56, 111, 172]
+                        },
+                        "materialRewardChance": [0.1, 0.42, 0.52, 0.62, 0.72],
+                        "consumableRewardChance": [0.05, 0.14, 0.24, 0.34, 0.44]
+                    },
+                    {
+                        "id": "find_tiles",
+                        "name": "Explorer",
+                        "descriptionTemplate": "Discover ${required} special tiles",
+                        "progressVerb": "discovered",
+                        "targetType": "stat",
+                        "targetStat": "special_tiles_found",
+                        "baseRequirements": [3, 8, 18, 32, 55],
+                        "requirementVariance": [1, 3, 6, 10, 18],
+                        "baseRewards": {
+                            "currency": [50, 150, 345, 605, 980],
+                            "currencyVariance": [20, 52, 104, 162, 255],
+                            "xp": [26, 77, 175, 355, 580],
+                            "xpVariance": [10, 26, 53, 107, 165]
+                        },
+                        "materialRewardChance": [0.05, 0.4, 0.5, 0.6, 0.7],
+                        "consumableRewardChance": [0, 0.12, 0.22, 0.32, 0.42]
+                    }
+                ],
+                "rewardTypes": [
+                    {
+                        "id": "job_xp",
+                        "name": "Job Experience",
+                        "registryKey": "jobs",
+                        "icon": "assets/media/xp.png"
+                    },
+                    {
+                        "id": "material",
+                        "name": "Material",
+                        "registryKey": "materials",
+                        "icon": "assets/media/materials.png"
+                    },
+                    {
+                        "id": "consumable",
+                        "name": "Consumable",
+                        "registryKey": "consumableTypes",
+                        "icon": "assets/media/consumable.png"
+                    }
+                ]
+            }
+        }]
+    }
+}

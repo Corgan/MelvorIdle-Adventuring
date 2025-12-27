@@ -1,6 +1,8 @@
 const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringDungeonCellElement } = await loadModule('src/components/adventuring-dungeon-cell.mjs');
+const { describeEffect, formatRequirement } = await loadModule('src/adventuring-utils.mjs');
+const { TooltipBuilder } = await loadModule('src/adventuring-tooltip.mjs');
 
 class AdventuringDungeonCellRenderQueue {
     constructor() {
@@ -20,7 +22,7 @@ export class AdventuringDungeonCell {
 
         this.renderQueue = new AdventuringDungeonCellRenderQueue();
 
-        //this.icon = cdnMedia('assets/media/main/question.svg');
+        //this.icon = cdnMedia('assets/media/main/question.png');
         this.explored = false;
         this.current = false;
 
@@ -60,6 +62,7 @@ export class AdventuringDungeonCell {
     render() {
         this.renderType();
         this.renderCurrent();
+        this.renderTooltip();
     }
 
     renderType() {
@@ -72,7 +75,7 @@ export class AdventuringDungeonCell {
             if(this.explored || this.type.alwaysShowIcon) {
                 this.component.icon.src = this.type.media;
             } else {
-                this.component.icon.src = cdnMedia('assets/media/main/question.svg');
+                this.component.icon.src = cdnMedia('assets/media/main/question.png');
             }
         }
 
@@ -81,6 +84,58 @@ export class AdventuringDungeonCell {
         this.component.styling.classList.toggle('invisible', this.type !== undefined && this.type === this.floor.wall);
 
         this.renderQueue.type = false;
+    }
+
+    /**
+     * Get tooltip HTML for this cell
+     * @returns {string} Tooltip HTML or empty string if no tooltip
+     */
+    get tooltip() {
+        // No tooltip for empty cells or walls
+        if(this.type === undefined || this.type === this.floor.wall) {
+            return '';
+        }
+
+        // Show "???" for unexplored cells (unless always shown)
+        if(!this.explored && !this.type.alwaysShowIcon) {
+            return '<span class="text-muted">???</span>';
+        }
+
+        const tooltip = TooltipBuilder.create()
+            .header(this.type.name);
+        
+        // Add effect descriptions if tile has effects
+        if(this.type.effects && this.type.effects.length > 0) {
+            tooltip.separator();
+            this.type.effects.forEach(effect => {
+                const desc = describeEffect(effect, this.manager);
+                // Color based on effect type
+                let colorClass = 'text-info';
+                if(effect.type === 'damage' || effect.type === 'damage_percent' || effect.type === 'debuff') {
+                    colorClass = 'text-danger';
+                } else if(effect.type === 'heal' || effect.type === 'heal_percent' || effect.type === 'energy') {
+                    colorClass = 'text-success';
+                } else if(effect.type === 'loot') {
+                    colorClass = 'text-warning';
+                }
+                tooltip.text(desc, colorClass);
+            });
+        }
+        
+        // Show requirements if any
+        if(this.type.requirements && this.type.requirements.length > 0) {
+            tooltip.separator();
+            this.type.requirements.forEach(req => {
+                const { text } = formatRequirement(req, this.manager);
+                tooltip.text(text, 'text-muted');
+            });
+        }
+        
+        return tooltip.build();
+    }
+
+    renderTooltip() {
+        this.component.setTooltipContent(this.tooltip);
     }
 
     renderCurrent() {
@@ -93,7 +148,8 @@ export class AdventuringDungeonCell {
     }
 
     encode(writer, tileMap) {
-        let value = tileMap.indexOf(this.type);
+        let value = this.type !== undefined ? tileMap.indexOf(this.type) : 0;
+        if(value < 0) value = 0; // Fallback if type not found in tileMap
         if(this.explored)
             value |= AdventuringDungeonCell.exploredFlag;
         writer.writeUint8(value);
@@ -106,6 +162,6 @@ export class AdventuringDungeonCell {
         let type = tileMap[mapIdx];
         if(type !== undefined && typeof type !== "string")
             this.type = type;
-        this.explored = (value & AdventuringDungeonCell.exploredFlag) == AdventuringDungeonCell.exploredFlag;
+        this.explored = (value & AdventuringDungeonCell.exploredFlag) === AdventuringDungeonCell.exploredFlag;
     }
 }

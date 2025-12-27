@@ -1,0 +1,253 @@
+{
+    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+    "namespace": "adventuring",
+    "data": {
+        "skillData": [{
+            "skillID": "adventuring:Adventuring",
+            "data": {
+                "jobs": [
+                    {
+                        "id": "assassin",
+                        "tier": 2,
+                        "name": "Assassin",
+                        "media": "melvor:assets/media/bank/potion_thieving_i.png#tint=red",
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:thief", "level": 20 }
+                        ],
+                        "isMilestoneReward": true,
+                        "allowedItems": [
+                            "adventuring:cowl",
+                            "adventuring:vest",
+                            "adventuring:chaps",
+                            "adventuring:vambraces",
+                            "adventuring:boots",
+                            "adventuring:amulet",
+                            "adventuring:ring",
+                            "adventuring:cape",
+                            "adventuring:dagger"
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:hitpoints", "value": 0.75 },
+                            { "id": "adventuring:defence", "value": 0.25 },
+                            { "id": "adventuring:agility", "value": 2.5 },
+                            { "id": "adventuring:strength", "value": 0.5 }
+                        ]
+                    }
+                ],
+                "generators": [
+                    {
+                        "id": "lethal_strike",
+                        "name": "Lethal Strike",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:assassin", "level": 1 }
+                        ],
+                        "energy": 25,
+                        "hits": [
+                            {
+                                "target": "back",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 15,
+                                            "scaling": [
+                                                { "id": "adventuring:agility", "value": 0.4 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:poison",
+                                        "stacks": {
+                                            "base": 2,
+                                            "scaling": [
+                                                { "id": "adventuring:agility", "value": 0.1 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "death_mark",
+                        "name": "Death Mark",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:assassin", "level": 10 }
+                        ],
+                        "energy": 25,
+                        "hits": [
+                            {
+                                "target": "lowest",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 12,
+                                            "scaling": [
+                                                { "id": "adventuring:agility", "value": 0.3 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:marked",
+                                        "stacks": {
+                                            "base": 4,
+                                            "scaling": [
+                                                { "id": "adventuring:agility", "value": 0.1 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "spenders": [
+                    {
+                        "id": "vanish",
+                        "name": "Vanish",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:assassin", "level": 5 }
+                        ],
+                        "cost": 100,
+                        "hits": [
+                            {
+                                "target": "self",
+                                "party": "ally",
+                                "effects": [
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:invisibility",
+                                        "stacks": {
+                                            "base": 1,
+                                            "scaling": []
+                                        }
+                                    },
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:haste",
+                                        "stacks": {
+                                            "base": 2,
+                                            "scaling": [
+                                                { "id": "adventuring:agility", "value": 0.05 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "coup_de_grace",
+                        "name": "Coup de Grace",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:assassin", "level": 15 }
+                        ],
+                        "cost": 150,
+                        "hits": [
+                            {
+                                "target": "lowest",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 60,
+                                            "scaling": [
+                                                { "id": "adventuring:agility", "value": 1.8 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "death_blossom",
+                        "name": "Death Blossom",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:assassin", "level": 25 }
+                        ],
+                        "cost": 180,
+                        "hits": [
+                            {
+                                "target": "aoe",
+                                "party": "enemy",
+                                "delay": 150,
+                                "repeat": 2,
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 15,
+                                            "scaling": [
+                                                { "id": "adventuring:agility", "value": 0.4 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:poison",
+                                        "stacks": {
+                                            "base": 2,
+                                            "scaling": [
+                                                { "id": "adventuring:agility", "value": 0.05 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "passives": [
+                    {
+                        "id": "shadow_cloak",
+                        "name": "Shadow Cloak",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:assassin", "level": 20 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "encounter_start",
+                                "type": "buff",
+                                "target": "self",
+                                "id": "adventuring:invisibility",
+                                "stacks": {
+                                    "base": 1,
+                                    "scaling": []
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "venomous_strikes",
+                        "name": "Venomous Strikes",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:assassin", "level": 30 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "round_start",
+                                "type": "debuff",
+                                "target": "lowest",
+                                "party": "enemy",
+                                "id": "adventuring:poison",
+                                "stacks": {
+                                    "base": 2,
+                                    "scaling": [
+                                        { "id": "adventuring:agility", "value": 0.1 }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        }]
+    }
+}

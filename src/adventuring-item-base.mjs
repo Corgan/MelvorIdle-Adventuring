@@ -1,6 +1,8 @@
 const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringItemBaseElement } = await loadModule('src/components/adventuring-item-base.mjs');
+const { TooltipBuilder } = await loadModule('src/adventuring-tooltip.mjs');
+const { RequirementsChecker, formatRequirements, describeEffect, describeEffectFull, formatTrigger } = await loadModule('src/adventuring-utils.mjs');
 
 const { AdventuringStats } = await loadModule('src/adventuring-stats.mjs');
 
@@ -12,6 +14,7 @@ class AdventuringItemBaseRenderQueue {
         this.selected = false;
         this.highlight = false;
         this.equipped = false;
+        this.newBadge = false;
     }
     updateAll() {
         this.tooltip = true;
@@ -20,6 +23,7 @@ class AdventuringItemBaseRenderQueue {
         this.selected = true;
         this.highlight = true;
         this.equipped = true;
+        this.newBadge = true;
     }
 }
 
@@ -53,10 +57,116 @@ export class AdventuringItemBase extends MasteryAction {
         this.maxUpgrades = 12;
         this.selected = false;
         this.highlight = false;
+        
+        // Special effects for unique items (trigger-based)
+        this.effects = data.effects || [];
+        this.isUnique = data.isUnique || false;
+        
+        // Unlock requirements (skill_level, job_level, etc.)
+        this.requirements = data.requirements || [];
+        this._reqChecker = null; // Created in postDataRegistration
+        
+        // Equipment set membership (set by AdventuringEquipmentSet.postDataRegistration)
+        this.set = null;
+        
+        // Item tier (for sorting/filtering)
+        this.tier = data.tier ?? 1;
+        
+        // Optional flavor text and custom description override
+        this.flavorText = data.flavorText;
+        this.customDescription = data.customDescription;
 
         this.component.clickable.onclick = () => {
             this.slotClicked();
         }
+        
+        // Mastery effects cache - rebuilt on level up
+        this._masteryEffectsCache = null;
+        this._masteryCacheLevel = -1;
+    }
+
+    /**
+     * Get the mastery category for equipment
+     */
+    get masteryCategory() {
+        return this.manager.masteryCategories.getObjectByID('adventuring:equipment');
+    }
+
+    /**
+     * Get cached mastery effects for this item's current level.
+     * Rebuilds cache if level changed.
+     */
+    get masteryEffects() {
+        const currentLevel = this.level;
+        if (this._masteryEffectsCache === null || this._masteryCacheLevel !== currentLevel) {
+            this._rebuildMasteryCache();
+        }
+        return this._masteryEffectsCache;
+    }
+
+    /**
+     * Rebuild the mastery effects cache from the category milestones
+     */
+    _rebuildMasteryCache() {
+        const category = this.masteryCategory;
+        this._masteryCacheLevel = this.level;
+        this._masteryEffectsCache = category ? category.getEffectsAtLevel(this.level) : [];
+    }
+
+    /**
+     * Invalidate mastery cache (called on level up)
+     */
+    invalidateMasteryCache() {
+        this._masteryEffectsCache = null;
+        this._masteryCacheLevel = -1;
+    }
+
+    /**
+     * Check if this item has a specific mastery effect type
+     * @param {string} effectType - The effect type to check for
+     * @returns {boolean}
+     */
+    hasMasteryEffect(effectType) {
+        return this.masteryEffects.some(e => e.type === effectType);
+    }
+
+    /**
+     * Get the total value of a specific mastery effect type
+     * @param {string} effectType - The effect type to sum
+     * @returns {number}
+     */
+    getMasteryEffectValue(effectType) {
+        return this.masteryEffects
+            .filter(e => e.type === effectType)
+            .reduce((sum, e) => sum + (e.value || 0), 0);
+    }
+    
+    /**
+     * Get the description for this item.
+     * Priority: customDescription > auto-generated from effects
+     * FlavorText is appended after the description.
+     */
+    get description() {
+        // Custom description takes priority
+        if(this.customDescription) {
+            return this.flavorText 
+                ? `${this.customDescription}\n\n${this.flavorText}`
+                : this.customDescription;
+        }
+        
+        // Generate from effects if any
+        if(this.effects && this.effects.length > 0) {
+            const effectDescs = this.effects.map(e => describeEffectFull(e, this.manager));
+            const generated = effectDescs.join('. ');
+            
+            if(this.flavorText) {
+                return generated ? `${generated}.\n\n${this.flavorText}` : this.flavorText;
+            }
+            return generated || '';
+        }
+        
+        // Just flavor text
+        return this.flavorText || '';
     }
 
     onLoad() {
@@ -67,6 +177,7 @@ export class AdventuringItemBase extends MasteryAction {
         this.renderQueue.selected = true;
         this.renderQueue.highlight = true;
         this.renderQueue.equipped = true;
+        this.renderQueue.newBadge = true;
     }
 
     postDataRegistration() {
@@ -97,6 +208,11 @@ export class AdventuringItemBase extends MasteryAction {
             this.type = this.manager.itemTypes.getObjectByID(this._type);
             delete this._type;
         }
+        
+        // Create requirements checker
+        if(this.requirements.length > 0) {
+            this._reqChecker = new RequirementsChecker(this.manager, this.requirements);
+        }
     }
 
     calculateStats() {
@@ -107,56 +223,94 @@ export class AdventuringItemBase extends MasteryAction {
     }
 
     get tooltip() {
-        let html = '<div>';
+        const tooltip = TooltipBuilder.create()
+            .header(this.name, this.media);
 
-        html += `<div><span>${this.name}</span></div>`;
         if(this.unlocked) {
-            let empty = `<i class="far fa-star"></i>`;
-            let solid = `<i class="fa fa-star"></i>`;
-            let half = `<i class="fa fa-star-half-alt"></i>`;
+            // Upgrade stars
+            let empty = `<i class="far fa-star text-muted"></i>`;
+            let solid = `<i class="fa fa-star text-warning"></i>`;
+            let half = `<i class="fa fa-star-half-alt text-warning"></i>`;
     
             let starCount = Math.floor(this.upgradeLevel / 2);
             let halfStarCount = this.upgradeLevel % 2;
             let emptyStarCount = ((this.maxUpgrades/2) - (starCount + halfStarCount));
             let stars = [...new Array(starCount).fill(solid), ...new Array(halfStarCount).fill(half), ...new Array(emptyStarCount).fill(empty)];
 
-            html += `<div><small>${stars.join('')}</small></div>`;
+            tooltip.text(stars.join(''), 'text-center');
             
+            // Show current level / max level
             if(this.upgradeLevel > 0) {
-                let { xp, level, percent, nextLevelXP } = this.manager.getMasteryProgress(this);
-                html += `<div><small>Level ${level} / ${this.levelCap}</small></div>`;
-                if(this.level < this.levelCap)
-                    html += `<div><small>${xp} / ${nextLevelXP} XP</small></div>`;
+                if(this.level < this.levelCap) {
+                    tooltip.masteryProgressFor(this.manager, this);
+                    tooltip.hint(`Max Level: ${this.levelCap}`);
+                } else {
+                    tooltip.subheader(`Level ${this.level} / ${this.levelCap}`, 'text-warning');
+                }
+            } else {
+                tooltip.hint(`Max Level: ${this.levelCap} (unlock to level up)`);
             }
 
-            this.stats.forEach((value, stat) => {
-                let statImg = `<img class="skill-icon-xxs" style="height: .66rem; width: .66rem; margin-top: 0;" src="${stat.media}">`
-                html += `<div><small>+${value}${statImg}</small></div>`;
-            });
+            // Stats
+            tooltip.stats(this.stats);
 
-            //html += `</br><div><small>${this.type.name}</small></div>`;
+            // Usable by jobs - show icons instead of text
+            tooltip.usableByJobs(this.jobs, this.manager);
+            
+            // Equipment Set info
+            if(this.set) {
+                tooltip.separator();
+                tooltip.subheader(this.set.name, 'text-info');
+                this.set.bonuses.forEach(bonus => {
+                    const color = 'text-muted';
+                    tooltip.text(`<span class="${color}">(${bonus.pieces}pc)</span> ${bonus.description}`, 'small');
+                });
+            }
+            
+            // Show special effects for unique items
+            if(this.effects && this.effects.length > 0) {
+                tooltip.separator();
+                if(this.isUnique) {
+                    tooltip.warning('Unique');
+                }
+                this.getEffectDescriptions().forEach(desc => {
+                    tooltip.info(desc);
+                });
+            }
+            
+            // Next milestone
+            tooltip.nextMilestone(this.manager, this);
 
-            let validJobs = this.jobs.filter(job => job.id !== "adventuring:none");
-            if(validJobs.length > 0) {
-                html += `<div><small>Usable By: `;
-                let jobList = validJobs.map(job => job.name).join(', ');
-                if(this.jobs.length == this.manager.jobs.size)
-                    jobList = "Any";
-                html += `${jobList}</small></div>`;
+            // Requirements (for items that have unlock requirements)
+            if(this.requirements.length > 0) {
+                tooltip.separator();
+                tooltip.hint('Requirements:');
+                formatRequirements(this.requirements, this.manager).forEach(({ text, met }) => {
+                    if(met) {
+                        tooltip.text(`<i class="fa fa-check text-success mr-1"></i>${text}`, 'text-success');
+                    } else {
+                        tooltip.text(`<i class="fa fa-times text-danger mr-1"></i>${text}`, 'text-danger');
+                    }
+                });
+            }
+
+            // Upgrade cost
+            if(this.materials !== undefined) {
+                let upgradeOrUnlock = (this.upgradeLevel === 0 ? 'Unlock': 'Upgrade');
+                tooltip.separator();
+                const costItems = [];
+                this.materials.forEach((amount, material) => {
+                    const cost = this.getCost(material);
+                    const owned = material.count;
+                    const color = owned >= cost ? 'text-success' : 'text-danger';
+                    costItems.push(tooltip.iconValue(material.media, `<span class="${color}">${cost}</span> <small class="text-muted">(${owned})</small>`));
+                });
+                tooltip.hint(`${upgradeOrUnlock} Cost:`);
+                tooltip.statRow(...costItems);
             }
         }
-
-        if(this.materials !== undefined) {
-            let upgradeOrUnlock = (this.upgradeLevel === 0 ? 'Unlock': 'Upgrade');
-            html += `<div><small>${upgradeOrUnlock} Cost: </small>`
-            this.materials.forEach((amount, material) => {
-                let statImg = `<img class="skill-icon-xxs" style="height: .66rem; width: .66rem; margin-top: 0;" src="${material.media}">`
-                html += `<small>${this.getCost(material)}${statImg}</small>`;
-            });
-            html += `</div>`;
-        }
-        html += '</div>'
-        return html;
+        
+        return tooltip.build();
     }
 
     get name() {
@@ -164,7 +318,7 @@ export class AdventuringItemBase extends MasteryAction {
     }
 
     get media() {
-        return this.unlocked ? this.getMediaURL(this._media) : this.getMediaURL('melvor:assets/media/main/question.svg');
+        return this.unlocked ? this.getMediaURL(this._media) : this.getMediaURL('melvor:assets/media/main/question.png');
     }
 
     get level() {
@@ -183,8 +337,14 @@ export class AdventuringItemBase extends MasteryAction {
         return this.manager.armory.unlocked.get(this) === true;
     }
 
+    get category() {
+        return this.manager.categories.getObjectByID('adventuring:Equipment');
+    }
+
     get upgradeable() {
         if(this.upgradeLevel >= this.maxUpgrades)
+            return false;
+        if(this.materials === undefined)
             return false;
         for(let material of this.materials.keys()) {
             if(this.getCost(material) > this.manager.stash.materialCounts.get(material))
@@ -221,7 +381,7 @@ export class AdventuringItemBase extends MasteryAction {
 
     get slots() {
         let slots = [];
-        if(this.type.slots !== undefined)
+        if(this.type !== undefined && this.type.slots !== undefined)
             slots = this.type.slots.map(slotType => this.manager.itemSlots.getObjectByID(slotType));
         return slots;
     }
@@ -240,16 +400,64 @@ export class AdventuringItemBase extends MasteryAction {
         return pairs;
     }
 
+    /**
+     * Check if all requirements are met to unlock/craft this item
+     * @returns {boolean} True if requirements are met (or no requirements exist)
+     */
+    get requirementsMet() {
+        if(!this._reqChecker) return true;
+        return this._reqChecker.check();
+    }
+    
+    /**
+     * Get formatted effect descriptions for tooltip display
+     * @returns {Array<string>} Array of effect description strings
+     */
+    getEffectDescriptions() {
+        if(!this.effects || this.effects.length === 0) return [];
+        
+        return this.effects.map(effect => {
+            // Use description if explicitly provided
+            if(effect.description) return effect.description;
+            
+            // Build description from effect data
+            let trigger = formatTrigger(effect.trigger);
+            let desc = describeEffect(effect, this.manager);
+            
+            // Add chance if applicable
+            if(effect.chance !== undefined && effect.chance < 1) {
+                const chancePercent = Math.round(effect.chance * 100);
+                desc = `${chancePercent}% chance: ${desc}`;
+            }
+            
+            // Combine trigger and description for non-passive effects
+            if(trigger && effect.trigger !== 'passive') {
+                return `${trigger}: ${desc}`;
+            }
+            
+            return desc;
+        });
+    }
+
     getCost(material) {
         let amount = this.materials.get(material);
-        return amount !== undefined ? Math.pow(5, this.upgradeLevel) * amount : 0;
+        if(amount === undefined) return 0;
+        
+        // Apply upgrade cost modifier from mastery
+        const costReduction = this.manager.modifiers.getUpgradeCostReduction(this);
+        const baseCost = Math.pow(5, this.upgradeLevel) * amount;
+        return Math.max(1, Math.floor(baseCost * (1 + costReduction)));
     }
 
     addXP(xp) {
         let { currentXP, level, percent, nextLevelXP } = this.manager.getMasteryProgress(this);
         if(level < this.levelCap) {
-            this.manager.addMasteryXP(this, xp);
-            this.manager.addMasteryPoolXP(xp);
+            // Apply equipment mastery XP bonus from modifier system
+            const xpBonus = this.manager.modifiers.getMasteryXPBonus(this);
+            const modifiedXP = Math.floor(xp * (1 + xpBonus));
+            
+            this.manager.addMasteryXP(this, modifiedXP);
+            this.manager.addMasteryPoolXP(modifiedXP);
         }
         this.renderQueue.tooltip = true;
         this.manager.party.all.forEach(member => member.equipment.slots.forEach(equipmentSlot => {
@@ -301,10 +509,14 @@ export class AdventuringItemBase extends MasteryAction {
         this.renderSelected();
         this.renderHighlight();
         this.renderEquipped();
+        this.renderNewBadge();
     }
 
     renderTooltip() {
         if(!this.renderQueue.tooltip)
+            return;
+
+        if(this.component.tooltip === undefined)
             return;
 
         this.component.tooltip.setContent(this.tooltip);
@@ -358,5 +570,15 @@ export class AdventuringItemBase extends MasteryAction {
         this.component.icon.classList.toggle('opacity-40', this.equipped && (this.selected || this.highlight));
 
         this.renderQueue.equipped = false;
+    }
+
+    renderNewBadge() {
+        if(!this.renderQueue.newBadge)
+            return;
+
+        const isNew = this.manager.armory.isNew(this);
+        this.component.newBadge.classList.toggle('d-none', !isNew);
+
+        this.renderQueue.newBadge = false;
     }
 }

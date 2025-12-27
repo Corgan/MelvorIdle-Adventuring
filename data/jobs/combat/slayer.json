@@ -1,0 +1,189 @@
+{
+    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+    "namespace": "adventuring",
+    "data": {
+        "skillData": [{
+            "skillID": "adventuring:Adventuring",
+            "data": {
+                "jobs": [
+                    {
+                        "id": "slayer",
+                        "tier": 2,
+                        "name": "Slayer",
+                        "media": "melvor:assets/media/bank/potion_attack_i.png#tint=gray",
+                        "requirements": [
+                            { "type": "slayer_tasks_completed", "count": 10 },
+                            { "type": "job_level", "job": "adventuring:fighter", "level": 10 },
+                            { "type": "job_level", "job": "adventuring:ranger", "level": 10 },
+                            { "type": "job_level", "job": "adventuring:cleric", "level": 10 }
+                        ],
+                        "isMilestoneReward": true,
+                        "allowedItems": [
+                            "adventuring:helm",
+                            "adventuring:platebody",
+                            "adventuring:platelegs",
+                            "adventuring:gauntlets",
+                            "adventuring:sabatons",
+
+                            "adventuring:cowl",
+                            "adventuring:vest",
+                            "adventuring:chaps",
+                            "adventuring:vambraces",
+                            "adventuring:leather_boots",
+
+                            "adventuring:wizard_hat",
+                            "adventuring:robes",
+                            "adventuring:wizard_bottoms",
+                            "adventuring:wizard_gloves",
+                            "adventuring:wizard_boots",
+
+                            "adventuring:amulet",
+                            "adventuring:ring",
+                            "adventuring:cape",
+                            
+                            "adventuring:shield",
+                            "adventuring:dagger",
+                            "adventuring:sword1h",
+                            "adventuring:sword2h",
+                            "adventuring:axe",
+                            "adventuring:scimitar",
+                            "adventuring:knives",
+                            "adventuring:javelin",
+                            "adventuring:shortbow",
+                            "adventuring:longbow",
+                            "adventuring:crossbow",
+                            "adventuring:wand",
+                            "adventuring:staff"
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:hitpoints", "value": 1.0 },
+                            { "id": "adventuring:defence", "value": 0.5 },
+                            { "id": "adventuring:agility", "value": 0.75 },
+                            { "id": "adventuring:strength", "value": 0.75 },
+                            { "id": "adventuring:ranged", "value": 0.75 },
+                            { "id": "adventuring:magic", "value": 0.75 }
+                        ]
+                    }
+                ],
+                "generators": [
+                    {
+                        "id": "study",
+                        "name": "Study",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:slayer", "level": 1 }
+                        ],
+                        "energy": 25,
+                        "learnType": "generator",
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 8,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.15 },
+                                                { "id": "adventuring:ranged", "value": 0.15 },
+                                                { "id": "adventuring:magic", "value": 0.15 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "analyze",
+                        "name": "Analyze",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:slayer", "level": 20 }
+                        ],
+                        "energy": 30,
+                        "learnType": "generator",
+                        "learnBonus": 0.25,
+                        "hits": [
+                            {
+                                "target": "random",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 12,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.2 },
+                                                { "id": "adventuring:ranged", "value": 0.2 },
+                                                { "id": "adventuring:magic", "value": 0.2 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "spenders": [
+                    {
+                        "id": "assimilate",
+                        "name": "Assimilate",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:slayer", "level": 5 }
+                        ],
+                        "cost": 100,
+                        "learnType": "spender",
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 25,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.4 },
+                                                { "id": "adventuring:ranged", "value": 0.4 },
+                                                { "id": "adventuring:magic", "value": 0.4 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "devour",
+                        "name": "Devour",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:slayer", "level": 30 }
+                        ],
+                        "cost": 100,
+                        "learnType": "spender",
+                        "learnBonus": 0.25,
+                        "hits": [
+                            {
+                                "target": "aoe",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 15,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.25 },
+                                                { "id": "adventuring:ranged", "value": 0.25 },
+                                                { "id": "adventuring:magic", "value": 0.25 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        }]
+    }
+}

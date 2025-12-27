@@ -1,6 +1,8 @@
 const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringStats } = await loadModule('src/adventuring-stats.mjs');
+const { ScalableEffect } = await loadModule('src/adventuring-scalable-effect.mjs');
+const { RequirementsChecker, buildHitEffectReplacements, parseDescription, describeEffectFull } = await loadModule('src/adventuring-utils.mjs');
 
 const { AdventuringAbilityElement } = await loadModule('src/components/adventuring-ability.mjs');
 const { AdventuringAbilityDetailsElement } = await loadModule('src/components/adventuring-ability-details.mjs');
@@ -11,116 +13,41 @@ class AdventuringAbilityRenderQueue {
         this.description = false;
         this.highlight = false;
         this.descriptionCharacter = false;
+        this.newBadge = false;
     }
 
     queueAll() {
         this.name = true;
         this.description = true;
         this.highlight = true;
+        this.newBadge = true;
     }
 }
 
-class AdventuringAbilityHitEffect {
+class AdventuringAbilityHitEffect extends ScalableEffect {
     constructor(manager, game, ability, hit, data) {
-        this.manager = manager;
-        this.game = game;
+        super(manager, game, data);
         this.hit = hit;
         this.ability = ability;
-        this.type = data.type;
 
-        if(data.id !== undefined)
-            this.id = data.id;
-        
         if(data.energy !== undefined)
             this.energy = data.energy;
-
-        if(data.amount !== undefined) {
-            this.amount = { base: data.amount.base };
-            if(data.amount.scaling !== undefined) {
-                this.amount._scaling = data.amount.scaling;
-                this.amount.scaling = new AdventuringStats(this.manager, this.game);
-            }
-        }
-
-        if(data.stacks !== undefined) {
-            this.stacks = { base: data.stacks.base };
-            if(data.stacks.scaling !== undefined) {
-                this.stacks._scaling = data.stacks.scaling;
-                this.stacks.scaling = new AdventuringStats(this.manager, this.game);
-            }
-        }
     }
 
     postDataRegistration() {
-        if(this.amount !== undefined && this.amount._scaling !== undefined) {
-            this.amount._scaling.forEach(({ id, value }) => {
-                this.amount.scaling.set(id, value);
-            });
-            delete this.amount._scaling;
-        } else {
-            if(this.type === "buff" || this.type === "debuff") {
-                let aura = this.manager.auras.getObjectByID(this.id);
-                if(aura !== undefined && aura.amount !== undefined) {
+        super.postDataRegistration();
+        
+        // Auto-populate amount/stacks from aura defaults for buff/debuff effects
+        if(this.type === "buff" || this.type === "debuff") {
+            let aura = this.manager.auras.getObjectByID(this.id);
+            if(aura !== undefined) {
+                if(this.amount === undefined && aura.amount !== undefined) {
                     this.amount = { base: aura.amount };
                 }
-            }
-        }
-        if(this.stacks !== undefined && this.stacks._scaling !== undefined) {
-            this.stacks._scaling.forEach(({ id, value }) => {
-                this.stacks.scaling.set(id, value);
-            });
-            delete this.stacks._scaling;
-        } else {
-            if(this.type === "buff" || this.type === "debuff") {
-                let aura = this.manager.auras.getObjectByID(this.id);
-                if(aura !== undefined && aura.stacks !== undefined) {
+                if(this.stacks === undefined && aura.stacks !== undefined) {
                     this.stacks = { base: aura.stacks };
                 }
             }
-        }
-    }
-
-    getAmount(stats, isDesc=false) {
-        let amount = this.amount !== undefined && this.amount.base !== undefined ? this.amount.base : 0;
-        if(isDesc) {
-            let ret = amount;
-            if(this.amount !== undefined && this.amount.scaling !== undefined) {
-                let showScale = stats === undefined || stats.size === 0;
-                ret += [...this.amount.scaling].reduce((str, [stat, scale]) => {
-                    let value = showScale ? scale : Math.floor(stats.get(stat) * scale);
-                    let statImg = `<img class="skill-icon-xxs" style="height: .66rem; width: .66rem; margin-top: 0;" src="${stat.media}">`
-                    return str + ` + ${value} ${statImg}`;
-                }, '');
-            }
-            return ret;
-        } else {
-            if(this.amount !== undefined && this.amount.scaling !== undefined && stats !== undefined)
-                amount += [...this.amount.scaling].reduce((bonus, [stat, scale]) => {
-                    return bonus + (stats.get(stat) * scale)
-                }, 0);
-            return Math.floor(amount);
-        }
-    }
-
-    getStacks(stats, isDesc=false) {
-        let stacks = this.stacks !== undefined && this.stacks.base !== undefined ? this.stacks.base : 0;
-        if(isDesc) {
-            let ret = stacks;
-            if(this.stacks !== undefined && this.stacks.scaling !== undefined) {
-                let showScale = stats === undefined || stats.size === 0;
-                ret += [...this.stacks.scaling].reduce((str, [stat, scale]) => {
-                    let value = showScale ? scale : Math.floor(stats.get(stat) * scale);
-                    let statImg = `<img class="skill-icon-xxs" style="height: .66rem; width: .66rem; margin-top: 0;" src="${stat.media}">`
-                    return str + ` + ${value} ${statImg}`;
-                }, '');
-            }
-            return ret;
-        } else {
-            if(this.stacks !== undefined && this.stacks.scaling !== undefined && stats !== undefined)
-                stacks += [...this.stacks.scaling].reduce((bonus, [stat, scale]) => {
-                    return bonus + (stats.get(stat) * scale)
-                }, 0);
-            return Math.floor(stacks);
         }
     }
 }
@@ -152,17 +79,20 @@ export class AdventuringAbility extends NamespacedObject {
         this.manager = manager;
         this.game = game;
         this.name = data.name;
-        this.description = data.description;
+        this._descriptionTemplate = data.description; // Template with placeholders like {hit.0.effect.0.amount}
+        this.flavorText = data.flavorText; // Optional flavor text
         this.hits = data.hits.map(hit => new AdventuringAbilityHit(this.manager, this.game, this, hit));
         if(data.energy)
             this.energy = data.energy;
         if(data.cost)
             this.cost = data.cost;
         this.isEnemy = data.isEnemy === true;
+        this.isAchievementAbility = data.isAchievementAbility === true;
         this.requirements = data.requirements;
         this.highlight = false;
 
         this.component = createElement('adventuring-ability');
+        this.component.setAbility(this);
 
         this.details = createElement('adventuring-ability-details');
 
@@ -171,78 +101,87 @@ export class AdventuringAbility extends NamespacedObject {
 
     postDataRegistration() {
         this.hits.forEach(hit => hit.postDataRegistration());
+        // Create requirements checker for this ability
+        this._reqChecker = new RequirementsChecker(this.manager, this.requirements);
     }
 
+    /**
+     * Check if this ability is unlocked by a specific job
+     * @param {object} job - Job to check
+     * @returns {boolean} True if this ability references the job in requirements
+     */
     unlockedBy(job) {
-        if(this.isEnemy)
-            return false;
-        if(this.requirements.length == 0)
-            return false;
-        return this.requirements.reduce((unlockedBy, requirement) => {
-            if(requirement.type == "current_job_level" && job.id === requirement.job)
-                return true;
-            if(requirement.type == "job_level" && job.id === requirement.job)
-                return true;
-            return unlockedBy;
-        }, false);
+        if(this.isEnemy) return false;
+        return this._reqChecker?.referencesJob(job.id) ?? false;
     }
 
     get unlocked() {
+        // Enemy abilities are unlocked if learned by Blue Mage
         if(this.isEnemy)
-            return false;
-        if(this.requirements.length == 0)
-            return true;
-        return this.requirements.reduce((equipable, requirement) => {
-            if(requirement.type == "job_level" || requirement.type == "current_job_level") {
-                let job = this.manager.jobs.getObjectByID(requirement.job);
-                if(job === undefined)
-                    return false;
-                if(this.manager.getMasteryLevel(job) < requirement.level)
-                    return false;
-            }
-            return equipable;
-        }, true);
+            return this.manager.learnedAbilities.has(this.id);
+        
+        // Achievement abilities are unlocked via achievement completion
+        if(this.isAchievementAbility)
+            return this.manager.unlockedAchievementAbilities.has(this.id);
+        
+        // Use RequirementsChecker for standard job_level requirements
+        // Note: For unlocked, we treat current_job_level same as job_level
+        return this._reqChecker?.check() ?? true;
     }
 
     canEquip(character) {
-        if(this.isEnemy)
-            return false;
-        if(this.requirements.length == 0)
-            return true;
-        return this.requirements.reduce((equipable, requirement) => {
-
-            if(requirement.type == "current_job_level") {
-                if(character.combatJob !== undefined && character.combatJob.id === requirement.job) {
-                    if(this.manager.getMasteryLevel(character.combatJob) < requirement.level)
-                        return false;
-                } else if(character.passiveJob !== undefined && character.passiveJob.id === requirement.job) {
-                    if(this.manager.getMasteryLevel(character.passiveJob) < requirement.level)
-                        return false;
-                } else {
-                    return false;
-                }
-            }
-
-            if(requirement.type == "job_level") {
-                let job = this.manager.jobs.getObjectByID(requirement.job);
-                if(job === undefined)
-                    return false;
-                if(this.manager.getMasteryLevel(job) < requirement.level)
-                    return false;
-            }
-
-            return equipable;
-        }, true);
+        // Blue Mage (Slayer) can equip learned enemy abilities
+        if(this.isEnemy) {
+            if(!this.manager.learnedAbilities.has(this.id)) return false;
+            const slayerJob = this.manager.jobs.getObjectByID('adventuring:slayer');
+            if(!slayerJob) return false;
+            return (character.combatJob === slayerJob) || (character.passiveJob === slayerJob);
+        }
+        
+        // Achievement abilities can be equipped by anyone once unlocked
+        if(this.isAchievementAbility) {
+            return this.manager.unlockedAchievementAbilities.has(this.id);
+        }
+        
+        // Use RequirementsChecker with character context for current_job_level
+        return this._reqChecker?.check({ character }) ?? true;
     }
 
     getDescription(stats, isDesc=false) {
-        return this.hits.reduce((desc, hit, i) => {
-            return hit.effects.reduce((hitDesc, effect, e) => {
-                hitDesc = hitDesc.replace(`{hit.${i}.effect.${e}.amount}`, effect.getAmount(stats, isDesc));
-                hitDesc = hitDesc.replace(`{hit.${i}.effect.${e}.stacks}`, effect.getStacks(stats, isDesc));
-                return hitDesc;
-            }, desc);
-        }, this.description);
+        // If we have a template description, use it with placeholders
+        if(this._descriptionTemplate) {
+            const replacements = buildHitEffectReplacements(this.hits, stats, isDesc);
+            let desc = parseDescription(this._descriptionTemplate, replacements);
+            if(this.flavorText) {
+                desc = `${desc}\n\n${this.flavorText}`;
+            }
+            return desc;
+        }
+        
+        // Auto-generate from hit effects
+        const effectDescs = [];
+        this.hits.forEach((hit, hitIndex) => {
+            hit.effects.forEach(effect => {
+                // Build a simplified effect object for description
+                const effectObj = {
+                    type: effect.type,
+                    trigger: effect.trigger || 'on_hit',
+                    value: effect.getAmount ? effect.getAmount(stats, isDesc) : (effect.amount?.base || effect.amount || 0),
+                    stacks: effect.getStacks ? effect.getStacks(stats, isDesc) : (effect.stacks?.base || effect.stacks || 0),
+                    id: effect.id,
+                    target: hit.target,
+                    condition: effect.condition,
+                    chance: effect.chance
+                };
+                effectDescs.push(describeEffectFull(effectObj, this.manager));
+            });
+        });
+        
+        let generated = effectDescs.join('. ');
+        if(this.flavorText) {
+            generated = generated ? `${generated}.\n\n${this.flavorText}` : this.flavorText;
+        }
+        return generated || 'No effect.';
     }
 
     setHighlight(highlight) {
@@ -254,6 +193,7 @@ export class AdventuringAbility extends NamespacedObject {
         this.renderName();
         this.renderDescription();
         this.renderHighlight();
+        this.renderNewBadge();
     }
 
     renderName() {
@@ -261,11 +201,11 @@ export class AdventuringAbility extends NamespacedObject {
             return;
 
         if(this.unlocked) {
-            this.component.name.textContent = this.name;
-            this.details.name.textContent = this.name;
+            this.component.nameText.textContent = this.name;
+            this.details.nameText.textContent = this.name;
         } else {
-            this.component.name.textContent = "???";
-            this.details.name.textContent = "???";
+            this.component.nameText.textContent = "???";
+            this.details.nameText.textContent = "???";
         }
 
         this.renderQueue.name = false;
@@ -298,5 +238,18 @@ export class AdventuringAbility extends NamespacedObject {
         this.component.styling.classList.toggle('bg-combat-menu-selected', this.highlight && this.unlocked);
 
         this.renderQueue.highlight = false;
+    }
+
+    renderNewBadge() {
+        if(!this.renderQueue.newBadge)
+            return;
+        
+        let isNew = this.unlocked && !this.manager.seenAbilities.has(this.id);
+        if(this.component.newBadge !== undefined)
+            this.component.newBadge.classList.toggle('d-none', !isNew);
+        if(this.details.newBadge !== undefined)
+            this.details.newBadge.classList.toggle('d-none', !isNew);
+        
+        this.renderQueue.newBadge = false;
     }
 }

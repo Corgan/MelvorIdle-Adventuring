@@ -9,6 +9,7 @@ export class AdventuringDungeonTile extends NamespacedObject {
         this.name = data.name;
         this._media = data.media;
         this.alwaysShowIcon = data.alwaysShowIcon !== undefined && data.alwaysShowIcon;
+        this.masteryUnlock = data.masteryUnlock === true;
 
         if(data.requirements !== undefined)
             this.requirements = data.requirements;
@@ -30,7 +31,7 @@ export class AdventuringDungeonTile extends NamespacedObject {
         if(this.requirements === undefined)
             return false;
         for(let requirement of this.requirements) {
-            if(requirement.type == "current_job") {
+            if(requirement.type === "current_job") {
                 if(!this.manager.party.all.some(member => (member.combatJob !== undefined && member.combatJob.id === requirement.job) || (member.passiveJob !== undefined && member.passiveJob.id === requirement.job)))
                     return false;
             }
@@ -42,7 +43,7 @@ export class AdventuringDungeonTile extends NamespacedObject {
         if(this.requirements === undefined)
             return true;
         for(let requirement of this.requirements) {
-            if(requirement.type == "current_job") {
+            if(requirement.type === "current_job") {
                 if(!this.manager.party.all.some(member => !member.dead && ((member.combatJob !== undefined && member.combatJob.id === requirement.job) || (member.passiveJob !== undefined && member.passiveJob.id === requirement.job))))
                     return false;
             }

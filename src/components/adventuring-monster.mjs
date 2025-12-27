@@ -8,6 +8,7 @@ export class AdventuringMonsterElement extends HTMLElement {
         this.icon = getElementFromFragment(this._content, 'icon', 'img');
         this.nameText = getElementFromFragment(this._content, 'name', 'span');
         this.level = getElementFromFragment(this._content, 'level', 'small');
+        this.newBadge = getElementFromFragment(this._content, 'new-badge', 'span');
         
         this.progressContainer = getElementFromFragment(this._content, 'progress-container', 'div');
         this.masteryProgress = getElementFromFragment(this._content, 'mastery-progress', 'progress-bar');

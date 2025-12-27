@@ -1,0 +1,862 @@
+{
+    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+    "namespace": "adventuring",
+    "data": {
+        "skillData": [{
+            "skillID": "adventuring:Adventuring",
+            "data": {
+                "consumables": [
+                    {
+                        "id": "ale_of_courage",
+                        "name": "Ale of Courage",
+                        "media": "melvor:assets/media/bank/potion_strength_i.png",
+                        "type": "drink",
+                        "source": "tavern",
+                        "tier": 1,
+                        "durationMode": "runs",
+                        "trigger": "encounter_start",
+                        "duration": 5,
+                        "target": "party",
+                        "effects": [
+                            {
+                                "type": "buff",
+                                "id": "adventuring:might",
+                                "stacks": { "base": 3, "scaling": [] }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "wine_of_wisdom",
+                        "name": "Wine of Wisdom",
+                        "media": "melvor:assets/media/bank/potion_magic_i.png",
+                        "type": "drink",
+                        "source": "tavern",
+                        "tier": 1,
+                        "durationMode": "runs",
+                        "trigger": "passive",
+                        "duration": 5,
+                        "target": "party",
+                        "effects": [
+                            {
+                                "type": "stat_bonus",
+                                "stat": "xp_bonus",
+                                "value": 0.15
+                            }
+                        ]
+                    },
+                    {
+                        "id": "mead_of_fortitude",
+                        "name": "Mead of Fortitude",
+                        "media": "melvor:assets/media/bank/potion_defence_i.png",
+                        "type": "drink",
+                        "source": "tavern",
+                        "tier": 1,
+                        "durationMode": "runs",
+                        "trigger": "encounter_start",
+                        "duration": 5,
+                        "target": "party",
+                        "effects": [
+                            {
+                                "type": "buff",
+                                "id": "adventuring:fortify",
+                                "stacks": { "base": 3, "scaling": [] }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "spirits_of_swiftness",
+                        "name": "Spirits of Swiftness",
+                        "media": "melvor:assets/media/bank/potion_agility_i.png",
+                        "type": "drink",
+                        "source": "tavern",
+                        "tier": 1,
+                        "durationMode": "runs",
+                        "trigger": "encounter_start",
+                        "duration": 5,
+                        "target": "party",
+                        "effects": [
+                            {
+                                "type": "buff",
+                                "id": "adventuring:haste",
+                                "stacks": { "base": 2, "scaling": [] }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "dragons_breath_brew",
+                        "name": "Dragon's Breath Brew",
+                        "media": "melvor:assets/media/bank/dragon_fire_potion.png",
+                        "type": "drink",
+                        "source": "tavern",
+                        "tier": 2,
+                        "durationMode": "runs",
+                        "trigger": "on_hit",
+                        "duration": 5,
+                        "target": "party",
+                        "effects": [
+                            {
+                                "type": "debuff",
+                                "id": "adventuring:burn",
+                                "stacks": { "base": 1, "scaling": [] }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "frost_giants_grog",
+                        "name": "Frost Giant's Grog",
+                        "media": "melvor:assets/media/bank/frost_potion.png",
+                        "type": "drink",
+                        "source": "tavern",
+                        "tier": 2,
+                        "durationMode": "runs",
+                        "trigger": "on_hit",
+                        "duration": 5,
+                        "target": "party",
+                        "effects": [
+                            {
+                                "type": "debuff",
+                                "id": "adventuring:chill",
+                                "stacks": { "base": 1, "scaling": [] }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "healers_honeywine",
+                        "name": "Healer's Honeywine",
+                        "media": "melvor:assets/media/bank/potion_hitpoints_ii.png",
+                        "type": "drink",
+                        "source": "tavern",
+                        "tier": 1,
+                        "durationMode": "runs",
+                        "trigger": "passive",
+                        "duration": 5,
+                        "target": "party",
+                        "effects": [
+                            {
+                                "type": "stat_bonus",
+                                "stat": "healing_bonus",
+                                "value": 0.25
+                            }
+                        ]
+                    },
+                    {
+                        "id": "rogues_rum",
+                        "name": "Rogue's Rum",
+                        "media": "melvor:assets/media/bank/potion_ranged_i.png",
+                        "type": "drink",
+                        "source": "tavern",
+                        "tier": 1,
+                        "durationMode": "runs",
+                        "trigger": "encounter_start",
+                        "duration": 5,
+                        "target": "party",
+                        "effects": [
+                            {
+                                "type": "buff",
+                                "id": "adventuring:evasion",
+                                "stacks": { "base": 3, "scaling": [] }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "berserkers_bloodwine",
+                        "name": "Berserker's Bloodwine",
+                        "media": "melvor:assets/media/bank/potion_strength_ii.png",
+                        "type": "drink",
+                        "source": "tavern",
+                        "tier": 2,
+                        "durationMode": "runs",
+                        "trigger": "encounter_start",
+                        "duration": 5,
+                        "target": "party",
+                        "effects": [
+                            {
+                                "type": "buff",
+                                "id": "adventuring:berserk",
+                                "stacks": { "base": 2, "scaling": [] }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "explorers_elixir",
+                        "name": "Explorer's Elixir",
+                        "media": "melvor:assets/media/bank/potion_attack_ii.png",
+                        "type": "drink",
+                        "source": "tavern",
+                        "tier": 2,
+                        "durationMode": "runs",
+                        "trigger": "passive",
+                        "duration": 5,
+                        "target": "party",
+                        "effects": [
+                            {
+                                "type": "stat_bonus",
+                                "stat": "material_bonus",
+                                "value": 0.10
+                            }
+                        ]
+                    },
+                    {
+                        "id": "champions_chalice",
+                        "name": "Champion's Chalice",
+                        "media": "melvor:assets/media/bank/potion_accuracy_ii.png",
+                        "type": "drink",
+                        "source": "tavern",
+                        "tier": 2,
+                        "durationMode": "runs",
+                        "trigger": "passive",
+                        "duration": 5,
+                        "target": "party",
+                        "effects": [
+                            {
+                                "type": "stat_bonus",
+                                "stat": "currency_bonus",
+                                "value": 0.20
+                            }
+                        ]
+                    },
+                    {
+                        "id": "mystic_moonshine",
+                        "name": "Mystic Moonshine",
+                        "media": "melvor:assets/media/bank/potion_magic_ii.png",
+                        "type": "drink",
+                        "source": "tavern",
+                        "tier": 2,
+                        "durationMode": "runs",
+                        "trigger": "passive",
+                        "duration": 5,
+                        "target": "party",
+                        "effects": [
+                            {
+                                "type": "stat_bonus",
+                                "stat": "energy_bonus",
+                                "value": 0.15
+                            }
+                        ]
+                    },
+                    {
+                        "id": "void_touched_wine",
+                        "name": "Void-Touched Wine",
+                        "media": "melvor:assets/media/bank/decay_potion.png",
+                        "type": "drink",
+                        "source": "tavern",
+                        "tier": 2,
+                        "durationMode": "runs",
+                        "trigger": "passive",
+                        "duration": 5,
+                        "target": "party",
+                        "effects": [
+                            {
+                                "type": "damage_bonus",
+                                "element": "dark",
+                                "value": 0.25
+                            },
+                            {
+                                "type": "resistance",
+                                "element": "dark",
+                                "value": 0.25
+                            }
+                        ]
+                    },
+                    {
+                        "id": "reality_anchor_brew",
+                        "name": "Reality Anchor Brew",
+                        "media": "melvor:assets/media/bank/potion_defence_ii.png",
+                        "type": "drink",
+                        "source": "tavern",
+                        "tier": 2,
+                        "durationMode": "runs",
+                        "trigger": "passive",
+                        "duration": 5,
+                        "target": "party",
+                        "effects": [
+                            {
+                                "type": "effect_immunity",
+                                "effect": "displacement"
+                            },
+                            {
+                                "type": "stat_bonus",
+                                "stat": "debuff_duration_reduction",
+                                "value": 0.50
+                            }
+                        ]
+                    },
+                    {
+                        "id": "entropic_elixir",
+                        "name": "Entropic Elixir",
+                        "media": "melvor:assets/media/bank/decay_potion.png",
+                        "type": "drink",
+                        "source": "tavern",
+                        "tier": 2,
+                        "durationMode": "runs",
+                        "trigger": "on_hit",
+                        "duration": 5,
+                        "target": "party",
+                        "effects": [
+                            {
+                                "type": "debuff",
+                                "id": "adventuring:decay",
+                                "stacks": { "base": 1, "scaling": [] }
+                            },
+                            {
+                                "type": "damage_bonus",
+                                "condition": "target_has_debuff",
+                                "value": 0.10
+                            }
+                        ]
+                    },
+                    {
+                        "id": "dimensional_draft",
+                        "name": "Dimensional Draft",
+                        "media": "melvor:assets/media/bank/potion_agility_ii.png",
+                        "type": "drink",
+                        "source": "tavern",
+                        "tier": 2,
+                        "durationMode": "runs",
+                        "trigger": "passive",
+                        "duration": 5,
+                        "target": "party",
+                        "effects": [
+                            {
+                                "type": "stat_bonus",
+                                "stat": "dodge",
+                                "value": 0.30
+                            },
+                            {
+                                "type": "stat_bonus",
+                                "stat": "agility",
+                                "value": 0.20
+                            }
+                        ]
+                    },
+                    {
+                        "id": "oblivion_spirits",
+                        "name": "Oblivion Spirits",
+                        "media": "melvor:assets/media/bank/potion_strength_iii.png",
+                        "type": "drink",
+                        "source": "tavern",
+                        "tier": 3,
+                        "durationMode": "runs",
+                        "trigger": "passive",
+                        "duration": 5,
+                        "target": "party",
+                        "effects": [
+                            {
+                                "type": "damage_bonus",
+                                "value": 0.20
+                            },
+                            {
+                                "type": "execute",
+                                "threshold": 0.15,
+                                "chance": 0.10,
+                                "exclude_boss": true
+                            }
+                        ]
+                    },
+                    {
+                        "id": "emperors_reserve",
+                        "name": "Emperor's Reserve",
+                        "media": "melvor:assets/media/bank/potion_melee_evasion_iv.png",
+                        "type": "drink",
+                        "source": "tavern",
+                        "tier": 3,
+                        "durationMode": "runs",
+                        "trigger": "passive",
+                        "duration": 10,
+                        "target": "party",
+                        "materials": [
+                            { "id": "adventuring:void_essence", "qty": 5 }
+                        ],
+                        "effects": [
+                            {
+                                "type": "stat_bonus",
+                                "stat": "xp_bonus",
+                                "value": 0.25
+                            },
+                            {
+                                "type": "stat_bonus",
+                                "stat": "currency_bonus",
+                                "value": 0.25
+                            },
+                            {
+                                "type": "stat_bonus",
+                                "stat": "all_stats",
+                                "value": 0.15
+                            }
+                        ]
+                    },
+                    {
+                        "id": "warriors_warcry_whiskey",
+                        "name": "Warrior's Warcry Whiskey",
+                        "media": "melvor:assets/media/bank/potion_attack_iii.png",
+                        "type": "drink",
+                        "source": "tavern",
+                        "tier": 3,
+                        "durationMode": "runs",
+                        "trigger": "on_kill",
+                        "duration": 5,
+                        "target": "party",
+                        "effects": [
+                            {
+                                "type": "buff",
+                                "id": "adventuring:might",
+                                "stacks": { "base": 2, "scaling": [] }
+                            },
+                            {
+                                "type": "buff",
+                                "id": "adventuring:fury",
+                                "stacks": { "base": 1, "scaling": [] }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "archmages_absinthe",
+                        "name": "Archmage's Absinthe",
+                        "media": "melvor:assets/media/bank/potion_magic_iii.png",
+                        "type": "drink",
+                        "source": "tavern",
+                        "tier": 3,
+                        "durationMode": "runs",
+                        "trigger": "encounter_start",
+                        "duration": 5,
+                        "target": "party",
+                        "effects": [
+                            {
+                                "type": "buff",
+                                "id": "adventuring:arcane_power",
+                                "stacks": { "base": 4, "scaling": [] }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "monks_meditation_mead",
+                        "name": "Monk's Meditation Mead",
+                        "media": "melvor:assets/media/bank/potion_prayer_iii.png",
+                        "type": "drink",
+                        "source": "tavern",
+                        "tier": 3,
+                        "durationMode": "runs",
+                        "trigger": "encounter_start",
+                        "duration": 5,
+                        "target": "party",
+                        "effects": [
+                            {
+                                "type": "buff",
+                                "id": "adventuring:focus",
+                                "stacks": { "base": 2, "scaling": [] }
+                            },
+                            {
+                                "type": "buff",
+                                "id": "adventuring:clarity",
+                                "stacks": { "base": 2, "scaling": [] }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "paladins_pledge",
+                        "name": "Paladin's Pledge",
+                        "media": "melvor:assets/media/bank/potion_hitpoints_iii.png",
+                        "type": "drink",
+                        "source": "tavern",
+                        "tier": 3,
+                        "durationMode": "runs",
+                        "trigger": "on_healed",
+                        "duration": 5,
+                        "target": "party",
+                        "effects": [
+                            {
+                                "type": "stat_bonus",
+                                "stat": "healing_received",
+                                "value": 0.20
+                            },
+                            {
+                                "type": "buff",
+                                "id": "adventuring:barrier",
+                                "stacks": { "base": 1, "scaling": [] }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "assassins_absinthe",
+                        "name": "Assassin's Absinthe",
+                        "media": "melvor:assets/media/bank/potion_ranged_iii.png",
+                        "type": "drink",
+                        "source": "tavern",
+                        "tier": 3,
+                        "durationMode": "runs",
+                        "trigger": "encounter_start",
+                        "duration": 5,
+                        "target": "party",
+                        "effects": [
+                            {
+                                "type": "stat_bonus",
+                                "stat": "crit_chance",
+                                "value": 0.15
+                            },
+                            {
+                                "type": "buff",
+                                "id": "adventuring:stealth",
+                                "stacks": { "base": 3, "scaling": [] }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "archers_ambrosia",
+                        "name": "Archer's Ambrosia",
+                        "media": "melvor:assets/media/bank/potion_agility_iii.png",
+                        "type": "drink",
+                        "source": "tavern",
+                        "tier": 3,
+                        "durationMode": "runs",
+                        "trigger": "encounter_start",
+                        "duration": 5,
+                        "target": "party",
+                        "effects": [
+                            {
+                                "type": "buff",
+                                "id": "adventuring:precision",
+                                "stacks": { "base": 2, "scaling": [] }
+                            },
+                            {
+                                "type": "buff",
+                                "id": "adventuring:haste",
+                                "stacks": { "base": 2, "scaling": [] }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "summoners_sangria",
+                        "name": "Summoner's Sangria",
+                        "media": "melvor:assets/media/bank/potion_damage_reduction_iii.png",
+                        "type": "drink",
+                        "source": "tavern",
+                        "tier": 3,
+                        "durationMode": "runs",
+                        "trigger": "passive",
+                        "duration": 5,
+                        "target": "party",
+                        "effects": [
+                            {
+                                "type": "stat_bonus",
+                                "stat": "summon_damage",
+                                "value": 0.25
+                            }
+                        ]
+                    },
+                    {
+                        "id": "necromancers_nightcap",
+                        "name": "Necromancer's Nightcap",
+                        "media": "melvor:assets/media/bank/decay_potion.png",
+                        "type": "drink",
+                        "source": "tavern",
+                        "tier": 3,
+                        "durationMode": "runs",
+                        "trigger": "on_hit",
+                        "duration": 5,
+                        "target": "party",
+                        "effects": [
+                            {
+                                "type": "debuff",
+                                "id": "adventuring:decay",
+                                "stacks": { "base": 1, "scaling": [] },
+                                "condition": "dark_damage"
+                            },
+                            {
+                                "type": "stat_bonus",
+                                "stat": "lifesteal",
+                                "value": 0.10
+                            }
+                        ]
+                    },
+                    {
+                        "id": "phoenix_firewater",
+                        "name": "Phoenix Firewater",
+                        "media": "melvor:assets/media/bank/dragon_fire_potion.png",
+                        "type": "drink",
+                        "source": "tavern",
+                        "tier": 3,
+                        "durationMode": "runs",
+                        "trigger": "on_death",
+                        "duration": 5,
+                        "target": "party",
+                        "effects": [
+                            {
+                                "type": "revive",
+                                "hpPercent": 0.30,
+                                "oncePerAdventure": true
+                            }
+                        ]
+                    },
+                    {
+                        "id": "titans_tonic",
+                        "name": "Titan's Tonic",
+                        "media": "melvor:assets/media/bank/potion_defence_iii.png",
+                        "type": "drink",
+                        "source": "tavern",
+                        "tier": 3,
+                        "durationMode": "runs",
+                        "trigger": "passive",
+                        "duration": 5,
+                        "target": "party",
+                        "effects": [
+                            {
+                                "type": "stat_bonus",
+                                "stat": "max_hp",
+                                "value": 0.30
+                            },
+                            {
+                                "type": "stat_bonus",
+                                "stat": "defence",
+                                "value": 0.20
+                            }
+                        ]
+                    },
+                    {
+                        "id": "storms_edge_stout",
+                        "name": "Storm's Edge Stout",
+                        "media": "melvor:assets/media/bank/frost_potion.png",
+                        "type": "drink",
+                        "source": "tavern",
+                        "tier": 3,
+                        "durationMode": "runs",
+                        "trigger": "on_hit",
+                        "duration": 5,
+                        "target": "party",
+                        "effects": [
+                            {
+                                "type": "debuff",
+                                "id": "adventuring:shock",
+                                "stacks": { "base": 2, "scaling": [] },
+                                "chance": 20
+                            }
+                        ]
+                    },
+                    {
+                        "id": "vampires_vintage",
+                        "name": "Vampire's Vintage",
+                        "media": "melvor:assets/media/bank/potion_melee_evasion_iii.png",
+                        "type": "drink",
+                        "source": "tavern",
+                        "tier": 3,
+                        "durationMode": "runs",
+                        "trigger": "passive",
+                        "duration": 5,
+                        "target": "party",
+                        "effects": [
+                            {
+                                "type": "stat_bonus",
+                                "stat": "lifesteal",
+                                "value": 0.15
+                            },
+                            {
+                                "type": "on_damage",
+                                "heal_percent": 0.05
+                            }
+                        ]
+                    },
+                    {
+                        "id": "mountain_kings_mead",
+                        "name": "Mountain King's Mead",
+                        "media": "melvor:assets/media/bank/potion_strength_iii.png",
+                        "type": "drink",
+                        "source": "tavern",
+                        "tier": 3,
+                        "durationMode": "runs",
+                        "trigger": "encounter_start",
+                        "duration": 5,
+                        "target": "party",
+                        "effects": [
+                            {
+                                "type": "stat_bonus",
+                                "stat": "stun_resistance",
+                                "value": 0.50
+                            },
+                            {
+                                "type": "buff",
+                                "id": "adventuring:taunt",
+                                "stacks": { "base": 3, "scaling": [] }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "lucky_leprechauns_lager",
+                        "name": "Lucky Leprechaun's Lager",
+                        "media": "melvor:assets/media/bank/potion_accuracy_iii.png",
+                        "type": "drink",
+                        "source": "tavern",
+                        "tier": 3,
+                        "durationMode": "runs",
+                        "trigger": "passive",
+                        "duration": 5,
+                        "target": "party",
+                        "effects": [
+                            {
+                                "type": "stat_bonus",
+                                "stat": "rare_drop_chance",
+                                "value": 0.30
+                            },
+                            {
+                                "type": "stat_bonus",
+                                "stat": "currency_bonus",
+                                "value": 0.20
+                            }
+                        ]
+                    },
+                    {
+                        "id": "chaos_cocktail",
+                        "name": "Chaos Cocktail",
+                        "media": "melvor:assets/media/bank/potion_magic_iv.png",
+                        "type": "drink",
+                        "source": "tavern",
+                        "tier": 4,
+                        "durationMode": "runs",
+                        "trigger": "encounter_start",
+                        "duration": 5,
+                        "target": "party",
+                        "materials": [
+                            { "id": "adventuring:chaos_essence", "qty": 3 }
+                        ],
+                        "effects": [
+                            {
+                                "type": "random_buff",
+                                "count": 3,
+                                "stacks": 2
+                            },
+                            {
+                                "type": "damage_bonus",
+                                "value": 0.15
+                            }
+                        ]
+                    },
+                    {
+                        "id": "celestial_champagne",
+                        "name": "Celestial Champagne",
+                        "media": "melvor:assets/media/bank/potion_hitpoints_iv.png",
+                        "type": "drink",
+                        "source": "tavern",
+                        "tier": 4,
+                        "durationMode": "runs",
+                        "trigger": "encounter_start",
+                        "duration": 10,
+                        "target": "party",
+                        "materials": [
+                            { "id": "adventuring:starlight_essence", "qty": 5 }
+                        ],
+                        "effects": [
+                            {
+                                "type": "stat_bonus",
+                                "stat": "healing_bonus",
+                                "value": 0.30
+                            },
+                            {
+                                "type": "stat_bonus",
+                                "stat": "healing_received",
+                                "value": 0.30
+                            },
+                            {
+                                "type": "buff",
+                                "id": "adventuring:regeneration",
+                                "stacks": { "base": 5, "scaling": [] }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "shadow_lords_scotch",
+                        "name": "Shadow Lord's Scotch",
+                        "media": "melvor:assets/media/bank/potion_ranged_iv.png",
+                        "type": "drink",
+                        "source": "tavern",
+                        "tier": 4,
+                        "durationMode": "runs",
+                        "trigger": "encounter_start",
+                        "duration": 10,
+                        "target": "party",
+                        "materials": [
+                            { "id": "adventuring:shadow_lords_sigil", "qty": 1 }
+                        ],
+                        "effects": [
+                            {
+                                "type": "stat_bonus",
+                                "stat": "crit_damage",
+                                "value": 0.25
+                            },
+                            {
+                                "type": "buff",
+                                "id": "adventuring:stealth",
+                                "stacks": { "base": 5, "scaling": [] }
+                            },
+                            {
+                                "type": "buff",
+                                "id": "adventuring:evasion",
+                                "stacks": { "base": 5, "scaling": [] }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "prismatic_punch",
+                        "name": "Prismatic Punch",
+                        "media": "melvor:assets/media/bank/potion_agility_iv.png",
+                        "type": "drink",
+                        "source": "tavern",
+                        "tier": 4,
+                        "durationMode": "runs",
+                        "trigger": "on_hit",
+                        "duration": 10,
+                        "target": "party",
+                        "materials": [
+                            { "id": "adventuring:prismatic_core", "qty": 2 }
+                        ],
+                        "effects": [
+                            {
+                                "type": "random_debuff",
+                                "count": 1,
+                                "stacks": 1
+                            },
+                            {
+                                "type": "damage_bonus",
+                                "value": 0.20
+                            }
+                        ]
+                    },
+                    {
+                        "id": "chaos_incarnates_chalice",
+                        "name": "Chaos Incarnate's Chalice",
+                        "media": "melvor:assets/media/bank/potion_strength_iv.png",
+                        "type": "drink",
+                        "source": "tavern",
+                        "tier": 4,
+                        "durationMode": "runs",
+                        "trigger": "encounter_start",
+                        "duration": 15,
+                        "target": "party",
+                        "materials": [
+                            { "id": "adventuring:chaos_core", "qty": 3 }
+                        ],
+                        "effects": [
+                            {
+                                "type": "stat_bonus",
+                                "stat": "all_stats",
+                                "value": 0.35
+                            },
+                            {
+                                "type": "stat_bonus",
+                                "stat": "xp_bonus",
+                                "value": 0.35
+                            },
+                            {
+                                "type": "stat_bonus",
+                                "stat": "currency_bonus",
+                                "value": 0.35
+                            },
+                            {
+                                "type": "random_buff",
+                                "count": 5,
+                                "stacks": 3
+                            }
+                        ]
+                    }
+                ]
+            }
+        }]
+    }
+}

@@ -1,0 +1,201 @@
+{
+    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+    "namespace": "adventuring",
+    "data": {
+        "skillData": [{
+            "skillID": "adventuring:Adventuring",
+            "data": {
+                "stats": [
+                    {
+                        "id": "thieving",
+                        "name": "Thieving",
+                        "media": "melvor:assets/media/bank/potion_thieving_i.png"
+                    }
+                ],
+                "jobs": [
+                    {
+                        "id": "thief",
+                        "name": "Thief",
+                        "media": "melvor:assets/media/bank/potion_thieving_i.png",
+                        "requirements": [
+                            { "type": "skill_level", "level": 20 }
+                        ],
+                        "isMilestoneReward": true,
+                        "isPassive": true,
+                        "scaling": [
+                            { "id": "adventuring:thieving", "value": 1 }
+                        ]
+                    }
+                ],
+                "materials": [
+                    {
+                        "id": "lockpick",
+                        "name": "Lockpick",
+                        "media": "melvor:assets/media/bank/potion_thieving_i.png",
+                        "category": "adventuring:salvage"
+                    }
+                ],
+                "buildings": [
+                    {
+                        "id": "thieves_den",
+                        "type": "workshop",
+                        "name": "Thieves' Den",
+                        "description": "A shadowy hideout for acquiring valuables. Thieves pilfer coins, gems, and other treasures.",
+                        "media": "melvor:assets/media/bank/potion_thieving_i.png",
+                        "requirements": [],
+                        "idle": ["Picking locks", "Casing targets"],
+                        "actions": ["adventuring:work"],
+                        "products": [
+                            "adventuring:stolen_jewelry",
+                            "adventuring:pickpocketed_coins",
+                            "adventuring:pilfered_key",
+                            "adventuring:swiped_gem"
+                        ]
+                    }
+                ],
+                "baseItems": [
+                    {
+                        "id": "stolen_jewelry",
+                        "name": "Stolen Jewelry",
+                        "media": "melvor:assets/media/bank/ring_of_wealth.png",
+                        "source": "workshop"
+                    },
+                    {
+                        "id": "pickpocketed_coins",
+                        "name": "Pickpocketed Coins",
+                        "media": "melvor:assets/media/main/coins.png",
+                        "source": "workshop"
+                    },
+                    {
+                        "id": "pilfered_key",
+                        "name": "Pilfered Key",
+                        "media": "melvor:assets/media/bank/bandit_chest_key.png",
+                        "source": "workshop"
+                    },
+                    {
+                        "id": "swiped_gem",
+                        "name": "Swiped Gem",
+                        "media": "melvor:assets/media/bank/ruby.png",
+                        "source": "workshop"
+                    }
+                ],
+                "products": [
+                    {
+                        "id": "stolen_jewelry",
+                        "name": "Stolen Jewelry",
+                        "outputType": "baseItem",
+                        "baseItem": "adventuring:stolen_jewelry",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:thief" },
+                            { "type": "job_level", "job": "adventuring:thief", "level": 1 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:lockpick", "count": 3 }
+                        ]
+                    },
+                    {
+                        "id": "pickpocketed_coins",
+                        "name": "Pickpocketed Coins",
+                        "outputType": "baseItem",
+                        "baseItem": "adventuring:pickpocketed_coins",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:thief" },
+                            { "type": "job_level", "job": "adventuring:thief", "level": 10 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:lockpick", "count": 2 }
+                        ]
+                    },
+                    {
+                        "id": "pilfered_key",
+                        "name": "Pilfered Key",
+                        "outputType": "baseItem",
+                        "baseItem": "adventuring:pilfered_key",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:thief" },
+                            { "type": "job_level", "job": "adventuring:thief", "level": 25 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:lockpick", "count": 5 }
+                        ]
+                    },
+                    {
+                        "id": "swiped_gem",
+                        "name": "Swiped Gem",
+                        "outputType": "baseItem",
+                        "baseItem": "adventuring:swiped_gem",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:thief" },
+                            { "type": "job_level", "job": "adventuring:thief", "level": 40 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:lockpick", "count": 4 }
+                        ]
+                    }
+                ],
+                "workOrders": [
+                    {
+                        "id": "stolen_jewelry",
+                        "building": "adventuring:thieves_den",
+                        "product": "adventuring:stolen_jewelry",
+                        "materials": [
+                            { "id": "adventuring:lockpick", "qty": 3 }
+                        ],
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:thief", "level": 1 }
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:thieving", "value": 0.2 }
+                        ]
+                    },
+                    {
+                        "id": "pickpocketed_coins",
+                        "building": "adventuring:thieves_den",
+                        "product": "adventuring:pickpocketed_coins",
+                        "materials": [
+                            { "id": "adventuring:lockpick", "qty": 2 }
+                        ],
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:thief", "level": 10 }
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:thieving", "value": 0.25 }
+                        ]
+                    },
+                    {
+                        "id": "pilfered_key",
+                        "building": "adventuring:thieves_den",
+                        "product": "adventuring:pilfered_key",
+                        "materials": [
+                            { "id": "adventuring:lockpick", "qty": 5 }
+                        ],
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:thief", "level": 25 }
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:thieving", "value": 0.3 }
+                        ]
+                    },
+                    {
+                        "id": "swiped_gem",
+                        "building": "adventuring:thieves_den",
+                        "product": "adventuring:swiped_gem",
+                        "materials": [
+                            { "id": "adventuring:lockpick", "qty": 4 }
+                        ],
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:thief", "level": 40 }
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:thieving", "value": 0.35 }
+                        ]
+                    }
+                ]
+            }
+        }]
+    }
+}

@@ -1,0 +1,325 @@
+/* Make custom element wrappers invisible to layout */
+adventuring-page,
+adventuring-overview,
+adventuring-overview-button,
+adventuring-party,
+adventuring-character,
+adventuring-abilities,
+adventuring-ability,
+adventuring-ability-small,
+adventuring-ability-details,
+adventuring-jobs,
+adventuring-job,
+adventuring-job-small,
+adventuring-job-summary,
+adventuring-job-details,
+adventuring-auras,
+adventuring-aura,
+adventuring-aura-instance,
+adventuring-stats,
+adventuring-stat,
+adventuring-card,
+adventuring-cards,
+adventuring-message-log,
+adventuring-message,
+adventuring-equipment,
+adventuring-equipment-slot,
+adventuring-item-base,
+adventuring-material,
+adventuring-stored-item,
+adventuring-dungeon,
+adventuring-dungeon-floor,
+adventuring-dungeon-cell,
+adventuring-encounter,
+adventuring-monster,
+adventuring-area,
+adventuring-building,
+adventuring-work-order,
+adventuring-town,
+adventuring-crossroads,
+adventuring-bestiary,
+adventuring-armory,
+adventuring-stash,
+adventuring-trainer,
+adventuring-tavern,
+adventuring-slayers,
+adventuring-lemons,
+adventuring-workshop {
+    display: contents;
+}
+
+/* Custom scrollbar styling for ability picker */
+.adventuring-scrollbar::-webkit-scrollbar {
+    width: 8px;
+}
+
+.adventuring-scrollbar::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+}
+
+.adventuring-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+}
+
+.adventuring-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+/* Firefox scrollbar styling */
+.adventuring-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.3) rgba(0, 0, 0, 0.2);
+}
+
+/* Job icon color tints using CSS attribute selectors on image src */
+/* Matches URLs containing #tint=color */
+img[src*="#tint=red"] {
+    filter: brightness(0) saturate(100%) invert(31%) sepia(98%) saturate(1234%) hue-rotate(344deg) brightness(95%) contrast(92%);
+}
+img[src*="#tint=orange"] {
+    filter: brightness(0) saturate(100%) invert(61%) sepia(85%) saturate(491%) hue-rotate(347deg) brightness(99%) contrast(95%);
+}
+img[src*="#tint=yellow"] {
+    filter: brightness(0) saturate(100%) invert(83%) sepia(49%) saturate(680%) hue-rotate(358deg) brightness(103%) contrast(101%);
+}
+img[src*="#tint=green"] {
+    filter: brightness(0) saturate(100%) invert(62%) sepia(39%) saturate(522%) hue-rotate(73deg) brightness(95%) contrast(88%);
+}
+img[src*="#tint=cyan"] {
+    filter: brightness(0) saturate(100%) invert(77%) sepia(17%) saturate(867%) hue-rotate(130deg) brightness(92%) contrast(89%);
+}
+img[src*="#tint=blue"] {
+    filter: brightness(0) saturate(100%) invert(45%) sepia(69%) saturate(456%) hue-rotate(176deg) brightness(93%) contrast(92%);
+}
+img[src*="#tint=purple"] {
+    filter: brightness(0) saturate(100%) invert(36%) sepia(63%) saturate(512%) hue-rotate(232deg) brightness(93%) contrast(94%);
+}
+img[src*="#tint=pink"] {
+    filter: brightness(0) saturate(100%) invert(56%) sepia(52%) saturate(456%) hue-rotate(291deg) brightness(97%) contrast(91%);
+}
+img[src*="#tint=white"] {
+    filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(103%) contrast(103%);
+}
+img[src*="#tint=gray"] {
+    filter: brightness(0) saturate(100%) invert(50%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%);
+}
+
+/* Shade filters - preserve original shading/luminosity while applying color */
+/* Uses grayscale to remove saturation, then sepia + hue-rotate to tint */
+/* Matches URLs containing #shade=color */
+img[src*="#shade=red"] {
+    filter: grayscale(1) sepia(1) hue-rotate(-15deg) saturate(2);
+}
+img[src*="#shade=orange"] {
+    filter: grayscale(1) sepia(1) hue-rotate(15deg) saturate(1.8);
+}
+img[src*="#shade=yellow"] {
+    filter: grayscale(1) sepia(1) hue-rotate(30deg) saturate(1.5);
+}
+img[src*="#shade=green"] {
+    filter: grayscale(1) sepia(1) hue-rotate(75deg) saturate(1.5);
+}
+img[src*="#shade=cyan"] {
+    filter: grayscale(1) sepia(1) hue-rotate(130deg) saturate(1.5);
+}
+img[src*="#shade=blue"] {
+    filter: grayscale(1) sepia(1) hue-rotate(180deg) saturate(1.5);
+}
+img[src*="#shade=purple"] {
+    filter: grayscale(1) sepia(1) hue-rotate(230deg) saturate(1.5);
+}
+img[src*="#shade=pink"] {
+    filter: grayscale(1) sepia(1) hue-rotate(290deg) saturate(1.5);
+}
+img[src*="#shade=magenta"] {
+    filter: grayscale(1) sepia(1) hue-rotate(270deg) saturate(2);
+}
+img[src*="#shade=brown"] {
+    filter: grayscale(1) sepia(1) hue-rotate(0deg) saturate(0.8);
+}
+img[src*="#shade=gold"] {
+    filter: grayscale(1) sepia(1) hue-rotate(25deg) saturate(2.5);
+}
+img[src*="#shade=silver"] {
+    filter: grayscale(1) sepia(0.2) saturate(0.3) brightness(1.1);
+}
+img[src*="#shade=bronze"] {
+    filter: grayscale(1) sepia(1) hue-rotate(10deg) saturate(1.2) brightness(0.85);
+}
+
+/* Custom selection state - darker green that doesn't clash with tints */
+.adventuring-selected {
+    background-color: rgba(40, 90, 50, 0.8) !important;
+    border-color: rgba(60, 130, 70, 0.9) !important;
+}
+
+/* Override Melvor's selection color for adventuring elements */
+adventuring-page .bg-combat-menu-selected,
+adventuring-overview .bg-combat-menu-selected,
+adventuring-party .bg-combat-menu-selected,
+adventuring-character .bg-combat-menu-selected,
+adventuring-hero .bg-combat-menu-selected,
+adventuring-encounter .bg-combat-menu-selected,
+adventuring-dungeon .bg-combat-menu-selected,
+adventuring-dungeon-cell .bg-combat-menu-selected,
+adventuring-ability .bg-combat-menu-selected,
+adventuring-card .bg-combat-menu-selected,
+adventuring-job .bg-combat-menu-selected,
+adventuring-job-summary .bg-combat-menu-selected {
+    background-color: rgba(40, 90, 50, 0.8) !important;
+}
+
+/* ========== Tutorial System ========== */
+
+/* Overlay - covers screen and blocks clicks except through the highlight hole */
+.adventuring-tutorial-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2000001;
+    pointer-events: auto;
+    background: rgba(0, 0, 0, 0.3);
+}
+
+/* Highlight ring around target element - allows clicks through */
+.adventuring-tutorial-highlight {
+    position: fixed;
+    border: 3px solid #ffc107;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(255, 193, 7, 0.6);
+    animation: tutorial-pulse 1.5s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 2000002;
+    background: transparent;
+}
+
+/* Click blocker for informational steps - blocks clicks but allows hover/tooltips */
+.adventuring-tutorial-click-blocker {
+    position: fixed;
+    z-index: 2000001;
+    pointer-events: auto;
+    background: transparent;
+    cursor: default;
+}
+
+@keyframes tutorial-pulse {
+    0%, 100% { 
+        box-shadow: 0 0 10px rgba(255, 193, 7, 0.4);
+    }
+    50% { 
+        box-shadow: 0 0 25px rgba(255, 193, 7, 0.8);
+    }
+}
+
+/* Tooltip container */
+.adventuring-tutorial-tooltip {
+    position: fixed;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border: 2px solid #ffc107;
+    border-radius: 8px;
+    padding: 14px 18px;
+    max-width: 320px;
+    min-width: 200px;
+    z-index: 2000002;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.6);
+    pointer-events: auto;
+}
+
+/* Tooltip message text */
+.tutorial-message {
+    color: #e0e0e0;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* Action links container */
+.tutorial-actions {
+    text-align: right;
+    border-top: 1px solid rgba(255, 193, 7, 0.2);
+    padding-top: 8px;
+}
+
+/* Arrow pointing to target */
+.tutorial-arrow {
+    position: absolute;
+    width: 0;
+    height: 0;
+}
+
+/* Arrow pointing up (tooltip is below target) */
+.tutorial-arrow-bottom {
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 10px solid #ffc107;
+}
+
+/* Arrow pointing down (tooltip is above target) */
+.tutorial-arrow-top {
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 10px solid #ffc107;
+}
+
+/* Arrow pointing left (tooltip is to the right of target) */
+.tutorial-arrow-right {
+    left: -10px;
+    top: 50%;
+    transform: translateY(-50%);
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-right: 10px solid #ffc107;
+}
+
+/* Arrow pointing right (tooltip is to the left of target) */
+.tutorial-arrow-left {
+    right: -10px;
+    top: 50%;
+    transform: translateY(-50%);
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-left: 10px solid #ffc107;
+}
+
+/* Active buffs display */
+.adventuring-buff-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.adventuring-buff-icon img {
+    width: 24px;
+    height: 24px;
+}
+
+/* Tint filters for difficulty icons */
+.adventuring-buff-icon.text-success img {
+    filter: sepia(1) saturate(5) hue-rotate(85deg) brightness(0.9);
+}
+
+.adventuring-buff-icon.text-warning img {
+    filter: sepia(1) saturate(5) hue-rotate(15deg) brightness(1.1);
+}
+
+.adventuring-buff-icon.text-danger img {
+    filter: sepia(1) saturate(5) hue-rotate(-10deg) brightness(0.9);
+}
+
+.adventuring-buff-icon.text-info img {
+    filter: sepia(1) saturate(5) hue-rotate(175deg) brightness(1.1);
+}

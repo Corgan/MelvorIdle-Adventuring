@@ -1,0 +1,228 @@
+{
+    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+    "namespace": "adventuring",
+    "data": {
+        "skillData": [{
+            "skillID": "adventuring:Adventuring",
+            "data": {
+                "jobs": [
+                    {
+                        "id": "knight",
+                        "tier": 2,
+                        "name": "Knight",
+                        "media": "melvor:assets/media/bank/potion_defence_i.png#tint=gray",
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:fighter", "level": 15 },
+                            { "type": "job_level", "job": "adventuring:paladin", "level": 10 }
+                        ],
+                        "isMilestoneReward": true,
+                        "allowedItems": [
+                            "adventuring:helm",
+                            "adventuring:platebody",
+                            "adventuring:platelegs",
+                            "adventuring:gauntlets",
+                            "adventuring:sabatons",
+                            "adventuring:amulet",
+                            "adventuring:ring",
+                            "adventuring:cape",
+                            "adventuring:shield",
+                            "adventuring:sword1h",
+                            "adventuring:sword2h"
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:hitpoints", "value": 1.75 },
+                            { "id": "adventuring:defence", "value": 1.25 },
+                            { "id": "adventuring:agility", "value": 0.5 },
+                            { "id": "adventuring:strength", "value": 1.25 }
+                        ]
+                    }
+                ],
+                "generators": [
+                    {
+                        "id": "sword_strike",
+                        "name": "Sword Strike",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:knight", "level": 1 }
+                        ],
+                        "energy": 20,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 15,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.4 },
+                                                { "id": "adventuring:defence", "value": 0.15 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "shield_bash",
+                        "name": "Shield Bash",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:knight", "level": 10 }
+                        ],
+                        "energy": 25,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 12,
+                                            "scaling": [
+                                                { "id": "adventuring:defence", "value": 0.4 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:weaken",
+                                        "stacks": {
+                                            "base": 2,
+                                            "scaling": [
+                                                { "id": "adventuring:defence", "value": 0.05 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "spenders": [
+                    {
+                        "id": "rallying_cry",
+                        "name": "Rallying Cry",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:knight", "level": 5 }
+                        ],
+                        "cost": 100,
+                        "hits": [
+                            {
+                                "target": "aoe",
+                                "party": "ally",
+                                "effects": [
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:might",
+                                        "stacks": {
+                                            "base": 2,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.1 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "mighty_blow",
+                        "name": "Mighty Blow",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:knight", "level": 15 }
+                        ],
+                        "cost": 130,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 25,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.8 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:stun"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "passives": [
+                    {
+                        "id": "armored",
+                        "name": "Armored",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:knight", "level": 20 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "round_start",
+                                "type": "buff",
+                                "target": "self",
+                                "id": "adventuring:block",
+                                "stacks": {
+                                    "base": 2,
+                                    "scaling": [
+                                        { "id": "adventuring:defence", "value": 0.25 }
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "stalwart_defense",
+                        "name": "Stalwart Defense",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:knight", "level": 30 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "encounter_start",
+                                "type": "buff",
+                                "target": "lowest_ally",
+                                "id": "adventuring:block",
+                                "stacks": {
+                                    "base": 5,
+                                    "scaling": [
+                                        { "id": "adventuring:defence", "value": 0.25 }
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "fortified_stance",
+                        "name": "Fortified Stance",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:knight", "level": 40 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "encounter_start",
+                                "type": "buff",
+                                "target": "self",
+                                "id": "adventuring:barrier",
+                                "stacks": {
+                                    "base": 4,
+                                    "scaling": [
+                                        { "id": "adventuring:defence", "value": 0.2 }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        }]
+    }
+}

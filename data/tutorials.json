@@ -1,0 +1,426 @@
+{
+    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+    "namespace": "adventuring",
+    "data": {
+        "skillData": [{
+            "skillID": "adventuring:Adventuring",
+            "data": {
+                "tutorials": [
+                    {
+                        "id": "tutorial_intro",
+                        "name": "Welcome to Adventuring",
+                        "priority": 0,
+                        "trigger": { "type": "immediate" },
+                        "requiresState": "town",
+                        "steps": [
+                            {
+                                "target": "combatJob:0",
+                                "message": "Welcome to Adventuring! Click here to choose a combat job for your first hero.",
+                                "position": "bottom"
+                            },
+                            {
+                                "target": "job:any",
+                                "message": "Select a job. Each job has unique abilities and stat bonuses!",
+                                "position": "top"
+                            },
+                            {
+                                "target": "ability:0:0",
+                                "message": "Now set a Generator ability - these build energy during combat.",
+                                "position": "bottom"
+                            },
+                            {
+                                "target": "job:any",
+                                "message": "Select a generator ability.",
+                                "position": "top"
+                            },
+                            {
+                                "target": "ability:0:1",
+                                "message": "Now set a Spender ability - these consume energy for powerful effects!",
+                                "position": "bottom"
+                            },
+                            {
+                                "target": "job:any",
+                                "message": "Select a spender ability.",
+                                "position": "top"
+                            },
+                            {
+                                "target": "combatJob:1",
+                                "message": "Great! Now let's set up your second hero. Click to choose their job.",
+                                "position": "bottom"
+                            },
+                            {
+                                "target": "job:any",
+                                "message": "Pick a different job for variety!",
+                                "position": "top"
+                            },
+                            {
+                                "target": "ability:1:0",
+                                "message": "Set a generator ability for hero 2.",
+                                "position": "bottom"
+                            },
+                            {
+                                "target": "job:any",
+                                "message": "Select a generator ability.",
+                                "position": "top"
+                            },
+                            {
+                                "target": "ability:1:1",
+                                "message": "Set a spender ability for hero 2.",
+                                "position": "bottom"
+                            },
+                            {
+                                "target": "job:any",
+                                "message": "Select a spender ability.",
+                                "position": "top"
+                            },
+                            {
+                                "target": "combatJob:2",
+                                "message": "One more hero! Click to choose their job.",
+                                "position": "bottom"
+                            },
+                            {
+                                "target": "job:any",
+                                "message": "Consider having a mix of damage and support jobs!",
+                                "position": "top"
+                            },
+                            {
+                                "target": "ability:2:0",
+                                "message": "Set a generator ability for hero 3.",
+                                "position": "bottom"
+                            },
+                            {
+                                "target": "job:any",
+                                "message": "Select a generator ability.",
+                                "position": "top"
+                            },
+                            {
+                                "target": "ability:2:1",
+                                "message": "Set a spender ability for hero 3.",
+                                "position": "bottom"
+                            },
+                            {
+                                "target": "job:any",
+                                "message": "Select a spender ability.",
+                                "position": "top"
+                            }
+                        ],
+                        "chainTo": "adventuring:tutorial_dungeon"
+                    },
+                    {
+                        "id": "tutorial_dungeon",
+                        "name": "Exploring Dungeons",
+                        "requiresState": "town",
+                        "priority": 0,
+                        "trigger": { "type": "chained" },
+                        "steps": [
+                            {
+                                "target": "page:crossroads",
+                                "message": "Time for adventure! Click the Crossroads to choose a dungeon.",
+                                "position": "bottom"
+                            },
+                            {
+                                "target": "area:any",
+                                "message": "Select an area to explore. Each area has unique monsters, materials, and challenges. Harder areas give better rewards!",
+                                "position": "top",
+                                "informational": true
+                            },
+                            {
+                                "target": "adventureButton:any",
+                                "message": "Click Adventure to begin exploring!",
+                                "position": "top"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "tutorial_explore",
+                        "name": "Dungeon Exploration",
+                        "requiresState": "dungeon",
+                        "priority": 0,
+                        "trigger": { 
+                            "type": "event",
+                            "event": "dungeonStart"
+                        },
+                        "steps": [
+                            {
+                                "target": "dungeonFloor:",
+                                "message": "Welcome to the dungeon! Your heroes will automatically explore, moving through tiles until they reach the exit or encounter enemies.",
+                                "position": "bottom",
+                                "informational": true
+                            },
+                            {
+                                "target": "dungeonFloor:",
+                                "message": "Different tiles have different effects: Monster tiles trigger combat, Fountain tiles restore health, Trap tiles deal damage, and Treasure tiles give bonus loot!",
+                                "position": "bottom",
+                                "informational": true
+                            },
+                            {
+                                "target": "turnProgressBar:",
+                                "message": "This progress bar shows the exploration timer. When it fills, your party moves to the next tile automatically.",
+                                "position": "bottom",
+                                "informational": true
+                            }
+                        ]
+                    },
+                    {
+                        "id": "tutorial_combat",
+                        "name": "Combat System",
+                        "requiresState": "dungeon",
+                        "priority": 0,
+                        "trigger": { 
+                            "type": "event",
+                            "event": "combatStart"
+                        },
+                        "steps": [
+                            {
+                                "target": "turnOrderCards:",
+                                "message": "Combat has begun! This display shows the turn order. Characters with higher Agility act first. The highlighted character is taking their turn.",
+                                "position": "bottom",
+                                "informational": true
+                            },
+                            {
+                                "target": "turnProgressBar:",
+                                "message": "The turn timer shows when the current character will act. When it fills, they'll automatically use their abilities.",
+                                "position": "bottom",
+                                "informational": true
+                            },
+                            {
+                                "target": "combatAbilities:any",
+                                "message": "Heroes use their Generator ability to build Energy, then spend it with their Spender ability for powerful attacks. This happens automatically each turn!",
+                                "position": "left",
+                                "informational": true
+                            },
+                            {
+                                "target": "combatLog:",
+                                "message": "The combat log shows what's happening - damage dealt, abilities used, and status effects. Watch your heroes battle automatically!",
+                                "position": "left",
+                                "informational": true
+                            }
+                        ]
+                    },
+                    {
+                        "id": "tutorial_tavern",
+                        "name": "Tavern Drinks",
+                        "priority": 20,
+                        "requiresState": "town",
+                        "trigger": { 
+                            "type": "currency",
+                            "currencyId": "currency",
+                            "amount": 25
+                        },
+                        "steps": [
+                            {
+                                "target": "page:town",
+                                "message": "You've earned some coins! Visit the Town to access shops and services.",
+                                "position": "bottom"
+                            },
+                            {
+                                "target": "backToTown:",
+                                "message": "Let's go back to the town overview first.",
+                                "position": "bottom"
+                            },
+                            {
+                                "target": "building:tavern",
+                                "message": "Click the Tavern to buy drinks that give your party powerful buffs.",
+                                "position": "top"
+                            },
+                            {
+                                "target": "drink:any",
+                                "message": "Click a drink to purchase it. Drinks provide buffs that last for a set number of dungeon runs.",
+                                "position": "top"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "tutorial_upgrade",
+                        "name": "Upgrading Equipment",
+                        "priority": 20,
+                        "requiresState": "town",
+                        "trigger": {
+                            "type": "material",
+                            "check": "anyUpgrade"
+                        },
+                        "steps": [
+                            {
+                                "target": "page:town",
+                                "message": "You've collected enough materials to upgrade equipment! Head to the Town.",
+                                "position": "bottom"
+                            },
+                            {
+                                "target": "backToTown:",
+                                "message": "Let's go back to the town overview first.",
+                                "position": "bottom"
+                            },
+                            {
+                                "target": "building:armory",
+                                "message": "Open the Armory to upgrade your hero's equipment.",
+                                "position": "top"
+                            },
+                            {
+                                "target": "item:weapon",
+                                "message": "Select an equipment piece to view its stats and upgrade costs. Upgrading increases the stats it provides!",
+                                "position": "right"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "tutorial_craft",
+                        "name": "Crafting Consumables",
+                        "priority": 20,
+                        "requiresState": "town",
+                        "trigger": {
+                            "type": "material",
+                            "check": "anyCraft"
+                        },
+                        "steps": [
+                            {
+                                "target": "page:town",
+                                "message": "You can now craft consumables! Head to the Town.",
+                                "position": "bottom"
+                            },
+                            {
+                                "target": "backToTown:",
+                                "message": "Let's go back to the town overview first.",
+                                "position": "bottom"
+                            },
+                            {
+                                "target": "building:alchemist",
+                                "message": "Open the Alchemist's Shop to craft powerful items for dungeon runs.",
+                                "position": "top"
+                            },
+                            {
+                                "target": "consumable:any",
+                                "message": "Select a consumable to craft it. Equip consumables to your party and use them for healing, damage, or special effects!",
+                                "position": "top"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "tutorial_bestiary",
+                        "name": "Bestiary & Slayer",
+                        "priority": 15,
+                        "trigger": {
+                            "type": "event",
+                            "event": "firstMonsterSeen"
+                        },
+                        "steps": [
+                            {
+                                "target": "page:bestiary",
+                                "message": "You've encountered your first monster! Check the Bestiary to learn about the creatures you've faced.",
+                                "position": "bottom"
+                            }
+                        ],
+                        "chainTo": "adventuring:tutorial_slayer"
+                    },
+                    {
+                        "id": "tutorial_slayer",
+                        "name": "Slayer Tasks",
+                        "priority": 15,
+                        "trigger": { "type": "chained" },
+                        "requiresState": "town",
+                        "steps": [
+                            {
+                                "target": "page:town",
+                                "message": "Head to the Town to find the Slayer's Guild.",
+                                "position": "bottom"
+                            },
+                            {
+                                "target": "backToTown:",
+                                "message": "Let's go back to the town overview first.",
+                                "position": "bottom"
+                            },
+                            {
+                                "target": "building:slayers",
+                                "message": "The Slayer's Guild offers tasks with bonus rewards! Accept tasks to earn Slayer Coins and special materials.",
+                                "position": "top"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "tutorial_mastery",
+                        "name": "Mastery Bonuses",
+                        "priority": 30,
+                        "trigger": {
+                            "type": "mastery",
+                            "category": "job",
+                            "level": 10
+                        },
+                        "requiresState": "town",
+                        "steps": [
+                            {
+                                "target": "page:town",
+                                "message": "Your job has reached Mastery Level 10! Check the Trainer in Town to see your progress.",
+                                "position": "bottom"
+                            },
+                            {
+                                "target": "backToTown:",
+                                "message": "Let's go back to the town overview first.",
+                                "position": "bottom"
+                            },
+                            {
+                                "target": "building:trainer",
+                                "message": "The Trainer shows mastery levels for all jobs. Higher mastery unlocks new abilities and bonuses!",
+                                "position": "top"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "tutorial_auto_run",
+                        "name": "Auto-Run",
+                        "priority": 25,
+                        "trigger": {
+                            "type": "mastery",
+                            "category": "area",
+                            "level": 10
+                        },
+                        "requiresState": "town",
+                        "steps": [
+                            {
+                                "target": "page:crossroads",
+                                "message": "An area has reached Mastery 10! You've unlocked Auto-Run. Let's check it out!",
+                                "position": "bottom"
+                            },
+                            {
+                                "target": "autoRepeat:any",
+                                "message": "Check this box to enable Auto-Run. With it enabled, your heroes will automatically start another dungeon run when they finish - no need to manually click Adventure each time!",
+                                "position": "top"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "tutorial_area_mastery",
+                        "name": "Area Mastery",
+                        "priority": 30,
+                        "trigger": {
+                            "type": "mastery",
+                            "category": "area",
+                            "level": 25
+                        },
+                        "requiresState": "town",
+                        "steps": [
+                            {
+                                "target": "page:crossroads",
+                                "message": "An area has reached Mastery 25! You've unlocked Heroic difficulty. Let's try it out!",
+                                "position": "bottom"
+                            },
+                            {
+                                "target": "difficultyButton:any",
+                                "message": "Click the difficulty dropdown to see available difficulty modes.",
+                                "position": "top"
+                            },
+                            {
+                                "target": "difficultyOption:heroic",
+                                "message": "Select Heroic mode for tougher enemies but better rewards!",
+                                "position": "right"
+                            },
+                            {
+                                "target": "adventureButton:any",
+                                "message": "Now click Adventure to explore at the new difficulty!",
+                                "position": "top"
+                            }
+                        ]
+                    }
+                ]
+            }
+        }]
+    }
+}

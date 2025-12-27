@@ -3,6 +3,7 @@ const { loadModule } = mod.getContext(import.meta);
 const { AdventuringStats } = await loadModule('src/adventuring-stats.mjs');
 const { AdventuringEquipmentSlot } = await loadModule('src/adventuring-equipment-slot.mjs');
 const { AdventuringEquipmentElement } = await loadModule('src/components/adventuring-equipment.mjs');
+const { createEffect } = await loadModule('src/adventuring-utils.mjs');
 
 export class AdventuringEquipment {
     constructor(manager, game, character) {
@@ -28,6 +29,125 @@ export class AdventuringEquipment {
                 });
             }
         });
+    }
+
+    /**
+     * Get all effects from equipped items as StandardEffect objects.
+     * Includes both passive stat bonuses and trigger-based effects.
+     * @param {string} [trigger] - Optional filter by trigger type
+     * @returns {StandardEffect[]} Array of standardized effects
+     */
+    getEffects(trigger = null) {
+        const effects = [];
+        
+        this.slots.forEach((equipmentSlot, slotType) => {
+            if(!equipmentSlot.canEquip(equipmentSlot.item)) return;
+            
+            const item = equipmentSlot.item;
+            
+            // Add passive stat bonuses from equipment stats
+            if(trigger === null || trigger === 'passive') {
+                item.stats.forEach((value, stat) => {
+                    if(value !== 0) {
+                        effects.push(createEffect(
+                            {
+                                trigger: 'passive',
+                                type: 'increase_stat_flat',
+                                stat: stat.id,
+                                value: value
+                            },
+                            item,
+                            item.name
+                        ));
+                    }
+                });
+            }
+            
+            // Add trigger-based effects from item effects array
+            if(item.effects && item.effects.length > 0) {
+                item.effects.forEach(effect => {
+                    // Skip if filtering by trigger and doesn't match
+                    if(trigger !== null && effect.trigger !== trigger) return;
+                    
+                    // Calculate effect amount based on item level scaling
+                    let amount = effect.amount || effect.value || 0;
+                    if(effect.scaling && item.level > 0) {
+                        amount += Math.floor(item.level * effect.scaling);
+                    }
+                    
+                    effects.push(createEffect(
+                        {
+                            trigger: effect.trigger || 'passive',
+                            type: effect.type,
+                            stat: effect.stat || effect.id,
+                            value: amount,
+                            target: effect.target,
+                            chance: effect.chance
+                        },
+                        item,
+                        item.name
+                    ));
+                });
+            }
+        });
+        
+        // Add equipment set bonus effects
+        if(this.character && this.manager && this.manager.equipmentSets) {
+            this.manager.equipmentSets.forEach(set => {
+                const setEffects = set.getActiveEffects(this.character);
+                setEffects.forEach(effect => {
+                    // Skip if filtering by trigger and doesn't match
+                    if(trigger !== null && effect.trigger !== trigger) return;
+                    
+                    effects.push(createEffect(
+                        {
+                            trigger: effect.trigger || 'passive',
+                            type: effect.type,
+                            stat: effect.stat,
+                            value: effect.value,
+                            id: effect.id,
+                            stacks: effect.stacks,
+                            chance: effect.chance,
+                            count: effect.count,
+                            threshold: effect.threshold
+                        },
+                        { name: effect.sourceName },
+                        effect.sourceName
+                    ));
+                });
+            });
+        }
+        
+        return effects;
+    }
+
+    // Trigger item effects for equipped items
+    trigger(triggerType, extra={}) {
+        let results = [];
+        this.slots.forEach((equipmentSlot, slotType) => {
+            if(!equipmentSlot.canEquip(equipmentSlot.item)) return;
+            
+            const item = equipmentSlot.item;
+            if(!item.effects || item.effects.length === 0) return;
+            
+            item.effects.forEach(effect => {
+                if(effect.trigger !== triggerType) return;
+                
+                // Calculate effect amount based on item level scaling
+                let amount = effect.amount || 0;
+                if(effect.scaling && item.level > 0) {
+                    amount += Math.floor(item.level * effect.scaling);
+                }
+                
+                results.push({
+                    item: item,
+                    effect: effect,
+                    amount: amount,
+                    chance: effect.chance || 100
+                });
+            });
+        });
+        return results;
     }
 
     onLoad() {

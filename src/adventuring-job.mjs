@@ -3,6 +3,8 @@ const { loadModule } = mod.getContext(import.meta);
 const { AdventuringStats } = await loadModule('src/adventuring-stats.mjs');
 const { AdventuringJobElement } = await loadModule('src/components/adventuring-job.mjs');
 const { AdventuringJobSummaryElement } = await loadModule('src/components/adventuring-job-summary.mjs');
+const { TooltipBuilder } = await loadModule('src/adventuring-tooltip.mjs');
+const { addMasteryXPWithBonus, RequirementsChecker } = await loadModule('src/adventuring-utils.mjs');
 
 class AdventuringJobRenderQueue {
     constructor(){
@@ -22,19 +24,24 @@ export class AdventuringJob extends MasteryAction {
 
         this.component = createElement('adventuring-job');
         this.summary = createElement('adventuring-job-summary');
+        this.summary.setJob(this);
         this.renderQueue = new AdventuringJobRenderQueue();
 
         this._name = data.name;
 
         this._media = data.media;
 
-        this.requirements = data.requirements;
+        this.requirements = data.requirements || [];
         this._scaling = data.scaling;
         this.scaling = new AdventuringStats(this.manager, this.game);
         
         this.stats = new AdventuringStats(this.manager, this.game);
 
         this.isPassive = data.isPassive === true;
+        
+        // Job tier (0-5+ for combat jobs, used for categorization)
+        // If not specified, defaults to 0 for passive jobs, or detected by requirements
+        this.tier = data.tier ?? (this.isPassive ? 0 : this.detectTierFromRequirements(data.requirements));
 
         if(data.allowedItems !== undefined)
             this._allowedItems = data.allowedItems;
@@ -46,6 +53,66 @@ export class AdventuringJob extends MasteryAction {
             if(this.unlocked)
                 this.viewDetails();
         }
+        
+        // Mastery effects cache - rebuilt on level up
+        this._masteryEffectsCache = null;
+        this._masteryCacheLevel = -1;
+    }
+
+    /**
+     * Get the mastery category for jobs
+     */
+    get masteryCategory() {
+        return this.manager.masteryCategories.getObjectByID('adventuring:jobs');
+    }
+
+    /**
+     * Get cached mastery effects for this job's current level.
+     * Rebuilds cache if level changed.
+     */
+    get masteryEffects() {
+        const currentLevel = this.level;
+        if (this._masteryEffectsCache === null || this._masteryCacheLevel !== currentLevel) {
+            this._rebuildMasteryCache();
+        }
+        return this._masteryEffectsCache;
+    }
+
+    /**
+     * Rebuild the mastery effects cache from the category milestones
+     */
+    _rebuildMasteryCache() {
+        const category = this.masteryCategory;
+        this._masteryCacheLevel = this.level;
+        this._masteryEffectsCache = category ? category.getEffectsAtLevel(this.level) : [];
+    }
+
+    /**
+     * Invalidate mastery cache (called on level up)
+     */
+    invalidateMasteryCache() {
+        this._masteryEffectsCache = null;
+        this._masteryCacheLevel = -1;
+    }
+
+    /**
+     * Check if this job has a specific mastery effect type
+     * @param {string} effectType - The effect type to check for
+     * @returns {boolean}
+     */
+    hasMasteryEffect(effectType) {
+        return this.masteryEffects.some(e => e.type === effectType);
+    }
+
+    /**
+     * Get the total value of a specific mastery effect type
+     * @param {string} effectType - The effect type to sum
+     * @returns {number}
+     */
+    getMasteryEffectValue(effectType) {
+        return this.masteryEffects
+            .filter(e => e.type === effectType)
+            .reduce((sum, e) => sum + (e.value || 0), 0);
     }
 
     get name() {
@@ -53,7 +120,7 @@ export class AdventuringJob extends MasteryAction {
     }
 
     get media() {
-        return this.unlocked ? this.getMediaURL(this._media) : this.getMediaURL('melvor:assets/media/main/question.svg');
+        return this.unlocked ? this.getMediaURL(this._media) : this.getMediaURL('melvor:assets/media/main/question.png');
     }
 
     get level() {
@@ -61,44 +128,51 @@ export class AdventuringJob extends MasteryAction {
     }
 
     get unlocked() {
-        if(this.requirements.length == 0)
-            return true;
-        return this.requirements.reduce((equipable, requirement) => {
-            if(requirement.type == "skill_level") {
-                if(this.manager.level < requirement.level)
-                    return false;
-            }
-            if(requirement.type == "job_level") {
-                let job = this.manager.jobs.getObjectByID(requirement.job);
-                if(job === undefined)
-                    return false;
-                if(this.manager.getMasteryLevel(job) < requirement.level)
-                    return false;
-            }
-            return equipable;
-        }, true);
+        return this._reqChecker?.check() ?? true;
+    }
+
+    /**
+     * Detect job tier based on requirements when not explicitly specified
+     * Tier 0: No job requirements
+     * Tier 1: Requires 1 job at low level
+     * Tier 2: Requires 2+ jobs or 1 job at high level
+     * Tier 3+: Requires tier 2+ jobs (detected later)
+     */
+    detectTierFromRequirements(requirements) {
+        if(!requirements || requirements.length === 0) return 0;
+        
+        const jobReqs = requirements.filter(r => r.type === 'job_level');
+        if(jobReqs.length === 0) return 0;
+        if(jobReqs.length === 1 && (jobReqs[0].level || 0) <= 25) return 1;
+        if(jobReqs.length >= 2 || (jobReqs[0].level || 0) > 25) return 2;
+        return 1;
+    }
+
+    get category() {
+        return this.manager.categories.getObjectByID('adventuring:Jobs');
     }
 
     get tooltip() {
-        let html = '<div>';
+        const tooltip = TooltipBuilder.create()
+            .header(this.name, this.media);
 
-        html += `<div><span>${this.name}</span></div>`;
         if(this.unlocked && this.isMilestoneReward) {
-            let { xp, level, percent, nextLevelXP } = this.manager.getMasteryProgress(this);
-            html += `<div><small>Level ${level}</small></div>`;
-            html += `<div><small>${xp} / ${nextLevelXP} XP</small></div>`;
-
-            this.stats.forEach((value, stat) => {
-                let statImg = `<img class="skill-icon-xxs" style="height: .66rem; width: .66rem; margin-top: 0;" src="${stat.media}">`
-                html += `<div><small>+${value}${statImg}</small></div>`;
-            });
+            tooltip.masteryProgressFor(this.manager, this);
+            
+            tooltip.stats(this.stats);
+            
+            // Next milestone
+            tooltip.nextMilestone(this.manager, this);
+        } else if(!this.unlocked) {
+            // Show unlock requirements for locked jobs
+            tooltip.unlockRequirements(this.requirements, this.manager);
         }
-        html += '</div>'
-        return html;
+        
+        return tooltip.build();
     }
 
     get allowMultiple() {
-        return this.alwaysMultiple || this.manager.getMasteryLevel(this) >= 99;
+        return this.alwaysMultiple || this.hasMasteryEffect('unlock_multi_job_assignment');
     }
 
     onLoad() {
@@ -112,12 +186,18 @@ export class AdventuringJob extends MasteryAction {
     calculateStats() {
         this.stats.reset();
         
+        // Get stat bonus from modifier system (includes Melvor mastery + other sources)
+        const statBonus = this.manager.modifiers.getJobStatBonus(this);
+        
         this.scaling.forEach((value, stat) => {
-            this.stats.set(stat, Math.floor(this.level * value));
+            const baseValue = Math.floor(this.level * value);
+            this.stats.set(stat, Math.floor(baseValue * (1 + statBonus)));
         });
     }
 
     postDataRegistration() {
+        this._reqChecker = new RequirementsChecker(this.manager, this.requirements);
+        
         if(this._scaling !== undefined) {
             this._scaling.forEach(({ id, value }) => {
                 this.scaling.set(id, value);
@@ -135,9 +215,7 @@ export class AdventuringJob extends MasteryAction {
     }
 
     addXP(xp) {
-        this.manager.addMasteryXP(this, xp);
-        this.manager.addMasteryPoolXP(xp);
-        this.renderQueue.tooltip = true;
+        addMasteryXPWithBonus(this.manager, this, xp);
         this.manager.party.all.forEach(member => (member.renderQueue.jobs = true));
     }
 
@@ -160,12 +238,12 @@ export class AdventuringJob extends MasteryAction {
             return;
 
         if(this.unlocked) {
-            this.component.name.textContent = this.name;
-            this.summary.name.textContent = this.name;
+            this.component.nameText.textContent = this.name;
+            this.summary.nameText.textContent = this.name;
             this.component.level.textContent = ` (${this.level})`;
             this.summary.level.textContent = ` (${this.level})`;
         } else {
-            this.component.name.textContent = "???";
+            this.component.nameText.textContent = "???";
             this.component.level.textContent = "";
             this.summary.level.textContent = "";
         }
@@ -175,6 +253,9 @@ export class AdventuringJob extends MasteryAction {
 
     renderTooltip() {
         if(!this.renderQueue.tooltip)
+            return;
+
+        if(this.component.tooltip === undefined)
             return;
 
         this.component.tooltip.setContent(this.tooltip);
@@ -190,7 +271,7 @@ export class AdventuringJob extends MasteryAction {
             this.component.icon.src = this.media;
             this.summary.icon.src = this.media;
         } else {
-            this.component.icon.src = this.getMediaURL('melvor:assets/media/main/question.svg');
+            this.component.icon.src = this.getMediaURL('melvor:assets/media/main/question.png');
         }
 
         this.renderQueue.icon = false;

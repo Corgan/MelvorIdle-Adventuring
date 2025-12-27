@@ -9,7 +9,7 @@
                     {
                         "id": "chicken_coop",
                         "name": "Chicken Coop",
-                        "media": "melvor:assets/media/monsters/mumma_chicken.svg",
+                        "media": "melvor:assets/media/monsters/chicken.png",
                         "requirements": [
                             { "type": "skill_level", "level": 1 }
                         ],
@@ -57,6 +57,7 @@
                         "id": "chick",
                         "name": "Chick",
                         "media": "melvor:assets/media/monsters/chick.png",
+                        "tags": ["beast", "bird"],
                         "xp": 10,
                         "stats": [
                             { "id": "adventuring:hitpoints", "value": 5 },
@@ -72,13 +73,15 @@
                         "passives": [],
                         "loot": [
                             { "id": "adventuring:currency", "qty": 2, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 1, "weight": 10 }
+                            { "id": "adventuring:parts", "qty": 1, "weight": 10 },
+                            { "id": "adventuring:feather", "qty": 1, "weight": 25 }
                         ]
                     },
                     {
                         "id": "chicken",
                         "name": "Chicken",
                         "media": "melvor:assets/media/monsters/chicken.png",
+                        "tags": ["beast", "bird"],
                         "xp": 15,
                         "stats": [
                             { "id": "adventuring:hitpoints", "value": 15 },
@@ -94,13 +97,15 @@
                         "passives": [],
                         "loot": [
                             { "id": "adventuring:currency", "qty": 5, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 2, "weight": 10 }
+                            { "id": "adventuring:parts", "qty": 2, "weight": 10 },
+                            { "id": "adventuring:feather", "qty": 2, "weight": 35 }
                         ]
                     },
                     {
                         "id": "mumma_chicken",
                         "name": "Mumma Chicken",
                         "media": "melvor:assets/media/monsters/mumma_chicken.png",
+                        "tags": ["beast", "bird"],
                         "xp": 30,
                         "stats": [
                             { "id": "adventuring:hitpoints", "value": 25 },
@@ -117,7 +122,8 @@
                         "loot": [
                             { "id": "adventuring:currency", "qty": 2, "weight": 100 },
                             { "id": "adventuring:parts", "qty": 5, "weight": 30 },
-                            { "id": "adventuring:big_parts", "qty": 1, "weight": 10 }
+                            { "id": "adventuring:big_parts", "qty": 1, "weight": 10 },
+                            { "id": "adventuring:feather", "qty": 3, "weight": 50 }
                         ]
                     }
                 ],
@@ -125,7 +131,6 @@
                     {
                         "id": "cluck",
                         "name": "Cluck",
-                        "description": "Deal {hit.0.effect.0.amount} damage to a random target.",
                         "requirements": [],
                         "isEnemy": true,
                         "energy": 35,
@@ -152,7 +157,6 @@
                     {
                         "id": "crow",
                         "name": "Crow",
-                        "description": "Deal {hit.0.effect.0.amount} damage to a random target.",
                         "requirements": [],
                         "isEnemy": true,
                         "cost": 70,
@@ -172,7 +176,28 @@
                                     }
                                 ]
                             }
-                        ]
+                        ],
+                        "masteryAuraId": "adventuring:mastery_aura_chicken_coop",
+                        "masteryAura": {
+                            "id": "mastery_aura_chicken_coop",
+                            "name": "Chicken Coop Mastery",
+                            "media": "melvor:assets/media/monsters/chicken.png",
+                            "combine": true,
+                            "stack": false,
+                            "amount": 3,
+                            "stacks": 99,
+                            "effects": [
+                                {
+                                    "trigger": "turn_start",
+                                    "type": "heal",
+                                    "target": "self"
+                                },
+                                {
+                                    "trigger": "dungeon_end",
+                                    "type": "remove"
+                                }
+                            ]
+                        }
                     }
                 ]
             }

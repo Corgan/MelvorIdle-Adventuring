@@ -20,10 +20,6 @@ export class AdventuringStatsElement extends HTMLElement {
         this.appendChild(this._content);
     }
 
-    setSkill(skill) {
-        this.skill = skill;
-    }
-
     update(stat, value) {
         if(typeof stat === "string")
             stat = this.skill.stats.getObjectByID(stat);
@@ -36,7 +32,7 @@ export class AdventuringStatsElement extends HTMLElement {
         }
         if(value !== 0 || stat.base !== undefined) {
             component.show();
-            component.tooltip.setContent(stat.name);
+            component.setTooltipContent(stat.name);
             component.value.textContent = value !== 0 ? value : "-";
         } else {
             component.hide();

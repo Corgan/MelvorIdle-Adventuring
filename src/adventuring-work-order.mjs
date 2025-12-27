@@ -38,8 +38,8 @@ export class AdventuringWorkOrder {
     }
 
     progress() {
-        let { item, count } = this.product.create();
-        this.workshop.store(item, count);
+        let { output, outputType, count } = this.product.create();
+        this.workshop.store(output, count, outputType);
 
         this.completed += 1;
         this.renderQueue.update = true;
@@ -67,6 +67,24 @@ export class AdventuringWorkOrder {
         this.workshop.renderQueue.workOrders = true;
     }
 
+    /**
+     * Get which party members can work on this order
+     */
+    getCraftableByText() {
+        if(!this.product) return '';
+        
+        const canWork = this.manager.party.all.filter(member => 
+            this.product.canMake(member)
+        );
+        
+        if(canWork.length === 0) {
+            return '<span class="text-warning">⚠ No party member can craft this</span>';
+        }
+        
+        const names = canWork.map(m => m.name).join(', ');
+        return `<span class="text-success">✓ Can be crafted by: ${names}</span>`;
+    }
+
     render() {
         if(!this.renderQueue.update)
             return;
@@ -75,9 +93,15 @@ export class AdventuringWorkOrder {
         this.component.inactive.classList.toggle('d-none', this.active)
         if(this.active) {
             this.component.icon.src = this.product.media;
-            this.component.name.textContent = this.product.name;
-            this.component.completed.textContent = this.completed;
-            this.component.count.textContent = this.count;
+            this.component.nameText.textContent = this.product.name;
+            this.component.progressText.textContent = `${this.completed} / ${this.count} completed`;
+            
+            // Update progress bar
+            const percent = this.count > 0 ? (this.completed / this.count) * 100 : 0;
+            this.component.progressBar.style.width = `${percent}%`;
+            
+            // Show who can craft this
+            this.component.craftableBy.innerHTML = this.getCraftableByText();
         }
 
         this.renderQueue.update = false;

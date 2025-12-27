@@ -1,0 +1,315 @@
+{
+    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+    "namespace": "adventuring",
+    "data": {
+        "skillData": [{
+            "skillID": "adventuring:Adventuring",
+            "data": {
+                "jobs": [
+                    {
+                        "id": "samurai",
+                        "tier": 2,
+                        "name": "Samurai",
+                        "media": "melvor:assets/media/bank/potion_attack_i.png#tint=pink",
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:fighter", "level": 25 },
+                            { "type": "job_level", "job": "adventuring:ranger", "level": 20 }
+                        ],
+                        "isMilestoneReward": true,
+                        "allowedItems": [
+                            "adventuring:helm",
+                            "adventuring:platebody",
+                            "adventuring:platelegs",
+                            "adventuring:gauntlets",
+                            "adventuring:sabatons",
+                            "adventuring:amulet",
+                            "adventuring:ring",
+                            "adventuring:cape",
+                            "adventuring:sword2h",
+                            "adventuring:sword1h"
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:hitpoints", "value": 1.0 },
+                            { "id": "adventuring:defence", "value": 0.5 },
+                            { "id": "adventuring:agility", "value": 1.5 },
+                            { "id": "adventuring:strength", "value": 1.5 }
+                        ]
+                    }
+                ],
+                "generators": [
+                    {
+                        "id": "iaido",
+                        "name": "Iaido",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:samurai", "level": 1 }
+                        ],
+                        "energy": 25,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 18,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.3 },
+                                                { "id": "adventuring:agility", "value": 0.2 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "focused_slash",
+                        "name": "Focused Slash",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:samurai", "level": 15 }
+                        ],
+                        "energy": 25,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 15,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.25 },
+                                                { "id": "adventuring:agility", "value": 0.2 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:bleed",
+                                        "stacks": {
+                                            "base": 3,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.1 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "spenders": [
+                    {
+                        "id": "blade_dance",
+                        "name": "Blade Dance",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:samurai", "level": 5 }
+                        ],
+                        "cost": 140,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "delay": 100,
+                                "repeat": 4,
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 12,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.25 },
+                                                { "id": "adventuring:agility", "value": 0.2 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "ki_focus",
+                        "name": "Ki Focus",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:samurai", "level": 20 }
+                        ],
+                        "cost": 100,
+                        "hits": [
+                            {
+                                "target": "self",
+                                "party": "ally",
+                                "effects": [
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:might",
+                                        "stacks": {
+                                            "base": 4,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.15 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:haste",
+                                        "stacks": {
+                                            "base": 3,
+                                            "scaling": [
+                                                { "id": "adventuring:agility", "value": 0.1 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "honorable_strike",
+                        "name": "Honorable Strike",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:samurai", "level": 25 }
+                        ],
+                        "cost": 155,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "delay": 100,
+                                "repeat": 2,
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 22,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.4 },
+                                                { "id": "adventuring:agility", "value": 0.3 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:bleed",
+                                        "stacks": {
+                                            "base": 2,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.1 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:vulnerability",
+                                        "stacks": {
+                                            "base": 2,
+                                            "scaling": [
+                                                { "id": "adventuring:agility", "value": 0.1 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "killing_blow",
+                        "name": "Killing Blow",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:samurai", "level": 35 }
+                        ],
+                        "cost": 170,
+                        "hits": [
+                            {
+                                "target": "lowest",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 70,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 1.5 },
+                                                { "id": "adventuring:agility", "value": 0.75 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "passives": [
+                    {
+                        "id": "warriors_discipline",
+                        "name": "Warrior's Discipline",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:samurai", "level": 25 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "encounter_start",
+                                "type": "buff",
+                                "target": "self",
+                                "id": "adventuring:might",
+                                "stacks": {
+                                    "base": 3,
+                                    "scaling": [
+                                        { "id": "adventuring:strength", "value": 0.15 }
+                                    ]
+                                }
+                            },
+                            {
+                                "trigger": "encounter_start",
+                                "type": "buff",
+                                "target": "self",
+                                "id": "adventuring:haste",
+                                "stacks": {
+                                    "base": 2,
+                                    "scaling": [
+                                        { "id": "adventuring:agility", "value": 0.1 }
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "way_of_sword",
+                        "name": "Way of the Sword",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:samurai", "level": 30 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "encounter_start",
+                                "type": "debuff",
+                                "target": "front",
+                                "party": "enemy",
+                                "id": "adventuring:bleed",
+                                "stacks": {
+                                    "base": 4,
+                                    "scaling": [
+                                        { "id": "adventuring:strength", "value": 0.2 }
+                                    ]
+                                }
+                            },
+                            {
+                                "trigger": "encounter_start",
+                                "type": "buff",
+                                "target": "self",
+                                "id": "adventuring:block",
+                                "stacks": {
+                                    "base": 3,
+                                    "scaling": [
+                                        { "id": "adventuring:defence", "value": 0.15 }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        }]
+    }
+}

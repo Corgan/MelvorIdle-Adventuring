@@ -7,6 +7,7 @@ export class AdventuringAbilityDetailsElement extends HTMLElement {
         this.styling = getElementFromFragment(this._content, 'styling', 'div');
         this.nameText = getElementFromFragment(this._content, 'name', 'small');
         this.description = getElementFromFragment(this._content, 'description', 'small');
+        this.newBadge = getElementFromFragment(this._content, 'new-badge', 'span');
     }
 
     mount(parent) {

@@ -1,0 +1,177 @@
+{
+    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+    "namespace": "adventuring",
+    "data": {
+        "skillData": [{
+            "skillID": "adventuring:Adventuring",
+            "data": {
+                "jobs": [
+                    {
+                        "id": "shaman",
+                        "tier": 5,
+                        "name": "Shaman",
+                        "media": "melvor:assets/media/skills/herblore/herblore.png",
+                        "scaling": [
+                            { "id": "adventuring:hitpoints", "value": 1.4 },
+                            { "id": "adventuring:defence", "value": 0.6 },
+                            { "id": "adventuring:agility", "value": 0.8 },
+                            { "id": "adventuring:strength", "value": 0.4 },
+                            { "id": "adventuring:ranged", "value": 0.3 },
+                            { "id": "adventuring:magic", "value": 1.4 },
+                            { "id": "adventuring:prayer", "value": 1.6 }
+                        ],
+                        "maxLevel": 20,
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:cleric", "level": 12 },
+                            { "type": "job_level", "job": "adventuring:wizard", "level": 10 }
+                        ],
+                        "abilities": {
+                            "generator": [
+                                {
+                                    "id": "spirit_bolt",
+                                    "name": "Spirit Bolt",
+                                    "media": "melvor:assets/media/skills/combat/magic.png",
+                                    "type": "attack",
+                                    "turns": 1,
+                                    "level": 1,
+                                    "target": { "type": "enemy", "count": 1 },
+                                    "damage": {
+                                        "type": "stat",
+                                        "stat": "adventuring:magic",
+                                        "scaling": 100
+                                    },
+                                    "resource": 6
+                                },
+                                {
+                                    "id": "totemic_strike",
+                                    "name": "Totemic Strike",
+                                    "media": "melvor:assets/media/skills/prayer/prayer.png",
+                                    "type": "attack",
+                                    "turns": 1,
+                                    "level": 5,
+                                    "target": { "type": "enemy", "count": 1 },
+                                    "damage": {
+                                        "type": "stat",
+                                        "stat": "adventuring:prayer",
+                                        "scaling": 90
+                                    },
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "id": "adventuring:barrier",
+                                            "target": "self",
+                                            "stacks": 3
+                                        }
+                                    ],
+                                    "resource": 5
+                                },
+                                {
+                                    "id": "ancestral_whisper",
+                                    "name": "Ancestral Whisper",
+                                    "media": "melvor:assets/media/skills/prayer/mystic_lore.png",
+                                    "type": "utility",
+                                    "turns": 1,
+                                    "level": 10,
+                                    "target": { "type": "ally", "count": 1 },
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "id": "adventuring:fortify",
+                                            "target": "target",
+                                            "stacks": 4
+                                        },
+                                        {
+                                            "type": "buff",
+                                            "id": "adventuring:focus",
+                                            "target": "target",
+                                            "stacks": 2
+                                        }
+                                    ],
+                                    "resource": 6
+                                }
+                            ],
+                            "spender": [
+                                {
+                                    "id": "spirit_storm",
+                                    "name": "Spirit Storm",
+                                    "media": "melvor:assets/media/skills/combat/magic.png",
+                                    "type": "attack",
+                                    "turns": 1,
+                                    "level": 3,
+                                    "cost": 12,
+                                    "target": { "type": "enemy", "count": "all" },
+                                    "damage": {
+                                        "type": "stat",
+                                        "stat": "adventuring:magic",
+                                        "scaling": 80
+                                    },
+                                    "effects": [
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:chill",
+                                            "target": "target",
+                                            "stacks": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "id": "ancestral_blessing",
+                                    "name": "Ancestral Blessing",
+                                    "media": "melvor:assets/media/skills/prayer/prayer.png",
+                                    "type": "utility",
+                                    "turns": 1,
+                                    "level": 8,
+                                    "cost": 16,
+                                    "target": { "type": "ally", "count": "all" },
+                                    "effects": [
+                                        {
+                                            "type": "heal",
+                                            "target": "target",
+                                            "amount": 35,
+                                            "scaling": 3.0
+                                        },
+                                        {
+                                            "type": "buff",
+                                            "id": "adventuring:barrier",
+                                            "target": "target",
+                                            "stacks": 5
+                                        }
+                                    ]
+                                },
+                                {
+                                    "id": "wrath_of_spirits",
+                                    "name": "Wrath of Spirits",
+                                    "media": "melvor:assets/media/skills/prayer/piety.png",
+                                    "type": "attack",
+                                    "turns": 2,
+                                    "level": 15,
+                                    "cost": 30,
+                                    "target": { "type": "enemy", "count": "all" },
+                                    "damage": {
+                                        "type": "multi_stat",
+                                        "stats": ["adventuring:magic", "adventuring:prayer"],
+                                        "scaling": 90
+                                    },
+                                    "effects": [
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:shred",
+                                            "target": "target",
+                                            "stacks": 8
+                                        },
+                                        {
+                                            "type": "buff",
+                                            "id": "adventuring:might",
+                                            "target": "all_allies",
+                                            "stacks": 4
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        }]
+    }
+}

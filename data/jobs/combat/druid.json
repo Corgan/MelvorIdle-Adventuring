@@ -1,0 +1,344 @@
+{
+    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+    "namespace": "adventuring",
+    "data": {
+        "skillData": [{
+            "skillID": "adventuring:Adventuring",
+            "data": {
+                "jobs": [
+                    {
+                        "id": "druid",
+                        "tier": 2,
+                        "name": "Druid",
+                        "media": "melvor:assets/media/bank/potion_magic_i.png#tint=green",
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:cleric", "level": 25 },
+                            { "type": "job_level", "job": "adventuring:ranger", "level": 15 }
+                        ],
+                        "isMilestoneReward": true,
+                        "allowedItems": [
+                            "adventuring:cowl",
+                            "adventuring:vest",
+                            "adventuring:chaps",
+                            "adventuring:vambraces",
+                            "adventuring:boots",
+                            "adventuring:amulet",
+                            "adventuring:ring",
+                            "adventuring:cape",
+                            "adventuring:staff",
+                            "adventuring:spellbook"
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:hitpoints", "value": 1.5 },
+                            { "id": "adventuring:defence", "value": 0.75 },
+                            { "id": "adventuring:agility", "value": 1.0 },
+                            { "id": "adventuring:prayer", "value": 2.0 },
+                            { "id": "adventuring:magic", "value": 1.25 }
+                        ]
+                    }
+                ],
+                "generators": [
+                    {
+                        "id": "nature_touch",
+                        "name": "Nature's Touch",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:druid", "level": 1 }
+                        ],
+                        "energy": 25,
+                        "hits": [
+                            {
+                                "target": "lowest",
+                                "party": "ally",
+                                "effects": [
+                                    {
+                                        "type": "heal",
+                                        "amount": {
+                                            "base": 20,
+                                            "scaling": [
+                                                { "id": "adventuring:prayer", "value": 0.5 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:regen",
+                                        "stacks": {
+                                            "base": 3,
+                                            "scaling": [
+                                                { "id": "adventuring:prayer", "value": 0.1 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "thorn_strike",
+                        "name": "Thorn Strike",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:druid", "level": 15 }
+                        ],
+                        "energy": 25,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 10,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 0.25 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:poison",
+                                        "stacks": {
+                                            "base": 3,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 0.1 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "spenders": [
+                    {
+                        "id": "rejuvenation",
+                        "name": "Rejuvenation",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:druid", "level": 5 }
+                        ],
+                        "cost": 130,
+                        "hits": [
+                            {
+                                "target": "aoe",
+                                "party": "ally",
+                                "effects": [
+                                    {
+                                        "type": "heal",
+                                        "amount": {
+                                            "base": 15,
+                                            "scaling": [
+                                                { "id": "adventuring:prayer", "value": 0.4 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:regen",
+                                        "stacks": {
+                                            "base": 3,
+                                            "scaling": [
+                                                { "id": "adventuring:prayer", "value": 0.1 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "entangle",
+                        "name": "Entangle",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:druid", "level": 20 }
+                        ],
+                        "cost": 140,
+                        "hits": [
+                            {
+                                "target": "aoe",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 10,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 0.3 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:chill",
+                                        "stacks": {
+                                            "base": 2,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 0.05 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:poison",
+                                        "stacks": {
+                                            "base": 2,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 0.05 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "wild_growth",
+                        "name": "Wild Growth",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:druid", "level": 25 }
+                        ],
+                        "cost": 160,
+                        "hits": [
+                            {
+                                "target": "aoe",
+                                "party": "ally",
+                                "delay": 150,
+                                "repeat": 2,
+                                "effects": [
+                                    {
+                                        "type": "heal",
+                                        "amount": {
+                                            "base": 12,
+                                            "scaling": [
+                                                { "id": "adventuring:prayer", "value": 0.3 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:regen",
+                                        "stacks": {
+                                            "base": 2,
+                                            "scaling": [
+                                                { "id": "adventuring:prayer", "value": 0.1 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:thorns",
+                                        "stacks": {
+                                            "base": 2,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 0.1 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "natures_wrath",
+                        "name": "Nature's Wrath",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:druid", "level": 35 }
+                        ],
+                        "cost": 180,
+                        "hits": [
+                            {
+                                "target": "aoe",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 25,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 0.6 },
+                                                { "id": "adventuring:prayer", "value": 0.4 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "target": "aoe",
+                                "party": "ally",
+                                "effects": [
+                                    {
+                                        "type": "heal",
+                                        "amount": {
+                                            "base": 12,
+                                            "scaling": [
+                                                { "id": "adventuring:prayer", "value": 0.3 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "passives": [
+                    {
+                        "id": "natures_blessing",
+                        "name": "Nature's Blessing",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:druid", "level": 25 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "encounter_start",
+                                "type": "buff",
+                                "target": "aoe",
+                                "party": "ally",
+                                "id": "adventuring:regen",
+                                "stacks": {
+                                    "base": 4,
+                                    "scaling": [
+                                        { "id": "adventuring:prayer", "value": 0.15 }
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "verdant_spirit",
+                        "name": "Verdant Spirit",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:druid", "level": 30 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "encounter_start",
+                                "type": "debuff",
+                                "target": "aoe",
+                                "party": "enemy",
+                                "id": "adventuring:poison",
+                                "stacks": {
+                                    "base": 3,
+                                    "scaling": [
+                                        { "id": "adventuring:magic", "value": 0.1 }
+                                    ]
+                                }
+                            },
+                            {
+                                "trigger": "encounter_start",
+                                "type": "buff",
+                                "target": "aoe",
+                                "party": "ally",
+                                "id": "adventuring:thorns",
+                                "stacks": {
+                                    "base": 3,
+                                    "scaling": [
+                                        { "id": "adventuring:magic", "value": 0.15 }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        }]
+    }
+}

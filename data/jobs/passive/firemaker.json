@@ -9,14 +9,14 @@
                     {
                         "id": "firemaking",
                         "name": "Firemaking",
-                        "media": "melvor:assets/media/skills/firemaking/firemaking.svg"
+                        "media": "melvor:assets/media/bank/potion_firemaking_i.png"
                     }
                 ],
                 "jobs": [
                     {
                         "id": "firemaker",
                         "name": "Firemaker",
-                        "media": "melvor:assets/media/skills/firemaking/firemaking.svg",
+                        "media": "melvor:assets/media/bank/potion_firemaking_i.png",
                         "requirements": [
                             { "type": "skill_level", "level": 10 }
                         ],
@@ -28,18 +28,254 @@
                     }
                 ],
                 "materials": [
-
+                    {
+                        "id": "crude_kindling",
+                        "name": "Crude Kindling",
+                        "media": "melvor:assets/media/bank/potion_firemaking_i.png",
+                        "category": "adventuring:salvage"
+                    },
+                    {
+                        "id": "refined_kindling",
+                        "name": "Refined Kindling",
+                        "media": "melvor:assets/media/bank/yew_logs.png",
+                        "tier": 2,
+                        "category": "adventuring:salvage",
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:master_firemaker", "level": 1 }
+                        ]
+                    },
+                    {
+                        "id": "immaculate_kindling",
+                        "name": "Immaculate Kindling",
+                        "media": "melvor:assets/media/bank/magic_logs.png",
+                        "tier": 3,
+                        "category": "adventuring:salvage",
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:grandmaster_firemaker", "level": 1 }
+                        ]
+                    },
+                    {
+                        "id": "transcendent_kindling",
+                        "name": "Transcendent Kindling",
+                        "media": "melvor:assets/media/bank/logs_elderwood.png",
+                        "tier": 4,
+                        "category": "adventuring:salvage",
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:legendary_firemaker", "level": 1 }
+                        ]
+                    }
                 ],
                 "buildings": [
-
+                    {
+                        "id": "firepit",
+                        "type": "workshop",
+                        "name": "Firepit",
+                        "description": "Burn logs to produce ash and magical embers. Firemakers harness the power of flames.",
+                        "media": "melvor:assets/media/skills/township/Magic_Emporium.png",
+                        "requirements": [],
+                        "idle": ["Stoking the flames", "Gathering kindling"],
+                        "actions": ["adventuring:work"],
+                        "products": [
+                            "adventuring:ash",
+                            "adventuring:warming_ember",
+                            "adventuring:blazing_spirit"
+                        ]
+                    }
                 ],
                 "products": [
-                    
+                    {
+                        "id": "ash",
+                        "item": "melvorF:Ash",
+                        "outputType": "item",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:firemaker" },
+                            { "type": "job_level", "job": "adventuring:firemaker", "level": 1 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_kindling", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "warming_ember",
+                        "consumable": "adventuring:warming_ember",
+                        "outputType": "consumable",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:firemaker" },
+                            { "type": "job_level", "job": "adventuring:firemaker", "level": 10 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_kindling", "count": 2 }
+                        ]
+                    },
+                    {
+                        "id": "blazing_spirit",
+                        "consumable": "adventuring:blazing_spirit",
+                        "outputType": "consumable",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:firemaker" },
+                            { "type": "job_level", "job": "adventuring:firemaker", "level": 20 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_kindling", "count": 3 }
+                        ]
+                    },
+                    {
+                        "id": "convert_crude_kindling_to_refined",
+                        "material": "adventuring:refined_kindling",
+                        "outputType": "material",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:master_firemaker", "level": 10 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_kindling", "count": 5 }
+                        ]
+                    },
+                    {
+                        "id": "convert_refined_kindling_to_immaculate",
+                        "material": "adventuring:immaculate_kindling",
+                        "outputType": "material",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:grandmaster_firemaker", "level": 10 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:refined_kindling", "count": 5 }
+                        ]
+                    },
+                    {
+                        "id": "convert_immaculate_kindling_to_transcendent",
+                        "material": "adventuring:transcendent_kindling",
+                        "outputType": "material",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:legendary_firemaker", "level": 10 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:immaculate_kindling", "count": 5 }
+                        ]
+                    },
+                    {
+                        "id": "refined_teak_logs",
+                        "item": "melvorD:Teak_Logs",
+                        "outputType": "item",
+                        "count": 20,
+                        "requirements": [
+                            { "type": "skill_level", "level": 25 },
+                            { "type": "current_job", "job": "adventuring:master_firemaker" },
+                            { "type": "job_level", "job": "adventuring:master_firemaker", "level": 1 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:refined_kindling", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "refined_mahogany_logs",
+                        "item": "melvorD:Mahogany_Logs",
+                        "outputType": "item",
+                        "count": 15,
+                        "requirements": [
+                            { "type": "skill_level", "level": 25 },
+                            { "type": "current_job", "job": "adventuring:master_firemaker" },
+                            { "type": "job_level", "job": "adventuring:master_firemaker", "level": 15 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:refined_kindling", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "refined_magic_logs_fm",
+                        "item": "melvorD:Magic_Logs",
+                        "outputType": "item",
+                        "count": 10,
+                        "requirements": [
+                            { "type": "skill_level", "level": 25 },
+                            { "type": "current_job", "job": "adventuring:master_firemaker" },
+                            { "type": "job_level", "job": "adventuring:master_firemaker", "level": 30 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:refined_kindling", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "immaculate_magic_logs_fm",
+                        "item": "melvorD:Magic_Logs",
+                        "outputType": "item",
+                        "count": 25,
+                        "requirements": [
+                            { "type": "skill_level", "level": 50 },
+                            { "type": "current_job", "job": "adventuring:grandmaster_firemaker" },
+                            { "type": "job_level", "job": "adventuring:grandmaster_firemaker", "level": 1 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:immaculate_kindling", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "transcendent_redwood_logs_fm",
+                        "item": "melvorD:Redwood_Logs",
+                        "outputType": "item",
+                        "count": 20,
+                        "requirements": [
+                            { "type": "skill_level", "level": 75 },
+                            { "type": "current_job", "job": "adventuring:legendary_firemaker" },
+                            { "type": "job_level", "job": "adventuring:legendary_firemaker", "level": 1 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:transcendent_kindling", "count": 1 }
+                        ]
+                    }
                 ],
                 "tiles": [
-                    
+                    {
+                        "id": "campfire",
+                        "name": "Campfire",
+                        "media": "melvor:assets/media/bank/potion_firemaking_i.png",
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:firemaker" }
+                        ],
+                        "weight": 10,
+                        "floor_max": 1,
+                        "dungeon_max": 1,
+                        "effects": [
+                            { "type": "xp", "amount": 30, "job": "adventuring:firemaker" },
+                            {
+                                "type": "loot",
+                                "pool": [
+                                    { "id": "adventuring:crude_kindling", "qty": 1, "weight": 100 }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "eternal_bonfire",
+                        "name": "Eternal Bonfire",
+                        "media": "melvor:assets/media/bank/potion_firemaking_i.png",
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:master_firemaker", "level": 1 }
+                        ],
+                        "weight": 8,
+                        "floor_max": 1,
+                        "dungeon_max": 2,
+                        "effects": [
+                            { "type": "xp", "amount": 100, "job": "adventuring:firemaker" },
+                            { "type": "xp", "amount": 50, "job": "adventuring:master_firemaker" },
+                            {
+                                "type": "loot",
+                                "pool": [
+                                    { "id": "adventuring:crude_kindling", "qty": 3, "weight": 60 },
+                                    { "id": "adventuring:refined_kindling", "qty": 2, "weight": 35 },
+                                    { "id": "adventuring:immaculate_kindling", "qty": 1, "weight": 5 }
+                                ]
+                            }
+                        ]
+                    }
                 ]
             }
         }]
     }
 }
+

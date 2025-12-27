@@ -1,0 +1,256 @@
+{
+    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+    "namespace": "adventuring",
+    "data": {
+        "skillData": [{
+            "skillID": "adventuring:Adventuring",
+            "data": {
+                "jobs": [
+                    {
+                        "id": "spellblade",
+                        "tier": 5,
+                        "name": "Spellblade",
+                        "media": "melvor:assets/media/bank/potion_magic_i.png#tint=red",
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:fighter", "level": 15 },
+                            { "type": "job_level", "job": "adventuring:wizard", "level": 15 }
+                        ],
+                        "isMilestoneReward": true,
+                        "allowedItems": [
+                            "adventuring:helmet",
+                            "adventuring:vest",
+                            "adventuring:leggings",
+                            "adventuring:bracers",
+                            "adventuring:boots",
+                            "adventuring:amulet",
+                            "adventuring:ring",
+                            "adventuring:cape",
+                            "adventuring:sword1h",
+                            "adventuring:dagger",
+                            "adventuring:spellbook"
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:hitpoints", "value": 1.0 },
+                            { "id": "adventuring:defence", "value": 0.6 },
+                            { "id": "adventuring:agility", "value": 0.8 },
+                            { "id": "adventuring:strength", "value": 1.5 },
+                            { "id": "adventuring:magic", "value": 1.5 }
+                        ]
+                    }
+                ],
+                "generators": [
+                    {
+                        "id": "arcane_slash",
+                        "name": "Arcane Slash",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:spellblade", "level": 1 }
+                        ],
+                        "energy": 25,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 12,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.25 },
+                                                { "id": "adventuring:magic", "value": 0.25 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "enchanted_strike",
+                        "name": "Enchanted Strike",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:spellblade", "level": 8 }
+                        ],
+                        "energy": 28,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 14,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.3 },
+                                                { "id": "adventuring:magic", "value": 0.2 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:burn",
+                                        "stacks": {
+                                            "base": 3,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 0.05 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "runic_blade",
+                        "name": "Runic Blade",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:spellblade", "level": 15 }
+                        ],
+                        "energy": 30,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 16,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.3 },
+                                                { "id": "adventuring:magic", "value": 0.25 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "target": "self",
+                                "party": "ally",
+                                "effects": [
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:arcane_power",
+                                        "stacks": {
+                                            "base": 3,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 0.05 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "spenders": [
+                    {
+                        "id": "spellstrike",
+                        "name": "Spellstrike",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:spellblade", "level": 1 }
+                        ],
+                        "energy": 80,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 40,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.6 },
+                                                { "id": "adventuring:magic", "value": 0.6 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "arcane_tempest",
+                        "name": "Arcane Tempest",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:spellblade", "level": 12 }
+                        ],
+                        "energy": 100,
+                        "hits": [
+                            {
+                                "target": "all",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 30,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.5 },
+                                                { "id": "adventuring:magic", "value": 0.5 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:shock",
+                                        "stacks": {
+                                            "base": 3,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 0.05 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "blade_of_annihilation",
+                        "name": "Blade of Annihilation",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:spellblade", "level": 20 }
+                        ],
+                        "energy": 100,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 60,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.9 },
+                                                { "id": "adventuring:magic", "value": 0.9 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "target": "self",
+                                "party": "ally",
+                                "effects": [
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:barrier",
+                                        "stacks": {
+                                            "base": 5,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 0.1 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        }]
+    }
+}

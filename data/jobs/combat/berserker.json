@@ -1,0 +1,321 @@
+{
+    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+    "namespace": "adventuring",
+    "data": {
+        "skillData": [{
+            "skillID": "adventuring:Adventuring",
+            "data": {
+                "jobs": [
+                    {
+                        "id": "berserker",
+                        "tier": 1,
+                        "name": "Berserker",
+                        "media": "melvor:assets/media/bank/potion_attack_i.png#tint=orange",
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:fighter", "level": 20 }
+                        ],
+                        "isMilestoneReward": true,
+                        "allowedItems": [
+                            "adventuring:helm",
+                            "adventuring:platebody",
+                            "adventuring:platelegs",
+                            "adventuring:gauntlets",
+                            "adventuring:sabatons",
+                            "adventuring:amulet",
+                            "adventuring:ring",
+                            "adventuring:cape",
+                            "adventuring:sword2h",
+                            "adventuring:axe"
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:hitpoints", "value": 1.0 },
+                            { "id": "adventuring:defence", "value": 0.25 },
+                            { "id": "adventuring:agility", "value": 0.5 },
+                            { "id": "adventuring:strength", "value": 2.0 }
+                        ]
+                    }
+                ],
+                "generators": [
+                    {
+                        "id": "rage_strike",
+                        "name": "Rage Strike",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:berserker", "level": 1 }
+                        ],
+                        "energy": 25,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 15,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.4 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "target": "self",
+                                "party": "ally",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 5,
+                                            "scaling": []
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "blood_frenzy",
+                        "name": "Blood Frenzy",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:berserker", "level": 10 }
+                        ],
+                        "energy": 30,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "delay": 150,
+                                "repeat": 3,
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 10,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.25 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:bleed",
+                                        "stacks": {
+                                            "base": 1,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.025 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "spenders": [
+                    {
+                        "id": "rampage",
+                        "name": "Rampage",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:berserker", "level": 5 }
+                        ],
+                        "cost": 120,
+                        "hits": [
+                            {
+                                "target": "aoe",
+                                "party": "enemy",
+                                "delay": 200,
+                                "repeat": 2,
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 8,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.3 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "target": "self",
+                                "party": "ally",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 10,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.1 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "bloodlust",
+                        "name": "Bloodlust",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:berserker", "level": 20 }
+                        ],
+                        "cost": 100,
+                        "hits": [
+                            {
+                                "target": "lowest",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 25,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.75 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "target": "self",
+                                "party": "ally",
+                                "effects": [
+                                    {
+                                        "type": "heal",
+                                        "amount": {
+                                            "base": 15,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.5 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "greater_rampage",
+                        "name": "Greater Rampage",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:berserker", "level": 30 }
+                        ],
+                        "cost": 150,
+                        "hits": [
+                            {
+                                "target": "aoe",
+                                "party": "enemy",
+                                "delay": 100,
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 15,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.4 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:bleed",
+                                        "stacks": { "base": 2 }
+                                    }
+                                ],
+                                "repeat": 2
+                            }
+                        ]
+                    },
+                    {
+                        "id": "primal_fury",
+                        "name": "Primal Fury",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:berserker", "level": 40 }
+                        ],
+                        "cost": 200,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "delay": 80,
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 12,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.3 }
+                                            ]
+                                        }
+                                    }
+                                ],
+                                "repeat": 5
+                            },
+                            {
+                                "target": "self",
+                                "party": "ally",
+                                "effects": [
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:might",
+                                        "stacks": {
+                                            "base": 3,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.1 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "passives": [
+                    {
+                        "id": "enrage",
+                        "name": "Enrage",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:berserker", "level": 15 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "encounter_start",
+                                "type": "buff",
+                                "target": "self",
+                                "id": "adventuring:might",
+                                "stacks": {
+                                    "base": 3,
+                                    "scaling": [
+                                        { "id": "adventuring:strength", "value": 0.1 }
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "bloodthirst",
+                        "name": "Bloodthirst",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:berserker", "level": 25 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "encounter_start",
+                                "type": "buff",
+                                "target": "self",
+                                "id": "adventuring:regen",
+                                "stacks": {
+                                    "base": 2,
+                                    "scaling": [
+                                        { "id": "adventuring:strength", "value": 0.1 }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        }]
+    }
+}

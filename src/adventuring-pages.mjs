@@ -19,6 +19,10 @@ export class AdventuringPages {
         this.pages.forEach(p => p.postDataRegistration());
     }
 
+    onPageChange() {
+        this.pages.forEach(p => p.onPageChange());
+    }
+
     go(page) {
         if(page instanceof AdventuringPage && page !== this.current) {
             this.pages.forEach(p => {
@@ -32,6 +36,11 @@ export class AdventuringPages {
 
             page.component.show();
             page.onShow();
+            
+            // Notify tutorial manager of page change
+            if(this.manager.tutorialManager && this.manager.tutorialManager.onOverviewPageChange) {
+                this.manager.tutorialManager.onOverviewPageChange();
+            }
         }
 
         this.manager.overview.renderQueue.status = true;

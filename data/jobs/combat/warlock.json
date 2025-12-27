@@ -1,0 +1,299 @@
+{
+    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+    "namespace": "adventuring",
+    "data": {
+        "skillData": [{
+            "skillID": "adventuring:Adventuring",
+            "data": {
+                "jobs": [
+                    {
+                        "id": "warlock",
+                        "tier": 2,
+                        "name": "Warlock",
+                        "media": "melvor:assets/media/bank/potion_magic_i.png#tint=green",
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:wizard", "level": 20 }
+                        ],
+                        "isMilestoneReward": true,
+                        "allowedItems": [
+                            "adventuring:hat",
+                            "adventuring:robes",
+                            "adventuring:bottoms",
+                            "adventuring:mitts",
+                            "adventuring:slippers",
+                            "adventuring:amulet",
+                            "adventuring:ring",
+                            "adventuring:cape",
+                            "adventuring:staff",
+                            "adventuring:spellbook"
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:hitpoints", "value": 0.75 },
+                            { "id": "adventuring:defence", "value": 0.25 },
+                            { "id": "adventuring:agility", "value": 0.5 },
+                            { "id": "adventuring:magic", "value": 2.5 }
+                        ]
+                    }
+                ],
+                "generators": [
+                    {
+                        "id": "shadow_bolt",
+                        "name": "Shadow Bolt",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:warlock", "level": 1 }
+                        ],
+                        "energy": 25,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 15,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 0.4 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "curse_of_pain",
+                        "name": "Curse of Pain",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:warlock", "level": 10 }
+                        ],
+                        "energy": 30,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 8,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 0.2 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:curse",
+                                        "stacks": {
+                                            "base": 2,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 0.05 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:poison",
+                                        "stacks": {
+                                            "base": 2,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 0.1 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "spenders": [
+                    {
+                        "id": "dark_pact",
+                        "name": "Dark Pact",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:warlock", "level": 5 }
+                        ],
+                        "cost": 100,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 40,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 1.2 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "target": "self",
+                                "party": "ally",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 10,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 0.15 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "life_drain",
+                        "name": "Life Drain",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:warlock", "level": 15 }
+                        ],
+                        "cost": 120,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 25,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 0.7 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "target": "self",
+                                "party": "ally",
+                                "effects": [
+                                    {
+                                        "type": "heal",
+                                        "amount": {
+                                            "base": 20,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 0.5 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "doom",
+                        "name": "Doom",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:warlock", "level": 25 }
+                        ],
+                        "cost": 180,
+                        "hits": [
+                            {
+                                "target": "aoe",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:curse",
+                                        "stacks": {
+                                            "base": 3,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 0.1 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:poison",
+                                        "stacks": {
+                                            "base": 3,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 0.1 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:burn",
+                                        "stacks": {
+                                            "base": 3,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 0.1 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "passives": [
+                    {
+                        "id": "dark_aura",
+                        "name": "Dark Aura",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:warlock", "level": 20 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "encounter_start",
+                                "type": "debuff",
+                                "target": "aoe",
+                                "party": "enemy",
+                                "id": "adventuring:weaken",
+                                "stacks": {
+                                    "base": 2,
+                                    "scaling": [
+                                        { "id": "adventuring:magic", "value": 0.1 }
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "soul_siphon",
+                        "name": "Soul Siphon",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:warlock", "level": 30 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "round_start",
+                                "type": "debuff",
+                                "target": "front",
+                                "party": "enemy",
+                                "id": "adventuring:curse",
+                                "stacks": {
+                                    "base": 1,
+                                    "scaling": [
+                                        { "id": "adventuring:magic", "value": 0.05 }
+                                    ]
+                                }
+                            },
+                            {
+                                "trigger": "round_start",
+                                "type": "buff",
+                                "target": "self",
+                                "id": "adventuring:regen",
+                                "stacks": {
+                                    "base": 1,
+                                    "scaling": [
+                                        { "id": "adventuring:magic", "value": 0.05 }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        }]
+    }
+}

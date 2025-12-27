@@ -7,16 +7,24 @@ export class AdventuringStatElement extends HTMLElement {
         this.styling = getElementFromFragment(this._content, 'styling', 'div');
         this.icon = getElementFromFragment(this._content, 'icon', 'img');
         this.value = getElementFromFragment(this._content, 'value', 'small');
+        this._tooltipContent = '';
     }
 
     mount(parent) {
         parent.append(this);
     }
 
+    setTooltipContent(content) {
+        this._tooltipContent = content;
+        if (this.tooltip) {
+            this.tooltip.setContent(content);
+        }
+    }
+
     connectedCallback() {
         this.appendChild(this._content);
         this.tooltip = tippy(this.styling, {
-            content: '',
+            content: this._tooltipContent,
             allowHTML: true,
             hideOnClick: false
         });

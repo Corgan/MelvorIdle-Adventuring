@@ -1,0 +1,330 @@
+{
+    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+    "namespace": "adventuring",
+    "data": {
+        "skillData": [{
+            "skillID": "adventuring:Adventuring",
+            "data": {
+                "passives": [
+                    {
+                        "id": "pressure_adaptation",
+                        "name": "Pressure Adaptation",
+                        "effects": [
+                            {
+                                "trigger": "round_start",
+                                "type": "buff",
+                                "target": "self",
+                                "buff": "adventuring:fortify",
+                                "stacks": { "base": 2, "scaling": [] }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "bioluminescence",
+                        "name": "Bioluminescence",
+                        "effects": [
+                            {
+                                "trigger": "on_hit",
+                                "type": "debuff",
+                                "target": "target",
+                                "buff": "adventuring:blind",
+                                "chance": 0.25,
+                                "stacks": { "base": 1, "scaling": [] }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "tidal_fury",
+                        "name": "Tidal Fury",
+                        "effects": [
+                            {
+                                "trigger": "encounter_start",
+                                "type": "buff",
+                                "target": "all_allies",
+                                "buff": "adventuring:might",
+                                "stacks": { "base": 4, "scaling": [] }
+                            }
+                        ]
+                    }
+                ],
+                "areas": [
+                    {
+                        "id": "abyssal_depths",
+                        "name": "Abyssal Depths",
+                        "media": "melvor:assets/media/bank/potion_fishing_i.png",
+                        "requirements": [
+                            { "type": "skill_level", "level": 70 }
+                        ],
+                        "height": 12,
+                        "width": 7,
+                        "floors": [
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:abyssal_leech", "weight": 60 },
+                                    { "id": "adventuring:deep_angler", "weight": 40 }
+                                ],
+                                "exit": ["adventuring:abyssal_leech", "adventuring:abyssal_leech", "adventuring:deep_angler"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:abyssal_leech", "weight": 40 },
+                                    { "id": "adventuring:deep_angler", "weight": 40 },
+                                    { "id": "adventuring:kraken_spawn", "weight": 20 }
+                                ],
+                                "exit": ["adventuring:deep_angler", "adventuring:deep_angler", "adventuring:kraken_spawn"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:deep_angler", "weight": 35 },
+                                    { "id": "adventuring:kraken_spawn", "weight": 35 },
+                                    { "id": "adventuring:brine_witch", "weight": 30 }
+                                ],
+                                "exit": ["adventuring:kraken_spawn", "adventuring:kraken_spawn", "adventuring:brine_witch"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:kraken_spawn", "weight": 30 },
+                                    { "id": "adventuring:brine_witch", "weight": 35 },
+                                    { "id": "adventuring:drowned_knight", "weight": 35 }
+                                ],
+                                "exit": ["adventuring:brine_witch", "adventuring:drowned_knight", "adventuring:drowned_knight"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:brine_witch", "weight": 30 },
+                                    { "id": "adventuring:drowned_knight", "weight": 40 },
+                                    { "id": "adventuring:tidal_elemental", "weight": 30 }
+                                ],
+                                "exit": ["adventuring:drowned_knight", "adventuring:drowned_knight", "adventuring:tidal_elemental"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:drowned_knight", "weight": 35 },
+                                    { "id": "adventuring:tidal_elemental", "weight": 65 }
+                                ],
+                                "exit": ["adventuring:tidal_elemental", "adventuring:tidal_elemental", "adventuring:the_leviathan"]
+                            }
+                        ]
+                    }
+                ],
+                "monsters": [
+                    {
+                        "id": "abyssal_leech",
+                        "name": "Abyssal Leech",
+                        "media": "melvor:assets/media/monsters/leech.png",
+                        "tags": ["aquatic", "beast"],
+                        "xp": 145,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 95 },
+                            { "id": "adventuring:defence", "value": 55 },
+                            { "id": "adventuring:agility", "value": 72 },
+                            { "id": "adventuring:strength", "value": 68 },
+                            { "id": "adventuring:ranged", "value": 45 },
+                            { "id": "adventuring:magic", "value": 50 },
+                            { "id": "adventuring:prayer", "value": 40 }
+                        ],
+                        "generator": "adventuring:blood_drain",
+                        "spender": "adventuring:leeching_swarm",
+                        "passives": [],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 18, "weight": 100 },
+                            { "id": "adventuring:parts", "qty": 3, "weight": 25 },
+                            { "id": "adventuring:abyssal_scale", "qty": 2, "weight": 40 }
+                        ]
+                    },
+                    {
+                        "id": "deep_angler",
+                        "name": "Deep Angler",
+                        "media": "melvor:assets/media/monsters/angry_fish.png",
+                        "tags": ["aquatic", "beast"],
+                        "xp": 150,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 90 },
+                            { "id": "adventuring:defence", "value": 52 },
+                            { "id": "adventuring:agility", "value": 65 },
+                            { "id": "adventuring:strength", "value": 75 },
+                            { "id": "adventuring:ranged", "value": 48 },
+                            { "id": "adventuring:magic", "value": 58 },
+                            { "id": "adventuring:prayer", "value": 42 }
+                        ],
+                        "generator": "adventuring:lure_flash",
+                        "spender": "adventuring:crushing_bite",
+                        "passives": ["adventuring:bioluminescence"],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 20, "weight": 100 },
+                            { "id": "adventuring:parts", "qty": 3, "weight": 22 },
+                            { "id": "adventuring:abyssal_scale", "qty": 2, "weight": 35 },
+                            { "id": "adventuring:deep_pearl", "qty": 1, "weight": 15 }
+                        ]
+                    },
+                    {
+                        "id": "kraken_spawn",
+                        "name": "Kraken Spawn",
+                        "media": "melvor:assets/media/monsters/octopus.png",
+                        "tags": ["aquatic", "beast"],
+                        "xp": 160,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 105 },
+                            { "id": "adventuring:defence", "value": 62 },
+                            { "id": "adventuring:agility", "value": 68 },
+                            { "id": "adventuring:strength", "value": 78 },
+                            { "id": "adventuring:ranged", "value": 55 },
+                            { "id": "adventuring:magic", "value": 52 },
+                            { "id": "adventuring:prayer", "value": 45 }
+                        ],
+                        "generator": "adventuring:tentacle_lash",
+                        "spender": "adventuring:constrict",
+                        "passives": [],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 22, "weight": 100 },
+                            { "id": "adventuring:parts", "qty": 4, "weight": 20 },
+                            { "id": "adventuring:abyssal_scale", "qty": 3, "weight": 30 },
+                            { "id": "adventuring:kraken_ink", "qty": 2, "weight": 25 }
+                        ]
+                    },
+                    {
+                        "id": "brine_witch",
+                        "name": "Brine Witch",
+                        "media": "melvor:assets/media/monsters/mermaid.png",
+                        "tags": ["aquatic", "humanoid", "mage"],
+                        "xp": 165,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 85 },
+                            { "id": "adventuring:defence", "value": 48 },
+                            { "id": "adventuring:agility", "value": 62 },
+                            { "id": "adventuring:strength", "value": 45 },
+                            { "id": "adventuring:ranged", "value": 50 },
+                            { "id": "adventuring:magic", "value": 85 },
+                            { "id": "adventuring:prayer", "value": 60 }
+                        ],
+                        "generator": "adventuring:salt_curse",
+                        "spender": "adventuring:tidal_surge",
+                        "passives": [],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 24, "weight": 100 },
+                            { "id": "adventuring:parts", "qty": 3, "weight": 18 },
+                            { "id": "adventuring:brine_salt", "qty": 3, "weight": 40 },
+                            { "id": "adventuring:arcane_dust", "qty": 2, "weight": 25 }
+                        ]
+                    },
+                    {
+                        "id": "drowned_knight",
+                        "name": "Drowned Knight",
+                        "media": "melvor:assets/media/monsters/undead_knight.png",
+                        "tags": ["aquatic", "undead", "humanoid"],
+                        "xp": 175,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 115 },
+                            { "id": "adventuring:defence", "value": 75 },
+                            { "id": "adventuring:agility", "value": 55 },
+                            { "id": "adventuring:strength", "value": 82 },
+                            { "id": "adventuring:ranged", "value": 45 },
+                            { "id": "adventuring:magic", "value": 48 },
+                            { "id": "adventuring:prayer", "value": 35 }
+                        ],
+                        "generator": "adventuring:corroded_slash",
+                        "spender": "adventuring:anchor_smash",
+                        "passives": ["adventuring:pressure_adaptation"],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 26, "weight": 100 },
+                            { "id": "adventuring:parts", "qty": 4, "weight": 25 },
+                            { "id": "adventuring:abyssal_scale", "qty": 3, "weight": 35 },
+                            { "id": "adventuring:pressure_crystal", "qty": 1, "weight": 20 }
+                        ]
+                    },
+                    {
+                        "id": "tidal_elemental",
+                        "name": "Tidal Elemental",
+                        "media": "melvor:assets/media/monsters/water_golem.png",
+                        "tags": ["aquatic", "elemental"],
+                        "xp": 185,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 120 },
+                            { "id": "adventuring:defence", "value": 68 },
+                            { "id": "adventuring:agility", "value": 60 },
+                            { "id": "adventuring:strength", "value": 70 },
+                            { "id": "adventuring:ranged", "value": 52 },
+                            { "id": "adventuring:magic", "value": 78 },
+                            { "id": "adventuring:prayer", "value": 55 }
+                        ],
+                        "generator": "adventuring:tidal_wave",
+                        "spender": "adventuring:whirlpool",
+                        "passives": [],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 28, "weight": 100 },
+                            { "id": "adventuring:parts", "qty": 4, "weight": 22 },
+                            { "id": "adventuring:pressure_crystal", "qty": 2, "weight": 30 },
+                            { "id": "adventuring:deep_pearl", "qty": 1, "weight": 18 }
+                        ]
+                    },
+                    {
+                        "id": "the_leviathan",
+                        "name": "The Leviathan",
+                        "media": "melvor:assets/media/monsters/sea_monster.png",
+                        "tags": ["aquatic", "beast", "boss"],
+                        "isBoss": true,
+                        "xp": 500,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 280 },
+                            { "id": "adventuring:defence", "value": 85 },
+                            { "id": "adventuring:agility", "value": 65 },
+                            { "id": "adventuring:strength", "value": 95 },
+                            { "id": "adventuring:ranged", "value": 60 },
+                            { "id": "adventuring:magic", "value": 75 },
+                            { "id": "adventuring:prayer", "value": 50 }
+                        ],
+                        "generator": "adventuring:crushing_maw",
+                        "spender": "adventuring:abyssal_roar",
+                        "passives": ["adventuring:tidal_fury", "adventuring:pressure_adaptation"],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 75, "weight": 100 },
+                            { "id": "adventuring:big_parts", "qty": 3, "weight": 100 },
+                            { "id": "adventuring:abyssal_scale", "qty": 8, "weight": 100 },
+                            { "id": "adventuring:deep_pearl", "qty": 3, "weight": 80 },
+                            { "id": "adventuring:kraken_ink", "qty": 4, "weight": 70 },
+                            { "id": "adventuring:leviathans_heart", "qty": 1, "weight": 100 }
+                        ]
+                    }
+                ],
+                "materials": [
+                    {
+                        "id": "abyssal_scale",
+                        "name": "Abyssal Scale",
+                        "media": "melvor:assets/media/bank/dragonhide_blue.png",
+                        "category": "adventuring:monster_drops"
+                    },
+                    {
+                        "id": "deep_pearl",
+                        "name": "Deep Pearl",
+                        "media": "melvor:assets/media/bank/pearl.png",
+                        "category": "adventuring:monster_drops"
+                    },
+                    {
+                        "id": "kraken_ink",
+                        "name": "Kraken Ink",
+                        "media": "melvor:assets/media/bank/strange_potion.png",
+                        "category": "adventuring:monster_drops"
+                    },
+                    {
+                        "id": "pressure_crystal",
+                        "name": "Pressure Crystal",
+                        "media": "melvor:assets/media/bank/diamond.png",
+                        "category": "adventuring:monster_drops"
+                    },
+                    {
+                        "id": "brine_salt",
+                        "name": "Brine Salt",
+                        "media": "melvor:assets/media/bank/salt.png",
+                        "category": "adventuring:monster_drops"
+                    },
+                    {
+                        "id": "leviathans_heart",
+                        "name": "Leviathan's Heart",
+                        "media": "melvor:assets/media/bank/hunters_heart.png",
+                        "category": "adventuring:boss_drops"
+                    }
+                ]
+            }
+        }]
+    }
+}

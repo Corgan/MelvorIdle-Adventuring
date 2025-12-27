@@ -10,6 +10,8 @@ export class AdventuringOverviewElement extends HTMLElement {
         this.turnProgressBar = getElementFromFragment(this._content, 'turn-progress-bar', 'progress-bar');
         this.cards = getElementFromFragment(this._content, 'cards', 'div');
         this.log = getElementFromFragment(this._content, 'log', 'div');
+        this.effects = getElementFromFragment(this._content, 'effects', 'div');
+        this.effectsContainer = getElementFromFragment(this._content, 'effects-container', 'div');
     }
 
     mount(parent) {

@@ -1,0 +1,371 @@
+{
+    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+    "namespace": "adventuring",
+    "data": {
+        "skillData": [{
+            "skillID": "adventuring:Adventuring",
+            "data": {
+                "jobs": [
+                    {
+                        "id": "inquisitor",
+                        "tier": 3,
+                        "name": "Inquisitor",
+                        "media": "melvor:assets/media/bank/potion_prayer_i.png#tint=purple",
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:priest", "level": 20 },
+                            { "type": "job_level", "job": "adventuring:elementalist", "level": 15 },
+                            { "type": "area_mastery", "area": "adventuring:bandit_hideout", "level": 25 }
+                        ],
+                        "isMilestoneReward": true,
+                        "allowedItems": [
+                            "adventuring:hat",
+                            "adventuring:robes",
+                            "adventuring:bottoms",
+                            "adventuring:mitts",
+                            "adventuring:slippers",
+                            "adventuring:amulet",
+                            "adventuring:ring",
+                            "adventuring:cape",
+                            "adventuring:staff",
+                            "adventuring:spellbook",
+                            "adventuring:mace"
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:hitpoints", "value": 1.0 },
+                            { "id": "adventuring:defence", "value": 0.5 },
+                            { "id": "adventuring:agility", "value": 0.5 },
+                            { "id": "adventuring:prayer", "value": 1.75 },
+                            { "id": "adventuring:magic", "value": 1.5 }
+                        ]
+                    }
+                ],
+                "generators": [
+                    {
+                        "id": "purifying_flames",
+                        "name": "Purifying Flames",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:inquisitor", "level": 1 }
+                        ],
+                        "energy": 25,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 15,
+                                            "scaling": [
+                                                { "id": "adventuring:prayer", "value": 0.25 },
+                                                { "id": "adventuring:magic", "value": 0.2 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:burn",
+                                        "stacks": {
+                                            "base": 3,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 0.1 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "purging_flame",
+                        "name": "Purging Flame",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:inquisitor", "level": 15 }
+                        ],
+                        "energy": 28,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 12,
+                                            "scaling": [
+                                                { "id": "adventuring:prayer", "value": 0.2 },
+                                                { "id": "adventuring:magic", "value": 0.25 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:burn",
+                                        "stacks": {
+                                            "base": 2,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 0.1 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:curse",
+                                        "stacks": {
+                                            "base": 2,
+                                            "scaling": [
+                                                { "id": "adventuring:prayer", "value": 0.1 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "spenders": [
+                    {
+                        "id": "righteous_fire",
+                        "name": "Righteous Fire",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:inquisitor", "level": 5 }
+                        ],
+                        "cost": 140,
+                        "hits": [
+                            {
+                                "target": "aoe",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 15,
+                                            "scaling": [
+                                                { "id": "adventuring:prayer", "value": 0.3 },
+                                                { "id": "adventuring:magic", "value": 0.4 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:burn",
+                                        "stacks": {
+                                            "base": 3,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 0.1 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "excommunicate",
+                        "name": "Excommunicate",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:inquisitor", "level": 20 }
+                        ],
+                        "cost": 130,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:curse",
+                                        "stacks": {
+                                            "base": 4,
+                                            "scaling": [
+                                                { "id": "adventuring:prayer", "value": 0.15 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:fear",
+                                        "stacks": {
+                                            "base": 3,
+                                            "scaling": [
+                                                { "id": "adventuring:prayer", "value": 0.1 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:weaken",
+                                        "stacks": {
+                                            "base": 3,
+                                            "scaling": [
+                                                { "id": "adventuring:prayer", "value": 0.1 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "holy_inquisition",
+                        "name": "Holy Inquisition",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:inquisitor", "level": 25 }
+                        ],
+                        "cost": 170,
+                        "hits": [
+                            {
+                                "target": "aoe",
+                                "party": "enemy",
+                                "delay": 150,
+                                "repeat": 2,
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 16,
+                                            "scaling": [
+                                                { "id": "adventuring:prayer", "value": 0.35 },
+                                                { "id": "adventuring:magic", "value": 0.35 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:atonement",
+                                        "stacks": {
+                                            "base": 2,
+                                            "scaling": [
+                                                { "id": "adventuring:prayer", "value": 0.1 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:burn",
+                                        "stacks": {
+                                            "base": 2,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 0.1 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "divine_punishment",
+                        "name": "Divine Punishment",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:inquisitor", "level": 35 }
+                        ],
+                        "cost": 200,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 50,
+                                            "scaling": [
+                                                { "id": "adventuring:prayer", "value": 1.0 },
+                                                { "id": "adventuring:magic", "value": 1.0 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "target": "aoe",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:burn",
+                                        "stacks": {
+                                            "base": 3,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 0.1 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:curse",
+                                        "stacks": {
+                                            "base": 3,
+                                            "scaling": [
+                                                { "id": "adventuring:prayer", "value": 0.1 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "passives": [
+                    {
+                        "id": "burning_conviction",
+                        "name": "Burning Conviction",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:inquisitor", "level": 25 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "encounter_start",
+                                "type": "debuff",
+                                "target": "aoe",
+                                "party": "enemy",
+                                "id": "adventuring:burn",
+                                "stacks": {
+                                    "base": 3,
+                                    "scaling": [
+                                        { "id": "adventuring:magic", "value": 0.15 }
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "zealots_fury",
+                        "name": "Zealot's Fury",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:inquisitor", "level": 30 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "encounter_start",
+                                "type": "buff",
+                                "target": "self",
+                                "id": "adventuring:arcane_power",
+                                "stacks": {
+                                    "base": 4,
+                                    "scaling": [
+                                        { "id": "adventuring:magic", "value": 0.2 }
+                                    ]
+                                }
+                            },
+                            {
+                                "trigger": "encounter_start",
+                                "type": "debuff",
+                                "target": "aoe",
+                                "party": "enemy",
+                                "id": "adventuring:curse",
+                                "stacks": {
+                                    "base": 2,
+                                    "scaling": [
+                                        { "id": "adventuring:prayer", "value": 0.1 }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        }]
+    }
+}

@@ -8,16 +8,24 @@ export class AdventuringStoredItemElement extends HTMLElement {
         this.border = getElementFromFragment(this._content, 'border', 'div');
         this.icon = getElementFromFragment(this._content, 'icon', 'img');
         this.count = getElementFromFragment(this._content, 'count', 'small');
+        this._tooltipContent = '';
     }
 
     mount(parent) {
         parent.append(this);
     }
 
+    setTooltipContent(content) {
+        this._tooltipContent = content;
+        if (this.tooltip) {
+            this.tooltip.setContent(content);
+        }
+    }
+
     connectedCallback() {
         this.appendChild(this._content);
         this.tooltip = tippy(this.clickable, {
-            content: '',
+            content: this._tooltipContent,
             allowHTML: true
         });
     }

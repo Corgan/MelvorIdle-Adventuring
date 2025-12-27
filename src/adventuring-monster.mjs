@@ -1,6 +1,7 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { AdventuringWeightedTable } = await loadModule('src/adventuring-utils.mjs');
+const { AdventuringWeightedTable, addMasteryXPWithBonus } = await loadModule('src/adventuring-utils.mjs');
+const { TooltipBuilder } = await loadModule('src/adventuring-tooltip.mjs');
 
 const { AdventuringMonsterElement } = await loadModule('src/components/adventuring-monster.mjs');
 
@@ -11,6 +12,7 @@ class AdventuringMonsterRenderQueue {
         this.icon = false;
         this.clickable = false;
         this.mastery = false;
+        this.newBadge = false;
     }
 
     updateAll() {
@@ -19,6 +21,7 @@ class AdventuringMonsterRenderQueue {
         this.icon = true;
         this.clickable = true;
         this.mastery = true;
+        this.newBadge = true;
     }
 }
 export class AdventuringMonster extends MasteryAction {
@@ -39,6 +42,66 @@ export class AdventuringMonster extends MasteryAction {
 
         this.lootGenerator = new AdventuringWeightedTable(this.manager, this.game);
         this.lootGenerator.loadTable(data.loot);
+        
+        // Mastery effects cache - rebuilt on level up
+        this._masteryEffectsCache = null;
+        this._masteryCacheLevel = -1;
+    }
+
+    /**
+     * Get the mastery category for monsters
+     */
+    get masteryCategory() {
+        return this.manager.masteryCategories.getObjectByID('adventuring:monsters');
+    }
+
+    /**
+     * Get cached mastery effects for this monster's current level.
+     * Rebuilds cache if level changed.
+     */
+    get masteryEffects() {
+        const currentLevel = this.level;
+        if (this._masteryEffectsCache === null || this._masteryCacheLevel !== currentLevel) {
+            this._rebuildMasteryCache();
+        }
+        return this._masteryEffectsCache;
+    }
+
+    /**
+     * Rebuild the mastery effects cache from the category milestones
+     */
+    _rebuildMasteryCache() {
+        const category = this.masteryCategory;
+        this._masteryCacheLevel = this.level;
+        this._masteryEffectsCache = category ? category.getEffectsAtLevel(this.level) : [];
+    }
+
+    /**
+     * Invalidate mastery cache (called on level up)
+     */
+    invalidateMasteryCache() {
+        this._masteryEffectsCache = null;
+        this._masteryCacheLevel = -1;
+    }
+
+    /**
+     * Check if this monster has a specific mastery effect type
+     * @param {string} effectType - The effect type to check for
+     * @returns {boolean}
+     */
+    hasMasteryEffect(effectType) {
+        return this.masteryEffects.some(e => e.type === effectType);
+    }
+
+    /**
+     * Get the total value of a specific mastery effect type
+     * @param {string} effectType - The effect type to sum
+     * @returns {number}
+     */
+    getMasteryEffectValue(effectType) {
+        return this.masteryEffects
+            .filter(e => e.type === effectType)
+            .reduce((sum, e) => sum + (e.value || 0), 0);
     }
 
     get name() {
@@ -46,7 +109,7 @@ export class AdventuringMonster extends MasteryAction {
     }
 
     get media() {
-        return this.unlocked ? this.getMediaURL(this._media) : this.getMediaURL('melvor:assets/media/main/question.svg');
+        return this.unlocked ? this.getMediaURL(this._media) : this.getMediaURL('melvor:assets/media/main/question.png');
     }
 
     get level() {
@@ -57,16 +120,36 @@ export class AdventuringMonster extends MasteryAction {
         return this.manager.bestiary.seen.get(this) === true;
     }
 
-    get tooltip() {
-        let html = '<div>';
+    get category() {
+        return this.manager.categories.getObjectByID('adventuring:Monsters');
+    }
 
-        html += `<div><span>${this.name}</span></div>`;
+    get tooltip() {
+        const tooltip = TooltipBuilder.create()
+            .header(this.name, this.media);
+
         if(this.unlocked) {
-            let { xp, level, percent, nextLevelXP } = this.manager.getMasteryProgress(this);
-            html += `<div><small>${xp} / ${nextLevelXP} XP</small></div>`;
+            tooltip.masteryProgressFor(this.manager, this);
+            
+            // Get mastery bonuses from modifier system
+            const dropRateBonus = this.manager.modifiers.getValue('monsterDropRate', { action: this });
+            const dropQtyBonus = this.manager.modifiers.getValue('monsterDropQty', { action: this });
+            
+            if(dropRateBonus > 0 || dropQtyBonus > 0) {
+                tooltip.separator();
+                if(dropRateBonus > 0) {
+                    tooltip.bonus(`+${dropRateBonus}% Drop Rate`);
+                }
+                if(dropQtyBonus > 0) {
+                    tooltip.bonus(`+${dropQtyBonus}% Drop Quantity`);
+                }
+            }
+            
+            // Next milestone
+            tooltip.nextMilestone(this.manager, this);
         }
-        html += '</div>'
-        return html;
+        
+        return tooltip.build();
     }
 
     onLoad() {
@@ -75,6 +158,7 @@ export class AdventuringMonster extends MasteryAction {
         this.renderQueue.icon = true;
         this.renderQueue.clickable = true;
         this.renderQueue.mastery = true;
+        this.renderQueue.newBadge = true;
     }
 
     postDataRegistration() {
@@ -82,9 +166,7 @@ export class AdventuringMonster extends MasteryAction {
     }
 
     addXP(xp) {
-        this.manager.addMasteryXP(this, xp);
-        this.manager.addMasteryPoolXP(xp);
-        this.renderQueue.tooltip = true;
+        addMasteryXPWithBonus(this.manager, this, xp);
     }
 
     render() {
@@ -93,6 +175,7 @@ export class AdventuringMonster extends MasteryAction {
         this.renderIcon();
         this.renderClickable();
         this.renderMastery();
+        this.renderNewBadge();
     }
 
     renderName() {
@@ -100,10 +183,10 @@ export class AdventuringMonster extends MasteryAction {
             return;
 
         if(this.unlocked) {
-            this.component.name.textContent = this.name;
+            this.component.nameText.textContent = this.name;
             this.component.level.textContent = ` (${this.level})`;
         } else {
-            this.component.name.textContent = "???";
+            this.component.nameText.textContent = "???";
             this.component.level.textContent = "";
         }
 
@@ -112,6 +195,9 @@ export class AdventuringMonster extends MasteryAction {
 
     renderTooltip() {
         if(!this.renderQueue.tooltip)
+            return;
+
+        if(this.component.tooltip === undefined)
             return;
 
         this.component.tooltip.setContent(this.tooltip);
@@ -126,7 +212,7 @@ export class AdventuringMonster extends MasteryAction {
         if(this.unlocked) {
             this.component.icon.src = this.media;
         } else {
-            this.component.icon.src = this.getMediaURL('melvor:assets/media/main/question.svg');
+            this.component.icon.src = this.getMediaURL('melvor:assets/media/main/question.png');
         }
 
         this.renderQueue.icon = false;
@@ -154,5 +240,15 @@ export class AdventuringMonster extends MasteryAction {
         }
 
         this.renderQueue.mastery = false;
+    }
+
+    renderNewBadge() {
+        if(!this.renderQueue.newBadge)
+            return;
+
+        const isNew = this.manager.bestiary.isNew(this);
+        this.component.newBadge.classList.toggle('d-none', !isNew);
+
+        this.renderQueue.newBadge = false;
     }
 }

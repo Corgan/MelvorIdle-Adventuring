@@ -1,0 +1,802 @@
+{
+    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+    "namespace": "adventuring",
+    "data": {
+        "skillData": [{
+            "skillID": "adventuring:Adventuring",
+            "data": {
+                "baseItems": [
+                    {
+                        "id": "vampiric_band",
+                        "name": "Vampiric Band",
+                        "media": "melvor:assets/media/bank/ring_gold_diamond.png",
+                        "type": "adventuring:ring",
+                        "isUnique": true,
+                        "materials": [
+                            { "id": "adventuring:currency", "qty": 2000 },
+                            { "id": "adventuring:vampire_fang", "qty": 15 }
+                        ],
+                        "base": [
+                            { "id": "adventuring:hitpoints", "value": 12 },
+                            { "id": "adventuring:strength", "value": 8 }
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:hitpoints", "value": 1.2 },
+                            { "id": "adventuring:strength", "value": 0.8 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "on_hit",
+                                "type": "lifesteal",
+                                "target": "self",
+                                "amount": 5,
+                                "scaling": 0.3
+                            }
+                        ]
+                    },
+                    {
+                        "id": "berserkers_loop",
+                        "name": "Berserker's Loop",
+                        "media": "melvor:assets/media/bank/ring_gold_emerald.png",
+                        "type": "adventuring:ring",
+                        "isUnique": true,
+                        "materials": [
+                            { "id": "adventuring:currency", "qty": 2200 },
+                            { "id": "adventuring:giants_toe", "qty": 20 }
+                        ],
+                        "base": [
+                            { "id": "adventuring:hitpoints", "value": 8 },
+                            { "id": "adventuring:strength", "value": 15 }
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:hitpoints", "value": 0.8 },
+                            { "id": "adventuring:strength", "value": 1.5 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "on_low_health",
+                                "type": "buff",
+                                "id": "adventuring:berserk",
+                                "target": "self",
+                                "amount": 25,
+                                "threshold": 30,
+                                "stacks": 1
+                            }
+                        ]
+                    },
+                    {
+                        "id": "guardian_ring",
+                        "name": "Guardian Ring",
+                        "media": "melvor:assets/media/bank/ring_silver_sapphire.png",
+                        "type": "adventuring:ring",
+                        "isUnique": true,
+                        "materials": [
+                            { "id": "adventuring:currency", "qty": 2500 },
+                            { "id": "adventuring:ancient_wrappings", "qty": 12 }
+                        ],
+                        "base": [
+                            { "id": "adventuring:hitpoints", "value": 20 },
+                            { "id": "adventuring:defence", "value": 12 }
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:hitpoints", "value": 2.0 },
+                            { "id": "adventuring:defence", "value": 1.2 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "on_ally_death",
+                                "type": "buff",
+                                "id": "adventuring:barrier",
+                                "target": "self",
+                                "amount": 20,
+                                "scaling": 2,
+                                "stacks": 3
+                            }
+                        ]
+                    },
+                    {
+                        "id": "phoenix_ring",
+                        "name": "Phoenix Ring",
+                        "media": "melvor:assets/media/bank/ring_gold_ruby.png",
+                        "type": "adventuring:ring",
+                        "isUnique": true,
+                        "materials": [
+                            { "id": "adventuring:currency", "qty": 5000 },
+                            { "id": "adventuring:fire_essence", "qty": 25 },
+                            { "id": "adventuring:feather", "qty": 50 }
+                        ],
+                        "base": [
+                            { "id": "adventuring:hitpoints", "value": 25 },
+                            { "id": "adventuring:prayer", "value": 10 }
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:hitpoints", "value": 2.5 },
+                            { "id": "adventuring:prayer", "value": 1.0 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "on_ally_death",
+                                "type": "revive",
+                                "target": "dead_ally",
+                                "amount": 25,
+                                "chance": 15,
+                                "scaling": 0.5
+                            }
+                        ]
+                    },
+                    {
+                        "id": "plague_ring",
+                        "name": "Plague Ring",
+                        "media": "melvor:assets/media/bank/ring_gold_topaz.png",
+                        "type": "adventuring:ring",
+                        "isUnique": true,
+                        "materials": [
+                            { "id": "adventuring:currency", "qty": 1800 },
+                            { "id": "adventuring:eye_of_newt", "qty": 25 }
+                        ],
+                        "base": [
+                            { "id": "adventuring:hitpoints", "value": 10 },
+                            { "id": "adventuring:magic", "value": 12 }
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:hitpoints", "value": 1.0 },
+                            { "id": "adventuring:magic", "value": 1.2 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "on_hit",
+                                "type": "debuff",
+                                "id": "adventuring:poison",
+                                "target": "target",
+                                "amount": 5,
+                                "scaling": 0.4,
+                                "stacks": 2,
+                                "chance": 20
+                            }
+                        ]
+                    },
+                    {
+                        "id": "frost_band",
+                        "name": "Frost Band",
+                        "media": "melvor:assets/media/bank/ring_silver_diamond.png",
+                        "type": "adventuring:ring",
+                        "isUnique": true,
+                        "materials": [
+                            { "id": "adventuring:currency", "qty": 2000 },
+                            { "id": "adventuring:frozen_essence", "qty": 15 }
+                        ],
+                        "base": [
+                            { "id": "adventuring:hitpoints", "value": 10 },
+                            { "id": "adventuring:magic", "value": 10 },
+                            { "id": "adventuring:agility", "value": 5 }
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:hitpoints", "value": 1.0 },
+                            { "id": "adventuring:magic", "value": 1.0 },
+                            { "id": "adventuring:agility", "value": 0.5 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "on_hit",
+                                "type": "debuff",
+                                "id": "adventuring:slow",
+                                "target": "target",
+                                "amount": 10,
+                                "stacks": 1,
+                                "chance": 25
+                            }
+                        ]
+                    },
+                    {
+                        "id": "thunder_loop",
+                        "name": "Thunder Loop",
+                        "media": "melvor:assets/media/bank/ring_deadeye.png",
+                        "type": "adventuring:ring",
+                        "isUnique": true,
+                        "materials": [
+                            { "id": "adventuring:currency", "qty": 2200 },
+                            { "id": "adventuring:air_essence", "qty": 20 }
+                        ],
+                        "base": [
+                            { "id": "adventuring:hitpoints", "value": 8 },
+                            { "id": "adventuring:magic", "value": 15 },
+                            { "id": "adventuring:agility", "value": 8 }
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:hitpoints", "value": 0.8 },
+                            { "id": "adventuring:magic", "value": 1.5 },
+                            { "id": "adventuring:agility", "value": 0.8 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "round_start",
+                                "type": "damage",
+                                "target": "random_enemy",
+                                "amount": 10,
+                                "scaling": 1.5,
+                                "chance": 20
+                            }
+                        ]
+                    },
+                    {
+                        "id": "regeneration_ring",
+                        "name": "Regeneration Ring",
+                        "media": "melvor:assets/media/bank/ring_prayer.png",
+                        "type": "adventuring:ring",
+                        "isUnique": true,
+                        "materials": [
+                            { "id": "adventuring:currency", "qty": 2500 },
+                            { "id": "adventuring:water_essence", "qty": 18 }
+                        ],
+                        "base": [
+                            { "id": "adventuring:hitpoints", "value": 25 },
+                            { "id": "adventuring:prayer", "value": 8 }
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:hitpoints", "value": 2.5 },
+                            { "id": "adventuring:prayer", "value": 0.8 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "round_start",
+                                "type": "heal",
+                                "target": "self",
+                                "amount": 3,
+                                "scaling": 0.3,
+                                "percentMax": true
+                            }
+                        ]
+                    },
+                    {
+                        "id": "executioners_seal",
+                        "name": "Executioner's Seal",
+                        "media": "melvor:assets/media/bank/ring_golden_stardust.png",
+                        "type": "adventuring:ring",
+                        "isUnique": true,
+                        "materials": [
+                            { "id": "adventuring:currency", "qty": 3500 },
+                            { "id": "adventuring:elder_dragon_heart", "qty": 8 }
+                        ],
+                        "base": [
+                            { "id": "adventuring:hitpoints", "value": 12 },
+                            { "id": "adventuring:strength", "value": 18 },
+                            { "id": "adventuring:agility", "value": 8 }
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:hitpoints", "value": 1.2 },
+                            { "id": "adventuring:strength", "value": 1.8 },
+                            { "id": "adventuring:agility", "value": 0.8 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "on_hit",
+                                "type": "damage",
+                                "target": "target",
+                                "amount": 15,
+                                "scaling": 1.5,
+                                "targetBelowHp": 25,
+                                "chance": 50
+                            }
+                        ]
+                    },
+                    {
+                        "id": "heart_of_the_mountain",
+                        "name": "Heart of the Mountain",
+                        "media": "melvor:assets/media/bank/amulet_of_defence.png",
+                        "type": "adventuring:amulet",
+                        "isUnique": true,
+                        "materials": [
+                            { "id": "adventuring:currency", "qty": 3000 },
+                            { "id": "adventuring:earth_essence", "qty": 25 },
+                            { "id": "adventuring:giants_toe", "qty": 15 }
+                        ],
+                        "base": [
+                            { "id": "adventuring:hitpoints", "value": 40 },
+                            { "id": "adventuring:defence", "value": 15 }
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:hitpoints", "value": 4.0 },
+                            { "id": "adventuring:defence", "value": 1.5 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "passive",
+                                "type": "stat_percent",
+                                "stat": "adventuring:hitpoints",
+                                "amount": 15
+                            }
+                        ]
+                    },
+                    {
+                        "id": "pendant_of_fury",
+                        "name": "Pendant of Fury",
+                        "media": "melvor:assets/media/bank/fez_amulet.png",
+                        "type": "adventuring:amulet",
+                        "isUnique": true,
+                        "materials": [
+                            { "id": "adventuring:currency", "qty": 2800 },
+                            { "id": "adventuring:dragon_scale", "qty": 18 }
+                        ],
+                        "base": [
+                            { "id": "adventuring:hitpoints", "value": 15 },
+                            { "id": "adventuring:strength", "value": 18 }
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:hitpoints", "value": 1.5 },
+                            { "id": "adventuring:strength", "value": 1.8 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "after_damage_received",
+                                "type": "buff",
+                                "id": "adventuring:might",
+                                "target": "self",
+                                "amount": 5,
+                                "stacks": 1,
+                                "maxStacks": 5
+                            }
+                        ]
+                    },
+                    {
+                        "id": "charm_of_reflection",
+                        "name": "Charm of Reflection",
+                        "media": "melvor:assets/media/bank/amulet_of_calculated_promotion.png",
+                        "type": "adventuring:amulet",
+                        "isUnique": true,
+                        "materials": [
+                            { "id": "adventuring:currency", "qty": 2500 },
+                            { "id": "adventuring:bat_wing", "qty": 30 }
+                        ],
+                        "base": [
+                            { "id": "adventuring:hitpoints", "value": 18 },
+                            { "id": "adventuring:defence", "value": 18 }
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:hitpoints", "value": 1.8 },
+                            { "id": "adventuring:defence", "value": 1.8 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "after_damage_received",
+                                "type": "damage",
+                                "target": "attacker",
+                                "amount": 10,
+                                "percentDamage": true
+                            }
+                        ]
+                    },
+                    {
+                        "id": "amulet_of_the_leech",
+                        "name": "Amulet of the Leech",
+                        "media": "melvor:assets/media/bank/amulet_of_looting.png",
+                        "type": "adventuring:amulet",
+                        "isUnique": true,
+                        "materials": [
+                            { "id": "adventuring:currency", "qty": 2800 },
+                            { "id": "adventuring:vampire_fang", "qty": 20 }
+                        ],
+                        "base": [
+                            { "id": "adventuring:hitpoints", "value": 20 },
+                            { "id": "adventuring:strength", "value": 10 }
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:hitpoints", "value": 2.0 },
+                            { "id": "adventuring:strength", "value": 1.0 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "on_kill",
+                                "type": "heal",
+                                "target": "self",
+                                "amount": 10,
+                                "percentMax": true
+                            }
+                        ]
+                    },
+                    {
+                        "id": "talisman_of_haste",
+                        "name": "Talisman of Haste",
+                        "media": "melvor:assets/media/bank/amulet_of_accuracy.png",
+                        "type": "adventuring:amulet",
+                        "isUnique": true,
+                        "materials": [
+                            { "id": "adventuring:currency", "qty": 3200 },
+                            { "id": "adventuring:air_essence", "qty": 25 }
+                        ],
+                        "base": [
+                            { "id": "adventuring:hitpoints", "value": 12 },
+                            { "id": "adventuring:agility", "value": 20 }
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:hitpoints", "value": 1.2 },
+                            { "id": "adventuring:agility", "value": 2.0 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "encounter_start",
+                                "type": "energy",
+                                "target": "self",
+                                "amount": 15
+                            }
+                        ]
+                    },
+                    {
+                        "id": "ward_of_protection",
+                        "name": "Ward of Protection",
+                        "media": "melvor:assets/media/bank/amulet_of_glory.png",
+                        "type": "adventuring:amulet",
+                        "isUnique": true,
+                        "materials": [
+                            { "id": "adventuring:currency", "qty": 3500 },
+                            { "id": "adventuring:ancient_wrappings", "qty": 15 }
+                        ],
+                        "base": [
+                            { "id": "adventuring:hitpoints", "value": 22 },
+                            { "id": "adventuring:defence", "value": 15 },
+                            { "id": "adventuring:prayer", "value": 10 }
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:hitpoints", "value": 2.2 },
+                            { "id": "adventuring:defence", "value": 1.5 },
+                            { "id": "adventuring:prayer", "value": 1.0 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "encounter_start",
+                                "type": "buff",
+                                "id": "adventuring:barrier",
+                                "target": "all_allies",
+                                "amount": 10,
+                                "scaling": 1,
+                                "stacks": 2
+                            }
+                        ]
+                    },
+                    {
+                        "id": "pendant_of_cleansing",
+                        "name": "Pendant of Cleansing",
+                        "media": "melvor:assets/media/bank/amulet_of_magic.png",
+                        "type": "adventuring:amulet",
+                        "isUnique": true,
+                        "materials": [
+                            { "id": "adventuring:currency", "qty": 2600 },
+                            { "id": "adventuring:water_essence", "qty": 20 }
+                        ],
+                        "base": [
+                            { "id": "adventuring:hitpoints", "value": 18 },
+                            { "id": "adventuring:prayer", "value": 15 }
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:hitpoints", "value": 1.8 },
+                            { "id": "adventuring:prayer", "value": 1.5 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "round_start",
+                                "type": "cleanse",
+                                "target": "self",
+                                "chance": 25
+                            }
+                        ]
+                    },
+                    {
+                        "id": "deaths_locket",
+                        "name": "Death's Locket",
+                        "media": "melvor:assets/media/bank/amulet_of_torture.png",
+                        "type": "adventuring:amulet",
+                        "isUnique": true,
+                        "materials": [
+                            { "id": "adventuring:currency", "qty": 4000 },
+                            { "id": "adventuring:bone", "qty": 50 },
+                            { "id": "adventuring:ancient_wrappings", "qty": 10 }
+                        ],
+                        "base": [
+                            { "id": "adventuring:hitpoints", "value": 15 },
+                            { "id": "adventuring:strength", "value": 20 }
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:hitpoints", "value": 1.5 },
+                            { "id": "adventuring:strength", "value": 2.0 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "on_ally_death",
+                                "type": "buff",
+                                "id": "adventuring:berserk",
+                                "target": "self",
+                                "amount": 20,
+                                "stacks": 1,
+                                "duration": 3
+                            }
+                        ]
+                    },
+                    {
+                        "id": "amulet_of_focus",
+                        "name": "Amulet of Focus",
+                        "media": "melvor:assets/media/bank/amulet_of_strength.png",
+                        "type": "adventuring:amulet",
+                        "isUnique": true,
+                        "materials": [
+                            { "id": "adventuring:currency", "qty": 3000 },
+                            { "id": "adventuring:mist_shard", "qty": 5 }
+                        ],
+                        "base": [
+                            { "id": "adventuring:hitpoints", "value": 15 },
+                            { "id": "adventuring:strength", "value": 12 },
+                            { "id": "adventuring:magic", "value": 12 }
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:hitpoints", "value": 1.5 },
+                            { "id": "adventuring:strength", "value": 1.2 },
+                            { "id": "adventuring:magic", "value": 1.2 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "passive",
+                                "type": "ability_damage_percent",
+                                "amount": 10
+                            }
+                        ]
+                    },
+                    {
+                        "id": "shadow_shroud",
+                        "name": "Shadow Shroud",
+                        "media": "melvor:assets/media/bank/cape_of_completion.png",
+                        "type": "adventuring:cape",
+                        "isUnique": true,
+                        "materials": [
+                            { "id": "adventuring:currency", "qty": 2500 },
+                            { "id": "adventuring:bat_wing", "qty": 40 }
+                        ],
+                        "base": [
+                            { "id": "adventuring:hitpoints", "value": 15 },
+                            { "id": "adventuring:agility", "value": 18 }
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:hitpoints", "value": 1.5 },
+                            { "id": "adventuring:agility", "value": 1.8 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "encounter_start",
+                                "type": "buff",
+                                "id": "adventuring:evasion",
+                                "target": "self",
+                                "amount": 30,
+                                "stacks": 2
+                            }
+                        ]
+                    },
+                    {
+                        "id": "mantle_of_thorns",
+                        "name": "Mantle of Thorns",
+                        "media": "melvor:assets/media/bank/cape_of_arrow_preservation.png",
+                        "type": "adventuring:cape",
+                        "isUnique": true,
+                        "materials": [
+                            { "id": "adventuring:currency", "qty": 2200 },
+                            { "id": "adventuring:spider_silk", "qty": 30 }
+                        ],
+                        "base": [
+                            { "id": "adventuring:hitpoints", "value": 18 },
+                            { "id": "adventuring:defence", "value": 15 }
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:hitpoints", "value": 1.8 },
+                            { "id": "adventuring:defence", "value": 1.5 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "after_damage_received",
+                                "type": "damage",
+                                "target": "attacker",
+                                "amount": 8,
+                                "scaling": 0.8
+                            }
+                        ]
+                    },
+                    {
+                        "id": "cape_of_the_phoenix",
+                        "name": "Cape of the Phoenix",
+                        "media": "melvor:assets/media/bank/infernal_cape.png",
+                        "type": "adventuring:cape",
+                        "isUnique": true,
+                        "materials": [
+                            { "id": "adventuring:currency", "qty": 6000 },
+                            { "id": "adventuring:fire_essence", "qty": 30 },
+                            { "id": "adventuring:feather", "qty": 75 }
+                        ],
+                        "base": [
+                            { "id": "adventuring:hitpoints", "value": 30 },
+                            { "id": "adventuring:prayer", "value": 15 }
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:hitpoints", "value": 3.0 },
+                            { "id": "adventuring:prayer", "value": 1.5 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "on_death",
+                                "type": "revive",
+                                "target": "self",
+                                "amount": 50,
+                                "chance": 25,
+                                "oncePerDungeon": true
+                            }
+                        ]
+                    },
+                    {
+                        "id": "banner_of_courage",
+                        "name": "Banner of Courage",
+                        "media": "melvor:assets/media/bank/max_skillcape.png",
+                        "type": "adventuring:cape",
+                        "isUnique": true,
+                        "materials": [
+                            { "id": "adventuring:currency", "qty": 3500 },
+                            { "id": "adventuring:pirates_doubloon", "qty": 25 }
+                        ],
+                        "base": [
+                            { "id": "adventuring:hitpoints", "value": 20 },
+                            { "id": "adventuring:strength", "value": 12 },
+                            { "id": "adventuring:prayer", "value": 10 }
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:hitpoints", "value": 2.0 },
+                            { "id": "adventuring:strength", "value": 1.2 },
+                            { "id": "adventuring:prayer", "value": 1.0 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "encounter_start",
+                                "type": "buff",
+                                "id": "adventuring:might",
+                                "target": "all_allies",
+                                "amount": 10,
+                                "stacks": 2
+                            }
+                        ]
+                    },
+                    {
+                        "id": "cloak_of_the_vampire",
+                        "name": "Cloak of the Vampire",
+                        "media": "melvor:assets/media/bank/cape_of_mysteries.png",
+                        "type": "adventuring:cape",
+                        "isUnique": true,
+                        "materials": [
+                            { "id": "adventuring:currency", "qty": 3000 },
+                            { "id": "adventuring:vampire_fang", "qty": 25 }
+                        ],
+                        "base": [
+                            { "id": "adventuring:hitpoints", "value": 20 },
+                            { "id": "adventuring:strength", "value": 12 }
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:hitpoints", "value": 2.0 },
+                            { "id": "adventuring:strength", "value": 1.2 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "passive",
+                                "type": "lifesteal_percent",
+                                "amount": 5
+                            }
+                        ]
+                    },
+                    {
+                        "id": "mantle_of_resilience",
+                        "name": "Mantle of Resilience",
+                        "media": "melvor:assets/media/bank/cape_of_prat.png",
+                        "type": "adventuring:cape",
+                        "isUnique": true,
+                        "materials": [
+                            { "id": "adventuring:currency", "qty": 2800 },
+                            { "id": "adventuring:giants_toe", "qty": 25 }
+                        ],
+                        "base": [
+                            { "id": "adventuring:hitpoints", "value": 25 },
+                            { "id": "adventuring:defence", "value": 18 }
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:hitpoints", "value": 2.5 },
+                            { "id": "adventuring:defence", "value": 1.8 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "on_low_health",
+                                "type": "buff",
+                                "id": "adventuring:fortify",
+                                "target": "self",
+                                "threshold": 35,
+                                "amount": 25,
+                                "stacks": 1
+                            }
+                        ]
+                    },
+                    {
+                        "id": "cape_of_the_wind",
+                        "name": "Cape of the Wind",
+                        "media": "melvor:assets/media/bank/ranged_skillcape.png",
+                        "type": "adventuring:cape",
+                        "isUnique": true,
+                        "materials": [
+                            { "id": "adventuring:currency", "qty": 2500 },
+                            { "id": "adventuring:air_essence", "qty": 22 }
+                        ],
+                        "base": [
+                            { "id": "adventuring:hitpoints", "value": 15 },
+                            { "id": "adventuring:agility", "value": 22 }
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:hitpoints", "value": 1.5 },
+                            { "id": "adventuring:agility", "value": 2.2 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "passive",
+                                "type": "dodge_percent",
+                                "amount": 15
+                            }
+                        ]
+                    },
+                    {
+                        "id": "warlords_cloak",
+                        "name": "Warlord's Cloak",
+                        "media": "melvor:assets/media/bank/attack_skillcape.png",
+                        "type": "adventuring:cape",
+                        "isUnique": true,
+                        "materials": [
+                            { "id": "adventuring:currency", "qty": 3200 },
+                            { "id": "adventuring:bandits_coin", "qty": 50 }
+                        ],
+                        "base": [
+                            { "id": "adventuring:hitpoints", "value": 18 },
+                            { "id": "adventuring:strength", "value": 18 }
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:hitpoints", "value": 1.8 },
+                            { "id": "adventuring:strength", "value": 1.8 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "on_kill",
+                                "type": "buff",
+                                "id": "adventuring:bloodlust",
+                                "target": "self",
+                                "amount": 5,
+                                "stacks": 1,
+                                "maxStacks": 5
+                            }
+                        ]
+                    },
+                    {
+                        "id": "healers_mantle",
+                        "name": "Healer's Mantle",
+                        "media": "melvor:assets/media/bank/prayer_skillcape.png",
+                        "type": "adventuring:cape",
+                        "isUnique": true,
+                        "materials": [
+                            { "id": "adventuring:currency", "qty": 2800 },
+                            { "id": "adventuring:water_essence", "qty": 22 }
+                        ],
+                        "base": [
+                            { "id": "adventuring:hitpoints", "value": 20 },
+                            { "id": "adventuring:prayer", "value": 18 }
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:hitpoints", "value": 2.0 },
+                            { "id": "adventuring:prayer", "value": 1.8 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "passive",
+                                "type": "healing_percent",
+                                "amount": 20
+                            }
+                        ]
+                    }
+                ]
+            }
+        }]
+    }
+}
+

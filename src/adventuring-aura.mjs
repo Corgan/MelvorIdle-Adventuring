@@ -1,6 +1,7 @@
 const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringStats } = await loadModule('src/adventuring-stats.mjs');
+const { parseDescription, buildEffectReplacements, describeEffectFull } = await loadModule('src/adventuring-utils.mjs');
 
 const { AdventuringAuraElement } = await loadModule('src/components/adventuring-aura.mjs');
 
@@ -88,7 +89,8 @@ export class AdventuringAura extends NamespacedObject {
         this.game = game;
         this._media = data.media;
         this.name = data.name;
-        this.description = data.description;
+        this._descriptionTemplate = data.description; // Template with placeholders
+        this.flavorText = data.flavorText; // Optional flavor text
         this.effects = data.effects.map(effect => new AdventuringAuraEffect(this.manager, this.game, this, effect));
 
         this.combine = data.combine === true; // No Source Filter
@@ -98,6 +100,7 @@ export class AdventuringAura extends NamespacedObject {
 
         this.accumulate = data.accumulate === true; // Add Amount when applying
         this.overwrite = data.overwrite === true; // Set Amount when applying
+        this.hidden = data.hidden === true; // Don't show in aura bar UI
         
         if(data.amount !== undefined)
             this.amount = data.amount;
@@ -123,11 +126,35 @@ export class AdventuringAura extends NamespacedObject {
     }
 
     getDescription(instance) {
-        return this.effects.reduce((desc, effect, i) => {
-            desc = desc.replace(`{effect.${i}.amount}`, effect.getAmount(instance));
-            desc = desc.replace(`{effect.${i}.stacks}`, effect.getStacks(instance));
+        // If we have a template description, use it with placeholders
+        if(this._descriptionTemplate) {
+            const replacements = buildEffectReplacements(this.effects, instance, true);
+            let desc = parseDescription(this._descriptionTemplate, replacements);
+            if(this.flavorText) {
+                desc = `${desc}\n\n${this.flavorText}`;
+            }
             return desc;
-        }, this.description);
+        }
+        
+        // Auto-generate from effects
+        const effectDescs = this.effects.map(effect => {
+            const effectObj = {
+                type: effect.type,
+                trigger: effect.trigger || 'passive',
+                value: effect.getAmount ? effect.getAmount(instance) : (this.amount || 0),
+                stacks: effect.getStacks ? effect.getStacks(instance) : (instance?.stacks || this.stacks || 0),
+                id: effect.id,
+                target: effect.target,
+                condition: effect.condition
+            };
+            return describeEffectFull(effectObj, this.manager);
+        });
+        
+        let generated = effectDescs.join('. ');
+        if(this.flavorText) {
+            generated = generated ? `${generated}.\n\n${this.flavorText}` : this.flavorText;
+        }
+        return generated || this.name;
     }
 
     setHighlight(highlight) {
@@ -144,7 +171,7 @@ export class AdventuringAura extends NamespacedObject {
         if(!this.renderQueue.name)
             return;
 
-        this.component.name.textContent = this.name;
+        this.component.nameText.textContent = this.name;
 
         this.renderQueue.name = false;
     }

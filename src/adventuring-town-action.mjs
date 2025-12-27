@@ -1,5 +1,7 @@
 const { loadModule } = mod.getContext(import.meta);
 
+const { RequirementsChecker } = await loadModule('src/adventuring-utils.mjs');
+
 export class AdventuringTownAction extends NamespacedObject {
     constructor(namespace, data, manager, game) {
         super(namespace, data.id);
@@ -37,7 +39,7 @@ export class AdventuringTownAction extends NamespacedObject {
     }
 
     postDataRegistration() {
-
+        this._reqChecker = new RequirementsChecker(this.manager, this.requirements);
     }
 
     execute(character, building) {
@@ -57,42 +59,6 @@ export class AdventuringTownAction extends NamespacedObject {
     }
 
     canDo(character) {
-        if(this.requirements.length == 0)
-            return true;
-        return this.requirements.reduce((doable, requirement) => {
-            if(requirement.type == "dead") {
-                if(!character.dead)
-                    return false;
-            }
-            if(requirement.type == "current_job") {
-                if((character.combatJob === undefined || character.combatJob.id !== requirement.job) && (character.passiveJob === undefined || character.passiveJob.id !== requirement.job))
-                    return false;
-            }
-            if(requirement.type == "comparison") {
-                let operand;
-                if(requirement.operand === "hitpoint_pct")
-                    operand = character.hitpointsPercent;
-                if(requirement.operand === "material_count") {
-                    let material = this.manager.materials.getObjectByID(requirement.material);
-                    let count = this.manager.stash.materialCounts.get(material);
-                    if(material === undefined || count === undefined)
-                        return false;
-                    operand = count;
-                }
-
-                if(operand === undefined)
-                    return false;
-
-                if(requirement.operator === "lt" && requirement.amount <= operand)
-                    return false;
-
-                if(requirement.operator === "gt" && requirement.amount >= operand)
-                    return false;
-
-                if(requirement.operator === "eq" && requirement.amount !== operand)
-                    return false;
-            }
-            return doable;
-        }, true);
+        return this._reqChecker?.check({ character }) ?? true;
     }
 }

@@ -178,6 +178,11 @@ export class AdventuringEquipmentSlot {
         this.renderQueue.icon = true;
         this.renderQueue.valid = true;
         this.renderQueue.upgrade = true;
+        
+        // Invalidate effect cache
+        if(this.equipment.character && this.equipment.character.effectCache) {
+            this.equipment.character.invalidateEffects('equipment');
+        }
     }
 
     setEmpty() {
@@ -192,6 +197,11 @@ export class AdventuringEquipmentSlot {
         this.renderQueue.icon = true;
         this.renderQueue.valid = true;
         this.renderQueue.upgrade = true;
+        
+        // Invalidate effect cache
+        if(this.equipment.character && this.equipment.character.effectCache) {
+            this.equipment.character.invalidateEffects('equipment');
+        }
     }
 
     get empty() {
@@ -259,7 +269,8 @@ export class AdventuringEquipmentSlot {
         this.component.icon.src = media;
         this.component.icon.classList.toggle('opacity-40', !this.empty && this.occupied);
 
-        this.component.tooltip.setContent(tooltip);
+        if(this.component.tooltip !== undefined)
+            this.component.tooltip.setContent(tooltip);
 
         this.renderQueue.icon = false;
     }

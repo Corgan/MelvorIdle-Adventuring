@@ -1,5 +1,5 @@
 <template id="adventuring-page-template">
-    <div class="content d-none" id="adventuring-container">
+    <div class="content" id="adventuring-container">
         <div class="skill-info">
             <skill-header data-skill-id="adventuring:Adventuring"></skill-header>
         </div>
@@ -40,8 +40,17 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-12 mb-1 col-md-4">
-                    <div id="log" class="block block-rounded-double text-left overflow-y-auto" style="min-height: 21vh">
+                <div class="col-12 mb-1 col-md-4 d-flex flex-column">
+                    <!-- Combat Log -->
+                    <div id="log" class="block block-rounded-double text-left overflow-y-auto mb-1 flex-grow-1" style="min-height: 8vh">
+                    </div>
+                    <!-- Party Buffs Section -->
+                    <div id="effects" class="block block-rounded-double text-center mb-0 flex-shrink-0">
+                        <div class="block-header block-header-default py-1 px-2">
+                            <h6 class="block-title font-size-sm text-muted m-0">Party Buffs</h6>
+                        </div>
+                        <div id="effects-container" class="block-content p-1 d-flex flex-wrap justify-content-center" style="min-height: 40px">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -58,13 +67,18 @@
         <div class="block-content p-3">
             <div class="block block-rounded-double bg-combat-inner-dark text-center" id="styling">
                 <div class="row no-gutters">
+                    <!-- Jobs Row -->
                     <div class="col-12" id="jobs"></div>
+                    
+                    <!-- Icon and Name -->
                     <div class="col-12" id="icon">
-                        <img class="skill-icon-xs m-3"></img>
+                        <img class="skill-icon-xs m-3">
                     </div>
                     <div class="col-12">
                         <h5 class="font-w700 text-combat-smoke text-center m-0 mt-2" id="name"></h5>
                     </div>
+                    
+                    <!-- HP and Energy Bars -->
                     <div class="col-12">
                         <div class="block-content px-3">
                             <div class="row text-center">
@@ -94,21 +108,41 @@
                             </div>
                         </div>
                     </div>
+                    
+                    <!-- Active Passive Abilities - Now inside Combat Abilities -->
+                    
+                    <!-- Auras -->
                     <div class="col-12" id="auras"></div>
                 </div>
             </div>
-            <div class="block block-rounded-double bg-combat-inner-dark text-center p-3" id="abilities"></div>
-            <div class="block block-rounded-double bg-combat-inner-dark text-center p-3" id="stats"></div>
+            
+            <!-- Abilities Section -->
+            <div class="block block-rounded-double bg-combat-inner-dark text-center p-3" id="abilities">
+                <div class="small text-muted mb-2">Combat Abilities</div>
+                <!-- Generator and Spender are added here dynamically -->
+                <!-- Passives Section (below abilities) -->
+                <div class="d-none mt-2 pt-2 border-top border-secondary" id="passive-abilities">
+                    <div class="small text-muted mb-1">Passives</div>
+                    <div class="d-flex flex-wrap justify-content-center" id="passive-abilities-list"></div>
+                </div>
+            </div>
+            
+            <!-- Stats Section (Redesigned as compact grid) -->
+            <div class="block block-rounded-double bg-combat-inner-dark p-2" id="stats">
+                <div class="small text-muted text-center mb-2">Stats</div>
+            </div>
+            
+            <!-- Equipment Section -->
             <div class="block block-rounded-double bg-combat-inner-dark text-center p-3 d-none" id="equipment"></div>
         </div>
     </div>
 </template>
 
 <template id="adventuring-stat-template">
-    <div class="col-4">
-        <div id="styling" class="mx-1 mb-2 block block-rounded-double bg-combat-inner-dark text-center" style="position: relative">
-            <img id="icon" class="skill-icon-xs" src="">
-            <div class="font-size-sm text-white text-center" style="position: absolute; bottom: -9px; width: 100%;"><small id="value" class="badge-pill bg-secondary">-</small></div>
+    <div class="col-4 mb-1">
+        <div class="d-flex flex-column align-items-center" id="styling">
+            <img id="icon" style="width: 16px; height: 16px;" src="">
+            <small id="value" class="font-w600 text-white">-</small>
         </div>
     </div>
 </template>
@@ -126,7 +160,18 @@
     <div id="page" class="row no-gutters d-none">
         <div class="col-12">
             <button id="back" class="btn btn-alt-info ml-3 mr-3 mb-3 mt-2 position-absolute" style="z-index: 10;">Back to Town</button>
-            <h3 class="font-w700 text-combat-smoke text-center m-0 mt-2">Trainer</h3>
+            <h3 class="font-w700 text-combat-smoke text-center m-0 mt-2">Training Tower</h3>
+        </div>
+        <div class="col-12 text-center mb-2">
+            <select id="category-filter" class="form-control form-control-sm d-inline-block" style="width: auto; min-width: 180px;">
+                <option value="all">All Jobs</option>
+                <option value="combat-tier0">Starter Jobs</option>
+                <option value="combat-tier1">Novice Jobs</option>
+                <option value="combat-tier2">Specialist Jobs</option>
+                <option value="combat-tier3">Elite Jobs</option>
+                <option value="combat-tier4">Grandmaster Jobs</option>
+                <option value="passive">Town Jobs</option>
+            </select>
         </div>
         <div class="col-12">
             <div class="block-content px-0 pt-3">
@@ -138,17 +183,30 @@
 
 <template id="adventuring-job-details-template">
     <div id="page" class="row no-gutters d-none">
-        <button id="back" class="btn btn-alt-info ml-3 mr-3 mb-3 mt-2 position-absolute" style="z-index: 10;">Back to Trainer</button>
+        <button id="back" class="btn btn-alt-info ml-3 mr-3 mb-3 mt-2 position-absolute" style="z-index: 10;">Back to Training Tower</button>
+        
+        <!-- Header -->
         <div class="col-12 text-center">
-            <img class="skill-icon-sm m-0 mt-2" id="icon"></img>
+            <img class="skill-icon-sm m-0 mt-2" id="icon">
         </div>
         <div class="col-12">
             <h3 id="name" class="font-w700 text-combat-smoke text-center m-0 mt-2">Name</h3>
         </div>
+        
+        <!-- Stat Scaling & Equipable Sections -->
         <div class="col-12 pt-3">
             <div class="row no-gutters">
-                <div class="col-6">
+                <!-- Stat Scaling -->
+                <div class="col-12 col-md-6">
                     <div class="block-content p-3">
+                        <h5 class="font-w600 text-combat-smoke mb-2">Stat Scaling</h5>
+                        <div class="block block-rounded-double bg-combat-inner-dark text-center p-3" id="scaling"></div>
+                    </div>
+                </div>
+                <!-- Equipable Items -->
+                <div class="col-12 col-md-6">
+                    <div class="block-content p-3">
+                        <h5 class="font-w600 text-combat-smoke mb-2">Equipable Items</h5>
                         <div class="block block-rounded-double bg-combat-inner-dark text-left p-3" id="equipable">
                             <div><span>Head: </span><small data-slot="adventuring:head"></small></div>
                             <div><span>Body: </span><small data-slot="adventuring:body"></small></div>
@@ -160,25 +218,14 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-6">
-                    <div class="block-content p-3">
-                        <div class="block block-rounded-double bg-combat-inner-dark text-center p-3" id="scaling"></div>
-                    </div>
-                </div>
             </div>
         </div>
-        <div class="col-6">
+        
+        <!-- Abilities Section (Single Column) -->
+        <div class="col-12 d-none" id="abilities-section">
             <div class="block-content p-3">
-                <div class="block block-rounded-double bg-combat-inner-dark text-center">
-                    <div class="row no-gutters p-3" id="generators"></div>
-                </div>
-            </div>
-        </div>
-        <div class="col-6">
-            <div class="block-content p-3">
-                <div class="block block-rounded-double bg-combat-inner-dark text-center">
-                    <div class="row no-gutters p-3" id="spenders"></div>
-                </div>
+                <h5 class="font-w600 text-combat-smoke mb-2">Abilities</h5>
+                <div class="block block-rounded-double bg-combat-inner-dark p-3" id="abilities-list"></div>
             </div>
         </div>
     </div>
@@ -193,6 +240,23 @@
         <div class="col-6 pt-3">
             <div class="block-content pt-3">
                 <div class="block block-rounded-double bg-combat-inner-dark text-center">
+                    <!-- Category dropdown -->
+                    <div class="p-2">
+                        <div class="dropdown">
+                            <button type="button" class="btn btn-primary dropdown-toggle font-size-sm" id="category-dropdown-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Melee</button>
+                            <div class="dropdown-menu overflow-y-auto" id="category-dropdown-options" style="max-height: 60vh;">
+                                <a class="dropdown-item pointer-enabled" id="option-melee">Melee</a>
+                                <a class="dropdown-item pointer-enabled" id="option-ranged">Ranged</a>
+                                <a class="dropdown-item pointer-enabled" id="option-magic">Magic</a>
+                                <a class="dropdown-item pointer-enabled" id="option-offhands">Offhands</a>
+                                <a class="dropdown-item pointer-enabled" id="option-heavy">Heavy Armor</a>
+                                <a class="dropdown-item pointer-enabled" id="option-medium">Medium Armor</a>
+                                <a class="dropdown-item pointer-enabled" id="option-light">Light Armor</a>
+                                <a class="dropdown-item pointer-enabled" id="option-accessories">Accessories</a>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Items content -->
                     <div class="row no-gutters p-3" id="items">
                     </div>
                 </div>
@@ -239,9 +303,8 @@
         </div>
         <div class="col-12 pt-3">
             <div class="block-content pt-3">
-                <div class="block block-rounded-double bg-combat-inner-dark text-center">
-                    <div class="row no-gutters p-3" id="materials">
-                    </div>
+                <div id="materials" class="row no-gutters">
+                    <!-- Category sections will be added dynamically -->
                 </div>
             </div>
         </div>
@@ -251,7 +314,7 @@
 <template id="adventuring-crossroads-template">
     <div id="page" class="row no-gutters d-none">
         <div class="col-12">
-            <h3 class="font-w700 text-combat-smoke text-center m-0 mt-2">Crossroads</h3>
+            <h3 class="font-w700 text-combat-smoke text-center m-0 mt-2 mb-3">Crossroads</h3>
         </div>
         <div class="col-12">
             <div class="block-content px-0 pt-3">
@@ -313,7 +376,8 @@
 
 <template id="adventuring-ability-template">
     <div class="col-4">
-        <div class="block block-rounded-double bg-combat-dark text-center px-2 mx-1 pointer-enabled" id="styling">
+        <div class="block block-rounded-double bg-combat-dark text-center px-2 mx-1 pointer-enabled" id="styling" style="position: relative;">
+            <span id="new-badge" class="badge badge-success d-none" style="position: absolute; top: 2px; right: 2px; font-size: 0.5rem; z-index: 10;">NEW</span>
             <div class="row no-gutters">
                 <div class="col-12">
                     <small class="font-w500 text-combat-smoke align-middle m-1" id="name"></small>
@@ -328,19 +392,16 @@
 
 <template id="adventuring-ability-small-template">
     <div class="col-12">
-        <div class="block block-rounded-double bg-combat-inner-dark text-center mx-2 mx-1" id="styling">
-            <div class="row no-gutters">
-                <div class="col-12">
-                    <small class="font-w500 text-combat-smoke align-middle m-1 font-size-xs" id="name"></small>
-                </div>
-            </div>
+        <div class="bg-dark rounded p-1 px-2 m-1 text-center pointer-enabled" id="styling" style="border: 1px solid rgba(255, 255, 255, 0.2);">
+            <small class="font-w600 text-info" id="name"></small>
         </div>
     </div>
 </template>
 
 <template id="adventuring-ability-details-template">
     <div class="col-12">
-        <div class="block block-rounded-double bg-combat-dark text-center px-2 mx-1" id="styling">
+        <div class="block block-rounded-double bg-combat-dark text-center px-2 mx-1" id="styling" style="position: relative;">
+            <span id="new-badge" class="badge badge-success d-none" style="position: absolute; top: 2px; right: 2px; font-size: 0.5rem; z-index: 10;">NEW</span>
             <div class="row no-gutters">
                 <div class="col-12">
                     <small class="font-w500 text-combat-smoke align-middle m-1" id="name"></small>
@@ -444,8 +505,96 @@
         <div id="border" class="border-secondary border-2x border-rounded-equip combat-equip-img fishing-img m-0" style="position: relative; overflow: hidden; border-width: 2px!important; border-style: solid!important;">
             <img id="icon" class="w-100 p-1" src="">
             <div id="lock" class="position-absolute w-100" style="top: 0; left: 0; right: 0; bottom: 0; justify-content: center; display: flex; align-items: center; color: #A38A00; background-color: rgba(0,0,0,0.3);"><i class="fa fa-lock"></i></div>
+            <span id="new-badge" class="badge badge-success d-none" style="position: absolute; top: 2px; right: 2px; font-size: 0.5rem; z-index: 10;">NEW</span>
         </div>
         <div class="font-size-sm text-white text-center" style="position: absolute; bottom: -8px; width: 100%;"><small id="upgrade" class="badge-pill bg-secondary">-</small></div>
+    </div>
+</template>
+
+<template id="adventuring-consumable-template">
+    <div id="clickable" class="pointer-enabled m-1" style="position: relative; width: fit-content;">
+        <div id="border" class="border-secondary border-2x border-rounded-equip combat-equip-img fishing-img m-0" style="position: relative; overflow: hidden; border-width: 2px!important; border-style: solid!important;">
+            <img id="icon" class="w-100 p-1" src="">
+        </div>
+        <div class="font-size-sm text-white text-center" style="position: absolute; bottom: -8px; width: 100%;"><small id="charges" class="badge-pill bg-warning">-</small></div>
+    </div>
+</template>
+
+<template id="adventuring-consumables-template">
+    <div id="page" class="row no-gutters d-none">
+        <div class="col-12">
+            <button id="back" class="btn btn-alt-info ml-3 mr-3 mb-3 mt-2 position-absolute" style="z-index: 10;">Back to Town</button>
+            <h3 class="font-w700 text-combat-smoke text-center m-0 mt-2">Alchemist's Shop</h3>
+        </div>
+        <!-- Equipped Slots at Top -->
+        <div class="col-12">
+            <div class="block-content p-3">
+                <h5 class="text-warning text-center mb-2">Equipped Consumables (3 slots)</h5>
+                <div id="slots" class="d-flex justify-content-center mb-3">
+                    <div id="slot-0" class="border-secondary border-2x border-rounded-equip combat-equip-img fishing-img m-1 pointer-enabled" style="border-width: 2px!important; border-style: dashed!important;">
+                        <img class="w-100 p-1 invisible" src="">
+                    </div>
+                    <div id="slot-1" class="border-secondary border-2x border-rounded-equip combat-equip-img fishing-img m-1 pointer-enabled" style="border-width: 2px!important; border-style: dashed!important;">
+                        <img class="w-100 p-1 invisible" src="">
+                    </div>
+                    <div id="slot-2" class="border-secondary border-2x border-rounded-equip combat-equip-img fishing-img m-1 pointer-enabled" style="border-width: 2px!important; border-style: dashed!important;">
+                        <img class="w-100 p-1 invisible" src="">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Left Column: Consumables List -->
+        <div class="col-6 pt-3">
+            <div class="block-content pt-3">
+                <div class="block block-rounded-double bg-combat-inner-dark text-center">
+                    <h5 class="text-info text-center m-0 pt-3">Available Consumables</h5>
+                    <div id="items" class="row no-gutters p-3"></div>
+                </div>
+            </div>
+        </div>
+        <!-- Right Column: Details Panel -->
+        <div class="col-6 pt-3">
+            <div class="block-content pt-3">
+                <div class="block block-rounded-double bg-combat-inner-dark text-center" id="details-container">
+                    <div id="details" class="row no-gutters p-3 d-none">
+                        <div class="col-12 text-center">
+                            <img class="skill-icon-sm m-0 mt-2" id="detail-icon"></img>
+                        </div>
+                        <div class="col-12">
+                            <h5 id="detail-name" class="font-w700 text-combat-smoke text-center m-0 mt-2"></h5>
+                            <p id="detail-description" class="text-muted small mb-2"></p>
+                        </div>
+                        <div class="col-12">
+                            <div class="block-content p-3">
+                                <h5 class="font-w700 text-combat-smoke text-center m-0 mt-2">Effects</h5>
+                                <div class="block block-rounded-double bg-combat-inner-dark text-center p-3" id="detail-effects"></div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="block-content p-3">
+                                <h5 class="font-w700 text-combat-smoke text-center m-0 mt-2">Charges</h5>
+                                <div class="block block-rounded-double bg-combat-inner-dark text-center p-3">
+                                    <span id="detail-charges" class="font-w600">0 / 0</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="block-content p-3">
+                                <h5 class="font-w700 text-combat-smoke text-center m-0 mt-2">Crafting Cost</h5>
+                                <div class="row no-gutters justify-content-center" id="detail-materials"></div>
+                            </div>
+                        </div>
+                        <div class="col-12 text-center p-3">
+                            <button id="craft-button" class="btn btn-primary mr-2">Craft</button>
+                            <button id="equip-button" class="btn btn-success">Equip</button>
+                        </div>
+                    </div>
+                    <div id="details-placeholder" class="p-5">
+                        <p class="text-muted">Select a consumable to view details</p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -453,6 +602,7 @@
     <div id="clickable" class="pointer-enabled m-1" style="position: relative; width: fit-content;">
         <div id="border" class="border-secondary border-2x border-rounded-equip combat-equip-img fishing-img m-0" style="position: relative; overflow: hidden; border-width: 2px!important; border-style: solid!important;">
             <img id="icon" class="w-100 p-1" src="">
+            <span id="new-badge" class="badge badge-success d-none" style="position: absolute; top: 2px; right: 2px; font-size: 0.5rem; z-index: 10;">NEW</span>
         </div>
         <div class="font-size-sm text-white text-center" style="position: absolute; bottom: -8px; width: 100%;"><small id="count" class="badge-pill bg-secondary">-</small></div>
     </div>
@@ -461,7 +611,7 @@
 <template id="adventuring-area-template">
     <div class="col-12 col-md-4">
         <div class="block-content p-3">
-            <div class="block block-rounded-double bg-combat-inner-dark text-center pointer-enabled" id="clickable">
+            <div class="block block-rounded-double bg-combat-inner-dark text-center" id="card">
                 <div class="row no-gutters">
                     <div class="col-12">
                         <img class="skill-icon-xs m-0 mt-2" id="icon"></img>
@@ -478,6 +628,21 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                    <div class="col-12 p-2" id="controls">
+                        <div class="d-flex justify-content-center align-items-center flex-wrap">
+                            <button class="btn btn-sm btn-success mr-2" id="adventure-button">Adventure</button>
+                            <div class="dropdown">
+                                <button type="button" class="btn btn-sm btn-secondary dropdown-toggle" id="difficulty-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Normal</button>
+                                <div class="dropdown-menu font-size-sm" id="difficulty-options"></div>
+                            </div>
+                        </div>
+                        <div class="d-none mt-2" id="auto-repeat-container">
+                            <label class="custom-control custom-checkbox custom-control-inline custom-control-sm mb-0">
+                                <input type="checkbox" class="custom-control-input" id="auto-repeat">
+                                <span class="custom-control-label font-size-sm">Auto-Run</span>
+                            </label>
                         </div>
                     </div>
                 </div>
@@ -561,7 +726,8 @@
 <template id="adventuring-monster-template">
     <div class="col-12 col-md-4">
         <div class="block-content p-3">
-            <div class="block block-rounded-double bg-combat-inner-dark text-center pointer-enabled" id="clickable">
+            <div class="block block-rounded-double bg-combat-inner-dark text-center pointer-enabled" id="clickable" style="position: relative;">
+                <span id="new-badge" class="badge badge-success d-none" style="position: absolute; top: 5px; right: 5px; font-size: 0.6rem; z-index: 10;">NEW</span>
                 <div class="row no-gutters">
                     <div class="col-12">
                         <img class="skill-icon-xs m-0 mt-2" id="icon"></img>
@@ -610,10 +776,18 @@
         <div class="col-12">
             <button id="back" class="btn btn-alt-info ml-3 mr-3 mb-3 mt-2 position-absolute" style="z-index: 10;">Back to Town</button>
             <h3 class="font-w700 text-combat-smoke text-center m-0 mt-2">Tavern</h3>
+            <p class="text-muted text-center mb-0 mt-1">Buy drinks for stat buffs that last multiple dungeon runs</p>
         </div>
-        <div class="col-12">
-            <div class="block-content px-0 pt-3">
-                <div class="row no-gutters"></div>
+        <div class="col-12 p-3">
+            <div class="block block-rounded bg-combat-dark p-3 mb-3">
+                <h5 class="font-w600 text-success m-0 mb-2">Active Drinks</h5>
+                <div id="active-buffs" class="d-flex flex-wrap"></div>
+            </div>
+        </div>
+        <div class="col-12 p-3">
+            <div class="block block-rounded bg-combat-dark p-3">
+                <h5 class="font-w600 text-warning m-0 mb-2">Drink Menu</h5>
+                <div class="row no-gutters" id="drinks"></div>
             </div>
         </div>
     </div>
@@ -625,10 +799,104 @@
             <button id="back" class="btn btn-alt-info ml-3 mr-3 mb-3 mt-2 position-absolute" style="z-index: 10;">Back to Town</button>
             <h3 class="font-w700 text-combat-smoke text-center m-0 mt-2">Slayer's Lodge</h3>
         </div>
-        <div class="col-12">
-            <div class="block-content px-0 pt-3">
-                <div class="row no-gutters"></div>
+        
+        <!-- Tab Navigation -->
+        <div class="col-12 px-3 pt-3">
+            <ul class="nav nav-tabs nav-tabs-alt" role="tablist">
+                <li class="nav-item">
+                    <button id="tab-tasks" class="nav-link active" data-tab="tasks">
+                        <i class="fa fa-scroll mr-1"></i> Slayer Tasks
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button id="tab-achievements" class="nav-link" data-tab="achievements">
+                        <i class="fa fa-trophy mr-1"></i> Achievements
+                        <span id="achievements-badge" class="badge badge-success ml-1 d-none">0</span>
+                    </button>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- Tasks Tab Content -->
+        <div id="tasks-content" class="col-12">
+            <div class="col-12 p-3">
+                <div class="block block-rounded bg-combat-dark p-3 mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="font-w600 text-warning m-0">Active Tasks</h5>
+                        <small class="text-muted">Max 3 tasks</small>
+                    </div>
+                    <div class="row no-gutters" id="active-tasks"></div>
+                </div>
             </div>
+            <div class="col-12 p-3">
+                <div class="block block-rounded bg-combat-dark p-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="font-w600 text-info m-0">Available Tasks</h5>
+                        <button id="refresh-button" class="btn btn-sm btn-warning">
+                            Refresh Tasks (<span id="refresh-cost">250</span> <img class="skill-icon-xxs" src="assets/media/main/gp.svg">)
+                        </button>
+                    </div>
+                    <div class="row no-gutters" id="available-tasks"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Achievements Tab Content -->
+        <div id="achievements-content" class="col-12 d-none">
+            <!-- Achievement Stats Summary -->
+            <div class="col-12 p-3">
+                <div class="block block-rounded bg-combat-dark p-3">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="font-w600 text-warning m-0"><i class="fa fa-trophy mr-2"></i>Achievement Progress</h5>
+                        <span id="achievement-summary" class="text-success font-w600">0 / 0 Complete</span>
+                    </div>
+                    <div class="progress mb-2" style="height: 8px;">
+                        <div id="achievement-progress-bar" class="progress-bar bg-success" style="width: 0%;"></div>
+                    </div>
+                    <div class="row text-center" id="achievement-stats">
+                        <!-- Stats will be populated here -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Category Filter -->
+            <div class="col-12 px-3">
+                <div class="btn-group btn-group-sm flex-wrap" id="achievement-category-filter">
+                    <button class="btn btn-outline-info active" data-category="all">All</button>
+                </div>
+            </div>
+            
+            <!-- Achievement Cards -->
+            <div class="col-12 p-3">
+                <div class="row no-gutters" id="achievement-list"></div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<!-- Achievement Card Template -->
+<template id="adventuring-achievement-card-template">
+    <div class="col-12 col-md-6 col-lg-4 p-2">
+        <div id="card" class="block block-rounded-double bg-combat-inner-dark p-3 h-100">
+            <div class="d-flex align-items-start mb-2">
+                <img id="icon" class="skill-icon-sm mr-2" src="">
+                <div class="flex-grow-1">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6 id="name" class="font-w600 text-white mb-0"></h6>
+                        <span id="category-badge" class="badge badge-secondary"></span>
+                    </div>
+                    <small id="description" class="text-muted"></small>
+                </div>
+            </div>
+            <div class="progress mb-2" style="height: 20px;">
+                <div id="progress-bar" class="progress-bar" style="width: 0%;">
+                    <span id="progress-text" class="small"></span>
+                </div>
+            </div>
+            <div id="rewards" class="small text-muted d-flex flex-wrap align-items-center">
+                <strong class="mr-1">Rewards:</strong>
+            </div>
+            <button id="claim-btn" class="btn btn-sm btn-success btn-block mt-2 d-none">Claim Rewards</button>
         </div>
     </div>
 </template>
@@ -637,11 +905,46 @@
     <div id="page" class="row no-gutters d-none">
         <div class="col-12">
             <button id="back" class="btn btn-alt-info ml-3 mr-3 mb-3 mt-2 position-absolute" style="z-index: 10;">Back to Town</button>
-            <h3 class="font-w700 text-combat-smoke text-center m-0 mt-2">Lemon Stall</h3>
+            <h3 class="font-w700 text-combat-smoke text-center m-0 mt-2">🍋 Lemon Stall 🍋</h3>
         </div>
-        <div class="col-12">
-            <div class="block-content px-0 pt-3">
-                <div class="row no-gutters"></div>
+        
+        <!-- Quote Section -->
+        <div class="col-12 p-3">
+            <div class="block block-rounded bg-combat-dark p-4 text-center">
+                <img data-src="melvor:assets/media/skills/township/Lemvor_Lemon_Stall.svg" class="skill-icon-lg mb-3">
+                <h5 id="quote" class="font-italic text-warning mb-3">"When life gives you lemons..."</h5>
+            </div>
+        </div>
+        
+        <!-- Actions -->
+        <div class="col-12 col-md-6 p-3">
+            <div class="block block-rounded bg-combat-inner-dark p-3 text-center h-100">
+                <h5 class="text-info mb-3">🥤 Lemonade Stand</h5>
+                <p class="text-muted small">Fresh squeezed, ice cold, slightly overpriced!</p>
+                <button id="buy-btn" class="btn btn-success">Buy Lemonade (5 coins)</button>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 p-3">
+            <div class="block block-rounded bg-combat-inner-dark p-3 text-center h-100">
+                <h5 class="text-warning mb-3">🍋 Lemon Squashing</h5>
+                <p class="text-muted small">Sometimes you just need to squash a lemon.</p>
+                <button id="squash-btn" class="btn btn-warning">Squash a Lemon!</button>
+            </div>
+        </div>
+        
+        <!-- Stats -->
+        <div class="col-12 p-3">
+            <div class="block block-rounded bg-combat-dark p-3">
+                <h5 class="text-success mb-3 text-center">Lemon Statistics</h5>
+                <div id="stats"></div>
+            </div>
+        </div>
+        
+        <!-- Secrets -->
+        <div class="col-12 p-3">
+            <div class="block block-rounded bg-combat-inner-dark p-3">
+                <h5 class="text-info mb-2">Lemon Secrets</h5>
+                <div id="secrets"></div>
             </div>
         </div>
     </div>
@@ -654,29 +957,55 @@
             <h3 class="font-w700 text-combat-smoke text-center m-0 mt-2" id="name"></h3>
         </div>
         <div class="col-12 pt-3">
-            <div class="block-content px-0 pt-3">
-                <div class="col-12">
-                    <h5 class="col-12 font-w700 text-combat-smoke text-left m-0 mt-2">Work Orders</h5>
-                    <div class="row no-gutters p-3" id="orders"></div>
+            <div class="block-content px-3 pt-3">
+                <!-- Active Work Orders Section -->
+                <div class="mb-4">
+                    <h5 class="font-w700 text-combat-smoke mb-3">Active Work Orders</h5>
+                    <div class="row" id="orders"></div>
                 </div>
-                <div class="col-12">
-                    <div class="row no-gutters p-3" style="align-items: center;">
-                        <h5 class="col-12 font-w700 text-combat-smoke text-left m-0 mt-2">New Work Order</h5>
-                        <div class="col-12 row no-gutters" style="align-items: center;">
-                            <div id="product-drop-down-container">
-                                <div class="dropdown">
-                                  <button id="product-button" class="btn btn-sm btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-                                  <div class="dropdown-menu font-size-sm overflow-y-auto" style="max-height: 60vh;z-index:1000;" id="product-recipe-options-container"></div>
+                
+                <!-- New Work Order Section -->
+                <div class="mb-4">
+                    <h5 class="font-w700 text-combat-smoke mb-3">Submit New Order</h5>
+                    <div class="block block-rounded-double bg-combat-inner-dark p-3">
+                        <div class="row align-items-center">
+                            <div class="col-12 col-md-4 mb-2 mb-md-0">
+                                <label class="small text-muted mb-1">Select Product</label>
+                                <div id="product-drop-down-container">
+                                    <div class="dropdown">
+                                        <button id="product-button" class="btn btn-sm btn-primary dropdown-toggle w-100" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Select Product</button>
+                                        <div class="dropdown-menu font-size-sm overflow-y-auto w-100" style="max-height: 60vh;z-index:1000;" id="product-recipe-options-container"></div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="px-1"><input type="number" min="0" class="form-control m-1" value="0" id="count"></div>
-                            <div class="px-1"><button id="submit" class="btn btn-alt-info">Submit</button></div>
+                            <div class="col-6 col-md-2 mb-2 mb-md-0">
+                                <label class="small text-muted mb-1">Quantity</label>
+                                <input type="number" min="1" class="form-control" value="1" id="count">
+                            </div>
+                            <div class="col-6 col-md-2 mb-2 mb-md-0 d-flex align-items-end">
+                                <button id="submit" class="btn btn-success w-100">Submit</button>
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <label class="small text-muted mb-1">Cost per Item</label>
+                                <div id="cost-display" class="d-flex flex-wrap align-items-center">
+                                    <span class="text-muted small">Select a product</span>
+                                </div>
+                            </div>
                         </div>
+                        <!-- Requirements Info -->
+                        <div id="requirements-display" class="mt-2 small text-info d-none"></div>
                     </div>
                 </div>
-                <div class="col-12">
-                    <h5 class="col-12 font-w700 text-combat-smoke text-left m-0 mt-2">Pick Up</h5>
-                    <div class="row no-gutters p-3" id="store"></div>
+                
+                <!-- Pick Up Section -->
+                <div class="mb-4">
+                    <h5 class="font-w700 text-combat-smoke mb-3">
+                        Ready for Pickup
+                    </h5>
+                    <div class="row" id="store"></div>
+                    <div id="store-empty" class="text-muted text-center p-3 d-none">
+                        <small>No items ready for pickup</small>
+                    </div>
                 </div>
             </div>
         </div>
@@ -684,21 +1013,329 @@
 </template>
 
 <template id="adventuring-work-order-template">
-    <div class="col-12">
-        <div id="style" class="row no-gutters">
-            <div class="block-content p-1">
-                <div class="block block-rounded-double bg-combat-inner-dark text-center p-1">
-                    <div class="col-12 row no-gutters d-none" style="align-items: center;" id="active">
-                        <div class="col"><img id="icon" class="skill-icon-xs"></img></div>
-                        <span class="col" id="name"></span>
-                        <span class="col" id="completed"></span>
-                        <span class="col" id="count"></span>
-                        <div class="px-1 col"><button id="cancel" class="btn btn-warning">X</button></div>
+    <div class="col-12 col-md-6 col-lg-4 p-2">
+        <div id="style" class="block block-rounded-double bg-combat-inner-dark h-100">
+            <!-- Active Order -->
+            <div class="d-none p-3" id="active">
+                <div class="d-flex align-items-center mb-2">
+                    <img id="icon" class="skill-icon-sm mr-2">
+                    <div class="flex-grow-1">
+                        <span class="font-w600 text-white" id="name"></span>
+                        <div class="small text-muted" id="progress-text"></div>
                     </div>
-                    <div class="col-12 p-2 d-none" id="inactive">
-                        <span>Submit a Work Order</span>
+                    <button id="cancel" class="btn btn-sm btn-danger ml-2">✕</button>
+                </div>
+                <div class="progress active-bar mb-2" style="height: 8px;">
+                    <div id="progress-bar" class="progress-bar bg-success" role="progressbar" style="width: 0%;"></div>
+                </div>
+                <div class="small text-info" id="craftable-by"></div>
+            </div>
+            <!-- Inactive Order Slot -->
+            <div class="d-none p-3 text-center" id="inactive">
+                <div class="text-muted"><small>Empty Slot</small></div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<!-- Game Guide for Adventuring -->
+<template id="adventuring-game-guide-template">
+        <h2 class="h1 mb-2"><img class="m-2" height="64px" data-src="assets/media/main/adventure.svg">Adventuring</h2>
+        <h5 class="font-w400 mb-5">Assemble a party of heroes, explore procedurally generated dungeons, and battle monsters!</h5>
+        <div class="col-12">
+            <div class="row gutters-tiny">
+                <!-- Left Column: Core Concepts -->
+                <div class="col-md-6">
+                    <div class="block-content">
+                        <div class="py-2 text-left">
+                            <h4 class="mb-2">Core Concepts</h4>
+                        </div>
+                        <div class="media d-flex align-items-center push">
+                            <div class="mr-3"><img class="m-2" height="48px" data-src="assets/media/main/adventure.svg"></div>
+                            <div class="media-body text-left">
+                                <div class="font-w600">Your Party</div>
+                                <div class="font-w400 font-size-sm">Recruit up to 3 heroes with different jobs. Each job provides unique stats, abilities, and playstyles.</div>
+                            </div>
+                        </div>
+                        <div class="media d-flex align-items-center push">
+                            <div class="mr-3"><img class="m-2" height="48px" data-adv-src="assets/media/crossroads.svg"></div>
+                            <div class="media-body text-left">
+                                <div class="font-w600">Dungeons</div>
+                                <div class="font-w400 font-size-sm">Your party automatically explores procedurally generated dungeon floors, encountering monsters, finding treasure, and avoiding traps.</div>
+                            </div>
+                        </div>
+                        <div class="media d-flex align-items-center push">
+                            <div class="mr-3"><img class="m-2" height="48px" data-src="assets/media/main/milestones_header.svg"></div>
+                            <div class="media-body text-left">
+                                <div class="font-w600">Jobs & Mastery</div>
+                                <div class="font-w400 font-size-sm">Level up jobs to unlock new abilities and passive bonuses. Each hero can switch between unlocked jobs in town.</div>
+                            </div>
+                        </div>
+                        <div class="media d-flex align-items-center push">
+                            <div class="mr-3"><img class="m-2" height="48px" data-src="assets/media/main/bank_header.svg"></div>
+                            <div class="media-body text-left">
+                                <div class="font-w600">Stash</div>
+                                <div class="font-w400 font-size-sm">Your inventory during dungeon runs. Loot from monsters and treasure chests automatically goes here.</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+                <!-- Right Column: Combat System -->
+                <div class="col-md-6">
+                    <div class="block-content block-content-full">
+                        <div class="py-2 text-left">
+                            <h4 class="mb-2">Combat System</h4>
+                        </div>
+                        <div class="media d-flex align-items-center push">
+                            <div class="mr-3"><img class="m-2" height="48px" data-src="assets/media/skills/combat/combat.svg"></div>
+                            <div class="media-body text-left">
+                                <div class="font-w600">Turn-Based Combat</div>
+                                <div class="font-w400 font-size-sm">Heroes and enemies take turns based on Agility. Higher agility means acting first in combat.</div>
+                            </div>
+                        </div>
+                        <div class="media d-flex align-items-center push">
+                            <div class="mr-3"><img class="m-2" height="48px" data-src="assets/media/skills/magic/magic.svg"></div>
+                            <div class="media-body text-left">
+                                <div class="font-w600">Energy System</div>
+                                <div class="font-w400 font-size-sm"><strong>Generators</strong> are basic attacks that build energy. <strong>Spenders</strong> are powerful abilities that consume energy. Balance both to maximize damage!</div>
+                            </div>
+                        </div>
+                        <div class="media d-flex align-items-center push">
+                            <div class="mr-3"><img class="m-2" height="48px" data-src="assets/media/status/attack_increase.png"></div>
+                            <div class="media-body text-left">
+                                <div class="font-w600">Buffs</div>
+                                <div class="font-w400 font-size-sm">Positive effects like <strong>Block</strong> (absorbs damage), <strong>Regen</strong> (heals over time), <strong>Haste</strong> (more agility), and <strong>Might</strong> (more strength).</div>
+                            </div>
+                        </div>
+                        <div class="media d-flex align-items-center push">
+                            <div class="mr-3"><img class="m-2" height="48px" data-src="assets/media/status/attack_decrease.png"></div>
+                            <div class="media-body text-left">
+                                <div class="font-w600">Debuffs</div>
+                                <div class="font-w400 font-size-sm">Negative effects like <strong>Bleed</strong> (damage over time), <strong>Burn</strong> (damage over time), <strong>Stun</strong> (skip turn), and <strong>Weaken</strong> (reduced strength).</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Row 2: Town Buildings -->
+            <div class="row gutters-tiny mt-3">
+                <div class="col-md-6">
+                    <div class="block-content">
+                        <div class="py-2 text-left">
+                            <h4 class="mb-2">Town Buildings</h4>
+                        </div>
+                        <div class="media d-flex align-items-center push">
+                            <div class="mr-3"><img class="m-2" height="48px" data-src="assets/media/skills/township/Tavern.png"></div>
+                            <div class="media-body text-left">
+                                <div class="font-w600">Tavern</div>
+                                <div class="font-w400 font-size-sm">Rest to recover HP, revive fallen heroes, and purchase drinks that provide temporary buffs lasting multiple runs.</div>
+                            </div>
+                        </div>
+                        <div class="media d-flex align-items-center push">
+                            <div class="mr-3"><img class="m-2" height="48px" data-src="assets/media/skills/township/Library.png"></div>
+                            <div class="media-body text-left">
+                                <div class="font-w600">Training Tower</div>
+                                <div class="font-w400 font-size-sm">View job details, available abilities, and stat scaling. See what each job offers before committing.</div>
+                            </div>
+                        </div>
+                        <div class="media d-flex align-items-center push">
+                            <div class="mr-3"><img class="m-2" height="48px" data-src="assets/media/skills/township/Tailor.png"></div>
+                            <div class="media-body text-left">
+                                <div class="font-w600">Armory</div>
+                                <div class="font-w400 font-size-sm">Craft and upgrade equipment for your heroes. Each slot can be upgraded for better stats and bonuses.</div>
+                            </div>
+                        </div>
+                        <div class="media d-flex align-items-center push">
+                            <div class="mr-3"><img class="m-2" height="48px" data-src="assets/media/skills/township/Hunters_Lodge.png"></div>
+                            <div class="media-body text-left">
+                                <div class="font-w600">Slayers' Lodge</div>
+                                <div class="font-w400 font-size-sm">Accept bounty tasks to hunt specific monsters. Completing tasks grants bonus rewards!</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="block-content block-content-full">
+                        <div class="py-2 text-left">
+                            <h4 class="mb-2">More Buildings</h4>
+                        </div>
+                        <div class="media d-flex align-items-center push">
+                            <div class="mr-3"><img class="m-2" height="48px" data-src="assets/media/skills/herblore/herblore.svg"></div>
+                            <div class="media-body text-left">
+                                <div class="font-w600">Alchemist's Shop</div>
+                                <div class="font-w400 font-size-sm">Equip potions, food, and consumables. Use them during dungeons for healing, buffs, and emergency saves.</div>
+                            </div>
+                        </div>
+                        <div class="media d-flex align-items-center push">
+                            <div class="mr-3"><img class="m-2" height="48px" data-src="assets/media/skills/township/Lemvor_Lemon_Stall.png"></div>
+                            <div class="media-body text-left">
+                                <div class="font-w600">Lemon Stall</div>
+                                <div class="font-w400 font-size-sm">The mysterious Lemon Stall holds citrus secrets. Squeeze lemons for rewards and unlock hidden lemon-based mechanics!</div>
+                            </div>
+                        </div>
+                        <div class="media d-flex align-items-center push">
+                            <div class="mr-3"><img class="m-2" height="48px" data-src="assets/media/main/lore_header.svg"></div>
+                            <div class="media-body text-left">
+                                <div class="font-w600">Bestiary</div>
+                                <div class="font-w400 font-size-sm">View information about monsters you've encountered. Track kill counts and discover their abilities.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Row 3: Materials & Passive Jobs -->
+            <div class="row gutters-tiny mt-3">
+                <div class="col-md-6">
+                    <div class="block-content">
+                        <div class="py-2 text-left">
+                            <h4 class="mb-2">Materials</h4>
+                        </div>
+                        <div class="media d-flex align-items-center push">
+                            <div class="mr-3"><img class="m-2" height="48px" data-src="assets/media/main/gp.svg"></div>
+                            <div class="media-body text-left">
+                                <div class="font-w600">Adventuring Coins</div>
+                                <div class="font-w400 font-size-sm">Currency earned from dungeons. Used to purchase drinks at the Tavern and other town services.</div>
+                            </div>
+                        </div>
+                        <div class="media d-flex align-items-center push">
+                            <div class="mr-3"><img class="m-2" height="48px" data-src="assets/media/bank/leather.png"></div>
+                            <div class="media-body text-left">
+                                <div class="font-w600">Monster Parts</div>
+                                <div class="font-w400 font-size-sm">Common crafting material dropped by monsters. Used to craft and upgrade basic equipment at the Armory.</div>
+                            </div>
+                        </div>
+                        <div class="media d-flex align-items-center push">
+                            <div class="mr-3"><img class="m-2" height="48px" data-src="assets/media/bank/dragonhide_green.png"></div>
+                            <div class="media-body text-left">
+                                <div class="font-w600">Big Monster Parts</div>
+                                <div class="font-w400 font-size-sm">Rare crafting material from tough enemies and bosses. Required for high-tier equipment upgrades.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="block-content block-content-full">
+                        <div class="py-2 text-left">
+                            <h4 class="mb-2">Passive Jobs & Workshops</h4>
+                        </div>
+                        <div class="media d-flex align-items-center push">
+                            <div class="mr-3"><img class="m-2" height="48px" data-src="assets/media/skills/township/Blacksmiths_Smithy.png"></div>
+                            <div class="media-body text-left">
+                                <div class="font-w600">What Are Passive Jobs?</div>
+                                <div class="font-w400 font-size-sm">Special jobs unlocked as your Adventuring level increases. Heroes automatically work these jobs when you're not actively exploring dungeons.</div>
+                            </div>
+                        </div>
+                        <div class="media d-flex align-items-center push">
+                            <div class="mr-3"><img class="m-2" height="48px" data-src="assets/media/skills/township/Carpenters_Workshop.png"></div>
+                            <div class="media-body text-left">
+                                <div class="font-w600">Workshops</div>
+                                <div class="font-w400 font-size-sm">Each passive job has a workshop building. Submit work orders to convert dungeon materials into actual game items (ores, logs, fish, etc.).</div>
+                            </div>
+                        </div>
+                        <div class="media d-flex align-items-center push">
+                            <div class="mr-3"><img class="m-2" height="48px" data-src="assets/media/skills/mining/rock_iron.png"></div>
+                            <div class="media-body text-left">
+                                <div class="font-w600">Work Orders</div>
+                                <div class="font-w400 font-size-sm">Queue up work orders specifying what items you want. Heroes with matching passive jobs will automatically fulfill orders while you explore dungeons or are offline!</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Row 4: Special Features -->
+            <div class="row gutters-tiny mt-3">
+                <div class="col-md-6">
+                    <div class="block-content">
+                        <div class="py-2 text-left">
+                            <h4 class="mb-2">Slayer</h4>
+                        </div>
+                        <div class="media d-flex align-items-center push">
+                            <div class="mr-3"><img class="m-2" height="48px" data-src="assets/media/skills/slayer/slayer.svg"></div>
+                            <div class="media-body text-left">
+                                <div class="font-w600">Slayer Tasks</div>
+                                <div class="font-w400 font-size-sm">Accept tasks from the Slayers' Lodge to hunt specific monsters. Completing tasks grants bonus XP, materials, and special rewards.</div>
+                            </div>
+                        </div>
+                        <div class="media d-flex align-items-center push">
+                            <div class="mr-3"><img class="m-2" height="48px" data-src="assets/media/skills/magic/magic.svg"></div>
+                            <div class="media-body text-left">
+                                <div class="font-w600">Slayer Job</div>
+                                <div class="font-w400 font-size-sm">A unique job that learns monster abilities! Analyze monsters during combat to permanently learn their signature abilities.</div>
+                            </div>
+                        </div>
+                        <div class="media d-flex align-items-center push">
+                            <div class="mr-3"><img class="m-2" height="48px" data-src="assets/media/main/question.svg"></div>
+                            <div class="media-body text-left">
+                                <div class="font-w600">Building Your Arsenal</div>
+                                <div class="font-w400 font-size-sm">The more monsters you analyze in combat, the more abilities you can equip on Slayer. Mix and match abilities from different monsters!</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="block-content block-content-full">
+                        <div class="py-2 text-left">
+                            <h4 class="mb-2">Consumables</h4>
+                        </div>
+                        <div class="media d-flex align-items-center push">
+                            <div class="mr-3"><img class="m-2" height="48px" data-src="assets/media/bank/potion_defence_i.png"></div>
+                            <div class="media-body text-left">
+                                <div class="font-w600">Potions</div>
+                                <div class="font-w400 font-size-sm">Provide stat boosts and special effects during dungeon runs. Equip them at the Alchemist's Shop before adventuring.</div>
+                            </div>
+                        </div>
+                        <div class="media d-flex align-items-center push">
+                            <div class="mr-3"><img class="m-2" height="48px" data-src="assets/media/bank/shrimp_cooked.png"></div>
+                            <div class="media-body text-left">
+                                <div class="font-w600">Food</div>
+                                <div class="font-w400 font-size-sm">Heals your heroes during dungeons. Keep food equipped to survive tough encounters and boss fights.</div>
+                            </div>
+                        </div>
+                        <div class="media d-flex align-items-center push">
+                            <div class="mr-3"><img class="m-2" height="48px" data-src="assets/media/bank/bone_necklace.png"></div>
+                            <div class="media-body text-left">
+                                <div class="font-w600">Charms</div>
+                                <div class="font-w400 font-size-sm">Special consumables with unique passive effects. Some provide buffs, others affect dungeon mechanics.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Bottom Row: Getting Started -->
+            <div class="row gutters-tiny mt-3">
+                <div class="col-12">
+                    <div class="block-content">
+                        <div class="py-2 text-left">
+                            <h4 class="mb-2">Getting Started</h4>
+                        </div>
+                        <div class="text-left">
+                            <ol class="font-w400">
+                                <li class="mb-2">Visit the <strong>Crossroads</strong> to select a dungeon area appropriate for your party's level.</li>
+                                <li class="mb-2">Enter the dungeon and watch your party automatically explore. Combat triggers when they encounter monsters.</li>
+                                <li class="mb-2">Collect <strong>Monster Parts</strong> from defeated enemies to upgrade equipment at the <strong>Armory</strong>.</li>
+                                <li class="mb-2">Level up your heroes' <strong>Jobs</strong> to unlock new abilities and increase your party's power.</li>
+                                <li class="mb-2">Accept <strong>Slayer Tasks</strong> for bonus rewards and analyze monsters in combat to learn abilities for the <strong>Slayer</strong> job.</li>
+                                <li class="mb-2">Unlock <strong>Passive Jobs</strong> as your skill level increases - heroes work these automatically when you're not in a dungeon!</li>
+                                <li class="mb-2">Check out the <strong>Lemon Stall</strong> for some citrusy surprises...</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+</template>
+
+<template id="adventuring-tutorial-tooltip-template">
+    <div class="adventuring-tutorial-overlay" id="overlay">
+        <div class="adventuring-tutorial-highlight" id="highlight"></div>
+        <div class="adventuring-tutorial-click-blocker d-none" id="click-blocker"></div>
+        <div class="adventuring-tutorial-tooltip" id="tooltip">
+            <div class="tutorial-arrow" id="arrow"></div>
+            <div class="tutorial-message" id="message"></div>
+            <div class="tutorial-actions mt-2">
+                <button class="btn btn-sm btn-primary mr-3 d-none" id="okay-btn">Okay</button>
+                <a href="#" class="small text-warning mr-3" id="skip-btn">Skip</a>
+                <a href="#" class="small text-muted" id="skip-all-btn">Skip All Tutorials</a>
             </div>
         </div>
     </div>

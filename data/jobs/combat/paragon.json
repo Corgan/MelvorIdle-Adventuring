@@ -1,0 +1,225 @@
+{
+    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+    "namespace": "adventuring",
+    "data": {
+        "skillData": [{
+            "skillID": "adventuring:Adventuring",
+            "data": {
+                "jobs": [
+                    {
+                        "id": "paragon",
+                        "tier": 5,
+                        "name": "Paragon",
+                        "media": "melvor:assets/media/bank/potion_defence_i.png#tint=gold",
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:guardian", "level": 25 },
+                            { "type": "job_level", "job": "adventuring:paladin", "level": 20 },
+                            { "type": "area_mastery", "area": "adventuring:crystal_caverns", "level": 50 }
+                        ],
+                        "isMilestoneReward": true,
+                        "allowedItems": [
+                            "adventuring:helm",
+                            "adventuring:platebody",
+                            "adventuring:platelegs",
+                            "adventuring:gauntlets",
+                            "adventuring:sabatons",
+                            "adventuring:amulet",
+                            "adventuring:ring",
+                            "adventuring:cape",
+                            "adventuring:shield",
+                            "adventuring:sword1h",
+                            "adventuring:mace"
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:hitpoints", "value": 3.0 },
+                            { "id": "adventuring:defence", "value": 3.0 },
+                            { "id": "adventuring:agility", "value": 0.5 },
+                            { "id": "adventuring:strength", "value": 1.0 },
+                            { "id": "adventuring:prayer", "value": 1.5 }
+                        ]
+                    }
+                ],
+                "generators": [
+                    {
+                        "id": "divine_bulwark",
+                        "name": "Divine Bulwark",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:paragon", "level": 1 }
+                        ],
+                        "energy": 30,
+                        "hits": [
+                            {
+                                "target": "aoe",
+                                "party": "ally",
+                                "effects": [
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:shield",
+                                        "stacks": {
+                                            "base": 15,
+                                            "scaling": [
+                                                { "id": "adventuring:defence", "value": 0.5 },
+                                                { "id": "adventuring:prayer", "value": 0.3 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "target": "aoe",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:taunt",
+                                        "stacks": {
+                                            "base": 2,
+                                            "scaling": []
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "martyrs_stand",
+                        "name": "Martyr's Stand",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:paragon", "level": 10 }
+                        ],
+                        "energy": 35,
+                        "hits": [
+                            {
+                                "target": "self",
+                                "effects": [
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:fortify",
+                                        "stacks": {
+                                            "base": 6,
+                                            "scaling": [
+                                                { "id": "adventuring:defence", "value": 0.15 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:martyrdom",
+                                        "stacks": {
+                                            "base": 3,
+                                            "scaling": []
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "holy_vengeance",
+                        "name": "Holy Vengeance",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:paragon", "level": 20 }
+                        ],
+                        "energy": 30,
+                        "hits": [
+                            {
+                                "target": "self",
+                                "effects": [
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:reflect",
+                                        "stacks": {
+                                            "base": 3,
+                                            "scaling": []
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "element": "holy",
+                                        "amount": {
+                                            "base": 20,
+                                            "scaling": [
+                                                { "id": "adventuring:prayer", "value": 0.4 },
+                                                { "id": "adventuring:defence", "value": 0.2 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "spenders": [
+                    {
+                        "id": "eternal_sentinel",
+                        "name": "Eternal Sentinel",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:paragon", "level": 30 }
+                        ],
+                        "energy": -100,
+                        "hits": [
+                            {
+                                "target": "self",
+                                "effects": [
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:unkillable",
+                                        "stacks": {
+                                            "base": 1,
+                                            "scaling": []
+                                        }
+                                    },
+                                    {
+                                        "type": "heal",
+                                        "delay": 1,
+                                        "amount": {
+                                            "base": 50,
+                                            "scaling": [
+                                                { "id": "adventuring:hitpoints", "value": 0.3 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "paragons_judgment",
+                        "name": "Paragon's Judgment",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:paragon", "level": 40 }
+                        ],
+                        "energy": -80,
+                        "hits": [
+                            {
+                                "target": "aoe",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "element": "holy",
+                                        "lifesteal": 1.0,
+                                        "lifestealTarget": "party",
+                                        "amount": {
+                                            "base": 35,
+                                            "scaling": [
+                                                { "id": "adventuring:prayer", "value": 0.6 },
+                                                { "id": "adventuring:defence", "value": 0.3 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        }]
+    }
+}

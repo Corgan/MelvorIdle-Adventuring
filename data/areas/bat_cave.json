@@ -1,0 +1,358 @@
+{
+    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+    "namespace": "adventuring",
+    "data": {
+        "skillData": [{
+            "skillID": "adventuring:Adventuring",
+            "data": {
+                "areas": [
+                    {
+                        "id": "bat_cave",
+                        "name": "Bat Cave",
+                        "media": "melvor:assets/media/monsters/eye_resurrected.png",
+                        "requirements": [
+                            { "type": "skill_level", "level": 35 }
+                        ],
+                        "height": 8,
+                        "width": 7,
+                        "floors": [
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:bat", "weight": 100 }
+                                ],
+                                "exit": ["adventuring:bat", "adventuring:bat", "adventuring:bat"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:bat", "weight": 70 },
+                                    { "id": "adventuring:big_bat", "weight": 30 }
+                                ],
+                                "exit": ["adventuring:bat", "adventuring:bat", "adventuring:big_bat"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:bat", "weight": 40 },
+                                    { "id": "adventuring:big_bat", "weight": 60 }
+                                ],
+                                "exit": ["adventuring:bat", "adventuring:big_bat", "adventuring:big_bat"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:big_bat", "weight": 70 },
+                                    { "id": "adventuring:the_eye", "weight": 30 }
+                                ],
+                                "exit": ["adventuring:big_bat", "adventuring:big_bat", "adventuring:the_eye"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:big_bat", "weight": 50 },
+                                    { "id": "adventuring:the_eye", "weight": 50 }
+                                ],
+                                "exit": ["adventuring:big_bat", "adventuring:the_eye", "adventuring:the_eye"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:the_eye", "weight": 80 },
+                                    { "id": "adventuring:big_bat", "weight": 20 }
+                                ],
+                                "exit": ["adventuring:the_eye", "adventuring:the_eye", "adventuring:the_eye"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:the_eye", "weight": 100 }
+                                ],
+                                "exit": ["adventuring:big_bat", "adventuring:the_eye", "adventuring:resurrected_eye"]
+                            }
+                        ]
+                    }
+                ],
+                "monsters": [
+                    {
+                        "id": "bat",
+                        "name": "Bat",
+                        "media": "melvor:assets/media/monsters/bat.png",
+                        "tags": ["beast", "flying"],
+                        "xp": 30,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 28 },
+                            { "id": "adventuring:defence", "value": 15 },
+                            { "id": "adventuring:agility", "value": 35 },
+                            { "id": "adventuring:strength", "value": 22 },
+                            { "id": "adventuring:ranged", "value": 18 },
+                            { "id": "adventuring:magic", "value": 15 },
+                            { "id": "adventuring:prayer", "value": 12 }
+                        ],
+                        "generator": "adventuring:sonic_screech",
+                        "spender": "adventuring:swooping_strike",
+                        "passives": [],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 10, "weight": 100 },
+                            { "id": "adventuring:parts", "qty": 4, "weight": 20 },
+                            { "id": "adventuring:bat_wing", "qty": 1, "weight": 28 }
+                        ]
+                    },
+                    {
+                        "id": "big_bat",
+                        "name": "Big Bat",
+                        "media": "melvor:assets/media/monsters/bat_big.png",
+                        "tags": ["beast", "flying"],
+                        "xp": 40,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 38 },
+                            { "id": "adventuring:defence", "value": 22 },
+                            { "id": "adventuring:agility", "value": 40 },
+                            { "id": "adventuring:strength", "value": 30 },
+                            { "id": "adventuring:ranged", "value": 25 },
+                            { "id": "adventuring:magic", "value": 20 },
+                            { "id": "adventuring:prayer", "value": 15 }
+                        ],
+                        "generator": "adventuring:sonic_screech",
+                        "spender": "adventuring:blood_drain",
+                        "passives": [],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 14, "weight": 100 },
+                            { "id": "adventuring:parts", "qty": 5, "weight": 25 },
+                            { "id": "adventuring:bat_wing", "qty": 2, "weight": 32 }
+                        ]
+                    },
+                    {
+                        "id": "the_eye",
+                        "name": "The Eye",
+                        "media": "melvor:assets/media/monsters/eye.png",
+                        "tags": ["elemental"],
+                        "xp": 50,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 45 },
+                            { "id": "adventuring:defence", "value": 28 },
+                            { "id": "adventuring:agility", "value": 30 },
+                            { "id": "adventuring:strength", "value": 25 },
+                            { "id": "adventuring:ranged", "value": 30 },
+                            { "id": "adventuring:magic", "value": 38 },
+                            { "id": "adventuring:prayer", "value": 25 }
+                        ],
+                        "generator": "adventuring:evil_gaze",
+                        "spender": "adventuring:mind_blast",
+                        "passives": [],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 18, "weight": 100 },
+                            { "id": "adventuring:parts", "qty": 6, "weight": 28 },
+                            { "id": "adventuring:eye_of_newt", "qty": 1, "weight": 30 }
+                        ]
+                    },
+                    {
+                        "id": "resurrected_eye",
+                        "name": "Resurrected Eye",
+                        "media": "melvor:assets/media/monsters/eye_resurrected.png",
+                        "tags": ["boss", "elemental"],
+                        "isBoss": true,
+                        "xp": 100,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 70 },
+                            { "id": "adventuring:defence", "value": 40 },
+                            { "id": "adventuring:agility", "value": 38 },
+                            { "id": "adventuring:strength", "value": 35 },
+                            { "id": "adventuring:ranged", "value": 40 },
+                            { "id": "adventuring:magic", "value": 55 },
+                            { "id": "adventuring:prayer", "value": 35 }
+                        ],
+                        "generator": "adventuring:evil_gaze",
+                        "spender": "adventuring:eldritch_horror",
+                        "passives": [],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 40, "weight": 100 },
+                            { "id": "adventuring:parts", "qty": 12, "weight": 45 },
+                            { "id": "adventuring:big_parts", "qty": 4, "weight": 35 },
+                            { "id": "adventuring:eye_of_newt", "qty": 2, "weight": 45 },
+                            { "id": "adventuring:bat_wing", "qty": 3, "weight": 40 }
+                        ]
+                    }
+                ],
+                "generators": [
+                    {
+                        "id": "sonic_screech",
+                        "name": "Sonic Screech",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "energy": 45,
+                        "hits": [
+                            {
+                                "target": "all",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 4,
+                                            "scaling": [
+                                                { "id": "adventuring:agility", "value": 0.5 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "evil_gaze",
+                        "name": "Evil Gaze",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "energy": 40,
+                        "hits": [
+                            {
+                                "target": "random",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 8,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 1.2 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "spenders": [
+                    {
+                        "id": "swooping_strike",
+                        "name": "Swooping Strike",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "cost": 80,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 20,
+                                            "scaling": [
+                                                { "id": "adventuring:agility", "value": 1.5 },
+                                                { "id": "adventuring:strength", "value": 0.8 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "blood_drain",
+                        "name": "Blood Drain",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "cost": 90,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 18,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 1.5 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "target": "self",
+                                "party": "ally",
+                                "effects": [
+                                    {
+                                        "type": "heal",
+                                        "amount": {
+                                            "base": 12,
+                                            "scaling": [
+                                                { "id": "adventuring:prayer", "value": 1 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "mind_blast",
+                        "name": "Mind Blast",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "cost": 85,
+                        "hits": [
+                            {
+                                "target": "back",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 28,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 2 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "eldritch_horror",
+                        "name": "Eldritch Horror",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "cost": 100,
+                        "hits": [
+                            {
+                                "target": "all",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 25,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 2.2 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ],
+                        "masteryAuraId": "adventuring:mastery_aura_bat_cave",
+                        "masteryAura": {
+                            "id": "mastery_aura_bat_cave",
+                            "name": "Bat Cave Mastery",
+                            "media": "melvor:assets/media/monsters/vampire.png",
+                            "combine": true,
+                            "stack": false,
+                            "amount": 10,
+                            "stacks": 99,
+                            "effects": [
+                                {
+                                    "trigger": "encounter_start",
+                                    "type": "energy",
+                                    "target": "self"
+                                },
+                                {
+                                    "trigger": "dungeon_end",
+                                    "type": "remove"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        }]
+    }
+}

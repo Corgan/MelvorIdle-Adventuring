@@ -8,6 +8,7 @@ export class AdventuringTrainerElement extends AdventuringSubpageElement {
 
         this.back = getElementFromFragment(this._content, 'back', 'button');
         this.jobs = getElementFromFragment(this._content, 'jobs', 'div');
+        this.categoryFilter = getElementFromFragment(this._content, 'category-filter', 'select');
     }
 }
 window.customElements.define('adventuring-trainer', AdventuringTrainerElement);

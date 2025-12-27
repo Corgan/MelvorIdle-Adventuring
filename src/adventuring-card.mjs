@@ -27,7 +27,7 @@ export class AdventuringCard {
         this.renderQueue = new AdventuringCardRenderQueue();
 
         this.name = "";
-        this.icon = cdnMedia('assets/media/main/question.svg');
+        this.icon = cdnMedia('assets/media/main/question.png');
         this.highlight = false;
         this.fade = false;
 
@@ -56,7 +56,7 @@ export class AdventuringCard {
         if(!this.renderQueue.name)
             return;
 
-        this.component.name.textContent = this.name;
+        this.component.nameText.textContent = this.name;
 
         this.renderQueue.name = false;
     }

@@ -1,0 +1,201 @@
+{
+    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+    "namespace": "adventuring",
+    "data": {
+        "skillData": [{
+            "skillID": "adventuring:Adventuring",
+            "data": {
+                "stats": [
+                    {
+                        "id": "cartography",
+                        "name": "Cartography",
+                        "media": "melvor:assets/media/skills/bank/skillcape_agility.png"
+                    }
+                ],
+                "jobs": [
+                    {
+                        "id": "cartographer",
+                        "name": "Cartographer",
+                        "media": "melvor:assets/media/skills/bank/skillcape_agility.png",
+                        "requirements": [
+                            { "type": "skill_level", "level": 35 }
+                        ],
+                        "isMilestoneReward": true,
+                        "isPassive": true,
+                        "scaling": [
+                            { "id": "adventuring:cartography", "value": 1 }
+                        ]
+                    }
+                ],
+                "materials": [
+                    {
+                        "id": "blank_parchment",
+                        "name": "Blank Parchment",
+                        "media": "melvor:assets/media/skills/bank/skillcape_agility.png",
+                        "category": "adventuring:salvage"
+                    }
+                ],
+                "buildings": [
+                    {
+                        "id": "map_room",
+                        "type": "workshop",
+                        "name": "Map Room",
+                        "description": "Chart unexplored territories and secret passages. Cartographers create maps for navigating dungeons.",
+                        "media": "melvor:assets/media/skills/bank/skillcape_agility.png",
+                        "requirements": [],
+                        "idle": ["Charting territories", "Drawing coastlines"],
+                        "actions": ["adventuring:work"],
+                        "products": [
+                            "adventuring:dungeon_map",
+                            "adventuring:treasure_map",
+                            "adventuring:escape_route",
+                            "adventuring:secret_passage_map"
+                        ]
+                    }
+                ],
+                "baseItems": [
+                    {
+                        "id": "dungeon_map",
+                        "name": "Dungeon Map",
+                        "media": "melvor:assets/media/bank/torn_page.png",
+                        "source": "workshop"
+                    },
+                    {
+                        "id": "treasure_map",
+                        "name": "Treasure Map",
+                        "media": "melvor:assets/media/bank/map_fragment.png",
+                        "source": "workshop"
+                    },
+                    {
+                        "id": "escape_route",
+                        "name": "Escape Route",
+                        "media": "melvor:assets/media/bank/scroll.png",
+                        "source": "workshop"
+                    },
+                    {
+                        "id": "secret_passage_map",
+                        "name": "Secret Passage Map",
+                        "media": "melvor:assets/media/bank/ancient_page.png",
+                        "source": "workshop"
+                    }
+                ],
+                "products": [
+                    {
+                        "id": "dungeon_map",
+                        "name": "Dungeon Map",
+                        "outputType": "baseItem",
+                        "baseItem": "adventuring:dungeon_map",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:cartographer" },
+                            { "type": "job_level", "job": "adventuring:cartographer", "level": 1 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:blank_parchment", "count": 2 }
+                        ]
+                    },
+                    {
+                        "id": "treasure_map",
+                        "name": "Treasure Map",
+                        "outputType": "baseItem",
+                        "baseItem": "adventuring:treasure_map",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:cartographer" },
+                            { "type": "job_level", "job": "adventuring:cartographer", "level": 20 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:blank_parchment", "count": 4 }
+                        ]
+                    },
+                    {
+                        "id": "escape_route",
+                        "name": "Escape Route",
+                        "outputType": "baseItem",
+                        "baseItem": "adventuring:escape_route",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:cartographer" },
+                            { "type": "job_level", "job": "adventuring:cartographer", "level": 35 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:blank_parchment", "count": 3 }
+                        ]
+                    },
+                    {
+                        "id": "secret_passage_map",
+                        "name": "Secret Passage Map",
+                        "outputType": "baseItem",
+                        "baseItem": "adventuring:secret_passage_map",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:cartographer" },
+                            { "type": "job_level", "job": "adventuring:cartographer", "level": 50 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:blank_parchment", "count": 5 }
+                        ]
+                    }
+                ],
+                "workOrders": [
+                    {
+                        "id": "dungeon_map",
+                        "building": "adventuring:map_room",
+                        "product": "adventuring:dungeon_map",
+                        "materials": [
+                            { "id": "adventuring:blank_parchment", "qty": 2 }
+                        ],
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:cartographer", "level": 1 }
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:cartography", "value": 0.2 }
+                        ]
+                    },
+                    {
+                        "id": "treasure_map",
+                        "building": "adventuring:map_room",
+                        "product": "adventuring:treasure_map",
+                        "materials": [
+                            { "id": "adventuring:blank_parchment", "qty": 4 }
+                        ],
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:cartographer", "level": 20 }
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:cartography", "value": 0.25 }
+                        ]
+                    },
+                    {
+                        "id": "escape_route",
+                        "building": "adventuring:map_room",
+                        "product": "adventuring:escape_route",
+                        "materials": [
+                            { "id": "adventuring:blank_parchment", "qty": 3 }
+                        ],
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:cartographer", "level": 35 }
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:cartography", "value": 0.3 }
+                        ]
+                    },
+                    {
+                        "id": "secret_passage_map",
+                        "building": "adventuring:map_room",
+                        "product": "adventuring:secret_passage_map",
+                        "materials": [
+                            { "id": "adventuring:blank_parchment", "qty": 5 }
+                        ],
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:cartographer", "level": 50 }
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:cartography", "value": 0.35 }
+                        ]
+                    }
+                ]
+            }
+        }]
+    }
+}

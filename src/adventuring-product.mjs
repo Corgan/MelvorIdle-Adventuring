@@ -1,12 +1,15 @@
 const { loadModule } = mod.getContext(import.meta);
 
+const { RequirementsChecker } = await loadModule('src/adventuring-utils.mjs');
+
 export class AdventuringProduct extends NamespacedObject {
     constructor(namespace, data, manager, game) {
         super(namespace, data.id);
         this.manager = manager;
         this.game = game;
 
-        this._item = data.item;
+        this.outputType = data.outputType || 'item';
+        this._output = data.item || data.material || data.consumable || data.baseItem;
         this.count = data.count;
 
         this.requirements = data.requirements;
@@ -14,11 +17,16 @@ export class AdventuringProduct extends NamespacedObject {
     }
 
     get name() {
-        return this.item.name;
+        return this.output?.name ?? 'Unknown';
     }
 
     get media() {
-        return this.item.media;
+        return this.output?.media ?? 'assets/media/main/question.png';
+    }
+
+    // Alias for backwards compatibility
+    get item() {
+        return this.output;
     }
 
     onLoad() {
@@ -26,8 +34,27 @@ export class AdventuringProduct extends NamespacedObject {
     }
 
     postDataRegistration() {
-        this.item = this.game.items.getObjectByID(this._item);
-        delete this._item;
+        this._reqChecker = new RequirementsChecker(this.manager, this.requirements);
+        
+        switch(this.outputType) {
+            case 'material':
+                this.output = this.manager.materials.getObjectByID(this._output);
+                break;
+            case 'consumable':
+                this.output = this.manager.consumableTypes.getObjectByID(this._output);
+                break;
+            case 'baseItem':
+                this.output = this.manager.baseItems.getObjectByID(this._output);
+                break;
+            case 'item':
+            default:
+                this.output = this.game.items.getObjectByID(this._output);
+                break;
+        }
+        if(!this.output) {
+            console.warn(`[Adventuring] Product "${this.id}" could not resolve output: ${this._output} (type: ${this.outputType})`);
+        }
+        delete this._output;
     }
 
     create() {
@@ -36,12 +63,14 @@ export class AdventuringProduct extends NamespacedObject {
             this.manager.stash.remove(material, mat.count);
         }
         return { 
-            item: this.item,
+            output: this.output,
+            outputType: this.outputType,
             count: this.count
         }
     }
 
     canMake(character) {
+        // Check materials first
         if(this.materials.length > 0) {
             for(let material of this.materials) {
                 let mat = this.manager.materials.getObjectByID(material.id);
@@ -49,21 +78,7 @@ export class AdventuringProduct extends NamespacedObject {
                     return false;
             }
         }
-        if(this.requirements.length == 0)
-            return true;
-        return this.requirements.reduce((doable, requirement) => {
-            if(requirement.type == "job_level") {
-                let job = this.manager.jobs.getObjectByID(requirement.job);
-                if(job === undefined)
-                    return false;
-                if(this.manager.getMasteryLevel(job) < requirement.level)
-                    return false;
-            }
-            if(requirement.type == "current_job") {
-                if((character.combatJob === undefined || character.combatJob.id !== requirement.job) && (character.passiveJob === undefined || character.passiveJob.id !== requirement.job))
-                    return false;
-            }
-            return doable;
-        }, true);
+        // Check requirements
+        return this._reqChecker?.check({ character }) ?? true;
     }
 }

@@ -9,14 +9,14 @@
                     {
                         "id": "crafting",
                         "name": "Crafting",
-                        "media": "melvor:assets/media/skills/crafting/crafting.svg"
+                        "media": "melvor:assets/media/bank/potion_crafting_i.png"
                     }
                 ],
                 "jobs": [
                     {
                         "id": "crafter",
                         "name": "Crafter",
-                        "media": "melvor:assets/media/skills/crafting/crafting.svg",
+                        "media": "melvor:assets/media/bank/potion_crafting_i.png",
                         "requirements": [
                             { "type": "skill_level", "level": 5 }
                         ],
@@ -28,18 +28,310 @@
                     }
                 ],
                 "materials": [
-
+                    {
+                        "id": "crude_hide",
+                        "name": "Crude Hide",
+                        "media": "melvor:assets/media/bank/potion_crafting_i.png",
+                        "category": "adventuring:salvage"
+                    },
+                    {
+                        "id": "refined_hide",
+                        "name": "Refined Hide",
+                        "media": "melvor:assets/media/bank/black_dhide_body.png",
+                        "tier": 2,
+                        "category": "adventuring:salvage",
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:master_crafter", "level": 1 }
+                        ]
+                    },
+                    {
+                        "id": "immaculate_hide",
+                        "name": "Immaculate Hide",
+                        "media": "melvor:assets/media/bank/ancient_dhide_body.png",
+                        "tier": 3,
+                        "category": "adventuring:salvage",
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:grandmaster_crafter", "level": 1 }
+                        ]
+                    },
+                    {
+                        "id": "transcendent_hide",
+                        "name": "Transcendent Hide",
+                        "media": "melvor:assets/media/bank/logs_elderwood.png",
+                        "tier": 4,
+                        "category": "adventuring:salvage",
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:legendary_crafter", "level": 1 }
+                        ]
+                    }
                 ],
                 "buildings": [
-
+                    {
+                        "id": "tannery",
+                        "type": "workshop",
+                        "name": "Tannery",
+                        "description": "Process hides into quality leather and dragonhide. Crafters create padding and wraps for armor.",
+                        "media": "melvor:assets/media/skills/township/Hunters_Cabin.png",
+                        "requirements": [],
+                        "idle": ["Stretching hides", "Oiling leather"],
+                        "actions": ["adventuring:work"],
+                        "products": [
+                            "adventuring:leather",
+                            "adventuring:green_dragonhide",
+                            "adventuring:blue_dragonhide",
+                            "adventuring:red_dragonhide",
+                            "adventuring:black_dragonhide",
+                            "adventuring:reinforced_padding",
+                            "adventuring:swift_wraps"
+                        ]
+                    }
                 ],
                 "products": [
-                    
+                    {
+                        "id": "leather",
+                        "item": "melvorD:Leather",
+                        "outputType": "item",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:crafter" },
+                            { "type": "job_level", "job": "adventuring:crafter", "level": 1 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_hide", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "green_dragonhide",
+                        "item": "melvorD:Green_Dragonhide",
+                        "outputType": "item",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:crafter" },
+                            { "type": "job_level", "job": "adventuring:crafter", "level": 10 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_hide", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "blue_dragonhide",
+                        "item": "melvorD:Blue_Dragonhide",
+                        "outputType": "item",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:crafter" },
+                            { "type": "job_level", "job": "adventuring:crafter", "level": 20 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_hide", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "red_dragonhide",
+                        "item": "melvorD:Red_Dragonhide",
+                        "outputType": "item",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:crafter" },
+                            { "type": "job_level", "job": "adventuring:crafter", "level": 30 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_hide", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "black_dragonhide",
+                        "item": "melvorD:Black_Dragonhide",
+                        "outputType": "item",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:crafter" },
+                            { "type": "job_level", "job": "adventuring:crafter", "level": 40 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_hide", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "reinforced_padding",
+                        "consumable": "adventuring:reinforced_padding",
+                        "outputType": "consumable",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:crafter" },
+                            { "type": "job_level", "job": "adventuring:crafter", "level": 15 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_hide", "count": 3 }
+                        ]
+                    },
+                    {
+                        "id": "swift_wraps",
+                        "consumable": "adventuring:swift_wraps",
+                        "outputType": "consumable",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:crafter" },
+                            { "type": "job_level", "job": "adventuring:crafter", "level": 20 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_hide", "count": 2 }
+                        ]
+                    },
+                    {
+                        "id": "convert_crude_hide_to_refined",
+                        "material": "adventuring:refined_hide",
+                        "outputType": "material",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:master_crafter", "level": 10 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_hide", "count": 5 }
+                        ]
+                    },
+                    {
+                        "id": "convert_refined_hide_to_immaculate",
+                        "material": "adventuring:immaculate_hide",
+                        "outputType": "material",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:grandmaster_crafter", "level": 10 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:refined_hide", "count": 5 }
+                        ]
+                    },
+                    {
+                        "id": "convert_immaculate_hide_to_transcendent",
+                        "material": "adventuring:transcendent_hide",
+                        "outputType": "material",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:legendary_crafter", "level": 10 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:immaculate_hide", "count": 5 }
+                        ]
+                    },
+                    {
+                        "id": "refined_green_dhide",
+                        "item": "melvorD:Green_Dragonhide",
+                        "outputType": "item",
+                        "count": 3,
+                        "requirements": [
+                            { "type": "skill_level", "level": 25 },
+                            { "type": "current_job", "job": "adventuring:master_crafter" },
+                            { "type": "job_level", "job": "adventuring:master_crafter", "level": 1 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:refined_hide", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "refined_blue_dhide",
+                        "item": "melvorD:Blue_Dragonhide",
+                        "outputType": "item",
+                        "count": 3,
+                        "requirements": [
+                            { "type": "skill_level", "level": 25 },
+                            { "type": "current_job", "job": "adventuring:master_crafter" },
+                            { "type": "job_level", "job": "adventuring:master_crafter", "level": 15 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:refined_hide", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "refined_red_dhide",
+                        "item": "melvorD:Red_Dragonhide",
+                        "outputType": "item",
+                        "count": 3,
+                        "requirements": [
+                            { "type": "skill_level", "level": 25 },
+                            { "type": "current_job", "job": "adventuring:master_crafter" },
+                            { "type": "job_level", "job": "adventuring:master_crafter", "level": 25 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:refined_hide", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "immaculate_black_dhide",
+                        "item": "melvorD:Black_Dragonhide",
+                        "outputType": "item",
+                        "count": 8,
+                        "requirements": [
+                            { "type": "skill_level", "level": 50 },
+                            { "type": "current_job", "job": "adventuring:grandmaster_crafter" },
+                            { "type": "job_level", "job": "adventuring:grandmaster_crafter", "level": 1 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:immaculate_hide", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "transcendent_elder_dhide",
+                        "item": "melvorF:Elder_Dragonhide",
+                        "outputType": "item",
+                        "count": 20,
+                        "requirements": [
+                            { "type": "skill_level", "level": 75 },
+                            { "type": "current_job", "job": "adventuring:legendary_crafter" },
+                            { "type": "job_level", "job": "adventuring:legendary_crafter", "level": 1 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:transcendent_hide", "count": 1 }
+                        ]
+                    }
                 ],
                 "tiles": [
-                    
+                    {
+                        "id": "hide_cache",
+                        "name": "Hide Cache",
+                        "media": "melvor:assets/media/bank/potion_crafting_i.png",
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:crafter" }
+                        ],
+                        "weight": 10,
+                        "floor_max": 1,
+                        "dungeon_max": 1,
+                        "effects": [
+                            { "type": "xp", "amount": 30, "job": "adventuring:crafter" },
+                            {
+                                "type": "loot",
+                                "pool": [
+                                    { "id": "adventuring:crude_hide", "qty": 1, "weight": 100 }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "artisans_workshop",
+                        "name": "Artisan's Workshop",
+                        "media": "melvor:assets/media/bank/potion_crafting_i.png",
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:master_crafter", "level": 1 }
+                        ],
+                        "weight": 8,
+                        "floor_max": 1,
+                        "dungeon_max": 2,
+                        "effects": [
+                            { "type": "xp", "amount": 100, "job": "adventuring:crafter" },
+                            { "type": "xp", "amount": 50, "job": "adventuring:master_crafter" },
+                            {
+                                "type": "loot",
+                                "pool": [
+                                    { "id": "adventuring:crude_hide", "qty": 3, "weight": 60 },
+                                    { "id": "adventuring:refined_hide", "qty": 2, "weight": 35 },
+                                    { "id": "adventuring:immaculate_hide", "qty": 1, "weight": 5 }
+                                ]
+                            }
+                        ]
+                    }
                 ]
             }
         }]
     }
 }
+

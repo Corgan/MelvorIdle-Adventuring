@@ -1,0 +1,329 @@
+{
+    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+    "namespace": "adventuring",
+    "data": {
+        "skillData": [{
+            "skillID": "adventuring:Adventuring",
+            "data": {
+                "passives": [
+                    {
+                        "id": "molten_blood",
+                        "name": "Molten Blood",
+                        "effects": [
+                            {
+                                "trigger": "after_damage_received",
+                                "type": "damage",
+                                "target": "attacker",
+                                "amount": { "base": 8, "scaling": [] }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "forge_hardened",
+                        "name": "Forge Hardened",
+                        "effects": [
+                            {
+                                "trigger": "encounter_start",
+                                "type": "buff",
+                                "target": "self",
+                                "buff": "adventuring:fortify",
+                                "stacks": { "base": 5, "scaling": [] }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "creation_wrath",
+                        "name": "Creation's Wrath",
+                        "effects": [
+                            {
+                                "trigger": "encounter_start",
+                                "type": "buff",
+                                "target": "self",
+                                "buff": "adventuring:might",
+                                "stacks": { "base": 8, "scaling": [] }
+                            },
+                            {
+                                "trigger": "encounter_start",
+                                "type": "debuff",
+                                "target": "all_enemies",
+                                "debuff": "adventuring:burn",
+                                "stacks": { "base": 5, "scaling": [] }
+                            }
+                        ]
+                    }
+                ],
+                "areas": [
+                    {
+                        "id": "primordial_forge",
+                        "name": "Primordial Forge",
+                        "media": "melvor:assets/media/bank/potion_smithing_i.png",
+                        "requirements": [
+                            { "type": "skill_level", "level": 85 }
+                        ],
+                        "height": 15,
+                        "width": 8,
+                        "floors": [
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:forge_ember", "weight": 60 },
+                                    { "id": "adventuring:molten_construct", "weight": 40 }
+                                ],
+                                "exit": ["adventuring:forge_ember", "adventuring:forge_ember", "adventuring:molten_construct"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:forge_ember", "weight": 30 },
+                                    { "id": "adventuring:molten_construct", "weight": 35 },
+                                    { "id": "adventuring:anvil_golem", "weight": 35 }
+                                ],
+                                "exit": ["adventuring:molten_construct", "adventuring:anvil_golem", "adventuring:anvil_golem"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:molten_construct", "weight": 25 },
+                                    { "id": "adventuring:anvil_golem", "weight": 35 },
+                                    { "id": "adventuring:hammer_sentinel", "weight": 40 }
+                                ],
+                                "exit": ["adventuring:anvil_golem", "adventuring:hammer_sentinel", "adventuring:hammer_sentinel"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:anvil_golem", "weight": 25 },
+                                    { "id": "adventuring:hammer_sentinel", "weight": 35 },
+                                    { "id": "adventuring:creation_elemental", "weight": 40 }
+                                ],
+                                "exit": ["adventuring:hammer_sentinel", "adventuring:creation_elemental", "adventuring:creation_elemental"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:hammer_sentinel", "weight": 30 },
+                                    { "id": "adventuring:creation_elemental", "weight": 35 },
+                                    { "id": "adventuring:forge_titan", "weight": 35 }
+                                ],
+                                "exit": ["adventuring:creation_elemental", "adventuring:forge_titan", "adventuring:forge_titan"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:creation_elemental", "weight": 35 },
+                                    { "id": "adventuring:forge_titan", "weight": 65 }
+                                ],
+                                "exit": ["adventuring:forge_titan", "adventuring:forge_titan", "adventuring:the_first_forgemaster"]
+                            }
+                        ]
+                    }
+                ],
+                "monsters": [
+                    {
+                        "id": "forge_ember",
+                        "name": "Forge Ember",
+                        "media": "melvor:assets/media/monsters/fire_spirit.png",
+                        "tags": ["elemental", "fire"],
+                        "xp": 195,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 135 },
+                            { "id": "adventuring:defence", "value": 65 },
+                            { "id": "adventuring:agility", "value": 78 },
+                            { "id": "adventuring:strength", "value": 82 },
+                            { "id": "adventuring:ranged", "value": 58 },
+                            { "id": "adventuring:magic", "value": 72 },
+                            { "id": "adventuring:prayer", "value": 48 }
+                        ],
+                        "generator": "adventuring:ember_spark",
+                        "spender": "adventuring:flame_burst",
+                        "passives": [],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 32, "weight": 100 },
+                            { "id": "adventuring:parts", "qty": 4, "weight": 25 },
+                            { "id": "adventuring:primordial_coal", "qty": 2, "weight": 45 }
+                        ]
+                    },
+                    {
+                        "id": "molten_construct",
+                        "name": "Molten Construct",
+                        "media": "melvor:assets/media/monsters/golem.png",
+                        "tags": ["elemental", "construct"],
+                        "xp": 210,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 165 },
+                            { "id": "adventuring:defence", "value": 88 },
+                            { "id": "adventuring:agility", "value": 45 },
+                            { "id": "adventuring:strength", "value": 92 },
+                            { "id": "adventuring:ranged", "value": 42 },
+                            { "id": "adventuring:magic", "value": 55 },
+                            { "id": "adventuring:prayer", "value": 40 }
+                        ],
+                        "generator": "adventuring:molten_slam",
+                        "spender": "adventuring:magma_wave",
+                        "passives": ["adventuring:molten_blood"],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 35, "weight": 100 },
+                            { "id": "adventuring:parts", "qty": 5, "weight": 22 },
+                            { "id": "adventuring:primordial_coal", "qty": 2, "weight": 38 },
+                            { "id": "adventuring:living_metal", "qty": 1, "weight": 22 }
+                        ]
+                    },
+                    {
+                        "id": "anvil_golem",
+                        "name": "Anvil Golem",
+                        "media": "melvor:assets/media/monsters/stone_knight.png",
+                        "tags": ["construct", "humanoid"],
+                        "xp": 225,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 185 },
+                            { "id": "adventuring:defence", "value": 98 },
+                            { "id": "adventuring:agility", "value": 38 },
+                            { "id": "adventuring:strength", "value": 95 },
+                            { "id": "adventuring:ranged", "value": 35 },
+                            { "id": "adventuring:magic", "value": 45 },
+                            { "id": "adventuring:prayer", "value": 55 }
+                        ],
+                        "generator": "adventuring:hammer_strike",
+                        "spender": "adventuring:forge_slam",
+                        "passives": ["adventuring:forge_hardened"],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 38, "weight": 100 },
+                            { "id": "adventuring:parts", "qty": 5, "weight": 20 },
+                            { "id": "adventuring:living_metal", "qty": 2, "weight": 35 },
+                            { "id": "adventuring:forge_spark", "qty": 1, "weight": 18 }
+                        ]
+                    },
+                    {
+                        "id": "hammer_sentinel",
+                        "name": "Hammer Sentinel",
+                        "media": "melvor:assets/media/monsters/burning_chest.png",
+                        "tags": ["construct", "fire"],
+                        "xp": 240,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 172 },
+                            { "id": "adventuring:defence", "value": 82 },
+                            { "id": "adventuring:agility", "value": 62 },
+                            { "id": "adventuring:strength", "value": 98 },
+                            { "id": "adventuring:ranged", "value": 55 },
+                            { "id": "adventuring:magic", "value": 68 },
+                            { "id": "adventuring:prayer", "value": 60 }
+                        ],
+                        "generator": "adventuring:blazing_hammer",
+                        "spender": "adventuring:sentinel_judgment",
+                        "passives": [],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 42, "weight": 100 },
+                            { "id": "adventuring:parts", "qty": 5, "weight": 25 },
+                            { "id": "adventuring:primordial_coal", "qty": 3, "weight": 32 },
+                            { "id": "adventuring:creation_spark", "qty": 1, "weight": 20 }
+                        ]
+                    },
+                    {
+                        "id": "creation_elemental",
+                        "name": "Creation Elemental",
+                        "media": "melvor:assets/media/monsters/fire_elemental.png",
+                        "tags": ["elemental", "fire"],
+                        "xp": 260,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 195 },
+                            { "id": "adventuring:defence", "value": 78 },
+                            { "id": "adventuring:agility", "value": 72 },
+                            { "id": "adventuring:strength", "value": 88 },
+                            { "id": "adventuring:ranged", "value": 65 },
+                            { "id": "adventuring:magic", "value": 95 },
+                            { "id": "adventuring:prayer", "value": 70 }
+                        ],
+                        "generator": "adventuring:creation_flame",
+                        "spender": "adventuring:genesis_burst",
+                        "passives": ["adventuring:molten_blood"],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 45, "weight": 100 },
+                            { "id": "adventuring:parts", "qty": 5, "weight": 22 },
+                            { "id": "adventuring:forge_spark", "qty": 2, "weight": 35 },
+                            { "id": "adventuring:creation_spark", "qty": 2, "weight": 28 }
+                        ]
+                    },
+                    {
+                        "id": "forge_titan",
+                        "name": "Forge Titan",
+                        "media": "melvor:assets/media/monsters/fire_giant.png",
+                        "tags": ["giant", "fire", "construct"],
+                        "xp": 285,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 220 },
+                            { "id": "adventuring:defence", "value": 92 },
+                            { "id": "adventuring:agility", "value": 52 },
+                            { "id": "adventuring:strength", "value": 105 },
+                            { "id": "adventuring:ranged", "value": 58 },
+                            { "id": "adventuring:magic", "value": 78 },
+                            { "id": "adventuring:prayer", "value": 72 }
+                        ],
+                        "generator": "adventuring:titan_smash",
+                        "spender": "adventuring:volcanic_eruption",
+                        "passives": ["adventuring:forge_hardened"],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 50, "weight": 100 },
+                            { "id": "adventuring:parts", "qty": 6, "weight": 25 },
+                            { "id": "adventuring:living_metal", "qty": 3, "weight": 38 },
+                            { "id": "adventuring:creation_spark", "qty": 2, "weight": 30 }
+                        ]
+                    },
+                    {
+                        "id": "the_first_forgemaster",
+                        "name": "The First Forgemaster",
+                        "media": "melvor:assets/media/monsters/ragnar.png",
+                        "tags": ["giant", "fire", "boss"],
+                        "isBoss": true,
+                        "xp": 750,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 500 },
+                            { "id": "adventuring:defence", "value": 100 },
+                            { "id": "adventuring:agility", "value": 65 },
+                            { "id": "adventuring:strength", "value": 115 },
+                            { "id": "adventuring:ranged", "value": 70 },
+                            { "id": "adventuring:magic", "value": 95 },
+                            { "id": "adventuring:prayer", "value": 88 }
+                        ],
+                        "generator": "adventuring:primordial_hammer",
+                        "spender": "adventuring:worldforge",
+                        "passives": ["adventuring:creation_wrath", "adventuring:molten_blood"],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 150, "weight": 100 },
+                            { "id": "adventuring:big_parts", "qty": 5, "weight": 100 },
+                            { "id": "adventuring:primordial_coal", "qty": 20, "weight": 100 },
+                            { "id": "adventuring:living_metal", "qty": 10, "weight": 100 },
+                            { "id": "adventuring:creation_spark", "qty": 6, "weight": 85 },
+                            { "id": "adventuring:forgemasters_heart", "qty": 1, "weight": 100 }
+                        ]
+                    }
+                ],
+                "materials": [
+                    {
+                        "id": "primordial_coal",
+                        "name": "Primordial Coal",
+                        "media": "melvor:assets/media/bank/coal_ore.png",
+                        "category": "adventuring:monster_drops"
+                    },
+                    {
+                        "id": "living_metal",
+                        "name": "Living Metal",
+                        "media": "melvor:assets/media/bank/runite_bar.png",
+                        "category": "adventuring:monster_drops"
+                    },
+                    {
+                        "id": "forge_spark",
+                        "name": "Forge Spark",
+                        "media": "melvor:assets/media/bank/fire_rune.png",
+                        "category": "adventuring:monster_drops"
+                    },
+                    {
+                        "id": "creation_spark",
+                        "name": "Creation Spark",
+                        "media": "melvor:assets/media/bank/summoning_shard_red.png",
+                        "category": "adventuring:monster_drops"
+                    },
+                    {
+                        "id": "forgemasters_heart",
+                        "name": "Forgemaster's Heart",
+                        "media": "melvor:assets/media/bank/infernal_core.png",
+                        "category": "adventuring:boss_drops"
+                    }
+                ]
+            }
+        }]
+    }
+}

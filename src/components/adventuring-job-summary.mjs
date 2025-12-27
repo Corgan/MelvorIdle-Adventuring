@@ -18,10 +18,10 @@ export class AdventuringJobSummaryElement extends HTMLElement {
         this.job = job;
         this.styling.onclick = () => {
             if(this.selectorCharacter !== undefined && this.selectorType !== undefined) {
-                if(this.selectorType == 'combatJob') {
+                if(this.selectorType === 'combatJob') {
                     this.selectorCharacter.setCombatJob(this.job);
                 }
-                if(this.selectorType == 'passiveJob') {
+                if(this.selectorType === 'passiveJob') {
                     this.selectorCharacter.setPassiveJob(this.job);
                 }
 

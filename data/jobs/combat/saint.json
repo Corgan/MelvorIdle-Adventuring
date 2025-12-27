@@ -1,0 +1,299 @@
+{
+    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+    "namespace": "adventuring",
+    "data": {
+        "skillData": [{
+            "skillID": "adventuring:Adventuring",
+            "data": {
+                "jobs": [
+                    {
+                        "id": "saint",
+                        "tier": 5,
+                        "name": "Saint",
+                        "media": "melvor:assets/media/bank/potion_prayer_i.png#tint=gold",
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:priest", "level": 25 },
+                            { "type": "job_level", "job": "adventuring:cleric", "level": 30 }
+                        ],
+                        "isMilestoneReward": true,
+                        "allowedItems": [
+                            "adventuring:hat",
+                            "adventuring:robes",
+                            "adventuring:bottoms",
+                            "adventuring:mitts",
+                            "adventuring:slippers",
+                            "adventuring:amulet",
+                            "adventuring:ring",
+                            "adventuring:cape",
+                            "adventuring:staff",
+                            "adventuring:scepter",
+                            "adventuring:spellbook"
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:hitpoints", "value": 2.0 },
+                            { "id": "adventuring:defence", "value": 0.75 },
+                            { "id": "adventuring:agility", "value": 0.5 },
+                            { "id": "adventuring:prayer", "value": 3.0 }
+                        ]
+                    }
+                ],
+                "generators": [
+                    {
+                        "id": "divine_touch",
+                        "name": "Divine Touch",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:saint", "level": 1 }
+                        ],
+                        "energy": 26,
+                        "hits": [
+                            {
+                                "target": "lowest",
+                                "party": "ally",
+                                "effects": [
+                                    {
+                                        "type": "heal",
+                                        "amount": {
+                                            "base": 25,
+                                            "scaling": [
+                                                { "id": "adventuring:prayer", "value": 0.7 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:barrier",
+                                        "stacks": {
+                                            "base": 3,
+                                            "scaling": [
+                                                { "id": "adventuring:prayer", "value": 0.08 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "divine_luminance",
+                        "name": "Divine Luminance",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:saint", "level": 10 }
+                        ],
+                        "energy": 30,
+                        "hits": [
+                            {
+                                "target": "all",
+                                "party": "ally",
+                                "effects": [
+                                    {
+                                        "type": "heal",
+                                        "amount": {
+                                            "base": 15,
+                                            "scaling": [
+                                                { "id": "adventuring:prayer", "value": 0.45 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "purifying_light",
+                        "name": "Purifying Light",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:saint", "level": 20 }
+                        ],
+                        "energy": 28,
+                        "hits": [
+                            {
+                                "target": "lowest",
+                                "party": "ally",
+                                "effects": [
+                                    {
+                                        "type": "heal",
+                                        "amount": {
+                                            "base": 20,
+                                            "scaling": [
+                                                { "id": "adventuring:prayer", "value": 0.55 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "cleanse",
+                                        "count": 3
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "spenders": [
+                    {
+                        "id": "saints_grace",
+                        "name": "Saint's Grace",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:saint", "level": 5 }
+                        ],
+                        "cost": 90,
+                        "hits": [
+                            {
+                                "target": "lowest",
+                                "party": "ally",
+                                "effects": [
+                                    {
+                                        "type": "heal",
+                                        "amount": {
+                                            "base": 999,
+                                            "percentMax": true
+                                        }
+                                    },
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:regeneration",
+                                        "stacks": {
+                                            "base": 8,
+                                            "scaling": [
+                                                { "id": "adventuring:prayer", "value": 0.15 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "miracle_of_life",
+                        "name": "Miracle of Life",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:saint", "level": 15 }
+                        ],
+                        "cost": 100,
+                        "hits": [
+                            {
+                                "target": "dead",
+                                "party": "ally",
+                                "effects": [
+                                    {
+                                        "type": "revive",
+                                        "hpPercent": 0.5
+                                    }
+                                ]
+                            },
+                            {
+                                "target": "all",
+                                "party": "ally",
+                                "effects": [
+                                    {
+                                        "type": "heal",
+                                        "amount": {
+                                            "base": 30,
+                                            "scaling": [
+                                                { "id": "adventuring:prayer", "value": 0.6 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "hallowed_refuge",
+                        "name": "Hallowed Refuge",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:saint", "level": 25 }
+                        ],
+                        "cost": 100,
+                        "hits": [
+                            {
+                                "target": "all",
+                                "party": "ally",
+                                "effects": [
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:barrier",
+                                        "stacks": {
+                                            "base": 6,
+                                            "scaling": [
+                                                { "id": "adventuring:prayer", "value": 0.12 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:regeneration",
+                                        "stacks": {
+                                            "base": 5,
+                                            "scaling": [
+                                                { "id": "adventuring:prayer", "value": 0.1 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:immunity",
+                                        "stacks": {
+                                            "base": 3,
+                                            "scaling": [
+                                                { "id": "adventuring:prayer", "value": 0.06 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "passives": [
+                    {
+                        "id": "blessed_aura",
+                        "name": "Blessed Aura",
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:saint", "level": 8 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "encounter_start",
+                                "type": "buff",
+                                "id": "adventuring:regeneration",
+                                "target": "all_allies",
+                                "stacks": 2
+                            }
+                        ]
+                    },
+                    {
+                        "id": "blessed_aegis",
+                        "name": "Blessed Aegis",
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:saint", "level": 18 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "ally_death",
+                                "type": "prevent_death",
+                                "healPercent": 0.25,
+                                "oncePerEncounter": true
+                            }
+                        ]
+                    },
+                    {
+                        "id": "grace_of_light",
+                        "name": "Grace of Light",
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:saint", "level": 28 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "on_heal",
+                                "type": "buff",
+                                "id": "adventuring:barrier",
+                                "target": "heal_target",
+                                "stacks": 2
+                            }
+                        ]
+                    }
+                ]
+            }
+        }]
+    }
+}

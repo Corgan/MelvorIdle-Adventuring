@@ -9,14 +9,14 @@
                     {
                         "id": "smithing",
                         "name": "Smithing",
-                        "media": "melvor:assets/media/skills/smithing/smithing.svg"
+                        "media": "melvor:assets/media/bank/potion_smithing_i.png"
                     }
                 ],
                 "jobs": [
                     {
                         "id": "smith",
                         "name": "Smith",
-                        "media": "melvor:assets/media/skills/smithing/smithing.svg",
+                        "media": "melvor:assets/media/bank/potion_smithing_i.png",
                         "requirements": [
                             { "type": "skill_level", "level": 5 }
                         ],
@@ -29,9 +29,40 @@
                 ],
                 "materials": [
                     {
-                        "id": "unknown_bar",
-                        "name": "Unknown Bar",
-                        "media": "melvor:assets/media/bank/steel_bar.png"
+                        "id": "crude_bar",
+                        "name": "Crude Bar",
+                        "media": "melvor:assets/media/bank/steel_bar.png",
+                        "category": "adventuring:salvage"
+                    },
+                    {
+                        "id": "refined_bar",
+                        "name": "Refined Bar",
+                        "media": "melvor:assets/media/bank/gold_bar.png",
+                        "tier": 2,
+                        "category": "adventuring:salvage",
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:master_smith", "level": 1 }
+                        ]
+                    },
+                    {
+                        "id": "immaculate_bar",
+                        "name": "Immaculate Bar",
+                        "media": "melvor:assets/media/bank/dragonite_bar.png",
+                        "tier": 3,
+                        "category": "adventuring:salvage",
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:grandmaster_smith", "level": 1 }
+                        ]
+                    },
+                    {
+                        "id": "transcendent_bar",
+                        "name": "Transcendent Bar",
+                        "media": "melvor:assets/media/bank/logs_elderwood.png",
+                        "tier": 4,
+                        "category": "adventuring:salvage",
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:legendary_smith", "level": 1 }
+                        ]
                     }
                 ],
                 "buildings": [
@@ -39,13 +70,21 @@
                         "id": "forge",
                         "type": "workshop",
                         "name": "Forge",
-                        "description": "Create work orders for Smiths. Converts Unknown Bars to complete orders.",
-                        "media": "melvor:assets/media/skills/township/Blacksmiths_Smithy.svg",
+                        "description": "Smelt ore into metal bars. Smiths craft equipment components and battle oils.",
+                        "media": "melvor:assets/media/skills/township/Blacksmiths_Smithy.png",
                         "requirements": [],
                         "idle": ["Playing with fire", "Bugging the Smiths"],
                         "actions": ["adventuring:work"],
                         "products": [
-                            "adventuring:bronze_bar"
+                            "adventuring:bronze_bar",
+                            "adventuring:iron_bar",
+                            "adventuring:steel_bar",
+                            "adventuring:mithril_bar",
+                            "adventuring:adamantite_bar",
+                            "adventuring:runite_bar",
+                            "adventuring:dragonite_bar",
+                            "adventuring:tempered_shield",
+                            "adventuring:battle_oil"
                         ]
                     }
                 ],
@@ -53,20 +92,409 @@
                     {
                         "id": "bronze_bar",
                         "item": "melvorD:Bronze_Bar",
+                        "outputType": "item",
                         "count": 1,
                         "requirements": [
                             { "type": "current_job", "job": "adventuring:smith" },
                             { "type": "job_level", "job": "adventuring:smith", "level": 1 }
                         ],
                         "materials": [
-                            { "id": "adventuring:unknown_ore", "count": 1 }
+                            { "id": "adventuring:crude_bar", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "iron_bar",
+                        "item": "melvorD:Iron_Bar",
+                        "outputType": "item",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:smith" },
+                            { "type": "job_level", "job": "adventuring:smith", "level": 5 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_bar", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "steel_bar",
+                        "item": "melvorD:Steel_Bar",
+                        "outputType": "item",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:smith" },
+                            { "type": "job_level", "job": "adventuring:smith", "level": 10 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_bar", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "mithril_bar",
+                        "item": "melvorD:Mithril_Bar",
+                        "outputType": "item",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:smith" },
+                            { "type": "job_level", "job": "adventuring:smith", "level": 20 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_bar", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "adamantite_bar",
+                        "item": "melvorD:Adamantite_Bar",
+                        "outputType": "item",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:smith" },
+                            { "type": "job_level", "job": "adventuring:smith", "level": 30 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_bar", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "runite_bar",
+                        "item": "melvorD:Runite_Bar",
+                        "outputType": "item",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:smith" },
+                            { "type": "job_level", "job": "adventuring:smith", "level": 40 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_bar", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "dragonite_bar",
+                        "item": "melvorD:Dragonite_Bar",
+                        "outputType": "item",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:smith" },
+                            { "type": "job_level", "job": "adventuring:smith", "level": 50 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_bar", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "tempered_shield",
+                        "consumable": "adventuring:tempered_shield",
+                        "outputType": "consumable",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:smith" },
+                            { "type": "job_level", "job": "adventuring:smith", "level": 15 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_bar", "count": 3 }
+                        ]
+                    },
+                    {
+                        "id": "battle_oil",
+                        "consumable": "adventuring:battle_oil",
+                        "outputType": "consumable",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:smith" },
+                            { "type": "job_level", "job": "adventuring:smith", "level": 20 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_bar", "count": 2 }
+                        ]
+                    },
+                    {
+                        "id": "convert_crude_bar_to_refined",
+                        "material": "adventuring:refined_bar",
+                        "outputType": "material",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:master_smith", "level": 10 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_bar", "count": 5 }
+                        ]
+                    },
+                    {
+                        "id": "convert_refined_bar_to_immaculate",
+                        "material": "adventuring:immaculate_bar",
+                        "outputType": "material",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:grandmaster_smith", "level": 10 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:refined_bar", "count": 5 }
+                        ]
+                    },
+                    {
+                        "id": "convert_immaculate_bar_to_transcendent",
+                        "material": "adventuring:transcendent_bar",
+                        "outputType": "material",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:legendary_smith", "level": 10 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:immaculate_bar", "count": 5 }
+                        ]
+                    },
+                    {
+                        "id": "refined_bronze_bar",
+                        "item": "melvorD:Bronze_Bar",
+                        "outputType": "item",
+                        "count": 3,
+                        "requirements": [
+                            { "type": "skill_level", "level": 25 },
+                            { "type": "current_job", "job": "adventuring:master_smith" },
+                            { "type": "job_level", "job": "adventuring:master_smith", "level": 1 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:refined_bar", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "refined_iron_bar",
+                        "item": "melvorD:Iron_Bar",
+                        "outputType": "item",
+                        "count": 3,
+                        "requirements": [
+                            { "type": "skill_level", "level": 25 },
+                            { "type": "current_job", "job": "adventuring:master_smith" },
+                            { "type": "job_level", "job": "adventuring:master_smith", "level": 5 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:refined_bar", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "refined_steel_bar",
+                        "item": "melvorD:Steel_Bar",
+                        "outputType": "item",
+                        "count": 3,
+                        "requirements": [
+                            { "type": "skill_level", "level": 25 },
+                            { "type": "current_job", "job": "adventuring:master_smith" },
+                            { "type": "job_level", "job": "adventuring:master_smith", "level": 10 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:refined_bar", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "refined_mithril_bar",
+                        "item": "melvorD:Mithril_Bar",
+                        "outputType": "item",
+                        "count": 3,
+                        "requirements": [
+                            { "type": "skill_level", "level": 25 },
+                            { "type": "current_job", "job": "adventuring:master_smith" },
+                            { "type": "job_level", "job": "adventuring:master_smith", "level": 15 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:refined_bar", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "refined_adamantite_bar",
+                        "item": "melvorD:Adamantite_Bar",
+                        "outputType": "item",
+                        "count": 3,
+                        "requirements": [
+                            { "type": "skill_level", "level": 25 },
+                            { "type": "current_job", "job": "adventuring:master_smith" },
+                            { "type": "job_level", "job": "adventuring:master_smith", "level": 20 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:refined_bar", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "refined_runite_bar",
+                        "item": "melvorD:Runite_Bar",
+                        "outputType": "item",
+                        "count": 3,
+                        "requirements": [
+                            { "type": "skill_level", "level": 25 },
+                            { "type": "current_job", "job": "adventuring:master_smith" },
+                            { "type": "job_level", "job": "adventuring:master_smith", "level": 25 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:refined_bar", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "refined_dragonite_bar",
+                        "item": "melvorD:Dragonite_Bar",
+                        "outputType": "item",
+                        "count": 3,
+                        "requirements": [
+                            { "type": "skill_level", "level": 25 },
+                            { "type": "current_job", "job": "adventuring:master_smith" },
+                            { "type": "job_level", "job": "adventuring:master_smith", "level": 30 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:refined_bar", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "immaculate_mithril_bar",
+                        "item": "melvorD:Mithril_Bar",
+                        "outputType": "item",
+                        "count": 8,
+                        "requirements": [
+                            { "type": "skill_level", "level": 50 },
+                            { "type": "current_job", "job": "adventuring:grandmaster_smith" },
+                            { "type": "job_level", "job": "adventuring:grandmaster_smith", "level": 1 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:immaculate_bar", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "immaculate_adamantite_bar",
+                        "item": "melvorD:Adamantite_Bar",
+                        "outputType": "item",
+                        "count": 8,
+                        "requirements": [
+                            { "type": "skill_level", "level": 50 },
+                            { "type": "current_job", "job": "adventuring:grandmaster_smith" },
+                            { "type": "job_level", "job": "adventuring:grandmaster_smith", "level": 10 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:immaculate_bar", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "immaculate_runite_bar",
+                        "item": "melvorD:Runite_Bar",
+                        "outputType": "item",
+                        "count": 8,
+                        "requirements": [
+                            { "type": "skill_level", "level": 50 },
+                            { "type": "current_job", "job": "adventuring:grandmaster_smith" },
+                            { "type": "job_level", "job": "adventuring:grandmaster_smith", "level": 20 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:immaculate_bar", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "immaculate_dragonite_bar",
+                        "item": "melvorD:Dragonite_Bar",
+                        "outputType": "item",
+                        "count": 8,
+                        "requirements": [
+                            { "type": "skill_level", "level": 50 },
+                            { "type": "current_job", "job": "adventuring:grandmaster_smith" },
+                            { "type": "job_level", "job": "adventuring:grandmaster_smith", "level": 30 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:immaculate_bar", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "transcendent_runite_bar",
+                        "item": "melvorD:Runite_Bar",
+                        "outputType": "item",
+                        "count": 20,
+                        "requirements": [
+                            { "type": "skill_level", "level": 75 },
+                            { "type": "current_job", "job": "adventuring:legendary_smith" },
+                            { "type": "job_level", "job": "adventuring:legendary_smith", "level": 1 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:transcendent_bar", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "transcendent_dragonite_bar",
+                        "item": "melvorD:Dragonite_Bar",
+                        "outputType": "item",
+                        "count": 20,
+                        "requirements": [
+                            { "type": "skill_level", "level": 75 },
+                            { "type": "current_job", "job": "adventuring:legendary_smith" },
+                            { "type": "job_level", "job": "adventuring:legendary_smith", "level": 15 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:transcendent_bar", "count": 1 }
                         ]
                     }
                 ],
                 "tiles": [
-                    
+                    {
+                        "id": "scrap_pile",
+                        "name": "Scrap Pile",
+                        "media": "melvor:assets/media/bank/potion_smithing_i.png",
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:smith" }
+                        ],
+                        "weight": 10,
+                        "floor_max": 1,
+                        "dungeon_max": 1,
+                        "effects": [
+                            { "type": "xp", "amount": 30, "job": "adventuring:smith" },
+                            {
+                                "type": "loot",
+                                "pool": [
+                                    { "id": "adventuring:crude_bar", "qty": 1, "weight": 100 }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "master_forge",
+                        "name": "Master Forge",
+                        "media": "melvor:assets/media/bank/potion_smithing_i.png",
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:master_smith", "level": 1 }
+                        ],
+                        "weight": 8,
+                        "floor_max": 1,
+                        "dungeon_max": 2,
+                        "effects": [
+                            { "type": "xp", "amount": 100, "job": "adventuring:smith" },
+                            { "type": "xp", "amount": 50, "job": "adventuring:master_smith" },
+                            {
+                                "type": "loot",
+                                "pool": [
+                                    { "id": "adventuring:crude_bar", "qty": 3, "weight": 60 },
+                                    { "id": "adventuring:refined_bar", "qty": 2, "weight": 35 },
+                                    { "id": "adventuring:immaculate_bar", "qty": 1, "weight": 5 }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "legendary_forge",
+                        "name": "Legendary Forge",
+                        "media": "melvor:assets/media/bank/potion_smithing_i.png",
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:legendary_smith", "level": 1 }
+                        ],
+                        "weight": 3,
+                        "floor_max": 1,
+                        "dungeon_max": 1,
+                        "effects": [
+                            { "type": "xp", "amount": 250, "job": "adventuring:legendary_smith" },
+                            { "type": "xp", "amount": 100, "job": "adventuring:grandmaster_smith" },
+                            {
+                                "type": "loot",
+                                "pool": [
+                                    { "id": "adventuring:refined_bar", "qty": 3, "weight": 40 },
+                                    { "id": "adventuring:immaculate_bar", "qty": 2, "weight": 40 },
+                                    { "id": "adventuring:transcendent_bar", "qty": 1, "weight": 20 }
+                                ]
+                            }
+                        ]
+                    }
                 ]
             }
         }]
     }
 }
+

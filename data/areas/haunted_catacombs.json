@@ -1,0 +1,669 @@
+{
+    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+    "namespace": "adventuring",
+    "data": {
+        "skillData": [{
+            "skillID": "adventuring:Adventuring",
+            "data": {
+                "passives": [
+                    {
+                        "id": "spectral_wail",
+                        "name": "Spectral Wail",
+                        "effects": [
+                            {
+                                "trigger": "round_start",
+                                "type": "debuff",
+                                "target": "all_enemies",
+                                "debuff": "adventuring:weaken",
+                                "stacks": { "base": 2, "scaling": [] }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "soul_drain",
+                        "name": "Soul Drain",
+                        "effects": [
+                            {
+                                "trigger": "turn_start",
+                                "type": "heal",
+                                "target": "self",
+                                "amount": { "base": 5, "scaling": [] }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "death_aura",
+                        "name": "Death Aura",
+                        "effects": [
+                            {
+                                "trigger": "encounter_start",
+                                "type": "debuff",
+                                "target": "all_enemies",
+                                "debuff": "adventuring:curse",
+                                "stacks": { "base": 3, "scaling": [] }
+                            }
+                        ]
+                    }
+                ],
+                "areas": [
+                    {
+                        "id": "haunted_catacombs",
+                        "name": "Haunted Catacombs",
+                        "media": "melvor:assets/media/bank/potion_prayer_i.png#tint=gray",
+                        "requirements": [
+                            { "type": "skill_level", "level": 52 }
+                        ],
+                        "height": 10,
+                        "width": 7,
+                        "floors": [
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:restless_spirit", "weight": 60 },
+                                    { "id": "adventuring:skeletal_warrior", "weight": 40 }
+                                ],
+                                "exit": ["adventuring:restless_spirit", "adventuring:restless_spirit", "adventuring:skeletal_warrior"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:restless_spirit", "weight": 40 },
+                                    { "id": "adventuring:skeletal_warrior", "weight": 40 },
+                                    { "id": "adventuring:wraith", "weight": 20 }
+                                ],
+                                "exit": ["adventuring:restless_spirit", "adventuring:skeletal_warrior", "adventuring:wraith"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:skeletal_warrior", "weight": 30 },
+                                    { "id": "adventuring:wraith", "weight": 40 },
+                                    { "id": "adventuring:banshee", "weight": 30 }
+                                ],
+                                "exit": ["adventuring:skeletal_warrior", "adventuring:wraith", "adventuring:banshee"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:wraith", "weight": 30 },
+                                    { "id": "adventuring:banshee", "weight": 40 },
+                                    { "id": "adventuring:skeletal_mage", "weight": 30 }
+                                ],
+                                "exit": ["adventuring:wraith", "adventuring:banshee", "adventuring:skeletal_mage"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:banshee", "weight": 30 },
+                                    { "id": "adventuring:skeletal_mage", "weight": 40 },
+                                    { "id": "adventuring:grave_warden", "weight": 30 }
+                                ],
+                                "exit": ["adventuring:banshee", "adventuring:skeletal_mage", "adventuring:grave_warden"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:skeletal_mage", "weight": 30 },
+                                    { "id": "adventuring:grave_warden", "weight": 50 },
+                                    { "id": "adventuring:revenant", "weight": 20 }
+                                ],
+                                "exit": ["adventuring:skeletal_mage", "adventuring:grave_warden", "adventuring:revenant"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:grave_warden", "weight": 40 },
+                                    { "id": "adventuring:revenant", "weight": 60 }
+                                ],
+                                "exit": ["adventuring:grave_warden", "adventuring:revenant", "adventuring:death_knight"]
+                            }
+                        ]
+                    }
+                ],
+                "monsters": [
+                    {
+                        "id": "restless_spirit",
+                        "name": "Restless Spirit",
+                        "media": "melvor:assets/media/monsters/ghost.png",
+                        "tags": ["undead", "flying"],
+                        "xp": 85,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 75 },
+                            { "id": "adventuring:defence", "value": 42 },
+                            { "id": "adventuring:agility", "value": 52 },
+                            { "id": "adventuring:strength", "value": 38 },
+                            { "id": "adventuring:ranged", "value": 40 },
+                            { "id": "adventuring:magic", "value": 50 },
+                            { "id": "adventuring:prayer", "value": 45 }
+                        ],
+                        "generator": "adventuring:frost_touch",
+                        "spender": "adventuring:shadow_bolt",
+                        "passives": [],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 8, "weight": 100 },
+                            { "id": "adventuring:parts", "qty": 2, "weight": 15 },
+                            { "id": "adventuring:spectral_essence", "qty": 1, "weight": 35 }
+                        ]
+                    },
+                    {
+                        "id": "skeletal_warrior",
+                        "name": "Skeletal Warrior",
+                        "media": "melvor:assets/media/monsters/skeleton.png",
+                        "tags": ["undead"],
+                        "xp": 90,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 85 },
+                            { "id": "adventuring:defence", "value": 55 },
+                            { "id": "adventuring:agility", "value": 40 },
+                            { "id": "adventuring:strength", "value": 58 },
+                            { "id": "adventuring:ranged", "value": 35 },
+                            { "id": "adventuring:magic", "value": 30 },
+                            { "id": "adventuring:prayer", "value": 35 }
+                        ],
+                        "generator": "adventuring:slash",
+                        "spender": "adventuring:execute",
+                        "passives": [],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 9, "weight": 100 },
+                            { "id": "adventuring:parts", "qty": 2, "weight": 15 },
+                            { "id": "adventuring:bone_fragment", "qty": 3, "weight": 40 },
+                            { "id": "adventuring:spectral_essence", "qty": 1, "weight": 25 }
+                        ]
+                    },
+                    {
+                        "id": "wraith",
+                        "name": "Wraith",
+                        "media": "melvor:assets/media/monsters/fearful_eye.png",
+                        "tags": ["undead", "flying"],
+                        "xp": 100,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 70 },
+                            { "id": "adventuring:defence", "value": 38 },
+                            { "id": "adventuring:agility", "value": 60 },
+                            { "id": "adventuring:strength", "value": 35 },
+                            { "id": "adventuring:ranged", "value": 45 },
+                            { "id": "adventuring:magic", "value": 62 },
+                            { "id": "adventuring:prayer", "value": 55 }
+                        ],
+                        "generator": "adventuring:shadow_bolt",
+                        "spender": "adventuring:soul_rend",
+                        "passives": ["adventuring:spectral_wail"],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 12, "weight": 100 },
+                            { "id": "adventuring:parts", "qty": 2, "weight": 12 },
+                            { "id": "adventuring:spectral_essence", "qty": 2, "weight": 45 }
+                        ]
+                    },
+                    {
+                        "id": "banshee",
+                        "name": "Banshee",
+                        "media": "melvor:assets/media/monsters/banshee.png",
+                        "tags": ["undead", "flying", "mage"],
+                        "xp": 105,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 65 },
+                            { "id": "adventuring:defence", "value": 35 },
+                            { "id": "adventuring:agility", "value": 55 },
+                            { "id": "adventuring:strength", "value": 30 },
+                            { "id": "adventuring:ranged", "value": 40 },
+                            { "id": "adventuring:magic", "value": 68 },
+                            { "id": "adventuring:prayer", "value": 50 }
+                        ],
+                        "generator": "adventuring:screech",
+                        "spender": "adventuring:wailing_death",
+                        "passives": [],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 14, "weight": 100 },
+                            { "id": "adventuring:parts", "qty": 2, "weight": 10 },
+                            { "id": "adventuring:spectral_essence", "qty": 2, "weight": 50 }
+                        ]
+                    },
+                    {
+                        "id": "skeletal_mage",
+                        "name": "Skeletal Mage",
+                        "media": "melvor:assets/media/monsters/necromancer.png",
+                        "tags": ["undead", "mage"],
+                        "xp": 110,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 70 },
+                            { "id": "adventuring:defence", "value": 40 },
+                            { "id": "adventuring:agility", "value": 45 },
+                            { "id": "adventuring:strength", "value": 32 },
+                            { "id": "adventuring:ranged", "value": 38 },
+                            { "id": "adventuring:magic", "value": 72 },
+                            { "id": "adventuring:prayer", "value": 60 }
+                        ],
+                        "generator": "adventuring:shadow_bolt",
+                        "spender": "adventuring:necrotic_blast",
+                        "passives": ["adventuring:soul_drain"],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 15, "weight": 100 },
+                            { "id": "adventuring:parts", "qty": 2, "weight": 10 },
+                            { "id": "adventuring:arcane_dust", "qty": 2, "weight": 30 },
+                            { "id": "adventuring:spectral_essence", "qty": 2, "weight": 40 }
+                        ]
+                    },
+                    {
+                        "id": "grave_warden",
+                        "name": "Grave Warden",
+                        "media": "melvor:assets/media/monsters/grave_warden.png",
+                        "tags": ["undead"],
+                        "xp": 115,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 110 },
+                            { "id": "adventuring:defence", "value": 65 },
+                            { "id": "adventuring:agility", "value": 38 },
+                            { "id": "adventuring:strength", "value": 62 },
+                            { "id": "adventuring:ranged", "value": 40 },
+                            { "id": "adventuring:magic", "value": 45 },
+                            { "id": "adventuring:prayer", "value": 55 }
+                        ],
+                        "generator": "adventuring:grave_smash",
+                        "spender": "adventuring:gravedigger",
+                        "passives": [],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 16, "weight": 100 },
+                            { "id": "adventuring:big_parts", "qty": 1, "weight": 15 },
+                            { "id": "adventuring:spectral_essence", "qty": 3, "weight": 45 }
+                        ]
+                    },
+                    {
+                        "id": "revenant",
+                        "name": "Revenant",
+                        "media": "melvor:assets/media/monsters/revenant.png",
+                        "tags": ["undead"],
+                        "xp": 125,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 130 },
+                            { "id": "adventuring:defence", "value": 58 },
+                            { "id": "adventuring:agility", "value": 50 },
+                            { "id": "adventuring:strength", "value": 70 },
+                            { "id": "adventuring:ranged", "value": 55 },
+                            { "id": "adventuring:magic", "value": 55 },
+                            { "id": "adventuring:prayer", "value": 60 }
+                        ],
+                        "generator": "adventuring:vengeful_strike",
+                        "spender": "adventuring:undying_fury",
+                        "passives": ["adventuring:undead_fortitude"],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 18, "weight": 100 },
+                            { "id": "adventuring:big_parts", "qty": 1, "weight": 18 },
+                            { "id": "adventuring:spectral_essence", "qty": 3, "weight": 50 }
+                        ]
+                    },
+                    {
+                        "id": "death_knight",
+                        "name": "Death Knight",
+                        "media": "melvor:assets/media/monsters/cursed_zombie.png",
+                        "tags": ["undead", "boss", "knight"],
+                        "isBoss": true,
+                        "xp": 350,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 450 },
+                            { "id": "adventuring:defence", "value": 85 },
+                            { "id": "adventuring:agility", "value": 55 },
+                            { "id": "adventuring:strength", "value": 95 },
+                            { "id": "adventuring:ranged", "value": 60 },
+                            { "id": "adventuring:magic", "value": 75 },
+                            { "id": "adventuring:prayer", "value": 80 }
+                        ],
+                        "generator": "adventuring:death_strike",
+                        "spender": "adventuring:soul_reaper",
+                        "passives": ["adventuring:death_aura", "adventuring:undead_fortitude"],
+                        "phases": [
+                            {
+                                "threshold": 0.5,
+                                "statMultipliers": { "strength": 1.3 },
+                                "healPercent": 0.1
+                            }
+                        ],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 100, "weight": 100 },
+                            { "id": "adventuring:big_parts", "qty": 3, "weight": 40 },
+                            { "id": "adventuring:spectral_essence", "qty": 8, "weight": 80 },
+                            { "id": "adventuring:death_knights_sigil", "qty": 1, "weight": 5 }
+                        ]
+                    }
+                ],
+                "materials": [
+                    {
+                        "id": "spectral_essence",
+                        "name": "Spectral Essence",
+                        "media": "melvor:assets/media/bank/soul_points.png",
+                        "category": "adventuring:monster_drops"
+                    }
+                ],
+                "generators": [
+                    {
+                        "id": "frost_touch",
+                        "name": "Frost Touch",
+                        "isEnemy": true,
+                        "requirements": [],
+                        "energy": 20,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 12,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 0.25 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:chill",
+                                        "stacks": {
+                                            "base": 2,
+                                            "scaling": []
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "screech",
+                        "name": "Screech",
+                        "isEnemy": true,
+                        "requirements": [],
+                        "energy": 25,
+                        "hits": [
+                            {
+                                "target": "all",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 8,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 0.2 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:fear",
+                                        "stacks": {
+                                            "base": 1,
+                                            "scaling": []
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "grave_smash",
+                        "name": "Grave Smash",
+                        "isEnemy": true,
+                        "requirements": [],
+                        "energy": 20,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 18,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.35 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "vengeful_strike",
+                        "name": "Vengeful Strike",
+                        "isEnemy": true,
+                        "requirements": [],
+                        "energy": 20,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 15,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.3 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "death_strike",
+                        "name": "Death Strike",
+                        "isEnemy": true,
+                        "requirements": [],
+                        "energy": 25,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 25,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.4 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:curse",
+                                        "stacks": {
+                                            "base": 2,
+                                            "scaling": []
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "spenders": [
+                    {
+                        "id": "wailing_death",
+                        "name": "Wailing Death",
+                        "isEnemy": true,
+                        "requirements": [],
+                        "cost": 80,
+                        "hits": [
+                            {
+                                "target": "all",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 20,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 0.3 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:fear",
+                                        "stacks": {
+                                            "base": 2,
+                                            "scaling": []
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "necrotic_blast",
+                        "name": "Necrotic Blast",
+                        "isEnemy": true,
+                        "requirements": [],
+                        "cost": 80,
+                        "hits": [
+                            {
+                                "target": "all",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 15,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 0.35 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:poison",
+                                        "stacks": {
+                                            "base": 3,
+                                            "scaling": []
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "gravedigger",
+                        "name": "Gravedigger",
+                        "isEnemy": true,
+                        "requirements": [],
+                        "cost": 100,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 45,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.5 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "undying_fury",
+                        "name": "Undying Fury",
+                        "isEnemy": true,
+                        "requirements": [],
+                        "cost": 100,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 30,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.4 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "target": "self",
+                                "party": "ally",
+                                "effects": [
+                                    {
+                                        "type": "heal",
+                                        "amount": {
+                                            "base": 30,
+                                            "scaling": [
+                                                { "id": "adventuring:prayer", "value": 0.3 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "soul_reaper",
+                        "name": "Soul Reaper",
+                        "isEnemy": true,
+                        "requirements": [],
+                        "cost": 100,
+                        "hits": [
+                            {
+                                "target": "all",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 35,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.45 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:curse",
+                                        "stacks": {
+                                            "base": 3,
+                                            "scaling": []
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:weaken",
+                                        "stacks": {
+                                            "base": 4,
+                                            "scaling": []
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "uniqueItems": [
+                    {
+                        "id": "death_knights_sigil",
+                        "name": "Death Knight's Sigil",
+                        "media": "melvor:assets/media/bank/cursed_amulet.png",
+                        "slot": "adventuring:amulet",
+                        "stats": [
+                            { "id": "adventuring:strength", "value": 8 },
+                            { "id": "adventuring:magic", "value": 8 },
+                            { "id": "adventuring:hitpoints", "value": 15 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "on_kill",
+                                "type": "debuff",
+                                "target": "all_enemies",
+                                "debuff": "adventuring:curse",
+                                "stacks": 2
+                            }
+                        ]
+                    }
+                ]
+            }
+        }]
+    }
+}

@@ -12,8 +12,8 @@ export class AdventuringJobDetailsElement extends AdventuringSubpageElement {
         this.icon = getElementFromFragment(this._content, 'icon', 'img');
         this.scaling = getElementFromFragment(this._content, 'scaling', 'div');
         this.equipable = getElementFromFragment(this._content, 'equipable', 'div');
-        this.generators = getElementFromFragment(this._content, 'generators', 'div');
-        this.spenders = getElementFromFragment(this._content, 'spenders', 'div');
+        this.abilitiesSection = getElementFromFragment(this._content, 'abilities-section', 'div');
+        this.abilitiesList = getElementFromFragment(this._content, 'abilities-list', 'div');
     }
 }
 window.customElements.define('adventuring-job-details', AdventuringJobDetailsElement);

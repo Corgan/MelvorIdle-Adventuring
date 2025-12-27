@@ -1,6 +1,7 @@
 const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringMaterialElement } = await loadModule('src/components/adventuring-material.mjs');
+const { TooltipBuilder } = await loadModule('src/adventuring-tooltip.mjs');
 
 const { AdventuringWeightedTable } = await loadModule('src/adventuring-utils.mjs');
 
@@ -9,12 +10,14 @@ class AdventuringMaterialRenderQueue {
         this.name = false;
         this.icon = false;
         this.count = false;
+        this.newBadge = false;
     }
 
     updateAll() {
         this.name = true;
         this.icon = true;
         this.count = true;
+        this.newBadge = true;
     }
 }
 
@@ -29,6 +32,9 @@ export class AdventuringMaterial extends NamespacedObject {
 
         this._name = data.name;
         this._media = data.media;
+        this.isCurrency = data.isCurrency === true;
+        this._categoryID = data.category; // Store raw ID for postDataRegistration lookup
+        this.tier = data.tier; // Optional tier (1=crude, 2=refined, 3=immaculate, 4=transcendent)
     }
 
     get name() {
@@ -36,7 +42,7 @@ export class AdventuringMaterial extends NamespacedObject {
     }
 
     get media() {
-        return this.unlocked ? this.getMediaURL(this._media) : this.getMediaURL('melvor:assets/media/main/question.svg');
+        return this.unlocked ? this.getMediaURL(this._media) : this.getMediaURL('melvor:assets/media/main/question.png');
     }
 
     get count() {
@@ -56,7 +62,14 @@ export class AdventuringMaterial extends NamespacedObject {
     }
 
     postDataRegistration() {
-        
+        if (this._categoryID) {
+            this.category = this.manager.materialCategories.getObjectByID(this._categoryID);
+            if (!this.category) {
+                console.warn(`Material ${this.id} has unknown category: ${this._categoryID}`);
+            }
+        }
+        // Register with stash for tracking and UI mounting
+        this.manager.stash.registerMaterial(this);
     }
 
     onLoad() {
@@ -69,13 +82,24 @@ export class AdventuringMaterial extends NamespacedObject {
         this.renderTooltip();
         this.renderIcon();
         this.renderCount();
+        this.renderNewBadge();
+    }
+
+    get tooltip() {
+        if(this.unlocked) {
+            return TooltipBuilder.forMaterial(this).build();
+        }
+        return TooltipBuilder.create().header(this.name, this.media).build();
     }
 
     renderTooltip() {
         if(!this.renderQueue.name)
             return;
 
-        this.component.tooltip.setContent(this.name);
+        if(this.component.tooltip === undefined)
+            return;
+        
+        this.component.tooltip.setContent(this.tooltip);
 
         this.renderQueue.name = false;
     }
@@ -97,5 +121,16 @@ export class AdventuringMaterial extends NamespacedObject {
         this.component.count.textContent = this.count;
 
         this.renderQueue.count = false;
+    }
+
+    renderNewBadge() {
+        if(!this.renderQueue.newBadge)
+            return;
+        
+        let isNew = this.unlocked && !this.manager.stash.seenMaterials.has(this.id);
+        if(this.component.newBadge !== undefined)
+            this.component.newBadge.classList.toggle('d-none', !isNew);
+        
+        this.renderQueue.newBadge = false;
     }
 }

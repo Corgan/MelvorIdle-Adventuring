@@ -16,6 +16,21 @@ class AdventuringParty {
         return [this.front, this.center, this.back];
     }
 
+    /** Get all alive party members */
+    get alive() {
+        return this.all.filter(member => !member.dead);
+    }
+
+    /** Get all dead party members */
+    get dead() {
+        return this.all.filter(member => member.dead);
+    }
+
+    /** Set locked state for all party members */
+    setAllLocked(locked) {
+        this.all.forEach(member => member.setLocked(locked));
+    }
+
     onLoad() {
         this.all.forEach(member => member.onLoad());
     }
@@ -41,6 +56,14 @@ class AdventuringParty {
         this.back.decode(reader, version);
         this.center.decode(reader, version);
         this.front.decode(reader, version);
+    }
+
+    getErrorLog() {
+        let log = `Party:\n`;
+        this.all.forEach((member, i) => {
+            log += `  [${i}] ${member.name}: HP=${member.hitpoints}/${member.maxHitpoints}, Energy=${member.energy}/${member.maxEnergy}, Dead=${member.dead}\n`;
+        });
+        return log;
     }
 }
 

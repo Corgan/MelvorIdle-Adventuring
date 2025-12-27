@@ -1,0 +1,397 @@
+{
+    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+    "namespace": "adventuring",
+    "data": {
+        "skillData": [{
+            "skillID": "adventuring:Adventuring",
+            "data": {
+                "passives": [
+                    {
+                        "id": "venomous_aura",
+                        "name": "Venomous Aura",
+                        "effects": [
+                            {
+                                "trigger": "round_start",
+                                "type": "debuff",
+                                "id": "adventuring:poison",
+                                "target": "all_enemies",
+                                "amount": { "base": 3, "scaling": [] },
+                                "stacks": { "base": 1, "scaling": [] }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "web_spinner",
+                        "name": "Web Spinner",
+                        "effects": [
+                            {
+                                "trigger": "encounter_start",
+                                "type": "debuff",
+                                "id": "adventuring:slow",
+                                "target": "random_enemy",
+                                "amount": { "base": 0.2, "scaling": [] },
+                                "stacks": { "base": 2, "scaling": [] }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "spider_swarm",
+                        "name": "Spider Swarm",
+                        "effects": [
+                            {
+                                "trigger": "encounter_start",
+                                "type": "summon",
+                                "monster": "adventuring:spiderling"
+                            }
+                        ]
+                    }
+                ],
+                "areas": [
+                    {
+                        "id": "spider_nest",
+                        "name": "Spider Nest",
+                        "media": "melvor:assets/media/monsters/spider_boss.png",
+                        "requirements": [
+                            { "type": "skill_level", "level": 15 }
+                        ],
+                        "height": 6,
+                        "width": 6,
+                        "floors": [
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:spider", "weight": 100 }
+                                ],
+                                "exit": ["adventuring:spider", "adventuring:spider", "adventuring:spider"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:spider", "weight": 70 },
+                                    { "id": "adventuring:brown_spider", "weight": 30 }
+                                ],
+                                "exit": ["adventuring:spider", "adventuring:spider", "adventuring:brown_spider"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:spider", "weight": 40 },
+                                    { "id": "adventuring:brown_spider", "weight": 60 }
+                                ],
+                                "exit": ["adventuring:spider", "adventuring:brown_spider", "adventuring:brown_spider"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:brown_spider", "weight": 80 },
+                                    { "id": "adventuring:spider_king", "weight": 20 }
+                                ],
+                                "exit": ["adventuring:brown_spider", "adventuring:brown_spider", "adventuring:spider_king"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:brown_spider", "weight": 50 },
+                                    { "id": "adventuring:spider_king", "weight": 50 }
+                                ],
+                                "exit": ["adventuring:brown_spider", "adventuring:spider_king", "adventuring:evil_spider"]
+                            }
+                        ]
+                    }
+                ],
+                "monsters": [
+                    {
+                        "id": "spider",
+                        "name": "Spider",
+                        "media": "melvor:assets/media/monsters/spider.png",
+                        "tags": ["spider", "beast"],
+                        "xp": 18,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 15 },
+                            { "id": "adventuring:defence", "value": 8 },
+                            { "id": "adventuring:agility", "value": 18 },
+                            { "id": "adventuring:strength", "value": 12 },
+                            { "id": "adventuring:ranged", "value": 8 },
+                            { "id": "adventuring:magic", "value": 8 },
+                            { "id": "adventuring:prayer", "value": 5 }
+                        ],
+                        "generator": "adventuring:venomous_bite",
+                        "spender": "adventuring:web_trap",
+                        "passives": [],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 5, "weight": 100 },
+                            { "id": "adventuring:parts", "qty": 2, "weight": 15 },
+                            { "id": "adventuring:spider_silk", "qty": 1, "weight": 22 }
+                        ]
+                    },
+                    {
+                        "id": "brown_spider",
+                        "name": "Brown Spider",
+                        "media": "melvor:assets/media/monsters/spider2.png",
+                        "tags": ["spider", "beast"],
+                        "xp": 22,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 20 },
+                            { "id": "adventuring:defence", "value": 12 },
+                            { "id": "adventuring:agility", "value": 22 },
+                            { "id": "adventuring:strength", "value": 18 },
+                            { "id": "adventuring:ranged", "value": 10 },
+                            { "id": "adventuring:magic", "value": 10 },
+                            { "id": "adventuring:prayer", "value": 8 }
+                        ],
+                        "generator": "adventuring:venomous_bite",
+                        "spender": "adventuring:poison_spray",
+                        "passives": [],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 6, "weight": 100 },
+                            { "id": "adventuring:parts", "qty": 2, "weight": 20 },
+                            { "id": "adventuring:spider_silk", "qty": 1, "weight": 25 }
+                        ]
+                    },
+                    {
+                        "id": "spider_king",
+                        "name": "Spider King",
+                        "media": "melvor:assets/media/monsters/spider_boss.png",
+                        "tags": ["spider", "beast"],
+                        "xp": 35,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 30 },
+                            { "id": "adventuring:defence", "value": 18 },
+                            { "id": "adventuring:agility", "value": 25 },
+                            { "id": "adventuring:strength", "value": 22 },
+                            { "id": "adventuring:ranged", "value": 15 },
+                            { "id": "adventuring:magic", "value": 15 },
+                            { "id": "adventuring:prayer", "value": 10 }
+                        ],
+                        "generator": "adventuring:venomous_bite",
+                        "spender": "adventuring:arachnid_fury",
+                        "passives": [],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 10, "weight": 100 },
+                            { "id": "adventuring:parts", "qty": 4, "weight": 25 },
+                            { "id": "adventuring:spider_silk", "qty": 2, "weight": 32 }
+                        ]
+                    },
+                    {
+                        "id": "evil_spider",
+                        "name": "Evil Spider",
+                        "media": "melvor:assets/media/monsters/spider_subboss.png",
+                        "tags": ["boss", "spider", "beast"],
+                        "xp": 60,
+                        "isBoss": true,
+                        "enrageThreshold": 25,
+                        "enrageBuff": {
+                            "damage": 0.4,
+                            "speed": 0.3
+                        },
+                        "phases": [
+                            {
+                                "name": "Venomous Hunter"
+                            },
+                            {
+                                "name": "Frenzied State",
+                                "hpThreshold": 40,
+                                "spender": "adventuring:arachnid_fury",
+                                "statBuffs": [
+                                    { "id": "adventuring:agility", "value": 0.3 }
+                                ]
+                            }
+                        ],
+                        "passives": ["adventuring:venomous_aura", "adventuring:spider_swarm"],
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 45 },
+                            { "id": "adventuring:defence", "value": 25 },
+                            { "id": "adventuring:agility", "value": 30 },
+                            { "id": "adventuring:strength", "value": 30 },
+                            { "id": "adventuring:ranged", "value": 20 },
+                            { "id": "adventuring:magic", "value": 20 },
+                            { "id": "adventuring:prayer", "value": 15 }
+                        ],
+                        "generator": "adventuring:venomous_bite",
+                        "spender": "adventuring:deadly_venom",
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 20, "weight": 100 },
+                            { "id": "adventuring:parts", "qty": 8, "weight": 40 },
+                            { "id": "adventuring:big_parts", "qty": 2, "weight": 25 },
+                            { "id": "adventuring:spider_silk", "qty": 3, "weight": 45 }
+                        ]
+                    },
+                    {
+                        "id": "spiderling",
+                        "name": "Spiderling",
+                        "media": "melvor:assets/media/monsters/spider.png",
+                        "tags": ["spider", "beast"],
+                        "xp": 8,
+                        "isSummon": true,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 12 },
+                            { "id": "adventuring:defence", "value": 5 },
+                            { "id": "adventuring:agility", "value": 15 },
+                            { "id": "adventuring:strength", "value": 10 },
+                            { "id": "adventuring:ranged", "value": 5 },
+                            { "id": "adventuring:magic", "value": 5 },
+                            { "id": "adventuring:prayer", "value": 3 }
+                        ],
+                        "generator": "adventuring:venomous_bite",
+                        "spender": "adventuring:web_trap",
+                        "passives": [],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 2, "weight": 100 }
+                        ]
+                    }
+                ],
+                "generators": [
+                    {
+                        "id": "venomous_bite",
+                        "name": "Venomous Bite",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "energy": 38,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 6,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 1 },
+                                                { "id": "adventuring:agility", "value": 0.3 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "spenders": [
+                    {
+                        "id": "web_trap",
+                        "name": "Web Trap",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "cost": 75,
+                        "hits": [
+                            {
+                                "target": "random",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 12,
+                                            "scaling": [
+                                                { "id": "adventuring:agility", "value": 1.2 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "poison_spray",
+                        "name": "Poison Spray",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "cost": 85,
+                        "hits": [
+                            {
+                                "target": "all",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 8,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 0.8 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "arachnid_fury",
+                        "name": "Arachnid Fury",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "cost": 95,
+                        "hits": [
+                            {
+                                "target": "random",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 8,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.8 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "target": "random",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 8,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.8 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "target": "random",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 8,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.8 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "deadly_venom",
+                        "name": "Deadly Venom",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "cost": 100,
+                        "hits": [
+                            {
+                                "target": "all",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 18,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 1.2 },
+                                                { "id": "adventuring:magic", "value": 0.6 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        }]
+    }
+}

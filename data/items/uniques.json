@@ -1,0 +1,2831 @@
+{
+    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+    "namespace": "adventuring",
+    "data": {
+        "skillData": [
+            {
+                "skillID": "adventuring:Adventuring",
+                "data": {
+                    "baseItems": [
+                        {
+                            "id": "venomfang",
+                            "name": "Venomfang",
+                            "media": "melvor:assets/media/bank/weapon_dagger_dragon.png",
+                            "type": "adventuring:dagger",
+                            "isUnique": true,
+                            "materials": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 2500
+                                },
+                                {
+                                    "id": "adventuring:spider_silk",
+                                    "qty": 25
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 8
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 22
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 18
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 0.8
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 2
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 1.6
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "on_hit",
+                                    "type": "debuff",
+                                    "id": "adventuring:poison",
+                                    "target": "target",
+                                    "amount": 5,
+                                    "scaling": 0.5,
+                                    "stacks": 2,
+                                    "chance": 35
+                                }
+                            ]
+                        },
+                        {
+                            "id": "spiders_embrace",
+                            "name": "Spider's Embrace",
+                            "media": "melvor:assets/media/bank/armour_platebody_dragon.png",
+                            "type": "adventuring:vest",
+                            "isUnique": true,
+                            "materials": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 3000
+                                },
+                                {
+                                    "id": "adventuring:spider_silk",
+                                    "qty": 40
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 18
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 20
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 12
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 1.6
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 1.8
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 1
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "after_damage_received",
+                                    "type": "debuff",
+                                    "id": "adventuring:slow",
+                                    "target": "attacker",
+                                    "amount": 15,
+                                    "stacks": 1,
+                                    "chance": 25
+                                }
+                            ]
+                        },
+                        {
+                            "id": "dragonfire_blade",
+                            "name": "Dragonfire Blade",
+                            "media": "melvor:assets/media/bank/weapon_2h_sword_dragon.png",
+                            "type": "adventuring:sword2h",
+                            "isUnique": true,
+                            "materials": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 5000
+                                },
+                                {
+                                    "id": "adventuring:dragon_scale",
+                                    "qty": 20
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 20
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 45
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 15
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 1.8
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 4
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 1.2
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "on_kill",
+                                    "type": "heal",
+                                    "target": "self",
+                                    "amount": 15,
+                                    "scaling": 2
+                                },
+                                {
+                                    "trigger": "on_hit",
+                                    "type": "damage",
+                                    "target": "target",
+                                    "amount": 8,
+                                    "scaling": 1,
+                                    "chance": 20
+                                }
+                            ]
+                        },
+                        {
+                            "id": "dragonscale_aegis",
+                            "name": "Dragonscale Aegis",
+                            "media": "melvor:assets/media/bank/armour_shield_dragon.png",
+                            "type": "adventuring:shield",
+                            "isUnique": true,
+                            "materials": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 4500
+                                },
+                                {
+                                    "id": "adventuring:dragon_scale",
+                                    "qty": 25
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 25
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 35
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 2.2
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 3
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "after_damage_received",
+                                    "type": "damage",
+                                    "target": "attacker",
+                                    "amount": 5,
+                                    "scaling": 0.8,
+                                    "chance": 30
+                                }
+                            ]
+                        },
+                        {
+                            "id": "blooddrinker",
+                            "name": "Blooddrinker",
+                            "media": "melvor:assets/media/bank/weapon_sword_ancient.png",
+                            "type": "adventuring:sword1h",
+                            "isUnique": true,
+                            "materials": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 6000
+                                },
+                                {
+                                    "id": "adventuring:vampire_fang",
+                                    "qty": 15
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 15
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 38
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 12
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 1.2
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 3.2
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 1
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "on_hit",
+                                    "type": "lifesteal",
+                                    "amount": 10,
+                                    "scaling": 0.5
+                                }
+                            ]
+                        },
+                        {
+                            "id": "nightlords_cloak",
+                            "name": "Nightlord's Cloak",
+                            "media": "melvor:assets/media/bank/skillcape_thieving.png",
+                            "type": "adventuring:cape",
+                            "isUnique": true,
+                            "materials": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 5500
+                                },
+                                {
+                                    "id": "adventuring:vampire_fang",
+                                    "qty": 20
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 20
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 25
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 18
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 1.8
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 2.2
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 1.5
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "turn_start",
+                                    "type": "heal",
+                                    "target": "self",
+                                    "amount": 3,
+                                    "scaling": 0.3
+                                }
+                            ]
+                        },
+                        {
+                            "id": "voidtouched_staff",
+                            "name": "Voidtouched Staff",
+                            "media": "melvor:assets/media/bank/weapon_staff_water.png",
+                            "type": "adventuring:staff",
+                            "isUnique": true,
+                            "materials": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 10000
+                                },
+                                {
+                                    "id": "adventuring:mist_shard",
+                                    "qty": 35
+                                },
+                                {
+                                    "id": "adventuring:all_essences",
+                                    "qty": 20
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 25
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 55
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 20
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 2
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 5
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 1.8
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "on_hit",
+                                    "type": "debuff",
+                                    "id": "adventuring:weaken",
+                                    "target": "target",
+                                    "amount": 10,
+                                    "stacks": 1,
+                                    "chance": 40
+                                },
+                                {
+                                    "trigger": "on_spender",
+                                    "type": "energy",
+                                    "amount": 10,
+                                    "scaling": 1,
+                                    "chance": 25
+                                }
+                            ]
+                        },
+                        {
+                            "id": "ahrenias_veil",
+                            "name": "Ahrenia's Veil",
+                            "media": "melvor:assets/media/bank/armour_helmet_ancient.png",
+                            "type": "adventuring:cowl",
+                            "isUnique": true,
+                            "materials": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 12000
+                                },
+                                {
+                                    "id": "adventuring:mist_shard",
+                                    "qty": 50
+                                },
+                                {
+                                    "id": "adventuring:all_essences",
+                                    "qty": 30
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 30
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 25
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 40
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 2.5
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 2
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 3.5
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "encounter_start",
+                                    "type": "buff",
+                                    "id": "adventuring:might",
+                                    "target": "self",
+                                    "amount": 15,
+                                    "stacks": 2
+                                },
+                                {
+                                    "trigger": "after_damage_received",
+                                    "type": "buff",
+                                    "id": "adventuring:protection",
+                                    "target": "self",
+                                    "amount": 10,
+                                    "stacks": 1,
+                                    "chance": 20
+                                }
+                            ]
+                        },
+                        {
+                            "id": "spider_queens_fang",
+                            "name": "Spider Queen's Fang",
+                            "media": "melvor:assets/media/bank/dagger_fang.png",
+                            "type": "adventuring:dagger",
+                            "isUnique": true,
+                            "materials": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 3000
+                                },
+                                {
+                                    "id": "adventuring:spider_silk",
+                                    "qty": 20
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 8
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 6
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 0.6
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 0.5
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "on_hit",
+                                    "type": "debuff",
+                                    "target": "target",
+                                    "buff": "adventuring:poison",
+                                    "chance": 0.25,
+                                    "stacks": 2
+                                }
+                            ]
+                        },
+                        {
+                            "id": "ancient_dragon_scale",
+                            "name": "Ancient Dragon Scale",
+                            "media": "melvor:assets/media/bank/dragonfire_shield.png",
+                            "type": "adventuring:shield",
+                            "isUnique": true,
+                            "materials": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 3000
+                                },
+                                {
+                                    "id": "adventuring:dragon_scale",
+                                    "qty": 15
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 15
+                                },
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 20
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 1.2
+                                },
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 1.6
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "after_damage_received",
+                                    "type": "debuff",
+                                    "target": "attacker",
+                                    "buff": "adventuring:burn",
+                                    "chance": 0.2,
+                                    "stacks": {
+                                        "base": 3,
+                                        "scaling": []
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "id": "vampire_lords_cloak",
+                            "name": "Vampire Lord's Cloak",
+                            "media": "melvor:assets/media/bank/royal_cape.png",
+                            "type": "adventuring:cape",
+                            "isUnique": true,
+                            "materials": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 3000
+                                },
+                                {
+                                    "id": "adventuring:vampire_fang",
+                                    "qty": 15
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 12
+                                },
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 10
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 1
+                                },
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 0.8
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "on_kill",
+                                    "type": "heal",
+                                    "target": "self",
+                                    "amount": {
+                                        "base": 0,
+                                        "scaling": [
+                                            {
+                                                "id": "max_hp",
+                                                "value": 0.1
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "id": "giants_grip_gauntlets",
+                            "name": "Giant's Grip Gauntlets",
+                            "media": "melvor:assets/media/bank/aeris_gloves.png",
+                            "type": "adventuring:gauntlets",
+                            "isUnique": true,
+                            "materials": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 3000
+                                },
+                                {
+                                    "id": "adventuring:giant_bone",
+                                    "qty": 15
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 14
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 8
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 1.1
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 0.6
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "passive",
+                                    "type": "damage_bonus",
+                                    "condition": "target_stunned",
+                                    "value": 0.25
+                                }
+                            ]
+                        },
+                        {
+                            "id": "phoenix_feather_charm",
+                            "name": "Phoenix Feather Charm",
+                            "media": "melvor:assets/media/bank/amulet_of_magic.png",
+                            "type": "adventuring:amulet",
+                            "isUnique": true,
+                            "materials": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 3000
+                                },
+                                {
+                                    "id": "adventuring:phoenix_feather",
+                                    "qty": 10
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 25
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 10
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 2
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 0.8
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "on_death",
+                                    "type": "revive",
+                                    "target": "self",
+                                    "amount": {
+                                        "base": 0,
+                                        "scaling": [
+                                            {
+                                                "id": "max_hp",
+                                                "value": 0.3
+                                            }
+                                        ]
+                                    },
+                                    "once_per_adventure": true
+                                }
+                            ]
+                        },
+                        {
+                            "id": "wolfs_howl_ring",
+                            "name": "Wolf's Howl Ring",
+                            "media": "melvor:assets/media/bank/deadeye_ring.png",
+                            "type": "adventuring:ring",
+                            "isUnique": true,
+                            "materials": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 3000
+                                },
+                                {
+                                    "id": "adventuring:wolf_pelt",
+                                    "qty": 20
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 6
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 8
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 0.5
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 0.6
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "passive",
+                                    "type": "damage_bonus",
+                                    "condition": "target_bleeding",
+                                    "value": 0.15
+                                }
+                            ]
+                        },
+                        {
+                            "id": "lich_kings_phylactery",
+                            "name": "Lich King's Phylactery",
+                            "media": "melvor:assets/media/bank/skull_cape.png",
+                            "type": "adventuring:amulet",
+                            "isUnique": true,
+                            "materials": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 3000
+                                },
+                                {
+                                    "id": "adventuring:lich_dust",
+                                    "qty": 15
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 18
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 12
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 1.4
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 1
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "passive",
+                                    "type": "cost_reduction",
+                                    "ability_type": "magic",
+                                    "value": 0.2
+                                }
+                            ]
+                        },
+                        {
+                            "id": "minotaurs_horn",
+                            "name": "Minotaur's Horn",
+                            "media": "melvor:assets/media/bank/ancient_axe.png",
+                            "type": "adventuring:sword1h",
+                            "isUnique": true,
+                            "materials": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 3000
+                                },
+                                {
+                                    "id": "adventuring:minotaur_horn",
+                                    "qty": 10
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 16
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 5
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 1.3
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 0.4
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "on_crit",
+                                    "type": "debuff",
+                                    "target": "target",
+                                    "buff": "adventuring:stun",
+                                    "stacks": {
+                                        "base": 1,
+                                        "scaling": []
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "id": "elemental_convergence_orb",
+                            "name": "Elemental Convergence Orb",
+                            "media": "melvor:assets/media/bank/fire_orb.png",
+                            "type": "adventuring:orb",
+                            "isUnique": true,
+                            "materials": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 3000
+                                },
+                                {
+                                    "id": "adventuring:elemental_core",
+                                    "qty": 15
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 14
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 8
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 1.1
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 0.6
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "on_hit",
+                                    "type": "random_debuff",
+                                    "target": "target",
+                                    "chance": 0.15,
+                                    "options": [
+                                        "adventuring:burn",
+                                        "adventuring:chill",
+                                        "adventuring:shock",
+                                        "adventuring:poison"
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "titans_heart",
+                            "name": "Titan's Heart",
+                            "media": "melvor:assets/media/bank/gem_ruby.png",
+                            "type": "adventuring:amulet",
+                            "isUnique": true,
+                            "materials": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 3000
+                                },
+                                {
+                                    "id": "adventuring:giant_bone",
+                                    "qty": 15
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 50
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 10
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 4
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 0.8
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "after_damage_received",
+                                    "type": "buff",
+                                    "target": "self",
+                                    "buff": "adventuring:fortify",
+                                    "stacks": {
+                                        "base": 1,
+                                        "scaling": []
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "id": "shadow_dancers_boots",
+                            "name": "Shadow Dancer's Boots",
+                            "media": "melvor:assets/media/bank/hunters_boots.png",
+                            "type": "adventuring:boots",
+                            "isUnique": true,
+                            "materials": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 3000
+                                },
+                                {
+                                    "id": "adventuring:shadow_essence",
+                                    "qty": 15
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 15
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 8
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 1.2
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 0.6
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "encounter_start",
+                                    "type": "buff",
+                                    "target": "self",
+                                    "buff": "adventuring:evasion",
+                                    "stacks": {
+                                        "base": 3,
+                                        "scaling": []
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "id": "storm_lords_scepter",
+                            "name": "Storm Lord's Scepter",
+                            "media": "melvor:assets/media/bank/ancient_sceptre.png",
+                            "type": "adventuring:staff",
+                            "isUnique": true,
+                            "materials": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 3000
+                                },
+                                {
+                                    "id": "adventuring:elemental_core",
+                                    "qty": 15
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 20
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 8
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 1.6
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 0.6
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "on_magic_hit",
+                                    "type": "debuff",
+                                    "target": "target",
+                                    "buff": "adventuring:shock",
+                                    "stacks": {
+                                        "base": 1,
+                                        "scaling": []
+                                    }
+                                },
+                                {
+                                    "trigger": "passive",
+                                    "type": "damage_bonus",
+                                    "ability_type": "magic",
+                                    "value": 0.2
+                                }
+                            ]
+                        },
+                        {
+                            "id": "sea_serpent_scale_mail",
+                            "name": "Sea Serpent Scale Mail",
+                            "media": "melvor:assets/media/bank/dragonfire_shield.png",
+                            "type": "adventuring:vest",
+                            "isUnique": true,
+                            "materials": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 3000
+                                },
+                                {
+                                    "id": "adventuring:spider_silk",
+                                    "qty": 20
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 18
+                                },
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 15
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 10
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 1.4
+                                },
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 1.2
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 0.8
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "passive",
+                                    "type": "immunity",
+                                    "debuff": "adventuring:poison"
+                                },
+                                {
+                                    "trigger": "passive",
+                                    "type": "damage_bonus",
+                                    "element": "water",
+                                    "value": 0.25
+                                }
+                            ]
+                        },
+                        {
+                            "id": "golem_core",
+                            "name": "Golem Core",
+                            "media": "melvor:assets/media/bank/gem_diamond.png",
+                            "type": "adventuring:ring",
+                            "isUnique": true,
+                            "materials": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 3000
+                                },
+                                {
+                                    "id": "adventuring:golem_core",
+                                    "qty": 10
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 20
+                                },
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 30
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 1.6
+                                },
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 2.4
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "passive",
+                                    "type": "immunity",
+                                    "debuff": "adventuring:stun"
+                                },
+                                {
+                                    "trigger": "passive",
+                                    "type": "damage_reduction",
+                                    "condition": "below_50_hp",
+                                    "value": 0.3
+                                }
+                            ]
+                        },
+                        {
+                            "id": "hydra_tooth_necklace",
+                            "name": "Hydra Tooth Necklace",
+                            "media": "melvor:assets/media/bank/fury_of_the_elemental_zodiac.png",
+                            "type": "adventuring:amulet",
+                            "isUnique": true,
+                            "materials": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 3000
+                                },
+                                {
+                                    "id": "adventuring:sea_scale",
+                                    "qty": 20
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 12
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 10
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 1
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 0.8
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "passive",
+                                    "type": "extra_target",
+                                    "ability_type": "multi_hit",
+                                    "value": 1
+                                }
+                            ]
+                        },
+                        {
+                            "id": "wyverns_wing_cloak",
+                            "name": "Wyvern's Wing Cloak",
+                            "media": "melvor:assets/media/bank/hunters_cape.png",
+                            "type": "adventuring:cape",
+                            "isUnique": true,
+                            "materials": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 3000
+                                },
+                                {
+                                    "id": "adventuring:wyvern_wing",
+                                    "qty": 15
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 14
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 10
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 1.1
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 0.8
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "passive",
+                                    "type": "dodge_chance",
+                                    "value": 0.2
+                                },
+                                {
+                                    "trigger": "on_dodge",
+                                    "type": "buff",
+                                    "target": "self",
+                                    "buff": "adventuring:haste",
+                                    "stacks": {
+                                        "base": 1,
+                                        "scaling": []
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "id": "cyclops_eye_ring",
+                            "name": "Cyclops Eye Ring",
+                            "media": "melvor:assets/media/bank/deadeye_ring.png",
+                            "type": "adventuring:ring",
+                            "isUnique": true,
+                            "materials": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 3000
+                                },
+                                {
+                                    "id": "adventuring:cyclops_eye",
+                                    "qty": 5
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 8
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 8
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 8
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 0.6
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 0.6
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 0.6
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "passive",
+                                    "type": "crit_chance",
+                                    "value": 0.25
+                                },
+                                {
+                                    "trigger": "passive",
+                                    "type": "crit_damage",
+                                    "value": 0.5
+                                }
+                            ]
+                        },
+                        {
+                            "id": "mummys_wrappings",
+                            "name": "Mummy's Wrappings",
+                            "media": "melvor:assets/media/bank/bandages.png",
+                            "type": "adventuring:vest",
+                            "isUnique": true,
+                            "materials": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 3000
+                                },
+                                {
+                                    "id": "adventuring:ancient_bandage",
+                                    "qty": 15
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 12
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 15
+                                },
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 20
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 1
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 1.2
+                                },
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 1.6
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "passive",
+                                    "type": "immunity",
+                                    "debuff": "adventuring:curse"
+                                },
+                                {
+                                    "trigger": "passive",
+                                    "type": "healing_received",
+                                    "value": 0.3
+                                }
+                            ]
+                        },
+                        {
+                            "id": "treant_bark_shield",
+                            "name": "Treant Bark Shield",
+                            "media": "melvor:assets/media/bank/shield_of_melee_power.png",
+                            "type": "adventuring:shield",
+                            "isUnique": true,
+                            "materials": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 3000
+                                },
+                                {
+                                    "id": "adventuring:golem_core",
+                                    "qty": 10
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 16
+                                },
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 25
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 1.3
+                                },
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 2
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "encounter_start",
+                                    "type": "buff",
+                                    "target": "self",
+                                    "buff": "adventuring:barrier",
+                                    "stacks": {
+                                        "base": 5,
+                                        "scaling": []
+                                    }
+                                },
+                                {
+                                    "trigger": "round_start",
+                                    "type": "buff",
+                                    "target": "self",
+                                    "buff": "adventuring:barrier",
+                                    "stacks": {
+                                        "base": 1,
+                                        "scaling": []
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "id": "demon_princes_signet",
+                            "name": "Demon Prince's Signet",
+                            "media": "melvor:assets/media/bank/ring_of_power.png",
+                            "type": "adventuring:ring",
+                            "isUnique": true,
+                            "materials": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 3000
+                                },
+                                {
+                                    "id": "adventuring:dragon_scale",
+                                    "qty": 15
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 12
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 10
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 1
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 0.8
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "on_kill",
+                                    "type": "buff",
+                                    "target": "self",
+                                    "buff": "adventuring:might",
+                                    "stacks": {
+                                        "base": 2,
+                                        "scaling": []
+                                    }
+                                },
+                                {
+                                    "trigger": "on_kill",
+                                    "type": "buff",
+                                    "target": "self",
+                                    "buff": "adventuring:berserk",
+                                    "stacks": {
+                                        "base": 2,
+                                        "scaling": []
+                                    }
+                                },
+                                {
+                                    "trigger": "passive",
+                                    "type": "damage_bonus",
+                                    "condition": "target_burning",
+                                    "value": 0.15
+                                }
+                            ]
+                        },
+                        {
+                            "id": "emperors_void_scepter",
+                            "name": "Emperor's Void Scepter",
+                            "media": "melvor:assets/media/bank/mystic_staff.png",
+                            "type": "adventuring:staff",
+                            "isUnique": true,
+                            "materials": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 3000
+                                },
+                                {
+                                    "id": "adventuring:void_essence",
+                                    "qty": 20
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:intelligence",
+                                    "value": 25
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 15
+                                },
+                                {
+                                    "id": "adventuring:wisdom",
+                                    "value": 10
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:intelligence",
+                                    "value": 2
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 1.2
+                                },
+                                {
+                                    "id": "adventuring:wisdom",
+                                    "value": 0.8
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "on_hit",
+                                    "type": "debuff",
+                                    "target": "target",
+                                    "buff": "adventuring:doom",
+                                    "chance": 0.3,
+                                    "stacks": {
+                                        "base": 1,
+                                        "scaling": []
+                                    }
+                                },
+                                {
+                                    "trigger": "passive",
+                                    "type": "damage_bonus",
+                                    "condition": "target_has_debuff",
+                                    "value": 0.25
+                                }
+                            ]
+                        },
+                        {
+                            "id": "void_crown",
+                            "name": "Void Crown",
+                            "media": "melvor:assets/media/bank/crown_of_rhaelyx.png",
+                            "type": "adventuring:helm",
+                            "isUnique": true,
+                            "materials": [
+                                {
+                                    "id": "adventuring:void_crown_fragment",
+                                    "qty": 5
+                                },
+                                {
+                                    "id": "adventuring:void_essence",
+                                    "qty": 20
+                                },
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 10000
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:intelligence",
+                                    "value": 20
+                                },
+                                {
+                                    "id": "adventuring:wisdom",
+                                    "value": 20
+                                },
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 30
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:intelligence",
+                                    "value": 1.6
+                                },
+                                {
+                                    "id": "adventuring:wisdom",
+                                    "value": 1.6
+                                },
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 2.4
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "passive",
+                                    "type": "debuff_immunity",
+                                    "debuff": "adventuring:doom"
+                                },
+                                {
+                                    "trigger": "passive",
+                                    "type": "damage_bonus",
+                                    "value": 0.2
+                                },
+                                {
+                                    "trigger": "turn_start",
+                                    "type": "heal_percent",
+                                    "value": 0.02
+                                }
+                            ]
+                        },
+                        {
+                            "id": "nullblade",
+                            "name": "Nullblade",
+                            "media": "melvor:assets/media/bank/dragon_sword.png",
+                            "type": "adventuring:sword1h",
+                            "isUnique": true,
+                            "materials": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 3000
+                                },
+                                {
+                                    "id": "adventuring:void_essence",
+                                    "qty": 20
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 18
+                                },
+                                {
+                                    "id": "adventuring:dexterity",
+                                    "value": 12
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 1.4
+                                },
+                                {
+                                    "id": "adventuring:dexterity",
+                                    "value": 1
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "on_hit",
+                                    "type": "dispel_buff",
+                                    "count": 1,
+                                    "chance": 1
+                                },
+                                {
+                                    "trigger": "passive",
+                                    "type": "damage_bonus",
+                                    "condition": "target_magic_user",
+                                    "value": 0.4
+                                }
+                            ]
+                        },
+                        {
+                            "id": "shadow_weavers_cloak",
+                            "name": "Shadow Weaver's Cloak",
+                            "media": "melvor:assets/media/bank/warlock_robes.png",
+                            "type": "adventuring:vest",
+                            "isUnique": true,
+                            "materials": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 3000
+                                },
+                                {
+                                    "id": "adventuring:shadow_essence",
+                                    "qty": 15
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 15
+                                },
+                                {
+                                    "id": "adventuring:intelligence",
+                                    "value": 10
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 8
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 1.2
+                                },
+                                {
+                                    "id": "adventuring:intelligence",
+                                    "value": 0.8
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 0.6
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "passive",
+                                    "type": "resistance",
+                                    "element": "dark",
+                                    "value": 0.3
+                                },
+                                {
+                                    "trigger": "after_damage_received",
+                                    "type": "buff",
+                                    "target": "self",
+                                    "buff": "adventuring:invisible",
+                                    "chance": 0.2,
+                                    "stacks": {
+                                        "base": 1,
+                                        "scaling": []
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "id": "dimension_walkers_boots",
+                            "name": "Dimension Walker's Boots",
+                            "media": "melvor:assets/media/bank/dragon_boots.png",
+                            "type": "adventuring:boots",
+                            "isUnique": true,
+                            "materials": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 3000
+                                },
+                                {
+                                    "id": "adventuring:void_essence",
+                                    "qty": 20
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 20
+                                },
+                                {
+                                    "id": "adventuring:dexterity",
+                                    "value": 10
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 1.6
+                                },
+                                {
+                                    "id": "adventuring:dexterity",
+                                    "value": 0.8
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "after_damage_received",
+                                    "type": "dodge",
+                                    "chance": 0.15
+                                }
+                            ]
+                        },
+                        {
+                            "id": "entropic_orb",
+                            "name": "Entropic Orb",
+                            "media": "melvor:assets/media/bank/mystic_orb.png",
+                            "type": "adventuring:orb",
+                            "isUnique": true,
+                            "materials": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 3000
+                                },
+                                {
+                                    "id": "adventuring:void_essence",
+                                    "qty": 20
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:intelligence",
+                                    "value": 18
+                                },
+                                {
+                                    "id": "adventuring:wisdom",
+                                    "value": 12
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:intelligence",
+                                    "value": 1.4
+                                },
+                                {
+                                    "id": "adventuring:wisdom",
+                                    "value": 1
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "on_spell_hit",
+                                    "type": "debuff",
+                                    "target": "target",
+                                    "buff": "adventuring:decay",
+                                    "chance": 1,
+                                    "stacks": {
+                                        "base": 2,
+                                        "scaling": []
+                                    }
+                                },
+                                {
+                                    "trigger": "passive",
+                                    "type": "spell_damage_bonus",
+                                    "value": 0.3
+                                }
+                            ]
+                        },
+                        {
+                            "id": "reality_anchor_ring",
+                            "name": "Reality Anchor Ring",
+                            "media": "melvor:assets/media/bank/signet_ring.png",
+                            "type": "adventuring:ring",
+                            "isUnique": true,
+                            "materials": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 3000
+                                },
+                                {
+                                    "id": "adventuring:void_essence",
+                                    "qty": 20
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 10
+                                },
+                                {
+                                    "id": "adventuring:wisdom",
+                                    "value": 8
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 0.8
+                                },
+                                {
+                                    "id": "adventuring:wisdom",
+                                    "value": 0.6
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "passive",
+                                    "type": "effect_immunity",
+                                    "effects": [
+                                        "teleport",
+                                        "displacement"
+                                    ]
+                                },
+                                {
+                                    "trigger": "passive",
+                                    "type": "all_resistance",
+                                    "value": 0.15
+                                }
+                            ]
+                        },
+                        {
+                            "id": "refined_warriors_blade",
+                            "name": "Refined Warrior's Blade",
+                            "media": "melvor:assets/media/bank/dragon_longsword.png",
+                            "type": "adventuring:sword1h",
+                            "isUnique": true,
+                            "materials": [
+                                {
+                                    "id": "adventuring:refined_bar",
+                                    "qty": 5
+                                },
+                                {
+                                    "id": "adventuring:refined_wood",
+                                    "qty": 2
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 18
+                                },
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 15
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 1.4
+                                },
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 1.2
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "passive",
+                                    "type": "damage_bonus",
+                                    "condition": "target_below_50_hp",
+                                    "value": 0.1
+                                }
+                            ],
+                            "requirements": [
+                                {
+                                    "type": "skill_level",
+                                    "level": 25
+                                },
+                                {
+                                    "type": "job_level",
+                                    "job": "adventuring:master_smith",
+                                    "level": 15
+                                }
+                            ]
+                        },
+                        {
+                            "id": "immaculate_warriors_blade",
+                            "name": "Immaculate Warrior's Blade",
+                            "media": "melvor:assets/media/bank/ancient_longsword.png",
+                            "type": "adventuring:sword1h",
+                            "isUnique": true,
+                            "materials": [
+                                {
+                                    "id": "adventuring:immaculate_bar",
+                                    "qty": 5
+                                },
+                                {
+                                    "id": "adventuring:immaculate_wood",
+                                    "qty": 2
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 32
+                                },
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 25
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 2.6
+                                },
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 2
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "passive",
+                                    "type": "damage_bonus",
+                                    "condition": "target_below_50_hp",
+                                    "value": 0.2
+                                },
+                                {
+                                    "trigger": "on_kill",
+                                    "type": "heal",
+                                    "target": "self",
+                                    "amount": {
+                                        "base": 0,
+                                        "scaling": [
+                                            {
+                                                "id": "max_hp",
+                                                "value": 0.05
+                                            }
+                                        ]
+                                    }
+                                }
+                            ],
+                            "requirements": [
+                                {
+                                    "type": "skill_level",
+                                    "level": 50
+                                },
+                                {
+                                    "type": "job_level",
+                                    "job": "adventuring:grandmaster_smith",
+                                    "level": 15
+                                }
+                            ]
+                        },
+                        {
+                            "id": "transcendent_warriors_blade",
+                            "name": "Transcendent Warrior's Blade",
+                            "media": "melvor:assets/media/bank/infernal_claw.png",
+                            "type": "adventuring:sword1h",
+                            "isUnique": true,
+                            "materials": [
+                                {
+                                    "id": "adventuring:transcendent_bar",
+                                    "qty": 5
+                                },
+                                {
+                                    "id": "adventuring:transcendent_wood",
+                                    "qty": 2
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 50
+                                },
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 40
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 4
+                                },
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 3.2
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "passive",
+                                    "type": "damage_bonus",
+                                    "condition": "target_below_50_hp",
+                                    "value": 0.35
+                                },
+                                {
+                                    "trigger": "on_kill",
+                                    "type": "heal",
+                                    "target": "self",
+                                    "amount": {
+                                        "base": 0,
+                                        "scaling": [
+                                            {
+                                                "id": "max_hp",
+                                                "value": 0.1
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "trigger": "on_kill",
+                                    "type": "buff",
+                                    "target": "self",
+                                    "buff": "adventuring:berserk",
+                                    "duration": 3
+                                }
+                            ],
+                            "requirements": [
+                                {
+                                    "type": "skill_level",
+                                    "level": 75
+                                },
+                                {
+                                    "type": "job_level",
+                                    "job": "adventuring:legendary_smith",
+                                    "level": 15
+                                }
+                            ]
+                        },
+                        {
+                            "id": "refined_rangers_bow",
+                            "name": "Refined Ranger's Bow",
+                            "media": "melvor:assets/media/bank/ancient_longbow.png",
+                            "type": "adventuring:bow",
+                            "isUnique": true,
+                            "materials": [
+                                {
+                                    "id": "adventuring:refined_shaft",
+                                    "qty": 5
+                                },
+                                {
+                                    "id": "adventuring:refined_hide",
+                                    "qty": 2
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 18
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 12
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 1.4
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 1
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "passive",
+                                    "type": "crit_chance_bonus",
+                                    "value": 0.05
+                                }
+                            ],
+                            "requirements": [
+                                {
+                                    "type": "skill_level",
+                                    "level": 25
+                                },
+                                {
+                                    "type": "job_level",
+                                    "job": "adventuring:master_fletcher",
+                                    "level": 15
+                                }
+                            ]
+                        },
+                        {
+                            "id": "immaculate_rangers_bow",
+                            "name": "Immaculate Ranger's Bow",
+                            "media": "melvor:assets/media/bank/stormsnap.png",
+                            "type": "adventuring:bow",
+                            "isUnique": true,
+                            "materials": [
+                                {
+                                    "id": "adventuring:immaculate_shaft",
+                                    "qty": 5
+                                },
+                                {
+                                    "id": "adventuring:immaculate_hide",
+                                    "qty": 2
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 32
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 20
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 2.6
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 1.6
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "passive",
+                                    "type": "crit_chance_bonus",
+                                    "value": 0.1
+                                },
+                                {
+                                    "trigger": "passive",
+                                    "type": "crit_damage_bonus",
+                                    "value": 0.25
+                                }
+                            ],
+                            "requirements": [
+                                {
+                                    "type": "skill_level",
+                                    "level": 50
+                                },
+                                {
+                                    "type": "job_level",
+                                    "job": "adventuring:grandmaster_fletcher",
+                                    "level": 15
+                                }
+                            ]
+                        },
+                        {
+                            "id": "transcendent_rangers_bow",
+                            "name": "Transcendent Ranger's Bow",
+                            "media": "melvor:assets/media/bank/hunters_bow.png",
+                            "type": "adventuring:bow",
+                            "isUnique": true,
+                            "materials": [
+                                {
+                                    "id": "adventuring:transcendent_shaft",
+                                    "qty": 5
+                                },
+                                {
+                                    "id": "adventuring:transcendent_hide",
+                                    "qty": 2
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 50
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 32
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 4
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 2.6
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "passive",
+                                    "type": "crit_chance_bonus",
+                                    "value": 0.15
+                                },
+                                {
+                                    "trigger": "passive",
+                                    "type": "crit_damage_bonus",
+                                    "value": 0.5
+                                },
+                                {
+                                    "trigger": "on_crit",
+                                    "type": "armor_pierce",
+                                    "value": 0.25
+                                }
+                            ],
+                            "requirements": [
+                                {
+                                    "type": "skill_level",
+                                    "level": 75
+                                },
+                                {
+                                    "type": "job_level",
+                                    "job": "adventuring:legendary_fletcher",
+                                    "level": 15
+                                }
+                            ]
+                        },
+                        {
+                            "id": "refined_mystics_staff",
+                            "name": "Refined Mystic's Staff",
+                            "media": "melvor:assets/media/bank/nature_staff.png",
+                            "type": "adventuring:staff",
+                            "isUnique": true,
+                            "materials": [
+                                {
+                                    "id": "adventuring:refined_essence",
+                                    "qty": 5
+                                },
+                                {
+                                    "id": "adventuring:refined_stardust",
+                                    "qty": 3
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 20
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 10
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 1.6
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 0.8
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "passive",
+                                    "type": "ability_cost_reduction",
+                                    "ability_type": "magic",
+                                    "value": 0.1
+                                }
+                            ],
+                            "requirements": [
+                                {
+                                    "type": "skill_level",
+                                    "level": 25
+                                },
+                                {
+                                    "type": "job_level",
+                                    "job": "adventuring:master_runecrafter",
+                                    "level": 15
+                                }
+                            ]
+                        },
+                        {
+                            "id": "immaculate_mystics_staff",
+                            "name": "Immaculate Mystic's Staff",
+                            "media": "melvor:assets/media/bank/cloudburst_staff.png",
+                            "type": "adventuring:staff",
+                            "isUnique": true,
+                            "materials": [
+                                {
+                                    "id": "adventuring:immaculate_essence",
+                                    "qty": 5
+                                },
+                                {
+                                    "id": "adventuring:immaculate_stardust",
+                                    "qty": 3
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 35
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 18
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 2.8
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 1.4
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "passive",
+                                    "type": "ability_cost_reduction",
+                                    "ability_type": "magic",
+                                    "value": 0.2
+                                },
+                                {
+                                    "trigger": "passive",
+                                    "type": "damage_bonus",
+                                    "damageType": "magic",
+                                    "value": 0.15
+                                }
+                            ],
+                            "requirements": [
+                                {
+                                    "type": "skill_level",
+                                    "level": 50
+                                },
+                                {
+                                    "type": "job_level",
+                                    "job": "adventuring:grandmaster_runecrafter",
+                                    "level": 15
+                                }
+                            ]
+                        },
+                        {
+                            "id": "transcendent_mystics_staff",
+                            "name": "Transcendent Mystic's Staff",
+                            "media": "melvor:assets/media/bank/ocean_song.png",
+                            "type": "adventuring:staff",
+                            "isUnique": true,
+                            "materials": [
+                                {
+                                    "id": "adventuring:transcendent_essence",
+                                    "qty": 5
+                                },
+                                {
+                                    "id": "adventuring:transcendent_stardust",
+                                    "qty": 3
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 55
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 28
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 4.4
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 2.2
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "passive",
+                                    "type": "ability_cost_reduction",
+                                    "ability_type": "magic",
+                                    "value": 0.3
+                                },
+                                {
+                                    "trigger": "passive",
+                                    "type": "damage_bonus",
+                                    "damageType": "magic",
+                                    "value": 0.3
+                                },
+                                {
+                                    "trigger": "on_spell_cast",
+                                    "type": "double_cast",
+                                    "chance": 0.1
+                                }
+                            ],
+                            "requirements": [
+                                {
+                                    "type": "skill_level",
+                                    "level": 75
+                                },
+                                {
+                                    "type": "job_level",
+                                    "job": "adventuring:legendary_runecrafter",
+                                    "level": 15
+                                }
+                            ]
+                        },
+                        {
+                            "id": "refined_guardians_plate",
+                            "name": "Refined Guardian's Plate",
+                            "media": "melvor:assets/media/bank/dragon_platebody.png",
+                            "type": "adventuring:vest",
+                            "isUnique": true,
+                            "materials": [
+                                {
+                                    "id": "adventuring:refined_bar",
+                                    "qty": 6
+                                },
+                                {
+                                    "id": "adventuring:refined_hide",
+                                    "qty": 2
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 25
+                                },
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 30
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 2
+                                },
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 2.4
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "passive",
+                                    "type": "damage_reduction",
+                                    "value": 0.05
+                                }
+                            ],
+                            "requirements": [
+                                {
+                                    "type": "skill_level",
+                                    "level": 25
+                                },
+                                {
+                                    "type": "job_level",
+                                    "job": "adventuring:master_crafter",
+                                    "level": 15
+                                }
+                            ]
+                        },
+                        {
+                            "id": "immaculate_guardians_plate",
+                            "name": "Immaculate Guardian's Plate",
+                            "media": "melvor:assets/media/bank/ancient_platebody.png",
+                            "type": "adventuring:vest",
+                            "isUnique": true,
+                            "materials": [
+                                {
+                                    "id": "adventuring:immaculate_bar",
+                                    "qty": 6
+                                },
+                                {
+                                    "id": "adventuring:immaculate_hide",
+                                    "qty": 2
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 42
+                                },
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 50
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 3.4
+                                },
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 4
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "passive",
+                                    "type": "damage_reduction",
+                                    "value": 0.1
+                                },
+                                {
+                                    "trigger": "after_damage_received",
+                                    "type": "reflect",
+                                    "value": 0.05
+                                }
+                            ],
+                            "requirements": [
+                                {
+                                    "type": "skill_level",
+                                    "level": 50
+                                },
+                                {
+                                    "type": "job_level",
+                                    "job": "adventuring:grandmaster_crafter",
+                                    "level": 15
+                                }
+                            ]
+                        },
+                        {
+                            "id": "transcendent_guardians_plate",
+                            "name": "Transcendent Guardian's Plate",
+                            "media": "melvor:assets/media/bank/terran_god_platebody.png",
+                            "type": "adventuring:vest",
+                            "isUnique": true,
+                            "materials": [
+                                {
+                                    "id": "adventuring:transcendent_bar",
+                                    "qty": 6
+                                },
+                                {
+                                    "id": "adventuring:transcendent_hide",
+                                    "qty": 2
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 65
+                                },
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 75
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 5.2
+                                },
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 6
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "passive",
+                                    "type": "damage_reduction",
+                                    "value": 0.15
+                                },
+                                {
+                                    "trigger": "after_damage_received",
+                                    "type": "reflect",
+                                    "value": 0.1
+                                },
+                                {
+                                    "trigger": "on_fatal_hit",
+                                    "type": "survive",
+                                    "hp": 1,
+                                    "once_per_fight": true
+                                }
+                            ],
+                            "requirements": [
+                                {
+                                    "type": "skill_level",
+                                    "level": 75
+                                },
+                                {
+                                    "type": "job_level",
+                                    "job": "adventuring:legendary_crafter",
+                                    "level": 15
+                                }
+                            ]
+                        },
+                        {
+                            "id": "refined_summoners_talisman",
+                            "name": "Refined Summoner's Talisman",
+                            "media": "melvor:assets/media/bank/fez_amulet.png",
+                            "type": "adventuring:amulet",
+                            "isUnique": true,
+                            "materials": [
+                                {
+                                    "id": "adventuring:refined_shard",
+                                    "qty": 5
+                                },
+                                {
+                                    "id": "adventuring:refined_essence",
+                                    "qty": 2
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:summon_damage",
+                                    "value": 12
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 10
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:summon_damage",
+                                    "value": 1
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 0.8
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "passive",
+                                    "type": "summon_attack_speed",
+                                    "value": 0.15
+                                }
+                            ],
+                            "requirements": [
+                                {
+                                    "type": "skill_level",
+                                    "level": 25
+                                },
+                                {
+                                    "type": "job_level",
+                                    "job": "adventuring:master_summoner",
+                                    "level": 15
+                                }
+                            ]
+                        },
+                        {
+                            "id": "immaculate_summoners_talisman",
+                            "name": "Immaculate Summoner's Talisman",
+                            "media": "melvor:assets/media/bank/bone_necklace.png",
+                            "type": "adventuring:amulet",
+                            "isUnique": true,
+                            "materials": [
+                                {
+                                    "id": "adventuring:immaculate_shard",
+                                    "qty": 5
+                                },
+                                {
+                                    "id": "adventuring:immaculate_essence",
+                                    "qty": 2
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:summon_damage",
+                                    "value": 22
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 18
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:summon_damage",
+                                    "value": 1.8
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 1.4
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "passive",
+                                    "type": "summon_attack_speed",
+                                    "value": 0.25
+                                }
+                            ],
+                            "requirements": [
+                                {
+                                    "type": "skill_level",
+                                    "level": 50
+                                },
+                                {
+                                    "type": "job_level",
+                                    "job": "adventuring:grandmaster_summoner",
+                                    "level": 15
+                                }
+                            ]
+                        },
+                        {
+                            "id": "transcendent_summoners_talisman",
+                            "name": "Transcendent Summoner's Talisman",
+                            "media": "melvor:assets/media/bank/tormented_soul_necklace.png",
+                            "type": "adventuring:amulet",
+                            "isUnique": true,
+                            "materials": [
+                                {
+                                    "id": "adventuring:transcendent_shard",
+                                    "qty": 5
+                                },
+                                {
+                                    "id": "adventuring:transcendent_essence",
+                                    "qty": 2
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:summon_damage",
+                                    "value": 35
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 28
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:summon_damage",
+                                    "value": 2.8
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 2.2
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "passive",
+                                    "type": "summon_attack_speed",
+                                    "value": 0.4
+                                },
+                                {
+                                    "trigger": "passive",
+                                    "type": "summon_protection",
+                                    "value": true
+                                }
+                            ],
+                            "requirements": [
+                                {
+                                    "type": "skill_level",
+                                    "level": 75
+                                },
+                                {
+                                    "type": "job_level",
+                                    "job": "adventuring:legendary_summoner",
+                                    "level": 15
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

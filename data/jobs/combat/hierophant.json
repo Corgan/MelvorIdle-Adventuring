@@ -1,0 +1,241 @@
+{
+    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+    "namespace": "adventuring",
+    "data": {
+        "skillData": [{
+            "skillID": "adventuring:Adventuring",
+            "data": {
+                "jobs": [
+                    {
+                        "id": "hierophant",
+                        "tier": 5,
+                        "name": "Hierophant",
+                        "media": "melvor:assets/media/bank/potion_prayer_i.png#tint=green",
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:druid", "level": 25 },
+                            { "type": "job_level", "job": "adventuring:cleric", "level": 20 },
+                            { "type": "area_mastery", "area": "adventuring:ancient_forest", "level": 50 }
+                        ],
+                        "isMilestoneReward": true,
+                        "allowedItems": [
+                            "adventuring:hat",
+                            "adventuring:robes",
+                            "adventuring:bottoms",
+                            "adventuring:mitts",
+                            "adventuring:slippers",
+                            "adventuring:amulet",
+                            "adventuring:ring",
+                            "adventuring:cape",
+                            "adventuring:staff",
+                            "adventuring:wand",
+                            "adventuring:spellbook"
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:hitpoints", "value": 1.5 },
+                            { "id": "adventuring:defence", "value": 0.75 },
+                            { "id": "adventuring:agility", "value": 0.5 },
+                            { "id": "adventuring:magic", "value": 2.5 },
+                            { "id": "adventuring:prayer", "value": 2.5 }
+                        ]
+                    }
+                ],
+                "generators": [
+                    {
+                        "id": "verdant_wrath",
+                        "name": "Verdant Wrath",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:hierophant", "level": 1 }
+                        ],
+                        "energy": 30,
+                        "hits": [
+                            {
+                                "target": "aoe",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "element": "nature",
+                                        "amount": {
+                                            "base": 15,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 0.4 },
+                                                { "id": "adventuring:prayer", "value": 0.2 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:poison",
+                                        "stacks": {
+                                            "base": 2,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 0.05 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "verdant_surge",
+                        "name": "Verdant Surge",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:hierophant", "level": 10 }
+                        ],
+                        "energy": 35,
+                        "hits": [
+                            {
+                                "target": "aoe",
+                                "party": "ally",
+                                "effects": [
+                                    {
+                                        "type": "heal",
+                                        "amount": {
+                                            "base": 20,
+                                            "scaling": [
+                                                { "id": "adventuring:prayer", "value": 0.5 },
+                                                { "id": "adventuring:magic", "value": 0.3 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:regen",
+                                        "stacks": {
+                                            "base": 3,
+                                            "scaling": [
+                                                { "id": "adventuring:prayer", "value": 0.1 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "primal_blessing",
+                        "name": "Primal Blessing",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:hierophant", "level": 20 }
+                        ],
+                        "energy": 40,
+                        "hits": [
+                            {
+                                "target": "aoe",
+                                "party": "ally",
+                                "effects": [
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:might",
+                                        "stacks": {
+                                            "base": 4,
+                                            "scaling": [
+                                                { "id": "adventuring:prayer", "value": 0.1 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:fortify",
+                                        "stacks": {
+                                            "base": 4,
+                                            "scaling": [
+                                                { "id": "adventuring:prayer", "value": 0.1 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "spenders": [
+                    {
+                        "id": "wrath_of_the_wilds",
+                        "name": "Wrath of the Wilds",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:hierophant", "level": 30 }
+                        ],
+                        "energy": -100,
+                        "hits": [
+                            {
+                                "target": "aoe",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "element": "nature",
+                                        "amount": {
+                                            "base": 50,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 0.8 },
+                                                { "id": "adventuring:prayer", "value": 0.5 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:entangle",
+                                        "stacks": {
+                                            "base": 3,
+                                            "scaling": []
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "target": "aoe",
+                                "party": "ally",
+                                "effects": [
+                                    {
+                                        "type": "heal",
+                                        "amount": {
+                                            "base": 40,
+                                            "scaling": [
+                                                { "id": "adventuring:prayer", "value": 0.6 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "natures_avatar",
+                        "name": "Nature's Avatar",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:hierophant", "level": 40 }
+                        ],
+                        "energy": -80,
+                        "hits": [
+                            {
+                                "target": "self",
+                                "effects": [
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:natures_blessing",
+                                        "stacks": {
+                                            "base": 5,
+                                            "scaling": [
+                                                { "id": "adventuring:prayer", "value": 0.15 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:nature_infusion",
+                                        "stacks": {
+                                            "base": 3,
+                                            "scaling": []
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        }]
+    }
+}

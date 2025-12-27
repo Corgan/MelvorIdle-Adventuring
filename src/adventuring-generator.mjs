@@ -5,5 +5,9 @@ const { AdventuringAbility } = await loadModule('src/adventuring-ability.mjs');
 export class AdventuringGenerator extends AdventuringAbility {
     constructor(namespace, data, manager, game) {
         super(namespace, data, manager, game);
+        this.abilityType = 'generator';
     }
+    
+    get isGenerator() { return true; }
+    get isSpender() { return false; }
 }

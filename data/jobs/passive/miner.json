@@ -9,14 +9,14 @@
                     {
                         "id": "mining",
                         "name": "Mining",
-                        "media": "melvor:assets/media/skills/mining/mining.svg"
+                        "media": "melvor:assets/media/bank/potion_mining_i.png"
                     }
                 ],
                 "jobs": [
                     {
                         "id": "miner",
                         "name": "Miner",
-                        "media": "melvor:assets/media/skills/mining/mining.svg",
+                        "media": "melvor:assets/media/bank/potion_mining_i.png",
                         "requirements": [
                             { "type": "skill_level", "level": 5 }
                         ],
@@ -30,9 +30,40 @@
                 ],
                 "materials": [
                     {
-                        "id": "unknown_ore",
-                        "name": "Unknown Ore",
-                        "media": "melvor:assets/media/skills/mining/rock_iron.svg"
+                        "id": "crude_ore",
+                        "name": "Crude Ore",
+                        "media": "melvor:assets/media/skills/mining/rock_iron.png",
+                        "category": "adventuring:salvage"
+                    },
+                    {
+                        "id": "refined_ore",
+                        "name": "Refined Ore",
+                        "media": "melvor:assets/media/bank/gold_ore.png",
+                        "tier": 2,
+                        "category": "adventuring:salvage",
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:master_miner", "level": 1 }
+                        ]
+                    },
+                    {
+                        "id": "immaculate_ore",
+                        "name": "Immaculate Ore",
+                        "media": "melvor:assets/media/bank/dragonite_ore.png",
+                        "tier": 3,
+                        "category": "adventuring:salvage",
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:grandmaster_miner", "level": 1 }
+                        ]
+                    },
+                    {
+                        "id": "transcendent_ore",
+                        "name": "Transcendent Ore",
+                        "media": "melvor:assets/media/bank/logs_elderwood.png",
+                        "tier": 4,
+                        "category": "adventuring:salvage",
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:legendary_miner", "level": 1 }
+                        ]
                     }
                 ],
                 "buildings": [
@@ -40,15 +71,24 @@
                         "id": "mine",
                         "type": "workshop",
                         "name": "Mine",
-                        "description": "Create work orders for Miners. Converts Unknown Ore to complete orders.",
-                        "media": "melvor:assets/media/skills/township/Miners_Field.svg",
+                        "description": "Excavate ore from the depths. Miners extract raw materials for smithing.",
+                        "media": "melvor:assets/media/skills/township/Miners_Field.png",
                         "requirements": [],
                         "idle": ["Hittin' rocks", "Digging for gold"],
                         "actions": ["adventuring:work"],
                         "products": [
                             "adventuring:copper_ore",
                             "adventuring:tin_ore",
-                            "adventuring:iron_ore"
+                            "adventuring:iron_ore",
+                            "adventuring:coal_ore",
+                            "adventuring:silver_ore",
+                            "adventuring:gold_ore",
+                            "adventuring:mithril_ore",
+                            "adventuring:adamantite_ore",
+                            "adventuring:runite_ore",
+                            "adventuring:dragonite_ore",
+                            "adventuring:stoneskin_salve",
+                            "adventuring:prospectors_luck"
                         ]
                     }
                 ],
@@ -56,37 +96,277 @@
                     {
                         "id": "copper_ore",
                         "item": "melvorD:Copper_Ore",
+                        "outputType": "item",
                         "count": 1,
                         "requirements": [
                             { "type": "current_job", "job": "adventuring:miner" },
                             { "type": "job_level", "job": "adventuring:miner", "level": 1 }
                         ],
                         "materials": [
-                            { "id": "adventuring:unknown_ore", "count": 1 }
+                            { "id": "adventuring:crude_ore", "count": 1 }
                         ]
                     },
                     {
                         "id": "tin_ore",
                         "item": "melvorD:Tin_Ore",
+                        "outputType": "item",
                         "count": 1,
                         "requirements": [
                             { "type": "current_job", "job": "adventuring:miner" },
                             { "type": "job_level", "job": "adventuring:miner", "level": 1 }
                         ],
                         "materials": [
-                            { "id": "adventuring:unknown_ore", "count": 1 }
+                            { "id": "adventuring:crude_ore", "count": 1 }
                         ]
                     },
                     {
                         "id": "iron_ore",
                         "item": "melvorD:Iron_Ore",
+                        "outputType": "item",
                         "count": 1,
                         "requirements": [
                             { "type": "current_job", "job": "adventuring:miner" },
                             { "type": "job_level", "job": "adventuring:miner", "level": 1 }
                         ],
                         "materials": [
-                            { "id": "adventuring:unknown_ore", "count": 1 }
+                            { "id": "adventuring:crude_ore", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "coal_ore",
+                        "item": "melvorD:Coal_Ore",
+                        "outputType": "item",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:miner" },
+                            { "type": "job_level", "job": "adventuring:miner", "level": 5 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_ore", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "silver_ore",
+                        "item": "melvorD:Silver_Ore",
+                        "outputType": "item",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:miner" },
+                            { "type": "job_level", "job": "adventuring:miner", "level": 10 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_ore", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "gold_ore",
+                        "item": "melvorD:Gold_Ore",
+                        "outputType": "item",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:miner" },
+                            { "type": "job_level", "job": "adventuring:miner", "level": 15 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_ore", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "mithril_ore",
+                        "item": "melvorD:Mithril_Ore",
+                        "outputType": "item",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:miner" },
+                            { "type": "job_level", "job": "adventuring:miner", "level": 20 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_ore", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "adamantite_ore",
+                        "item": "melvorD:Adamantite_Ore",
+                        "outputType": "item",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:miner" },
+                            { "type": "job_level", "job": "adventuring:miner", "level": 30 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_ore", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "runite_ore",
+                        "item": "melvorD:Runite_Ore",
+                        "outputType": "item",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:miner" },
+                            { "type": "job_level", "job": "adventuring:miner", "level": 40 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_ore", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "dragonite_ore",
+                        "item": "melvorD:Dragonite_Ore",
+                        "outputType": "item",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:miner" },
+                            { "type": "job_level", "job": "adventuring:miner", "level": 50 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_ore", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "stoneskin_salve",
+                        "consumable": "adventuring:stoneskin_salve",
+                        "outputType": "consumable",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:miner" },
+                            { "type": "job_level", "job": "adventuring:miner", "level": 15 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_ore", "count": 2 }
+                        ]
+                    },
+                    {
+                        "id": "prospectors_luck",
+                        "consumable": "adventuring:prospectors_luck",
+                        "outputType": "consumable",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:miner" },
+                            { "type": "job_level", "job": "adventuring:miner", "level": 25 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_ore", "count": 3 }
+                        ]
+                    },
+                    {
+                        "id": "convert_crude_ore_to_refined",
+                        "material": "adventuring:refined_ore",
+                        "outputType": "material",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:master_miner", "level": 10 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_ore", "count": 5 }
+                        ]
+                    },
+                    {
+                        "id": "convert_refined_ore_to_immaculate",
+                        "material": "adventuring:immaculate_ore",
+                        "outputType": "material",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:grandmaster_miner", "level": 10 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:refined_ore", "count": 5 }
+                        ]
+                    },
+                    {
+                        "id": "convert_immaculate_ore_to_transcendent",
+                        "material": "adventuring:transcendent_ore",
+                        "outputType": "material",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:legendary_miner", "level": 10 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:immaculate_ore", "count": 5 }
+                        ]
+                    },
+                    {
+                        "id": "refined_mithril_ore",
+                        "item": "melvorD:Mithril_Ore",
+                        "outputType": "item",
+                        "count": 3,
+                        "requirements": [
+                            { "type": "skill_level", "level": 25 },
+                            { "type": "current_job", "job": "adventuring:master_miner" },
+                            { "type": "job_level", "job": "adventuring:master_miner", "level": 1 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:refined_ore", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "refined_adamantite_ore",
+                        "item": "melvorD:Adamantite_Ore",
+                        "outputType": "item",
+                        "count": 3,
+                        "requirements": [
+                            { "type": "skill_level", "level": 25 },
+                            { "type": "current_job", "job": "adventuring:master_miner" },
+                            { "type": "job_level", "job": "adventuring:master_miner", "level": 15 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:refined_ore", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "refined_runite_ore",
+                        "item": "melvorD:Runite_Ore",
+                        "outputType": "item",
+                        "count": 3,
+                        "requirements": [
+                            { "type": "skill_level", "level": 25 },
+                            { "type": "current_job", "job": "adventuring:master_miner" },
+                            { "type": "job_level", "job": "adventuring:master_miner", "level": 30 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:refined_ore", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "immaculate_runite_ore",
+                        "item": "melvorD:Runite_Ore",
+                        "outputType": "item",
+                        "count": 8,
+                        "requirements": [
+                            { "type": "skill_level", "level": 50 },
+                            { "type": "current_job", "job": "adventuring:grandmaster_miner" },
+                            { "type": "job_level", "job": "adventuring:grandmaster_miner", "level": 1 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:immaculate_ore", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "immaculate_dragonite_ore",
+                        "item": "melvorD:Dragonite_Ore",
+                        "outputType": "item",
+                        "count": 8,
+                        "requirements": [
+                            { "type": "skill_level", "level": 50 },
+                            { "type": "current_job", "job": "adventuring:grandmaster_miner" },
+                            { "type": "job_level", "job": "adventuring:grandmaster_miner", "level": 20 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:immaculate_ore", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "transcendent_dragonite_ore",
+                        "item": "melvorD:Dragonite_Ore",
+                        "outputType": "item",
+                        "count": 20,
+                        "requirements": [
+                            { "type": "skill_level", "level": 75 },
+                            { "type": "current_job", "job": "adventuring:legendary_miner" },
+                            { "type": "job_level", "job": "adventuring:legendary_miner", "level": 1 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:transcendent_ore", "count": 1 }
                         ]
                     }
                 ],
@@ -94,7 +374,7 @@
                     {
                         "id": "ore",
                         "name": "Ore",
-                        "media": "melvor:assets/media/skills/mining/rock_copper.svg",
+                        "media": "melvor:assets/media/skills/mining/rock_copper.png",
                         "requirements": [
                             { "type": "current_job", "job": "adventuring:miner" }
                         ],
@@ -106,7 +386,53 @@
                             {
                                 "type": "loot",
                                 "pool": [
-                                    { "id": "adventuring:unknown_ore", "qty": 1, "weight": 100 }
+                                    { "id": "adventuring:crude_ore", "qty": 1, "weight": 100 }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "ancient_mine",
+                        "name": "Ancient Mine",
+                        "media": "melvor:assets/media/bank/potion_mining_i.png",
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:master_miner", "level": 1 }
+                        ],
+                        "weight": 8,
+                        "floor_max": 1,
+                        "dungeon_max": 2,
+                        "effects": [
+                            { "type": "xp", "amount": 100, "job": "adventuring:miner" },
+                            { "type": "xp", "amount": 50, "job": "adventuring:master_miner" },
+                            {
+                                "type": "loot",
+                                "pool": [
+                                    { "id": "adventuring:crude_ore", "qty": 3, "weight": 60 },
+                                    { "id": "adventuring:refined_ore", "qty": 2, "weight": 35 },
+                                    { "id": "adventuring:immaculate_ore", "qty": 1, "weight": 5 }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "legendary_depths",
+                        "name": "Legendary Depths",
+                        "media": "melvor:assets/media/bank/potion_mining_i.png",
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:legendary_miner", "level": 1 }
+                        ],
+                        "weight": 3,
+                        "floor_max": 1,
+                        "dungeon_max": 1,
+                        "effects": [
+                            { "type": "xp", "amount": 250, "job": "adventuring:legendary_miner" },
+                            { "type": "xp", "amount": 100, "job": "adventuring:grandmaster_miner" },
+                            {
+                                "type": "loot",
+                                "pool": [
+                                    { "id": "adventuring:refined_ore", "qty": 3, "weight": 40 },
+                                    { "id": "adventuring:immaculate_ore", "qty": 2, "weight": 40 },
+                                    { "id": "adventuring:transcendent_ore", "qty": 1, "weight": 20 }
                                 ]
                             }
                         ]
@@ -116,3 +442,4 @@
         }]
     }
 }
+

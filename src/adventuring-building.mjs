@@ -1,6 +1,8 @@
 const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringWorkshop } = await loadModule('src/adventuring-workshop.mjs');
+const { TooltipBuilder } = await loadModule('src/adventuring-tooltip.mjs');
+const { RequirementsChecker } = await loadModule('src/adventuring-utils.mjs');
 
 const { AdventuringBuildingElement } = await loadModule('src/components/adventuring-building.mjs');
 
@@ -79,24 +81,19 @@ export class AdventuringBuilding extends NamespacedObject {
     }
 
     get unlocked() {
-        if(this.requirements.length == 0)
-            return true;
-        return this.requirements.reduce((equipable, requirement) => {
-            if(requirement.type == "skill_level") {
-                if(this.manager.level < requirement.level)
-                    return false;
-            }
-            return equipable;
-        }, true);
+        return this._reqChecker?.check() ?? true;
     }
 
     get tooltip() {
-        let html = '<div>';
-
-        html += `<div><span>${this.name}</span></div>`;
-        html += `<div><span>${this.description}</span></div>`;
-        html += '</div>'
-        return html;
+        const tooltip = TooltipBuilder.create()
+            .header(this.name, this.media)
+            .hint(this.description);
+        
+        if(!this.unlocked) {
+            tooltip.unlockRequirements(this.requirements, this.manager);
+        }
+        
+        return tooltip.build();
     }
 
     get action() {
@@ -132,6 +129,7 @@ export class AdventuringBuilding extends NamespacedObject {
     }
 
     postDataRegistration() {
+        this._reqChecker = new RequirementsChecker(this.manager, this.requirements);
         if(this._actions !== undefined)
             this.actions = this._actions.map(id => this.manager.townActions.getObjectByID(id));
     }
@@ -146,6 +144,9 @@ export class AdventuringBuilding extends NamespacedObject {
         if(!this.renderQueue.tooltip)
             return;
 
+        if(this.component.tooltip === undefined)
+            return;
+
         this.component.tooltip.setContent(this.tooltip);
 
         this.renderQueue.tooltip = false;
@@ -158,7 +159,7 @@ export class AdventuringBuilding extends NamespacedObject {
         if(this.unlocked) {
             this.component.icon.src = this.media;
         } else {
-            this.component.icon.src = this.getMediaURL('melvor:assets/media/main/question.svg');
+            this.component.icon.src = this.getMediaURL('melvor:assets/media/main/question.png');
         }
 
         this.renderQueue.icon = false;

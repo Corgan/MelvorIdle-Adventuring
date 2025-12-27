@@ -81,7 +81,7 @@ export class AdventuringDungeonFloor {
 
         current.setExplored(true);
 
-        if(current.type === this.exit || current.type == this.boss)
+        if(current.type === this.exit || current.type === this.boss)
             return;
 
         let [mX, mY] = this.getBestMove();
@@ -167,7 +167,7 @@ export class AdventuringDungeonFloor {
                     }
                 }
             }
-            if (pCount == 0) {
+            if (pCount === 0) {
                 exitRepeats++;
                 for (let x = 0; x < this.width; x++) {
                     let cell = this.at(x, this.height - 2);
@@ -203,20 +203,51 @@ export class AdventuringDungeonFloor {
     }
 
     chooseTile(x, y) {
+        // Get tile modifiers from dungeon mastery
+        const area = this.dungeon.area;
+        const tileModifiers = area ? area.getTileModifiers() : {};
+        
+        // Check if current floor has no random encounters
+        const hasMonsters = this.dungeon.currentFloor && this.dungeon.currentFloor.monsters && this.dungeon.currentFloor.monsters.length > 0;
+        
         let toLoad = this.manager.tiles.allObjects.filter(tile => {
             if(tile.weight === undefined)
                 return false;
             if(!tile.spawnable)
                 return false;
+            // Skip encounter tiles if floor has no monsters
+            if(!hasMonsters && tile === this.encounter)
+                return false;
             if(tile.dungeon_max !== undefined && tile.dungeon_max !== -1 && this.dungeon.tileCount.get(tile) >= tile.dungeon_max)
                 return false;
             if(tile.floor_max !== undefined && tile.floor_max !== -1 && this.tileCount.get(tile) >= tile.floor_max)
                 return false;
+            
+            // Check if tile requires mastery unlock (weight 0 until unlocked)
+            if(tile.masteryUnlock) {
+                const modifier = tileModifiers[tile.id] || 0;
+                if(modifier <= 0) return false;
+            }
+            
             return true;
-        });
+        }).map(tile => {
+            // Apply mastery-based weight modifiers
+            const modifier = tileModifiers[tile.id];
+            if(modifier !== undefined) {
+                return { ...tile, weight: Math.floor(tile.weight * modifier) };
+            }
+            return tile;
+        }).filter(tile => tile.weight > 0); // Remove tiles with 0 weight
 
-        let id = this.tileTable.loadTable(toLoad).getEntry().id;
-        return this.manager.tiles.getObjectByID(id);
+        // Fallback to empty if no tiles available
+        if(toLoad.length === 0)
+            return this.empty;
+
+        let entry = this.tileTable.loadTable(toLoad).getEntry();
+        if(entry === undefined)
+            return this.empty;
+
+        return this.manager.tiles.getObjectByID(entry.id) || this.empty;
         
         /*if(this.emptyCount >= 2 && Math.random() <= this.encounter.chance) {
             if( !this.is(x + 1, y, this.encounter) &&
@@ -273,8 +304,28 @@ export class AdventuringDungeonFloor {
     }
 
     complete() {
+        // Trigger floor_end effects before healing/transitioning
+        this.manager.party.all.forEach(member => {
+            member.trigger('floor_end', {});
+        });
+        
         this.manager.dungeon.progress++;
         this.manager.overview.renderQueue.status = true;
+
+        // Heal and revive party between floors (but not between encounters within a floor)
+        // This provides a checkpoint system while keeping floor-level tension
+        this.manager.party.all.forEach(member => {
+            if (member.dead) {
+                // Revive dead members to full HP
+                member.dead = false;
+                member.hitpoints = member.maxHitpoints;
+                member.renderQueue.hitpoints = true;
+            } else {
+                // Heal living members to full HP
+                member.hitpoints = member.maxHitpoints;
+                member.renderQueue.hitpoints = true;
+            }
+        });
 
         if(this.manager.dungeon.progress >= this.manager.dungeon.numFloors) {
             this.manager.dungeon.complete();
@@ -293,16 +344,21 @@ export class AdventuringDungeonFloor {
         if(!this.renderQueue.cells)
             return;
 
+        if(this.grid.length < this.height * this.width)
+            return;
+
         let cells = [];
         let rowEnds = 0;
         for(let y = 0; y < this.height; y++) {
             for(let x = 0; x < this.width; x++) {
                 let i = x + (this.width * y);
+                if(this.grid[i] === undefined)
+                    continue;
                 this.grid[i].setCurrent(this.current === this.grid[i]);
                 cells.push(this.grid[i]);
             }
 
-            if(this.cellRowEnds[rowEnds] == undefined)
+            if(this.cellRowEnds[rowEnds] === undefined)
                 this.cellRowEnds[rowEnds] = createElement('div', { className: 'w-100' });
         
             cells.push(this.cellRowEnds[rowEnds++]);
@@ -331,7 +387,9 @@ export class AdventuringDungeonFloor {
         writer.writeArray(this.tileMap, (tile, writer) => {
             writer.writeNamespacedObject(tile);
         });
-        let grid = this.grid.filter(cell => cell.type !== undefined);
+        // Only encode cells up to expected grid size
+        let expectedSize = this.height * this.width;
+        let grid = this.grid.slice(0, expectedSize);
         writer.writeArray(grid, (cell, writer) => {
             cell.encode(writer, this.tileMap);
         });
@@ -356,6 +414,15 @@ export class AdventuringDungeonFloor {
             cell.decode(reader, version, tileMap);
             return cell;
         });
+
+        // Ensure grid has the correct number of cells
+        const expectedSize = this.height * this.width;
+        while(this.grid.length < expectedSize) {
+            let cell = new AdventuringDungeonCell(this.manager, this.game, this);
+            cell.set(this.wall);
+            this.grid.push(cell);
+        }
+
         this.forkStack = reader.getArray((reader) => {
             return [reader.getUint8(), reader.getUint8()];
         });

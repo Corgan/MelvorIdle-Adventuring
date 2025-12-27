@@ -1,0 +1,729 @@
+{
+    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+    "namespace": "adventuring",
+    "data": {
+        "skillData": [{
+            "skillID": "adventuring:Adventuring",
+            "data": {
+                "passives": [
+                    {
+                        "id": "goblin_frenzy",
+                        "name": "Goblin Frenzy",
+                        "effects": [
+                            {
+                                "trigger": "encounter_start",
+                                "type": "buff",
+                                "target": "all_allies",
+                                "buff": "adventuring:might",
+                                "stacks": { "base": 3, "scaling": [] }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "sneaky_tactics",
+                        "name": "Sneaky Tactics",
+                        "effects": [
+                            {
+                                "trigger": "round_start",
+                                "type": "buff",
+                                "target": "self",
+                                "buff": "adventuring:evasion",
+                                "stacks": { "base": 2, "scaling": [] }
+                            }
+                        ]
+                    }
+                ],
+                "areas": [
+                    {
+                        "id": "goblin_fortress",
+                        "name": "Goblin Fortress",
+                        "media": "melvor:assets/media/monsters/golbin.png",
+                        "requirements": [
+                            { "type": "skill_level", "level": 42 }
+                        ],
+                        "height": 9,
+                        "width": 7,
+                        "floors": [
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:goblin_grunt", "weight": 70 },
+                                    { "id": "adventuring:goblin_scout", "weight": 30 }
+                                ],
+                                "exit": ["adventuring:goblin_grunt", "adventuring:goblin_grunt", "adventuring:goblin_scout"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:goblin_grunt", "weight": 40 },
+                                    { "id": "adventuring:goblin_scout", "weight": 35 },
+                                    { "id": "adventuring:goblin_bomber", "weight": 25 }
+                                ],
+                                "exit": ["adventuring:goblin_grunt", "adventuring:goblin_scout", "adventuring:goblin_bomber"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:goblin_scout", "weight": 30 },
+                                    { "id": "adventuring:goblin_bomber", "weight": 35 },
+                                    { "id": "adventuring:goblin_shaman", "weight": 35 }
+                                ],
+                                "exit": ["adventuring:goblin_scout", "adventuring:goblin_bomber", "adventuring:goblin_shaman"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:goblin_bomber", "weight": 30 },
+                                    { "id": "adventuring:goblin_shaman", "weight": 35 },
+                                    { "id": "adventuring:goblin_berserker", "weight": 35 }
+                                ],
+                                "exit": ["adventuring:goblin_bomber", "adventuring:goblin_shaman", "adventuring:goblin_berserker"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:goblin_shaman", "weight": 30 },
+                                    { "id": "adventuring:goblin_berserker", "weight": 40 },
+                                    { "id": "adventuring:goblin_warlord", "weight": 30 }
+                                ],
+                                "exit": ["adventuring:goblin_shaman", "adventuring:goblin_berserker", "adventuring:goblin_warlord"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:goblin_berserker", "weight": 40 },
+                                    { "id": "adventuring:goblin_warlord", "weight": 60 }
+                                ],
+                                "exit": ["adventuring:goblin_berserker", "adventuring:goblin_warlord", "adventuring:goblin_king"]
+                            }
+                        ]
+                    }
+                ],
+                "monsters": [
+                    {
+                        "id": "goblin_grunt",
+                        "name": "Goblin Grunt",
+                        "media": "melvor:assets/media/monsters/golbin.png",
+                        "tags": ["goblin", "humanoid"],
+                        "xp": 65,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 55 },
+                            { "id": "adventuring:defence", "value": 32 },
+                            { "id": "adventuring:agility", "value": 45 },
+                            { "id": "adventuring:strength", "value": 42 },
+                            { "id": "adventuring:ranged", "value": 35 },
+                            { "id": "adventuring:magic", "value": 28 },
+                            { "id": "adventuring:prayer", "value": 25 }
+                        ],
+                        "generator": "adventuring:shiv",
+                        "spender": "adventuring:flurry",
+                        "passives": [],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 5, "weight": 100 },
+                            { "id": "adventuring:parts", "qty": 2, "weight": 20 },
+                            { "id": "adventuring:goblin_ear", "qty": 2, "weight": 45 }
+                        ]
+                    },
+                    {
+                        "id": "goblin_scout",
+                        "name": "Goblin Scout",
+                        "media": "melvor:assets/media/monsters/ranged_golbin.png",
+                        "tags": ["goblin", "humanoid"],
+                        "xp": 70,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 45 },
+                            { "id": "adventuring:defence", "value": 28 },
+                            { "id": "adventuring:agility", "value": 55 },
+                            { "id": "adventuring:strength", "value": 35 },
+                            { "id": "adventuring:ranged", "value": 50 },
+                            { "id": "adventuring:magic", "value": 30 },
+                            { "id": "adventuring:prayer", "value": 28 }
+                        ],
+                        "generator": "adventuring:quick_shot",
+                        "spender": "adventuring:arrow_volley",
+                        "passives": ["adventuring:sneaky_tactics"],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 6, "weight": 100 },
+                            { "id": "adventuring:parts", "qty": 2, "weight": 18 },
+                            { "id": "adventuring:goblin_ear", "qty": 2, "weight": 40 }
+                        ]
+                    },
+                    {
+                        "id": "goblin_bomber",
+                        "name": "Goblin Bomber",
+                        "media": "melvor:assets/media/monsters/golbin.png",
+                        "tags": ["goblin", "humanoid"],
+                        "xp": 75,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 50 },
+                            { "id": "adventuring:defence", "value": 30 },
+                            { "id": "adventuring:agility", "value": 48 },
+                            { "id": "adventuring:strength", "value": 38 },
+                            { "id": "adventuring:ranged", "value": 55 },
+                            { "id": "adventuring:magic", "value": 35 },
+                            { "id": "adventuring:prayer", "value": 25 }
+                        ],
+                        "generator": "adventuring:throw_bomb",
+                        "spender": "adventuring:explosive_barrage",
+                        "passives": [],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 7, "weight": 100 },
+                            { "id": "adventuring:parts", "qty": 2, "weight": 22 },
+                            { "id": "adventuring:goblin_ear", "qty": 2, "weight": 35 },
+                            { "id": "adventuring:goblin_bomb", "qty": 1, "weight": 15 }
+                        ]
+                    },
+                    {
+                        "id": "goblin_shaman",
+                        "name": "Goblin Shaman",
+                        "media": "melvor:assets/media/monsters/golbin.png",
+                        "tags": ["goblin", "humanoid", "mage"],
+                        "xp": 80,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 48 },
+                            { "id": "adventuring:defence", "value": 28 },
+                            { "id": "adventuring:agility", "value": 42 },
+                            { "id": "adventuring:strength", "value": 30 },
+                            { "id": "adventuring:ranged", "value": 35 },
+                            { "id": "adventuring:magic", "value": 58 },
+                            { "id": "adventuring:prayer", "value": 48 }
+                        ],
+                        "generator": "adventuring:hex",
+                        "spender": "adventuring:ancestral_curse",
+                        "passives": [],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 8, "weight": 100 },
+                            { "id": "adventuring:parts", "qty": 2, "weight": 15 },
+                            { "id": "adventuring:goblin_ear", "qty": 2, "weight": 35 },
+                            { "id": "adventuring:arcane_dust", "qty": 2, "weight": 25 }
+                        ]
+                    },
+                    {
+                        "id": "goblin_berserker",
+                        "name": "Goblin Berserker",
+                        "media": "melvor:assets/media/monsters/golbin.png",
+                        "tags": ["goblin", "humanoid"],
+                        "xp": 90,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 75 },
+                            { "id": "adventuring:defence", "value": 35 },
+                            { "id": "adventuring:agility", "value": 50 },
+                            { "id": "adventuring:strength", "value": 65 },
+                            { "id": "adventuring:ranged", "value": 32 },
+                            { "id": "adventuring:magic", "value": 25 },
+                            { "id": "adventuring:prayer", "value": 30 }
+                        ],
+                        "generator": "adventuring:raging_slash",
+                        "spender": "adventuring:berserk_fury",
+                        "passives": [],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 10, "weight": 100 },
+                            { "id": "adventuring:parts", "qty": 2, "weight": 20 },
+                            { "id": "adventuring:goblin_ear", "qty": 3, "weight": 45 }
+                        ]
+                    },
+                    {
+                        "id": "goblin_warlord",
+                        "name": "Goblin Warlord",
+                        "media": "melvor:assets/media/monsters/golbin_chief.png",
+                        "tags": ["goblin", "humanoid"],
+                        "xp": 100,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 95 },
+                            { "id": "adventuring:defence", "value": 48 },
+                            { "id": "adventuring:agility", "value": 45 },
+                            { "id": "adventuring:strength", "value": 60 },
+                            { "id": "adventuring:ranged", "value": 40 },
+                            { "id": "adventuring:magic", "value": 35 },
+                            { "id": "adventuring:prayer", "value": 38 }
+                        ],
+                        "generator": "adventuring:war_shout",
+                        "spender": "adventuring:warlords_command",
+                        "passives": [],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 12, "weight": 100 },
+                            { "id": "adventuring:big_parts", "qty": 1, "weight": 15 },
+                            { "id": "adventuring:goblin_ear", "qty": 4, "weight": 50 }
+                        ]
+                    },
+                    {
+                        "id": "goblin_king",
+                        "name": "Goblin King",
+                        "media": "melvor:assets/media/monsters/golbin_chief.png",
+                        "tags": ["goblin", "humanoid", "boss"],
+                        "isBoss": true,
+                        "xp": 280,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 380 },
+                            { "id": "adventuring:defence", "value": 62 },
+                            { "id": "adventuring:agility", "value": 55 },
+                            { "id": "adventuring:strength", "value": 75 },
+                            { "id": "adventuring:ranged", "value": 50 },
+                            { "id": "adventuring:magic", "value": 48 },
+                            { "id": "adventuring:prayer", "value": 52 }
+                        ],
+                        "generator": "adventuring:royal_command",
+                        "spender": "adventuring:goblin_horde",
+                        "passives": ["adventuring:goblin_frenzy"],
+                        "phases": [
+                            {
+                                "threshold": 0.5,
+                                "statMultipliers": { "strength": 1.25, "agility": 1.2 },
+                                "healPercent": 0.1
+                            }
+                        ],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 80, "weight": 100 },
+                            { "id": "adventuring:big_parts", "qty": 3, "weight": 35 },
+                            { "id": "adventuring:goblin_ear", "qty": 10, "weight": 80 },
+                            { "id": "adventuring:goblin_kings_crown", "qty": 1, "weight": 5 }
+                        ]
+                    }
+                ],
+                "materials": [
+                    {
+                        "id": "goblin_bomb",
+                        "name": "Goblin Bomb",
+                        "media": "melvor:assets/media/bank/bomb.png",
+                        "category": "adventuring:monster_drops"
+                    }
+                ],
+                "generators": [
+                    {
+                        "id": "shiv",
+                        "name": "Shiv",
+                        "isEnemy": true,
+                        "requirements": [],
+                        "energy": 20,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 10,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.25 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "throw_bomb",
+                        "name": "Throw Bomb",
+                        "isEnemy": true,
+                        "requirements": [],
+                        "energy": 25,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 12,
+                                            "scaling": [
+                                                { "id": "adventuring:ranged", "value": 0.25 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:burn",
+                                        "stacks": {
+                                            "base": 2,
+                                            "scaling": []
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "hex",
+                        "name": "Hex",
+                        "isEnemy": true,
+                        "requirements": [],
+                        "energy": 20,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 10,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 0.25 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:curse",
+                                        "stacks": {
+                                            "base": 1,
+                                            "scaling": []
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "raging_slash",
+                        "name": "Raging Slash",
+                        "isEnemy": true,
+                        "requirements": [],
+                        "energy": 20,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 14,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.3 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "target": "self",
+                                "party": "ally",
+                                "effects": [
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:berserk",
+                                        "stacks": {
+                                            "base": 1,
+                                            "scaling": []
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "war_shout",
+                        "name": "War Shout",
+                        "isEnemy": true,
+                        "requirements": [],
+                        "energy": 25,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 12,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.25 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "target": "all",
+                                "party": "ally",
+                                "effects": [
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:might",
+                                        "stacks": {
+                                            "base": 2,
+                                            "scaling": []
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "royal_command",
+                        "name": "Royal Command",
+                        "isEnemy": true,
+                        "requirements": [],
+                        "energy": 30,
+                        "hits": [
+                            {
+                                "target": "all",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 10,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.2 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "target": "all",
+                                "party": "ally",
+                                "effects": [
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:might",
+                                        "stacks": {
+                                            "base": 2,
+                                            "scaling": []
+                                        }
+                                    },
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:haste",
+                                        "stacks": {
+                                            "base": 1,
+                                            "scaling": []
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "spenders": [
+                    {
+                        "id": "flurry",
+                        "name": "Flurry",
+                        "isEnemy": true,
+                        "requirements": [],
+                        "cost": 60,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 25,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.35 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "explosive_barrage",
+                        "name": "Explosive Barrage",
+                        "isEnemy": true,
+                        "requirements": [],
+                        "cost": 80,
+                        "hits": [
+                            {
+                                "target": "all",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 15,
+                                            "scaling": [
+                                                { "id": "adventuring:ranged", "value": 0.25 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:burn",
+                                        "stacks": {
+                                            "base": 3,
+                                            "scaling": []
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "ancestral_curse",
+                        "name": "Ancestral Curse",
+                        "isEnemy": true,
+                        "requirements": [],
+                        "cost": 80,
+                        "hits": [
+                            {
+                                "target": "all",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 12,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 0.3 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:curse",
+                                        "stacks": {
+                                            "base": 2,
+                                            "scaling": []
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:weaken",
+                                        "stacks": {
+                                            "base": 2,
+                                            "scaling": []
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "berserk_fury",
+                        "name": "Berserk Fury",
+                        "isEnemy": true,
+                        "requirements": [],
+                        "cost": 100,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 40,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.5 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "warlords_command",
+                        "name": "Warlord's Command",
+                        "isEnemy": true,
+                        "requirements": [],
+                        "cost": 100,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 30,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.4 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "target": "all",
+                                "party": "ally",
+                                "effects": [
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:might",
+                                        "stacks": {
+                                            "base": 3,
+                                            "scaling": []
+                                        }
+                                    },
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:fortify",
+                                        "stacks": {
+                                            "base": 2,
+                                            "scaling": []
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "goblin_horde",
+                        "name": "Goblin Horde",
+                        "isEnemy": true,
+                        "requirements": [],
+                        "cost": 100,
+                        "hits": [
+                            {
+                                "target": "all",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 35,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.45 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:weaken",
+                                        "stacks": {
+                                            "base": 3,
+                                            "scaling": []
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "uniqueItems": [
+                    {
+                        "id": "goblin_kings_crown",
+                        "name": "Goblin King's Crown",
+                        "media": "melvor:assets/media/bank/gold_crown.png",
+                        "slot": "adventuring:helm",
+                        "stats": [
+                            { "id": "adventuring:strength", "value": 10 },
+                            { "id": "adventuring:agility", "value": 8 },
+                            { "id": "adventuring:hitpoints", "value": 12 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "encounter_start",
+                                "type": "buff",
+                                "target": "self",
+                                "buff": "adventuring:might",
+                                "stacks": 3
+                            },
+                            {
+                                "trigger": "encounter_start",
+                                "type": "buff",
+                                "target": "self",
+                                "buff": "adventuring:haste",
+                                "stacks": 2
+                            }
+                        ]
+                    }
+                ]
+            }
+        }]
+    }
+}

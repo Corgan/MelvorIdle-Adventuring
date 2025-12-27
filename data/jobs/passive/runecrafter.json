@@ -9,14 +9,14 @@
                     {
                         "id": "runecrafting",
                         "name": "Runecrafting",
-                        "media": "melvor:assets/media/skills/runecrafting/runecrafting.svg"
+                        "media": "melvor:assets/media/bank/potion_runecrafting_i.png"
                     }
                 ],
                 "jobs": [
                     {
                         "id": "runecrafter",
                         "name": "Runecrafter",
-                        "media": "melvor:assets/media/skills/runecrafting/runecrafting.svg",
+                        "media": "melvor:assets/media/bank/potion_runecrafting_i.png",
                         "requirements": [
                             { "type": "skill_level", "level": 5 }
                         ],
@@ -28,18 +28,604 @@
                     }
                 ],
                 "materials": [
-
+                    {
+                        "id": "crude_essence",
+                        "name": "Crude Essence",
+                        "media": "melvor:assets/media/bank/potion_runecrafting_i.png",
+                        "category": "adventuring:salvage"
+                    },
+                    {
+                        "id": "refined_essence",
+                        "name": "Refined Essence",
+                        "media": "melvor:assets/media/bank/nature_rune.png",
+                        "tier": 2,
+                        "category": "adventuring:salvage",
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:master_runecrafter", "level": 1 }
+                        ]
+                    },
+                    {
+                        "id": "immaculate_essence",
+                        "name": "Immaculate Essence",
+                        "media": "melvor:assets/media/bank/ancient_rune.png",
+                        "tier": 3,
+                        "category": "adventuring:salvage",
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:grandmaster_runecrafter", "level": 1 }
+                        ]
+                    },
+                    {
+                        "id": "transcendent_essence",
+                        "name": "Transcendent Essence",
+                        "media": "melvor:assets/media/bank/logs_elderwood.png",
+                        "tier": 4,
+                        "category": "adventuring:salvage",
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:legendary_runecrafter", "level": 1 }
+                        ]
+                    },
+                    {
+                        "id": "enchanted_fire_essence",
+                        "name": "Enchanted Fire Essence",
+                        "media": "melvor:assets/media/bank/fire_rune.png",
+                        "category": "adventuring:materials"
+                    },
+                    {
+                        "id": "enchanted_frost_essence",
+                        "name": "Enchanted Frost Essence",
+                        "media": "melvor:assets/media/bank/water_rune.png",
+                        "category": "adventuring:materials"
+                    },
+                    {
+                        "id": "enchanted_storm_essence",
+                        "name": "Enchanted Storm Essence",
+                        "media": "melvor:assets/media/bank/air_rune.png",
+                        "category": "adventuring:materials"
+                    },
+                    {
+                        "id": "enchanted_earth_essence",
+                        "name": "Enchanted Earth Essence",
+                        "media": "melvor:assets/media/bank/earth_rune.png",
+                        "category": "adventuring:materials"
+                    },
+                    {
+                        "id": "mana_crystal",
+                        "name": "Mana Crystal",
+                        "media": "melvor:assets/media/bank/gem_sapphire.png",
+                        "category": "adventuring:materials"
+                    },
+                    {
+                        "id": "prismatic_shard",
+                        "name": "Prismatic Shard",
+                        "media": "melvor:assets/media/bank/gem_diamond.png",
+                        "category": "adventuring:materials"
+                    }
                 ],
                 "buildings": [
-
+                    {
+                        "id": "altar",
+                        "type": "workshop",
+                        "name": "Runecrafting Altar",
+                        "description": "Channel magical essence into powerful runes. Runecrafters supply components for spellcasting.",
+                        "media": "melvor:assets/media/skills/township/Magic_Emporium.png",
+                        "requirements": [],
+                        "idle": ["Meditating", "Channeling essence", "Infusing magic"],
+                        "actions": ["adventuring:work"],
+                        "products": [
+                            "adventuring:rune_essence",
+                            "adventuring:air_rune",
+                            "adventuring:mind_rune",
+                            "adventuring:water_rune",
+                            "adventuring:earth_rune",
+                            "adventuring:fire_rune",
+                            "adventuring:body_rune",
+                            "adventuring:chaos_rune",
+                            "adventuring:death_rune",
+                            "adventuring:blood_rune",
+                            "adventuring:ancient_rune",
+                            "adventuring:mana_surge",
+                            "adventuring:rune_shield_elixir",
+                            "adventuring:enchanted_fire_essence",
+                            "adventuring:enchanted_frost_essence",
+                            "adventuring:enchanted_storm_essence",
+                            "adventuring:enchanted_earth_essence",
+                            "adventuring:mana_crystal",
+                            "adventuring:prismatic_shard"
+                        ]
+                    }
                 ],
                 "products": [
-                    
+                    {
+                        "id": "rune_essence",
+                        "item": "melvorD:Rune_Essence",
+                        "outputType": "item",
+                        "count": 5,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:runecrafter" },
+                            { "type": "job_level", "job": "adventuring:runecrafter", "level": 1 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_essence", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "air_rune",
+                        "item": "melvorD:Air_Rune",
+                        "outputType": "item",
+                        "count": 10,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:runecrafter" },
+                            { "type": "job_level", "job": "adventuring:runecrafter", "level": 1 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_essence", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "mind_rune",
+                        "item": "melvorD:Mind_Rune",
+                        "outputType": "item",
+                        "count": 10,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:runecrafter" },
+                            { "type": "job_level", "job": "adventuring:runecrafter", "level": 5 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_essence", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "water_rune",
+                        "item": "melvorD:Water_Rune",
+                        "outputType": "item",
+                        "count": 10,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:runecrafter" },
+                            { "type": "job_level", "job": "adventuring:runecrafter", "level": 10 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_essence", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "earth_rune",
+                        "item": "melvorD:Earth_Rune",
+                        "outputType": "item",
+                        "count": 10,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:runecrafter" },
+                            { "type": "job_level", "job": "adventuring:runecrafter", "level": 15 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_essence", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "fire_rune",
+                        "item": "melvorD:Fire_Rune",
+                        "outputType": "item",
+                        "count": 10,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:runecrafter" },
+                            { "type": "job_level", "job": "adventuring:runecrafter", "level": 20 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_essence", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "body_rune",
+                        "item": "melvorD:Body_Rune",
+                        "outputType": "item",
+                        "count": 10,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:runecrafter" },
+                            { "type": "job_level", "job": "adventuring:runecrafter", "level": 25 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_essence", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "chaos_rune",
+                        "item": "melvorD:Chaos_Rune",
+                        "outputType": "item",
+                        "count": 10,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:runecrafter" },
+                            { "type": "job_level", "job": "adventuring:runecrafter", "level": 30 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_essence", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "death_rune",
+                        "item": "melvorD:Death_Rune",
+                        "outputType": "item",
+                        "count": 10,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:runecrafter" },
+                            { "type": "job_level", "job": "adventuring:runecrafter", "level": 40 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_essence", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "blood_rune",
+                        "item": "melvorD:Blood_Rune",
+                        "outputType": "item",
+                        "count": 10,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:runecrafter" },
+                            { "type": "job_level", "job": "adventuring:runecrafter", "level": 50 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_essence", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "ancient_rune",
+                        "item": "melvorD:Ancient_Rune",
+                        "outputType": "item",
+                        "count": 10,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:runecrafter" },
+                            { "type": "job_level", "job": "adventuring:runecrafter", "level": 60 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_essence", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "mana_surge",
+                        "consumable": "adventuring:mana_surge",
+                        "outputType": "consumable",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:runecrafter" },
+                            { "type": "job_level", "job": "adventuring:runecrafter", "level": 15 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_essence", "count": 2 }
+                        ]
+                    },
+                    {
+                        "id": "rune_shield_elixir",
+                        "consumable": "adventuring:rune_shield_elixir",
+                        "outputType": "consumable",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:runecrafter" },
+                            { "type": "job_level", "job": "adventuring:runecrafter", "level": 25 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_essence", "count": 3 }
+                        ]
+                    },
+                    {
+                        "id": "enchanted_fire_essence",
+                        "name": "Enchanted Fire Essence",
+                        "outputType": "material",
+                        "material": "adventuring:enchanted_fire_essence",
+                        "count": 3,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:runecrafter" },
+                            { "type": "job_level", "job": "adventuring:runecrafter", "level": 35 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:fire_core", "count": 1 },
+                            { "id": "adventuring:elemental_essence", "count": 3 }
+                        ]
+                    },
+                    {
+                        "id": "enchanted_frost_essence",
+                        "name": "Enchanted Frost Essence",
+                        "outputType": "material",
+                        "material": "adventuring:enchanted_frost_essence",
+                        "count": 3,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:runecrafter" },
+                            { "type": "job_level", "job": "adventuring:runecrafter", "level": 35 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:frost_core", "count": 1 },
+                            { "id": "adventuring:elemental_essence", "count": 3 }
+                        ]
+                    },
+                    {
+                        "id": "enchanted_storm_essence",
+                        "name": "Enchanted Storm Essence",
+                        "outputType": "material",
+                        "material": "adventuring:enchanted_storm_essence",
+                        "count": 3,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:runecrafter" },
+                            { "type": "job_level", "job": "adventuring:runecrafter", "level": 40 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:storm_core", "count": 1 },
+                            { "id": "adventuring:elemental_essence", "count": 3 }
+                        ]
+                    },
+                    {
+                        "id": "enchanted_earth_essence",
+                        "name": "Enchanted Earth Essence",
+                        "outputType": "material",
+                        "material": "adventuring:enchanted_earth_essence",
+                        "count": 3,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:runecrafter" },
+                            { "type": "job_level", "job": "adventuring:runecrafter", "level": 40 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:earth_core", "count": 1 },
+                            { "id": "adventuring:elemental_essence", "count": 3 }
+                        ]
+                    },
+                    {
+                        "id": "mana_crystal",
+                        "name": "Mana Crystal",
+                        "outputType": "material",
+                        "material": "adventuring:mana_crystal",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:runecrafter" },
+                            { "type": "job_level", "job": "adventuring:runecrafter", "level": 45 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:elemental_essence", "count": 10 },
+                            { "id": "adventuring:arcane_dust", "count": 5 }
+                        ]
+                    },
+                    {
+                        "id": "prismatic_shard",
+                        "name": "Prismatic Shard",
+                        "outputType": "material",
+                        "material": "adventuring:prismatic_shard",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:runecrafter" },
+                            { "type": "job_level", "job": "adventuring:runecrafter", "level": 55 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:enchanted_fire_essence", "count": 5 },
+                            { "id": "adventuring:enchanted_frost_essence", "count": 5 },
+                            { "id": "adventuring:enchanted_storm_essence", "count": 5 },
+                            { "id": "adventuring:enchanted_earth_essence", "count": 5 },
+                            { "id": "adventuring:mana_crystal", "count": 2 }
+                        ]
+                    },
+                    {
+                        "id": "convert_crude_essence_to_refined",
+                        "material": "adventuring:refined_essence",
+                        "outputType": "material",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:master_runecrafter", "level": 10 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:crude_essence", "count": 5 }
+                        ]
+                    },
+                    {
+                        "id": "convert_refined_essence_to_immaculate",
+                        "material": "adventuring:immaculate_essence",
+                        "outputType": "material",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:grandmaster_runecrafter", "level": 10 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:refined_essence", "count": 5 }
+                        ]
+                    },
+                    {
+                        "id": "convert_immaculate_essence_to_transcendent",
+                        "material": "adventuring:transcendent_essence",
+                        "outputType": "material",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:legendary_runecrafter", "level": 10 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:immaculate_essence", "count": 5 }
+                        ]
+                    },
+                    {
+                        "id": "refined_nature_rune",
+                        "item": "melvorF:Nature_Rune",
+                        "outputType": "item",
+                        "count": 5,
+                        "requirements": [
+                            { "type": "skill_level", "level": 25 },
+                            { "type": "current_job", "job": "adventuring:master_runecrafter" },
+                            { "type": "job_level", "job": "adventuring:master_runecrafter", "level": 1 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:refined_essence", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "refined_death_rune",
+                        "item": "melvorD:Death_Rune",
+                        "outputType": "item",
+                        "count": 5,
+                        "requirements": [
+                            { "type": "skill_level", "level": 25 },
+                            { "type": "current_job", "job": "adventuring:master_runecrafter" },
+                            { "type": "job_level", "job": "adventuring:master_runecrafter", "level": 15 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:refined_essence", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "refined_ancient_rune",
+                        "item": "melvorD:Ancient_Rune",
+                        "outputType": "item",
+                        "count": 5,
+                        "requirements": [
+                            { "type": "skill_level", "level": 25 },
+                            { "type": "current_job", "job": "adventuring:master_runecrafter" },
+                            { "type": "job_level", "job": "adventuring:master_runecrafter", "level": 30 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:refined_essence", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "immaculate_ancient_rune",
+                        "item": "melvorD:Ancient_Rune",
+                        "outputType": "item",
+                        "count": 12,
+                        "requirements": [
+                            { "type": "skill_level", "level": 50 },
+                            { "type": "current_job", "job": "adventuring:grandmaster_runecrafter" },
+                            { "type": "job_level", "job": "adventuring:grandmaster_runecrafter", "level": 1 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:immaculate_essence", "count": 1 }
+                        ]
+                    },
+                    {
+                        "id": "transcendent_ancient_rune",
+                        "item": "melvorD:Ancient_Rune",
+                        "outputType": "item",
+                        "count": 30,
+                        "requirements": [
+                            { "type": "skill_level", "level": 75 },
+                            { "type": "current_job", "job": "adventuring:legendary_runecrafter" },
+                            { "type": "job_level", "job": "adventuring:legendary_runecrafter", "level": 1 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:transcendent_essence", "count": 1 }
+                        ]
+                    }
                 ],
                 "tiles": [
-                    
+                    {
+                        "id": "essence_rock",
+                        "name": "Essence Rock",
+                        "media": "melvor:assets/media/bank/potion_runecrafting_i.png",
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:runecrafter" }
+                        ],
+                        "weight": 10,
+                        "floor_max": 1,
+                        "dungeon_max": 1,
+                        "effects": [
+                            { "type": "xp", "amount": 30, "job": "adventuring:runecrafter" },
+                            {
+                                "type": "loot",
+                                "pool": [
+                                    { "id": "adventuring:crude_essence", "qty": 1, "weight": 100 }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "runic_sanctum",
+                        "name": "Runic Sanctum",
+                        "media": "melvor:assets/media/bank/potion_astrology_i.png",
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:master_runecrafter", "level": 1 }
+                        ],
+                        "weight": 8,
+                        "floor_max": 1,
+                        "dungeon_max": 2,
+                        "effects": [
+                            { "type": "xp", "amount": 100, "job": "adventuring:runecrafter" },
+                            { "type": "xp", "amount": 50, "job": "adventuring:master_runecrafter" },
+                            {
+                                "type": "loot",
+                                "pool": [
+                                    { "id": "adventuring:crude_essence", "qty": 3, "weight": 60 },
+                                    { "id": "adventuring:refined_essence", "qty": 2, "weight": 35 },
+                                    { "id": "adventuring:immaculate_essence", "qty": 1, "weight": 5 }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "workOrders": [
+                    {
+                        "id": "runecrafter_basic",
+                        "type": "crafting",
+                        "name": "Basic Runecrafting",
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:runecrafter", "level": 1 }
+                        ],
+                        "products": [
+                            { "id": "adventuring:rune_essence", "weight": 30 },
+                            { "id": "adventuring:air_rune", "weight": 25 },
+                            { "id": "adventuring:mind_rune", "weight": 25 },
+                            { "id": "adventuring:water_rune", "weight": 20 }
+                        ],
+                        "currencyRewards": [
+                            { "id": "adventuring:currency", "min": 20, "max": 40 }
+                        ],
+                        "xpReward": 35
+                    },
+                    {
+                        "id": "runecrafter_intermediate",
+                        "type": "crafting",
+                        "name": "Intermediate Runecrafting",
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:runecrafter", "level": 15 }
+                        ],
+                        "products": [
+                            { "id": "adventuring:earth_rune", "weight": 30 },
+                            { "id": "adventuring:fire_rune", "weight": 30 },
+                            { "id": "adventuring:body_rune", "weight": 25 },
+                            { "id": "adventuring:mana_surge", "weight": 15 }
+                        ],
+                        "currencyRewards": [
+                            { "id": "adventuring:currency", "min": 40, "max": 80 }
+                        ],
+                        "xpReward": 60
+                    },
+                    {
+                        "id": "runecrafter_advanced",
+                        "type": "crafting",
+                        "name": "Advanced Runecrafting",
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:runecrafter", "level": 30 }
+                        ],
+                        "products": [
+                            { "id": "adventuring:chaos_rune", "weight": 30 },
+                            { "id": "adventuring:death_rune", "weight": 25 },
+                            { "id": "adventuring:rune_shield_elixir", "weight": 20 },
+                            { "id": "adventuring:enchanted_fire_essence", "weight": 15 },
+                            { "id": "adventuring:enchanted_frost_essence", "weight": 10 }
+                        ],
+                        "currencyRewards": [
+                            { "id": "adventuring:currency", "min": 75, "max": 150 }
+                        ],
+                        "xpReward": 100
+                    },
+                    {
+                        "id": "runecrafter_master",
+                        "type": "crafting",
+                        "name": "Master Runecrafting",
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:runecrafter", "level": 50 }
+                        ],
+                        "products": [
+                            { "id": "adventuring:blood_rune", "weight": 30 },
+                            { "id": "adventuring:ancient_rune", "weight": 25 },
+                            { "id": "adventuring:mana_crystal", "weight": 25 },
+                            { "id": "adventuring:prismatic_shard", "weight": 20 }
+                        ],
+                        "currencyRewards": [
+                            { "id": "adventuring:currency", "min": 150, "max": 300 }
+                        ],
+                        "xpReward": 200
+                    }
                 ]
             }
         }]
     }
 }
+

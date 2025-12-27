@@ -1,0 +1,201 @@
+{
+    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+    "namespace": "adventuring",
+    "data": {
+        "skillData": [{
+            "skillID": "adventuring:Adventuring",
+            "data": {
+                "stats": [
+                    {
+                        "id": "archaeology",
+                        "name": "Archaeology",
+                        "media": "melvor:assets/media/skills/bank/skillcape_agility.png"
+                    }
+                ],
+                "jobs": [
+                    {
+                        "id": "archaeologist",
+                        "name": "Archaeologist",
+                        "media": "melvor:assets/media/skills/bank/skillcape_agility.png",
+                        "requirements": [
+                            { "type": "skill_level", "level": 30 }
+                        ],
+                        "isMilestoneReward": true,
+                        "isPassive": true,
+                        "scaling": [
+                            { "id": "adventuring:archaeology", "value": 1 }
+                        ]
+                    }
+                ],
+                "materials": [
+                    {
+                        "id": "dig_site_map",
+                        "name": "Dig Site Map",
+                        "media": "melvor:assets/media/skills/bank/skillcape_agility.png",
+                        "category": "adventuring:salvage"
+                    }
+                ],
+                "buildings": [
+                    {
+                        "id": "excavation_site",
+                        "type": "workshop",
+                        "name": "Excavation Site",
+                        "description": "Unearth ancient artifacts and forgotten relics. Archaeologists discover treasures from the past.",
+                        "media": "melvor:assets/media/skills/bank/skillcape_agility.png",
+                        "requirements": [],
+                        "idle": ["Brushing artifacts", "Cataloging finds"],
+                        "actions": ["adventuring:work"],
+                        "products": [
+                            "adventuring:ancient_coin",
+                            "adventuring:fossil_fragment",
+                            "adventuring:relic_shard",
+                            "adventuring:ancient_tome"
+                        ]
+                    }
+                ],
+                "baseItems": [
+                    {
+                        "id": "ancient_coin",
+                        "name": "Ancient Coin",
+                        "media": "melvor:assets/media/bank/gold_topaz_ring.png",
+                        "source": "workshop"
+                    },
+                    {
+                        "id": "fossil_fragment",
+                        "name": "Fossil Fragment",
+                        "media": "melvor:assets/media/bank/bone.png",
+                        "source": "workshop"
+                    },
+                    {
+                        "id": "relic_shard",
+                        "name": "Relic Shard",
+                        "media": "melvor:assets/media/bank/ancient_relic.png",
+                        "source": "workshop"
+                    },
+                    {
+                        "id": "ancient_tome",
+                        "name": "Ancient Tome",
+                        "media": "melvor:assets/media/bank/ancient_page.png",
+                        "source": "workshop"
+                    }
+                ],
+                "products": [
+                    {
+                        "id": "ancient_coin",
+                        "name": "Ancient Coin",
+                        "outputType": "baseItem",
+                        "baseItem": "adventuring:ancient_coin",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:archaeologist" },
+                            { "type": "job_level", "job": "adventuring:archaeologist", "level": 1 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:dig_site_map", "count": 2 }
+                        ]
+                    },
+                    {
+                        "id": "fossil_fragment",
+                        "name": "Fossil Fragment",
+                        "outputType": "baseItem",
+                        "baseItem": "adventuring:fossil_fragment",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:archaeologist" },
+                            { "type": "job_level", "job": "adventuring:archaeologist", "level": 15 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:dig_site_map", "count": 3 }
+                        ]
+                    },
+                    {
+                        "id": "relic_shard",
+                        "name": "Relic Shard",
+                        "outputType": "baseItem",
+                        "baseItem": "adventuring:relic_shard",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:archaeologist" },
+                            { "type": "job_level", "job": "adventuring:archaeologist", "level": 30 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:dig_site_map", "count": 4 }
+                        ]
+                    },
+                    {
+                        "id": "ancient_tome",
+                        "name": "Ancient Tome",
+                        "outputType": "baseItem",
+                        "baseItem": "adventuring:ancient_tome",
+                        "count": 1,
+                        "requirements": [
+                            { "type": "current_job", "job": "adventuring:archaeologist" },
+                            { "type": "job_level", "job": "adventuring:archaeologist", "level": 50 }
+                        ],
+                        "materials": [
+                            { "id": "adventuring:dig_site_map", "count": 5 }
+                        ]
+                    }
+                ],
+                "workOrders": [
+                    {
+                        "id": "ancient_coin",
+                        "building": "adventuring:excavation_site",
+                        "product": "adventuring:ancient_coin",
+                        "materials": [
+                            { "id": "adventuring:dig_site_map", "qty": 2 }
+                        ],
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:archaeologist", "level": 1 }
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:archaeology", "value": 0.2 }
+                        ]
+                    },
+                    {
+                        "id": "fossil_fragment",
+                        "building": "adventuring:excavation_site",
+                        "product": "adventuring:fossil_fragment",
+                        "materials": [
+                            { "id": "adventuring:dig_site_map", "qty": 3 }
+                        ],
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:archaeologist", "level": 15 }
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:archaeology", "value": 0.25 }
+                        ]
+                    },
+                    {
+                        "id": "relic_shard",
+                        "building": "adventuring:excavation_site",
+                        "product": "adventuring:relic_shard",
+                        "materials": [
+                            { "id": "adventuring:dig_site_map", "qty": 4 }
+                        ],
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:archaeologist", "level": 30 }
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:archaeology", "value": 0.3 }
+                        ]
+                    },
+                    {
+                        "id": "ancient_tome",
+                        "building": "adventuring:excavation_site",
+                        "product": "adventuring:ancient_tome",
+                        "materials": [
+                            { "id": "adventuring:dig_site_map", "qty": 5 }
+                        ],
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:archaeologist", "level": 50 }
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:archaeology", "value": 0.35 }
+                        ]
+                    }
+                ]
+            }
+        }]
+    }
+}

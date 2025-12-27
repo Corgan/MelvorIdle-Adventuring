@@ -8,8 +8,9 @@
                 "jobs": [
                     {
                         "id": "ranger",
+                        "tier": 0,
                         "name": "Ranger",
-                        "media": "melvor:assets/media/skills/ranged/ranged.svg",
+                        "media": "melvor:assets/media/bank/potion_ranged_i.png#tint=green",
                         "requirements": [
                             { "type": "skill_level", "level": 1 }
                         ],
@@ -33,10 +34,10 @@
                             "adventuring:longbow"
                         ],
                         "scaling": [
-                            { "id": "adventuring:hitpoints", "value": 0.5 },
+                            { "id": "adventuring:hitpoints", "value": 1.0 },
                             { "id": "adventuring:defence", "value": 0.5 },
                             { "id": "adventuring:agility", "value": 1.5 },
-                            { "id": "adventuring:ranged", "value": 1.5 }
+                            { "id": "adventuring:ranged", "value": 2.0 }
                         ]
                     }
                 ],
@@ -44,7 +45,6 @@
                     {
                         "id": "shoot",
                         "name": "Shoot",
-                        "description": "Deal {hit.0.effect.0.amount} damage to the back enemy and apply {hit.0.effect.1.stacks} Bleed.",
                         "requirements": [
                             { "type": "current_job_level", "job": "adventuring:ranger", "level": 1 }
                         ],
@@ -57,9 +57,46 @@
                                     {
                                         "type": "damage",
                                         "amount": {
-                                            "base": 10,
+                                            "base": 15,
                                             "scaling": [
-                                                { "id": "adventuring:ranged", "value": 0.25 }
+                                                { "id": "adventuring:ranged", "value": 0.4 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:bleed",
+                                        "stacks": {
+                                            "base": 2,
+                                            "scaling": [
+                                                { "id": "adventuring:ranged", "value": 0.05 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "multi_shot",
+                        "name": "Multi-Shot",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:ranger", "level": 10 }
+                        ],
+                        "energy": 20,
+                        "hits": [
+                            {
+                                "target": "random",
+                                "party": "enemy",
+                                "delay": 100,
+                                "repeat": 3,
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 12,
+                                            "scaling": [
+                                                { "id": "adventuring:ranged", "value": 0.35 }
                                             ]
                                         }
                                     },
@@ -68,8 +105,41 @@
                                         "id": "adventuring:bleed",
                                         "stacks": {
                                             "base": 1,
+                                            "scaling": []
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "poison_arrow",
+                        "name": "Poison Arrow",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:ranger", "level": 15 }
+                        ],
+                        "energy": 25,
+                        "hits": [
+                            {
+                                "target": "back",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 20,
                                             "scaling": [
-                                                { "id": "adventuring:ranged", "value": 0.025 }
+                                                { "id": "adventuring:ranged", "value": 0.5 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:poison",
+                                        "stacks": {
+                                            "base": 3,
+                                            "scaling": [
+                                                { "id": "adventuring:ranged", "value": 0.05 }
                                             ]
                                         }
                                     }
@@ -82,7 +152,6 @@
                     {
                         "id": "snipe",
                         "name": "Snipe",
-                        "description": "Deal {hit.0.effect.0.amount} damage to and stun the back enemy.",
                         "requirements": [
                             { "type": "current_job_level", "job": "adventuring:ranger", "level": 5 }
                         ],
@@ -109,10 +178,215 @@
                                 ]
                             }
                         ]
+                    },
+                    {
+                        "id": "rain_of_arrows",
+                        "name": "Rain of Arrows",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:ranger", "level": 20 }
+                        ],
+                        "cost": 140,
+                        "hits": [
+                            {
+                                "target": "aoe",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 10,
+                                            "scaling": [
+                                                { "id": "adventuring:ranged", "value": 0.4 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:bleed",
+                                        "stacks": {
+                                            "base": 1,
+                                            "scaling": [
+                                                { "id": "adventuring:agility", "value": 0.025 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "piercing_volley",
+                        "name": "Piercing Volley",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:ranger", "level": 30 }
+                        ],
+                        "cost": 160,
+                        "hits": [
+                            {
+                                "target": "aoe",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 15,
+                                            "scaling": [
+                                                { "id": "adventuring:ranged", "value": 0.5 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:vulnerability",
+                                        "stacks": {
+                                            "base": 2,
+                                            "scaling": [
+                                                { "id": "adventuring:ranged", "value": 0.05 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "arrow_storm",
+                        "name": "Arrow Storm",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:ranger", "level": 40 }
+                        ],
+                        "cost": 180,
+                        "hits": [
+                            {
+                                "target": "random",
+                                "party": "enemy",
+                                "delay": 60,
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 10,
+                                            "scaling": [
+                                                { "id": "adventuring:ranged", "value": 0.25 }
+                                            ]
+                                        }
+                                    }
+                                ],
+                                "repeat": 6
+                            }
+                        ]
+                    },
+                    {
+                        "id": "skyfall",
+                        "name": "Skyfall",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:ranger", "level": 50 }
+                        ],
+                        "cost": 220,
+                        "hits": [
+                            {
+                                "target": "aoe",
+                                "party": "enemy",
+                                "delay": 300,
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 25,
+                                            "scaling": [
+                                                { "id": "adventuring:ranged", "value": 0.8 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:marked",
+                                        "stacks": {
+                                            "base": 3,
+                                            "scaling": [
+                                                { "id": "adventuring:ranged", "value": 0.1 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:bleed",
+                                        "stacks": {
+                                            "base": 3,
+                                            "scaling": [
+                                                { "id": "adventuring:ranged", "value": 0.1 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
                     }
                 ],
                 "passives": [
-
+                    {
+                        "id": "evasion",
+                        "name": "Evasion",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:ranger", "level": 25 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "round_start",
+                                "type": "buff",
+                                "target": "self",
+                                "id": "adventuring:block",
+                                "stacks": {
+                                    "base": 1,
+                                    "scaling": [
+                                        { "id": "adventuring:agility", "value": 0.1 }
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "keen_eye",
+                        "name": "Keen Eye",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:ranger", "level": 35 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "encounter_start",
+                                "type": "debuff",
+                                "target": "random_enemy",
+                                "id": "adventuring:marked",
+                                "stacks": {
+                                    "base": 3,
+                                    "scaling": [
+                                        { "id": "adventuring:ranged", "value": 0.1 }
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "natures_swiftness",
+                        "name": "Nature's Swiftness",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:ranger", "level": 45 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "encounter_start",
+                                "type": "buff",
+                                "target": "self",
+                                "id": "adventuring:haste",
+                                "stacks": {
+                                    "base": 3,
+                                    "scaling": [
+                                        { "id": "adventuring:agility", "value": 0.1 }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
                 ]
             }
         }]

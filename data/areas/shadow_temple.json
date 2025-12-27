@@ -1,0 +1,694 @@
+{
+    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+    "namespace": "adventuring",
+    "data": {
+        "skillData": [{
+            "skillID": "adventuring:Adventuring",
+            "data": {
+                "passives": [
+                    {
+                        "id": "dark_shroud",
+                        "name": "Dark Shroud",
+                        "effects": [
+                            {
+                                "trigger": "encounter_start",
+                                "type": "buff",
+                                "id": "adventuring:evasion",
+                                "target": "self",
+                                "stacks": 5
+                            },
+                            {
+                                "trigger": "encounter_start",
+                                "type": "buff",
+                                "id": "adventuring:stealth",
+                                "target": "self",
+                                "stacks": 3
+                            }
+                        ]
+                    },
+                    {
+                        "id": "darkness_embraces",
+                        "name": "Darkness Embraces",
+                        "effects": [
+                            {
+                                "trigger": "encounter_start",
+                                "type": "buff",
+                                "id": "adventuring:might",
+                                "target": "self",
+                                "stacks": 4
+                            },
+                            {
+                                "trigger": "after_damage_received",
+                                "type": "buff",
+                                "id": "adventuring:stealth",
+                                "target": "self",
+                                "stacks": 2,
+                                "chance": 20
+                            }
+                        ]
+                    },
+                    {
+                        "id": "shadow_mastery",
+                        "name": "Shadow Mastery",
+                        "effects": [
+                            {
+                                "trigger": "on_kill",
+                                "type": "buff",
+                                "id": "adventuring:haste",
+                                "target": "self",
+                                "stacks": 6
+                            },
+                            {
+                                "trigger": "on_kill",
+                                "type": "buff",
+                                "id": "adventuring:might",
+                                "target": "self",
+                                "stacks": 4
+                            },
+                            {
+                                "trigger": "on_kill",
+                                "type": "heal",
+                                "target": "self",
+                                "amount": 15,
+                                "scaling": 1.5
+                            }
+                        ]
+                    }
+                ],
+                "areas": [
+                    {
+                        "id": "shadow_temple",
+                        "name": "Shadow Temple",
+                        "media": "melvor:assets/media/skills/thieving/thieving.png",
+                        "requirements": [
+                            { "type": "skill_level", "level": 75 }
+                        ],
+                        "width": 14,
+                        "height": 9,
+                        "floors": [
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:shadow_acolyte", "weight": 45 },
+                                    { "id": "adventuring:shade", "weight": 35 },
+                                    { "id": "adventuring:dark_stalker", "weight": 20 }
+                                ],
+                                "exit": ["adventuring:shadow_acolyte", "adventuring:shade", "adventuring:dark_stalker"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:shade", "weight": 35 },
+                                    { "id": "adventuring:dark_stalker", "weight": 35 },
+                                    { "id": "adventuring:shadow_priest", "weight": 30 }
+                                ],
+                                "exit": ["adventuring:shade", "adventuring:dark_stalker", "adventuring:shadow_priest"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:shadow_priest", "weight": 30 },
+                                    { "id": "adventuring:void_assassin", "weight": 35 },
+                                    { "id": "adventuring:nightmare", "weight": 35 }
+                                ],
+                                "exit": ["adventuring:shadow_priest", "adventuring:void_assassin", "adventuring:nightmare"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:void_assassin", "weight": 30 },
+                                    { "id": "adventuring:nightmare", "weight": 35 },
+                                    { "id": "adventuring:shadow_knight", "weight": 35 }
+                                ],
+                                "exit": ["adventuring:void_assassin", "adventuring:nightmare", "adventuring:shadow_knight"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:shadow_knight", "weight": 35 },
+                                    { "id": "adventuring:umbral_mage", "weight": 35 },
+                                    { "id": "adventuring:nightmare", "weight": 30 }
+                                ],
+                                "exit": ["adventuring:shadow_knight", "adventuring:umbral_mage", "adventuring:the_shadow_lord"]
+                            }
+                        ]
+                    }
+                ],
+                "monsters": [
+                    {
+                        "id": "shadow_acolyte",
+                        "name": "Shadow Acolyte",
+                        "media": "melvor:assets/media/monsters/dark_wizard.png",
+                        "tags": ["shadow", "mage", "humanoid"],
+                        "xp": 520,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 140 },
+                            { "id": "adventuring:defence", "value": 35 },
+                            { "id": "adventuring:agility", "value": 40 },
+                            { "id": "adventuring:strength", "value": 35 },
+                            { "id": "adventuring:ranged", "value": 20 },
+                            { "id": "adventuring:magic", "value": 50 },
+                            { "id": "adventuring:prayer", "value": 30 }
+                        ],
+                        "generator": "adventuring:void_bolt",
+                        "spender": "adventuring:darkness",
+                        "passives": [],
+                        "loot": [
+                            { "id": "adventuring:shadow_essence", "weight": 55, "minQty": 2, "maxQty": 4 },
+                            { "id": "adventuring:dark_fabric", "weight": 30, "minQty": 1, "maxQty": 2 },
+                            { "id": "adventuring:currency", "weight": 15, "minQty": 150, "maxQty": 240 }
+                        ]
+                    },
+                    {
+                        "id": "shade",
+                        "name": "Shade",
+                        "media": "melvor:assets/media/monsters/banshee.png",
+                        "tags": ["shadow", "undead"],
+                        "xp": 500,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 115 },
+                            { "id": "adventuring:defence", "value": 25 },
+                            { "id": "adventuring:agility", "value": 55 },
+                            { "id": "adventuring:strength", "value": 30 },
+                            { "id": "adventuring:ranged", "value": 15 },
+                            { "id": "adventuring:magic", "value": 45 },
+                            { "id": "adventuring:prayer", "value": 20 }
+                        ],
+                        "generator": "adventuring:spectral_lunge",
+                        "spender": "adventuring:terror",
+                        "passives": [],
+                        "loot": [
+                            { "id": "adventuring:shadow_essence", "weight": 50, "minQty": 2, "maxQty": 4 },
+                            { "id": "adventuring:nightmare_dust", "weight": 35, "minQty": 1, "maxQty": 2 },
+                            { "id": "adventuring:currency", "weight": 15, "minQty": 130, "maxQty": 220 }
+                        ]
+                    },
+                    {
+                        "id": "dark_stalker",
+                        "name": "Dark Stalker",
+                        "media": "melvor:assets/media/monsters/spider_3.png",
+                        "tags": ["shadow", "beast"],
+                        "xp": 510,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 130 },
+                            { "id": "adventuring:defence", "value": 32 },
+                            { "id": "adventuring:agility", "value": 52 },
+                            { "id": "adventuring:strength", "value": 48 },
+                            { "id": "adventuring:ranged", "value": 25 },
+                            { "id": "adventuring:magic", "value": 20 },
+                            { "id": "adventuring:prayer", "value": 12 }
+                        ],
+                        "generator": "adventuring:predators_pounce",
+                        "spender": "adventuring:shadow_step",
+                        "passives": [],
+                        "loot": [
+                            { "id": "adventuring:dark_fabric", "weight": 50, "minQty": 2, "maxQty": 4 },
+                            { "id": "adventuring:shadow_essence", "weight": 35, "minQty": 1, "maxQty": 2 },
+                            { "id": "adventuring:currency", "weight": 15, "minQty": 140, "maxQty": 230 }
+                        ]
+                    },
+                    {
+                        "id": "shadow_priest",
+                        "name": "Shadow Priest",
+                        "media": "melvor:assets/media/monsters/dark_wizard.png",
+                        "tags": ["shadow", "mage", "humanoid"],
+                        "xp": 560,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 150 },
+                            { "id": "adventuring:defence", "value": 40 },
+                            { "id": "adventuring:agility", "value": 35 },
+                            { "id": "adventuring:strength", "value": 32 },
+                            { "id": "adventuring:ranged", "value": 18 },
+                            { "id": "adventuring:magic", "value": 58 },
+                            { "id": "adventuring:prayer", "value": 45 }
+                        ],
+                        "generator": "adventuring:void_bolt",
+                        "spender": "adventuring:dark_blessing",
+                        "passives": [],
+                        "loot": [
+                            { "id": "adventuring:shadow_essence", "weight": 45, "minQty": 3, "maxQty": 5 },
+                            { "id": "adventuring:nightmare_dust", "weight": 40, "minQty": 2, "maxQty": 3 },
+                            { "id": "adventuring:currency", "weight": 15, "minQty": 170, "maxQty": 270 }
+                        ]
+                    },
+                    {
+                        "id": "void_assassin",
+                        "name": "Void Assassin",
+                        "media": "melvor:assets/media/monsters/assassin.png",
+                        "tags": ["shadow", "melee", "humanoid"],
+                        "xp": 580,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 145 },
+                            { "id": "adventuring:defence", "value": 35 },
+                            { "id": "adventuring:agility", "value": 60 },
+                            { "id": "adventuring:strength", "value": 55 },
+                            { "id": "adventuring:ranged", "value": 30 },
+                            { "id": "adventuring:magic", "value": 30 },
+                            { "id": "adventuring:prayer", "value": 15 }
+                        ],
+                        "generator": "adventuring:predators_pounce",
+                        "spender": "adventuring:execute",
+                        "passives": [],
+                        "loot": [
+                            { "id": "adventuring:dark_fabric", "weight": 45, "minQty": 3, "maxQty": 5 },
+                            { "id": "adventuring:void_crystal", "weight": 35, "minQty": 1, "maxQty": 2 },
+                            { "id": "adventuring:currency", "weight": 20, "minQty": 180, "maxQty": 290 }
+                        ]
+                    },
+                    {
+                        "id": "nightmare",
+                        "name": "Nightmare",
+                        "media": "melvor:assets/media/monsters/angel_of_death.png",
+                        "tags": ["shadow", "mage"],
+                        "xp": 600,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 170 },
+                            { "id": "adventuring:defence", "value": 42 },
+                            { "id": "adventuring:agility", "value": 45 },
+                            { "id": "adventuring:strength", "value": 40 },
+                            { "id": "adventuring:ranged", "value": 20 },
+                            { "id": "adventuring:magic", "value": 55 },
+                            { "id": "adventuring:prayer", "value": 35 }
+                        ],
+                        "generator": "adventuring:nightmare_touch",
+                        "spender": "adventuring:terror",
+                        "passives": [],
+                        "loot": [
+                            { "id": "adventuring:nightmare_dust", "weight": 50, "minQty": 3, "maxQty": 5 },
+                            { "id": "adventuring:shadow_essence", "weight": 35, "minQty": 2, "maxQty": 4 },
+                            { "id": "adventuring:currency", "weight": 15, "minQty": 190, "maxQty": 300 }
+                        ]
+                    },
+                    {
+                        "id": "shadow_knight",
+                        "name": "Shadow Knight",
+                        "media": "melvor:assets/media/monsters/dark_knight.png",
+                        "tags": ["shadow", "melee", "humanoid"],
+                        "xp": 640,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 200 },
+                            { "id": "adventuring:defence", "value": 55 },
+                            { "id": "adventuring:agility", "value": 35 },
+                            { "id": "adventuring:strength", "value": 60 },
+                            { "id": "adventuring:ranged", "value": 20 },
+                            { "id": "adventuring:magic", "value": 35 },
+                            { "id": "adventuring:prayer", "value": 25 }
+                        ],
+                        "generator": "adventuring:dark_strike",
+                        "spender": "adventuring:shadow_charge",
+                        "passives": [],
+                        "loot": [
+                            { "id": "adventuring:dark_fabric", "weight": 40, "minQty": 3, "maxQty": 5 },
+                            { "id": "adventuring:void_crystal", "weight": 40, "minQty": 2, "maxQty": 3 },
+                            { "id": "adventuring:currency", "weight": 20, "minQty": 210, "maxQty": 330 }
+                        ]
+                    },
+                    {
+                        "id": "umbral_mage",
+                        "name": "Umbral Mage",
+                        "media": "melvor:assets/media/monsters/dark_wizard.png",
+                        "tags": ["shadow", "mage", "humanoid"],
+                        "xp": 660,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 165 },
+                            { "id": "adventuring:defence", "value": 38 },
+                            { "id": "adventuring:agility", "value": 40 },
+                            { "id": "adventuring:strength", "value": 35 },
+                            { "id": "adventuring:ranged", "value": 22 },
+                            { "id": "adventuring:magic", "value": 70 },
+                            { "id": "adventuring:prayer", "value": 40 }
+                        ],
+                        "generator": "adventuring:void_bolt",
+                        "spender": "adventuring:void_eruption",
+                        "passives": [],
+                        "loot": [
+                            { "id": "adventuring:shadow_essence", "weight": 40, "minQty": 4, "maxQty": 6 },
+                            { "id": "adventuring:void_crystal", "weight": 40, "minQty": 2, "maxQty": 3 },
+                            { "id": "adventuring:currency", "weight": 20, "minQty": 220, "maxQty": 340 }
+                        ]
+                    },
+                    {
+                        "id": "the_shadow_lord",
+                        "name": "The Shadow Lord",
+                        "media": "melvor:assets/media/monsters/cult_monster.png",
+                        "tags": ["shadow", "boss"],
+                        "isBoss": true,
+                        "xp": 900,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 550 },
+                            { "id": "adventuring:defence", "value": 72 },
+                            { "id": "adventuring:agility", "value": 50 },
+                            { "id": "adventuring:strength", "value": 70 },
+                            { "id": "adventuring:ranged", "value": 35 },
+                            { "id": "adventuring:magic", "value": 75 },
+                            { "id": "adventuring:prayer", "value": 55 }
+                        ],
+                        "generator": "adventuring:shadow_strike",
+                        "spender": "adventuring:realm_of_shadow",
+                        "passives": ["adventuring:dark_shroud", "adventuring:shadow_mastery"],
+                        "loot": [
+                            { "id": "adventuring:shadow_lords_sigil", "weight": 100, "minQty": 1, "maxQty": 2 },
+                            { "id": "adventuring:shadow_essence", "weight": 100, "minQty": 6, "maxQty": 10 },
+                            { "id": "adventuring:void_crystal", "weight": 100, "minQty": 4, "maxQty": 6 },
+                            { "id": "adventuring:nightmare_dust", "weight": 100, "minQty": 4, "maxQty": 7 },
+                            { "id": "adventuring:dark_fabric", "weight": 100, "minQty": 5, "maxQty": 8 }
+                        ]
+                    }
+                ],
+                "generators": [
+                    {
+                        "id": "umbral_blast",
+                        "name": "Umbral Blast",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "energy": 25,
+                        "hits": [
+                            {
+                                "target": "single_enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "damage_type": "magic",
+                                        "amount": 16,
+                                        "scaling": 1.1
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "spectral_lunge",
+                        "name": "Spectral Lunge",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "energy": 25,
+                        "hits": [
+                            {
+                                "target": "single_enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "damage_type": "agility",
+                                        "amount": 14,
+                                        "scaling": 1.0
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "predators_pounce",
+                        "name": "Predator's Pounce",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "energy": 28,
+                        "hits": [
+                            {
+                                "target": "single_enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "damage_type": "strength",
+                                        "amount": 18,
+                                        "scaling": 1.2
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "nightmare_touch",
+                        "name": "Nightmare Touch",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "energy": 28,
+                        "hits": [
+                            {
+                                "target": "single_enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "damage_type": "magic",
+                                        "amount": 20,
+                                        "scaling": 1.2
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "dark_strike",
+                        "name": "Dark Strike",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "energy": 30,
+                        "hits": [
+                            {
+                                "target": "single_enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "damage_type": "strength",
+                                        "amount": 22,
+                                        "scaling": 1.3
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "umbral_cleave",
+                        "name": "Umbral Cleave",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "energy": 35,
+                        "hits": [
+                            {
+                                "target": "single_enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "damage_type": "strength",
+                                        "amount": 28,
+                                        "scaling": 1.4
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "spenders": [
+                    {
+                        "id": "darkness",
+                        "name": "Darkness",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "cost": 55,
+                        "hits": [
+                            {
+                                "target": "all_enemies",
+                                "effects": [
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:blind",
+                                        "stacks": 3
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "terror",
+                        "name": "Terror",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "cost": 60,
+                        "hits": [
+                            {
+                                "target": "all_enemies",
+                                "effects": [
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:fear",
+                                        "stacks": 3
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "phantom_fade",
+                        "name": "Phantom Fade",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "cost": 55,
+                        "hits": [
+                            {
+                                "target": "single_enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "damage_type": "agility",
+                                        "amount": 16,
+                                        "scaling": 1.0
+                                    }
+                                ]
+                            },
+                            {
+                                "target": "self",
+                                "effects": [
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:evasion",
+                                        "stacks": 4
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "dark_blessing",
+                        "name": "Dark Blessing",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "cost": 70,
+                        "hits": [
+                            {
+                                "target": "all_allies",
+                                "effects": [
+                                    {
+                                        "type": "heal",
+                                        "amount": 20,
+                                        "scaling": 0.8
+                                    },
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:might",
+                                        "stacks": 3
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "condemning_blow",
+                        "name": "Condemning Blow",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "cost": 80,
+                        "hits": [
+                            {
+                                "target": "single_enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "damage_type": "strength",
+                                        "amount": 35,
+                                        "scaling": 1.5
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "shadow_charge",
+                        "name": "Shadow Charge",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "cost": 75,
+                        "hits": [
+                            {
+                                "target": "all_enemies",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "damage_type": "strength",
+                                        "amount": 18,
+                                        "scaling": 1.0
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "void_eruption",
+                        "name": "Void Eruption",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "cost": 85,
+                        "hits": [
+                            {
+                                "target": "all_enemies",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "damage_type": "magic",
+                                        "amount": 24,
+                                        "scaling": 1.2
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "realm_of_shadow",
+                        "name": "Realm of Shadow",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "cost": 100,
+                        "hits": [
+                            {
+                                "target": "all_enemies",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "damage_type": "magic",
+                                        "amount": 30,
+                                        "scaling": 1.3
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:blind",
+                                        "stacks": 4
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:fear",
+                                        "stacks": 3
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "materials": [
+                    {
+                        "id": "shadow_essence",
+                        "name": "Shadow Essence",
+                        "media": "melvor:assets/media/bank/rune_death.png",
+                        "category": "adventuring:monster_drops"
+                    },
+                    {
+                        "id": "dark_fabric",
+                        "name": "Dark Fabric",
+                        "media": "melvor:assets/media/bank/black_dhide.png",
+                        "category": "adventuring:monster_drops"
+                    },
+                    {
+                        "id": "nightmare_dust",
+                        "name": "Nightmare Dust",
+                        "media": "melvor:assets/media/bank/soulstone.png",
+                        "category": "adventuring:monster_drops"
+                    },
+                    {
+                        "id": "void_crystal",
+                        "name": "Void Crystal",
+                        "media": "melvor:assets/media/bank/onyx.png",
+                        "category": "adventuring:monster_drops"
+                    },
+                    {
+                        "id": "shadow_lords_sigil",
+                        "name": "Shadow Lord's Sigil",
+                        "media": "melvor:assets/media/bank/chest_black.png",
+                        "category": "adventuring:boss_drops"
+                    }
+                ]
+            }
+        }]
+    }
+}

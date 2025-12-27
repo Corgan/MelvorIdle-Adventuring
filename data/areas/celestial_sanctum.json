@@ -1,0 +1,443 @@
+{
+    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+    "namespace": "adventuring",
+    "data": {
+        "skillData": [{
+            "skillID": "adventuring:Adventuring",
+            "data": {
+                "passives": [
+                    {
+                        "id": "divine_blessing",
+                        "name": "Divine Blessing",
+                        "effects": [
+                            {
+                                "trigger": "round_start",
+                                "type": "heal",
+                                "target": "self",
+                                "amount": { "base": 5, "scaling": [] }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "radiant_aura",
+                        "name": "Radiant Aura",
+                        "effects": [
+                            {
+                                "trigger": "encounter_start",
+                                "type": "buff",
+                                "target": "all_allies",
+                                "buff": "adventuring:focus",
+                                "stacks": { "base": 3, "scaling": [] }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "eclipse_power",
+                        "name": "Eclipse Power",
+                        "effects": [
+                            {
+                                "trigger": "encounter_start",
+                                "type": "buff",
+                                "target": "self",
+                                "buff": "adventuring:might",
+                                "stacks": { "base": 5, "scaling": [] }
+                            },
+                            {
+                                "trigger": "encounter_start",
+                                "type": "buff",
+                                "target": "self",
+                                "buff": "adventuring:barrier",
+                                "stacks": { "base": 5, "scaling": [] }
+                            }
+                        ]
+                    }
+                ],
+                "areas": [
+                    {
+                        "id": "celestial_sanctum",
+                        "name": "Celestial Sanctum",
+                        "media": "melvor:assets/media/bank/potion_prayer_i.png",
+                        "requirements": [
+                            { "type": "skill_level", "level": 70 }
+                        ],
+                        "height": 12,
+                        "width": 7,
+                        "floors": [
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:seraph_guard", "weight": 60 },
+                                    { "id": "adventuring:celestial_hound", "weight": 40 }
+                                ],
+                                "exit": ["adventuring:seraph_guard", "adventuring:seraph_guard", "adventuring:celestial_hound"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:seraph_guard", "weight": 35 },
+                                    { "id": "adventuring:celestial_hound", "weight": 35 },
+                                    { "id": "adventuring:light_weaver", "weight": 30 }
+                                ],
+                                "exit": ["adventuring:celestial_hound", "adventuring:light_weaver", "adventuring:light_weaver"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:celestial_hound", "weight": 30 },
+                                    { "id": "adventuring:light_weaver", "weight": 35 },
+                                    { "id": "adventuring:divine_archer", "weight": 35 }
+                                ],
+                                "exit": ["adventuring:light_weaver", "adventuring:divine_archer", "adventuring:divine_archer"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:light_weaver", "weight": 25 },
+                                    { "id": "adventuring:divine_archer", "weight": 40 },
+                                    { "id": "adventuring:star_elemental", "weight": 35 }
+                                ],
+                                "exit": ["adventuring:divine_archer", "adventuring:star_elemental", "adventuring:star_elemental"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:divine_archer", "weight": 30 },
+                                    { "id": "adventuring:star_elemental", "weight": 35 },
+                                    { "id": "adventuring:sun_warrior", "weight": 35 }
+                                ],
+                                "exit": ["adventuring:star_elemental", "adventuring:sun_warrior", "adventuring:sun_warrior"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:star_elemental", "weight": 40 },
+                                    { "id": "adventuring:sun_warrior", "weight": 60 }
+                                ],
+                                "exit": ["adventuring:sun_warrior", "adventuring:sun_warrior", "adventuring:the_fallen_archon"]
+                            }
+                        ]
+                    }
+                ],
+                "monsters": [
+                    {
+                        "id": "seraph_guard",
+                        "name": "Seraph Guard",
+                        "media": "melvor:assets/media/monsters/angel.png",
+                        "tags": ["celestial", "humanoid"],
+                        "xp": 148,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 100 },
+                            { "id": "adventuring:defence", "value": 70 },
+                            { "id": "adventuring:agility", "value": 65 },
+                            { "id": "adventuring:strength", "value": 72 },
+                            { "id": "adventuring:ranged", "value": 50 },
+                            { "id": "adventuring:magic", "value": 55 },
+                            { "id": "adventuring:prayer", "value": 60 }
+                        ],
+                        "generator": "adventuring:divine_strike",
+                        "spender": "adventuring:divine_sentence",
+                        "passives": ["adventuring:divine_blessing"],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 20, "weight": 100 },
+                            { "id": "adventuring:parts", "qty": 3, "weight": 25 },
+                            { "id": "adventuring:celestial_feather", "qty": 2, "weight": 40 }
+                        ]
+                    },
+                    {
+                        "id": "celestial_hound",
+                        "name": "Celestial Hound",
+                        "media": "melvor:assets/media/monsters/wolf.png",
+                        "tags": ["celestial", "beast"],
+                        "xp": 152,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 88 },
+                            { "id": "adventuring:defence", "value": 55 },
+                            { "id": "adventuring:agility", "value": 80 },
+                            { "id": "adventuring:strength", "value": 75 },
+                            { "id": "adventuring:ranged", "value": 45 },
+                            { "id": "adventuring:magic", "value": 48 },
+                            { "id": "adventuring:prayer", "value": 52 }
+                        ],
+                        "generator": "adventuring:radiant_bite",
+                        "spender": "adventuring:celestial_pack_howl",
+                        "passives": [],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 21, "weight": 100 },
+                            { "id": "adventuring:parts", "qty": 3, "weight": 22 },
+                            { "id": "adventuring:celestial_feather", "qty": 2, "weight": 35 },
+                            { "id": "adventuring:starlight_essence", "qty": 1, "weight": 18 }
+                        ]
+                    },
+                    {
+                        "id": "light_weaver",
+                        "name": "Light Weaver",
+                        "media": "melvor:assets/media/monsters/magic_elemental.png",
+                        "tags": ["celestial", "mage"],
+                        "xp": 158,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 82 },
+                            { "id": "adventuring:defence", "value": 50 },
+                            { "id": "adventuring:agility", "value": 62 },
+                            { "id": "adventuring:strength", "value": 42 },
+                            { "id": "adventuring:ranged", "value": 48 },
+                            { "id": "adventuring:magic", "value": 85 },
+                            { "id": "adventuring:prayer", "value": 70 }
+                        ],
+                        "generator": "adventuring:light_beam",
+                        "spender": "adventuring:healing_light",
+                        "passives": ["adventuring:radiant_aura"],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 23, "weight": 100 },
+                            { "id": "adventuring:parts", "qty": 3, "weight": 20 },
+                            { "id": "adventuring:starlight_essence", "qty": 2, "weight": 35 },
+                            { "id": "adventuring:divine_gold", "qty": 1, "weight": 20 }
+                        ]
+                    },
+                    {
+                        "id": "divine_archer",
+                        "name": "Divine Archer",
+                        "media": "melvor:assets/media/monsters/archer.png",
+                        "tags": ["celestial", "humanoid"],
+                        "xp": 165,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 90 },
+                            { "id": "adventuring:defence", "value": 55 },
+                            { "id": "adventuring:agility", "value": 75 },
+                            { "id": "adventuring:strength", "value": 55 },
+                            { "id": "adventuring:ranged", "value": 88 },
+                            { "id": "adventuring:magic", "value": 52 },
+                            { "id": "adventuring:prayer", "value": 58 }
+                        ],
+                        "generator": "adventuring:starlight_arrow",
+                        "spender": "adventuring:arrow_rain",
+                        "passives": [],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 25, "weight": 100 },
+                            { "id": "adventuring:parts", "qty": 4, "weight": 22 },
+                            { "id": "adventuring:celestial_feather", "qty": 3, "weight": 30 },
+                            { "id": "adventuring:moon_tear", "qty": 1, "weight": 15 }
+                        ]
+                    },
+                    {
+                        "id": "star_elemental",
+                        "name": "Star Elemental",
+                        "media": "melvor:assets/media/monsters/fire_elemental.png",
+                        "tags": ["celestial", "elemental"],
+                        "xp": 175,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 110 },
+                            { "id": "adventuring:defence", "value": 62 },
+                            { "id": "adventuring:agility", "value": 58 },
+                            { "id": "adventuring:strength", "value": 65 },
+                            { "id": "adventuring:ranged", "value": 55 },
+                            { "id": "adventuring:magic", "value": 82 },
+                            { "id": "adventuring:prayer", "value": 65 }
+                        ],
+                        "generator": "adventuring:nova_burst",
+                        "spender": "adventuring:stellar_explosion",
+                        "passives": [],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 27, "weight": 100 },
+                            { "id": "adventuring:parts", "qty": 4, "weight": 20 },
+                            { "id": "adventuring:starlight_essence", "qty": 3, "weight": 35 },
+                            { "id": "adventuring:sun_fragment", "qty": 1, "weight": 18 }
+                        ]
+                    },
+                    {
+                        "id": "sun_warrior",
+                        "name": "Sun Warrior",
+                        "media": "melvor:assets/media/monsters/paladin.png",
+                        "tags": ["celestial", "humanoid"],
+                        "xp": 185,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 125 },
+                            { "id": "adventuring:defence", "value": 78 },
+                            { "id": "adventuring:agility", "value": 60 },
+                            { "id": "adventuring:strength", "value": 85 },
+                            { "id": "adventuring:ranged", "value": 50 },
+                            { "id": "adventuring:magic", "value": 58 },
+                            { "id": "adventuring:prayer", "value": 72 }
+                        ],
+                        "generator": "adventuring:solar_strike",
+                        "spender": "adventuring:blazing_judgment",
+                        "passives": ["adventuring:divine_blessing"],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 30, "weight": 100 },
+                            { "id": "adventuring:parts", "qty": 4, "weight": 25 },
+                            { "id": "adventuring:sun_fragment", "qty": 2, "weight": 35 },
+                            { "id": "adventuring:divine_gold", "qty": 2, "weight": 25 }
+                        ]
+                    },
+                    {
+                        "id": "the_fallen_archon",
+                        "name": "The Fallen Archon",
+                        "media": "melvor:assets/media/monsters/ahrenia.png",
+                        "tags": ["celestial", "humanoid", "boss"],
+                        "isBoss": true,
+                        "xp": 520,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 300 },
+                            { "id": "adventuring:defence", "value": 82 },
+                            { "id": "adventuring:agility", "value": 70 },
+                            { "id": "adventuring:strength", "value": 88 },
+                            { "id": "adventuring:ranged", "value": 65 },
+                            { "id": "adventuring:magic", "value": 92 },
+                            { "id": "adventuring:prayer", "value": 85 }
+                        ],
+                        "generator": "adventuring:holy_light",
+                        "spender": "adventuring:eclipse",
+                        "passives": ["adventuring:eclipse_power", "adventuring:radiant_aura"],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 85, "weight": 100 },
+                            { "id": "adventuring:big_parts", "qty": 3, "weight": 100 },
+                            { "id": "adventuring:celestial_feather", "qty": 10, "weight": 100 },
+                            { "id": "adventuring:starlight_essence", "qty": 5, "weight": 100 },
+                            { "id": "adventuring:divine_gold", "qty": 4, "weight": 80 },
+                            { "id": "adventuring:archons_essence", "qty": 1, "weight": 100 }
+                        ]
+                    }
+                ],
+                "generators": [
+                    {
+                        "id": "divine_strike",
+                        "name": "Divine Strike",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "energy": 55,
+                        "hits": [{ "target": "front", "party": "enemy", "effects": [{ "type": "damage", "amount": { "base": 16, "scaling": [{ "id": "adventuring:strength", "value": 1.2 }] } }] }]
+                    },
+                    {
+                        "id": "radiant_bite",
+                        "name": "Radiant Bite",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "energy": 50,
+                        "hits": [{ "target": "front", "party": "enemy", "effects": [{ "type": "damage", "amount": { "base": 18, "scaling": [{ "id": "adventuring:strength", "value": 1.3 }] } }] }]
+                    },
+                    {
+                        "id": "light_beam",
+                        "name": "Light Beam",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "energy": 55,
+                        "hits": [{ "target": "random", "party": "enemy", "effects": [{ "type": "damage", "amount": { "base": 14, "scaling": [{ "id": "adventuring:magic", "value": 1.4 }] } }] }]
+                    },
+                    {
+                        "id": "starlight_arrow",
+                        "name": "Starlight Arrow",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "energy": 55,
+                        "hits": [{ "target": "front", "party": "enemy", "effects": [{ "type": "damage", "amount": { "base": 16, "scaling": [{ "id": "adventuring:ranged", "value": 1.3 }] } }] }]
+                    },
+                    {
+                        "id": "nova_burst",
+                        "name": "Nova Burst",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "energy": 60,
+                        "hits": [{ "target": "all", "party": "enemy", "effects": [{ "type": "damage", "amount": { "base": 12, "scaling": [{ "id": "adventuring:magic", "value": 1.2 }] } }] }]
+                    },
+                    {
+                        "id": "solar_strike",
+                        "name": "Solar Strike",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "energy": 55,
+                        "hits": [{ "target": "front", "party": "enemy", "effects": [{ "type": "damage", "amount": { "base": 20, "scaling": [{ "id": "adventuring:strength", "value": 1.4 }] } }] }]
+                    }
+                ],
+                "spenders": [
+                    {
+                        "id": "divine_sentence",
+                        "name": "Divine Sentence",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "cost": 100,
+                        "hits": [{ "target": "front", "party": "enemy", "effects": [{ "type": "damage", "amount": { "base": 30, "scaling": [{ "id": "adventuring:strength", "value": 1.8 }] } }] }]
+                    },
+                    {
+                        "id": "celestial_pack_howl",
+                        "name": "Celestial Howl",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "cost": 100,
+                        "hits": [{ "target": "all", "party": "ally", "effects": [{ "type": "buff", "buff": "adventuring:might", "stacks": { "base": 3, "scaling": [] } }] }]
+                    },
+                    {
+                        "id": "healing_light",
+                        "name": "Healing Light",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "cost": 100,
+                        "hits": [{ "target": "all", "party": "ally", "effects": [{ "type": "heal", "amount": { "base": 25, "scaling": [{ "id": "adventuring:magic", "value": 0.5 }] } }] }]
+                    },
+                    {
+                        "id": "arrow_rain",
+                        "name": "Arrow Rain",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "cost": 100,
+                        "hits": [{ "target": "all", "party": "enemy", "effects": [{ "type": "damage", "amount": { "base": 20, "scaling": [{ "id": "adventuring:ranged", "value": 1.5 }] } }] }]
+                    },
+                    {
+                        "id": "stellar_explosion",
+                        "name": "Stellar Explosion",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "cost": 100,
+                        "hits": [{ "target": "all", "party": "enemy", "effects": [{ "type": "damage", "amount": { "base": 28, "scaling": [{ "id": "adventuring:magic", "value": 2.0 }] } }] }]
+                    },
+                    {
+                        "id": "blazing_judgment",
+                        "name": "Blazing Judgment",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "cost": 100,
+                        "hits": [{ "target": "all", "party": "enemy", "effects": [{ "type": "damage", "amount": { "base": 32, "scaling": [{ "id": "adventuring:strength", "value": 1.8 }] } }] }]
+                    },
+                    {
+                        "id": "eclipse",
+                        "name": "Eclipse",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "cost": 120,
+                        "hits": [{ "target": "all", "party": "enemy", "effects": [{ "type": "damage", "amount": { "base": 40, "scaling": [{ "id": "adventuring:magic", "value": 2.2 }] } }] }]
+                    }
+                ],
+                "materials": [
+                    {
+                        "id": "celestial_feather",
+                        "name": "Celestial Feather",
+                        "media": "melvor:assets/media/bank/feather.png",
+                        "category": "adventuring:monster_drops"
+                    },
+                    {
+                        "id": "starlight_essence",
+                        "name": "Starlight Essence",
+                        "media": "melvor:assets/media/bank/stardust.png",
+                        "category": "adventuring:monster_drops"
+                    },
+                    {
+                        "id": "divine_gold",
+                        "name": "Divine Gold",
+                        "media": "melvor:assets/media/bank/gold_bar.png",
+                        "category": "adventuring:monster_drops"
+                    },
+                    {
+                        "id": "moon_tear",
+                        "name": "Moon Tear",
+                        "media": "melvor:assets/media/bank/pearl.png",
+                        "category": "adventuring:monster_drops"
+                    },
+                    {
+                        "id": "sun_fragment",
+                        "name": "Sun Fragment",
+                        "media": "melvor:assets/media/bank/fire_rune.png",
+                        "category": "adventuring:monster_drops"
+                    },
+                    {
+                        "id": "archons_essence",
+                        "name": "Archon's Essence",
+                        "media": "melvor:assets/media/bank/strange_potion.png",
+                        "category": "adventuring:boss_drops"
+                    }
+                ]
+            }
+        }]
+    }
+}

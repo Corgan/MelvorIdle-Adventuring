@@ -7,6 +7,8 @@ export class AdventuringTavernElement extends AdventuringSubpageElement {
         super('adventuring-tavern-template');
 
         this.back = getElementFromFragment(this._content, 'back', 'button');
+        this.drinks = getElementFromFragment(this._content, 'drinks', 'div');
+        this.activeBuffs = getElementFromFragment(this._content, 'active-buffs', 'div');
     }
 }
 window.customElements.define('adventuring-tavern', AdventuringTavernElement);

@@ -1,0 +1,343 @@
+{
+    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+    "namespace": "adventuring",
+    "data": {
+        "skillData": [{
+            "skillID": "adventuring:Adventuring",
+            "data": {
+                "jobs": [
+                    {
+                        "id": "warlord",
+                        "tier": 3,
+                        "name": "Warlord",
+                        "media": "melvor:assets/media/bank/potion_attack_i.png#tint=purple",
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:berserker", "level": 20 },
+                            { "type": "job_level", "job": "adventuring:samurai", "level": 15 },
+                            { "type": "area_mastery", "area": "adventuring:giants_plateau", "level": 25 }
+                        ],
+                        "isMilestoneReward": true,
+                        "allowedItems": [
+                            "adventuring:helm",
+                            "adventuring:platebody",
+                            "adventuring:platelegs",
+                            "adventuring:gauntlets",
+                            "adventuring:sabatons",
+                            "adventuring:amulet",
+                            "adventuring:ring",
+                            "adventuring:cape",
+                            "adventuring:sword2h",
+                            "adventuring:axe",
+                            "adventuring:shield",
+                            "adventuring:sword1h",
+                            "adventuring:bow"
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:hitpoints", "value": 1.5 },
+                            { "id": "adventuring:defence", "value": 0.75 },
+                            { "id": "adventuring:agility", "value": 1.0 },
+                            { "id": "adventuring:strength", "value": 2.0 }
+                        ]
+                    }
+                ],
+                "generators": [
+                    {
+                        "id": "cleave",
+                        "name": "Cleave",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:warlord", "level": 1 }
+                        ],
+                        "energy": 25,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 15,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.35 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "target": "back",
+                                "party": "enemy",
+                                "delay": 100,
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 15,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.35 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "commanding_shout",
+                        "name": "Commanding Shout",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:warlord", "level": 15 }
+                        ],
+                        "energy": 30,
+                        "hits": [
+                            {
+                                "target": "aoe",
+                                "party": "ally",
+                                "effects": [
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:might",
+                                        "stacks": {
+                                            "base": 2,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.1 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "target": "aoe",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:fear",
+                                        "stacks": {
+                                            "base": 2,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.05 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "spenders": [
+                    {
+                        "id": "reaping_cyclone",
+                        "name": "Reaping Cyclone",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:warlord", "level": 5 }
+                        ],
+                        "cost": 150,
+                        "hits": [
+                            {
+                                "target": "aoe",
+                                "party": "enemy",
+                                "delay": 150,
+                                "repeat": 3,
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 12,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.35 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "warcry",
+                        "name": "Warcry",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:warlord", "level": 20 }
+                        ],
+                        "cost": 140,
+                        "hits": [
+                            {
+                                "target": "aoe",
+                                "party": "ally",
+                                "effects": [
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:might",
+                                        "stacks": {
+                                            "base": 3,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.15 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:haste",
+                                        "stacks": {
+                                            "base": 2,
+                                            "scaling": [
+                                                { "id": "adventuring:agility", "value": 0.1 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "tactical_command",
+                        "name": "Tactical Command",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:warlord", "level": 25 }
+                        ],
+                        "cost": 160,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "delay": 100,
+                                "repeat": 2,
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 25,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.5 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "target": "aoe",
+                                "party": "ally",
+                                "effects": [
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:might",
+                                        "stacks": {
+                                            "base": 2,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.1 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:block",
+                                        "stacks": {
+                                            "base": 2,
+                                            "scaling": [
+                                                { "id": "adventuring:defence", "value": 0.1 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "devastating_strike",
+                        "name": "Devastating Strike",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:warlord", "level": 35 }
+                        ],
+                        "cost": 180,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 60,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 1.8 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:bleed",
+                                        "stacks": {
+                                            "base": 5,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.15 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "passives": [
+                    {
+                        "id": "veterans_presence",
+                        "name": "Veteran's Presence",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:warlord", "level": 25 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "encounter_start",
+                                "type": "buff",
+                                "target": "aoe",
+                                "party": "ally",
+                                "id": "adventuring:might",
+                                "stacks": {
+                                    "base": 3,
+                                    "scaling": [
+                                        { "id": "adventuring:strength", "value": 0.15 }
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "inspiring_presence",
+                        "name": "Inspiring Presence",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:warlord", "level": 30 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "encounter_start",
+                                "type": "debuff",
+                                "target": "aoe",
+                                "party": "enemy",
+                                "id": "adventuring:fear",
+                                "stacks": {
+                                    "base": 2,
+                                    "scaling": [
+                                        { "id": "adventuring:strength", "value": 0.1 }
+                                    ]
+                                }
+                            },
+                            {
+                                "trigger": "encounter_start",
+                                "type": "buff",
+                                "target": "aoe",
+                                "party": "ally",
+                                "id": "adventuring:haste",
+                                "stacks": {
+                                    "base": 2,
+                                    "scaling": [
+                                        { "id": "adventuring:agility", "value": 0.1 }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        }]
+    }
+}

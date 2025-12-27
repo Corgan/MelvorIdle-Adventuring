@@ -29,6 +29,10 @@ export class AdventuringCharacterElement extends HTMLElement {
         this.auras = getElementFromFragment(this._content, 'auras', 'div');
         this.stats = getElementFromFragment(this._content, 'stats', 'div');
 
+        // Passive abilities section
+        this.passiveAbilitiesContainer = getElementFromFragment(this._content, 'passive-abilities', 'div');
+        this.passiveAbilitiesList = getElementFromFragment(this._content, 'passive-abilities-list', 'div');
+
         this.abilitiesContainer = getElementFromFragment(this._content, 'abilities', 'div');
         this.abilities = createElement('adventuring-abilities');
 
@@ -55,6 +59,8 @@ export class AdventuringCharacterElement extends HTMLElement {
         this.abilitiesContainer.appendChild(this.abilities);
         this.abilities.container.appendChild(this.generator);
         this.abilities.container.appendChild(this.spender);
+        // Move passive abilities to after the abilities element
+        this.abilitiesContainer.appendChild(this.passiveAbilitiesContainer);
 
         this.jobsContainer.appendChild(this.jobs);
         this.jobs.container.appendChild(this.combatJob);

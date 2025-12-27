@@ -1,0 +1,483 @@
+{
+    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+    "namespace": "adventuring",
+    "data": {
+        "skillData": [{
+            "skillID": "adventuring:Adventuring",
+            "data": {
+                "passives": [
+                    {
+                        "id": "void_shroud",
+                        "name": "Void Shroud",
+                        "effects": [
+                            {
+                                "trigger": "encounter_start",
+                                "type": "debuff",
+                                "id": "adventuring:weaken",
+                                "target": "all_enemies",
+                                "amount": { "base": 0.15, "scaling": [] },
+                                "stacks": { "base": 2, "scaling": [] }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "mist_incarnation",
+                        "name": "Mist Incarnation",
+                        "effects": [
+                            {
+                                "trigger": "encounter_start",
+                                "type": "immunity",
+                                "duration": 2
+                            },
+                            {
+                                "trigger": "encounter_start",
+                                "type": "summon",
+                                "monster": "adventuring:mist_wraith"
+                            }
+                        ]
+                    }
+                ],
+                "areas": [
+                    {
+                        "id": "into_the_mist",
+                        "name": "Into the Mist",
+                        "media": "melvor:assets/media/monsters/ahrenia.png",
+                        "requirements": [
+                            { "type": "skill_level", "level": 99 }
+                        ],
+                        "height": 7,
+                        "width": 7,
+                        "floors": [
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:mist_walker", "weight": 100 }
+                                ],
+                                "exit": ["adventuring:mist_walker", "adventuring:mist_walker", "adventuring:mist_walker"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:mist_walker", "weight": 70 },
+                                    { "id": "adventuring:shadow_beast", "weight": 30 }
+                                ],
+                                "exit": ["adventuring:mist_walker", "adventuring:mist_walker", "adventuring:shadow_beast"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:mist_walker", "weight": 50 },
+                                    { "id": "adventuring:shadow_beast", "weight": 50 }
+                                ],
+                                "exit": ["adventuring:mist_walker", "adventuring:shadow_beast", "adventuring:shadow_beast"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:shadow_beast", "weight": 70 },
+                                    { "id": "adventuring:mist_walker", "weight": 30 }
+                                ],
+                                "exit": ["adventuring:shadow_beast", "adventuring:shadow_beast", "adventuring:shadow_beast"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:shadow_beast", "weight": 60 },
+                                    { "id": "adventuring:void_entity", "weight": 40 }
+                                ],
+                                "exit": ["adventuring:shadow_beast", "adventuring:shadow_beast", "adventuring:void_entity"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:shadow_beast", "weight": 40 },
+                                    { "id": "adventuring:void_entity", "weight": 60 }
+                                ],
+                                "exit": ["adventuring:shadow_beast", "adventuring:void_entity", "adventuring:void_entity"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:void_entity", "weight": 80 },
+                                    { "id": "adventuring:shadow_beast", "weight": 20 }
+                                ],
+                                "exit": ["adventuring:void_entity", "adventuring:void_entity", "adventuring:void_entity"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:void_entity", "weight": 100 }
+                                ],
+                                "exit": ["adventuring:void_entity", "adventuring:void_entity", "adventuring:void_entity"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:void_entity", "weight": 100 }
+                                ],
+                                "exit": ["adventuring:void_entity", "adventuring:void_entity", "adventuring:void_entity"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:void_entity", "weight": 100 }
+                                ],
+                                "exit": ["adventuring:void_entity", "adventuring:void_entity", "adventuring:void_entity"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:void_entity", "weight": 100 }
+                                ],
+                                "exit": ["adventuring:void_entity", "adventuring:void_entity", "adventuring:void_entity"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:void_entity", "weight": 100 }
+                                ],
+                                "exit": ["adventuring:void_entity", "adventuring:void_entity", "adventuring:void_entity"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:void_entity", "weight": 100 }
+                                ],
+                                "exit": ["adventuring:void_entity", "adventuring:void_entity", "adventuring:void_entity"]
+                            },
+                            {
+                                "monsters": [
+                                    { "id": "adventuring:void_entity", "weight": 100 }
+                                ],
+                                "exit": ["adventuring:void_entity", "adventuring:void_entity", "adventuring:ahrenia"]
+                            }
+                        ]
+                    }
+                ],
+                "monsters": [
+                    {
+                        "id": "mist_walker",
+                        "name": "Mist Walker",
+                        "media": "melvor:assets/media/monsters/mysterious_figure.png",
+                        "tags": ["elemental"],
+                        "xp": 175,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 101 },
+                            { "id": "adventuring:defence", "value": 55 },
+                            { "id": "adventuring:agility", "value": 90 },
+                            { "id": "adventuring:strength", "value": 55 },
+                            { "id": "adventuring:ranged", "value": 49 },
+                            { "id": "adventuring:magic", "value": 62 },
+                            { "id": "adventuring:prayer", "value": 78 }
+                        ],
+                        "generator": "adventuring:mist_strike",
+                        "spender": "adventuring:phasing_assault",
+                        "passives": [],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 98, "weight": 100 },
+                            { "id": "adventuring:parts", "qty": 30, "weight": 58 },
+                            { "id": "adventuring:big_parts", "qty": 10, "weight": 42 },
+                            { "id": "adventuring:mist_shard", "qty": 1, "weight": 25 }
+                        ]
+                    },
+                    {
+                        "id": "shadow_beast",
+                        "name": "Shadow Beast",
+                        "media": "melvor:assets/media/monsters/dark_bringer.png",
+                        "tags": ["elemental"],
+                        "xp": 195,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 117 },
+                            { "id": "adventuring:defence", "value": 60 },
+                            { "id": "adventuring:agility", "value": 80 },
+                            { "id": "adventuring:strength", "value": 68 },
+                            { "id": "adventuring:ranged", "value": 46 },
+                            { "id": "adventuring:magic", "value": 72 },
+                            { "id": "adventuring:prayer", "value": 85 }
+                        ],
+                        "generator": "adventuring:shadow_claw",
+                        "spender": "adventuring:darkness_embrace",
+                        "passives": [],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 112, "weight": 100 },
+                            { "id": "adventuring:parts", "qty": 34, "weight": 60 },
+                            { "id": "adventuring:big_parts", "qty": 14, "weight": 48 },
+                            { "id": "adventuring:mist_shard", "qty": 1, "weight": 32 }
+                        ]
+                    },
+                    {
+                        "id": "void_entity",
+                        "name": "Void Entity",
+                        "media": "melvor:assets/media/monsters/witch.png",
+                        "tags": ["elemental"],
+                        "xp": 220,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 130 },
+                            { "id": "adventuring:defence", "value": 64 },
+                            { "id": "adventuring:agility", "value": 75 },
+                            { "id": "adventuring:strength", "value": 62 },
+                            { "id": "adventuring:ranged", "value": 55 },
+                            { "id": "adventuring:magic", "value": 88 },
+                            { "id": "adventuring:prayer", "value": 95 }
+                        ],
+                        "generator": "adventuring:void_bolt",
+                        "spender": "adventuring:annihilation",
+                        "passives": [],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 130, "weight": 100 },
+                            { "id": "adventuring:parts", "qty": 38, "weight": 62 },
+                            { "id": "adventuring:big_parts", "qty": 18, "weight": 52 },
+                            { "id": "adventuring:mist_shard", "qty": 2, "weight": 40 }
+                        ]
+                    },
+                    {
+                        "id": "ahrenia",
+                        "name": "Ahrenia",
+                        "media": "melvor:assets/media/monsters/ahrenia.png",
+                        "tags": ["boss", "elemental"],
+                        "xp": 500,
+                        "isBoss": true,
+                        "enrageThreshold": 20,
+                        "enrageBuff": {
+                            "damage": 0.75,
+                            "speed": 0.5
+                        },
+                        "phases": [
+                            {
+                                "name": "Wrath of the Mist"
+                            },
+                            {
+                                "name": "Dark Awakening",
+                                "hpThreshold": 65,
+                                "spender": "adventuring:darkness_embrace",
+                                "statBuffs": [
+                                    { "id": "adventuring:magic", "value": 0.25 }
+                                ]
+                            },
+                            {
+                                "name": "Final Form",
+                                "hpThreshold": 30,
+                                "generator": "adventuring:annihilation",
+                                "spender": "adventuring:reality_shatter",
+                                "healPercent": 10,
+                                "statBuffs": [
+                                    { "id": "adventuring:strength", "value": 0.5 },
+                                    { "id": "adventuring:magic", "value": 0.5 }
+                                ]
+                            }
+                        ],
+                        "passives": ["adventuring:void_shroud", "adventuring:mist_incarnation"],
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 293 },
+                            { "id": "adventuring:defence", "value": 85 },
+                            { "id": "adventuring:agility", "value": 95 },
+                            { "id": "adventuring:strength", "value": 85 },
+                            { "id": "adventuring:ranged", "value": 72 },
+                            { "id": "adventuring:magic", "value": 117 },
+                            { "id": "adventuring:prayer", "value": 120 }
+                        ],
+                        "generator": "adventuring:void_bolt",
+                        "spender": "adventuring:reality_shatter",
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 350, "weight": 100 },
+                            { "id": "adventuring:parts", "qty": 65, "weight": 80 },
+                            { "id": "adventuring:big_parts", "qty": 35, "weight": 70 },
+                            { "id": "adventuring:mist_shard", "qty": 10, "weight": 100 },
+                            { "id": "adventuring:air_essence", "qty": 5, "weight": 50 },
+                            { "id": "adventuring:water_essence", "qty": 5, "weight": 50 },
+                            { "id": "adventuring:earth_essence", "qty": 5, "weight": 50 },
+                            { "id": "adventuring:fire_essence", "qty": 5, "weight": 50 }
+                        ]
+                    },
+                    {
+                        "id": "mist_wraith",
+                        "name": "Mist Wraith",
+                        "media": "melvor:assets/media/monsters/ghost.png",
+                        "tags": ["elemental"],
+                        "xp": 80,
+                        "isSummon": true,
+                        "stats": [
+                            { "id": "adventuring:hitpoints", "value": 80 },
+                            { "id": "adventuring:defence", "value": 50 },
+                            { "id": "adventuring:agility", "value": 55 },
+                            { "id": "adventuring:strength", "value": 45 },
+                            { "id": "adventuring:ranged", "value": 40 },
+                            { "id": "adventuring:magic", "value": 75 },
+                            { "id": "adventuring:prayer", "value": 50 }
+                        ],
+                        "generator": "adventuring:mist_strike",
+                        "spender": "adventuring:darkness_embrace",
+                        "passives": ["adventuring:void_shroud"],
+                        "loot": [
+                            { "id": "adventuring:currency", "qty": 30, "weight": 100 },
+                            { "id": "adventuring:mist_shard", "qty": 1, "weight": 50 }
+                        ]
+                    }
+                ],
+                "generators": [
+                    {
+                        "id": "mist_strike",
+                        "name": "Mist Strike",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "energy": 50,
+                        "hits": [
+                            {
+                                "target": "random",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 25,
+                                            "scaling": [
+                                                { "id": "adventuring:agility", "value": 1.2 },
+                                                { "id": "adventuring:strength", "value": 1 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "shadow_claw",
+                        "name": "Shadow Claw",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "energy": 55,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 30,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 1.8 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "void_bolt",
+                        "name": "Void Bolt",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "energy": 55,
+                        "hits": [
+                            {
+                                "target": "all",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 18,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 1.5 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "spenders": [
+                    {
+                        "id": "phasing_assault",
+                        "name": "Phasing Assault",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "cost": 95,
+                        "hits": [
+                            {
+                                "target": "back",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 55,
+                                            "scaling": [
+                                                { "id": "adventuring:agility", "value": 2.2 },
+                                                { "id": "adventuring:strength", "value": 1.5 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "darkness_embrace",
+                        "name": "Darkness Embrace",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "cost": 100,
+                        "hits": [
+                            {
+                                "target": "all",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 50,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 2.8 },
+                                                { "id": "adventuring:strength", "value": 1.2 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "annihilation",
+                        "name": "Annihilation",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "cost": 100,
+                        "hits": [
+                            {
+                                "target": "all",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 65,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 3.2 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "reality_shatter",
+                        "name": "Reality Shatter",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "cost": 100,
+                        "hits": [
+                            {
+                                "target": "all",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 100,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 4 },
+                                                { "id": "adventuring:strength", "value": 2 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        }]
+    }
+}

@@ -8,8 +8,9 @@
                 "jobs": [
                     {
                         "id": "wizard",
+                        "tier": 1,
                         "name": "Wizard",
-                        "media": "melvor:assets/media/skills/magic/magic.svg",
+                        "media": "melvor:assets/media/bank/potion_magic_i.png#tint=blue",
                         "requirements": [
                             { "type": "skill_level", "level": 5 }
                         ],
@@ -30,10 +31,10 @@
                             "adventuring:spellbook"
                         ],
                         "scaling": [
-                            { "id": "adventuring:hitpoints", "value": 1 },
+                            { "id": "adventuring:hitpoints", "value": 1.25 },
                             { "id": "adventuring:defence", "value": 0.5 },
-                            { "id": "adventuring:agility", "value": 0.25 },
-                            { "id": "adventuring:magic", "value": 1.5 }
+                            { "id": "adventuring:agility", "value": 0.5 },
+                            { "id": "adventuring:magic", "value": 2.0 }
                         ]
                     }
                 ],
@@ -41,7 +42,6 @@
                     {
                         "id": "electrocute",
                         "name": "Electrocute",
-                        "description": "Deal {hit.0.effect.0.amount} damage all enemies and apply {hit.0.effect.1.stacks} Shock.",
                         "requirements": [
                             { "type": "current_job_level", "job": "adventuring:wizard", "level": 1 }
                         ],
@@ -54,9 +54,9 @@
                                     {
                                         "type": "damage",
                                         "amount": {
-                                            "base": 5,
+                                            "base": 8,
                                             "scaling": [
-                                                { "id": "adventuring:magic", "value": 0.25 }
+                                                { "id": "adventuring:magic", "value": 0.35 }
                                             ]
                                         }
                                     },
@@ -77,7 +77,6 @@
                     {
                         "id": "bouncing_flame",
                         "name": "Bouncing Flame",
-                        "description": "Deal {hit.0.effect.0.amount} damage to a random target and apply {hit.0.effect.1.stacks} Burn, bouncing 2 additional times.",
                         "requirements": [
                             { "type": "current_job_level", "job": "adventuring:wizard", "level": 10 }
                         ],
@@ -92,9 +91,9 @@
                                         "type": "damage",
                                         "energy": 10,
                                         "amount": {
-                                            "base": 5,
+                                            "base": 8,
                                             "scaling": [
-                                                { "id": "adventuring:magic", "value": 0.15 }
+                                                { "id": "adventuring:magic", "value": 0.25 }
                                             ]
                                         }
                                     },
@@ -111,13 +110,74 @@
                                 ]
                             }
                         ]
+                    },
+                    {
+                        "id": "frost_nova",
+                        "name": "Frost Nova",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:wizard", "level": 20 }
+                        ],
+                        "energy": 25,
+                        "hits": [
+                            {
+                                "target": "aoe",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 10,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 0.3 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:chill",
+                                        "stacks": {
+                                            "base": 2,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 0.05 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "arcane_missile",
+                        "name": "Arcane Missile",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:wizard", "level": 25 }
+                        ],
+                        "energy": 30,
+                        "hits": [
+                            {
+                                "target": "random",
+                                "party": "enemy",
+                                "delay": 150,
+                                "repeat": 4,
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 8,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 0.25 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
                     }
                 ],
                 "spenders": [
                     {
                         "id": "pyroblast",
                         "name": "Pyroblast",
-                        "description": "Deal {hit.0.effect.0.amount} damage to the back enemy.",
                         "requirements": [
                             { "type": "current_job_level", "job": "adventuring:wizard", "level": 5 }
                         ],
@@ -143,7 +203,6 @@
                     {
                         "id": "flame_wave",
                         "name": "Flame Wave",
-                        "description": "Deal {hit.0.effect.0.amount} damage to all enemies.",
                         "requirements": [
                             { "type": "current_job_level", "job": "adventuring:wizard", "level": 15 }
                         ],
@@ -165,10 +224,156 @@
                                 ]
                             }
                         ]
+                    },
+                    {
+                        "id": "meteor",
+                        "name": "Meteor",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:wizard", "level": 30 }
+                        ],
+                        "cost": 180,
+                        "hits": [
+                            {
+                                "target": "aoe",
+                                "party": "enemy",
+                                "delay": 500,
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 30,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 1.25 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:burn",
+                                        "stacks": {
+                                            "base": 3,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 0.1 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "chain_lightning",
+                        "name": "Chain Lightning",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:wizard", "level": 40 }
+                        ],
+                        "cost": 160,
+                        "hits": [
+                            {
+                                "target": "random",
+                                "party": "enemy",
+                                "delay": 80,
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 10,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 0.25 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:shock",
+                                        "stacks": { "base": 1 }
+                                    }
+                                ],
+                                "repeat": 5
+                            }
+                        ]
+                    },
+                    {
+                        "id": "arcane_explosion",
+                        "name": "Arcane Explosion",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:wizard", "level": 50 }
+                        ],
+                        "cost": 220,
+                        "hits": [
+                            {
+                                "target": "aoe",
+                                "party": "enemy",
+                                "delay": 150,
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 25,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 0.75 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:vulnerability",
+                                        "stacks": {
+                                            "base": 1,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 0.03 }
+                                            ]
+                                        }
+                                    }
+                                ],
+                                "repeat": 2
+                            }
+                        ]
                     }
                 ],
                 "passives": [
-
+                    {
+                        "id": "mana_shield",
+                        "name": "Mana Shield",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:wizard", "level": 35 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "encounter_start",
+                                "type": "buff",
+                                "target": "self",
+                                "id": "adventuring:barrier",
+                                "stacks": {
+                                    "base": 5,
+                                    "scaling": [
+                                        { "id": "adventuring:magic", "value": 0.25 }
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "arcane_brilliance",
+                        "name": "Arcane Brilliance",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:wizard", "level": 45 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "encounter_start",
+                                "type": "buff",
+                                "target": "self",
+                                "id": "adventuring:arcane_power",
+                                "stacks": {
+                                    "base": 3,
+                                    "scaling": [
+                                        { "id": "adventuring:magic", "value": 0.1 }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
                 ]
             }
         }]

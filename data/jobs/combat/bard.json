@@ -1,0 +1,316 @@
+{
+    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+    "namespace": "adventuring",
+    "data": {
+        "skillData": [{
+            "skillID": "adventuring:Adventuring",
+            "data": {
+                "jobs": [
+                    {
+                        "id": "bard",
+                        "tier": 2,
+                        "name": "Bard",
+                        "media": "melvor:assets/media/bank/potion_agility_i.png#tint=pink",
+                        "requirements": [
+                            { "type": "job_level", "job": "adventuring:thief", "level": 15 }
+                        ],
+                        "isMilestoneReward": true,
+                        "allowedItems": [
+                            "adventuring:cowl",
+                            "adventuring:vest",
+                            "adventuring:chaps",
+                            "adventuring:vambraces",
+                            "adventuring:boots",
+                            "adventuring:amulet",
+                            "adventuring:ring",
+                            "adventuring:cape",
+                            "adventuring:dagger",
+                            "adventuring:wand"
+                        ],
+                        "scaling": [
+                            { "id": "adventuring:hitpoints", "value": 1.0 },
+                            { "id": "adventuring:defence", "value": 0.5 },
+                            { "id": "adventuring:agility", "value": 1.5 },
+                            { "id": "adventuring:magic", "value": 0.75 },
+                            { "id": "adventuring:prayer", "value": 0.5 }
+                        ]
+                    }
+                ],
+                "generators": [
+                    {
+                        "id": "cutting_words",
+                        "name": "Cutting Words",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:bard", "level": 1 }
+                        ],
+                        "energy": 22,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 8,
+                                            "scaling": [
+                                                { "id": "adventuring:agility", "value": 0.2 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:weaken",
+                                        "stacks": {
+                                            "base": 2,
+                                            "scaling": [
+                                                { "id": "adventuring:agility", "value": 0.05 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "inspiring_melody",
+                        "name": "Inspiring Melody",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:bard", "level": 10 }
+                        ],
+                        "energy": 25,
+                        "hits": [
+                            {
+                                "target": "lowest",
+                                "party": "ally",
+                                "effects": [
+                                    {
+                                        "type": "heal",
+                                        "amount": {
+                                            "base": 15,
+                                            "scaling": [
+                                                { "id": "adventuring:agility", "value": 0.3 },
+                                                { "id": "adventuring:prayer", "value": 0.2 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:might",
+                                        "stacks": {
+                                            "base": 1,
+                                            "scaling": [
+                                                { "id": "adventuring:agility", "value": 0.05 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "spenders": [
+                    {
+                        "id": "song_of_valor",
+                        "name": "Song of Valor",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:bard", "level": 5 }
+                        ],
+                        "cost": 120,
+                        "hits": [
+                            {
+                                "target": "aoe",
+                                "party": "ally",
+                                "effects": [
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:might",
+                                        "stacks": {
+                                            "base": 2,
+                                            "scaling": [
+                                                { "id": "adventuring:agility", "value": 0.05 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:haste",
+                                        "stacks": {
+                                            "base": 1,
+                                            "scaling": [
+                                                { "id": "adventuring:agility", "value": 0.03 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "discordant_scream",
+                        "name": "Discordant Scream",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:bard", "level": 15 }
+                        ],
+                        "cost": 140,
+                        "hits": [
+                            {
+                                "target": "aoe",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 10,
+                                            "scaling": [
+                                                { "id": "adventuring:agility", "value": 0.25 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:fear",
+                                        "stacks": {
+                                            "base": 2,
+                                            "scaling": [
+                                                { "id": "adventuring:agility", "value": 0.05 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "hymn_of_restoration",
+                        "name": "Hymn of Restoration",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:bard", "level": 20 }
+                        ],
+                        "cost": 130,
+                        "hits": [
+                            {
+                                "target": "aoe",
+                                "party": "ally",
+                                "effects": [
+                                    {
+                                        "type": "heal",
+                                        "amount": {
+                                            "base": 18,
+                                            "scaling": [
+                                                { "id": "adventuring:agility", "value": 0.35 },
+                                                { "id": "adventuring:prayer", "value": 0.25 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:regen",
+                                        "stacks": {
+                                            "base": 3,
+                                            "scaling": [
+                                                { "id": "adventuring:agility", "value": 0.05 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "war_drums",
+                        "name": "War Drums",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:bard", "level": 25 }
+                        ],
+                        "cost": 170,
+                        "hits": [
+                            {
+                                "target": "aoe",
+                                "party": "ally",
+                                "effects": [
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:might",
+                                        "stacks": {
+                                            "base": 3,
+                                            "scaling": [
+                                                { "id": "adventuring:agility", "value": 0.1 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:haste",
+                                        "stacks": {
+                                            "base": 2,
+                                            "scaling": [
+                                                { "id": "adventuring:agility", "value": 0.05 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:barrier",
+                                        "stacks": {
+                                            "base": 2,
+                                            "scaling": [
+                                                { "id": "adventuring:prayer", "value": 0.1 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "passives": [
+                    {
+                        "id": "battle_anthem",
+                        "name": "Battle Anthem",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:bard", "level": 25 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "encounter_start",
+                                "type": "buff",
+                                "target": "aoe",
+                                "party": "ally",
+                                "id": "adventuring:haste",
+                                "stacks": {
+                                    "base": 2,
+                                    "scaling": [
+                                        { "id": "adventuring:agility", "value": 0.1 }
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "bardic_inspiration",
+                        "name": "Bardic Inspiration",
+                        "requirements": [
+                            { "type": "current_job_level", "job": "adventuring:bard", "level": 30 }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "round_start",
+                                "type": "buff",
+                                "target": "aoe",
+                                "party": "ally",
+                                "id": "adventuring:might",
+                                "stacks": {
+                                    "base": 1,
+                                    "scaling": [
+                                        { "id": "adventuring:agility", "value": 0.05 }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        }]
+    }
+}
