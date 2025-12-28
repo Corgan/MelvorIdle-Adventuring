@@ -916,15 +916,20 @@ function describeEffect(effect, manager) {
     switch(effect.type) {
         // Stat modifiers
         case 'increase_stat_flat':
-            return `${sign(effect.value)}${effect.value} ${statName(effect.stat)}`;
+            if (effect.perStack) return `+${statName(effect.stat || effect.id)} per stack`;
+            return `${sign(effect.value)}${effect.value} ${statName(effect.stat || effect.id)}`;
         case 'increase_stat_percent':
-            return `${sign(effect.value)}${effect.value}% ${statName(effect.stat)}`;
+            if (effect.perStack) return `+% ${statName(effect.stat || effect.id)} per stack`;
+            const statPctVal = effect.value ?? effect.amount;
+            return `${sign(statPctVal)}${statPctVal}% ${statName(effect.stat || effect.id)}`;
         
         // Damage/Healing
         case 'damage':
-            return `Deal ${effect.value || effect.amount} damage`;
+            if (effect.perStack) return 'Deal damage per stack';
+            return `Deal ${effect.value || effect.amount || '?'} damage`;
         case 'heal':
-            return `Heal ${effect.value || effect.amount} HP`;
+            if (effect.perStack) return 'Heal per stack';
+            return `Heal ${effect.value || effect.amount || effect.count || '?'} HP`;
         case 'heal_percent':
             const healPct = typeof effect.value === 'number' 
                 ? effect.value 
@@ -933,14 +938,21 @@ function describeEffect(effect, manager) {
                     : (effect.amount || 0));
             return `Restore ${healPct}% HP`;
         case 'lifesteal':
-            return `Heal for ${effect.value || effect.amount}% of damage dealt`;
+            if (effect.perStack) return 'Lifesteal % per stack';
+            return `Heal for ${effect.value || effect.amount || '?'}% of damage dealt`;
         
         // Damage modifiers
         case 'damage_buff':
         case 'increase_damage':
+            if (effect.perStack) return '+Damage per stack';
             return `${sign(effect.value || effect.amount)}${effect.value || effect.amount} Damage`;
         case 'increase_damage_percent':
-            return `${sign(effect.value)}${effect.value}% Damage`;
+            if (effect.perStack) return '+% Damage per stack';
+            const dmgPctVal = effect.value ?? effect.amount;
+            return `${sign(dmgPctVal)}${dmgPctVal}% Damage`;
+        case 'reduce_stat_percent':
+            if (effect.perStack) return `-% ${statName(effect.id)} per stack`;
+            return `-${effect.value || effect.amount}% ${statName(effect.id)}`;
         case 'defense_buff':
             return `${sign(effect.value || effect.amount)}${effect.value || effect.amount} Defense`;
         case 'speed_buff':
@@ -1024,7 +1036,8 @@ function describeEffect(effect, manager) {
         
         // Damage reflection
         case 'reflect_damage':
-            return `Reflect ${effect.value}% damage taken`;
+            if (effect.perStack) return `Reflect % damage per stack`;
+            return `Reflect ${effect.value ?? effect.amount}% damage taken`;
         
         // Spell echo
         case 'spell_echo':
@@ -1305,7 +1318,16 @@ function createDefaultEffectProcessor() {
     });
     
     processor.register('remove', (effect, instance, ctx) => {
-        instance.remove();
+        // If effect has an age condition, it triggers that many times before removing
+        // age=3 means the effect triggers at age 0, 1, 2, then removes at age 3
+        if (effect.age !== undefined) {
+            if (instance.age >= effect.age) {
+                instance.remove();
+            }
+            // Otherwise the effect just triggers but doesn't remove yet
+        } else {
+            instance.remove();
+        }
         return ctx.extra;
     });
     

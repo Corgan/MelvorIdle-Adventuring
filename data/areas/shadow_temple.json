@@ -145,7 +145,7 @@
                             { "id": "adventuring:magic", "value": 50 },
                             { "id": "adventuring:prayer", "value": 30 }
                         ],
-                        "generator": "adventuring:void_bolt",
+                        "generator": "adventuring:void_missile",
                         "spender": "adventuring:darkness",
                         "passives": [],
                         "loot": [
@@ -170,7 +170,7 @@
                             { "id": "adventuring:prayer", "value": 20 }
                         ],
                         "generator": "adventuring:spectral_lunge",
-                        "spender": "adventuring:terror",
+                        "spender": "adventuring:phantom_fade",
                         "passives": [],
                         "loot": [
                             { "id": "adventuring:shadow_essence", "weight": 50, "minQty": 2, "maxQty": 4 },
@@ -194,7 +194,7 @@
                             { "id": "adventuring:prayer", "value": 12 }
                         ],
                         "generator": "adventuring:predators_pounce",
-                        "spender": "adventuring:shadow_step",
+                        "spender": "adventuring:terror",
                         "passives": [],
                         "loot": [
                             { "id": "adventuring:dark_fabric", "weight": 50, "minQty": 2, "maxQty": 4 },
@@ -217,8 +217,8 @@
                             { "id": "adventuring:magic", "value": 58 },
                             { "id": "adventuring:prayer", "value": 45 }
                         ],
-                        "generator": "adventuring:void_bolt",
-                        "spender": "adventuring:dark_blessing",
+                        "generator": "adventuring:twilight_bolt",
+                        "spender": "adventuring:void_eruption",
                         "passives": [],
                         "loot": [
                             { "id": "adventuring:shadow_essence", "weight": 45, "minQty": 3, "maxQty": 5 },
@@ -241,8 +241,8 @@
                             { "id": "adventuring:magic", "value": 30 },
                             { "id": "adventuring:prayer", "value": 15 }
                         ],
-                        "generator": "adventuring:predators_pounce",
-                        "spender": "adventuring:execute",
+                        "generator": "adventuring:dark_strike",
+                        "spender": "adventuring:twilight_assassination",
                         "passives": [],
                         "loot": [
                             { "id": "adventuring:dark_fabric", "weight": 45, "minQty": 3, "maxQty": 5 },
@@ -266,7 +266,7 @@
                             { "id": "adventuring:prayer", "value": 35 }
                         ],
                         "generator": "adventuring:nightmare_touch",
-                        "spender": "adventuring:terror",
+                        "spender": "adventuring:dark_blessing",
                         "passives": [],
                         "loot": [
                             { "id": "adventuring:nightmare_dust", "weight": 50, "minQty": 3, "maxQty": 5 },
@@ -289,7 +289,7 @@
                             { "id": "adventuring:magic", "value": 35 },
                             { "id": "adventuring:prayer", "value": 25 }
                         ],
-                        "generator": "adventuring:dark_strike",
+                        "generator": "adventuring:umbral_cleave",
                         "spender": "adventuring:shadow_charge",
                         "passives": [],
                         "loot": [
@@ -313,8 +313,8 @@
                             { "id": "adventuring:magic", "value": 70 },
                             { "id": "adventuring:prayer", "value": 40 }
                         ],
-                        "generator": "adventuring:void_bolt",
-                        "spender": "adventuring:void_eruption",
+                        "generator": "adventuring:umbral_blast",
+                        "spender": "adventuring:realm_of_shadow",
                         "passives": [],
                         "loot": [
                             { "id": "adventuring:shadow_essence", "weight": 40, "minQty": 4, "maxQty": 6 },
@@ -338,8 +338,8 @@
                             { "id": "adventuring:magic", "value": 75 },
                             { "id": "adventuring:prayer", "value": 55 }
                         ],
-                        "generator": "adventuring:shadow_strike",
-                        "spender": "adventuring:realm_of_shadow",
+                        "generator": "adventuring:lords_shadow_strike",
+                        "spender": "adventuring:condemning_blow",
                         "passives": ["adventuring:dark_shroud", "adventuring:shadow_mastery"],
                         "loot": [
                             { "id": "adventuring:shadow_lords_sigil", "weight": 100, "minQty": 1, "maxQty": 2 },
@@ -351,6 +351,71 @@
                     }
                 ],
                 "generators": [
+                    {
+                        "id": "void_missile",
+                        "name": "Void Missile",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "energy": 24,
+                        "hits": [
+                            {
+                                "target": "single_enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "damage_type": "magic",
+                                        "amount": 14,
+                                        "scaling": 1.0
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "twilight_bolt",
+                        "name": "Twilight Bolt",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "energy": 26,
+                        "hits": [
+                            {
+                                "target": "single_enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "damage_type": "magic",
+                                        "amount": 16,
+                                        "scaling": 1.1
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:blind",
+                                        "stacks": 1
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "lords_shadow_strike",
+                        "name": "Lord's Shadow Strike",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "energy": 35,
+                        "hits": [
+                            {
+                                "target": "single_enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "damage_type": "strength",
+                                        "amount": 28,
+                                        "scaling": 1.3
+                                    }
+                                ]
+                            }
+                        ]
+                    },
                     {
                         "id": "umbral_blast",
                         "name": "Umbral Blast",
@@ -473,6 +538,26 @@
                     }
                 ],
                 "spenders": [
+                    {
+                        "id": "twilight_assassination",
+                        "name": "Twilight Assassination",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "cost": 75,
+                        "hits": [
+                            {
+                                "target": "single_enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "damage_type": "strength",
+                                        "amount": 40,
+                                        "scaling": 1.4
+                                    }
+                                ]
+                            }
+                        ]
+                    },
                     {
                         "id": "darkness",
                         "name": "Darkness",

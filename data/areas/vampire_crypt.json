@@ -261,7 +261,7 @@
                             { "id": "adventuring:prayer", "value": 18 }
                         ],
                         "generator": "adventuring:vampiric_bite",
-                        "spender": "adventuring:blood_drain",
+                        "spender": "adventuring:bat_siphon",
                         "passives": ["adventuring:vampiric_regeneration"],
                         "loot": [
                             { "id": "adventuring:currency", "qty": 12, "weight": 100 }
@@ -334,6 +334,43 @@
                     }
                 ],
                 "spenders": [
+                    {
+                        "id": "bat_siphon",
+                        "name": "Bat Siphon",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "cost": 45,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 15,
+                                            "scaling": [
+                                                { "id": "adventuring:agility", "value": 0.8 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "target": "self",
+                                "party": "ally",
+                                "effects": [
+                                    {
+                                        "type": "heal",
+                                        "amount": {
+                                            "base": 8,
+                                            "scaling": []
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
                     {
                         "id": "blood_siphon",
                         "name": "Blood Siphon",

@@ -313,25 +313,69 @@ export class AdventuringDungeon extends AdventuringPage {
     }
 
     /**
-     * Get stat multiplier for endless mode based on current wave
-     * Each wave increases stats by 5%
+     * Get the wave generation configuration from the current difficulty
      */
-    getEndlessStatMultiplier() {
-        if(!this.isEndless) return 1.0;
-        return 1.0 + (this.endlessWave * 0.05);
+    get waveGeneration() {
+        return this.area?.getDifficulty()?.waveGeneration ?? null;
     }
 
     /**
-     * Get XP/loot multiplier for endless mode based on current wave
-     * Each wave increases rewards by 2%
+     * Get the wave scaling configuration from the current difficulty
      */
-    getEndlessRewardMultiplier() {
-        if(!this.isEndless) return 1.0;
-        return 1.0 + (this.endlessWave * 0.02);
+    get waveScaling() {
+        return this.area?.getDifficulty()?.waveScaling ?? null;
     }
 
+    /**
+     * Get stat multiplier for wave-scaling difficulties based on current wave
+     * Uses waveScaling.statMultiplierPerWave from the difficulty JSON
+     */
+    getEndlessStatMultiplier() {
+        const scaling = this.waveScaling;
+        if(!scaling) return 1.0;
+        const perWave = scaling.statMultiplierPerWave ?? 0.05;
+        return 1.0 + (this.endlessWave * perWave);
+    }
+
+    /**
+     * Get XP/loot multiplier for wave-scaling difficulties based on current wave
+     * Uses waveScaling.rewardMultiplierPerWave from the difficulty JSON
+     */
+    getEndlessRewardMultiplier() {
+        const scaling = this.waveScaling;
+        if(!scaling) return 1.0;
+        const perWave = scaling.rewardMultiplierPerWave ?? 0.02;
+        return 1.0 + (this.endlessWave * perWave);
+    }
+
+    /**
+     * Get the current floor based on difficulty's floor selection strategy
+     * For infinite modes, floors are selected based on waveGeneration.floorSelection
+     */
     get currentFloor() {
-        return this.area.floors[Math.max(0, Math.min(this.progress, this.numFloors))];
+        if (!this.area?.floors?.length) return undefined;
+        
+        const waveGen = this.waveGeneration;
+        if (waveGen?.type === 'infinite') {
+            const floors = this.area.floors;
+            const selection = waveGen.floorSelection ?? 'first';
+            
+            switch (selection) {
+                case 'cycle':
+                    // Rotate through all floors based on wave number
+                    return floors[this.endlessWave % floors.length];
+                case 'random':
+                    // Random floor each wave (seeded by wave for consistency)
+                    return floors[Math.floor(Math.random() * floors.length)];
+                case 'first':
+                default:
+                    // Always use first floor
+                    return floors[0];
+            }
+        }
+        
+        // Standard mode: use progress-based floor selection
+        return this.area.floors[Math.max(0, Math.min(this.progress, this.numFloors - 1))];
     }
 
     go() {
@@ -495,7 +539,15 @@ export class AdventuringDungeon extends AdventuringPage {
 
     setArea(area) {
         this.area = area;
-        this.numFloors = this.area.floors.length;
+        
+        // For infinite modes, numFloors represents floors per wave
+        // For standard modes, numFloors is the total floor count
+        const difficulty = area.getDifficulty();
+        if (difficulty?.waveGeneration?.type === 'infinite') {
+            this.numFloors = difficulty.waveGeneration.floorsPerWave ?? 1;
+        } else {
+            this.numFloors = this.area.floors?.length ?? 1;
+        }
 
         if(this.currentFloor !== undefined)
             this.groupGenerator.loadTable(this.currentFloor.monsters);

@@ -37,16 +37,10 @@ class AdventuringAbilityHitEffect extends ScalableEffect {
     postDataRegistration() {
         super.postDataRegistration();
         
-        // Auto-populate amount/stacks from aura defaults for buff/debuff effects
+        // Auto-populate stacks for buff/debuff effects (default to 1)
         if(this.type === "buff" || this.type === "debuff") {
-            let aura = this.manager.auras.getObjectByID(this.id);
-            if(aura !== undefined) {
-                if(this.amount === undefined && aura.amount !== undefined) {
-                    this.amount = { base: aura.amount };
-                }
-                if(this.stacks === undefined && aura.stacks !== undefined) {
-                    this.stacks = { base: aura.stacks };
-                }
+            if(this.stacks === undefined) {
+                this.stacks = { base: 1 };
             }
         }
     }

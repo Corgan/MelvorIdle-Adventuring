@@ -150,7 +150,7 @@
                             { "id": "adventuring:magic", "value": 62 },
                             { "id": "adventuring:prayer", "value": 75 }
                         ],
-                        "generator": "adventuring:soul_siphon",
+                        "generator": "adventuring:life_siphon",
                         "spender": "adventuring:necrotic_arrow",
                         "passives": [],
                         "loot": [
@@ -177,7 +177,7 @@
                             { "id": "adventuring:magic", "value": 78 },
                             { "id": "adventuring:prayer", "value": 95 }
                         ],
-                        "generator": "adventuring:essence_drain",
+                        "generator": "adventuring:cursed_essence",
                         "spender": "adventuring:eternal_damnation",
                         "passives": [],
                         "loot": [
@@ -190,6 +190,35 @@
                     }
                 ],
                 "generators": [
+                    {
+                        "id": "cursed_essence",
+                        "name": "Cursed Essence",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "energy": 55,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 18,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 1.4 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "heal",
+                                        "target": "self",
+                                        "amount": { "base": 8, "scaling": [] }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
                     {
                         "id": "curse_of_ages",
                         "name": "Curse of Ages",

@@ -24,29 +24,29 @@
                             },
                             {
                                 "monsters": [
-                                    { "id": "adventuring:evil_wizard", "weight": 50 },
-                                    { "id": "adventuring:master_wizard", "weight": 25 }
+                                    { "id": "adventuring:evil_wizard", "weight": 60 },
+                                    { "id": "adventuring:master_wizard", "weight": 40 }
                                 ],
                                 "exit": ["adventuring:evil_wizard", "adventuring:evil_wizard", "adventuring:master_wizard"]
                             },
                             {
                                 "monsters": [
-                                    { "id": "adventuring:evil_wizard", "weight": 25 },
-                                    { "id": "adventuring:master_wizard", "weight": 50 }
+                                    { "id": "adventuring:evil_wizard", "weight": 40 },
+                                    { "id": "adventuring:master_wizard", "weight": 60 }
                                 ],
                                 "exit": ["adventuring:evil_wizard", "adventuring:master_wizard", "adventuring:master_wizard"]
                             },
                             {
                                 "monsters": [
-                                    { "id": "adventuring:master_wizard", "weight": 50 },
-                                    { "id": "adventuring:dark_wizard", "weight": 25 }
+                                    { "id": "adventuring:master_wizard", "weight": 60 },
+                                    { "id": "adventuring:dark_wizard", "weight": 40 }
                                 ],
                                 "exit": ["adventuring:master_wizard", "adventuring:master_wizard", "adventuring:dark_wizard"]
                             },
                             {
                                 "monsters": [
-                                    { "id": "adventuring:master_wizard", "weight": 25 },
-                                    { "id": "adventuring:dark_wizard", "weight": 50 }
+                                    { "id": "adventuring:master_wizard", "weight": 40 },
+                                    { "id": "adventuring:dark_wizard", "weight": 60 }
                                 ],
                                 "exit": ["adventuring:master_wizard", "adventuring:dark_wizard", "adventuring:dark_wizard"]
                             },
@@ -75,8 +75,8 @@
                             { "id": "adventuring:magic", "value": 30 },
                             { "id": "adventuring:prayer", "value": 30 }
                         ],
-                        "generator": "adventuring:electrocute",
-                        "spender": "adventuring:flame_wave",
+                        "generator": "adventuring:arcane_shock",
+                        "spender": "adventuring:scorching_surge",
                         "passives": [],
                         "loot": [
                             { "id": "adventuring:currency", "qty": 2, "weight": 100 },
@@ -99,8 +99,8 @@
                             { "id": "adventuring:magic", "value": 30 },
                             { "id": "adventuring:prayer", "value": 30 }
                         ],
-                        "generator": "adventuring:electrocute",
-                        "spender": "adventuring:flame_wave",
+                        "generator": "adventuring:arcane_shock",
+                        "spender": "adventuring:scorching_surge",
                         "passives": [],
                         "loot": [
                             { "id": "adventuring:currency", "qty": 2, "weight": 100 },
@@ -123,8 +123,8 @@
                             { "id": "adventuring:magic", "value": 30 },
                             { "id": "adventuring:prayer", "value": 30 }
                         ],
-                        "generator": "adventuring:bouncing_flame",
-                        "spender": "adventuring:pyroblast",
+                        "generator": "adventuring:chain_flames",
+                        "spender": "adventuring:grand_conflagration",
                         "passives": [],
                         "loot": [
                             { "id": "adventuring:currency", "qty": 2, "weight": 100 },
@@ -147,13 +147,79 @@
                             { "id": "adventuring:magic", "value": 40 },
                             { "id": "adventuring:prayer", "value": 40 }
                         ],
-                        "generator": "adventuring:bouncing_flame",
-                        "spender": "adventuring:pyroblast",
+                        "generator": "adventuring:chain_flames",
+                        "spender": "adventuring:grand_conflagration",
                         "passives": [],
                         "loot": [
                             { "id": "adventuring:currency", "qty": 2, "weight": 100 },
                             { "id": "adventuring:parts", "qty": 1, "weight": 10 },
                             { "id": "adventuring:arcane_dust", "qty": 3, "weight": 50 }
+                        ]
+                    }
+                ],
+                "generators": [
+                    {
+                        "id": "arcane_shock",
+                        "name": "Arcane Shock",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "energy": 22,
+                        "hits": [
+                            {
+                                "target": "single_enemy",
+                                "effects": [
+                                    { "type": "damage", "damage_type": "magic", "amount": 10, "scaling": 0.5 }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "chain_flames",
+                        "name": "Chain Flames",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "energy": 26,
+                        "hits": [
+                            {
+                                "target": "random",
+                                "count": 2,
+                                "effects": [
+                                    { "type": "damage", "damage_type": "magic", "amount": 8, "scaling": 0.4 }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "spenders": [
+                    {
+                        "id": "scorching_surge",
+                        "name": "Scorching Surge",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "cost": 50,
+                        "hits": [
+                            {
+                                "target": "all_enemies",
+                                "effects": [
+                                    { "type": "damage", "damage_type": "magic", "amount": 14, "scaling": 0.6 }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "grand_conflagration",
+                        "name": "Grand Conflagration",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "cost": 65,
+                        "hits": [
+                            {
+                                "target": "single_enemy",
+                                "effects": [
+                                    { "type": "damage", "damage_type": "magic", "amount": 25, "scaling": 0.9 },
+                                    { "type": "debuff", "id": "adventuring:burn", "stacks": 2 }
+                                ]
+                            }
                         ]
                     }
                 ]

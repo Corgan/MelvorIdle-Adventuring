@@ -65,8 +65,8 @@ export class AdventuringAuraInstance {
                 if(this.stacks > 1) {
                     tooltip.hint(`Stacks: ${this.stacks}`);
                 }
-                if(this.amount && this.amount > 1) {
-                    tooltip.hint(`Amount: ${this.amount}`);
+                if(this.age > 0) {
+                    tooltip.hint(`Age: ${this.age}`);
                 }
                 
                 return tooltip.build();
@@ -104,13 +104,17 @@ export class AdventuringAuraInstance {
         return Array.from(triggers);
     }
 
-    setAura(aura, stacks=1, amount=1) {
+    setAura(aura, stacks=1) {
         this.base = aura;
         this.stacks = stacks;
-        // Use the aura's base amount if no amount is provided or amount is 0
-        // This ensures buffs like Regen use their base healing amount (e.g., 5)
-        // even when applied by passives that only specify stacks
-        this.amount = amount > 0 ? amount : (aura.amount !== undefined ? aura.amount : 1);
+        
+        // Enforce maxStacks if defined
+        if(aura.maxStacks !== undefined) {
+            this.stacks = Math.min(this.stacks, aura.maxStacks);
+        }
+        
+        // Initialize age - tracks how many rounds this aura has been active
+        this.age = 0;
         
         this.auras.buildEffects();
         this.renderQueue.icon = true;
@@ -122,9 +126,13 @@ export class AdventuringAuraInstance {
         this.auras.character?.invalidateEffects?.('auras');
     }
 
-    set(stacks, amount) {
+    setStacks(stacks) {
         this.stacks = stacks;
-        this.amount = amount;
+        
+        // Enforce maxStacks if defined
+        if(this.base?.maxStacks !== undefined) {
+            this.stacks = Math.min(this.stacks, this.base.maxStacks);
+        }
         
         this.auras.buildEffects();
         this.renderQueue.icon = true;
@@ -212,7 +220,8 @@ export class AdventuringAuraInstance {
     encode(writer) {
         writer.writeNamespacedObject(this.base);
         writer.writeUint32(this.stacks);
-        writer.writeUint8(this.manager.encounter.all.indexOf(this.source))
+        writer.writeUint8(this.manager.encounter.all.indexOf(this.source));
+        writer.writeUint16(this.age || 0);
         return writer;
     }
 
@@ -225,5 +234,6 @@ export class AdventuringAuraInstance {
         this.stacks = reader.getUint32();
         let sourceIdx = reader.getUint8();
         this.source = this.manager.encounter.all[sourceIdx];
+        this.age = reader.getUint16();
     }
 }

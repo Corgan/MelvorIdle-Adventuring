@@ -196,7 +196,7 @@
                             { "id": "adventuring:prayer", "value": 32 }
                         ],
                         "generator": "adventuring:fire_breath",
-                        "spender": "adventuring:inferno",
+                        "spender": "adventuring:dragon_inferno",
                         "loot": [
                             { "id": "adventuring:currency", "qty": 50, "weight": 100 },
                             { "id": "adventuring:parts", "qty": 16, "weight": 42 },
@@ -221,7 +221,7 @@
                             { "id": "adventuring:prayer", "value": 10 }
                         ],
                         "generator": "adventuring:fire_breath",
-                        "spender": "adventuring:claw_slash",
+                        "spender": "adventuring:whelp_rend",
                         "passives": [],
                         "loot": [
                             { "id": "adventuring:currency", "qty": 8, "weight": 100 }
@@ -303,6 +303,59 @@
                     }
                 ],
                 "spenders": [
+                    {
+                        "id": "dragon_inferno",
+                        "name": "Dragon Inferno",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "cost": 100,
+                        "hits": [
+                            {
+                                "target": "all",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 30,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 2.0 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:burn",
+                                        "stacks": 3
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "whelp_rend",
+                        "name": "Whelp Rend",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "cost": 50,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 12,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 1.0 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
                     {
                         "id": "tail_swipe",
                         "name": "Tail Swipe",

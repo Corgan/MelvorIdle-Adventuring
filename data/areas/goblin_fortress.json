@@ -115,7 +115,7 @@
                         "loot": [
                             { "id": "adventuring:currency", "qty": 5, "weight": 100 },
                             { "id": "adventuring:parts", "qty": 2, "weight": 20 },
-                            { "id": "adventuring:goblin_ear", "qty": 2, "weight": 45 }
+                            { "id": "adventuring:golbin_ear", "qty": 2, "weight": 45 }
                         ]
                     },
                     {
@@ -133,13 +133,13 @@
                             { "id": "adventuring:magic", "value": 30 },
                             { "id": "adventuring:prayer", "value": 28 }
                         ],
-                        "generator": "adventuring:quick_shot",
-                        "spender": "adventuring:arrow_volley",
+                        "generator": "adventuring:scout_shot",
+                        "spender": "adventuring:scout_barrage",
                         "passives": ["adventuring:sneaky_tactics"],
                         "loot": [
                             { "id": "adventuring:currency", "qty": 6, "weight": 100 },
                             { "id": "adventuring:parts", "qty": 2, "weight": 18 },
-                            { "id": "adventuring:goblin_ear", "qty": 2, "weight": 40 }
+                            { "id": "adventuring:golbin_ear", "qty": 2, "weight": 40 }
                         ]
                     },
                     {
@@ -163,7 +163,7 @@
                         "loot": [
                             { "id": "adventuring:currency", "qty": 7, "weight": 100 },
                             { "id": "adventuring:parts", "qty": 2, "weight": 22 },
-                            { "id": "adventuring:goblin_ear", "qty": 2, "weight": 35 },
+                            { "id": "adventuring:golbin_ear", "qty": 2, "weight": 35 },
                             { "id": "adventuring:goblin_bomb", "qty": 1, "weight": 15 }
                         ]
                     },
@@ -188,7 +188,7 @@
                         "loot": [
                             { "id": "adventuring:currency", "qty": 8, "weight": 100 },
                             { "id": "adventuring:parts", "qty": 2, "weight": 15 },
-                            { "id": "adventuring:goblin_ear", "qty": 2, "weight": 35 },
+                            { "id": "adventuring:golbin_ear", "qty": 2, "weight": 35 },
                             { "id": "adventuring:arcane_dust", "qty": 2, "weight": 25 }
                         ]
                     },
@@ -213,7 +213,7 @@
                         "loot": [
                             { "id": "adventuring:currency", "qty": 10, "weight": 100 },
                             { "id": "adventuring:parts", "qty": 2, "weight": 20 },
-                            { "id": "adventuring:goblin_ear", "qty": 3, "weight": 45 }
+                            { "id": "adventuring:golbin_ear", "qty": 3, "weight": 45 }
                         ]
                     },
                     {
@@ -237,7 +237,7 @@
                         "loot": [
                             { "id": "adventuring:currency", "qty": 12, "weight": 100 },
                             { "id": "adventuring:big_parts", "qty": 1, "weight": 15 },
-                            { "id": "adventuring:goblin_ear", "qty": 4, "weight": 50 }
+                            { "id": "adventuring:golbin_ear", "qty": 4, "weight": 50 }
                         ]
                     },
                     {
@@ -269,7 +269,7 @@
                         "loot": [
                             { "id": "adventuring:currency", "qty": 80, "weight": 100 },
                             { "id": "adventuring:big_parts", "qty": 3, "weight": 35 },
-                            { "id": "adventuring:goblin_ear", "qty": 10, "weight": 80 },
+                            { "id": "adventuring:golbin_ear", "qty": 10, "weight": 80 },
                             { "id": "adventuring:goblin_kings_crown", "qty": 1, "weight": 5 }
                         ]
                     }
@@ -283,6 +283,30 @@
                     }
                 ],
                 "generators": [
+                    {
+                        "id": "scout_shot",
+                        "name": "Scout Shot",
+                        "isEnemy": true,
+                        "requirements": [],
+                        "energy": 22,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 12,
+                                            "scaling": [
+                                                { "id": "adventuring:ranged", "value": 0.3 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
                     {
                         "id": "shiv",
                         "name": "Shiv",
@@ -496,6 +520,30 @@
                 ],
                 "spenders": [
                     {
+                        "id": "scout_barrage",
+                        "name": "Scout Barrage",
+                        "isEnemy": true,
+                        "requirements": [],
+                        "cost": 55,
+                        "hits": [
+                            {
+                                "target": "all",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 15,
+                                            "scaling": [
+                                                { "id": "adventuring:ranged", "value": 0.4 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
                         "id": "flurry",
                         "name": "Flurry",
                         "isEnemy": true,
@@ -690,35 +738,6 @@
                                         }
                                     }
                                 ]
-                            }
-                        ]
-                    }
-                ],
-                "uniqueItems": [
-                    {
-                        "id": "goblin_kings_crown",
-                        "name": "Goblin King's Crown",
-                        "media": "melvor:assets/media/bank/gold_crown.png",
-                        "slot": "adventuring:helm",
-                        "stats": [
-                            { "id": "adventuring:strength", "value": 10 },
-                            { "id": "adventuring:agility", "value": 8 },
-                            { "id": "adventuring:hitpoints", "value": 12 }
-                        ],
-                        "effects": [
-                            {
-                                "trigger": "encounter_start",
-                                "type": "buff",
-                                "target": "self",
-                                "buff": "adventuring:might",
-                                "stacks": 3
-                            },
-                            {
-                                "trigger": "encounter_start",
-                                "type": "buff",
-                                "target": "self",
-                                "buff": "adventuring:haste",
-                                "stacks": 2
                             }
                         ]
                     }

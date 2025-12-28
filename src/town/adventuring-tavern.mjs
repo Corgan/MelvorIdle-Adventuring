@@ -159,17 +159,26 @@ export class AdventuringTavern extends AdventuringPage {
         icon.src = drink.media;
         info.appendChild(icon);
 
+        // Only show name + effectText (description already includes effects, causing doubling)
         const nameDesc = document.createElement('div');
-        nameDesc.innerHTML = `<strong class="text-white">${drink.name}</strong><br><small class="text-muted">${drink.description}</small>`;
+        nameDesc.innerHTML = `<strong class="text-white">${drink.name}</strong>`;
         info.appendChild(nameDesc);
 
         card.appendChild(info);
 
-        // Effects
+        // Effects (using effectText which is the compact version)
         const effects = document.createElement('div');
         effects.className = 'small text-success mb-2';
         effects.textContent = drink.effectText;
         card.appendChild(effects);
+        
+        // Flavor text (if present)
+        if(drink.flavorText) {
+            const flavor = document.createElement('div');
+            flavor.className = 'small text-muted font-italic mb-2';
+            flavor.textContent = drink.flavorText;
+            card.appendChild(flavor);
+        }
 
         // Cost - styled like armory
         const costSection = document.createElement('div');

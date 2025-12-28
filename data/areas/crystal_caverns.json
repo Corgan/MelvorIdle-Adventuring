@@ -162,7 +162,7 @@
                             { "id": "adventuring:prayer", "value": 25 }
                         ],
                         "generator": "adventuring:gem_bolt",
-                        "spender": "adventuring:prismatic_blast",
+                        "spender": "adventuring:diamond_storm",
                         "passives": [],
                         "loot": [
                             { "id": "adventuring:prismatic_dust", "weight": 55, "minQty": 2, "maxQty": 4 },
@@ -258,7 +258,7 @@
                             { "id": "adventuring:prayer", "value": 22 }
                         ],
                         "generator": "adventuring:sapphire_lance",
-                        "spender": "adventuring:blizzard",
+                        "spender": "adventuring:frozen_burst",
                         "passives": [],
                         "loot": [
                             { "id": "adventuring:sapphire_chip", "weight": 50, "minQty": 2, "maxQty": 4 },
@@ -281,8 +281,8 @@
                             { "id": "adventuring:magic", "value": 40 },
                             { "id": "adventuring:prayer", "value": 35 }
                         ],
-                        "generator": "adventuring:nature_bolt",
-                        "spender": "adventuring:natures_blessing",
+                        "generator": "adventuring:verdant_bolt",
+                        "spender": "adventuring:emerald_restoration",
                         "passives": [],
                         "loot": [
                             { "id": "adventuring:prismatic_dust", "weight": 45, "minQty": 3, "maxQty": 5 },
@@ -306,7 +306,7 @@
                             { "id": "adventuring:prayer", "value": 25 }
                         ],
                         "generator": "adventuring:crystal_strike",
-                        "spender": "adventuring:diamond_storm",
+                        "spender": "adventuring:crystalline_tempest",
                         "passives": [],
                         "loot": [
                             { "id": "adventuring:crystal_shard", "weight": 45, "minQty": 4, "maxQty": 7 },
@@ -343,6 +343,26 @@
                     }
                 ],
                 "generators": [
+                    {
+                        "id": "verdant_bolt",
+                        "name": "Verdant Bolt",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "energy": 26,
+                        "hits": [
+                            {
+                                "target": "single_enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "damage_type": "magic",
+                                        "amount": 16,
+                                        "scaling": 1.15
+                                    }
+                                ]
+                            }
+                        ]
+                    },
                     {
                         "id": "crystal_strike",
                         "name": "Crystal Strike",
@@ -465,6 +485,55 @@
                     }
                 ],
                 "spenders": [
+                    {
+                        "id": "frozen_burst",
+                        "name": "Frozen Burst",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "cost": 70,
+                        "hits": [
+                            {
+                                "target": "all_enemies",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "damage_type": "magic",
+                                        "amount": 20,
+                                        "scaling": 1.1
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:slow",
+                                        "stacks": 2
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "emerald_restoration",
+                        "name": "Emerald Restoration",
+                        "requirements": [],
+                        "isEnemy": true,
+                        "cost": 65,
+                        "hits": [
+                            {
+                                "target": "all_allies",
+                                "effects": [
+                                    {
+                                        "type": "heal",
+                                        "amount": 25,
+                                        "scaling": 0.9
+                                    },
+                                    {
+                                        "type": "buff",
+                                        "id": "adventuring:regeneration",
+                                        "stacks": 2
+                                    }
+                                ]
+                            }
+                        ]
+                    },
                     {
                         "id": "shatter",
                         "name": "Shatter",

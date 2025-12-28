@@ -7,6 +7,19 @@
             "data": {
                 "passives": [
                     {
+                        "id": "vengeful_resilience",
+                        "name": "Vengeful Resilience",
+                        "effects": [
+                            {
+                                "trigger": "on_damage_taken",
+                                "type": "buff",
+                                "target": "self",
+                                "buff": "adventuring:might",
+                                "stacks": { "base": 1, "scaling": [] }
+                            }
+                        ]
+                    },
+                    {
                         "id": "spectral_wail",
                         "name": "Spectral Wail",
                         "effects": [
@@ -130,7 +143,7 @@
                             { "id": "adventuring:prayer", "value": 45 }
                         ],
                         "generator": "adventuring:frost_touch",
-                        "spender": "adventuring:shadow_bolt",
+                        "spender": "adventuring:ghostly_wail",
                         "passives": [],
                         "loot": [
                             { "id": "adventuring:currency", "qty": 8, "weight": 100 },
@@ -153,8 +166,8 @@
                             { "id": "adventuring:magic", "value": 30 },
                             { "id": "adventuring:prayer", "value": 35 }
                         ],
-                        "generator": "adventuring:slash",
-                        "spender": "adventuring:execute",
+                        "generator": "adventuring:bone_slash",
+                        "spender": "adventuring:skeletal_strike",
                         "passives": [],
                         "loot": [
                             { "id": "adventuring:currency", "qty": 9, "weight": 100 },
@@ -178,8 +191,8 @@
                             { "id": "adventuring:magic", "value": 62 },
                             { "id": "adventuring:prayer", "value": 55 }
                         ],
-                        "generator": "adventuring:shadow_bolt",
-                        "spender": "adventuring:soul_rend",
+                        "generator": "adventuring:spectral_bolt",
+                        "spender": "adventuring:wraith_touch",
                         "passives": ["adventuring:spectral_wail"],
                         "loot": [
                             { "id": "adventuring:currency", "qty": 12, "weight": 100 },
@@ -226,7 +239,7 @@
                             { "id": "adventuring:magic", "value": 72 },
                             { "id": "adventuring:prayer", "value": 60 }
                         ],
-                        "generator": "adventuring:shadow_bolt",
+                        "generator": "adventuring:spectral_bolt",
                         "spender": "adventuring:necrotic_blast",
                         "passives": ["adventuring:soul_drain"],
                         "loot": [
@@ -277,7 +290,7 @@
                         ],
                         "generator": "adventuring:vengeful_strike",
                         "spender": "adventuring:undying_fury",
-                        "passives": ["adventuring:undead_fortitude"],
+                        "passives": ["adventuring:vengeful_resilience"],
                         "loot": [
                             { "id": "adventuring:currency", "qty": 18, "weight": 100 },
                             { "id": "adventuring:big_parts", "qty": 1, "weight": 18 },
@@ -302,7 +315,7 @@
                         ],
                         "generator": "adventuring:death_strike",
                         "spender": "adventuring:soul_reaper",
-                        "passives": ["adventuring:death_aura", "adventuring:undead_fortitude"],
+                        "passives": ["adventuring:death_aura", "adventuring:soul_drain"],
                         "phases": [
                             {
                                 "threshold": 0.5,
@@ -327,6 +340,54 @@
                     }
                 ],
                 "generators": [
+                    {
+                        "id": "bone_slash",
+                        "name": "Bone Slash",
+                        "isEnemy": true,
+                        "requirements": [],
+                        "energy": 22,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 14,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.3 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "spectral_bolt",
+                        "name": "Spectral Bolt",
+                        "isEnemy": true,
+                        "requirements": [],
+                        "energy": 24,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 14,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 0.35 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
                     {
                         "id": "frost_touch",
                         "name": "Frost Touch",
@@ -473,6 +534,83 @@
                     }
                 ],
                 "spenders": [
+                    {
+                        "id": "ghostly_wail",
+                        "name": "Ghostly Wail",
+                        "isEnemy": true,
+                        "requirements": [],
+                        "cost": 55,
+                        "hits": [
+                            {
+                                "target": "all",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 16,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 0.3 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "wraith_touch",
+                        "name": "Wraith Touch",
+                        "isEnemy": true,
+                        "requirements": [],
+                        "cost": 60,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 22,
+                                            "scaling": [
+                                                { "id": "adventuring:magic", "value": 0.35 }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "debuff",
+                                        "id": "adventuring:weaken",
+                                        "stacks": { "base": 1, "scaling": [] }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "skeletal_strike",
+                        "name": "Skeletal Strike",
+                        "isEnemy": true,
+                        "requirements": [],
+                        "cost": 65,
+                        "hits": [
+                            {
+                                "target": "front",
+                                "party": "enemy",
+                                "effects": [
+                                    {
+                                        "type": "damage",
+                                        "amount": {
+                                            "base": 28,
+                                            "scaling": [
+                                                { "id": "adventuring:strength", "value": 0.4 }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
                     {
                         "id": "wailing_death",
                         "name": "Wailing Death",
@@ -637,28 +775,6 @@
                                         }
                                     }
                                 ]
-                            }
-                        ]
-                    }
-                ],
-                "uniqueItems": [
-                    {
-                        "id": "death_knights_sigil",
-                        "name": "Death Knight's Sigil",
-                        "media": "melvor:assets/media/bank/cursed_amulet.png",
-                        "slot": "adventuring:amulet",
-                        "stats": [
-                            { "id": "adventuring:strength", "value": 8 },
-                            { "id": "adventuring:magic", "value": 8 },
-                            { "id": "adventuring:hitpoints", "value": 15 }
-                        ],
-                        "effects": [
-                            {
-                                "trigger": "on_kill",
-                                "type": "debuff",
-                                "target": "all_enemies",
-                                "debuff": "adventuring:curse",
-                                "stacks": 2
                             }
                         ]
                     }

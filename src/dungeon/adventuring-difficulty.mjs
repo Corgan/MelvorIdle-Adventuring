@@ -39,13 +39,44 @@ export class AdventuringDifficulty extends NamespacedObject {
         // Unlock requirements
         this.unlockLevel = data.unlockLevel || 0;
         
-        // Special modes
+        // Wave-based mode flag (infinite floors, wave counter)
         this.isEndless = data.isEndless === true;
+        
+        // Wave scaling configuration (for endless-style modes)
+        // Defines how stats/rewards scale per wave
+        this.waveScaling = data.waveScaling || null;
+        
+        // Wave generation configuration (for infinite modes)
+        // type: 'infinite' = waves repeat forever
+        // floorsPerWave: number of floors per wave (default 1)
+        // floorSelection: 'cycle' = rotate through area floors, 'random' = pick random floor, 'first' = always use first floor
+        this.waveGeneration = data.waveGeneration || null;
         
         // All modifiers and effects are stored as effects
         this.effects = (data.effects || []).map(effect => 
             new DifficultyEffect(this.manager, this.game, this, effect)
         );
+    }
+
+    /**
+     * Check if this difficulty uses infinite wave generation
+     */
+    get isInfinite() {
+        return this.waveGeneration?.type === 'infinite';
+    }
+
+    /**
+     * Get floors per wave (default 1 for infinite modes)
+     */
+    get floorsPerWave() {
+        return this.waveGeneration?.floorsPerWave ?? 1;
+    }
+
+    /**
+     * Get floor selection strategy
+     */
+    get floorSelection() {
+        return this.waveGeneration?.floorSelection ?? 'first';
     }
 
     get name() {

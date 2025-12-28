@@ -32,7 +32,24 @@ export class AdventuringAuras {
 
     trigger(type) {
         let resolvedEffects = this.effectByType.get(type);
+        
+        // Increment age of all auras at round_end
+        if (type === 'round_end') {
+            this.incrementAges();
+        }
+        
         return resolvedEffects !== undefined ? resolvedEffects : [];
+    }
+    
+    /**
+     * Increment the age of all active auras.
+     * Age tracks how many rounds the aura has been active.
+     */
+    incrementAges() {
+        for (const auraInstance of this.auras.values()) {
+            if (auraInstance.base === undefined || auraInstance.stacks <= 0) continue;
+            auraInstance.age = (auraInstance.age || 0) + 1;
+        }
     }
 
     /**
@@ -55,12 +72,8 @@ export class AdventuringAuras {
                 
                 // Map aura effect types to standard types
                 let type = effectData.type;
-                let value = effectData.getAmount ? effectData.getAmount(auraInstance) : (effectData.amount || auraInstance.amount || 0);
-                
-                // Handle stacking effects
-                if(effectData.stack) {
-                    value = value * auraInstance.stacks;
-                }
+                // getAmount already handles perStack multiplication
+                let value = effectData.getAmount ? effectData.getAmount(auraInstance) : (effectData.amount || 0);
                 
                 // Handle reduce variants by negating the value
                 if(type === 'reduce_stat_percent') {
@@ -134,7 +147,7 @@ export class AdventuringAuras {
         }
     }
 
-    add(aura, { amount, stacks }, source) {
+    add(aura, { stacks = 1 }, source) {
         if(typeof aura === "string")
             aura = this.manager.auras.getObjectByID(aura);
         
@@ -143,26 +156,37 @@ export class AdventuringAuras {
             return;
         }
 
-        let existing = this.get(aura, !aura.combine ? source : undefined);
+        // Determine if we should find an existing instance based on combineMode
+        let existing = undefined;
+        if(aura.combineMode === 'stack' || aura.combineMode === 'refresh') {
+            existing = this.get(aura); // Find any existing instance
+        } else if(aura.combineMode === 'bySource') {
+            existing = this.get(aura, source); // Find instance from same source
+        }
+        // combineMode === 'separate' always creates new instance
 
-        if(existing === undefined || !(aura.stack || aura.refresh || aura.accumulate || aura.overwrite)) { // Create a new Aura if we don't stack and we don't refresh, or we don't exist yet
+        if(existing === undefined) {
+            // Create a new instance
             let instance = new AdventuringAuraInstance(this.manager, this.game, this, source);
             this.auras.add(instance);
-            instance.setAura(aura, stacks, amount);
+            instance.setAura(aura, stacks);
         } else {
-            let existingStacks = existing.stacks;
-            let existingAmount = existing.amount;
-            if(aura.stack)
-                existingStacks = existingStacks + stacks;
-            if(aura.refresh)
-                existingStacks = stacks;
-            if(aura.accumulate)
-                existingAmount = existingAmount + amount;
-            if(aura.overwrite)
-                existingAmount = amount;
-
-            if(existingStacks !== existing.stacks || existingAmount !== existing.amount) {
-                existing.set(existingStacks, existingAmount);
+            // Update existing instance based on combineMode
+            let newStacks = existing.stacks;
+            if(aura.combineMode === 'stack' || aura.combineMode === 'bySource') { // Both modes add stacks
+                newStacks = existing.stacks + stacks;
+            } else if(aura.combineMode === 'refresh') {
+                newStacks = stacks;
+                existing.age = 0; // Reset age on refresh
+            }
+            
+            // Enforce maxStacks if defined
+            if(aura.maxStacks !== undefined) {
+                newStacks = Math.min(newStacks, aura.maxStacks);
+            }
+            
+            if(newStacks !== existing.stacks) {
+                existing.setStacks(newStacks);
             }
         }
         this.renderQueue.auras = true;

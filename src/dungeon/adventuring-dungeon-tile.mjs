@@ -31,9 +31,17 @@ export class AdventuringDungeonTile extends NamespacedObject {
         if(this.requirements === undefined)
             return false;
         for(let requirement of this.requirements) {
-            if(requirement.type === "current_job") {
-                if(!this.manager.party.all.some(member => (member.combatJob !== undefined && member.combatJob.id === requirement.job) || (member.passiveJob !== undefined && member.passiveJob.id === requirement.job)))
+            if(requirement.type === "current_job_level") {
+                const hasJob = this.manager.party.all.some(member => {
+                    if(member.combatJob !== undefined && member.combatJob.id === requirement.job) {
+                        return member.combatJob.level >= requirement.level;
+                    }
+                    if(member.passiveJob !== undefined && member.passiveJob.id === requirement.job) {
+                        return member.passiveJob.level >= requirement.level;
+                    }
                     return false;
+                });
+                if(!hasJob) return false;
             }
         }
         return true;
@@ -43,9 +51,18 @@ export class AdventuringDungeonTile extends NamespacedObject {
         if(this.requirements === undefined)
             return true;
         for(let requirement of this.requirements) {
-            if(requirement.type === "current_job") {
-                if(!this.manager.party.all.some(member => !member.dead && ((member.combatJob !== undefined && member.combatJob.id === requirement.job) || (member.passiveJob !== undefined && member.passiveJob.id === requirement.job))))
+            if(requirement.type === "current_job_level") {
+                const hasJob = this.manager.party.all.some(member => {
+                    if(member.dead) return false;
+                    if(member.combatJob !== undefined && member.combatJob.id === requirement.job) {
+                        return member.combatJob.level >= requirement.level;
+                    }
+                    if(member.passiveJob !== undefined && member.passiveJob.id === requirement.job) {
+                        return member.passiveJob.level >= requirement.level;
+                    }
                     return false;
+                });
+                if(!hasJob) return false;
             }
         }
         return true;

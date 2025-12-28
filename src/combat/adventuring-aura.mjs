@@ -27,9 +27,10 @@ class AdventuringAuraEffect {
         this.aura = aura;
         this.type = data.type;
         this.trigger = data.trigger;
-        this.consume = data.consume === true; // Remove stacks by amount
-        this.stack = data.stack === true; // Amount multiplied by stack count
-        this.split = data.split === true; // Amount divided by stack count
+        this.consume = data.consume === true; // Remove stacks when triggered
+        this.perStack = data.perStack === true; // Amount multiplied by stack count
+        this.amount = data.amount; // Effect's base amount
+        this.age = data.age; // For remove effects: trigger this many times before removal
         
         if(data.modifier !== undefined)
            this.modifier = data.modifier;
@@ -47,26 +48,16 @@ class AdventuringAuraEffect {
     }
 
     getAmount(instance) {
-        let min = this.aura.amount !== undefined ? this.aura.amount : 1;
-        let amount = min;
-
-        if(instance.amount !== undefined) {
-            amount = instance.amount;
-        }
+        // Amount is defined on the effect itself
+        let amount = this.amount !== undefined ? this.amount : 1;
 
         let stacks = this.getStacks(instance);
 
-        if(this.stack)
+        if(this.perStack)
             amount = Math.ceil(amount * stacks);
 
-        if(this.split) {
-            amount = Math.ceil(amount / stacks);
-            if(instance.amount !== undefined)
-                instance.amount = Math.max(min * stacks, instance.amount - amount);
-        }
-
         if(this.modifier) {
-            amount = Math.ceil(amount * modifier);
+            amount = Math.ceil(amount * this.modifier);
         }
 
         return amount;
@@ -93,20 +84,16 @@ export class AdventuringAura extends NamespacedObject {
         this.flavorText = data.flavorText; // Optional flavor text
         this.effects = data.effects.map(effect => new AdventuringAuraEffect(this.manager, this.game, this, effect));
 
-        this.combine = data.combine === true; // No Source Filter
-
-        this.stack = data.stack === true; // Add stacks when applying
-        this.refresh = data.refresh === true; // Set stacks when applying
-
-        this.accumulate = data.accumulate === true; // Add Amount when applying
-        this.overwrite = data.overwrite === true; // Set Amount when applying
+        // combineMode: how the aura behaves when reapplied
+        // - 'stack': add new stacks to existing (default if stackable)
+        // - 'refresh': replace stacks with new value
+        // - 'bySource': separate instances per source (ability, character, etc.)
+        // - 'separate': always create new instance
+        this.combineMode = data.combineMode || (data.stackable ? 'stack' : 'separate');
+        
+        this.stackable = data.stackable === true; // Whether this aura can have multiple stacks
+        this.maxStacks = data.maxStacks; // Optional cap on stack count
         this.hidden = data.hidden === true; // Don't show in aura bar UI
-        
-        if(data.amount !== undefined)
-            this.amount = data.amount;
-        
-        if(data.stacks !== undefined)
-            this.stacks = data.stacks;
 
         this.highlight = false;
 

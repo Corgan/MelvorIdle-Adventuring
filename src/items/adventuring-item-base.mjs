@@ -60,7 +60,6 @@ export class AdventuringItemBase extends MasteryAction {
         
         // Special effects for unique items (trigger-based)
         this.effects = data.effects || [];
-        this.isUnique = data.isUnique || false;
         
         // Unlock requirements (skill_level, job_level, etc.)
         this.requirements = data.requirements || [];
@@ -267,12 +266,9 @@ export class AdventuringItemBase extends MasteryAction {
                 });
             }
             
-            // Show special effects for unique items
+            // Show special effects for items with effects
             if(this.effects && this.effects.length > 0) {
                 tooltip.separator();
-                if(this.isUnique) {
-                    tooltip.warning('Unique');
-                }
                 this.getEffectDescriptions().forEach(desc => {
                     tooltip.info(desc);
                 });
