@@ -1,6 +1,6 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { ScalableEffect } = await loadModule('src/combat/adventuring-scalable-effect.mjs');
+const { AdventuringScalableEffect } = await loadModule('src/combat/adventuring-scalable-effect.mjs');
 
 /**
  * Effect types for difficulties:
@@ -11,7 +11,7 @@ const { ScalableEffect } = await loadModule('src/combat/adventuring-scalable-eff
  * - debuff: Apply a debuff to enemies at spawn
  * - enemy_buff: Apply a buff to enemies at spawn
  */
-class DifficultyEffect extends ScalableEffect {
+class DifficultyEffect extends AdventuringScalableEffect {
     constructor(manager, game, difficulty, data) {
         super(manager, game, data);
         this.difficulty = difficulty;
@@ -266,3 +266,4 @@ export class AdventuringDifficulty extends NamespacedObject {
         return lines.join('');
     }
 }
+

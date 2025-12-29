@@ -6,7 +6,7 @@ const { AdventuringStats } = await loadModule('src/core/adventuring-stats.mjs');
  * Base class for effects that have amount/stacks with stat-based scaling.
  * Used by AbilityHitEffect and PassiveEffect.
  */
-export class ScalableEffect {
+export class AdventuringScalableEffect {
     constructor(manager, game, data) {
         this.manager = manager;
         this.game = game;

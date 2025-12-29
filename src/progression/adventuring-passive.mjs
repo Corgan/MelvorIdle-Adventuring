@@ -1,9 +1,9 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { ScalableEffect } = await loadModule('src/combat/adventuring-scalable-effect.mjs');
+const { AdventuringScalableEffect } = await loadModule('src/combat/adventuring-scalable-effect.mjs');
 const { RequirementsChecker, parseDescription, buildEffectReplacements, describeEffectFull } = await loadModule('src/core/adventuring-utils.mjs');
 
-class AdventuringPassiveEffect extends ScalableEffect {
+class AdventuringPassiveEffect extends AdventuringScalableEffect {
     constructor(manager, game, passive, data) {
         super(manager, game, data);
         this.passive = passive;

@@ -1,7 +1,7 @@
 const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringStats } = await loadModule('src/core/adventuring-stats.mjs');
-const { ScalableEffect } = await loadModule('src/combat/adventuring-scalable-effect.mjs');
+const { AdventuringScalableEffect } = await loadModule('src/combat/adventuring-scalable-effect.mjs');
 const { RequirementsChecker, buildHitEffectReplacements, parseDescription, describeEffectFull } = await loadModule('src/core/adventuring-utils.mjs');
 
 const { AdventuringAbilityElement } = await loadModule('src/combat/components/adventuring-ability.mjs');
@@ -24,7 +24,7 @@ class AdventuringAbilityRenderQueue {
     }
 }
 
-class AdventuringAbilityHitEffect extends ScalableEffect {
+class AdventuringAbilityHitEffect extends AdventuringScalableEffect {
     constructor(manager, game, ability, hit, data) {
         super(manager, game, data);
         this.hit = hit;
