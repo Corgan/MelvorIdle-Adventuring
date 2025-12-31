@@ -2,402 +2,711 @@
     "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
     "namespace": "adventuring",
     "data": {
-        "skillData": [{
-            "skillID": "adventuring:Adventuring",
-            "data": {
-                "passives": [
-                    {
-                        "id": "infernal_rage",
-                        "name": "Infernal Rage",
-                        "effects": [
-                            {
-                                "trigger": "round_start",
-                                "type": "buff",
-                                "id": "adventuring:might",
-                                "target": "self",
-                                "stacks": { "base": 1, "scaling": [] }
-                            }
-                        ]
-                    }
-                ],
-                "areas": [
-                    {
-                        "id": "demons_domain",
-                        "name": "Demon's Domain",
-                        "media": "melvor:assets/media/monsters/fierce_devil.png",
-                        "requirements": [
-                            { "type": "skill_level", "level": 78 }
-                        ],
-                        "height": 11,
-                        "width": 9,
-                        "floors": [
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:fierce_devil", "weight": 100 }
-                                ],
-                                "exit": ["adventuring:fierce_devil", "adventuring:fierce_devil", "adventuring:fierce_devil"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:fierce_devil", "weight": 60 },
-                                    { "id": "adventuring:raging_horned_elite", "weight": 40 }
-                                ],
-                                "exit": ["adventuring:fierce_devil", "adventuring:fierce_devil", "adventuring:raging_horned_elite"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:fierce_devil", "weight": 30 },
-                                    { "id": "adventuring:raging_horned_elite", "weight": 70 }
-                                ],
-                                "exit": ["adventuring:raging_horned_elite", "adventuring:raging_horned_elite", "adventuring:raging_horned_elite"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:raging_horned_elite", "weight": 60 },
-                                    { "id": "adventuring:seething_horned_elite", "weight": 40 }
-                                ],
-                                "exit": ["adventuring:raging_horned_elite", "adventuring:raging_horned_elite", "adventuring:seething_horned_elite"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:raging_horned_elite", "weight": 30 },
-                                    { "id": "adventuring:seething_horned_elite", "weight": 70 }
-                                ],
-                                "exit": ["adventuring:seething_horned_elite", "adventuring:seething_horned_elite", "adventuring:seething_horned_elite"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:seething_horned_elite", "weight": 60 },
-                                    { "id": "adventuring:dark_horned_elite", "weight": 40 }
-                                ],
-                                "exit": ["adventuring:seething_horned_elite", "adventuring:seething_horned_elite", "adventuring:dark_horned_elite"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:seething_horned_elite", "weight": 30 },
-                                    { "id": "adventuring:dark_horned_elite", "weight": 70 }
-                                ],
-                                "exit": ["adventuring:dark_horned_elite", "adventuring:dark_horned_elite", "adventuring:dark_horned_elite"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:dark_horned_elite", "weight": 100 }
-                                ],
-                                "exit": ["adventuring:dark_horned_elite", "adventuring:dark_horned_elite", "adventuring:dark_horned_elite"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:dark_horned_elite", "weight": 100 }
-                                ],
-                                "exit": ["adventuring:dark_horned_elite", "adventuring:dark_horned_elite", "adventuring:dark_horned_elite"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:dark_horned_elite", "weight": 100 }
-                                ],
-                                "exit": ["adventuring:dark_horned_elite", "adventuring:dark_horned_elite", "adventuring:infernal_lord"]
-                            }
-                        ]
-                    }
-                ],
-                "monsters": [
-                    {
-                        "id": "fierce_devil",
-                        "name": "Fierce Devil",
-                        "media": "melvor:assets/media/monsters/fierce_devil.png",
-                        "tags": ["demon"],
-                        "xp": 130,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 95 },
-                            { "id": "adventuring:defence", "value": 52 },
-                            { "id": "adventuring:agility", "value": 48 },
-                            { "id": "adventuring:strength", "value": 68 },
-                            { "id": "adventuring:ranged", "value": 45 },
-                            { "id": "adventuring:magic", "value": 65 },
-                            { "id": "adventuring:prayer", "value": 50 }
-                        ],
-                        "generator": "adventuring:hellfire_bolt",
-                        "spender": "adventuring:inferno_burst",
-                        "passives": [],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 82, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 22, "weight": 48 },
-                            { "id": "adventuring:demon_horn", "qty": 1, "weight": 25 }
-                        ]
-                    },
-                    {
-                        "id": "raging_horned_elite",
-                        "name": "Raging Horned Elite",
-                        "media": "melvor:assets/media/monsters/raging_horned_elite.png",
-                        "tags": ["demon"],
-                        "xp": 150,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 112 },
-                            { "id": "adventuring:defence", "value": 58 },
-                            { "id": "adventuring:agility", "value": 52 },
-                            { "id": "adventuring:strength", "value": 78 },
-                            { "id": "adventuring:ranged", "value": 50 },
-                            { "id": "adventuring:magic", "value": 70 },
-                            { "id": "adventuring:prayer", "value": 55 }
-                        ],
-                        "generator": "adventuring:hellfire_bolt",
-                        "spender": "adventuring:demonic_charge",
-                        "passives": ["adventuring:infernal_rage"],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 95, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 25, "weight": 50 },
-                            { "id": "adventuring:demon_horn", "qty": 1, "weight": 30 }
-                        ]
-                    },
-                    {
-                        "id": "seething_horned_elite",
-                        "name": "Seething Horned Elite",
-                        "media": "melvor:assets/media/monsters/seething_horned_elite.png",
-                        "tags": ["demon"],
-                        "xp": 170,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 128 },
-                            { "id": "adventuring:defence", "value": 65 },
-                            { "id": "adventuring:agility", "value": 55 },
-                            { "id": "adventuring:strength", "value": 85 },
-                            { "id": "adventuring:ranged", "value": 55 },
-                            { "id": "adventuring:magic", "value": 78 },
-                            { "id": "adventuring:prayer", "value": 60 }
-                        ],
-                        "generator": "adventuring:demon_slash",
-                        "spender": "adventuring:hellfire_storm",
-                        "passives": ["adventuring:infernal_rage"],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 108, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 28, "weight": 52 },
-                            { "id": "adventuring:demon_horn", "qty": 2, "weight": 35 }
-                        ]
-                    },
-                    {
-                        "id": "dark_horned_elite",
-                        "name": "Dark Horned Elite",
-                        "media": "melvor:assets/media/monsters/dark_horned_elite.png",
-                        "tags": ["demon"],
-                        "xp": 195,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 145 },
-                            { "id": "adventuring:defence", "value": 72 },
-                            { "id": "adventuring:agility", "value": 58 },
-                            { "id": "adventuring:strength", "value": 92 },
-                            { "id": "adventuring:ranged", "value": 60 },
-                            { "id": "adventuring:magic", "value": 85 },
-                            { "id": "adventuring:prayer", "value": 65 }
-                        ],
-                        "generator": "adventuring:demon_slash",
-                        "spender": "adventuring:hellfire_storm",
-                        "passives": ["adventuring:infernal_rage"],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 122, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 30, "weight": 55 },
-                            { "id": "adventuring:big_parts", "qty": 10, "weight": 40 },
-                            { "id": "adventuring:demon_horn", "qty": 2, "weight": 40 }
-                        ]
-                    },
-                    {
-                        "id": "infernal_lord",
-                        "name": "Infernal Lord",
-                        "media": "melvor:assets/media/monsters/fierce_devil.png",
-                        "tags": ["demon", "boss"],
-                        "isBoss": true,
-                        "xp": 420,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 350 },
-                            { "id": "adventuring:defence", "value": 95 },
-                            { "id": "adventuring:agility", "value": 68 },
-                            { "id": "adventuring:strength", "value": 115 },
-                            { "id": "adventuring:ranged", "value": 75 },
-                            { "id": "adventuring:magic", "value": 110 },
-                            { "id": "adventuring:prayer", "value": 80 }
-                        ],
-                        "generator": "adventuring:infernal_wave",
-                        "spender": "adventuring:hellfire_doom",
-                        "passives": ["adventuring:infernal_rage"],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 250, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 45, "weight": 68 },
-                            { "id": "adventuring:big_parts", "qty": 22, "weight": 55 },
-                            { "id": "adventuring:demon_horn", "qty": 7, "weight": 65 }
-                        ]
-                    }
-                ],
-                "generators": [
-                    {
-                        "id": "hellfire_bolt",
-                        "name": "Hellfire Bolt",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "energy": 55,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 18,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "value": 1.2 }
-                                            ]
-                                        }
+        "skillData": [
+            {
+                "skillID": "adventuring:Adventuring",
+                "data": {
+                    "passives": [
+                        {
+                            "id": "infernal_rage",
+                            "name": "Infernal Rage",
+                            "effects": [
+                                {
+                                    "trigger": "round_start",
+                                    "type": "buff",
+                                    "id": "adventuring:might",
+                                    "target": "self",
+                                    "stacks": {
+                                        "base": 1,
+                                        "scaling": []
                                     }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "demon_slash",
-                        "name": "Demon Slash",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "energy": 55,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 20,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "value": 1.3 }
-                                            ]
+                                }
+                            ]
+                        }
+                    ],
+                    "areas": [
+                        {
+                            "id": "demons_domain",
+                            "name": "Demon's Domain",
+                            "media": "melvor:assets/media/monsters/fierce_devil.png",
+                            "requirements": [
+                                {
+                                    "type": "skill_level",
+                                    "level": 78
+                                }
+                            ],
+                            "height": 11,
+                            "width": 9,
+                            "floors": [
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:fierce_devil",
+                                            "weight": 100
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "infernal_wave",
-                        "name": "Infernal Wave",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "energy": 65,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 18,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "value": 1.1 }
-                                            ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:fierce_devil",
+                                        "adventuring:fierce_devil",
+                                        "adventuring:fierce_devil"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:fierce_devil",
+                                            "weight": 60
+                                        },
+                                        {
+                                            "id": "adventuring:raging_horned_elite",
+                                            "weight": 40
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ],
-                "spenders": [
-                    {
-                        "id": "inferno_burst",
-                        "name": "Inferno Burst",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 100,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 32,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "value": 1.8 }
-                                            ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:fierce_devil",
+                                        "adventuring:fierce_devil",
+                                        "adventuring:raging_horned_elite"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:fierce_devil",
+                                            "weight": 30
+                                        },
+                                        {
+                                            "id": "adventuring:raging_horned_elite",
+                                            "weight": 70
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "demonic_charge",
-                        "name": "Demonic Charge",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 100,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 38,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "value": 2.0 }
-                                            ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:raging_horned_elite",
+                                        "adventuring:raging_horned_elite",
+                                        "adventuring:raging_horned_elite"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:raging_horned_elite",
+                                            "weight": 60
+                                        },
+                                        {
+                                            "id": "adventuring:seething_horned_elite",
+                                            "weight": 40
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "hellfire_storm",
-                        "name": "Hellfire Storm",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 100,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 32,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "value": 1.8 }
-                                            ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:raging_horned_elite",
+                                        "adventuring:raging_horned_elite",
+                                        "adventuring:seething_horned_elite"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:raging_horned_elite",
+                                            "weight": 30
+                                        },
+                                        {
+                                            "id": "adventuring:seething_horned_elite",
+                                            "weight": 70
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "hellfire_doom",
-                        "name": "Hellfire Doom",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 100,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 45,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "value": 2.4 }
-                                            ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:seething_horned_elite",
+                                        "adventuring:seething_horned_elite",
+                                        "adventuring:seething_horned_elite"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:seething_horned_elite",
+                                            "weight": 60
+                                        },
+                                        {
+                                            "id": "adventuring:dark_horned_elite",
+                                            "weight": 40
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:seething_horned_elite",
+                                        "adventuring:seething_horned_elite",
+                                        "adventuring:dark_horned_elite"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:seething_horned_elite",
+                                            "weight": 30
+                                        },
+                                        {
+                                            "id": "adventuring:dark_horned_elite",
+                                            "weight": 70
+                                        }
+                                    ],
+                                    "exit": [
+                                        "adventuring:dark_horned_elite",
+                                        "adventuring:dark_horned_elite",
+                                        "adventuring:dark_horned_elite"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:dark_horned_elite",
+                                            "weight": 100
+                                        }
+                                    ],
+                                    "exit": [
+                                        "adventuring:dark_horned_elite",
+                                        "adventuring:dark_horned_elite",
+                                        "adventuring:dark_horned_elite"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:dark_horned_elite",
+                                            "weight": 100
+                                        }
+                                    ],
+                                    "exit": [
+                                        "adventuring:dark_horned_elite",
+                                        "adventuring:dark_horned_elite",
+                                        "adventuring:dark_horned_elite"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:dark_horned_elite",
+                                            "weight": 100
+                                        }
+                                    ],
+                                    "exit": [
+                                        "adventuring:dark_horned_elite",
+                                        "adventuring:dark_horned_elite",
+                                        "adventuring:infernal_lord"
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "monsters": [
+                        {
+                            "id": "fierce_devil",
+                            "name": "Fierce Devil",
+                            "media": "melvor:assets/media/monsters/fierce_devil.png",
+                            "tags": [
+                                "demon"
+                            ],
+                            "xp": 130,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 62
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 40
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 48
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 52
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 45
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 65
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 50
+                                }
+                            ],
+                            "generator": "adventuring:hellfire_bolt",
+                            "spender": "adventuring:inferno_burst",
+                            "passives": [],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 82,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 22,
+                                    "weight": 48
+                                },
+                                {
+                                    "id": "adventuring:demon_horn",
+                                    "qty": 1,
+                                    "weight": 25
+                                }
+                            ]
+                        },
+                        {
+                            "id": "raging_horned_elite",
+                            "name": "Raging Horned Elite",
+                            "media": "melvor:assets/media/monsters/raging_horned_elite.png",
+                            "tags": [
+                                "demon"
+                            ],
+                            "xp": 150,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 75
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 45
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 52
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 60
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 50
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 70
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 55
+                                }
+                            ],
+                            "generator": "adventuring:hellfire_bolt",
+                            "spender": "adventuring:demonic_charge",
+                            "passives": [
+                                "adventuring:infernal_rage"
+                            ],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 95,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 25,
+                                    "weight": 50
+                                },
+                                {
+                                    "id": "adventuring:demon_horn",
+                                    "qty": 1,
+                                    "weight": 30
+                                }
+                            ]
+                        },
+                        {
+                            "id": "seething_horned_elite",
+                            "name": "Seething Horned Elite",
+                            "media": "melvor:assets/media/monsters/seething_horned_elite.png",
+                            "tags": [
+                                "demon"
+                            ],
+                            "xp": 170,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 85
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 50
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 55
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 65
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 55
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 78
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 60
+                                }
+                            ],
+                            "generator": "adventuring:demon_slash",
+                            "spender": "adventuring:hellfire_storm",
+                            "passives": [
+                                "adventuring:infernal_rage"
+                            ],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 108,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 28,
+                                    "weight": 52
+                                },
+                                {
+                                    "id": "adventuring:demon_horn",
+                                    "qty": 2,
+                                    "weight": 35
+                                }
+                            ]
+                        },
+                        {
+                            "id": "dark_horned_elite",
+                            "name": "Dark Horned Elite",
+                            "media": "melvor:assets/media/monsters/dark_horned_elite.png",
+                            "tags": [
+                                "demon"
+                            ],
+                            "xp": 195,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 95
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 55
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 58
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 70
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 60
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 85
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 65
+                                }
+                            ],
+                            "generator": "adventuring:demon_slash",
+                            "spender": "adventuring:hellfire_storm",
+                            "passives": [
+                                "adventuring:infernal_rage"
+                            ],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 122,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 30,
+                                    "weight": 55
+                                },
+                                {
+                                    "id": "adventuring:big_parts",
+                                    "qty": 10,
+                                    "weight": 40
+                                },
+                                {
+                                    "id": "adventuring:demon_horn",
+                                    "qty": 2,
+                                    "weight": 40
+                                }
+                            ]
+                        },
+                        {
+                            "id": "infernal_lord",
+                            "name": "Infernal Lord",
+                            "media": "melvor:assets/media/monsters/fierce_devil.png",
+                            "tags": [
+                                "demon",
+                                "boss"
+                            ],
+                            "isBoss": true,
+                            "xp": 420,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 230
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 72
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 68
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 85
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 75
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 110
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 80
+                                }
+                            ],
+                            "generator": "adventuring:infernal_wave",
+                            "spender": "adventuring:hellfire_doom",
+                            "passives": [
+                                "adventuring:infernal_rage"
+                            ],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 250,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 45,
+                                    "weight": 68
+                                },
+                                {
+                                    "id": "adventuring:big_parts",
+                                    "qty": 22,
+                                    "weight": 55
+                                },
+                                {
+                                    "id": "adventuring:demon_horn",
+                                    "qty": 7,
+                                    "weight": 65
+                                }
+                            ]
+                        }
+                    ],
+                    "generators": [
+                        {
+                            "id": "hellfire_bolt",
+                            "name": "Hellfire Bolt",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "energy": 55,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 18,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "value": 1.2
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "demon_slash",
+                            "name": "Demon Slash",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "energy": 55,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 20,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "value": 1.3
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "infernal_wave",
+                            "name": "Infernal Wave",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "energy": 65,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 18,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "value": 1.1
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "spenders": [
+                        {
+                            "id": "inferno_burst",
+                            "name": "Inferno Burst",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 100,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 32,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "value": 1.8
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "demonic_charge",
+                            "name": "Demonic Charge",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 100,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 38,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "value": 2.0
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "hellfire_storm",
+                            "name": "Hellfire Storm",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 100,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 32,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "value": 1.8
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "hellfire_doom",
+                            "name": "Hellfire Doom",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 100,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 45,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "value": 2.4
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
             }
-        }]
+        ]
     }
 }

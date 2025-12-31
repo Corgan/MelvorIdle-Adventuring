@@ -2,208 +2,281 @@
     "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
     "namespace": "adventuring",
     "data": {
-        "skillData": [{
-            "skillID": "adventuring:Adventuring",
-            "data": {
-                "jobs": [
-                    {
-                        "id": "deadeye",
-                        "tier": 5,
-                        "name": "Deadeye",
-                        "media": "melvor:assets/media/skills/ranged/ranged.svg#tint=red",
-                        "requirements": [
-                            { "type": "job_level", "job": "adventuring:ranger", "level": 25 },
-                            { "type": "job_level", "job": "adventuring:shadowblade", "level": 20 },
-                            { "type": "area_mastery", "area": "adventuring:pirate_cove", "level": 50 }
-                        ],
-                        "isMilestoneReward": true,
-                        "allowedItems": [
-                            "adventuring:cowl",
-                            "adventuring:vest",
-                            "adventuring:chaps",
-                            "adventuring:vambraces",
-                            "adventuring:boots",
-                            "adventuring:amulet",
-                            "adventuring:ring",
-                            "adventuring:cape",
-                            "adventuring:longbow",
-                            "adventuring:crossbow",
-                            "adventuring:dagger"
-                        ],
-                        "scaling": [
-                            { "id": "adventuring:hitpoints", "value": 1.0 },
-                            { "id": "adventuring:defence", "value": 0.5 },
-                            { "id": "adventuring:agility", "value": 3.0 },
-                            { "id": "adventuring:ranged", "value": 2.5 }
-                        ]
-                    }
-                ],
-                "generators": [
-                    {
-                        "id": "phantom_arrow",
-                        "name": "Phantom Arrow",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:deadeye", "level": 1 }
-                        ],
-                        "energy": 25,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "pierce": true,
-                                        "amount": {
-                                            "base": 18,
-                                            "scaling": [
-                                                { "id": "adventuring:ranged", "value": 0.5 },
-                                                { "id": "adventuring:agility", "value": 0.2 }
-                                            ]
+        "skillData": [
+            {
+                "skillID": "adventuring:Adventuring",
+                "data": {
+                    "jobs": [
+                        {
+                            "id": "deadeye",
+                            "tier": 5,
+                            "name": "Deadeye",
+                            "media": "melvor:assets/media/skills/ranged/ranged.svg#tint=red",
+                            "requirements": [
+                                {
+                                    "type": "job_level",
+                                    "job": "adventuring:ranger",
+                                    "level": 25
+                                },
+                                {
+                                    "type": "job_level",
+                                    "job": "adventuring:shadowblade",
+                                    "level": 20
+                                },
+                                {
+                                    "type": "area_mastery",
+                                    "area": "adventuring:pirate_cove",
+                                    "level": 50
+                                }
+                            ],
+                            "isMilestoneReward": true,
+                            "allowedItems": [
+                                "adventuring:cowl",
+                                "adventuring:vest",
+                                "adventuring:chaps",
+                                "adventuring:vambraces",
+                                "adventuring:boots",
+                                "adventuring:amulet",
+                                "adventuring:ring",
+                                "adventuring:cape",
+                                "adventuring:longbow",
+                                "adventuring:crossbow",
+                                "adventuring:dagger"
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 1.0
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 0.5
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 3.0
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 2.5
+                                }
+                            ]
+                        }
+                    ],
+                    "generators": [
+                        {
+                            "id": "phantom_arrow",
+                            "name": "Phantom Arrow",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:deadeye",
+                                    "level": 1
+                                }
+                            ],
+                            "energy": 25,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "pierce": true,
+                                            "amount": {
+                                                "base": 18,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:ranged",
+                                                        "value": 0.5
+                                                    },
+                                                    {
+                                                        "id": "adventuring:agility",
+                                                        "value": 0.2
+                                                    }
+                                                ]
+                                            }
                                         }
-                                    }
-                                ]
-                            },
-                            {
-                                "target": "back",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 12,
-                                            "scaling": [
-                                                { "id": "adventuring:ranged", "value": 0.3 }
-                                            ]
+                                    ]
+                                },
+                                {
+                                    "target": "back",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 12,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:ranged",
+                                                        "value": 0.3
+                                                    }
+                                                ]
+                                            }
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "shadow_volley",
-                        "name": "Shadow Volley",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:deadeye", "level": 10 }
-                        ],
-                        "energy": 35,
-                        "hits": [
-                            {
-                                "target": "random",
-                                "party": "enemy",
-                                "repeat": 5,
-                                "delay": 100,
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 8,
-                                            "scaling": [
-                                                { "id": "adventuring:ranged", "value": 0.25 },
-                                                { "id": "adventuring:agility", "value": 0.15 }
-                                            ]
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "shadow_volley",
+                            "name": "Shadow Volley",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:deadeye",
+                                    "level": 10
+                                }
+                            ],
+                            "energy": 35,
+                            "hits": [
+                                {
+                                    "target": "random",
+                                    "party": "enemy",
+                                    "repeat": 5,
+                                    "delay": 100,
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 8,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:ranged",
+                                                        "value": 0.25
+                                                    },
+                                                    {
+                                                        "id": "adventuring:agility",
+                                                        "value": 0.15
+                                                    }
+                                                ]
+                                            }
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "marked_for_death",
-                        "name": "Marked for Death",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:deadeye", "level": 20 }
-                        ],
-                        "energy": 30,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 15,
-                                            "scaling": [
-                                                { "id": "adventuring:ranged", "value": 0.4 }
-                                            ]
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "marked_for_death",
+                            "name": "Marked for Death",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:deadeye",
+                                    "level": 20
+                                }
+                            ],
+                            "energy": 30,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 15,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:ranged",
+                                                        "value": 0.4
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:marked",
+                                            "stacks": {
+                                                "base": 5,
+                                                "scaling": []
+                                            }
                                         }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:marked",
-                                        "stacks": {
-                                            "base": 5,
-                                            "scaling": []
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "spenders": [
+                        {
+                            "id": "death_from_above",
+                            "name": "Death from Above",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:deadeye",
+                                    "level": 30
+                                }
+                            ],
+                            "hits": [
+                                {
+                                    "target": "random",
+                                    "party": "enemy",
+                                    "repeat": 8,
+                                    "delay": 75,
+                                    "critChance": 0.25,
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 12,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:ranged",
+                                                        "value": 0.35
+                                                    },
+                                                    {
+                                                        "id": "adventuring:agility",
+                                                        "value": 0.2
+                                                    }
+                                                ]
+                                            }
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ],
-                "spenders": [
-                    {
-                        "id": "death_from_above",
-                        "name": "Death from Above",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:deadeye", "level": 30 }
-                        ],
-                        "energy": 100,
-                        "hits": [
-                            {
-                                "target": "random",
-                                "party": "enemy",
-                                "repeat": 8,
-                                "delay": 75,
-                                "critChance": 0.25,
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 12,
-                                            "scaling": [
-                                                { "id": "adventuring:ranged", "value": 0.35 },
-                                                { "id": "adventuring:agility", "value": 0.2 }
-                                            ]
+                                    ]
+                                }
+                            ],
+                            "cost": 100
+                        },
+                        {
+                            "id": "dead_reckoning",
+                            "name": "Dead Reckoning",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:deadeye",
+                                    "level": 40
+                                }
+                            ],
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 60,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:ranged",
+                                                        "value": 1.0
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "execute",
+                                            "threshold": 0.25
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "dead_reckoning",
-                        "name": "Dead Reckoning",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:deadeye", "level": 40 }
-                        ],
-                        "energy": 80,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 60,
-                                            "scaling": [
-                                                { "id": "adventuring:ranged", "value": 1.0 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "execute",
-                                        "threshold": 0.25
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ]
+                                    ]
+                                }
+                            ],
+                            "cost": 80
+                        }
+                    ]
+                }
             }
-        }]
+        ]
     }
 }

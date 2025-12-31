@@ -390,6 +390,234 @@
     </div>
 </template>
 
+<template id="adventuring-ability-selector-row-template">
+    <div class="d-flex align-items-center p-2 mb-1 bg-combat-inner-dark rounded pointer-enabled" data-id="row">
+        <span class="font-w600 flex-grow-1" data-id="name"></span>
+    </div>
+</template>
+
+<!-- Effect icon with tippy tooltip - used in overview buffs -->
+<template id="adventuring-effect-icon-template">
+    <div class="adventuring-buff-icon m-1" data-id="icon">
+        <img class="skill-icon-xs" data-id="img" alt="">
+    </div>
+</template>
+
+<!-- Passive ability badge with tippy tooltip - used in hero passive abilities -->
+<template id="adventuring-passive-badge-template">
+    <div class="bg-dark rounded p-1 px-2 m-1 d-flex align-items-center pointer-enabled" data-id="badge" style="border: 1px solid rgba(255, 255, 255, 0.2);">
+        <small class="text-warning font-w600" data-id="name"></small>
+    </div>
+</template>
+
+<!-- Ability row for job details - used in job details ability list -->
+<template id="adventuring-ability-row-template">
+    <div class="d-flex align-items-center p-2 mb-1 border-bottom border-dark pointer-enabled" data-id="row">
+        <span class="mr-2" data-id="status"></span>
+        <span class="font-w600" data-id="name"></span>
+        <span class="badge ml-auto" data-id="badge"></span>
+        <small class="text-muted ml-2" data-id="level"></small>
+    </div>
+</template>
+
+<!-- Job selector button - used in job small selector popup -->
+<template id="adventuring-job-selector-btn-template">
+    <div class="position-relative m-1" data-id="wrapper">
+        <div class="d-flex flex-column align-items-center p-2 rounded pointer-enabled bg-combat-inner-dark" data-id="btn" style="width: 60px; cursor: pointer;">
+            <img class="skill-icon-xs mb-1" data-id="icon">
+            <small class="text-white text-center" data-id="name" style="font-size: 10px; line-height: 1.1;"></small>
+            <small class="text-muted" data-id="level" style="font-size: 9px;"></small>
+        </div>
+    </div>
+</template>
+
+<!-- Task reward item - used in slayers task rewards -->
+<template id="adventuring-task-reward-template">
+    <span class="d-inline-flex align-items-center" data-id="reward">
+        <span data-id="qty"></span>
+        <img class="skill-icon-xxs ml-1 d-none" data-id="icon">
+    </span>
+</template>
+
+<!-- Drink card - used in tavern -->
+<template id="adventuring-drink-card-template">
+    <div class="col-12 col-md-6 col-lg-4 p-2" data-id="col">
+        <div class="block block-rounded-double bg-combat-inner-dark p-3" data-id="card">
+            <div class="d-flex justify-content-between align-items-center mb-2" data-id="header">
+                <span class="badge" data-id="tierBadge"></span>
+                <small class="text-muted" data-id="duration"></small>
+            </div>
+            <div class="d-flex align-items-center mb-2" data-id="info">
+                <img class="skill-icon-sm mr-2" data-id="icon">
+                <div data-id="nameContainer">
+                    <strong class="text-white" data-id="name"></strong>
+                </div>
+            </div>
+            <div class="small text-success mb-2" data-id="effects"></div>
+            <div class="small text-muted font-italic mb-2 d-none" data-id="flavor"></div>
+            <div class="mb-2" data-id="costSection">
+                <h6 class="font-w700 text-combat-smoke text-center m-0 mb-1">Cost</h6>
+                <div class="row no-gutters justify-content-center" data-id="costItems"></div>
+            </div>
+            <button class="btn btn-sm btn-block" data-id="buyBtn"></button>
+        </div>
+    </div>
+</template>
+
+<!-- Stash category section - simplified without collapsible -->
+<template id="adventuring-stash-category-template">
+    <div class="col-12 mb-3" data-id="section">
+        <div class="block block-rounded-double bg-combat-inner-dark">
+            <div class="block-header block-header-default bg-dark-bank-block-header px-3 py-1">
+                <h5 class="font-size-sm font-w600 mb-0 text-warning">
+                    <i class="fa fa-folder-open mr-1"></i><span data-id="categoryName"></span>
+                </h5>
+            </div>
+            <div class="block-content py-2">
+                <div class="row no-gutters" data-id="items"></div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<!-- Stat bonus badge - used in slayers achievements -->
+<template id="adventuring-stat-badge-template">
+    <div class="col-auto p-2" data-id="col">
+        <div data-id="content">
+            <i class="fa mr-1" data-id="icon"></i>
+            <span class="font-w600" data-id="value"></span>
+            <small class="text-muted ml-1" data-id="label"></small>
+        </div>
+    </div>
+</template>
+
+<!-- Active buff badge - used in tavern active drinks -->
+<template id="adventuring-active-buff-badge-template">
+    <div class="badge badge-info m-1 p-2 d-flex align-items-center" data-id="badge">
+        <img class="skill-icon-xxs mr-1" data-id="icon">
+        <span data-id="text"></span>
+    </div>
+</template>
+
+<!-- Material cost item - displays material icon with have/need counts -->
+<template id="adventuring-material-cost-template">
+    <div class="d-flex align-items-center mr-3" data-id="container">
+        <img class="skill-icon-xxs mr-1" data-id="icon">
+        <span class="small" data-id="text"></span>
+    </div>
+</template>
+
+<!-- Requirement status - displays met/unmet requirement with icon -->
+<template id="adventuring-requirement-template">
+    <span data-id="container">
+        <span class="mr-1" data-id="status"></span>
+        <span data-id="text"></span>
+    </span>
+</template>
+
+<!-- Job icon with name - compact job reference -->
+<template id="adventuring-job-icon-template">
+    <span class="d-inline-flex align-items-center" data-id="container">
+        <img class="skill-icon-xxs mr-1" data-id="icon">
+        <span data-id="name"></span>
+    </span>
+</template>
+
+<!-- Empty state message - centered placeholder for empty containers -->
+<template id="adventuring-empty-state-template">
+    <div class="text-center text-muted p-3" data-id="container"></div>
+</template>
+
+<!-- Achievement reward item - displays a reward in achievement cards -->
+<template id="adventuring-achievement-reward-template">
+    <span class="d-inline-flex align-items-center mr-2" data-id="container">
+        <span data-id="text"></span>
+        <img class="skill-icon-xxs ml-1 d-none" data-id="icon">
+    </span>
+</template>
+
+<!-- Stat display card - value with label underneath -->
+<template id="adventuring-stat-card-template">
+    <div class="text-center" data-id="container">
+        <h4 class="text-warning mb-0" data-id="value"></h4>
+        <small class="text-muted" data-id="label"></small>
+    </div>
+</template>
+
+<!-- Dropdown option - icon + name for dropdown menus -->
+<template id="adventuring-dropdown-option-template">
+    <a class="dropdown-item pointer-enabled" data-id="container">
+        <img class="skill-icon-xs mr-2" data-id="icon">
+        <span data-id="name"></span>
+    </a>
+</template>
+
+<!-- Info message block - icon + title + description for guidance messages -->
+<template id="adventuring-info-message-template">
+    <div class="col-12 text-center p-4" data-id="container">
+        <div class="text-muted mb-2" data-id="iconWrap">
+            <i class="fa fa-2x mb-2" data-id="icon"></i>
+        </div>
+        <p class="mb-2" data-id="title"></p>
+        <p class="text-muted small" data-id="description"></p>
+    </div>
+</template>
+
+<!-- Icon slot - unified icon box for items, materials, equipment, consumables -->
+<template id="adventuring-icon-slot-template">
+    <div class="pointer-enabled m-1" data-id="clickable" style="position: relative; width: fit-content;">
+        <div class="border-secondary border-2x border-rounded-equip combat-equip-img fishing-img m-0" data-id="border" style="position: relative; overflow: hidden; border-width: 2px!important; border-style: solid!important;">
+            <img class="w-100 p-1" data-id="icon" src="">
+            <div class="position-absolute w-100 d-none" data-id="lock" style="top: 0; left: 0; right: 0; bottom: 0; justify-content: center; display: flex; align-items: center; color: #A38A00; background-color: rgba(0,0,0,0.3);"><i class="fa fa-lock"></i></div>
+            <span class="badge badge-success d-none" data-id="cornerBadge" style="position: absolute; top: 2px; right: 2px; font-size: 0.5rem; z-index: 10;"></span>
+        </div>
+        <div class="font-size-sm text-white text-center" style="position: absolute; bottom: -8px; width: 100%;">
+            <small class="badge-pill bg-secondary d-none" data-id="bottomBadge">-</small>
+        </div>
+    </div>
+</template>
+
+<!-- Entity display - unified display for jobs, monsters, areas with icon + name + level + progress -->
+<template id="adventuring-entity-display-template">
+    <div class="col-12 col-md-4" data-id="col">
+        <div class="block-content p-3">
+            <div class="block block-rounded-double bg-combat-inner-dark text-center pointer-enabled" data-id="clickable" style="position: relative;">
+                <span class="badge badge-success d-none" data-id="newBadge" style="position: absolute; top: 5px; right: 5px; font-size: 0.6rem; z-index: 10;">NEW</span>
+                <div class="row no-gutters">
+                    <div class="col-12">
+                        <img class="skill-icon-xs m-0 mt-2" data-id="icon">
+                        <h5 class="font-w700 text-combat-smoke text-center m-0 mt-2"><span data-id="name"></span><small data-id="level"></small></h5>
+                    </div>
+                    <div class="col-12" data-id="progressContainer">
+                        <div class="block-content p-3">
+                            <div class="row text-center">
+                                <div class="col-12">
+                                    <div class="row m-0 position-relative">
+                                        <div class="progress active col-12 p-0" style="height: 15px">
+                                            <progress-bar data-id="progress"></progress-bar>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<!-- Picker icon - small clickable icon for job/ability selection -->
+<template id="adventuring-picker-icon-template">
+    <div class="block block-rounded-double bg-combat-inner-dark text-center m-2 pointer-enabled" data-id="styling">
+        <div class="row no-gutters">
+            <div class="col-12">
+                <img class="skill-icon-xs m-2" data-id="icon">
+            </div>
+        </div>
+    </div>
+</template>
+
 <template id="adventuring-ability-small-template">
     <div class="col-12">
         <div class="bg-dark rounded p-1 px-2 m-1 text-center pointer-enabled" id="styling" style="border: 1px solid rgba(255, 255, 255, 0.2);">
@@ -1337,6 +1565,36 @@
                 <a href="#" class="small text-warning mr-3" id="skip-btn">Skip</a>
                 <a href="#" class="small text-muted" id="skip-all-btn">Skip All Tutorials</a>
             </div>
+        </div>
+    </div>
+</template>
+
+<template id="adventuring-slayer-task-template">
+    <div class="col-12 col-md-6 col-lg-4 p-2" data-id="col">
+        <div class="block block-rounded-double bg-combat-inner-dark p-3" data-id="card">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span data-id="tierBadge" class="badge"></span>
+                <small data-id="typeName" class="text-muted"></small>
+            </div>
+            <!-- Target -->
+            <div class="d-flex align-items-center mb-2">
+                <img data-id="targetIcon" class="skill-icon-xs mr-2" />
+                <span data-id="description" class="text-white"></span>
+            </div>
+            <!-- Progress (shown for active tasks) -->
+            <div data-id="progressContainer" class="mb-2 d-none">
+                <div class="progress active-progress" style="height: 20px;">
+                    <div data-id="progressBar" class="progress-bar" role="progressbar"></div>
+                </div>
+            </div>
+            <!-- Rewards -->
+            <div class="small text-muted mb-2 d-flex align-items-center flex-wrap">
+                <strong class="mr-1">Rewards: </strong>
+                <span data-id="rewards"></span>
+            </div>
+            <!-- Action button -->
+            <button data-id="actionBtn" class="btn btn-sm btn-block"></button>
         </div>
     </div>
 </template>

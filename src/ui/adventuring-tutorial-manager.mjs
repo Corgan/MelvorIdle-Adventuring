@@ -296,18 +296,19 @@ export class AdventuringTutorialManager {
      * This ensures tutorials are checked after the game is fully loaded
      */
     onOfflineLoopExited() {
-        
-        // Only check if we're currently on the adventuring page
-        var currentPage = this.game.openPage;
-        if(currentPage && currentPage.action === this.manager) {
-            // Small delay to ensure UI is fully rendered
-            setTimeout(() => {
-                this.checkAllPendingTutorials();
+        // Small delay to ensure UI is fully rendered
+        setTimeout(() => {
+            // Always check and queue tutorials (e.g., immediate tutorials on new saves)
+            this.checkAllPendingTutorials();
+            
+            // Only show if we're currently on the adventuring page
+            var currentPage = this.game.openPage;
+            if(currentPage && currentPage.action === this.manager) {
                 if(this.activeTutorial) {
                     this.showCurrentStep();
                 }
-            }, 100);
-        }
+            }
+        }, 100);
     }
 
     /**

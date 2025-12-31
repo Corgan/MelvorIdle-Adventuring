@@ -99,15 +99,7 @@ export class Adventuring extends SkillWithMastery {
         this.achievementCategories = new NamespaceRegistry(this.game.registeredNamespaces);
         this.achievements = new NamespaceRegistry(this.game.registeredNamespaces);
         
-        // Mastery milestones (tag-based kill bonuses)
-        this.masteryMilestones = [];
-        this.unlockedMilestones = {}; // { tagName: Set of milestone IDs }
-
-        // Achievement system state
-        this.achievementStats = null;
-        this.completedAchievements = new Set();
-        this.achievementBonuses = {};
-        this.unlockedAchievementAbilities = new Set();
+        // Achievement system (manager.achievements)
         this.achievementManager = new AchievementManager(this, game);
 
         this.itemSlots = new NamespaceRegistry(this.game.registeredNamespaces);
@@ -594,6 +586,11 @@ export class Adventuring extends SkillWithMastery {
         this.tutorialManager.onPageVisible();
     }
 
+    onPageVisible() {
+        // Called when the adventuring page becomes visible
+        this.tutorialManager.onPageVisible();
+    }
+
     nextTownTick() {
         if(this.isActive)
             return;
@@ -614,21 +611,6 @@ export class Adventuring extends SkillWithMastery {
 
     registerData(namespace, data) {
         super.registerData(namespace, data); // pets, rareDrops, minibar, customMilestones
-
-        // Register mastery milestones (tag-based kill bonuses)
-        if(data.masteryMilestones !== undefined) {
-            data.masteryMilestones.forEach(milestone => {
-                this.masteryMilestones.push({
-                    id: milestone.id,
-                    level: milestone.level,
-                    name: milestone.name,
-                    description: milestone.description,
-                    rewards: milestone.rewards || []
-                });
-            });
-            // Sort by level for easy checking
-            this.masteryMilestones.sort((a, b) => a.level - b.level);
-        }
 
         if(data.categories !== undefined) {
             data.categories.forEach(data => {
@@ -869,6 +851,9 @@ export class Adventuring extends SkillWithMastery {
         this.consumableTypes.forEach(consumable => consumable.postDataRegistration());
         this.equipmentSets.forEach(set => set.postDataRegistration());
 
+        // Build source lookup tables for tooltips
+        this.buildSourceLookups();
+
         let jobMilestones = this.jobs.allObjects.filter(job => job.isMilestoneReward);
         let areaMilestones = this.areas.allObjects.filter(area => area.isMilestoneReward);
 
@@ -907,6 +892,49 @@ export class Adventuring extends SkillWithMastery {
                     allSkillLevelsRequirement.exceptions = new Set();
                 allSkillLevelsRequirement.exceptions.add(this);
             }
+        });
+    }
+
+    /**
+     * Build reverse lookup tables for source hints in tooltips
+     * Maps materials -> monsters that drop them, monsters -> areas they appear in
+     */
+    buildSourceLookups() {
+        // Monster -> Areas lookup
+        this.monsterSources = new Map();
+        this.areas.forEach(area => {
+            if(!area.floors) return;
+            area.floors.forEach(floor => {
+                if(!floor.monsters) return;
+                floor.monsters.forEach(entry => {
+                    const monster = this.monsters.getObjectByID(entry.id);
+                    if(!monster) return;
+                    if(!this.monsterSources.has(monster)) {
+                        this.monsterSources.set(monster, []);
+                    }
+                    const sources = this.monsterSources.get(monster);
+                    if(!sources.includes(area)) {
+                        sources.push(area);
+                    }
+                });
+            });
+        });
+
+        // Material -> Monsters lookup
+        this.materialSources = new Map();
+        this.monsters.forEach(monster => {
+            if(!monster.lootGenerator?.table) return;
+            monster.lootGenerator.table.forEach(entry => {
+                const material = this.materials.getObjectByID(entry.id);
+                if(!material) return;
+                if(!this.materialSources.has(material)) {
+                    this.materialSources.set(material, []);
+                }
+                const sources = this.materialSources.get(material);
+                if(!sources.includes(monster)) {
+                    sources.push(monster);
+                }
+            });
         });
     }
 

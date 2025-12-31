@@ -198,11 +198,7 @@ export class AdventuringAuraInstance {
         if(!this.renderQueue.tooltip)
             return;
 
-        if(this.component.tooltip === undefined)
-            return;
-
-        const tooltipContent = this.tooltip;
-        this.component.tooltip.setContent(tooltipContent);
+        this.component.setTooltipContent(this.tooltip);
 
         this.renderQueue.tooltip = false;
     }

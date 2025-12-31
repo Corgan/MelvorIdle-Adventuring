@@ -116,7 +116,7 @@ export class AdventuringJob extends MasteryAction {
     }
 
     get name() {
-        return this.unlocked ? this._name : "???";
+        return this._name;
     }
 
     get media() {
@@ -153,22 +153,7 @@ export class AdventuringJob extends MasteryAction {
     }
 
     get tooltip() {
-        const tooltip = TooltipBuilder.create()
-            .header(this.name, this.media);
-
-        if(this.unlocked && this.isMilestoneReward) {
-            tooltip.masteryProgressFor(this.manager, this);
-            
-            tooltip.stats(this.stats);
-            
-            // Next milestone
-            tooltip.nextMilestone(this.manager, this);
-        } else if(!this.unlocked) {
-            // Show unlock requirements for locked jobs
-            tooltip.unlockRequirements(this.requirements, this.manager);
-        }
-        
-        return tooltip.build();
+        return TooltipBuilder.forJob(this, this.manager).build();
     }
 
     get allowMultiple() {
@@ -255,10 +240,7 @@ export class AdventuringJob extends MasteryAction {
         if(!this.renderQueue.tooltip)
             return;
 
-        if(this.component.tooltip === undefined)
-            return;
-
-        this.component.tooltip.setContent(this.tooltip);
+        this.component.setTooltipContent(this.tooltip);
 
         this.renderQueue.tooltip = false;
     }

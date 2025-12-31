@@ -219,64 +219,21 @@ export class AdventuringItemBase extends MasteryAction {
 
         this.base.forEach((value, stat) => this.stats.set(stat, value));
         this.scaling.forEach((value, stat) => this.stats.set(stat, this.stats.get(stat) + Math.floor(this.level * value)));
+
+        // Apply equipment_stats_percent mastery bonus (level 99)
+        const statBonus = this.getMasteryEffectValue('equipment_stats_percent');
+        if (statBonus > 0) {
+            this.stats.forEach((value, stat) => {
+                const bonus = Math.floor(value * statBonus / 100);
+                this.stats.set(stat, value + bonus);
+            });
+        }
     }
 
     get tooltip() {
-        const tooltip = TooltipBuilder.create()
-            .header(this.name, this.media);
+        const tooltip = TooltipBuilder.forEquipment(this, this.manager);
 
         if(this.unlocked) {
-            // Upgrade stars
-            let empty = `<i class="far fa-star text-muted"></i>`;
-            let solid = `<i class="fa fa-star text-warning"></i>`;
-            let half = `<i class="fa fa-star-half-alt text-warning"></i>`;
-    
-            let starCount = Math.floor(this.upgradeLevel / 2);
-            let halfStarCount = this.upgradeLevel % 2;
-            let emptyStarCount = ((this.maxUpgrades/2) - (starCount + halfStarCount));
-            let stars = [...new Array(starCount).fill(solid), ...new Array(halfStarCount).fill(half), ...new Array(emptyStarCount).fill(empty)];
-
-            tooltip.text(stars.join(''), 'text-center');
-            
-            // Show current level / max level
-            if(this.upgradeLevel > 0) {
-                if(this.level < this.levelCap) {
-                    tooltip.masteryProgressFor(this.manager, this);
-                    tooltip.hint(`Max Level: ${this.levelCap}`);
-                } else {
-                    tooltip.subheader(`Level ${this.level} / ${this.levelCap}`, 'text-warning');
-                }
-            } else {
-                tooltip.hint(`Max Level: ${this.levelCap} (unlock to level up)`);
-            }
-
-            // Stats
-            tooltip.stats(this.stats);
-
-            // Usable by jobs - show icons instead of text
-            tooltip.usableByJobs(this.jobs, this.manager);
-            
-            // Equipment Set info
-            if(this.set) {
-                tooltip.separator();
-                tooltip.subheader(this.set.name, 'text-info');
-                this.set.bonuses.forEach(bonus => {
-                    const color = 'text-muted';
-                    tooltip.text(`<span class="${color}">(${bonus.pieces}pc)</span> ${bonus.description}`, 'small');
-                });
-            }
-            
-            // Show special effects for items with effects
-            if(this.effects && this.effects.length > 0) {
-                tooltip.separator();
-                this.getEffectDescriptions().forEach(desc => {
-                    tooltip.info(desc);
-                });
-            }
-            
-            // Next milestone
-            tooltip.nextMilestone(this.manager, this);
-
             // Requirements (for items that have unlock requirements)
             if(this.requirements.length > 0) {
                 tooltip.separator();
@@ -310,7 +267,12 @@ export class AdventuringItemBase extends MasteryAction {
     }
 
     get name() {
-        return this.unlocked ? this._name : "???";
+        const baseName = this._name;
+        // Add "Mastered" prefix at level 99 equipment mastery
+        if (this.unlocked && this.hasMasteryEffect('unlock_mastered_variant')) {
+            return `Mastered ${baseName}`;
+        }
+        return baseName;
     }
 
     get media() {
@@ -512,10 +474,7 @@ export class AdventuringItemBase extends MasteryAction {
         if(!this.renderQueue.tooltip)
             return;
 
-        if(this.component.tooltip === undefined)
-            return;
-
-        this.component.tooltip.setContent(this.tooltip);
+        this.component.setTooltipContent(this.tooltip);
 
         this.renderQueue.tooltip = false;
     }

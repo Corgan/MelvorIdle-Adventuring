@@ -6,6 +6,9 @@ const { formatRequirements } = await loadModule('src/core/adventuring-utils.mjs'
 
 const { AdventuringWorkshopElement } = await loadModule('src/town/components/adventuring-workshop.mjs');
 const { AdventuringStoredItemElement } = await loadModule('src/items/components/adventuring-stored-item.mjs');
+const { AdventuringMaterialCostElement } = await loadModule('src/ui/components/adventuring-material-cost.mjs');
+const { AdventuringRequirementElement } = await loadModule('src/ui/components/adventuring-requirement.mjs');
+const { AdventuringDropdownOptionElement } = await loadModule('src/ui/components/adventuring-dropdown-option.mjs');
 
 class AdventuringWorkshopRenderQueue {
     constructor() {
@@ -130,15 +133,10 @@ export class AdventuringWorkshop extends AdventuringPage {
             
             const have = this.manager.stash.getCount(material);
             const need = mat.count;
-            const canAfford = have >= need;
             
-            const item = document.createElement('div');
-            item.className = `d-flex align-items-center mr-3 ${canAfford ? 'text-success' : 'text-danger'}`;
-            item.innerHTML = `
-                <img class="skill-icon-xxs mr-1" src="${material.media}">
-                <span class="small">${have}/${need}</span>
-            `;
-            this.component.costDisplay.appendChild(item);
+            const costEl = new AdventuringMaterialCostElement();
+            costEl.setCost({ iconSrc: material.media, have, need });
+            this.component.costDisplay.appendChild(costEl);
         });
     }
 
@@ -152,13 +150,19 @@ export class AdventuringWorkshop extends AdventuringPage {
         }
 
         const formatted = formatRequirements(this.selectedProduct.requirements, this.manager);
-        const reqs = formatted.map(({ text, met }) => {
-            const colorClass = met ? 'text-success' : 'text-warning';
-            return `<span class="${colorClass}">${text}</span>`;
-        }).join(' • ');
-
-        if(reqs) {
-            this.component.requirementsDisplay.innerHTML = reqs;
+        
+        if(formatted.length > 0) {
+            this.component.requirementsDisplay.replaceChildren();
+            formatted.forEach((req, i) => {
+                if(i > 0) {
+                    const separator = document.createElement('span');
+                    separator.textContent = ' • ';
+                    this.component.requirementsDisplay.appendChild(separator);
+                }
+                const reqEl = new AdventuringRequirementElement();
+                reqEl.setRequirement({ text: req.text, met: req.met, showIcon: false });
+                this.component.requirementsDisplay.appendChild(reqEl);
+            });
             this.component.requirementsDisplay.classList.remove('d-none');
         } else {
             this.component.requirementsDisplay.classList.add('d-none');
@@ -243,20 +247,11 @@ export class AdventuringWorkshop extends AdventuringPage {
         this.products.forEach(product => {
             let productContainer = this.dropdownOptions.get(product);
             if(productContainer === undefined) {
-                productContainer = createElement('a', {
-                    className: 'dropdown-item pointer-enabled',
-                    children: [
-                        createElement('img', { className: 'skill-icon-xs mr-2' }), 
-                        createElement('span')
-                    ]
-                });
-                productContainer.onclick = () => this.selectProduct(product);
+                productContainer = new AdventuringDropdownOptionElement();
                 this.dropdownOptions.set(product, productContainer);
             }
             this.component.productRecipeOptions.appendChild(productContainer);
-            let [ icon, name ] = productContainer.children;
-            icon.src = product.media;
-            name.textContent = product.name;
+            productContainer.setFromItem(product, () => this.selectProduct(product));
         });
         if(this.selectedProduct === undefined)
             this.component.productButton.textContent = 'Select Product';

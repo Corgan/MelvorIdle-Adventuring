@@ -3,6 +3,9 @@ const { loadModule } = mod.getContext(import.meta);
 const { AdventuringPage } = await loadModule('src/ui/adventuring-page.mjs');
 const { AdventuringTavernElement } = await loadModule('src/town/components/adventuring-tavern.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
+const { AdventuringDrinkCardElement } = await loadModule('src/town/components/adventuring-drink-card.mjs');
+const { AdventuringActiveBuffBadgeElement } = await loadModule('src/town/components/adventuring-active-buff-badge.mjs');
+const { AdventuringEmptyStateElement } = await loadModule('src/ui/components/adventuring-empty-state.mjs');
 
 class TavernRenderQueue {
     constructor() {
@@ -109,16 +112,18 @@ export class AdventuringTavern extends AdventuringPage {
         const activeDrinks = this.activeBuffs;
 
         if(activeDrinks.length === 0) {
-            const empty = document.createElement('div');
-            empty.className = 'text-center text-muted p-2';
-            empty.textContent = 'No active drinks. Buy one to gain buffs!';
+            const empty = new AdventuringEmptyStateElement();
+            empty.setMessage('No active drinks. Buy one to gain buffs!', 'p-2');
             this.component.activeBuffs.appendChild(empty);
         } else {
             activeDrinks.forEach(({ consumable, runsRemaining }) => {
-                const badge = document.createElement('div');
-                badge.className = 'badge badge-info m-1 p-2';
-                badge.innerHTML = `<img class="skill-icon-xxs mr-1" src="${consumable.media}">${consumable.name} (${runsRemaining} runs)`;
+                const badge = new AdventuringActiveBuffBadgeElement();
                 this.component.activeBuffs.appendChild(badge);
+                badge.setBuff({
+                    iconSrc: consumable.media,
+                    name: consumable.name,
+                    remaining: runsRemaining
+                });
             });
         }
 
@@ -127,117 +132,43 @@ export class AdventuringTavern extends AdventuringPage {
     }
 
     createDrinkCard(drink) {
-        const col = document.createElement('div');
-        col.className = 'col-12 col-md-6 col-lg-4 p-2';
-
-        const card = document.createElement('div');
-        card.className = 'block block-rounded-double bg-combat-inner-dark p-3';
-
-        // Tier badge
-        const tierColors = ['secondary', 'info', 'warning'];
-        const header = document.createElement('div');
-        header.className = 'd-flex justify-content-between align-items-center mb-2';
+        const card = new AdventuringDrinkCardElement();
         
-        const tierBadge = document.createElement('span');
-        tierBadge.className = `badge badge-${tierColors[drink.tier - 1] || 'secondary'}`;
-        tierBadge.textContent = `Tier ${drink.tier}`;
-        header.appendChild(tierBadge);
-
-        const duration = document.createElement('small');
-        duration.className = 'text-muted';
-        duration.textContent = `${drink.duration} runs`;
-        header.appendChild(duration);
-
-        card.appendChild(header);
-
-        // Drink info
-        const info = document.createElement('div');
-        info.className = 'd-flex align-items-center mb-2';
-        
-        const icon = document.createElement('img');
-        icon.className = 'skill-icon-sm mr-2';
-        icon.src = drink.media;
-        info.appendChild(icon);
-
-        // Only show name + effectText (description already includes effects, causing doubling)
-        const nameDesc = document.createElement('div');
-        nameDesc.innerHTML = `<strong class="text-white">${drink.name}</strong>`;
-        info.appendChild(nameDesc);
-
-        card.appendChild(info);
-
-        // Effects (using effectText which is the compact version)
-        const effects = document.createElement('div');
-        effects.className = 'small text-success mb-2';
-        effects.textContent = drink.effectText;
-        card.appendChild(effects);
-        
-        // Flavor text (if present)
-        if(drink.flavorText) {
-            const flavor = document.createElement('div');
-            flavor.className = 'small text-muted font-italic mb-2';
-            flavor.textContent = drink.flavorText;
-            card.appendChild(flavor);
-        }
-
-        // Cost - styled like armory
-        const costSection = document.createElement('div');
-        costSection.className = 'mb-2';
-        
-        const costLabel = document.createElement('h6');
-        costLabel.className = 'font-w700 text-combat-smoke text-center m-0 mb-1';
-        costLabel.textContent = 'Cost';
-        costSection.appendChild(costLabel);
-        
-        const costItems = document.createElement('div');
-        costItems.className = 'row no-gutters justify-content-center';
-        
-        if(drink.cost && drink.cost.length > 0) {
-            for(const c of drink.cost) {
-                const mat = this.manager.materials.getObjectByID(c.id);
-                if(mat) {
-                    const component = createElement('adventuring-material');
-                    component.mount(costItems);
-                    const owned = mat.count;
-                    component.setTooltipContent(TooltipBuilder.forMaterial(mat).build());
-                    component.icon.src = mat.media;
-                    component.count.textContent = c.qty;
-                    // Border based on affordability
-                    if(owned >= c.qty) {
-                        component.border.classList.remove('border-danger');
-                        component.border.classList.add('border-success');
-                    } else {
-                        component.border.classList.remove('border-success');
-                        component.border.classList.add('border-danger');
-                    }
-                }
-            }
-        }
-        costSection.appendChild(costItems);
-        card.appendChild(costSection);
-
-        // Buy button
-        const btn = document.createElement('button');
-        btn.className = 'btn btn-sm btn-block';
-        
-        if(drink.canAfford()) {
-            btn.className += ' btn-primary';
-            btn.textContent = 'Buy';
-            btn.onclick = () => {
-                if(drink.purchase()) {
+        card.setDrink({
+            drink,
+            canAfford: drink.canAfford(),
+            onBuy: (d) => {
+                if (d.purchase()) {
                     this.renderQueue.all = true;
                     this.render();
                 }
-            };
-        } else {
-            btn.className += ' btn-secondary';
-            btn.textContent = 'Cannot Afford';
-            btn.disabled = true;
-        }
-        card.appendChild(btn);
-
-        col.appendChild(card);
-        return col;
+            },
+            renderCosts: (container, d) => {
+                if (d.cost && d.cost.length > 0) {
+                    for (const c of d.cost) {
+                        const mat = this.manager.materials.getObjectByID(c.id);
+                        if (mat) {
+                            const component = createElement('adventuring-material');
+                            component.mount(container);
+                            const owned = mat.count;
+                            component.setTooltipContent(TooltipBuilder.forMaterial(mat, this.manager).build());
+                            component.icon.src = mat.media;
+                            component.count.textContent = c.qty;
+                            // Border based on affordability
+                            if (owned >= c.qty) {
+                                component.border.classList.remove('border-danger');
+                                component.border.classList.add('border-success');
+                            } else {
+                                component.border.classList.remove('border-success');
+                                component.border.classList.add('border-danger');
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        return card;
     }
 
     // Encoding/decoding handled by AdventuringConsumables (tavern drinks use charges)

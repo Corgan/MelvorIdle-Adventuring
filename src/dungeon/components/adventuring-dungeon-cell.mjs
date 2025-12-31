@@ -1,4 +1,8 @@
-export class AdventuringDungeonCellElement extends HTMLElement {
+const { loadModule } = mod.getContext(import.meta);
+
+const { AdventuringTooltipElement } = await loadModule('src/core/adventuring-tooltip-element.mjs');
+
+export class AdventuringDungeonCellElement extends AdventuringTooltipElement {
     constructor() {
         super();
         this._content = new DocumentFragment();
@@ -6,33 +10,18 @@ export class AdventuringDungeonCellElement extends HTMLElement {
 
         this.styling = getElementFromFragment(this._content, 'styling', 'div');
         this.icon = getElementFromFragment(this._content, 'icon', 'img');
-        this.tooltip = undefined;
-    }
-
-    mount(parent) {
-        parent.append(this);
+        
+        this._tooltipTarget = this.styling;
+        this._tooltipOptions = { placement: 'top' };
     }
 
     connectedCallback() {
         this.appendChild(this._content);
-        this.tooltip = tippy(this.styling, {
-            content: '',
-            allowHTML: true,
-            placement: 'top'
-        });
+        super.connectedCallback();
     }
 
     disconnectedCallback() {
-        if(this.tooltip !== undefined) {
-            this.tooltip.destroy();
-            this.tooltip = undefined;
-        }
-    }
-
-    setTooltipContent(content) {
-        if(this.tooltip !== undefined) {
-            this.tooltip.setContent(content);
-        }
+        super.disconnectedCallback();
     }
 }
 window.customElements.define('adventuring-dungeon-cell', AdventuringDungeonCellElement);

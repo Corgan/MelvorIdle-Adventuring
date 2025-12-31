@@ -2,1207 +2,1985 @@
     "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
     "namespace": "adventuring",
     "data": {
-        "skillData": [{
-            "skillID": "adventuring:Adventuring",
-            "data": {
-                "passives": [
-                    {
-                        "id": "flame_shroud",
-                        "name": "Flame Shroud",
-                        "effects": [
-                            {
-                                "trigger": "round_start",
-                                "type": "debuff",
-                                "target": "all_enemies",
-                                "buff": "adventuring:burn",
-                                "stacks": { "base": 2, "scaling": [] }
-                            }
-                        ]
-                    },
-                    {
-                        "id": "frost_aura",
-                        "name": "Frost Aura",
-                        "effects": [
-                            {
-                                "trigger": "round_start",
-                                "type": "debuff",
-                                "target": "all_enemies",
-                                "buff": "adventuring:chill",
-                                "stacks": { "base": 2, "scaling": [] }
-                            }
-                        ]
-                    },
-                    {
-                        "id": "storm_aura",
-                        "name": "Storm Aura",
-                        "effects": [
-                            {
-                                "trigger": "round_start",
-                                "type": "debuff",
-                                "target": "random_enemy",
-                                "buff": "adventuring:shock",
-                                "stacks": { "base": 2, "scaling": [] }
-                            }
-                        ]
-                    },
-                    {
-                        "id": "earth_aura",
-                        "name": "Earth Aura",
-                        "effects": [
-                            {
-                                "trigger": "round_start",
-                                "type": "buff",
-                                "target": "self",
-                                "buff": "adventuring:fortify",
-                                "stacks": { "base": 2, "scaling": [] }
-                            }
-                        ]
-                    },
-                    {
-                        "id": "elemental_instability",
-                        "name": "Elemental Instability",
-                        "effects": [
-                            {
-                                "trigger": "on_death",
-                                "type": "damage",
-                                "target": "all_enemies",
-                                "amount": { "base": 50, "scaling": [] }
-                            }
-                        ]
-                    }
-                ],
-                "areas": [
-                    {
-                        "id": "elemental_plane",
-                        "name": "Elemental Plane",
-                        "media": "melvor:assets/media/monsters/fire_spirit.png",
-                        "requirements": [
-                            { "type": "skill_level", "level": 55 }
-                        ],
-                        "height": 10,
-                        "width": 8,
-                        "floors": [
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:fire_wisp", "weight": 40 },
-                                    { "id": "adventuring:ice_wisp", "weight": 40 },
-                                    { "id": "adventuring:lightning_wisp", "weight": 20 }
-                                ],
-                                "exit": ["adventuring:fire_wisp", "adventuring:ice_wisp", "adventuring:lightning_wisp"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:fire_wisp", "weight": 30 },
-                                    { "id": "adventuring:ice_wisp", "weight": 30 },
-                                    { "id": "adventuring:earth_wisp", "weight": 40 }
-                                ],
-                                "exit": ["adventuring:fire_wisp", "adventuring:ice_wisp", "adventuring:earth_wisp"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:fire_elemental_warrior", "weight": 35 },
-                                    { "id": "adventuring:ice_elemental_warrior", "weight": 35 },
-                                    { "id": "adventuring:lightning_wisp", "weight": 30 }
-                                ],
-                                "exit": ["adventuring:fire_elemental_warrior", "adventuring:ice_elemental_warrior", "adventuring:earth_wisp"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:fire_elemental_warrior", "weight": 30 },
-                                    { "id": "adventuring:ice_elemental_warrior", "weight": 30 },
-                                    { "id": "adventuring:storm_elemental", "weight": 40 }
-                                ],
-                                "exit": ["adventuring:fire_elemental_warrior", "adventuring:storm_elemental", "adventuring:earth_golem"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:storm_elemental", "weight": 35 },
-                                    { "id": "adventuring:earth_golem", "weight": 35 },
-                                    { "id": "adventuring:magma_elemental", "weight": 30 }
-                                ],
-                                "exit": ["adventuring:storm_elemental", "adventuring:earth_golem", "adventuring:magma_elemental"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:magma_elemental", "weight": 30 },
-                                    { "id": "adventuring:blizzard_elemental", "weight": 30 },
-                                    { "id": "adventuring:earthquake_titan", "weight": 40 }
-                                ],
-                                "exit": ["adventuring:magma_elemental", "adventuring:blizzard_elemental", "adventuring:earthquake_titan"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:earthquake_titan", "weight": 40 },
-                                    { "id": "adventuring:blizzard_elemental", "weight": 30 },
-                                    { "id": "adventuring:magma_elemental", "weight": 30 }
-                                ],
-                                "exit": ["adventuring:earthquake_titan", "adventuring:blizzard_elemental", "adventuring:primordial_elemental"]
-                            }
-                        ]
-                    }
-                ],
-                "monsters": [
-                    {
-                        "id": "fire_wisp",
-                        "name": "Fire Wisp",
-                        "media": "melvor:assets/media/monsters/fire_spirit.png",
-                        "tags": ["elemental", "fire", "flying"],
-                        "xp": 95,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 55 },
-                            { "id": "adventuring:defence", "value": 30 },
-                            { "id": "adventuring:agility", "value": 55 },
-                            { "id": "adventuring:strength", "value": 35 },
-                            { "id": "adventuring:ranged", "value": 40 },
-                            { "id": "adventuring:magic", "value": 60 },
-                            { "id": "adventuring:prayer", "value": 35 }
-                        ],
-                        "generator": "adventuring:ember_bolt",
-                        "spender": "adventuring:flame_burst",
-                        "passives": [],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 8, "weight": 100 },
-                            { "id": "adventuring:elemental_essence", "qty": 2, "weight": 50 },
-                            { "id": "adventuring:fire_core", "qty": 1, "weight": 20 }
-                        ]
-                    },
-                    {
-                        "id": "ice_wisp",
-                        "name": "Ice Wisp",
-                        "media": "melvor:assets/media/monsters/ice_monster.png",
-                        "tags": ["elemental", "ice", "flying"],
-                        "xp": 95,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 55 },
-                            { "id": "adventuring:defence", "value": 32 },
-                            { "id": "adventuring:agility", "value": 52 },
-                            { "id": "adventuring:strength", "value": 35 },
-                            { "id": "adventuring:ranged", "value": 40 },
-                            { "id": "adventuring:magic", "value": 58 },
-                            { "id": "adventuring:prayer", "value": 35 }
-                        ],
-                        "generator": "adventuring:frost_bolt",
-                        "spender": "adventuring:ice_shards",
-                        "passives": [],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 8, "weight": 100 },
-                            { "id": "adventuring:elemental_essence", "qty": 2, "weight": 50 },
-                            { "id": "adventuring:frost_core", "qty": 1, "weight": 20 }
-                        ]
-                    },
-                    {
-                        "id": "lightning_wisp",
-                        "name": "Lightning Wisp",
-                        "media": "melvor:assets/media/monsters/air_spirit.png",
-                        "tags": ["elemental", "lightning", "flying"],
-                        "xp": 100,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 50 },
-                            { "id": "adventuring:defence", "value": 28 },
-                            { "id": "adventuring:agility", "value": 70 },
-                            { "id": "adventuring:strength", "value": 35 },
-                            { "id": "adventuring:ranged", "value": 45 },
-                            { "id": "adventuring:magic", "value": 62 },
-                            { "id": "adventuring:prayer", "value": 35 }
-                        ],
-                        "generator": "adventuring:spark",
-                        "spender": "adventuring:storm_chain",
-                        "passives": [],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 9, "weight": 100 },
-                            { "id": "adventuring:elemental_essence", "qty": 2, "weight": 50 },
-                            { "id": "adventuring:storm_core", "qty": 1, "weight": 20 }
-                        ]
-                    },
-                    {
-                        "id": "earth_wisp",
-                        "name": "Earth Wisp",
-                        "media": "melvor:assets/media/monsters/earth_golem.png",
-                        "tags": ["elemental", "earth"],
-                        "xp": 100,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 70 },
-                            { "id": "adventuring:defence", "value": 45 },
-                            { "id": "adventuring:agility", "value": 35 },
-                            { "id": "adventuring:strength", "value": 50 },
-                            { "id": "adventuring:ranged", "value": 30 },
-                            { "id": "adventuring:magic", "value": 45 },
-                            { "id": "adventuring:prayer", "value": 40 }
-                        ],
-                        "generator": "adventuring:boulder_hurl",
-                        "spender": "adventuring:boulder_crash",
-                        "passives": ["adventuring:earth_aura"],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 9, "weight": 100 },
-                            { "id": "adventuring:elemental_essence", "qty": 2, "weight": 50 },
-                            { "id": "adventuring:earth_core", "qty": 1, "weight": 20 }
-                        ]
-                    },
-                    {
-                        "id": "fire_elemental_warrior",
-                        "name": "Fire Elemental Warrior",
-                        "media": "melvor:assets/media/monsters/fire_spirit.png",
-                        "tags": ["elemental", "fire"],
-                        "xp": 110,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 85 },
-                            { "id": "adventuring:defence", "value": 40 },
-                            { "id": "adventuring:agility", "value": 50 },
-                            { "id": "adventuring:strength", "value": 55 },
-                            { "id": "adventuring:ranged", "value": 40 },
-                            { "id": "adventuring:magic", "value": 65 },
-                            { "id": "adventuring:prayer", "value": 40 }
-                        ],
-                        "generator": "adventuring:flame_strike",
-                        "spender": "adventuring:blazing_fury",
-                        "passives": ["adventuring:flame_shroud"],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 12, "weight": 100 },
-                            { "id": "adventuring:elemental_essence", "qty": 3, "weight": 55 },
-                            { "id": "adventuring:fire_core", "qty": 2, "weight": 25 }
-                        ]
-                    },
-                    {
-                        "id": "ice_elemental_warrior",
-                        "name": "Ice Elemental Warrior",
-                        "media": "melvor:assets/media/monsters/ice_monster.png",
-                        "tags": ["elemental", "ice"],
-                        "xp": 110,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 85 },
-                            { "id": "adventuring:defence", "value": 42 },
-                            { "id": "adventuring:agility", "value": 48 },
-                            { "id": "adventuring:strength", "value": 52 },
-                            { "id": "adventuring:ranged", "value": 40 },
-                            { "id": "adventuring:magic", "value": 62 },
-                            { "id": "adventuring:prayer", "value": 40 }
-                        ],
-                        "generator": "adventuring:icy_slash",
-                        "spender": "adventuring:blizzard_strike",
-                        "passives": ["adventuring:frost_aura"],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 12, "weight": 100 },
-                            { "id": "adventuring:elemental_essence", "qty": 3, "weight": 55 },
-                            { "id": "adventuring:frost_core", "qty": 2, "weight": 25 }
-                        ]
-                    },
-                    {
-                        "id": "storm_elemental",
-                        "name": "Storm Elemental",
-                        "media": "melvor:assets/media/monsters/air_spirit.png",
-                        "tags": ["elemental", "lightning", "flying"],
-                        "xp": 120,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 75 },
-                            { "id": "adventuring:defence", "value": 35 },
-                            { "id": "adventuring:agility", "value": 65 },
-                            { "id": "adventuring:strength", "value": 45 },
-                            { "id": "adventuring:ranged", "value": 50 },
-                            { "id": "adventuring:magic", "value": 70 },
-                            { "id": "adventuring:prayer", "value": 45 }
-                        ],
-                        "generator": "adventuring:thunderbolt",
-                        "spender": "adventuring:storm_surge",
-                        "passives": ["adventuring:storm_aura"],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 14, "weight": 100 },
-                            { "id": "adventuring:elemental_essence", "qty": 3, "weight": 55 },
-                            { "id": "adventuring:storm_core", "qty": 2, "weight": 25 }
-                        ]
-                    },
-                    {
-                        "id": "earth_golem",
-                        "name": "Earth Golem",
-                        "media": "melvor:assets/media/monsters/earth_golem.png",
-                        "tags": ["elemental", "earth", "golem"],
-                        "xp": 120,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 120 },
-                            { "id": "adventuring:defence", "value": 60 },
-                            { "id": "adventuring:agility", "value": 28 },
-                            { "id": "adventuring:strength", "value": 70 },
-                            { "id": "adventuring:ranged", "value": 25 },
-                            { "id": "adventuring:magic", "value": 40 },
-                            { "id": "adventuring:prayer", "value": 40 }
-                        ],
-                        "generator": "adventuring:ground_pound",
-                        "spender": "adventuring:elemental_quake",
-                        "passives": ["adventuring:earth_aura"],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 14, "weight": 100 },
-                            { "id": "adventuring:elemental_essence", "qty": 3, "weight": 55 },
-                            { "id": "adventuring:earth_core", "qty": 2, "weight": 30 }
-                        ]
-                    },
-                    {
-                        "id": "magma_elemental",
-                        "name": "Magma Elemental",
-                        "media": "melvor:assets/media/monsters/fire_spirit.png",
-                        "tags": ["elemental", "fire", "earth"],
-                        "xp": 135,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 110 },
-                            { "id": "adventuring:defence", "value": 55 },
-                            { "id": "adventuring:agility", "value": 35 },
-                            { "id": "adventuring:strength", "value": 75 },
-                            { "id": "adventuring:ranged", "value": 40 },
-                            { "id": "adventuring:magic", "value": 68 },
-                            { "id": "adventuring:prayer", "value": 45 }
-                        ],
-                        "generator": "adventuring:lava_splash",
-                        "spender": "adventuring:volcanic_eruption",
-                        "passives": ["adventuring:flame_shroud", "adventuring:earth_aura"],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 16, "weight": 100 },
-                            { "id": "adventuring:elemental_essence", "qty": 4, "weight": 60 },
-                            { "id": "adventuring:fire_core", "qty": 2, "weight": 30 },
-                            { "id": "adventuring:earth_core", "qty": 2, "weight": 30 }
-                        ]
-                    },
-                    {
-                        "id": "blizzard_elemental",
-                        "name": "Blizzard Elemental",
-                        "media": "melvor:assets/media/monsters/ice_monster.png",
-                        "tags": ["elemental", "ice", "lightning"],
-                        "xp": 135,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 95 },
-                            { "id": "adventuring:defence", "value": 50 },
-                            { "id": "adventuring:agility", "value": 55 },
-                            { "id": "adventuring:strength", "value": 55 },
-                            { "id": "adventuring:ranged", "value": 50 },
-                            { "id": "adventuring:magic", "value": 75 },
-                            { "id": "adventuring:prayer", "value": 48 }
-                        ],
-                        "generator": "adventuring:ice_storm",
-                        "spender": "adventuring:frozen_tempest",
-                        "passives": ["adventuring:frost_aura", "adventuring:storm_aura"],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 16, "weight": 100 },
-                            { "id": "adventuring:elemental_essence", "qty": 4, "weight": 60 },
-                            { "id": "adventuring:frost_core", "qty": 2, "weight": 30 },
-                            { "id": "adventuring:storm_core", "qty": 2, "weight": 30 }
-                        ]
-                    },
-                    {
-                        "id": "earthquake_titan",
-                        "name": "Earthquake Titan",
-                        "media": "melvor:assets/media/monsters/earth_golem.png",
-                        "tags": ["elemental", "earth", "golem"],
-                        "xp": 150,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 180 },
-                            { "id": "adventuring:defence", "value": 75 },
-                            { "id": "adventuring:agility", "value": 25 },
-                            { "id": "adventuring:strength", "value": 90 },
-                            { "id": "adventuring:ranged", "value": 30 },
-                            { "id": "adventuring:magic", "value": 50 },
-                            { "id": "adventuring:prayer", "value": 50 }
-                        ],
-                        "generator": "adventuring:titan_stomp",
-                        "spender": "adventuring:earthen_strike",
-                        "passives": ["adventuring:earth_aura", "adventuring:elemental_instability"],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 20, "weight": 100 },
-                            { "id": "adventuring:elemental_essence", "qty": 5, "weight": 65 },
-                            { "id": "adventuring:earth_core", "qty": 3, "weight": 35 }
-                        ]
-                    },
-                    {
-                        "id": "primordial_elemental",
-                        "name": "Primordial Elemental",
-                        "media": "melvor:assets/media/monsters/fire_spirit.png",
-                        "tags": ["elemental", "fire", "ice", "earth", "lightning", "boss"],
-                        "isBoss": true,
-                        "xp": 400,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 500 },
-                            { "id": "adventuring:defence", "value": 70 },
-                            { "id": "adventuring:agility", "value": 50 },
-                            { "id": "adventuring:strength", "value": 80 },
-                            { "id": "adventuring:ranged", "value": 60 },
-                            { "id": "adventuring:magic", "value": 90 },
-                            { "id": "adventuring:prayer", "value": 60 }
-                        ],
-                        "generator": "adventuring:primal_wave",
-                        "spender": "adventuring:primordial_fury",
-                        "passives": ["adventuring:flame_shroud", "adventuring:frost_aura", "adventuring:storm_aura", "adventuring:earth_aura"],
-                        "phases": [
-                            {
-                                "threshold": 0.75,
-                                "statMultipliers": { "magic": 1.15 },
-                                "healPercent": 0
-                            },
-                            {
-                                "threshold": 0.5,
-                                "statMultipliers": { "magic": 1.25, "defence": 1.15 },
-                                "healPercent": 0.05
-                            },
-                            {
-                                "threshold": 0.25,
-                                "statMultipliers": { "magic": 1.4, "defence": 1.25, "strength": 1.2 },
-                                "healPercent": 0.1
-                            }
-                        ],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 100, "weight": 100 },
-                            { "id": "adventuring:big_parts", "qty": 4, "weight": 40 },
-                            { "id": "adventuring:elemental_essence", "qty": 15, "weight": 100 },
-                            { "id": "adventuring:fire_core", "qty": 3, "weight": 50 },
-                            { "id": "adventuring:frost_core", "qty": 3, "weight": 50 },
-                            { "id": "adventuring:storm_core", "qty": 3, "weight": 50 },
-                            { "id": "adventuring:earth_core", "qty": 3, "weight": 50 },
-                            { "id": "adventuring:primordial_crystal", "qty": 1, "weight": 8 }
-                        ]
-                    }
-                ],
-                "materials": [
-                    {
-                        "id": "elemental_essence",
-                        "name": "Elemental Essence",
-                        "media": "melvor:assets/media/bank/magic_essence.png",
-                        "category": "adventuring:monster_drops"
-                    },
-                    {
-                        "id": "fire_core",
-                        "name": "Fire Core",
-                        "media": "melvor:assets/media/bank/fire_rune.png",
-                        "category": "adventuring:monster_drops"
-                    },
-                    {
-                        "id": "frost_core",
-                        "name": "Frost Core",
-                        "media": "melvor:assets/media/bank/water_rune.png",
-                        "category": "adventuring:monster_drops"
-                    },
-                    {
-                        "id": "storm_core",
-                        "name": "Storm Core",
-                        "media": "melvor:assets/media/bank/air_rune.png",
-                        "category": "adventuring:monster_drops"
-                    },
-                    {
-                        "id": "earth_core",
-                        "name": "Earth Core",
-                        "media": "melvor:assets/media/bank/earth_rune.png",
-                        "category": "adventuring:monster_drops"
-                    }
-                ],
-                "generators": [
-                    {
-                        "id": "ember_bolt",
-                        "name": "Ember Bolt",
-                        "isEnemy": true,
-                        "requirements": [],
-                        "energy": 20,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 12,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "value": 0.25 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:burn",
-                                        "stacks": { "base": 1, "scaling": [] }
+        "skillData": [
+            {
+                "skillID": "adventuring:Adventuring",
+                "data": {
+                    "passives": [
+                        {
+                            "id": "flame_shroud",
+                            "name": "Flame Shroud",
+                            "effects": [
+                                {
+                                    "trigger": "round_start",
+                                    "type": "debuff",
+                                    "target": "all_enemies",
+                                    "buff": "adventuring:burn",
+                                    "stacks": {
+                                        "base": 2,
+                                        "scaling": []
                                     }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "frost_bolt",
-                        "name": "Frost Bolt",
-                        "isEnemy": true,
-                        "requirements": [],
-                        "energy": 20,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 12,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "value": 0.25 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:chill",
-                                        "stacks": { "base": 1, "scaling": [] }
+                                }
+                            ]
+                        },
+                        {
+                            "id": "frost_aura",
+                            "name": "Frost Aura",
+                            "effects": [
+                                {
+                                    "trigger": "round_start",
+                                    "type": "debuff",
+                                    "target": "all_enemies",
+                                    "buff": "adventuring:chill",
+                                    "stacks": {
+                                        "base": 2,
+                                        "scaling": []
                                     }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "spark",
-                        "name": "Spark",
-                        "isEnemy": true,
-                        "requirements": [],
-                        "energy": 20,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 10,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "value": 0.25 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:shock",
-                                        "stacks": { "base": 1, "scaling": [] }
+                                }
+                            ]
+                        },
+                        {
+                            "id": "storm_aura",
+                            "name": "Storm Aura",
+                            "effects": [
+                                {
+                                    "trigger": "round_start",
+                                    "type": "debuff",
+                                    "target": "random_enemy",
+                                    "buff": "adventuring:shock",
+                                    "stacks": {
+                                        "base": 2,
+                                        "scaling": []
                                     }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "boulder_hurl",
-                        "name": "Boulder Hurl",
-                        "isEnemy": true,
-                        "requirements": [],
-                        "energy": 20,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 15,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "value": 0.3 }
-                                            ]
-                                        }
+                                }
+                            ]
+                        },
+                        {
+                            "id": "earth_aura",
+                            "name": "Earth Aura",
+                            "effects": [
+                                {
+                                    "trigger": "round_start",
+                                    "type": "buff",
+                                    "target": "self",
+                                    "buff": "adventuring:fortify",
+                                    "stacks": {
+                                        "base": 2,
+                                        "scaling": []
                                     }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "flame_strike",
-                        "name": "Flame Strike",
-                        "isEnemy": true,
-                        "requirements": [],
-                        "energy": 25,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 18,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "value": 0.3 },
-                                                { "id": "adventuring:strength", "value": 0.15 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:burn",
-                                        "stacks": { "base": 2, "scaling": [] }
+                                }
+                            ]
+                        },
+                        {
+                            "id": "elemental_instability",
+                            "name": "Elemental Instability",
+                            "effects": [
+                                {
+                                    "trigger": "on_death",
+                                    "type": "damage",
+                                    "target": "all_enemies",
+                                    "amount": {
+                                        "base": 50,
+                                        "scaling": []
                                     }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "icy_slash",
-                        "name": "Icy Slash",
-                        "isEnemy": true,
-                        "requirements": [],
-                        "energy": 25,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 18,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "value": 0.3 },
-                                                { "id": "adventuring:strength", "value": 0.15 }
-                                            ]
+                                }
+                            ]
+                        }
+                    ],
+                    "areas": [
+                        {
+                            "id": "elemental_plane",
+                            "name": "Elemental Plane",
+                            "media": "melvor:assets/media/monsters/fire_spirit.png",
+                            "requirements": [
+                                {
+                                    "type": "skill_level",
+                                    "level": 55
+                                }
+                            ],
+                            "height": 10,
+                            "width": 8,
+                            "floors": [
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:fire_wisp",
+                                            "weight": 40
+                                        },
+                                        {
+                                            "id": "adventuring:ice_wisp",
+                                            "weight": 40
+                                        },
+                                        {
+                                            "id": "adventuring:lightning_wisp",
+                                            "weight": 20
                                         }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:chill",
-                                        "stacks": { "base": 2, "scaling": [] }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "thunderbolt",
-                        "name": "Thunderbolt",
-                        "isEnemy": true,
-                        "requirements": [],
-                        "energy": 25,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 16,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "value": 0.35 }
-                                            ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:fire_wisp",
+                                        "adventuring:ice_wisp",
+                                        "adventuring:lightning_wisp"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:fire_wisp",
+                                            "weight": 30
+                                        },
+                                        {
+                                            "id": "adventuring:ice_wisp",
+                                            "weight": 30
+                                        },
+                                        {
+                                            "id": "adventuring:earth_wisp",
+                                            "weight": 40
                                         }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:shock",
-                                        "stacks": { "base": 2, "scaling": [] }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "ground_pound",
-                        "name": "Ground Pound",
-                        "isEnemy": true,
-                        "requirements": [],
-                        "energy": 25,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 12,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "value": 0.25 }
-                                            ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:fire_wisp",
+                                        "adventuring:ice_wisp",
+                                        "adventuring:earth_wisp"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:fire_elemental_warrior",
+                                            "weight": 35
+                                        },
+                                        {
+                                            "id": "adventuring:ice_elemental_warrior",
+                                            "weight": 35
+                                        },
+                                        {
+                                            "id": "adventuring:lightning_wisp",
+                                            "weight": 30
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "lava_splash",
-                        "name": "Lava Splash",
-                        "isEnemy": true,
-                        "requirements": [],
-                        "energy": 25,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 20,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "value": 0.25 },
-                                                { "id": "adventuring:strength", "value": 0.2 }
-                                            ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:fire_elemental_warrior",
+                                        "adventuring:ice_elemental_warrior",
+                                        "adventuring:earth_wisp"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:fire_elemental_warrior",
+                                            "weight": 30
+                                        },
+                                        {
+                                            "id": "adventuring:ice_elemental_warrior",
+                                            "weight": 30
+                                        },
+                                        {
+                                            "id": "adventuring:storm_elemental",
+                                            "weight": 40
                                         }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:burn",
-                                        "stacks": { "base": 3, "scaling": [] }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "ice_storm",
-                        "name": "Ice Storm",
-                        "isEnemy": true,
-                        "requirements": [],
-                        "energy": 25,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 18,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "value": 0.35 }
-                                            ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:fire_elemental_warrior",
+                                        "adventuring:storm_elemental",
+                                        "adventuring:earth_golem"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:storm_elemental",
+                                            "weight": 35
+                                        },
+                                        {
+                                            "id": "adventuring:earth_golem",
+                                            "weight": 35
+                                        },
+                                        {
+                                            "id": "adventuring:magma_elemental",
+                                            "weight": 30
                                         }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:chill",
-                                        "stacks": { "base": 2, "scaling": [] }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:shock",
-                                        "stacks": { "base": 1, "scaling": [] }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "titan_stomp",
-                        "name": "Titan Stomp",
-                        "isEnemy": true,
-                        "requirements": [],
-                        "energy": 30,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 18,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "value": 0.35 }
-                                            ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:storm_elemental",
+                                        "adventuring:earth_golem",
+                                        "adventuring:magma_elemental"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:magma_elemental",
+                                            "weight": 30
+                                        },
+                                        {
+                                            "id": "adventuring:blizzard_elemental",
+                                            "weight": 30
+                                        },
+                                        {
+                                            "id": "adventuring:earthquake_titan",
+                                            "weight": 40
                                         }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:weaken",
-                                        "stacks": { "base": 1, "scaling": [] }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "primal_wave",
-                        "name": "Primal Wave",
-                        "isEnemy": true,
-                        "requirements": [],
-                        "energy": 30,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 15,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "value": 0.3 }
-                                            ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:magma_elemental",
+                                        "adventuring:blizzard_elemental",
+                                        "adventuring:earthquake_titan"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:earthquake_titan",
+                                            "weight": 40
+                                        },
+                                        {
+                                            "id": "adventuring:blizzard_elemental",
+                                            "weight": 30
+                                        },
+                                        {
+                                            "id": "adventuring:magma_elemental",
+                                            "weight": 30
                                         }
+                                    ],
+                                    "exit": [
+                                        "adventuring:earthquake_titan",
+                                        "adventuring:blizzard_elemental",
+                                        "adventuring:primordial_elemental"
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "monsters": [
+                        {
+                            "id": "fire_wisp",
+                            "name": "Fire Wisp",
+                            "media": "melvor:assets/media/monsters/fire_spirit.png",
+                            "tags": [
+                                "elemental",
+                                "fire",
+                                "flying"
+                            ],
+                            "xp": 95,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 35
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 22
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 55
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 25
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 40
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 60
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 35
+                                }
+                            ],
+                            "generator": "adventuring:ember_bolt",
+                            "spender": "adventuring:flame_burst",
+                            "passives": [],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 8,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:elemental_essence",
+                                    "qty": 2,
+                                    "weight": 50
+                                },
+                                {
+                                    "id": "adventuring:fire_core",
+                                    "qty": 1,
+                                    "weight": 20
+                                }
+                            ]
+                        },
+                        {
+                            "id": "ice_wisp",
+                            "name": "Ice Wisp",
+                            "media": "melvor:assets/media/monsters/ice_monster.png",
+                            "tags": [
+                                "elemental",
+                                "ice",
+                                "flying"
+                            ],
+                            "xp": 95,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 35
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 24
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 52
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 25
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 40
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 58
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 35
+                                }
+                            ],
+                            "generator": "adventuring:frost_bolt",
+                            "spender": "adventuring:ice_shards",
+                            "passives": [],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 8,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:elemental_essence",
+                                    "qty": 2,
+                                    "weight": 50
+                                },
+                                {
+                                    "id": "adventuring:frost_core",
+                                    "qty": 1,
+                                    "weight": 20
+                                }
+                            ]
+                        },
+                        {
+                            "id": "lightning_wisp",
+                            "name": "Lightning Wisp",
+                            "media": "melvor:assets/media/monsters/air_guard.png",
+                            "tags": [
+                                "elemental",
+                                "lightning",
+                                "flying"
+                            ],
+                            "xp": 100,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 32
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 20
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 70
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 25
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 45
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 62
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 35
+                                }
+                            ],
+                            "generator": "adventuring:spark",
+                            "spender": "adventuring:storm_chain",
+                            "passives": [],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 9,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:elemental_essence",
+                                    "qty": 2,
+                                    "weight": 50
+                                },
+                                {
+                                    "id": "adventuring:storm_core",
+                                    "qty": 1,
+                                    "weight": 20
+                                }
+                            ]
+                        },
+                        {
+                            "id": "earth_wisp",
+                            "name": "Earth Wisp",
+                            "media": "melvor:assets/media/monsters/earth_golem.png",
+                            "tags": [
+                                "elemental",
+                                "earth"
+                            ],
+                            "xp": 100,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 45
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 32
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 35
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 36
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 30
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 45
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 40
+                                }
+                            ],
+                            "generator": "adventuring:boulder_hurl",
+                            "spender": "adventuring:boulder_crash",
+                            "passives": [
+                                "adventuring:earth_aura"
+                            ],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 9,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:elemental_essence",
+                                    "qty": 2,
+                                    "weight": 50
+                                },
+                                {
+                                    "id": "adventuring:earth_core",
+                                    "qty": 1,
+                                    "weight": 20
+                                }
+                            ]
+                        },
+                        {
+                            "id": "fire_elemental_warrior",
+                            "name": "Fire Elemental Warrior",
+                            "media": "melvor:assets/media/monsters/fire_spirit.png",
+                            "tags": [
+                                "elemental",
+                                "fire"
+                            ],
+                            "xp": 110,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 55
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 30
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 50
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 40
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 40
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 65
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 40
+                                }
+                            ],
+                            "generator": "adventuring:flame_strike",
+                            "spender": "adventuring:blazing_fury",
+                            "passives": [
+                                "adventuring:flame_shroud"
+                            ],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 12,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:elemental_essence",
+                                    "qty": 3,
+                                    "weight": 55
+                                },
+                                {
+                                    "id": "adventuring:fire_core",
+                                    "qty": 2,
+                                    "weight": 25
+                                }
+                            ]
+                        },
+                        {
+                            "id": "ice_elemental_warrior",
+                            "name": "Ice Elemental Warrior",
+                            "media": "melvor:assets/media/monsters/ice_monster.png",
+                            "tags": [
+                                "elemental",
+                                "ice"
+                            ],
+                            "xp": 110,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 55
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 32
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 48
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 38
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 40
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 62
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 40
+                                }
+                            ],
+                            "generator": "adventuring:icy_slash",
+                            "spender": "adventuring:blizzard_strike",
+                            "passives": [
+                                "adventuring:frost_aura"
+                            ],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 12,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:elemental_essence",
+                                    "qty": 3,
+                                    "weight": 55
+                                },
+                                {
+                                    "id": "adventuring:frost_core",
+                                    "qty": 2,
+                                    "weight": 25
+                                }
+                            ]
+                        },
+                        {
+                            "id": "storm_elemental",
+                            "name": "Storm Elemental",
+                            "media": "melvor:assets/media/monsters/air_guard.png",
+                            "tags": [
+                                "elemental",
+                                "lightning",
+                                "flying"
+                            ],
+                            "xp": 120,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 48
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 26
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 65
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 33
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 50
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 70
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 45
+                                }
+                            ],
+                            "generator": "adventuring:thunderbolt",
+                            "spender": "adventuring:storm_surge",
+                            "passives": [
+                                "adventuring:storm_aura"
+                            ],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 14,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:elemental_essence",
+                                    "qty": 3,
+                                    "weight": 55
+                                },
+                                {
+                                    "id": "adventuring:storm_core",
+                                    "qty": 2,
+                                    "weight": 25
+                                }
+                            ]
+                        },
+                        {
+                            "id": "earth_golem",
+                            "name": "Earth Golem",
+                            "media": "melvor:assets/media/monsters/earth_golem.png",
+                            "tags": [
+                                "elemental",
+                                "earth",
+                                "golem"
+                            ],
+                            "xp": 120,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 78
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 44
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 28
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 50
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 25
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 40
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 40
+                                }
+                            ],
+                            "generator": "adventuring:ground_pound",
+                            "spender": "adventuring:elemental_quake",
+                            "passives": [
+                                "adventuring:earth_aura"
+                            ],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 14,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:elemental_essence",
+                                    "qty": 3,
+                                    "weight": 55
+                                },
+                                {
+                                    "id": "adventuring:earth_core",
+                                    "qty": 2,
+                                    "weight": 30
+                                }
+                            ]
+                        },
+                        {
+                            "id": "magma_elemental",
+                            "name": "Magma Elemental",
+                            "media": "melvor:assets/media/monsters/fire_spirit.png",
+                            "tags": [
+                                "elemental",
+                                "fire",
+                                "earth"
+                            ],
+                            "xp": 135,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 70
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 40
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 35
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 54
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 40
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 68
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 45
+                                }
+                            ],
+                            "generator": "adventuring:lava_splash",
+                            "spender": "adventuring:volcanic_eruption",
+                            "passives": [
+                                "adventuring:flame_shroud",
+                                "adventuring:earth_aura"
+                            ],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 16,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:elemental_essence",
+                                    "qty": 4,
+                                    "weight": 60
+                                },
+                                {
+                                    "id": "adventuring:fire_core",
+                                    "qty": 2,
+                                    "weight": 30
+                                },
+                                {
+                                    "id": "adventuring:earth_core",
+                                    "qty": 2,
+                                    "weight": 30
+                                }
+                            ]
+                        },
+                        {
+                            "id": "blizzard_elemental",
+                            "name": "Blizzard Elemental",
+                            "media": "melvor:assets/media/monsters/ice_monster.png",
+                            "tags": [
+                                "elemental",
+                                "ice",
+                                "lightning"
+                            ],
+                            "xp": 135,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 60
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 36
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 55
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 40
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 50
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 75
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 48
+                                }
+                            ],
+                            "generator": "adventuring:ice_storm",
+                            "spender": "adventuring:frozen_tempest",
+                            "passives": [
+                                "adventuring:frost_aura",
+                                "adventuring:storm_aura"
+                            ],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 16,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:elemental_essence",
+                                    "qty": 4,
+                                    "weight": 60
+                                },
+                                {
+                                    "id": "adventuring:frost_core",
+                                    "qty": 2,
+                                    "weight": 30
+                                },
+                                {
+                                    "id": "adventuring:storm_core",
+                                    "qty": 2,
+                                    "weight": 30
+                                }
+                            ]
+                        },
+                        {
+                            "id": "earthquake_titan",
+                            "name": "Earthquake Titan",
+                            "media": "melvor:assets/media/monsters/earth_golem.png",
+                            "tags": [
+                                "elemental",
+                                "earth",
+                                "golem"
+                            ],
+                            "xp": 150,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 115
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 55
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 25
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 65
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 30
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 50
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 50
+                                }
+                            ],
+                            "generator": "adventuring:titan_stomp",
+                            "spender": "adventuring:earthen_strike",
+                            "passives": [
+                                "adventuring:earth_aura",
+                                "adventuring:elemental_instability"
+                            ],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 20,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:elemental_essence",
+                                    "qty": 5,
+                                    "weight": 65
+                                },
+                                {
+                                    "id": "adventuring:earth_core",
+                                    "qty": 3,
+                                    "weight": 35
+                                }
+                            ]
+                        },
+                        {
+                            "id": "primordial_elemental",
+                            "name": "Primordial Elemental",
+                            "media": "melvor:assets/media/monsters/fire_spirit.png",
+                            "tags": [
+                                "elemental",
+                                "fire",
+                                "ice",
+                                "earth",
+                                "lightning",
+                                "boss"
+                            ],
+                            "isBoss": true,
+                            "xp": 400,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 200
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 52
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 50
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 58
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 60
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 90
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 60
+                                }
+                            ],
+                            "generator": "adventuring:primal_wave",
+                            "spender": "adventuring:primordial_fury",
+                            "passives": [
+                                "adventuring:flame_shroud",
+                                "adventuring:frost_aura",
+                                "adventuring:storm_aura",
+                                "adventuring:earth_aura"
+                            ],
+                            "phases": [
+                                {
+                                    "threshold": 0.75,
+                                    "statMultipliers": {
+                                        "magic": 1.15
                                     },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:burn",
-                                        "stacks": { "base": 1, "scaling": [] }
+                                    "healPercent": 0
+                                },
+                                {
+                                    "threshold": 0.5,
+                                    "statMultipliers": {
+                                        "magic": 1.25,
+                                        "defence": 1.15
                                     },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:chill",
-                                        "stacks": { "base": 1, "scaling": [] }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ],
-                "spenders": [
-                    {
-                        "id": "flame_burst",
-                        "name": "Flame Burst",
-                        "isEnemy": true,
-                        "requirements": [],
-                        "cost": 80,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 20,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "value": 0.35 }
-                                            ]
+                                    "healPercent": 0.05
+                                },
+                                {
+                                    "threshold": 0.25,
+                                    "statMultipliers": {
+                                        "magic": 1.4,
+                                        "defence": 1.25,
+                                        "strength": 1.2
+                                    },
+                                    "healPercent": 0.1
+                                }
+                            ],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 100,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:big_parts",
+                                    "qty": 4,
+                                    "weight": 40
+                                },
+                                {
+                                    "id": "adventuring:elemental_essence",
+                                    "qty": 15,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:fire_core",
+                                    "qty": 3,
+                                    "weight": 50
+                                },
+                                {
+                                    "id": "adventuring:frost_core",
+                                    "qty": 3,
+                                    "weight": 50
+                                },
+                                {
+                                    "id": "adventuring:storm_core",
+                                    "qty": 3,
+                                    "weight": 50
+                                },
+                                {
+                                    "id": "adventuring:earth_core",
+                                    "qty": 3,
+                                    "weight": 50
+                                },
+                                {
+                                    "id": "adventuring:primordial_crystal",
+                                    "qty": 1,
+                                    "weight": 8
+                                }
+                            ]
+                        }
+                    ],
+                    "materials": [
+                        {
+                            "id": "elemental_essence",
+                            "name": "Elemental Essence",
+                            "media": "melvor:assets/media/bank/essence_of_summoning_i.png#shade=purple",
+                            "category": "adventuring:monster_drops"
+                        },
+                        {
+                            "id": "fire_core",
+                            "name": "Fire Core",
+                            "media": "melvor:assets/media/bank/rune_fire.png",
+                            "category": "adventuring:monster_drops"
+                        },
+                        {
+                            "id": "frost_core",
+                            "name": "Frost Core",
+                            "media": "melvor:assets/media/bank/rune_water.png",
+                            "category": "adventuring:monster_drops"
+                        },
+                        {
+                            "id": "storm_core",
+                            "name": "Storm Core",
+                            "media": "melvor:assets/media/bank/rune_air.png",
+                            "category": "adventuring:monster_drops"
+                        },
+                        {
+                            "id": "earth_core",
+                            "name": "Earth Core",
+                            "media": "melvor:assets/media/bank/rune_earth.png",
+                            "category": "adventuring:monster_drops"
+                        }
+                    ],
+                    "generators": [
+                        {
+                            "id": "ember_bolt",
+                            "name": "Ember Bolt",
+                            "isEnemy": true,
+                            "requirements": [],
+                            "energy": 20,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 12,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "value": 0.25
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:burn",
+                                            "stacks": {
+                                                "base": 1,
+                                                "scaling": []
+                                            }
                                         }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:burn",
-                                        "stacks": { "base": 3, "scaling": [] }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "ice_shards",
-                        "name": "Ice Shards",
-                        "isEnemy": true,
-                        "requirements": [],
-                        "cost": 80,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 20,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "value": 0.35 }
-                                            ]
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "frost_bolt",
+                            "name": "Frost Bolt",
+                            "isEnemy": true,
+                            "requirements": [],
+                            "energy": 20,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 12,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "value": 0.25
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:chill",
+                                            "stacks": {
+                                                "base": 1,
+                                                "scaling": []
+                                            }
                                         }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:chill",
-                                        "stacks": { "base": 3, "scaling": [] }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "storm_chain",
-                        "name": "Storm Chain",
-                        "isEnemy": true,
-                        "requirements": [],
-                        "cost": 80,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 18,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "value": 0.4 }
-                                            ]
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "spark",
+                            "name": "Spark",
+                            "isEnemy": true,
+                            "requirements": [],
+                            "energy": 20,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 10,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "value": 0.25
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:shock",
+                                            "stacks": {
+                                                "base": 1,
+                                                "scaling": []
+                                            }
                                         }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:shock",
-                                        "stacks": { "base": 2, "scaling": [] }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "boulder_crash",
-                        "name": "Boulder Crash",
-                        "isEnemy": true,
-                        "requirements": [],
-                        "cost": 80,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 45,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "value": 0.5 }
-                                            ]
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "boulder_hurl",
+                            "name": "Boulder Hurl",
+                            "isEnemy": true,
+                            "requirements": [],
+                            "energy": 20,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 15,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "value": 0.3
+                                                    }
+                                                ]
+                                            }
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "blazing_fury",
-                        "name": "Blazing Fury",
-                        "isEnemy": true,
-                        "requirements": [],
-                        "cost": 100,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 25,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "value": 0.4 }
-                                            ]
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "flame_strike",
+                            "name": "Flame Strike",
+                            "isEnemy": true,
+                            "requirements": [],
+                            "energy": 25,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 18,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "value": 0.3
+                                                    },
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "value": 0.15
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:burn",
+                                            "stacks": {
+                                                "base": 2,
+                                                "scaling": []
+                                            }
                                         }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:burn",
-                                        "stacks": { "base": 5, "scaling": [] }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "blizzard_strike",
-                        "name": "Blizzard Strike",
-                        "isEnemy": true,
-                        "requirements": [],
-                        "cost": 100,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 25,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "value": 0.4 }
-                                            ]
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "icy_slash",
+                            "name": "Icy Slash",
+                            "isEnemy": true,
+                            "requirements": [],
+                            "energy": 25,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 18,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "value": 0.3
+                                                    },
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "value": 0.15
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:chill",
+                                            "stacks": {
+                                                "base": 2,
+                                                "scaling": []
+                                            }
                                         }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:chill",
-                                        "stacks": { "base": 5, "scaling": [] }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "storm_surge",
-                        "name": "Storm Surge",
-                        "isEnemy": true,
-                        "requirements": [],
-                        "cost": 100,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 22,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "value": 0.45 }
-                                            ]
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "thunderbolt",
+                            "name": "Thunderbolt",
+                            "isEnemy": true,
+                            "requirements": [],
+                            "energy": 25,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 16,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "value": 0.35
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:shock",
+                                            "stacks": {
+                                                "base": 2,
+                                                "scaling": []
+                                            }
                                         }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:shock",
-                                        "stacks": { "base": 4, "scaling": [] }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "elemental_quake",
-                        "name": "Elemental Quake",
-                        "isEnemy": true,
-                        "requirements": [],
-                        "cost": 100,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 30,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "value": 0.45 }
-                                            ]
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "ground_pound",
+                            "name": "Ground Pound",
+                            "isEnemy": true,
+                            "requirements": [],
+                            "energy": 25,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 12,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "value": 0.25
+                                                    }
+                                                ]
+                                            }
                                         }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:stun",
-                                        "stacks": { "base": 1, "scaling": [] }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "volcanic_eruption",
-                        "name": "Volcanic Eruption",
-                        "isEnemy": true,
-                        "requirements": [],
-                        "cost": 100,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 35,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "value": 0.35 },
-                                                { "id": "adventuring:strength", "value": 0.25 }
-                                            ]
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "lava_splash",
+                            "name": "Lava Splash",
+                            "isEnemy": true,
+                            "requirements": [],
+                            "energy": 25,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 20,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "value": 0.25
+                                                    },
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "value": 0.2
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:burn",
+                                            "stacks": {
+                                                "base": 3,
+                                                "scaling": []
+                                            }
                                         }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:burn",
-                                        "stacks": { "base": 4, "scaling": [] }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "frozen_tempest",
-                        "name": "Frozen Tempest",
-                        "isEnemy": true,
-                        "requirements": [],
-                        "cost": 100,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 28,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "value": 0.45 }
-                                            ]
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "ice_storm",
+                            "name": "Ice Storm",
+                            "isEnemy": true,
+                            "requirements": [],
+                            "energy": 25,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 18,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "value": 0.35
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:chill",
+                                            "stacks": {
+                                                "base": 2,
+                                                "scaling": []
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:shock",
+                                            "stacks": {
+                                                "base": 1,
+                                                "scaling": []
+                                            }
                                         }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:chill",
-                                        "stacks": { "base": 3, "scaling": [] }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:shock",
-                                        "stacks": { "base": 2, "scaling": [] }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "earthen_strike",
-                        "name": "Earthen Strike",
-                        "isEnemy": true,
-                        "requirements": [],
-                        "cost": 100,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 40,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "value": 0.5 }
-                                            ]
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "titan_stomp",
+                            "name": "Titan Stomp",
+                            "isEnemy": true,
+                            "requirements": [],
+                            "energy": 30,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 18,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "value": 0.35
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:weaken",
+                                            "stacks": {
+                                                "base": 1,
+                                                "scaling": []
+                                            }
                                         }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:stun",
-                                        "stacks": { "base": 2, "scaling": [] }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "primordial_fury",
-                        "name": "Primordial Fury",
-                        "isEnemy": true,
-                        "requirements": [],
-                        "cost": 100,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 45,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "value": 0.5 }
-                                            ]
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "primal_wave",
+                            "name": "Primal Wave",
+                            "isEnemy": true,
+                            "requirements": [],
+                            "energy": 30,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 15,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "value": 0.3
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:burn",
+                                            "stacks": {
+                                                "base": 1,
+                                                "scaling": []
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:chill",
+                                            "stacks": {
+                                                "base": 1,
+                                                "scaling": []
+                                            }
                                         }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:burn",
-                                        "stacks": { "base": 2, "scaling": [] }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:chill",
-                                        "stacks": { "base": 2, "scaling": [] }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:shock",
-                                        "stacks": { "base": 2, "scaling": [] }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ]
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "spenders": [
+                        {
+                            "id": "flame_burst",
+                            "name": "Flame Burst",
+                            "isEnemy": true,
+                            "requirements": [],
+                            "cost": 80,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 20,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "value": 0.35
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:burn",
+                                            "stacks": {
+                                                "base": 3,
+                                                "scaling": []
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "ice_shards",
+                            "name": "Ice Shards",
+                            "isEnemy": true,
+                            "requirements": [],
+                            "cost": 80,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 20,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "value": 0.35
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:chill",
+                                            "stacks": {
+                                                "base": 3,
+                                                "scaling": []
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "storm_chain",
+                            "name": "Storm Chain",
+                            "isEnemy": true,
+                            "requirements": [],
+                            "cost": 80,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 18,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "value": 0.4
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:shock",
+                                            "stacks": {
+                                                "base": 2,
+                                                "scaling": []
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "boulder_crash",
+                            "name": "Boulder Crash",
+                            "isEnemy": true,
+                            "requirements": [],
+                            "cost": 80,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 45,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "value": 0.5
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "blazing_fury",
+                            "name": "Blazing Fury",
+                            "isEnemy": true,
+                            "requirements": [],
+                            "cost": 100,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 25,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "value": 0.4
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:burn",
+                                            "stacks": {
+                                                "base": 5,
+                                                "scaling": []
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "blizzard_strike",
+                            "name": "Blizzard Strike",
+                            "isEnemy": true,
+                            "requirements": [],
+                            "cost": 100,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 25,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "value": 0.4
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:chill",
+                                            "stacks": {
+                                                "base": 5,
+                                                "scaling": []
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "storm_surge",
+                            "name": "Storm Surge",
+                            "isEnemy": true,
+                            "requirements": [],
+                            "cost": 100,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 22,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "value": 0.45
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:shock",
+                                            "stacks": {
+                                                "base": 4,
+                                                "scaling": []
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "elemental_quake",
+                            "name": "Elemental Quake",
+                            "isEnemy": true,
+                            "requirements": [],
+                            "cost": 100,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 30,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "value": 0.45
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:stun",
+                                            "stacks": {
+                                                "base": 1,
+                                                "scaling": []
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "volcanic_eruption",
+                            "name": "Volcanic Eruption",
+                            "isEnemy": true,
+                            "requirements": [],
+                            "cost": 100,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 35,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "value": 0.35
+                                                    },
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "value": 0.25
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:burn",
+                                            "stacks": {
+                                                "base": 4,
+                                                "scaling": []
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "frozen_tempest",
+                            "name": "Frozen Tempest",
+                            "isEnemy": true,
+                            "requirements": [],
+                            "cost": 100,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 28,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "value": 0.45
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:chill",
+                                            "stacks": {
+                                                "base": 3,
+                                                "scaling": []
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:shock",
+                                            "stacks": {
+                                                "base": 2,
+                                                "scaling": []
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "earthen_strike",
+                            "name": "Earthen Strike",
+                            "isEnemy": true,
+                            "requirements": [],
+                            "cost": 100,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 40,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "value": 0.5
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:stun",
+                                            "stacks": {
+                                                "base": 2,
+                                                "scaling": []
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "primordial_fury",
+                            "name": "Primordial Fury",
+                            "isEnemy": true,
+                            "requirements": [],
+                            "cost": 100,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 45,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "value": 0.5
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:burn",
+                                            "stacks": {
+                                                "base": 2,
+                                                "scaling": []
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:chill",
+                                            "stacks": {
+                                                "base": 2,
+                                                "scaling": []
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:shock",
+                                            "stacks": {
+                                                "base": 2,
+                                                "scaling": []
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
             }
-        }]
+        ]
     }
 }

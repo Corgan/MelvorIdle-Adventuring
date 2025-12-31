@@ -232,7 +232,7 @@ export class AdventuringArea extends MasteryAction {
     }
 
     get name() {
-        return this.unlocked ? this._name : "???";
+        return this._name;
     }
 
     get media() {
@@ -308,6 +308,25 @@ export class AdventuringArea extends MasteryAction {
     }
 
     /**
+     * Get tooltip-ready effects for current mastery bonuses
+     * Converts decimal bonuses to percentage values that describeEffect can format
+     * @returns {Array} Array of {type, value} effect objects
+     */
+    getMasteryBonusEffects() {
+        const { xpBonus, exploreSpeedBonus } = this.getMasteryBonuses();
+        const effects = [];
+        
+        if(xpBonus > 0) {
+            effects.push({ type: 'xp_percent', value: Math.round(xpBonus * 100) });
+        }
+        if(exploreSpeedBonus > 0) {
+            effects.push({ type: 'explore_speed_percent', value: Math.round(exploreSpeedBonus * 100) });
+        }
+        
+        return effects;
+    }
+
+    /**
      * Get tile weight modifiers based on mastery level from modifier system
      * Returns a map of tile ID to weight multiplier
      */
@@ -347,83 +366,7 @@ export class AdventuringArea extends MasteryAction {
     }
 
     get tooltip() {
-        const tooltip = TooltipBuilder.create()
-            .header(this.name, this.media);
-
-        if(this.unlocked) {
-            tooltip.masteryProgressFor(this.manager, this);
-            
-            // Dungeon Mastery bonuses
-            const bonuses = this.getMasteryBonuses();
-            const nextMilestone = this.getNextMilestone();
-            
-            const hasBonuses = bonuses.xpBonus > 0 || bonuses.exploreSpeedBonus > 0 || this.autoRepeatUnlocked;
-            if(hasBonuses) {
-                tooltip.separator();
-                if(bonuses.xpBonus > 0) {
-                    tooltip.bonus(`+${Math.round(bonuses.xpBonus * 100)}% XP`);
-                }
-                if(bonuses.exploreSpeedBonus > 0) {
-                    tooltip.bonus(`+${Math.round(bonuses.exploreSpeedBonus * 100)}% Explore Speed`);
-                }
-                if(this.autoRepeatUnlocked) {
-                    const isActive = this.manager.autoRepeatArea === this;
-                    if(isActive) {
-                        tooltip.info('Auto-Run ACTIVE');
-                    } else {
-                        tooltip.hint('Auto-Run Available');
-                    }
-                }
-            }
-            
-            if(nextMilestone) {
-                tooltip.separator().nextUnlock(nextMilestone.level, nextMilestone.description);
-            } else {
-                tooltip.separator().warning('Mastered!');
-            }
-
-            // Difficulty modes
-            const difficulty = this.getDifficulty();
-            if(difficulty) {
-                tooltip.separator();
-                tooltip.subheader(`${difficulty.name} Mode`, difficulty.color);
-                
-                if(difficulty.statMultiplier !== 1) {
-                    tooltip.penalty(`Enemy Stats: +${Math.round((difficulty.statMultiplier - 1) * 100)}%`);
-                }
-                if(difficulty.xpMultiplier !== 1) {
-                    tooltip.bonus(`+${Math.round((difficulty.xpMultiplier - 1) * 100)}% XP`);
-                }
-                if(difficulty.lootMultiplier !== 1) {
-                    tooltip.bonus(`+${Math.round((difficulty.lootMultiplier - 1) * 100)}% Loot`);
-                }
-
-                // Endless mode
-                if(difficulty.isEndless) {
-                    tooltip.info('Difficulty scales with each wave');
-                }
-            }
-            
-            if(this.bestEndlessStreak > 0) {
-                tooltip.separator().warning(`Best Endless: ${this.bestEndlessStreak} waves`);
-            }
-
-            // Mastery Aura (Level 99)
-            if(this.masteryAura) {
-                tooltip.separator();
-                if(this.masteryAuraUnlocked) {
-                    tooltip.warning(this.masteryAura.name);
-                    tooltip.bonus(this.masteryAura._description || this.masteryAura.description);
-                } else {
-                    tooltip.nextUnlock(99, this.masteryAura.name);
-                }
-            }
-        } else {
-            // Show unlock requirements for locked areas
-            tooltip.unlockRequirements(this.requirements, this.manager);
-        }
-        
-        return tooltip.build();
+        return TooltipBuilder.forArea(this, this.manager).build();
     }
 
     onLoad() {
@@ -475,7 +418,7 @@ export class AdventuringArea extends MasteryAction {
             this.getAllDifficulties().forEach((mode, index) => {
                 const option = this.difficultyOptionElements[index];
                 if(option) {
-                    const isUnlocked = mode.isUnlocked(this.level);
+                    const isUnlocked = mode.isUnlocked(this);
                     const isSelected = mode === this.selectedDifficulty;
                     option.className = `dropdown-item pointer-enabled ${mode.color}`;
                     if(!isUnlocked) {
@@ -498,10 +441,7 @@ export class AdventuringArea extends MasteryAction {
         if(!this.renderQueue.tooltip)
             return;
 
-        if(this.component.tooltip === undefined)
-            return;
-
-        this.component.tooltip.setContent(this.tooltip);
+        this.component.setTooltipContent(this.tooltip);
 
         this.renderQueue.tooltip = false;
     }

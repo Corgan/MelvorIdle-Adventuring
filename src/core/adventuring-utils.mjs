@@ -512,6 +512,12 @@ class RequirementsChecker {
                 return item ? item.upgradeLevel >= req.level : false;
             }
                 
+            case 'achievement_completion': {
+                // Check if the required achievement is completed
+                const achievement = this.manager.achievements?.getObjectByID(req.id);
+                return achievement ? achievement.isComplete : false;
+            }
+
             default:
                 console.warn(`Unknown requirement type: ${req.type}`);
                 return true;
@@ -1061,6 +1067,121 @@ function describeEffect(effect, manager) {
         case 'random_debuffs':
             return `Apply ${effect.count} random debuffs (${effect.stacks} stacks)`;
         
+
+        // Singular versions
+        case 'random_buff':
+            return `Apply random buff (${effect.stacks || 1} stacks)`;
+        case 'random_debuff':
+            return `Apply random debuff (${effect.stacks || 1} stacks)`;
+
+        // Dispel effects
+        case 'dispel':
+        case 'dispel_buff':
+            return `Remove ${effect.count || 1} buff(s) from target`;
+        case 'dispel_debuff':
+            return `Remove ${effect.count || 1} debuff(s)`;
+
+        // Enemy stat debuff
+        case 'enemy_stat_debuff':
+            return `Reduce enemy ${statName(effect.stat || effect.id)} by ${effect.value || effect.amount}%`;
+
+        // Cleanse variants
+        case 'cleanse_debuff':
+        case 'cleanse_random_debuff':
+            return `Cleanse ${effect.count || 1} debuff(s)`;
+        case 'cleanse_all_allies':
+            return `Cleanse all allies`;
+
+        // Buff all allies
+        case 'buff_all_allies':
+            return `Buff all allies with ${auraName(effect.id)}`;
+
+        // Apply variants
+        case 'apply_buff':
+            return `Apply ${effect.stacks || 1} ${auraName(effect.id)}`;
+        case 'apply_debuff':
+            return `Apply ${effect.stacks || 1} ${auraName(effect.id)} to target`;
+        case 'apply_debuff_all':
+            return `Apply ${effect.stacks || 1} ${auraName(effect.id)} to all enemies`;
+
+        // Damage variants
+        case 'damage_all':
+        case 'damage_all_enemies':
+            return `Deal ${effect.value || effect.amount || '?'} damage to all enemies`;
+
+        // Summon effects
+        case 'summon':
+            return `Summon a companion`;
+        case 'summon_power_bonus':
+            return `+${effect.value}% summon power`;
+        case 'summon_attack_speed':
+            return `+${effect.value}% summon attack speed`;
+
+        // Armor pierce
+        case 'armor_pierce':
+        case 'armour_penetration':
+        case 'ignore_defence':
+            return `Ignore ${effect.value || effect.amount}% defense`;
+
+        // Ward
+        case 'ward':
+            return `Block next ${effect.stacks || 1} attacks`;
+
+        // Charm
+        case 'charm':
+            return `Charm target for ${effect.duration || 1} turns`;
+
+        // Double cast
+        case 'double_cast':
+            return `${effect.chance || effect.value}% chance to cast twice`;
+
+        // Mastery unlock effects
+        case 'unlock_auto_run':
+            return 'Unlock Auto-Run';
+        case 'unlock_difficulty':
+            const diffId = effect.difficultyID?.split(':').pop() || 'Unknown';
+            return `Unlock ${diffId.charAt(0).toUpperCase() + diffId.slice(1)} Mode`;
+        case 'unlock_mastery_aura':
+            return 'Unlock Mastery Aura';
+        case 'unlock_multi_job_assignment':
+            return 'Unlock Multi-Job Assignment';
+        case 'unlock_mastered_variant':
+            return 'Unlock Mastered Variant';
+
+        // Mastery stat bonuses
+        case 'job_stats_percent':
+            return `+${effect.value}% Job Stats`;
+        case 'drop_rate_percent':
+            return `+${effect.value}% Drop Rate`;
+        case 'drop_quantity_percent':
+            return `+${effect.value}% Drop Quantity`;
+        case 'explore_speed_percent':
+            return `+${effect.value}% Explore Speed`;
+        case 'trap_spawn_rate_percent':
+            return `${effect.value > 0 ? '+' : ''}${effect.value}% Trap Spawn Rate`;
+        case 'fountain_spawn_rate_percent':
+            return `+${effect.value}% Fountain Spawn Rate`;
+        case 'treasure_spawn_rate_percent':
+            return `+${effect.value}% Treasure Spawn Rate`;
+        case 'shrine_spawn_rate_percent':
+            return `+${effect.value}% Shrine Spawn Rate`;
+        case 'ability_learn_chance_percent':
+            return `+${effect.value}% Ability Learn Chance`;
+        case 'equipment_xp_percent':
+            return `+${effect.value}% Equipment XP`;
+        case 'upgrade_cost_percent':
+            return `${effect.value > 0 ? '+' : ''}${effect.value}% Upgrade Cost`;
+        case 'equipment_stats_percent':
+            return `+${effect.value}% Equipment Stats`;
+
+        // Generic percentage bonuses (used by tooltip helpers)
+        case 'xp_percent':
+            return `+${effect.value}% XP`;
+        case 'loot_percent':
+            return `+${effect.value}% Loot`;
+        case 'enemy_stats_percent':
+            return `Enemy Stats: +${effect.value}%`;
+
         default:
             // Try to generate something reasonable
             if(effect.value !== undefined) {
@@ -1520,3 +1641,4 @@ export {
     evaluateCondition,
     describeCondition
 }
+

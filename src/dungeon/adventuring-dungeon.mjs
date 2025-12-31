@@ -328,23 +328,23 @@ export class AdventuringDungeon extends AdventuringPage {
 
     /**
      * Get stat multiplier for wave-scaling difficulties based on current wave
-     * Uses waveScaling.statMultiplierPerWave from the difficulty JSON
+     * Uses waveScaling.statPercentPerWave (whole percent, e.g., 5 = +5% per wave)
      */
     getEndlessStatMultiplier() {
         const scaling = this.waveScaling;
         if(!scaling) return 1.0;
-        const perWave = scaling.statMultiplierPerWave ?? 0.05;
+        const perWave = (scaling.statPercentPerWave ?? 5) / 100;
         return 1.0 + (this.endlessWave * perWave);
     }
 
     /**
      * Get XP/loot multiplier for wave-scaling difficulties based on current wave
-     * Uses waveScaling.rewardMultiplierPerWave from the difficulty JSON
+     * Uses waveScaling.rewardPercentPerWave (whole percent, e.g., 2 = +2% per wave)
      */
     getEndlessRewardMultiplier() {
         const scaling = this.waveScaling;
         if(!scaling) return 1.0;
-        const perWave = scaling.rewardMultiplierPerWave ?? 0.02;
+        const perWave = (scaling.rewardPercentPerWave ?? 2) / 100;
         return 1.0 + (this.endlessWave * perWave);
     }
 
@@ -408,10 +408,7 @@ export class AdventuringDungeon extends AdventuringPage {
     }
 
     explore() {
-        // If timers are paused (e.g., tutorial informational step), restart timer and wait
-        console.log('[Dungeon] explore() called, timersPaused:', this.manager.timersPaused);
         if(this.manager.timersPaused) {
-            console.log('[Dungeon] Timers paused, restarting timer without exploring');
             this.exploreTimer.start(this.getEffectiveExploreInterval());
             return;
         }
@@ -479,11 +476,12 @@ export class AdventuringDungeon extends AdventuringPage {
 
     /**
      * Process tile damage effect
+     * Note: effect.amount is whole percent (10 = 10% of max HP)
      */
     processTileDamage(effect, sourceName) {
-        let damage = effect.amount;
+        let damagePercent = effect.amount;
         this.manager.party.all.forEach(member => {
-            let amount = Math.floor(member.maxHitpoints * damage);
+            let amount = Math.floor(member.maxHitpoints * damagePercent / 100);
             member.damage({ amount: amount });
             this.manager.log.add(`${sourceName} did ${amount} damage to ${member.name}`);
         });
@@ -491,13 +489,15 @@ export class AdventuringDungeon extends AdventuringPage {
 
     /**
      * Process tile heal effect (including revive)
+     * Note: effect.amount is whole percent (20 = 20% of max HP)
      */
     processTileHeal(effect, sourceName) {
-        let heal = effect.amount;
+        let healPercent = effect.amount;
         this.manager.party.all.forEach(member => {
-            let amount = Math.floor(member.maxHitpoints * heal);
+            let amount = Math.floor(member.maxHitpoints * healPercent / 100);
             if(member.dead) {
-                member.revive({ amount: amount });
+                // Pass the percent directly to revive (it expects whole percent)
+                member.revive({ amount: healPercent });
                 this.manager.log.add(`${sourceName} revived ${member.name} to ${amount} health.`);
             } else {
                 member.heal({ amount: amount });

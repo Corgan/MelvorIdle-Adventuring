@@ -1,6 +1,6 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { formatRequirement } = await loadModule('src/core/adventuring-utils.mjs');
+const { formatRequirement, describeEffect } = await loadModule('src/core/adventuring-utils.mjs');
 
 /**
  * Tooltip builder utility - creates styled tooltips matching Melvor's style
@@ -113,6 +113,111 @@ export class TooltipBuilder {
     }
 
     /**
+     * Add a source hint with optional icon
+     * Used to show where an item/monster/etc comes from
+     * @param {string} text - The source description (e.g., "Drops from: Goblin")
+     * @param {string} [iconSrc] - Optional icon URL
+     */
+    source(text, iconSrc = null) {
+        let html = '<div class="text-center"><small class="text-muted">';
+        if(iconSrc) {
+            html += `<img class="skill-icon-xxs mr-1" src="${iconSrc}">`;
+        }
+        html += `${text}</small></div>`;
+        this.sections.push(html);
+        return this;
+    }
+
+    /**
+     * Add source hints from an array of source objects (monsters, areas, etc.)
+     * Shows up to 3 sources with "+N more" if there are more
+     * @param {Array} sources - Array of source objects with .name property
+     * @param {string} prefix - Prefix text (e.g., "Drops from", "Found in")
+     */
+    sourceHint(sources, prefix) {
+        if(!sources || sources.length === 0) return this;
+        const sourceNames = sources.slice(0, 3).map(s => s.name);
+        let sourceText = sourceNames.join(', ');
+        if(sources.length > 3) {
+            sourceText += ` +${sources.length - 3} more`;
+        }
+        return this.source(`${prefix}: ${sourceText}`);
+    }
+
+    /**
+     * Add modifier bonuses from the manager's modifier system
+     * Uses describeEffect to format the bonus descriptions
+     * @param {Object} manager - The adventuring manager
+     * @param {Object} action - The mastery action to get bonuses for
+     * @param {Array<string>} modifierTypes - Array of modifier type strings to check
+     */
+    modifierBonuses(manager, action, modifierTypes) {
+        const bonuses = modifierTypes
+            .map(type => ({ type, value: manager.modifiers.getBonus(type, { action }) }))
+            .filter(b => b.value > 0);
+        
+        if(bonuses.length === 0) return this;
+        
+        this.separator();
+        bonuses.forEach(b => {
+            this.bonus(describeEffect(b, manager));
+        });
+        return this;
+    }
+
+    /**
+     * Add a list of effects as bonus/penalty lines using describeEffect
+     * @param {Array} effects - Array of effect objects {type, value, ...}
+     * @param {Object} [manager] - Optional manager for describeEffect
+     * @param {boolean} [addSeparator=true] - Whether to add separator before effects
+     */
+    effects(effects, manager = null, addSeparator = true) {
+        if(!effects || effects.length === 0) return this;
+        
+        if(addSeparator) this.separator();
+        effects.forEach(e => {
+            const description = describeEffect(e, manager);
+            // Negative values or penalty types get penalty styling
+            const isPenalty = e.value < 0 || e.type?.includes('enemy_') || e.type?.includes('_cost');
+            if(isPenalty) {
+                this.penalty(description);
+            } else {
+                this.bonus(description);
+            }
+        });
+        return this;
+    }
+
+    /**
+     * Add difficulty mode header and effects
+     * @param {Object} difficulty - Difficulty object with name, color, getTooltipEffects(), isEndless
+     * @param {Object} [manager] - Optional manager for describeEffect
+     */
+    difficultyInfo(difficulty, manager = null) {
+        if(!difficulty) return this;
+        
+        this.separator();
+        this.subheader(`${difficulty.name} Mode`, difficulty.color);
+        
+        // Use the difficulty's tooltip effects method
+        const effects = difficulty.getTooltipEffects?.() || [];
+        effects.forEach(e => {
+            const description = describeEffect(e, manager);
+            const isPenalty = e.type?.includes('enemy_') || e.value < 0;
+            if(isPenalty) {
+                this.penalty(description);
+            } else {
+                this.bonus(description);
+            }
+        });
+        
+        if(difficulty.isEndless) {
+            this.info('Difficulty scales with each wave');
+        }
+        return this;
+    }
+
+    /**
      * Add a warning line
      */
     warning(text) {
@@ -203,13 +308,355 @@ export class TooltipBuilder {
      * Create a simple material tooltip showing name, icon, and owned count.
      * Used for material displays in costs, rewards, etc.
      * @param {Object} material - Material object with name, media, count
+     * @param {Object} [manager] - Optional adventuring manager for source hints
      * @returns {TooltipBuilder} This builder for chaining
      */
-    static forMaterial(material) {
-        return TooltipBuilder.create()
+    static forMaterial(material, manager = null) {
+        const tooltip = TooltipBuilder.create()
             .header(material.name, material.media)
             .separator()
             .text(`Owned: ${material.count}`, 'text-center');
+        
+        // Add source hints if manager is available
+        if(manager?.materialSources) {
+            tooltip.sourceHint(manager.materialSources.get(material), 'Drops from');
+        }
+        
+        return tooltip;
+    }
+
+    /**
+     * Create a job tooltip showing name, icon, mastery progress, stats, and milestones.
+     * @param {Object} job - Job object with name, media, stats, requirements, isMilestoneReward
+     * @param {Object} manager - The adventuring manager
+     * @returns {TooltipBuilder} This builder for chaining
+     */
+    static forJob(job, manager) {
+        const tooltip = TooltipBuilder.create()
+            .header(job.name, job.media);
+
+        if(job.unlocked && job.isMilestoneReward) {
+            tooltip.masteryProgressFor(manager, job);
+            tooltip.stats(job.stats);
+            tooltip.nextMilestone(manager, job);
+        } else if(!job.unlocked) {
+            tooltip.unlockRequirements(job.requirements, manager);
+        }
+        
+        return tooltip;
+    }
+
+    /**
+     * Create an ability tooltip (generator, spender, or passive).
+     * @param {Object} ability - Ability object with name, description, energy/cost, requirements
+     * @param {Object} options - Configuration options
+     * @param {Object} [options.character] - Character object for stat-based description scaling
+     * @param {Object} [options.manager] - Adventuring manager for job lookups
+     * @param {string} [options.type] - Ability type: 'generator', 'spender', or 'passive'
+     * @param {boolean} [options.showUnlockLevel=false] - Whether to show unlock level info
+     * @param {Object} [options.masteryAction] - Action to check mastery level for unlock requirements
+     * @returns {TooltipBuilder} This builder for chaining
+     */
+    static forAbility(ability, options = {}) {
+        const { character, manager, type, showUnlockLevel = false, masteryAction } = options;
+        const isUnlocked = ability.unlocked !== undefined ? ability.unlocked : true;
+        
+        const tooltip = TooltipBuilder.create()
+            .header(isUnlocked ? ability.name : '???');
+        
+        // Type badge if provided
+        if(type) {
+            const typeColors = { generator: 'text-info', spender: 'text-warning', passive: 'text-success' };
+            const typeLabels = { generator: 'Generator', spender: 'Spender', passive: 'Passive' };
+            tooltip.info(`<span class="${typeColors[type]}">${typeLabels[type]}</span>`);
+        }
+        
+        // Usable by section (before description when type is provided)
+        if(manager && type) {
+            const req = ability.requirements?.find(r => r.type === 'job_level' || r.type === 'current_job_level');
+            if(req) {
+                const job = manager.jobs.getObjectByID(req.job);
+                if(job) {
+                    tooltip.separator();
+                    if(req.type === 'current_job_level') {
+                        tooltip.hint(`Usable by: <img class="skill-icon-xxs mr-1" src="${job.media}">${job.name}`);
+                    } else {
+                        tooltip.hint(`Usable by: All Jobs`);
+                    }
+                }
+            } else {
+                tooltip.separator();
+                tooltip.hint(`Usable by: All Jobs`);
+            }
+        }
+        
+        // Description with stats
+        tooltip.separator();
+        if(isUnlocked) {
+            const desc = ability.getDescription ? ability.getDescription(character, true) : ability.description;
+            tooltip.info(desc);
+        } else {
+            tooltip.warning('???');
+        }
+        
+        // Energy cost/generation (for non-passives when unlocked)
+        if(type !== 'passive' && isUnlocked) {
+            if(ability.energy !== undefined) {
+                tooltip.separator();
+                tooltip.bonus(`+${ability.energy} Energy`);
+            } else if(ability.cost !== undefined) {
+                tooltip.separator();
+                tooltip.penalty(`-${ability.cost} Energy`);
+            }
+        }
+        
+        // Usable by section (after description when no type is provided - combat selector style)
+        if(manager && !type) {
+            const req = ability.requirements?.find(r => r.type === 'job_level' || r.type === 'current_job_level');
+            if(req) {
+                const job = manager.jobs.getObjectByID(req.job);
+                if(job) {
+                    tooltip.separator();
+                    if(req.type === 'current_job_level') {
+                        tooltip.hint(`Usable by: <img class="skill-icon-xxs mr-1" src="${job.media}">${job.name}`);
+                    } else {
+                        tooltip.hint(`Usable by: All Jobs`);
+                    }
+                    if(showUnlockLevel) {
+                        tooltip.text(`<img class="skill-icon-xxs mr-1" src="${job.media}">Learned from ${job.name} Lv.${req.level}`, 'text-muted text-center');
+                    }
+                }
+            } else {
+                tooltip.separator();
+                tooltip.hint(`Usable by: All Jobs`);
+            }
+        }
+        
+        // Unlock requirement with progress
+        if(showUnlockLevel && masteryAction && manager) {
+            const req = ability.requirements?.find(r => r.type === 'job_level' || r.type === 'current_job_level');
+            if(req) {
+                const currentLevel = manager.getMasteryLevel(masteryAction);
+                tooltip.separator();
+                if(isUnlocked) {
+                    tooltip.text(`Unlocked at Lv.${req.level}`, 'text-success');
+                } else {
+                    tooltip.warning(`Requires Lv.${req.level} (${currentLevel}/${req.level})`);
+                }
+            }
+        }
+        
+        return tooltip;
+    }
+
+    /**
+     * Create an equipment tooltip showing name, stats, upgrade info, and requirements.
+     * @param {Object} item - Equipment item with name, media, stats, upgradeLevel, jobs, etc.
+     * @param {Object} manager - The adventuring manager
+     * @returns {TooltipBuilder} This builder for chaining
+     */
+    static forEquipment(item, manager) {
+        const tooltip = TooltipBuilder.create()
+            .header(item.name, item.media);
+
+        if(item.unlocked) {
+            // Upgrade stars
+            const empty = `<i class="far fa-star text-muted"></i>`;
+            const solid = `<i class="fa fa-star text-warning"></i>`;
+            const half = `<i class="fa fa-star-half-alt text-warning"></i>`;
+    
+            const starCount = Math.floor(item.upgradeLevel / 2);
+            const halfStarCount = item.upgradeLevel % 2;
+            const emptyStarCount = ((item.maxUpgrades/2) - (starCount + halfStarCount));
+            const stars = [...new Array(starCount).fill(solid), ...new Array(halfStarCount).fill(half), ...new Array(emptyStarCount).fill(empty)];
+
+            tooltip.text(stars.join(''), 'text-center');
+            
+            // Level info
+            if(item.upgradeLevel > 0) {
+                if(item.level < item.levelCap) {
+                    tooltip.masteryProgressFor(manager, item);
+                    tooltip.hint(`Max Level: ${item.levelCap}`);
+                } else {
+                    tooltip.subheader(`Level ${item.level} / ${item.levelCap}`, 'text-warning');
+                }
+            } else {
+                tooltip.hint(`Max Level: ${item.levelCap} (unlock to level up)`);
+            }
+
+            // Stats
+            tooltip.stats(item.stats);
+
+            // Usable by jobs
+            tooltip.usableByJobs(item.jobs, manager);
+            
+            // Equipment Set info
+            if(item.set) {
+                tooltip.separator();
+                tooltip.subheader(item.set.name, 'text-info');
+                item.set.bonuses.forEach(bonus => {
+                    tooltip.text(`<span class="text-muted">(${bonus.pieces}pc)</span> ${bonus.description}`, 'small');
+                });
+            }
+            
+            // Special effects
+            if(item.effects && item.effects.length > 0) {
+                tooltip.separator();
+                item.getEffectDescriptions().forEach(desc => {
+                    tooltip.info(desc);
+                });
+            }
+            
+            // Next milestone
+            tooltip.nextMilestone(manager, item);
+        }
+        
+        return tooltip;
+    }
+
+    /**
+     * Create a monster tooltip showing name, icon, mastery progress, and drop bonuses.
+     * @param {Object} monster - Monster object with name, media, unlocked
+     * @param {Object} manager - The adventuring manager
+     * @returns {TooltipBuilder} This builder for chaining
+     */
+    static forMonster(monster, manager) {
+        const tooltip = TooltipBuilder.create()
+            .header(monster.name, monster.media);
+
+        if(monster.unlocked) {
+            tooltip.masteryProgressFor(manager, monster);
+            
+            // Get mastery bonuses from modifier system
+            tooltip.modifierBonuses(manager, monster, ['drop_rate_percent', 'drop_quantity_percent']);
+            
+            // Next milestone
+            tooltip.nextMilestone(manager, monster);
+        } else {
+            tooltip.separator();
+            tooltip.hint('Defeat this monster to unlock');
+        }
+        
+        // Source hints - which areas contain this monster
+        tooltip.sourceHint(manager.monsterSources?.get(monster), 'Found in');
+        
+        return tooltip;
+    }
+
+    /**
+     * Create an area tooltip showing name, mastery progress, bonuses, and difficulty.
+     * @param {Object} area - Area object with name, media, unlocked, etc.
+     * @param {Object} manager - The adventuring manager
+     * @returns {TooltipBuilder} This builder for chaining
+     */
+    static forArea(area, manager) {
+        const tooltip = TooltipBuilder.create()
+            .header(area.name, area.media);
+
+        if(area.unlocked) {
+            tooltip.masteryProgressFor(manager, area);
+            
+            // Dungeon Mastery bonuses from area
+            tooltip.effects(area.getMasteryBonusEffects(), manager);
+            
+            // Auto-run status (special case - not an effect)
+            if(area.autoRepeatUnlocked) {
+                const isActive = manager.autoRepeatArea === area;
+                if(isActive) {
+                    tooltip.info('Auto-Run ACTIVE');
+                } else {
+                    tooltip.hint('Auto-Run Available');
+                }
+            }
+            
+            // Next milestone
+            const nextMilestone = area.getNextMilestone();
+            if(nextMilestone) {
+                const description = nextMilestone.description || 
+                    (nextMilestone.effects?.map(e => describeEffect(e, manager)).join(', ') || 'Unknown');
+                tooltip.separator().nextUnlock(nextMilestone.level, description);
+            } else {
+                tooltip.separator().warning('Mastered!');
+            }
+
+            // Difficulty modes
+            tooltip.difficultyInfo(area.getDifficulty(), manager);
+            
+            if(area.bestEndlessStreak > 0) {
+                tooltip.separator().warning(`Best Endless: ${area.bestEndlessStreak} waves`);
+            }
+
+            // Mastery Aura (Level 99)
+            if(area.masteryAura) {
+                tooltip.separator();
+                if(area.masteryAuraUnlocked) {
+                    tooltip.warning(area.masteryAura.name);
+                    tooltip.bonus(area.masteryAura._description || area.masteryAura.description);
+                } else {
+                    tooltip.nextUnlock(99, area.masteryAura.name);
+                }
+            }
+        } else {
+            // Show unlock requirements for locked areas
+            tooltip.unlockRequirements(area.requirements, manager);
+        }
+        
+        return tooltip;
+    }
+
+    /**
+     * Create a consumable tooltip showing name, type, description, charges, and cost.
+     * @param {Object} consumable - Consumable object with name, media, type, description, charges, etc.
+     * @returns {TooltipBuilder} This builder for chaining
+     */
+    static forConsumable(consumable) {
+        const typeLabel = consumable.type ? (consumable.type.charAt(0).toUpperCase() + consumable.type.slice(1)) : 'Consumable';
+        const tooltip = TooltipBuilder.create()
+            .header(consumable.name, consumable.media)
+            .subheader(typeLabel)
+            .hint(consumable.description)
+            .separator();
+        
+        if(consumable.isTavernDrink) {
+            // Show runs remaining for tavern drinks (charges = runs)
+            if(consumable.charges > 0) {
+                tooltip.bonus(`Active: ${consumable.charges} runs remaining`);
+            }
+        } else {
+            // Show charges for charge-based consumables
+            tooltip.warning(`Charges: ${consumable.charges}/${consumable.maxCharges}`);
+        }
+        
+        if(consumable.materials !== undefined && consumable.materials.size > 0 && consumable.charges < consumable.maxCharges) {
+            tooltip.separator().hint('Craft Cost:');
+            const costItems = [];
+            consumable.materials.forEach((qty, material) => {
+                const owned = material.count;
+                const color = owned >= qty ? 'text-success' : 'text-danger';
+                costItems.push(tooltip.iconValue(material.media, `<span class="${color}">${qty}</span> <small class="text-muted">(${owned})</small>`));
+            });
+            tooltip.statRow(...costItems);
+        }
+        
+        return tooltip;
+    }
+
+    /**
+     * Create a building tooltip showing name, description, and unlock requirements.
+     * @param {Object} building - Building object with name, media, description, unlocked, requirements
+     * @param {Object} manager - The adventuring manager
+     * @returns {TooltipBuilder} This builder for chaining
+     */
+    static forBuilding(building, manager) {
+        const tooltip = TooltipBuilder.create()
+            .header(building.name, building.media)
+            .hint(building.description);
+        
+        if(!building.unlocked) {
+            tooltip.unlockRequirements(building.requirements, manager);
+        }
+        
+        return tooltip;
     }
 
     /**
@@ -289,7 +736,10 @@ export class TooltipBuilder {
         const nextMilestone = manager.getNextMasteryUnlock(level, categoryId);
         if(nextMilestone) {
             if(addSeparator) this.separator();
-            this.nextUnlock(nextMilestone.level, nextMilestone.description);
+            // Generate description from effects if not explicitly provided
+            const description = nextMilestone.description || 
+                (nextMilestone.effects?.map(e => describeEffect(e, manager)).join(', ') || 'Unknown');
+            this.nextUnlock(nextMilestone.level, description);
         } else if(level >= 99) {
             if(addSeparator) this.separator();
             this.warning('Mastered!');

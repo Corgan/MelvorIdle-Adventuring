@@ -1,4 +1,8 @@
-export class AdventuringAreaElement extends HTMLElement {
+const { loadModule } = mod.getContext(import.meta);
+
+const { AdventuringTooltipElement } = await loadModule('src/core/adventuring-tooltip-element.mjs');
+
+export class AdventuringAreaElement extends AdventuringTooltipElement {
     constructor() {
         super();
         this._content = new DocumentFragment();
@@ -19,26 +23,17 @@ export class AdventuringAreaElement extends HTMLElement {
         
         this.autoRepeatContainer = getElementFromFragment(this._content, 'auto-repeat-container', 'div');
         this.autoRepeat = getElementFromFragment(this._content, 'auto-repeat', 'input');
-    }
-
-    mount(parent) {
-        parent.append(this);
+        
+        this._tooltipTarget = this.card;
     }
 
     connectedCallback() {
         this.appendChild(this._content);
-        this.tooltip = tippy(this.card, {
-            content: '',
-            allowHTML: true,
-            hideOnClick: false
-        });
+        super.connectedCallback();
     }
 
     disconnectedCallback() {
-        if (this.tooltip !== undefined) {
-            this.tooltip.destroy();
-            this.tooltip = undefined;
-        }
+        super.disconnectedCallback();
     }
 }
 window.customElements.define('adventuring-area', AdventuringAreaElement);

@@ -2,730 +2,1164 @@
     "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
     "namespace": "adventuring",
     "data": {
-        "skillData": [{
-            "skillID": "adventuring:Adventuring",
-            "data": {
-                "passives": [
-                    {
-                        "id": "crystal_resonance",
-                        "name": "Crystal Resonance",
-                        "effects": [
-                            {
-                                "trigger": "encounter_start",
-                                "type": "buff",
-                                "id": "adventuring:focus",
-                                "target": "self",
-                                "stacks": 4
-                            },
-                            {
-                                "trigger": "encounter_start",
-                                "type": "buff",
-                                "id": "adventuring:barrier",
-                                "target": "self",
-                                "stacks": 3
-                            }
-                        ]
-                    },
-                    {
-                        "id": "prismatic_light",
-                        "name": "Prismatic Light",
-                        "effects": [
-                            {
-                                "trigger": "encounter_start",
-                                "type": "buff",
-                                "id": "adventuring:might",
-                                "target": "self",
-                                "stacks": 3
-                            },
-                            {
-                                "trigger": "encounter_start",
-                                "type": "buff",
-                                "id": "adventuring:haste",
-                                "target": "self",
-                                "stacks": 3
-                            }
-                        ]
-                    },
-                    {
-                        "id": "gem_power",
-                        "name": "Gem Power",
-                        "effects": [
-                            {
-                                "trigger": "on_kill",
-                                "type": "buff",
-                                "id": "adventuring:focus",
-                                "target": "self",
-                                "stacks": 6
-                            },
-                            {
-                                "trigger": "on_kill",
-                                "type": "heal",
-                                "target": "self",
-                                "amount": 20,
-                                "scaling": 2.0
-                            }
-                        ]
-                    }
-                ],
-                "areas": [
-                    {
-                        "id": "crystal_caverns",
-                        "name": "Crystal Caverns",
-                        "media": "melvor:assets/media/skills/mining/mining.png",
-                        "requirements": [
-                            { "type": "skill_level", "level": 67 }
-                        ],
-                        "width": 15,
-                        "height": 8,
-                        "floors": [
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:crystal_golem", "weight": 45 },
-                                    { "id": "adventuring:gem_sprite", "weight": 35 },
-                                    { "id": "adventuring:cave_crawler", "weight": 20 }
-                                ],
-                                "exit": ["adventuring:crystal_golem", "adventuring:gem_sprite", "adventuring:cave_crawler"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:gem_sprite", "weight": 35 },
-                                    { "id": "adventuring:quartz_elemental", "weight": 35 },
-                                    { "id": "adventuring:crystal_golem", "weight": 30 }
-                                ],
-                                "exit": ["adventuring:gem_sprite", "adventuring:quartz_elemental", "adventuring:crystal_golem"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:quartz_elemental", "weight": 30 },
-                                    { "id": "adventuring:ruby_guardian", "weight": 35 },
-                                    { "id": "adventuring:sapphire_sentinel", "weight": 35 }
-                                ],
-                                "exit": ["adventuring:quartz_elemental", "adventuring:ruby_guardian", "adventuring:sapphire_sentinel"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:ruby_guardian", "weight": 30 },
-                                    { "id": "adventuring:sapphire_sentinel", "weight": 30 },
-                                    { "id": "adventuring:emerald_warden", "weight": 40 }
-                                ],
-                                "exit": ["adventuring:ruby_guardian", "adventuring:sapphire_sentinel", "adventuring:emerald_warden"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:emerald_warden", "weight": 35 },
-                                    { "id": "adventuring:diamond_construct", "weight": 40 },
-                                    { "id": "adventuring:ruby_guardian", "weight": 25 }
-                                ],
-                                "exit": ["adventuring:emerald_warden", "adventuring:diamond_construct", "adventuring:the_prismatic_core"]
-                            }
-                        ]
-                    }
-                ],
-                "monsters": [
-                    {
-                        "id": "crystal_golem",
-                        "name": "Crystal Golem",
-                        "media": "melvor:assets/media/monsters/rock_crab.png",
-                        "tags": ["elemental", "melee"],
-                        "xp": 450,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 175 },
-                            { "id": "adventuring:defence", "value": 55 },
-                            { "id": "adventuring:agility", "value": 15 },
-                            { "id": "adventuring:strength", "value": 50 },
-                            { "id": "adventuring:ranged", "value": 10 },
-                            { "id": "adventuring:magic", "value": 30 },
-                            { "id": "adventuring:prayer", "value": 15 }
-                        ],
-                        "generator": "adventuring:crystal_strike",
-                        "spender": "adventuring:shatter",
-                        "passives": [],
-                        "loot": [
-                            { "id": "adventuring:crystal_shard", "weight": 55, "minQty": 2, "maxQty": 4 },
-                            { "id": "adventuring:prismatic_dust", "weight": 30, "minQty": 1, "maxQty": 2 },
-                            { "id": "adventuring:currency", "weight": 15, "minQty": 120, "maxQty": 200 }
-                        ]
-                    },
-                    {
-                        "id": "gem_sprite",
-                        "name": "Gem Sprite",
-                        "media": "melvor:assets/media/monsters/fairy.png",
-                        "tags": ["elemental", "mage"],
-                        "xp": 420,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 105 },
-                            { "id": "adventuring:defence", "value": 28 },
-                            { "id": "adventuring:agility", "value": 45 },
-                            { "id": "adventuring:strength", "value": 20 },
-                            { "id": "adventuring:ranged", "value": 25 },
-                            { "id": "adventuring:magic", "value": 55 },
-                            { "id": "adventuring:prayer", "value": 25 }
-                        ],
-                        "generator": "adventuring:gem_bolt",
-                        "spender": "adventuring:diamond_storm",
-                        "passives": [],
-                        "loot": [
-                            { "id": "adventuring:prismatic_dust", "weight": 55, "minQty": 2, "maxQty": 4 },
-                            { "id": "adventuring:crystal_shard", "weight": 30, "minQty": 1, "maxQty": 2 },
-                            { "id": "adventuring:currency", "weight": 15, "minQty": 100, "maxQty": 180 }
-                        ]
-                    },
-                    {
-                        "id": "cave_crawler",
-                        "name": "Cave Crawler",
-                        "media": "melvor:assets/media/monsters/moist_monster.png",
-                        "tags": ["beast", "melee"],
-                        "xp": 400,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 130 },
-                            { "id": "adventuring:defence", "value": 35 },
-                            { "id": "adventuring:agility", "value": 40 },
-                            { "id": "adventuring:strength", "value": 45 },
-                            { "id": "adventuring:ranged", "value": 15 },
-                            { "id": "adventuring:magic", "value": 15 },
-                            { "id": "adventuring:prayer", "value": 10 }
-                        ],
-                        "generator": "adventuring:toxic_mandibles",
-                        "spender": "adventuring:burrow",
-                        "passives": [],
-                        "loot": [
-                            { "id": "adventuring:crystal_shard", "weight": 50, "minQty": 1, "maxQty": 3 },
-                            { "id": "adventuring:prismatic_dust", "weight": 35, "minQty": 1, "maxQty": 2 },
-                            { "id": "adventuring:currency", "weight": 15, "minQty": 90, "maxQty": 160 }
-                        ]
-                    },
-                    {
-                        "id": "quartz_elemental",
-                        "name": "Quartz Elemental",
-                        "media": "melvor:assets/media/monsters/statue.png",
-                        "tags": ["elemental", "mage"],
-                        "xp": 470,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 155 },
-                            { "id": "adventuring:defence", "value": 48 },
-                            { "id": "adventuring:agility", "value": 25 },
-                            { "id": "adventuring:strength", "value": 42 },
-                            { "id": "adventuring:ranged", "value": 15 },
-                            { "id": "adventuring:magic", "value": 45 },
-                            { "id": "adventuring:prayer", "value": 20 }
-                        ],
-                        "generator": "adventuring:crystal_strike",
-                        "spender": "adventuring:resonance",
-                        "passives": [],
-                        "loot": [
-                            { "id": "adventuring:crystal_shard", "weight": 50, "minQty": 2, "maxQty": 4 },
-                            { "id": "adventuring:prismatic_dust", "weight": 35, "minQty": 2, "maxQty": 3 },
-                            { "id": "adventuring:currency", "weight": 15, "minQty": 140, "maxQty": 220 }
-                        ]
-                    },
-                    {
-                        "id": "ruby_guardian",
-                        "name": "Ruby Guardian",
-                        "media": "melvor:assets/media/monsters/statue.png",
-                        "tags": ["elemental", "melee"],
-                        "xp": 500,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 180 },
-                            { "id": "adventuring:defence", "value": 52 },
-                            { "id": "adventuring:agility", "value": 22 },
-                            { "id": "adventuring:strength", "value": 60 },
-                            { "id": "adventuring:ranged", "value": 12 },
-                            { "id": "adventuring:magic", "value": 35 },
-                            { "id": "adventuring:prayer", "value": 18 }
-                        ],
-                        "generator": "adventuring:fire_strike",
-                        "spender": "adventuring:ruby_flare",
-                        "passives": [],
-                        "loot": [
-                            { "id": "adventuring:ruby_fragment", "weight": 50, "minQty": 2, "maxQty": 4 },
-                            { "id": "adventuring:crystal_shard", "weight": 35, "minQty": 1, "maxQty": 3 },
-                            { "id": "adventuring:currency", "weight": 15, "minQty": 160, "maxQty": 250 }
-                        ]
-                    },
-                    {
-                        "id": "sapphire_sentinel",
-                        "name": "Sapphire Sentinel",
-                        "media": "melvor:assets/media/monsters/statue.png",
-                        "tags": ["elemental", "mage"],
-                        "xp": 500,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 165 },
-                            { "id": "adventuring:defence", "value": 50 },
-                            { "id": "adventuring:agility", "value": 30 },
-                            { "id": "adventuring:strength", "value": 45 },
-                            { "id": "adventuring:ranged", "value": 18 },
-                            { "id": "adventuring:magic", "value": 52 },
-                            { "id": "adventuring:prayer", "value": 22 }
-                        ],
-                        "generator": "adventuring:sapphire_lance",
-                        "spender": "adventuring:frozen_burst",
-                        "passives": [],
-                        "loot": [
-                            { "id": "adventuring:sapphire_chip", "weight": 50, "minQty": 2, "maxQty": 4 },
-                            { "id": "adventuring:crystal_shard", "weight": 35, "minQty": 1, "maxQty": 3 },
-                            { "id": "adventuring:currency", "weight": 15, "minQty": 160, "maxQty": 250 }
-                        ]
-                    },
-                    {
-                        "id": "emerald_warden",
-                        "name": "Emerald Warden",
-                        "media": "melvor:assets/media/monsters/statue.png",
-                        "tags": ["elemental", "mage"],
-                        "xp": 540,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 195 },
-                            { "id": "adventuring:defence", "value": 55 },
-                            { "id": "adventuring:agility", "value": 28 },
-                            { "id": "adventuring:strength", "value": 52 },
-                            { "id": "adventuring:ranged", "value": 20 },
-                            { "id": "adventuring:magic", "value": 40 },
-                            { "id": "adventuring:prayer", "value": 35 }
-                        ],
-                        "generator": "adventuring:verdant_bolt",
-                        "spender": "adventuring:emerald_restoration",
-                        "passives": [],
-                        "loot": [
-                            { "id": "adventuring:prismatic_dust", "weight": 45, "minQty": 3, "maxQty": 5 },
-                            { "id": "adventuring:crystal_shard", "weight": 40, "minQty": 2, "maxQty": 4 },
-                            { "id": "adventuring:currency", "weight": 15, "minQty": 180, "maxQty": 280 }
-                        ]
-                    },
-                    {
-                        "id": "diamond_construct",
-                        "name": "Diamond Construct",
-                        "media": "melvor:assets/media/monsters/statue.png",
-                        "tags": ["elemental", "melee"],
-                        "xp": 580,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 220 },
-                            { "id": "adventuring:defence", "value": 65 },
-                            { "id": "adventuring:agility", "value": 20 },
-                            { "id": "adventuring:strength", "value": 58 },
-                            { "id": "adventuring:ranged", "value": 15 },
-                            { "id": "adventuring:magic", "value": 50 },
-                            { "id": "adventuring:prayer", "value": 25 }
-                        ],
-                        "generator": "adventuring:crystal_strike",
-                        "spender": "adventuring:crystalline_tempest",
-                        "passives": [],
-                        "loot": [
-                            { "id": "adventuring:crystal_shard", "weight": 45, "minQty": 4, "maxQty": 7 },
-                            { "id": "adventuring:prismatic_dust", "weight": 40, "minQty": 3, "maxQty": 5 },
-                            { "id": "adventuring:currency", "weight": 15, "minQty": 200, "maxQty": 320 }
-                        ]
-                    },
-                    {
-                        "id": "the_prismatic_core",
-                        "name": "The Prismatic Core",
-                        "media": "melvor:assets/media/monsters/air_golem.png",
-                        "tags": ["elemental", "boss"],
-                        "isBoss": true,
-                        "xp": 820,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 500 },
-                            { "id": "adventuring:defence", "value": 70 },
-                            { "id": "adventuring:agility", "value": 35 },
-                            { "id": "adventuring:strength", "value": 65 },
-                            { "id": "adventuring:ranged", "value": 30 },
-                            { "id": "adventuring:magic", "value": 70 },
-                            { "id": "adventuring:prayer", "value": 45 }
-                        ],
-                        "generator": "adventuring:prismatic_blast",
-                        "spender": "adventuring:crystal_apocalypse",
-                        "passives": ["adventuring:crystal_resonance", "adventuring:prismatic_light"],
-                        "loot": [
-                            { "id": "adventuring:prismatic_core", "weight": 100, "minQty": 1, "maxQty": 2 },
-                            { "id": "adventuring:crystal_shard", "weight": 100, "minQty": 6, "maxQty": 10 },
-                            { "id": "adventuring:prismatic_dust", "weight": 100, "minQty": 5, "maxQty": 8 },
-                            { "id": "adventuring:ruby_fragment", "weight": 100, "minQty": 3, "maxQty": 5 },
-                            { "id": "adventuring:sapphire_chip", "weight": 100, "minQty": 3, "maxQty": 5 }
-                        ]
-                    }
-                ],
-                "generators": [
-                    {
-                        "id": "verdant_bolt",
-                        "name": "Verdant Bolt",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "energy": 26,
-                        "hits": [
-                            {
-                                "target": "single_enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "damage_type": "magic",
-                                        "amount": 16,
-                                        "scaling": 1.15
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "crystal_strike",
-                        "name": "Crystal Strike",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "energy": 28,
-                        "hits": [
-                            {
-                                "target": "single_enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "damage_type": "strength",
-                                        "amount": 18,
-                                        "scaling": 1.2
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "gem_bolt",
-                        "name": "Gem Bolt",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "energy": 25,
-                        "hits": [
-                            {
-                                "target": "single_enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "damage_type": "magic",
-                                        "amount": 15,
-                                        "scaling": 1.1
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "toxic_mandibles",
-                        "name": "Toxic Mandibles",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "energy": 25,
-                        "hits": [
-                            {
-                                "target": "single_enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "damage_type": "strength",
-                                        "amount": 14,
-                                        "scaling": 1.0
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "fire_strike",
-                        "name": "Fire Strike",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "energy": 28,
-                        "hits": [
-                            {
-                                "target": "single_enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "damage_type": "magic",
-                                        "amount": 18,
-                                        "scaling": 1.2
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "sapphire_lance",
-                        "name": "Sapphire Lance",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "energy": 25,
-                        "hits": [
-                            {
-                                "target": "single_enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "damage_type": "magic",
-                                        "amount": 16,
-                                        "scaling": 1.1
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "prismatic_blast",
-                        "name": "Prismatic Blast",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "energy": 30,
-                        "hits": [
-                            {
-                                "target": "single_enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "damage_type": "magic",
-                                        "amount": 22,
-                                        "scaling": 1.3
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ],
-                "spenders": [
-                    {
-                        "id": "frozen_burst",
-                        "name": "Frozen Burst",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 70,
-                        "hits": [
-                            {
-                                "target": "all_enemies",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "damage_type": "magic",
-                                        "amount": 20,
-                                        "scaling": 1.1
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:slow",
-                                        "stacks": 2
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "emerald_restoration",
-                        "name": "Emerald Restoration",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 65,
-                        "hits": [
-                            {
-                                "target": "all_allies",
-                                "effects": [
-                                    {
-                                        "type": "heal",
-                                        "amount": 25,
-                                        "scaling": 0.9
-                                    },
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:regeneration",
-                                        "stacks": 2
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "shatter",
-                        "name": "Shatter",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 65,
-                        "hits": [
-                            {
-                                "target": "all_enemies",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "damage_type": "strength",
-                                        "amount": 15,
-                                        "scaling": 0.9
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "burrow",
-                        "name": "Burrow",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 50,
-                        "hits": [
-                            {
-                                "target": "self",
-                                "effects": [
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:evasion",
-                                        "stacks": 5
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "resonance",
-                        "name": "Resonance",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 60,
-                        "hits": [
-                            {
-                                "target": "all_allies",
-                                "effects": [
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:focus",
-                                        "stacks": 3
-                                    },
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:barrier",
-                                        "stacks": 2
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "ruby_flare",
-                        "name": "Ruby Flare",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 75,
-                        "hits": [
-                            {
-                                "target": "all_enemies",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "damage_type": "magic",
-                                        "amount": 20,
-                                        "scaling": 1.1
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:burn",
-                                        "stacks": 3
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "crystalline_tempest",
-                        "name": "Crystalline Tempest",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 75,
-                        "hits": [
-                            {
-                                "target": "all_enemies",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "damage_type": "magic",
-                                        "amount": 18,
-                                        "scaling": 1.0
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:slow",
-                                        "stacks": 3
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "diamond_storm",
-                        "name": "Diamond Storm",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 85,
-                        "hits": [
-                            {
-                                "target": "all_enemies",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "damage_type": "strength",
-                                        "amount": 25,
-                                        "scaling": 1.2
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "crystal_apocalypse",
-                        "name": "Crystal Apocalypse",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 100,
-                        "hits": [
-                            {
-                                "target": "all_enemies",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "damage_type": "magic",
-                                        "amount": 32,
-                                        "scaling": 1.4
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:weaken",
-                                        "stacks": 4
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ],
-                "materials": [
-                    {
-                        "id": "crystal_shard",
-                        "name": "Crystal Shard",
-                        "media": "melvor:assets/media/bank/diamond.png",
-                        "category": "adventuring:monster_drops"
-                    },
-                    {
-                        "id": "prismatic_dust",
-                        "name": "Prismatic Dust",
-                        "media": "melvor:assets/media/bank/stardust.png",
-                        "category": "adventuring:monster_drops"
-                    },
-                    {
-                        "id": "ruby_fragment",
-                        "name": "Ruby Fragment",
-                        "media": "melvor:assets/media/bank/ruby.png",
-                        "category": "adventuring:monster_drops"
-                    },
-                    {
-                        "id": "sapphire_chip",
-                        "name": "Sapphire Chip",
-                        "media": "melvor:assets/media/bank/sapphire.png",
-                        "category": "adventuring:monster_drops"
-                    },
-                    {
-                        "id": "prismatic_core",
-                        "name": "Prismatic Core",
-                        "media": "melvor:assets/media/bank/chest_purple.png",
-                        "category": "adventuring:boss_drops"
-                    }
-                ]
+        "skillData": [
+            {
+                "skillID": "adventuring:Adventuring",
+                "data": {
+                    "passives": [
+                        {
+                            "id": "crystal_resonance",
+                            "name": "Crystal Resonance",
+                            "effects": [
+                                {
+                                    "trigger": "encounter_start",
+                                    "type": "buff",
+                                    "id": "adventuring:focus",
+                                    "target": "self",
+                                    "stacks": 4
+                                },
+                                {
+                                    "trigger": "encounter_start",
+                                    "type": "buff",
+                                    "id": "adventuring:barrier",
+                                    "target": "self",
+                                    "stacks": 3
+                                }
+                            ]
+                        },
+                        {
+                            "id": "prismatic_light",
+                            "name": "Prismatic Light",
+                            "effects": [
+                                {
+                                    "trigger": "encounter_start",
+                                    "type": "buff",
+                                    "id": "adventuring:might",
+                                    "target": "self",
+                                    "stacks": 3
+                                },
+                                {
+                                    "trigger": "encounter_start",
+                                    "type": "buff",
+                                    "id": "adventuring:haste",
+                                    "target": "self",
+                                    "stacks": 3
+                                }
+                            ]
+                        },
+                        {
+                            "id": "gem_power",
+                            "name": "Gem Power",
+                            "effects": [
+                                {
+                                    "trigger": "on_kill",
+                                    "type": "buff",
+                                    "id": "adventuring:focus",
+                                    "target": "self",
+                                    "stacks": 6
+                                },
+                                {
+                                    "trigger": "on_kill",
+                                    "type": "heal",
+                                    "target": "self",
+                                    "amount": 20,
+                                    "scaling": 2.0
+                                }
+                            ]
+                        }
+                    ],
+                    "areas": [
+                        {
+                            "id": "crystal_caverns",
+                            "name": "Crystal Caverns",
+                            "media": "melvor:assets/media/skills/mining/mining.svg#shade=cyan",
+                            "requirements": [
+                                {
+                                    "type": "skill_level",
+                                    "level": 67
+                                }
+                            ],
+                            "width": 15,
+                            "height": 8,
+                            "floors": [
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:crystal_golem",
+                                            "weight": 45
+                                        },
+                                        {
+                                            "id": "adventuring:gem_sprite",
+                                            "weight": 35
+                                        },
+                                        {
+                                            "id": "adventuring:cave_crawler",
+                                            "weight": 20
+                                        }
+                                    ],
+                                    "exit": [
+                                        "adventuring:crystal_golem",
+                                        "adventuring:gem_sprite",
+                                        "adventuring:cave_crawler"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:gem_sprite",
+                                            "weight": 35
+                                        },
+                                        {
+                                            "id": "adventuring:quartz_elemental",
+                                            "weight": 35
+                                        },
+                                        {
+                                            "id": "adventuring:crystal_golem",
+                                            "weight": 30
+                                        }
+                                    ],
+                                    "exit": [
+                                        "adventuring:gem_sprite",
+                                        "adventuring:quartz_elemental",
+                                        "adventuring:crystal_golem"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:quartz_elemental",
+                                            "weight": 30
+                                        },
+                                        {
+                                            "id": "adventuring:ruby_guardian",
+                                            "weight": 35
+                                        },
+                                        {
+                                            "id": "adventuring:sapphire_sentinel",
+                                            "weight": 35
+                                        }
+                                    ],
+                                    "exit": [
+                                        "adventuring:quartz_elemental",
+                                        "adventuring:ruby_guardian",
+                                        "adventuring:sapphire_sentinel"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:ruby_guardian",
+                                            "weight": 30
+                                        },
+                                        {
+                                            "id": "adventuring:sapphire_sentinel",
+                                            "weight": 30
+                                        },
+                                        {
+                                            "id": "adventuring:emerald_warden",
+                                            "weight": 40
+                                        }
+                                    ],
+                                    "exit": [
+                                        "adventuring:ruby_guardian",
+                                        "adventuring:sapphire_sentinel",
+                                        "adventuring:emerald_warden"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:emerald_warden",
+                                            "weight": 35
+                                        },
+                                        {
+                                            "id": "adventuring:diamond_construct",
+                                            "weight": 40
+                                        },
+                                        {
+                                            "id": "adventuring:ruby_guardian",
+                                            "weight": 25
+                                        }
+                                    ],
+                                    "exit": [
+                                        "adventuring:emerald_warden",
+                                        "adventuring:diamond_construct",
+                                        "adventuring:the_prismatic_core"
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "monsters": [
+                        {
+                            "id": "crystal_golem",
+                            "name": "Crystal Golem",
+                            "media": "melvor:assets/media/monsters/ice_troll.png#shade=brown",
+                            "tags": [
+                                "elemental",
+                                "melee"
+                            ],
+                            "xp": 450,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 88
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 44
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 15
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 40
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 10
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 30
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 15
+                                }
+                            ],
+                            "generator": "adventuring:crystal_strike",
+                            "spender": "adventuring:shatter",
+                            "passives": [],
+                            "loot": [
+                                {
+                                    "id": "adventuring:crystal_shard",
+                                    "weight": 55,
+                                    "minQty": 2,
+                                    "maxQty": 4
+                                },
+                                {
+                                    "id": "adventuring:prismatic_dust",
+                                    "weight": 30,
+                                    "minQty": 1,
+                                    "maxQty": 2
+                                },
+                                {
+                                    "id": "adventuring:currency",
+                                    "weight": 15,
+                                    "minQty": 120,
+                                    "maxQty": 200
+                                }
+                            ]
+                        },
+                        {
+                            "id": "gem_sprite",
+                            "name": "Gem Sprite",
+                            "media": "melvor:assets/media/monsters/fairy.png",
+                            "tags": [
+                                "elemental",
+                                "mage"
+                            ],
+                            "xp": 420,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 52
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 22
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 45
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 16
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 25
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 55
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 25
+                                }
+                            ],
+                            "generator": "adventuring:gem_bolt",
+                            "spender": "adventuring:diamond_storm",
+                            "passives": [],
+                            "loot": [
+                                {
+                                    "id": "adventuring:prismatic_dust",
+                                    "weight": 55,
+                                    "minQty": 2,
+                                    "maxQty": 4
+                                },
+                                {
+                                    "id": "adventuring:crystal_shard",
+                                    "weight": 30,
+                                    "minQty": 1,
+                                    "maxQty": 2
+                                },
+                                {
+                                    "id": "adventuring:currency",
+                                    "weight": 15,
+                                    "minQty": 100,
+                                    "maxQty": 180
+                                }
+                            ]
+                        },
+                        {
+                            "id": "cave_crawler",
+                            "name": "Cave Crawler",
+                            "media": "melvor:assets/media/monsters/water_monster.png#shade=green",
+                            "tags": [
+                                "beast",
+                                "melee"
+                            ],
+                            "xp": 400,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 65
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 28
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 40
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 36
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 15
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 15
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 10
+                                }
+                            ],
+                            "generator": "adventuring:toxic_mandibles",
+                            "spender": "adventuring:burrow",
+                            "passives": [],
+                            "loot": [
+                                {
+                                    "id": "adventuring:crystal_shard",
+                                    "weight": 50,
+                                    "minQty": 1,
+                                    "maxQty": 3
+                                },
+                                {
+                                    "id": "adventuring:prismatic_dust",
+                                    "weight": 35,
+                                    "minQty": 1,
+                                    "maxQty": 2
+                                },
+                                {
+                                    "id": "adventuring:currency",
+                                    "weight": 15,
+                                    "minQty": 90,
+                                    "maxQty": 160
+                                }
+                            ]
+                        },
+                        {
+                            "id": "quartz_elemental",
+                            "name": "Quartz Elemental",
+                            "media": "melvor:assets/media/monsters/statue.png",
+                            "tags": [
+                                "elemental",
+                                "mage"
+                            ],
+                            "xp": 470,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 78
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 38
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 25
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 34
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 15
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 45
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 20
+                                }
+                            ],
+                            "generator": "adventuring:crystal_strike",
+                            "spender": "adventuring:resonance",
+                            "passives": [],
+                            "loot": [
+                                {
+                                    "id": "adventuring:crystal_shard",
+                                    "weight": 50,
+                                    "minQty": 2,
+                                    "maxQty": 4
+                                },
+                                {
+                                    "id": "adventuring:prismatic_dust",
+                                    "weight": 35,
+                                    "minQty": 2,
+                                    "maxQty": 3
+                                },
+                                {
+                                    "id": "adventuring:currency",
+                                    "weight": 15,
+                                    "minQty": 140,
+                                    "maxQty": 220
+                                }
+                            ]
+                        },
+                        {
+                            "id": "ruby_guardian",
+                            "name": "Ruby Guardian",
+                            "media": "melvor:assets/media/monsters/statue.png",
+                            "tags": [
+                                "elemental",
+                                "melee"
+                            ],
+                            "xp": 500,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 90
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 42
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 22
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 48
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 12
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 35
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 18
+                                }
+                            ],
+                            "generator": "adventuring:fire_strike",
+                            "spender": "adventuring:ruby_flare",
+                            "passives": [],
+                            "loot": [
+                                {
+                                    "id": "adventuring:ruby_fragment",
+                                    "weight": 50,
+                                    "minQty": 2,
+                                    "maxQty": 4
+                                },
+                                {
+                                    "id": "adventuring:crystal_shard",
+                                    "weight": 35,
+                                    "minQty": 1,
+                                    "maxQty": 3
+                                },
+                                {
+                                    "id": "adventuring:currency",
+                                    "weight": 15,
+                                    "minQty": 160,
+                                    "maxQty": 250
+                                }
+                            ]
+                        },
+                        {
+                            "id": "sapphire_sentinel",
+                            "name": "Sapphire Sentinel",
+                            "media": "melvor:assets/media/monsters/statue.png",
+                            "tags": [
+                                "elemental",
+                                "mage"
+                            ],
+                            "xp": 500,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 82
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 40
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 30
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 36
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 18
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 52
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 22
+                                }
+                            ],
+                            "generator": "adventuring:sapphire_lance",
+                            "spender": "adventuring:frozen_burst",
+                            "passives": [],
+                            "loot": [
+                                {
+                                    "id": "adventuring:sapphire_chip",
+                                    "weight": 50,
+                                    "minQty": 2,
+                                    "maxQty": 4
+                                },
+                                {
+                                    "id": "adventuring:crystal_shard",
+                                    "weight": 35,
+                                    "minQty": 1,
+                                    "maxQty": 3
+                                },
+                                {
+                                    "id": "adventuring:currency",
+                                    "weight": 15,
+                                    "minQty": 160,
+                                    "maxQty": 250
+                                }
+                            ]
+                        },
+                        {
+                            "id": "emerald_warden",
+                            "name": "Emerald Warden",
+                            "media": "melvor:assets/media/monsters/statue.png",
+                            "tags": [
+                                "elemental",
+                                "mage"
+                            ],
+                            "xp": 540,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 98
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 44
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 28
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 42
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 20
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 40
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 35
+                                }
+                            ],
+                            "generator": "adventuring:verdant_bolt",
+                            "spender": "adventuring:emerald_restoration",
+                            "passives": [],
+                            "loot": [
+                                {
+                                    "id": "adventuring:prismatic_dust",
+                                    "weight": 45,
+                                    "minQty": 3,
+                                    "maxQty": 5
+                                },
+                                {
+                                    "id": "adventuring:crystal_shard",
+                                    "weight": 40,
+                                    "minQty": 2,
+                                    "maxQty": 4
+                                },
+                                {
+                                    "id": "adventuring:currency",
+                                    "weight": 15,
+                                    "minQty": 180,
+                                    "maxQty": 280
+                                }
+                            ]
+                        },
+                        {
+                            "id": "diamond_construct",
+                            "name": "Diamond Construct",
+                            "media": "melvor:assets/media/monsters/statue.png",
+                            "tags": [
+                                "elemental",
+                                "melee"
+                            ],
+                            "xp": 580,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 110
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 52
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 20
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 46
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 15
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 50
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 25
+                                }
+                            ],
+                            "generator": "adventuring:crystal_strike",
+                            "spender": "adventuring:crystalline_tempest",
+                            "passives": [],
+                            "loot": [
+                                {
+                                    "id": "adventuring:crystal_shard",
+                                    "weight": 45,
+                                    "minQty": 4,
+                                    "maxQty": 7
+                                },
+                                {
+                                    "id": "adventuring:prismatic_dust",
+                                    "weight": 40,
+                                    "minQty": 3,
+                                    "maxQty": 5
+                                },
+                                {
+                                    "id": "adventuring:currency",
+                                    "weight": 15,
+                                    "minQty": 200,
+                                    "maxQty": 320
+                                }
+                            ]
+                        },
+                        {
+                            "id": "the_prismatic_core",
+                            "name": "The Prismatic Core",
+                            "media": "melvor:assets/media/monsters/air_golem.png",
+                            "tags": [
+                                "elemental",
+                                "boss"
+                            ],
+                            "isBoss": true,
+                            "xp": 820,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 230
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 56
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 35
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 52
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 30
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 70
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 45
+                                }
+                            ],
+                            "generator": "adventuring:prismatic_blast",
+                            "spender": "adventuring:crystal_apocalypse",
+                            "passives": [
+                                "adventuring:crystal_resonance",
+                                "adventuring:prismatic_light"
+                            ],
+                            "loot": [
+                                {
+                                    "id": "adventuring:prismatic_core",
+                                    "weight": 100,
+                                    "minQty": 1,
+                                    "maxQty": 2
+                                },
+                                {
+                                    "id": "adventuring:crystal_shard",
+                                    "weight": 100,
+                                    "minQty": 6,
+                                    "maxQty": 10
+                                },
+                                {
+                                    "id": "adventuring:prismatic_dust",
+                                    "weight": 100,
+                                    "minQty": 5,
+                                    "maxQty": 8
+                                },
+                                {
+                                    "id": "adventuring:ruby_fragment",
+                                    "weight": 100,
+                                    "minQty": 3,
+                                    "maxQty": 5
+                                },
+                                {
+                                    "id": "adventuring:sapphire_chip",
+                                    "weight": 100,
+                                    "minQty": 3,
+                                    "maxQty": 5
+                                }
+                            ]
+                        }
+                    ],
+                    "generators": [
+                        {
+                            "id": "verdant_bolt",
+                            "name": "Verdant Bolt",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "energy": 26,
+                            "hits": [
+                                {
+                                    "target": "single_enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "damage_type": "magic",
+                                            "amount": 16,
+                                            "scaling": 1.15
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "crystal_strike",
+                            "name": "Crystal Strike",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "energy": 28,
+                            "hits": [
+                                {
+                                    "target": "single_enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "damage_type": "strength",
+                                            "amount": 18,
+                                            "scaling": 1.2
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "gem_bolt",
+                            "name": "Gem Bolt",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "energy": 25,
+                            "hits": [
+                                {
+                                    "target": "single_enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "damage_type": "magic",
+                                            "amount": 15,
+                                            "scaling": 1.1
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "toxic_mandibles",
+                            "name": "Toxic Mandibles",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "energy": 25,
+                            "hits": [
+                                {
+                                    "target": "single_enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "damage_type": "strength",
+                                            "amount": 14,
+                                            "scaling": 1.0
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "fire_strike",
+                            "name": "Fire Strike",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "energy": 28,
+                            "hits": [
+                                {
+                                    "target": "single_enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "damage_type": "magic",
+                                            "amount": 18,
+                                            "scaling": 1.2
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "sapphire_lance",
+                            "name": "Sapphire Lance",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "energy": 25,
+                            "hits": [
+                                {
+                                    "target": "single_enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "damage_type": "magic",
+                                            "amount": 16,
+                                            "scaling": 1.1
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "prismatic_blast",
+                            "name": "Prismatic Blast",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "energy": 30,
+                            "hits": [
+                                {
+                                    "target": "single_enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "damage_type": "magic",
+                                            "amount": 22,
+                                            "scaling": 1.3
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "spenders": [
+                        {
+                            "id": "frozen_burst",
+                            "name": "Frozen Burst",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 70,
+                            "hits": [
+                                {
+                                    "target": "all_enemies",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "damage_type": "magic",
+                                            "amount": 20,
+                                            "scaling": 1.1
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:slow",
+                                            "stacks": 2
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "emerald_restoration",
+                            "name": "Emerald Restoration",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 65,
+                            "hits": [
+                                {
+                                    "target": "all_allies",
+                                    "effects": [
+                                        {
+                                            "type": "heal",
+                                            "amount": 25,
+                                            "scaling": 0.9
+                                        },
+                                        {
+                                            "type": "buff",
+                                            "id": "adventuring:regeneration",
+                                            "stacks": 2
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "shatter",
+                            "name": "Shatter",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 65,
+                            "hits": [
+                                {
+                                    "target": "all_enemies",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "damage_type": "strength",
+                                            "amount": 15,
+                                            "scaling": 0.9
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "burrow",
+                            "name": "Burrow",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 50,
+                            "hits": [
+                                {
+                                    "target": "self",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "id": "adventuring:evasion",
+                                            "stacks": 5
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "resonance",
+                            "name": "Resonance",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 60,
+                            "hits": [
+                                {
+                                    "target": "all_allies",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "id": "adventuring:focus",
+                                            "stacks": 3
+                                        },
+                                        {
+                                            "type": "buff",
+                                            "id": "adventuring:barrier",
+                                            "stacks": 2
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "ruby_flare",
+                            "name": "Ruby Flare",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 75,
+                            "hits": [
+                                {
+                                    "target": "all_enemies",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "damage_type": "magic",
+                                            "amount": 20,
+                                            "scaling": 1.1
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:burn",
+                                            "stacks": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "crystalline_tempest",
+                            "name": "Crystalline Tempest",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 75,
+                            "hits": [
+                                {
+                                    "target": "all_enemies",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "damage_type": "magic",
+                                            "amount": 18,
+                                            "scaling": 1.0
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:slow",
+                                            "stacks": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "diamond_storm",
+                            "name": "Diamond Storm",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 85,
+                            "hits": [
+                                {
+                                    "target": "all_enemies",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "damage_type": "strength",
+                                            "amount": 25,
+                                            "scaling": 1.2
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "crystal_apocalypse",
+                            "name": "Crystal Apocalypse",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 100,
+                            "hits": [
+                                {
+                                    "target": "all_enemies",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "damage_type": "magic",
+                                            "amount": 32,
+                                            "scaling": 1.4
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:weaken",
+                                            "stacks": 4
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "materials": [
+                        {
+                            "id": "crystal_shard",
+                            "name": "Crystal Shard",
+                            "media": "melvor:assets/media/bank/diamond.png",
+                            "category": "adventuring:monster_drops"
+                        },
+                        {
+                            "id": "prismatic_dust",
+                            "name": "Prismatic Dust",
+                            "media": "melvor:assets/media/bank/stardust.png",
+                            "category": "adventuring:monster_drops"
+                        },
+                        {
+                            "id": "ruby_fragment",
+                            "name": "Ruby Fragment",
+                            "media": "melvor:assets/media/bank/ruby.png",
+                            "category": "adventuring:monster_drops"
+                        },
+                        {
+                            "id": "sapphire_chip",
+                            "name": "Sapphire Chip",
+                            "media": "melvor:assets/media/bank/sapphire.png",
+                            "category": "adventuring:monster_drops"
+                        },
+                        {
+                            "id": "prismatic_core",
+                            "name": "Prismatic Core",
+                            "media": "melvor:assets/media/bank/mastery_token_woodcutting.png#shade=purple",
+                            "category": "adventuring:boss_drops"
+                        }
+                    ]
+                }
             }
-        }]
+        ]
     }
 }

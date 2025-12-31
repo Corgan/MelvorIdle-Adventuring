@@ -1,4 +1,8 @@
-export class AdventuringJobElement extends HTMLElement {
+const { loadModule } = mod.getContext(import.meta);
+
+const { AdventuringTooltipElement } = await loadModule('src/core/adventuring-tooltip-element.mjs');
+
+export class AdventuringJobElement extends AdventuringTooltipElement {
     constructor() {
         super();
         this._content = new DocumentFragment();
@@ -11,26 +15,17 @@ export class AdventuringJobElement extends HTMLElement {
 
         this.progressContainer = getElementFromFragment(this._content, 'progress-container', 'div');
         this.masteryProgress = getElementFromFragment(this._content, 'mastery-progress', 'progress-bar');
-    }
-
-    mount(parent) {
-        parent.append(this);
+        
+        this._tooltipTarget = this.clickable;
     }
 
     connectedCallback() {
         this.appendChild(this._content);
-        this.tooltip = tippy(this.clickable, {
-            content: '',
-            allowHTML: true,
-            hideOnClick: false
-        });
+        super.connectedCallback();
     }
 
     disconnectedCallback() {
-        if (this.tooltip !== undefined) {
-            this.tooltip.destroy();
-            this.tooltip = undefined;
-        }
+        super.disconnectedCallback();
     }
 }
 window.customElements.define('adventuring-job', AdventuringJobElement);

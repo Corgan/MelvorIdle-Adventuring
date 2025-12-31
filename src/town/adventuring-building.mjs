@@ -69,7 +69,7 @@ export class AdventuringBuilding extends NamespacedObject {
     }
 
     get name() {
-        return this.unlocked ? this._name : "???";
+        return this._name;
     }
 
     get description() {
@@ -77,7 +77,7 @@ export class AdventuringBuilding extends NamespacedObject {
     }
 
     get media() {
-        return this.getMediaURL(this._media);
+        return this.unlocked ? this.getMediaURL(this._media) : this.getMediaURL('melvor:assets/media/main/question.png');
     }
 
     get unlocked() {
@@ -85,15 +85,7 @@ export class AdventuringBuilding extends NamespacedObject {
     }
 
     get tooltip() {
-        const tooltip = TooltipBuilder.create()
-            .header(this.name, this.media)
-            .hint(this.description);
-        
-        if(!this.unlocked) {
-            tooltip.unlockRequirements(this.requirements, this.manager);
-        }
-        
-        return tooltip.build();
+        return TooltipBuilder.forBuilding(this, this.manager).build();
     }
 
     get action() {
@@ -144,10 +136,7 @@ export class AdventuringBuilding extends NamespacedObject {
         if(!this.renderQueue.tooltip)
             return;
 
-        if(this.component.tooltip === undefined)
-            return;
-
-        this.component.tooltip.setContent(this.tooltip);
+        this.component.setTooltipContent(this.tooltip);
 
         this.renderQueue.tooltip = false;
     }

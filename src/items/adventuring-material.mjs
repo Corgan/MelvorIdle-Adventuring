@@ -38,7 +38,7 @@ export class AdventuringMaterial extends NamespacedObject {
     }
 
     get name() {
-        return this.unlocked ? this._name : "???";
+        return this._name;
     }
 
     get media() {
@@ -87,7 +87,7 @@ export class AdventuringMaterial extends NamespacedObject {
 
     get tooltip() {
         if(this.unlocked) {
-            return TooltipBuilder.forMaterial(this).build();
+            return TooltipBuilder.forMaterial(this, this.manager).build();
         }
         return TooltipBuilder.create().header(this.name, this.media).build();
     }
@@ -96,10 +96,7 @@ export class AdventuringMaterial extends NamespacedObject {
         if(!this.renderQueue.name)
             return;
 
-        if(this.component.tooltip === undefined)
-            return;
-        
-        this.component.tooltip.setContent(this.tooltip);
+        this.component.setTooltipContent(this.tooltip);
 
         this.renderQueue.name = false;
     }

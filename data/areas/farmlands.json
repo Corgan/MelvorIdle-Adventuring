@@ -2,483 +2,816 @@
     "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
     "namespace": "adventuring",
     "data": {
-        "skillData": [{
-            "skillID": "adventuring:Adventuring",
-            "data": {
-                "areas": [
-                    {
-                        "id": "farmlands",
-                        "name": "Farmlands",
-                        "media": "melvor:assets/media/monsters/adult_farmer.png",
-                        "requirements": [
-                            { "type": "skill_level", "level": 5 }
-                        ],
-                        "height": 5,
-                        "width": 5,
-                        "floors": [
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:cow", "weight": 35 },
-                                    { "id": "adventuring:plant", "weight": 35 },
-                                    { "id": "adventuring:seagull", "weight": 15 },
-                                    { "id": "adventuring:thorny_vine", "weight": 15 }
-                                ],
-                                "exit": ["adventuring:seagull", "adventuring:plant", "adventuring:thorny_vine"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:cow", "weight": 30 },
-                                    { "id": "adventuring:plant", "weight": 25 },
-                                    { "id": "adventuring:junior_farmer", "weight": 25 },
-                                    { "id": "adventuring:seagull", "weight": 10 },
-                                    { "id": "adventuring:thorny_vine", "weight": 10 }
-                                ],
-                                "exit": ["adventuring:cow", "adventuring:plant", "adventuring:junior_farmer"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:junior_farmer", "weight": 50 },
-                                    { "id": "adventuring:adult_farmer", "weight": 50 }
-                                ],
-                                "exit": ["adventuring:junior_farmer", "adventuring:adult_farmer", "adventuring:adult_farmer"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:adult_farmer", "weight": 100 }
-                                ],
-                                "exit": ["adventuring:adult_farmer", "adventuring:adult_farmer", "adventuring:farmland_overseer"]
-                            }
-                        ]
-                    }
-                ],
-                "monsters": [
-                    {
-                        "id": "cow",
-                        "name": "Cow",
-                        "media": "melvor:assets/media/monsters/cow.png",
-                        "tags": ["beast"],
-                        "xp": 12,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 10 },
-                            { "id": "adventuring:defence", "value": 5 },
-                            { "id": "adventuring:agility", "value": 3 },
-                            { "id": "adventuring:strength", "value": 8 },
-                            { "id": "adventuring:ranged", "value": 3 },
-                            { "id": "adventuring:magic", "value": 3 },
-                            { "id": "adventuring:prayer", "value": 3 }
-                        ],
-                        "generator": "adventuring:headbutt",
-                        "spender": "adventuring:cattle_charge",
-                        "passives": [],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 3, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 1, "weight": 15 },
-                            { "id": "adventuring:hay_bundle", "qty": 1, "weight": 20 }
-                        ]
-                    },
-                    {
-                        "id": "plant",
-                        "name": "Plant",
-                        "media": "melvor:assets/media/monsters/plant.png",
-                        "tags": ["plant"],
-                        "xp": 10,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 8 },
-                            { "id": "adventuring:defence", "value": 3 },
-                            { "id": "adventuring:agility", "value": 2 },
-                            { "id": "adventuring:strength", "value": 6 },
-                            { "id": "adventuring:ranged", "value": 5 },
-                            { "id": "adventuring:magic", "value": 5 },
-                            { "id": "adventuring:prayer", "value": 3 }
-                        ],
-                        "generator": "adventuring:vine_whip",
-                        "spender": "adventuring:thorn_spray",
-                        "passives": [],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 2, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 1, "weight": 10 },
-                            { "id": "adventuring:hay_bundle", "qty": 1, "weight": 18 }
-                        ]
-                    },
-                    {
-                        "id": "junior_farmer",
-                        "name": "Junior Farmer",
-                        "media": "melvor:assets/media/monsters/junior_farmer.png",
-                        "tags": ["humanoid"],
-                        "xp": 15,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 12 },
-                            { "id": "adventuring:defence", "value": 8 },
-                            { "id": "adventuring:agility", "value": 6 },
-                            { "id": "adventuring:strength", "value": 10 },
-                            { "id": "adventuring:ranged", "value": 8 },
-                            { "id": "adventuring:magic", "value": 5 },
-                            { "id": "adventuring:prayer", "value": 5 }
-                        ],
-                        "generator": "adventuring:pitchfork_jab",
-                        "spender": "adventuring:haymaker",
-                        "passives": [],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 4, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 2, "weight": 15 },
-                            { "id": "adventuring:hay_bundle", "qty": 1, "weight": 22 }
-                        ]
-                    },
-                    {
-                        "id": "adult_farmer",
-                        "name": "Adult Farmer",
-                        "media": "melvor:assets/media/monsters/adult_farmer.png",
-                        "tags": ["humanoid"],
-                        "xp": 20,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 18 },
-                            { "id": "adventuring:defence", "value": 12 },
-                            { "id": "adventuring:agility", "value": 8 },
-                            { "id": "adventuring:strength", "value": 15 },
-                            { "id": "adventuring:ranged", "value": 10 },
-                            { "id": "adventuring:magic", "value": 8 },
-                            { "id": "adventuring:prayer", "value": 8 }
-                        ],
-                        "generator": "adventuring:pitchfork_jab",
-                        "spender": "adventuring:haymaker",
-                        "passives": [],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 6, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 2, "weight": 20 },
-                            { "id": "adventuring:hay_bundle", "qty": 1, "weight": 25 }
-                        ]
-                    },
-                    {
-                        "id": "farmland_overseer",
-                        "name": "Farmland Overseer",
-                        "media": "melvor:assets/media/monsters/master_farmer.png",
-                        "tags": ["humanoid"],
-                        "xp": 40,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 30 },
-                            { "id": "adventuring:defence", "value": 18 },
-                            { "id": "adventuring:agility", "value": 12 },
-                            { "id": "adventuring:strength", "value": 22 },
-                            { "id": "adventuring:ranged", "value": 15 },
-                            { "id": "adventuring:magic", "value": 12 },
-                            { "id": "adventuring:prayer", "value": 12 }
-                        ],
-                        "generator": "adventuring:pitchfork_jab",
-                        "spender": "adventuring:harvest_fury",
-                        "passives": [],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 10, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 5, "weight": 30 },
-                            { "id": "adventuring:big_parts", "qty": 1, "weight": 15 },
-                            { "id": "adventuring:hay_bundle", "qty": 2, "weight": 35 }
-                        ]
-                    },
-                    {
-                        "id": "seagull",
-                        "name": "Seagull",
-                        "media": "melvor:assets/media/monsters/seagull.png",
-                        "tags": ["bird", "flying"],
-                        "xp": 8,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 6 },
-                            { "id": "adventuring:defence", "value": 2 },
-                            { "id": "adventuring:agility", "value": 12 },
-                            { "id": "adventuring:strength", "value": 4 },
-                            { "id": "adventuring:ranged", "value": 6 },
-                            { "id": "adventuring:magic", "value": 3 },
-                            { "id": "adventuring:prayer", "value": 3 }
-                        ],
-                        "generator": "adventuring:peck",
-                        "spender": "adventuring:dive_bomb",
-                        "passives": [],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 2, "weight": 100 },
-                            { "id": "adventuring:feather", "qty": 1, "weight": 40 }
-                        ]
-                    },
-                    {
-                        "id": "thorny_vine",
-                        "name": "Thorny Vine",
-                        "media": "melvor:assets/media/monsters/plant.png",
-                        "tags": ["plant"],
-                        "xp": 12,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 10 },
-                            { "id": "adventuring:defence", "value": 5 },
-                            { "id": "adventuring:agility", "value": 3 },
-                            { "id": "adventuring:strength", "value": 8 },
-                            { "id": "adventuring:ranged", "value": 6 },
-                            { "id": "adventuring:magic", "value": 6 },
-                            { "id": "adventuring:prayer", "value": 4 }
-                        ],
-                        "generator": "adventuring:vine_whip",
-                        "spender": "adventuring:thorn_spray",
-                        "passives": [],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 3, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 1, "weight": 15 },
-                            { "id": "adventuring:hay_bundle", "qty": 1, "weight": 22 }
-                        ]
-                    }
-                ],
-                "generators": [
-                    {
-                        "id": "headbutt",
-                        "name": "Headbutt",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "energy": 40,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 4,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "value": 0.8 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "vine_whip",
-                        "name": "Vine Whip",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "energy": 35,
-                        "hits": [
-                            {
-                                "target": "random",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 3,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "value": 0.6 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "pitchfork_jab",
-                        "name": "Pitchfork Jab",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "energy": 45,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 5,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "value": 1 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "peck",
-                        "name": "Peck",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "energy": 35,
-                        "hits": [
-                            {
-                                "target": "random",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 2,
-                                            "scaling": [
-                                                { "id": "adventuring:agility", "value": 0.5 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ],
-                "spenders": [
-                    {
-                        "id": "cattle_charge",
-                        "name": "Cattle Charge",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 80,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 8,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "value": 0.8 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "thorn_spray",
-                        "name": "Thorn Spray",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 70,
-                        "hits": [
-                            {
-                                "target": "random",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 10,
-                                            "scaling": [
-                                                { "id": "adventuring:ranged", "value": 1 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            },
-                            {
-                                "target": "random",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 5,
-                                            "scaling": [
-                                                { "id": "adventuring:ranged", "value": 0.5 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "haymaker",
-                        "name": "Haymaker",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 90,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 18,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "value": 1.8 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "harvest_fury",
-                        "name": "Harvest Fury",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 100,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 15,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "value": 1.5 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ],
-                        "masteryAuraId": "adventuring:mastery_aura_farmlands",
-                        "masteryAura": {
-                            "id": "mastery_aura_farmlands",
-                            "name": "Farmlands Mastery",
+        "skillData": [
+            {
+                "skillID": "adventuring:Adventuring",
+                "data": {
+                    "areas": [
+                        {
+                            "id": "farmlands",
+                            "name": "Farmlands",
                             "media": "melvor:assets/media/monsters/adult_farmer.png",
-                            "combine": true,
-                            "stack": false,
-                            "amount": 5,
-                            "stacks": 99,
-                            "effects": [
+                            "requirements": [
                                 {
-                                    "trigger": "encounter_start",
-                                    "type": "apply_buff",
-                                    "id": "adventuring:block",
-                                    "target": "self"
+                                    "type": "skill_level",
+                                    "level": 5
+                                }
+                            ],
+                            "height": 5,
+                            "width": 5,
+                            "floors": [
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:cow",
+                                            "weight": 35
+                                        },
+                                        {
+                                            "id": "adventuring:plant",
+                                            "weight": 35
+                                        },
+                                        {
+                                            "id": "adventuring:seagull",
+                                            "weight": 15
+                                        },
+                                        {
+                                            "id": "adventuring:thorny_vine",
+                                            "weight": 15
+                                        }
+                                    ],
+                                    "exit": [
+                                        "adventuring:seagull",
+                                        "adventuring:plant",
+                                        "adventuring:thorny_vine"
+                                    ]
                                 },
                                 {
-                                    "trigger": "dungeon_end",
-                                    "type": "remove"
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:cow",
+                                            "weight": 30
+                                        },
+                                        {
+                                            "id": "adventuring:plant",
+                                            "weight": 25
+                                        },
+                                        {
+                                            "id": "adventuring:junior_farmer",
+                                            "weight": 25
+                                        },
+                                        {
+                                            "id": "adventuring:seagull",
+                                            "weight": 10
+                                        },
+                                        {
+                                            "id": "adventuring:thorny_vine",
+                                            "weight": 10
+                                        }
+                                    ],
+                                    "exit": [
+                                        "adventuring:cow",
+                                        "adventuring:plant",
+                                        "adventuring:junior_farmer"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:junior_farmer",
+                                            "weight": 50
+                                        },
+                                        {
+                                            "id": "adventuring:adult_farmer",
+                                            "weight": 50
+                                        }
+                                    ],
+                                    "exit": [
+                                        "adventuring:junior_farmer",
+                                        "adventuring:adult_farmer",
+                                        "adventuring:adult_farmer"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:adult_farmer",
+                                            "weight": 100
+                                        }
+                                    ],
+                                    "exit": [
+                                        "adventuring:adult_farmer",
+                                        "adventuring:adult_farmer",
+                                        "adventuring:farmland_overseer"
+                                    ]
                                 }
                             ]
                         }
-                    },
-                    {
-                        "id": "dive_bomb",
-                        "name": "Dive Bomb",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 70,
-                        "hits": [
-                            {
-                                "target": "random",
-                                "party": "enemy",
+                    ],
+                    "monsters": [
+                        {
+                            "id": "cow",
+                            "name": "Cow",
+                            "media": "melvor:assets/media/monsters/cow.png",
+                            "tags": [
+                                "beast"
+                            ],
+                            "xp": 12,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 7
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 5
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 3
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 5
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 3
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 3
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 3
+                                }
+                            ],
+                            "generator": "adventuring:headbutt",
+                            "spender": "adventuring:cattle_charge",
+                            "passives": [],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 3,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 1,
+                                    "weight": 15
+                                },
+                                {
+                                    "id": "adventuring:hay_bundle",
+                                    "qty": 1,
+                                    "weight": 20
+                                }
+                            ]
+                        },
+                        {
+                            "id": "plant",
+                            "name": "Plant",
+                            "media": "melvor:assets/media/monsters/plant.png",
+                            "tags": [
+                                "plant"
+                            ],
+                            "xp": 10,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 5
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 3
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 2
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 3
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 5
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 5
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 3
+                                }
+                            ],
+                            "generator": "adventuring:vine_whip",
+                            "spender": "adventuring:thorn_spray",
+                            "passives": [],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 2,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 1,
+                                    "weight": 10
+                                },
+                                {
+                                    "id": "adventuring:hay_bundle",
+                                    "qty": 1,
+                                    "weight": 18
+                                }
+                            ]
+                        },
+                        {
+                            "id": "junior_farmer",
+                            "name": "Junior Farmer",
+                            "media": "melvor:assets/media/monsters/junior_farmer.png",
+                            "tags": [
+                                "humanoid"
+                            ],
+                            "xp": 15,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 8
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 8
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 6
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 6
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 8
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 5
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 5
+                                }
+                            ],
+                            "generator": "adventuring:pitchfork_jab",
+                            "spender": "adventuring:haymaker",
+                            "passives": [],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 4,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 2,
+                                    "weight": 15
+                                },
+                                {
+                                    "id": "adventuring:hay_bundle",
+                                    "qty": 1,
+                                    "weight": 22
+                                }
+                            ]
+                        },
+                        {
+                            "id": "adult_farmer",
+                            "name": "Adult Farmer",
+                            "media": "melvor:assets/media/monsters/adult_farmer.png",
+                            "tags": [
+                                "humanoid"
+                            ],
+                            "xp": 20,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 12
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 12
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 8
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 9
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 10
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 8
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 8
+                                }
+                            ],
+                            "generator": "adventuring:pitchfork_jab",
+                            "spender": "adventuring:haymaker",
+                            "passives": [],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 6,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 2,
+                                    "weight": 20
+                                },
+                                {
+                                    "id": "adventuring:hay_bundle",
+                                    "qty": 1,
+                                    "weight": 25
+                                }
+                            ]
+                        },
+                        {
+                            "id": "farmland_overseer",
+                            "name": "Farmland Overseer",
+                            "media": "melvor:assets/media/monsters/master_farmer.png",
+                            "tags": [
+                                "humanoid"
+                            ],
+                            "xp": 40,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 21
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 18
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 12
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 14
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 15
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 12
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 12
+                                }
+                            ],
+                            "generator": "adventuring:pitchfork_jab",
+                            "spender": "adventuring:harvest_fury",
+                            "passives": [],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 10,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 5,
+                                    "weight": 30
+                                },
+                                {
+                                    "id": "adventuring:big_parts",
+                                    "qty": 1,
+                                    "weight": 15
+                                },
+                                {
+                                    "id": "adventuring:hay_bundle",
+                                    "qty": 2,
+                                    "weight": 35
+                                }
+                            ]
+                        },
+                        {
+                            "id": "seagull",
+                            "name": "Seagull",
+                            "media": "melvor:assets/media/monsters/seagull.png",
+                            "tags": [
+                                "bird",
+                                "flying"
+                            ],
+                            "xp": 8,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 4
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 2
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 12
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 2
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 6
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 3
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 3
+                                }
+                            ],
+                            "generator": "adventuring:peck",
+                            "spender": "adventuring:dive_bomb",
+                            "passives": [],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 2,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:feather",
+                                    "qty": 1,
+                                    "weight": 40
+                                }
+                            ]
+                        },
+                        {
+                            "id": "thorny_vine",
+                            "name": "Thorny Vine",
+                            "media": "melvor:assets/media/monsters/plant.png",
+                            "tags": [
+                                "plant"
+                            ],
+                            "xp": 12,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 7
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 5
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 3
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 5
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 6
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 6
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 4
+                                }
+                            ],
+                            "generator": "adventuring:vine_whip",
+                            "spender": "adventuring:thorn_spray",
+                            "passives": [],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 3,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 1,
+                                    "weight": 15
+                                },
+                                {
+                                    "id": "adventuring:hay_bundle",
+                                    "qty": 1,
+                                    "weight": 22
+                                }
+                            ]
+                        }
+                    ],
+                    "generators": [
+                        {
+                            "id": "headbutt",
+                            "name": "Headbutt",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "energy": 40,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 4,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "value": 0.8
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "vine_whip",
+                            "name": "Vine Whip",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "energy": 35,
+                            "hits": [
+                                {
+                                    "target": "random",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 3,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "value": 0.6
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "pitchfork_jab",
+                            "name": "Pitchfork Jab",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "energy": 45,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 5,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "value": 1
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "peck",
+                            "name": "Peck",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "energy": 35,
+                            "hits": [
+                                {
+                                    "target": "random",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 2,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:agility",
+                                                        "value": 0.5
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "spenders": [
+                        {
+                            "id": "cattle_charge",
+                            "name": "Cattle Charge",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 80,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 8,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "value": 0.8
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "thorn_spray",
+                            "name": "Thorn Spray",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 70,
+                            "hits": [
+                                {
+                                    "target": "random",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 10,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:ranged",
+                                                        "value": 1
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                },
+                                {
+                                    "target": "random",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 5,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:ranged",
+                                                        "value": 0.5
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "haymaker",
+                            "name": "Haymaker",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 90,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 18,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "value": 1.8
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "harvest_fury",
+                            "name": "Harvest Fury",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 100,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 15,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "value": 1.5
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ],
+                            "masteryAuraId": "adventuring:mastery_aura_farmlands",
+                            "masteryAura": {
+                                "id": "mastery_aura_farmlands",
+                                "name": "Farmlands Mastery",
+                                "media": "melvor:assets/media/monsters/adult_farmer.png",
+                                "combine": true,
+                                "stack": false,
+                                "amount": 5,
+                                "stacks": 99,
                                 "effects": [
                                     {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 6,
-                                            "scaling": [
-                                                { "id": "adventuring:agility", "value": 0.8 }
-                                            ]
-                                        }
+                                        "trigger": "encounter_start",
+                                        "type": "apply_buff",
+                                        "id": "adventuring:block",
+                                        "target": "self"
+                                    },
+                                    {
+                                        "trigger": "dungeon_end",
+                                        "type": "remove"
                                     }
                                 ]
                             }
-                        ]
-                    }
-                ]
+                        },
+                        {
+                            "id": "dive_bomb",
+                            "name": "Dive Bomb",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 70,
+                            "hits": [
+                                {
+                                    "target": "random",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 6,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:agility",
+                                                        "value": 0.8
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
             }
-        }]
+        ]
     }
 }

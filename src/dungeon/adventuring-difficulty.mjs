@@ -108,27 +108,75 @@ export class AdventuringDifficulty extends NamespacedObject {
     }
 
     /**
-     * Get the stat multiplier from effects (default 1.0)
+     * Get the enemy stat bonus percent from effects (default 0)
+     * Returns whole percent value (50 = +50%)
+     */
+    get enemyStatsPercent() {
+        const effect = this.effects.find(e => e.type === 'enemy_stats_percent');
+        return effect && effect.amount ? effect.amount.base : 0;
+    }
+
+    /**
+     * Get the stat multiplier (for game calculations)
+     * Derived from enemyStatsPercent: 50% -> 1.5x multiplier
      */
     get statMultiplier() {
-        const effect = this.effects.find(e => e.type === 'enemy_stat_multiplier');
-        return effect && effect.amount ? effect.amount.base : 1.0;
+        return 1 + (this.enemyStatsPercent / 100);
     }
 
     /**
-     * Get the XP multiplier from effects (default 1.0)
+     * Get the XP bonus percent from effects (default 0)
+     * Returns whole percent value (50 = +50%)
+     */
+    get xpPercent() {
+        const effect = this.effects.find(e => e.type === 'xp_percent');
+        return effect && effect.amount ? effect.amount.base : 0;
+    }
+
+    /**
+     * Get the XP multiplier (for game calculations)
+     * Derived from xpPercent: 50% -> 1.5x multiplier
      */
     get xpMultiplier() {
-        const effect = this.effects.find(e => e.type === 'xp_multiplier');
-        return effect && effect.amount ? effect.amount.base : 1.0;
+        return 1 + (this.xpPercent / 100);
     }
 
     /**
-     * Get the loot multiplier from effects (default 1.0)
+     * Get the loot bonus percent from effects (default 0)
+     * Returns whole percent value (50 = +50%)
+     */
+    get lootPercent() {
+        const effect = this.effects.find(e => e.type === 'loot_percent');
+        return effect && effect.amount ? effect.amount.base : 0;
+    }
+
+    /**
+     * Get the loot multiplier (for game calculations)
+     * Derived from lootPercent: 50% -> 1.5x multiplier
      */
     get lootMultiplier() {
-        const effect = this.effects.find(e => e.type === 'loot_multiplier');
-        return effect && effect.amount ? effect.amount.base : 1.0;
+        return 1 + (this.lootPercent / 100);
+    }
+
+    /**
+     * Get tooltip-ready effects for display
+     * Effects are already in percentage format, just filter and return
+     * @returns {Array} Array of {type, value} effect objects
+     */
+    getTooltipEffects() {
+        const effects = [];
+        
+        if(this.enemyStatsPercent !== 0) {
+            effects.push({ type: 'enemy_stats_percent', value: this.enemyStatsPercent });
+        }
+        if(this.xpPercent !== 0) {
+            effects.push({ type: 'xp_percent', value: this.xpPercent });
+        }
+        if(this.lootPercent !== 0) {
+            effects.push({ type: 'loot_percent', value: this.lootPercent });
+        }
+        
+        return effects;
     }
 
     postDataRegistration() {

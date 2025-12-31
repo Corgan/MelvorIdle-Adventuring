@@ -1,8 +1,71 @@
 const { loadModule } = mod.getContext(import.meta);
 
+const { AdventuringTooltipElement } = await loadModule('src/core/adventuring-tooltip-element.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
 
-export class AdventuringAbilitySmallElement extends HTMLElement {
+/**
+ * Selector row element for ability picker popup
+ * Properly manages tippy tooltip lifecycle
+ */
+export class AdventuringAbilitySelectorRowElement extends AdventuringTooltipElement {
+    constructor() {
+        super();
+        this._content = new DocumentFragment();
+        this._content.append(getTemplateNode('adventuring-ability-selector-row-template'));
+        
+        this.row = getElementFromFragment(this._content, 'row', 'div');
+        this.nameText = getElementFromFragment(this._content, 'name', 'span');
+        
+        this.ability = null;
+        this.isSelected = false;
+        this.onSelect = null;
+        
+        this._tooltipTarget = this.row;
+        this._tooltipOptions = { placement: 'right' };
+    }
+
+    connectedCallback() {
+        this.appendChild(this._content);
+        super.connectedCallback();
+    }
+
+    disconnectedCallback() {
+        super.disconnectedCallback();
+        this.onSelect = null;
+    }
+
+    /**
+     * Set up the row with ability data
+     * @param {Object} ability - The ability to display
+     * @param {boolean} isSelected - Whether this ability is currently selected
+     * @param {string} tooltipContent - HTML content for the tooltip
+     * @param {Function} onSelect - Callback when row is clicked
+     */
+    setAbility(ability, isSelected, tooltipContent, onSelect) {
+        this.ability = ability;
+        this.isSelected = isSelected;
+        this.onSelect = onSelect;
+        
+        this.nameText.textContent = ability.name;
+        
+        if (isSelected) {
+            this.row.classList.add('border', 'border-success');
+        } else {
+            this.row.classList.remove('border', 'border-success');
+        }
+        
+        this.row.onclick = () => {
+            if (this.onSelect) {
+                this.onSelect(this.ability);
+            }
+        };
+        
+        this.setTooltipContent(tooltipContent);
+    }
+}
+window.customElements.define('adventuring-ability-selector-row', AdventuringAbilitySelectorRowElement);
+
+export class AdventuringAbilitySmallElement extends AdventuringTooltipElement {
     constructor() {
         super();
         this._content = new DocumentFragment();
@@ -12,26 +75,16 @@ export class AdventuringAbilitySmallElement extends HTMLElement {
         this.nameText = getElementFromFragment(this._content, 'name', 'small');
         
         this.selectorPopup = undefined;
-    }
-
-    mount(parent) {
-        parent.append(this);
+        this._tooltipTarget = this.styling;
     }
 
     connectedCallback() {
         this.appendChild(this._content);
-        this.tooltip = tippy(this.styling, {
-            content: '',
-            allowHTML: true,
-            hideOnClick: false
-        });
+        super.connectedCallback();
     }
 
     disconnectedCallback() {
-        if (this.tooltip !== undefined) {
-            this.tooltip.destroy();
-            this.tooltip = undefined;
-        }
+        super.disconnectedCallback();
         if (this.selectorPopup !== undefined) {
             this.selectorPopup.destroy();
             this.selectorPopup = undefined;
@@ -71,44 +124,11 @@ export class AdventuringAbilitySmallElement extends HTMLElement {
      */
     buildAbilityTooltip(ability, character) {
         const char = character || this.character || this.selectorCharacter;
-        const tooltip = new TooltipBuilder();
-        
-        tooltip.header(ability.name);
-        
-        // Description with stats - pass character object (which has .stats) for proper scaling
-        const desc = ability.getDescription ? ability.getDescription(char, true) : ability.description;
-        tooltip.separator();
-        tooltip.info(desc);
-        
-        // Energy cost/generation
-        tooltip.separator();
-        if(ability.energy !== undefined) {
-            tooltip.bonus(`+${ability.energy} Energy`);
-        } else if(ability.cost !== undefined) {
-            tooltip.penalty(`-${ability.cost} Energy`);
-        }
-        
-        // Usable by section - show which job(s) can use this ability
-        const req = ability.requirements?.find(r => r.type === 'job_level' || r.type === 'current_job_level');
-        if(req) {
-            const job = this.skill.jobs.getObjectByID(req.job);
-            if(job) {
-                tooltip.separator();
-                if(req.type === 'current_job_level') {
-                    // Restricted to specific job
-                    tooltip.hint(`Usable by: <img class="skill-icon-xxs mr-1" src="${job.media}">${job.name}`);
-                } else {
-                    // Learned from job but usable by all
-                    tooltip.hint(`Usable by: All Jobs`);
-                }
-                tooltip.text(`<img class="skill-icon-xxs mr-1" src="${job.media}">Learned from ${job.name} Lv.${req.level}`, 'text-muted text-center');
-            }
-        } else {
-            tooltip.separator();
-            tooltip.hint(`Usable by: All Jobs`);
-        }
-        
-        return tooltip.build();
+        return TooltipBuilder.forAbility(ability, {
+            character: char,
+            manager: this.skill,
+            showUnlockLevel: true
+        }).build();
     }
 
     /**
@@ -136,47 +156,29 @@ export class AdventuringAbilitySmallElement extends HTMLElement {
         container.style.overflowY = 'auto';
         
         abilities.forEach(ability => {
-            const row = document.createElement('div');
-            row.className = 'd-flex align-items-center p-2 mb-1 bg-combat-inner-dark rounded pointer-enabled';
+            const row = new AdventuringAbilitySelectorRowElement();
+            container.appendChild(row);
             
             const isSelected = this.selectorCharacter[this.selectorType] === ability;
-            if(isSelected) {
-                row.classList.add('border', 'border-success');
-            }
+            const tooltipContent = this.buildAbilityTooltip(ability);
             
-            // Name
-            const name = document.createElement('span');
-            name.className = 'font-w600 flex-grow-1';
-            name.textContent = ability.name;
-            row.appendChild(name);
-            
-            // Click to select
-            row.onclick = () => {
+            row.setAbility(ability, isSelected, tooltipContent, (selectedAbility) => {
                 if(this.selectorType === 'generator') {
-                    this.selectorCharacter.setGenerator(ability);
+                    this.selectorCharacter.setGenerator(selectedAbility);
                 }
                 if(this.selectorType === 'spender') {
-                    this.selectorCharacter.setSpender(ability);
+                    this.selectorCharacter.setSpender(selectedAbility);
                 }
                 
                 // Mark as seen
-                if(ability.unlocked) {
-                    this.skill.seenAbilities.add(ability.id);
+                if(selectedAbility.unlocked) {
+                    this.skill.seenAbilities.add(selectedAbility.id);
                 }
                 
                 if(this.selectorPopup) {
                     this.selectorPopup.hide();
                 }
-            };
-            
-            // Add tooltip to row
-            tippy(row, {
-                content: this.buildAbilityTooltip(ability),
-                allowHTML: true,
-                placement: 'right'
             });
-            
-            container.appendChild(row);
         });
         
         return container;

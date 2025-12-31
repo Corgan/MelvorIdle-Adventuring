@@ -35,19 +35,15 @@ export async function setup({ gameData, patch, loadTemplates, loadModule, loadSt
     };
 
     try {
-    console.log("Loading Adventuring Templates");
+
     await loadTemplates("templates.html");
     await loadStylesheet("style.css");
 
     sidebar.category('Party', { before: 'Combat' });
   
-    console.log("Loading Adventuring Module");
     const { Adventuring } = await loadModule('src/core/adventuring.mjs');
 
-    console.log("Registering Adventuring Skill");
     game.adventuring = game.registerSkill(game.registeredNamespaces.getNamespace('adventuring'), Adventuring);
-
-    console.log("Registering Adventuring Data");
 
     await load('data/base.json');
     await load('data/difficulties.json');
@@ -251,7 +247,6 @@ export async function setup({ gameData, patch, loadTemplates, loadModule, loadSt
     if(cloudManager.hasAoDEntitlementAndIsEnabled)
         await load('data/data-aod.json');
 
-    console.log('Registered Adventuring Data.');
     } catch(e) { console.error('ADVENTURING SETUP ERROR:', e); throw e; }
 
     onModsLoaded(async () => {
@@ -304,7 +299,6 @@ export async function setup({ gameData, patch, loadTemplates, loadModule, loadSt
 
     onInterfaceAvailable(async () => {
         try {
-        console.log("Appending Adventuring Page");
         game.adventuring.component.mount(document.getElementById('main-container')); // Add skill container
         
         // Hook offline loop exit to trigger tutorial checks after offline progress completes
@@ -313,16 +307,11 @@ export async function setup({ gameData, patch, loadTemplates, loadModule, loadSt
         });
         
         // Load and mount the game guide
-        console.log("[Adventuring] Loading game guide component...");
         await loadModule('src/ui/components/adventuring-game-guide.mjs');
         const gameGuide = document.createElement('adventuring-game-guide');
         const gameGuideContainer = document.querySelector('#modal-game-guide .block-content.block-content-full');
-        console.log("[Adventuring] Game guide container found:", gameGuideContainer);
         if (gameGuideContainer) {
             gameGuideContainer.appendChild(gameGuide);
-            console.log("[Adventuring] Game guide appended to container");
-        } else {
-            console.warn("[Adventuring] Game guide container not found! Looking for #modal-game-guide .block-content.block-content-full");
         }
         
         // Set image sources for game guide and other templates

@@ -368,8 +368,8 @@ class AdventuringCharacter {
             this.hitpoints = 0;
 
         // Track damage dealt for achievements (if attacker is hero dealing to enemy)
-        if(character && character.isHero && !this.isHero && this.manager.achievementManager) {
-            const stats = this.manager.achievementStats;
+        if(character && character.isHero && !this.isHero && this.manager.achievements) {
+            const stats = this.manager.achievementManager.stats;
             if(stats) {
                 stats.totalDamage = (stats.totalDamage || 0) + amount;
             }
@@ -413,8 +413,8 @@ class AdventuringCharacter {
             this.hitpoints = 0;
 
         // Track healing for achievements (if this is a hero being healed)
-        if(this.isHero && this.manager.achievementManager && actualHeal > 0) {
-            const stats = this.manager.achievementStats;
+        if(this.isHero && this.manager.achievements && actualHeal > 0) {
+            const stats = this.manager.achievementManager.stats;
             if(stats) {
                 stats.totalHealing = (stats.totalHealing || 0) + actualHeal;
             }
@@ -434,12 +434,13 @@ class AdventuringCharacter {
         this.renderQueue.hitpoints = true;
     }
 
-    revive({ amount=1 }, character) {
+    revive({ amount=100 }, character) {
         if(!this.dead)
             return;
 
         this.dead = false;
-        this.hitpoints = Math.floor(this.maxHitpoints * amount);
+        // amount is whole percent (50 = 50% HP)
+        this.hitpoints = Math.floor(this.maxHitpoints * amount / 100);
         
         if(isNaN(this.hitpoints))
             this.hitpoints = this.maxHitpoints;
@@ -573,8 +574,7 @@ class AdventuringCharacter {
             return;
 
         this.component.generator.nameText.textContent = this.generator.name;
-        if(this.component.generator.tooltip !== undefined)
-            this.component.generator.tooltip.setContent(this.component.generator.buildAbilityTooltip(this.generator));
+        this.component.generator.setTooltipContent(this.component.generator.buildAbilityTooltip(this.generator));
         this.component.generator.styling.classList.toggle('bg-combat-menu-selected', this.generator === this.action && this.highlight);
 
         this.renderQueue.generator = false;
@@ -585,8 +585,7 @@ class AdventuringCharacter {
             return;
 
         this.component.spender.nameText.textContent = this.spender.name;
-        if(this.component.spender.tooltip !== undefined)
-            this.component.spender.tooltip.setContent(this.component.spender.buildAbilityTooltip(this.spender));
+        this.component.spender.setTooltipContent(this.component.spender.buildAbilityTooltip(this.spender));
         this.component.spender.styling.classList.toggle('bg-combat-menu-selected', this.spender === this.action && this.highlight);
 
         this.renderQueue.spender = false;

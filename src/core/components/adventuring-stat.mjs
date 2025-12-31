@@ -1,4 +1,8 @@
-export class AdventuringStatElement extends HTMLElement {
+const { loadModule } = mod.getContext(import.meta);
+
+const { AdventuringTooltipElement } = await loadModule('src/core/adventuring-tooltip-element.mjs');
+
+export class AdventuringStatElement extends AdventuringTooltipElement {
     constructor() {
         super();
         this._content = new DocumentFragment();
@@ -7,34 +11,17 @@ export class AdventuringStatElement extends HTMLElement {
         this.styling = getElementFromFragment(this._content, 'styling', 'div');
         this.icon = getElementFromFragment(this._content, 'icon', 'img');
         this.value = getElementFromFragment(this._content, 'value', 'small');
-        this._tooltipContent = '';
-    }
-
-    mount(parent) {
-        parent.append(this);
-    }
-
-    setTooltipContent(content) {
-        this._tooltipContent = content;
-        if (this.tooltip) {
-            this.tooltip.setContent(content);
-        }
+        
+        this._tooltipTarget = this.styling;
     }
 
     connectedCallback() {
         this.appendChild(this._content);
-        this.tooltip = tippy(this.styling, {
-            content: this._tooltipContent,
-            allowHTML: true,
-            hideOnClick: false
-        });
+        super.connectedCallback();
     }
 
     disconnectedCallback() {
-        if (this.tooltip !== undefined) {
-            this.tooltip.destroy();
-            this.tooltip = undefined;
-        }
+        super.disconnectedCallback();
     }
 
     show() {

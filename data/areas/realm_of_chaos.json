@@ -2,729 +2,1467 @@
     "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
     "namespace": "adventuring",
     "data": {
-        "skillData": [{
-            "skillID": "adventuring:Adventuring",
-            "data": {
-                "passives": [
-                    {
-                        "id": "chaotic_instability",
-                        "name": "Chaotic Instability",
-                        "effects": [
-                            {
-                                "trigger": "encounter_start",
-                                "type": "random_buff",
-                                "target": "self",
-                                "count": 5,
-                                "stacks": 3
-                            },
-                            {
-                                "trigger": "encounter_start",
-                                "type": "random_debuff",
-                                "target": "self",
-                                "count": 3,
-                                "stacks": 2
-                            }
-                        ]
-                    },
-                    {
-                        "id": "reality_unraveling",
-                        "name": "Reality Unraveling",
-                        "effects": [
-                            {
-                                "trigger": "on_hit",
-                                "type": "chaos_damage",
-                                "bonusDamageChance": 25,
-                                "bonusDamagePercent": 50,
-                                "healEnemyChance": 25,
-                                "healEnemyPercent": 25
-                            }
-                        ]
-                    },
-                    {
-                        "id": "void_corruption",
-                        "name": "Void Corruption",
-                        "effects": [
-                            {
-                                "trigger": "on_kill",
-                                "type": "buff",
-                                "id": "adventuring:might",
-                                "target": "self",
-                                "stacks": 8
-                            },
-                            {
-                                "trigger": "on_kill",
-                                "type": "buff",
-                                "id": "adventuring:arcane_power",
-                                "target": "self",
-                                "stacks": 8
-                            },
-                            {
-                                "trigger": "on_kill",
-                                "type": "damage",
-                                "target": "self",
-                                "percentMax": 0.05
-                            }
-                        ]
-                    }
-                ],
-                "areas": [
-                    {
-                        "id": "realm_of_chaos",
-                        "name": "Realm of Chaos",
-                        "media": "melvor:assets/media/skills/astrology/astrology.png",
-                        "requirements": [
-                            { "type": "skill_level", "level": 95 }
-                        ],
-                        "height": 10,
-                        "width": 16,
-                        "floors": [
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:chaos_spawn", "weight": 40 },
-                                    { "id": "adventuring:void_rift", "weight": 35 },
-                                    { "id": "adventuring:entropy_wisp", "weight": 25 }
-                                ],
-                                "exit": ["adventuring:chaos_spawn", "adventuring:void_rift", "adventuring:entropy_wisp"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:void_rift", "weight": 30 },
-                                    { "id": "adventuring:entropy_wisp", "weight": 35 },
-                                    { "id": "adventuring:chaos_elemental", "weight": 35 }
-                                ],
-                                "exit": ["adventuring:void_rift", "adventuring:entropy_wisp", "adventuring:chaos_elemental"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:chaos_elemental", "weight": 30 },
-                                    { "id": "adventuring:reality_shredder", "weight": 35 },
-                                    { "id": "adventuring:void_stalker", "weight": 35 }
-                                ],
-                                "exit": ["adventuring:chaos_elemental", "adventuring:reality_shredder", "adventuring:void_stalker"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:reality_shredder", "weight": 30 },
-                                    { "id": "adventuring:void_stalker", "weight": 35 },
-                                    { "id": "adventuring:chaos_knight", "weight": 35 }
-                                ],
-                                "exit": ["adventuring:reality_shredder", "adventuring:void_stalker", "adventuring:chaos_knight"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:chaos_knight", "weight": 30 },
-                                    { "id": "adventuring:entropy_lord", "weight": 35 },
-                                    { "id": "adventuring:void_herald", "weight": 35 }
-                                ],
-                                "exit": ["adventuring:chaos_knight", "adventuring:entropy_lord", "adventuring:void_herald"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:entropy_lord", "weight": 35 },
-                                    { "id": "adventuring:void_herald", "weight": 65 }
-                                ],
-                                "exit": ["adventuring:void_herald", "adventuring:void_herald", "adventuring:the_chaos_incarnate"]
-                            }
-                        ]
-                    }
-                ],
-                "monsters": [
-                    {
-                        "id": "chaos_spawn",
-                        "name": "Chaos Spawn",
-                        "media": "melvor:assets/media/monsters/rune_knight.png",
-                        "tags": ["elemental", "chaos"],
-                        "xp": 850,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 320 },
-                            { "id": "adventuring:defence", "value": 65 },
-                            { "id": "adventuring:agility", "value": 60 },
-                            { "id": "adventuring:strength", "value": 70 },
-                            { "id": "adventuring:ranged", "value": 55 },
-                            { "id": "adventuring:magic", "value": 65 },
-                            { "id": "adventuring:prayer", "value": 50 }
-                        ],
-                        "generator": "adventuring:rift_chaos_bolt",
-                        "spender": "adventuring:reality_warp",
-                        "passives": [],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 425, "weight": 100 },
-                            { "id": "adventuring:chaos_essence", "qty": 4, "weight": 55 },
-                            { "id": "adventuring:void_fragment", "qty": 3, "weight": 30 }
-                        ]
-                    },
-                    {
-                        "id": "void_rift",
-                        "name": "Void Rift",
-                        "media": "melvor:assets/media/monsters/strange_eyed_monster.png",
-                        "tags": ["elemental", "void"],
-                        "xp": 830,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 280 },
-                            { "id": "adventuring:defence", "value": 50 },
-                            { "id": "adventuring:agility", "value": 70 },
-                            { "id": "adventuring:strength", "value": 55 },
-                            { "id": "adventuring:ranged", "value": 60 },
-                            { "id": "adventuring:magic", "value": 80 },
-                            { "id": "adventuring:prayer", "value": 45 }
-                        ],
-                        "generator": "adventuring:rift_void_pulse",
-                        "spender": "adventuring:dimensional_tear",
-                        "passives": [],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 405, "weight": 100 },
-                            { "id": "adventuring:void_fragment", "qty": 4, "weight": 50 },
-                            { "id": "adventuring:entropy_dust", "qty": 3, "weight": 35 }
-                        ]
-                    },
-                    {
-                        "id": "entropy_wisp",
-                        "name": "Entropy Wisp",
-                        "media": "melvor:assets/media/monsters/banshee.png",
-                        "tags": ["elemental", "chaos"],
-                        "xp": 820,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 250 },
-                            { "id": "adventuring:defence", "value": 45 },
-                            { "id": "adventuring:agility", "value": 80 },
-                            { "id": "adventuring:strength", "value": 50 },
-                            { "id": "adventuring:ranged", "value": 45 },
-                            { "id": "adventuring:magic", "value": 85 },
-                            { "id": "adventuring:prayer", "value": 55 }
-                        ],
-                        "generator": "adventuring:entropy_drain",
-                        "spender": "adventuring:decay",
-                        "passives": [],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 395, "weight": 100 },
-                            { "id": "adventuring:entropy_dust", "qty": 4, "weight": 55 },
-                            { "id": "adventuring:chaos_essence", "qty": 3, "weight": 30 }
-                        ]
-                    },
-                    {
-                        "id": "chaos_elemental",
-                        "name": "Chaos Elemental",
-                        "media": "melvor:assets/media/monsters/ice_elemental.png",
-                        "tags": ["elemental", "chaos"],
-                        "xp": 880,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 350 },
-                            { "id": "adventuring:defence", "value": 68 },
-                            { "id": "adventuring:agility", "value": 55 },
-                            { "id": "adventuring:strength", "value": 75 },
-                            { "id": "adventuring:ranged", "value": 60 },
-                            { "id": "adventuring:magic", "value": 75 },
-                            { "id": "adventuring:prayer", "value": 48 }
-                        ],
-                        "generator": "adventuring:chaotic_frenzy",
-                        "spender": "adventuring:chaotic_storm",
-                        "passives": [],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 460, "weight": 100 },
-                            { "id": "adventuring:chaos_essence", "qty": 5, "weight": 45 },
-                            { "id": "adventuring:reality_shard", "qty": 1, "weight": 35 }
-                        ]
-                    },
-                    {
-                        "id": "reality_shredder",
-                        "name": "Reality Shredder",
-                        "media": "melvor:assets/media/monsters/bounty_hunter.png",
-                        "tags": ["humanoid", "void"],
-                        "xp": 900,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 330 },
-                            { "id": "adventuring:defence", "value": 60 },
-                            { "id": "adventuring:agility", "value": 75 },
-                            { "id": "adventuring:strength", "value": 82 },
-                            { "id": "adventuring:ranged", "value": 55 },
-                            { "id": "adventuring:magic", "value": 60 },
-                            { "id": "adventuring:prayer", "value": 42 }
-                        ],
-                        "generator": "adventuring:shred_reality",
-                        "spender": "adventuring:dimension_slice",
-                        "passives": [],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 480, "weight": 100 },
-                            { "id": "adventuring:void_fragment", "qty": 5, "weight": 45 },
-                            { "id": "adventuring:reality_shard", "qty": 2, "weight": 40 }
-                        ]
-                    },
-                    {
-                        "id": "void_stalker",
-                        "name": "Void Stalker",
-                        "media": "melvor:assets/media/monsters/hunting_greater_dragon.png",
-                        "tags": ["beast", "void"],
-                        "xp": 920,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 380 },
-                            { "id": "adventuring:defence", "value": 70 },
-                            { "id": "adventuring:agility", "value": 68 },
-                            { "id": "adventuring:strength", "value": 78 },
-                            { "id": "adventuring:ranged", "value": 65 },
-                            { "id": "adventuring:magic", "value": 55 },
-                            { "id": "adventuring:prayer", "value": 50 }
-                        ],
-                        "generator": "adventuring:rift_void_strike",
-                        "spender": "adventuring:null_zone",
-                        "passives": [],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 500, "weight": 100 },
-                            { "id": "adventuring:void_fragment", "qty": 5, "weight": 50 },
-                            { "id": "adventuring:entropy_dust", "qty": 4, "weight": 35 }
-                        ]
-                    },
-                    {
-                        "id": "chaos_knight",
-                        "name": "Chaos Knight",
-                        "media": "melvor:assets/media/monsters/red_knight.png",
-                        "tags": ["humanoid", "chaos"],
-                        "xp": 960,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 420 },
-                            { "id": "adventuring:defence", "value": 85 },
-                            { "id": "adventuring:agility", "value": 50 },
-                            { "id": "adventuring:strength", "value": 90 },
-                            { "id": "adventuring:ranged", "value": 45 },
-                            { "id": "adventuring:magic", "value": 70 },
-                            { "id": "adventuring:prayer", "value": 55 }
-                        ],
-                        "generator": "adventuring:chaos_blade",
-                        "spender": "adventuring:reality_crush",
-                        "passives": [],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 535, "weight": 100 },
-                            { "id": "adventuring:chaos_essence", "qty": 6, "weight": 45 },
-                            { "id": "adventuring:reality_shard", "qty": 3, "weight": 40 }
-                        ]
-                    },
-                    {
-                        "id": "entropy_lord",
-                        "name": "Entropy Lord",
-                        "media": "melvor:assets/media/monsters/dark_wizard.png",
-                        "tags": ["humanoid", "mage", "chaos"],
-                        "xp": 980,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 360 },
-                            { "id": "adventuring:defence", "value": 65 },
-                            { "id": "adventuring:agility", "value": 60 },
-                            { "id": "adventuring:strength", "value": 70 },
-                            { "id": "adventuring:ranged", "value": 55 },
-                            { "id": "adventuring:magic", "value": 95 },
-                            { "id": "adventuring:prayer", "value": 65 }
-                        ],
-                        "generator": "adventuring:entropy_bolt",
-                        "spender": "adventuring:heat_death",
-                        "passives": [],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 550, "weight": 100 },
-                            { "id": "adventuring:entropy_dust", "qty": 6, "weight": 45 },
-                            { "id": "adventuring:reality_shard", "qty": 3, "weight": 40 }
-                        ]
-                    },
-                    {
-                        "id": "void_herald",
-                        "name": "Void Herald",
-                        "media": "melvor:assets/media/monsters/angel_of_death.png",
-                        "tags": ["humanoid", "void", "boss"],
-                        "xp": 1000,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 400 },
-                            { "id": "adventuring:defence", "value": 75 },
-                            { "id": "adventuring:agility", "value": 65 },
-                            { "id": "adventuring:strength", "value": 80 },
-                            { "id": "adventuring:ranged", "value": 70 },
-                            { "id": "adventuring:magic", "value": 85 },
-                            { "id": "adventuring:prayer", "value": 60 }
-                        ],
-                        "generator": "adventuring:herald_call",
-                        "spender": "adventuring:void_proclamation",
-                        "passives": [],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 570, "weight": 100 },
-                            { "id": "adventuring:void_fragment", "qty": 6, "weight": 40 },
-                            { "id": "adventuring:chaos_core", "qty": 1, "weight": 25 },
-                            { "id": "adventuring:reality_shard", "qty": 3, "weight": 20 }
-                        ]
-                    },
-                    {
-                        "id": "the_chaos_incarnate",
-                        "name": "The Chaos Incarnate",
-                        "media": "melvor:assets/media/monsters/cult_monster.png",
-                        "tags": ["elemental", "chaos", "boss"],
-                        "xp": 1500,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 800 },
-                            { "id": "adventuring:defence", "value": 95 },
-                            { "id": "adventuring:agility", "value": 75 },
-                            { "id": "adventuring:strength", "value": 100 },
-                            { "id": "adventuring:ranged", "value": 80 },
-                            { "id": "adventuring:magic", "value": 100 },
-                            { "id": "adventuring:prayer", "value": 75 }
-                        ],
-                        "generator": "adventuring:chaos_incarnation",
-                        "spender": "adventuring:end_of_reality",
-                        "passives": ["adventuring:chaotic_instability", "adventuring:void_corruption"],
-                        "loot": [
-                            { "id": "adventuring:chaos_core", "qty": 3, "weight": 100 },
-                            { "id": "adventuring:chaos_essence", "qty": 12, "weight": 100 },
-                            { "id": "adventuring:void_fragment", "qty": 10, "weight": 100 },
-                            { "id": "adventuring:entropy_dust", "qty": 10, "weight": 100 },
-                            { "id": "adventuring:reality_shard", "qty": 6, "weight": 100 }
-                        ]
-                    }
-                ],
-                "generators": [
-                    {
-                        "id": "rift_chaos_bolt",
-                        "name": "Rift Chaos Bolt",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "energy": 30,
-                        "hits": [
-                            {
-                                "target": "random",
-                                "party": "enemy",
-                                "effects": [
-                                    { "type": "damage", "amount": { "base": 18, "scaling": [{ "id": "adventuring:magic", "value": 0.6 }] } }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "rift_void_pulse",
-                        "name": "Rift Void Pulse",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "energy": 28,
-                        "hits": [
-                            {
-                                "target": "single_enemy",
-                                "effects": [
-                                    { "type": "damage", "amount": { "base": 20, "scaling": [{ "id": "adventuring:magic", "value": 0.7 }] } }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "entropy_drain",
-                        "name": "Entropy Drain",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "energy": 32,
-                        "hits": [
-                            {
-                                "target": "single_enemy",
-                                "effects": [
-                                    { "type": "damage", "amount": { "base": 16, "scaling": [{ "id": "adventuring:magic", "value": 0.65 }] } },
-                                    { "type": "debuff", "id": "adventuring:weaken", "stacks": 2 }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "chaotic_frenzy",
-                        "name": "Chaotic Frenzy",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "energy": 30,
-                        "hits": [
-                            {
-                                "target": "single_enemy",
-                                "effects": [
-                                    { "type": "damage", "amount": { "base": 22, "scaling": [{ "id": "adventuring:strength", "value": 0.5 }, { "id": "adventuring:magic", "value": 0.4 }] } }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "shred_reality",
-                        "name": "Shred Reality",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "energy": 35,
-                        "hits": [
-                            {
-                                "target": "single_enemy",
-                                "effects": [
-                                    { "type": "damage", "amount": { "base": 25, "scaling": [{ "id": "adventuring:strength", "value": 0.8 }] } },
-                                    { "type": "debuff", "id": "adventuring:vulnerability", "stacks": 1 }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "rift_void_strike",
-                        "name": "Rift Void Strike",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "energy": 32,
-                        "hits": [
-                            {
-                                "target": "single_enemy",
-                                "effects": [
-                                    { "type": "damage", "amount": { "base": 24, "scaling": [{ "id": "adventuring:strength", "value": 0.7 }] } }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "chaos_blade",
-                        "name": "Chaos Blade",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "energy": 35,
-                        "hits": [
-                            {
-                                "target": "single_enemy",
-                                "effects": [
-                                    { "type": "damage", "amount": { "base": 28, "scaling": [{ "id": "adventuring:strength", "value": 0.85 }] } }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "entropy_bolt",
-                        "name": "Entropy Bolt",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "energy": 30,
-                        "hits": [
-                            {
-                                "target": "single_enemy",
-                                "effects": [
-                                    { "type": "damage", "amount": { "base": 26, "scaling": [{ "id": "adventuring:magic", "value": 0.9 }] } }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "herald_call",
-                        "name": "Herald's Call",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "energy": 35,
-                        "hits": [
-                            {
-                                "target": "single_enemy",
-                                "effects": [
-                                    { "type": "damage", "amount": { "base": 28, "scaling": [{ "id": "adventuring:magic", "value": 0.8 }] } },
-                                    { "type": "debuff", "id": "adventuring:fear", "stacks": 1 }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "chaos_incarnation",
-                        "name": "Chaos Incarnation",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "energy": 40,
-                        "hits": [
-                            {
-                                "target": "random",
-                                "party": "enemy",
-                                "repeat": 3,
-                                "effects": [
-                                    { "type": "damage", "amount": { "base": 20, "scaling": [{ "id": "adventuring:strength", "value": 0.5 }, { "id": "adventuring:magic", "value": 0.5 }] } }
-                                ]
-                            }
-                        ]
-                    }
-                ],
-                "spenders": [
-                    {
-                        "id": "reality_warp",
-                        "name": "Reality Warp",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 75,
-                        "hits": [
-                            {
-                                "target": "all_enemies",
-                                "effects": [
-                                    { "type": "damage", "amount": { "base": 30, "scaling": [{ "id": "adventuring:magic", "value": 0.7 }] } },
-                                    { "type": "debuff", "id": "adventuring:slow", "stacks": 2 }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "dimensional_tear",
-                        "name": "Dimensional Tear",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 70,
-                        "hits": [
-                            {
-                                "target": "single_enemy",
-                                "effects": [
-                                    { "type": "damage", "amount": { "base": 45, "scaling": [{ "id": "adventuring:magic", "value": 1.0 }] } }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "decay",
-                        "name": "Decay",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 65,
-                        "hits": [
-                            {
-                                "target": "all_enemies",
-                                "effects": [
-                                    { "type": "damage", "amount": { "base": 25, "scaling": [{ "id": "adventuring:magic", "value": 0.8 }] } },
-                                    { "type": "debuff", "id": "adventuring:poison", "stacks": 3 }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "chaotic_storm",
-                        "name": "Chaotic Storm",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 80,
-                        "hits": [
-                            {
-                                "target": "all_enemies",
-                                "effects": [
-                                    { "type": "damage", "amount": { "base": 35, "scaling": [{ "id": "adventuring:magic", "value": 0.9 }] } }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "dimension_slice",
-                        "name": "Dimension Slice",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 85,
-                        "hits": [
-                            {
-                                "target": "single_enemy",
-                                "effects": [
-                                    { "type": "damage", "amount": { "base": 55, "scaling": [{ "id": "adventuring:strength", "value": 1.1 }] } },
-                                    { "type": "debuff", "id": "adventuring:bleed", "stacks": 2 }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "null_zone",
-                        "name": "Null Zone",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 80,
-                        "hits": [
-                            {
-                                "target": "all_enemies",
-                                "effects": [
-                                    { "type": "damage", "amount": { "base": 40, "scaling": [{ "id": "adventuring:strength", "value": 0.8 }] } },
-                                    { "type": "debuff", "id": "adventuring:weaken", "stacks": 3 }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "reality_crush",
-                        "name": "Reality Crush",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 90,
-                        "hits": [
-                            {
-                                "target": "single_enemy",
-                                "effects": [
-                                    { "type": "damage", "amount": { "base": 60, "scaling": [{ "id": "adventuring:strength", "value": 1.2 }] } }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "heat_death",
-                        "name": "Heat Death",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 95,
-                        "hits": [
-                            {
-                                "target": "all_enemies",
-                                "effects": [
-                                    { "type": "damage", "amount": { "base": 50, "scaling": [{ "id": "adventuring:magic", "value": 1.1 }] } },
-                                    { "type": "debuff", "id": "adventuring:burn", "stacks": 4 }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "void_proclamation",
-                        "name": "Void Proclamation",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 90,
-                        "hits": [
-                            {
-                                "target": "all_enemies",
-                                "effects": [
-                                    { "type": "damage", "amount": { "base": 45, "scaling": [{ "id": "adventuring:magic", "value": 1.0 }] } },
-                                    { "type": "debuff", "id": "adventuring:fear", "stacks": 2 },
-                                    { "type": "debuff", "id": "adventuring:vulnerability", "stacks": 2 }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "end_of_reality",
-                        "name": "End of Reality",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 100,
-                        "hits": [
-                            {
-                                "target": "all_enemies",
-                                "effects": [
-                                    { "type": "damage", "amount": { "base": 60, "scaling": [{ "id": "adventuring:strength", "value": 0.8 }, { "id": "adventuring:magic", "value": 0.8 }] } },
-                                    { "type": "debuff", "id": "adventuring:slow", "stacks": 3 },
-                                    { "type": "debuff", "id": "adventuring:weaken", "stacks": 3 }
-                                ]
-                            }
-                        ]
-                    }
-                ],
-                "materials": [
-                    {
-                        "id": "chaos_essence",
-                        "name": "Chaos Essence",
-                        "media": "melvor:assets/media/bank/rune_chaos.png",
-                        "category": "adventuring:monster_drops"
-                    },
-                    {
-                        "id": "void_fragment",
-                        "name": "Void Fragment",
-                        "media": "melvor:assets/media/bank/obsidian.png",
-                        "category": "adventuring:monster_drops"
-                    },
-                    {
-                        "id": "entropy_dust",
-                        "name": "Entropy Dust",
-                        "media": "melvor:assets/media/bank/stardust.png",
-                        "category": "adventuring:monster_drops"
-                    },
-                    {
-                        "id": "reality_shard",
-                        "name": "Reality Shard",
-                        "media": "melvor:assets/media/bank/superior_diamond_fragment.png",
-                        "category": "adventuring:monster_drops"
-                    },
-                    {
-                        "id": "chaos_core",
-                        "name": "Chaos Core",
-                        "media": "melvor:assets/media/bank/ring_of_throwing.png",
-                        "category": "adventuring:boss_drops"
-                    }
-                ]
+        "skillData": [
+            {
+                "skillID": "adventuring:Adventuring",
+                "data": {
+                    "passives": [
+                        {
+                            "id": "chaotic_instability",
+                            "name": "Chaotic Instability",
+                            "effects": [
+                                {
+                                    "trigger": "encounter_start",
+                                    "type": "random_buff",
+                                    "target": "self",
+                                    "count": 5,
+                                    "stacks": 3
+                                },
+                                {
+                                    "trigger": "encounter_start",
+                                    "type": "random_debuff",
+                                    "target": "self",
+                                    "count": 3,
+                                    "stacks": 2
+                                }
+                            ]
+                        },
+                        {
+                            "id": "reality_unraveling",
+                            "name": "Reality Unraveling",
+                            "effects": [
+                                {
+                                    "trigger": "on_hit",
+                                    "type": "chaos_damage",
+                                    "bonusDamageChance": 25,
+                                    "bonusDamagePercent": 50,
+                                    "healEnemyChance": 25,
+                                    "healEnemyPercent": 25
+                                }
+                            ]
+                        },
+                        {
+                            "id": "void_corruption",
+                            "name": "Void Corruption",
+                            "effects": [
+                                {
+                                    "trigger": "on_kill",
+                                    "type": "buff",
+                                    "id": "adventuring:might",
+                                    "target": "self",
+                                    "stacks": 8
+                                },
+                                {
+                                    "trigger": "on_kill",
+                                    "type": "buff",
+                                    "id": "adventuring:arcane_power",
+                                    "target": "self",
+                                    "stacks": 8
+                                },
+                                {
+                                    "trigger": "on_kill",
+                                    "type": "damage",
+                                    "target": "self",
+                                    "percentMax": 0.05
+                                }
+                            ]
+                        }
+                    ],
+                    "areas": [
+                        {
+                            "id": "realm_of_chaos",
+                            "name": "Realm of Chaos",
+                            "media": "melvor:assets/media/skills/astrology/astrology.svg#shade=purple",
+                            "requirements": [
+                                {
+                                    "type": "skill_level",
+                                    "level": 95
+                                }
+                            ],
+                            "height": 10,
+                            "width": 16,
+                            "floors": [
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:chaos_spawn",
+                                            "weight": 40
+                                        },
+                                        {
+                                            "id": "adventuring:void_rift",
+                                            "weight": 35
+                                        },
+                                        {
+                                            "id": "adventuring:entropy_wisp",
+                                            "weight": 25
+                                        }
+                                    ],
+                                    "exit": [
+                                        "adventuring:chaos_spawn",
+                                        "adventuring:void_rift",
+                                        "adventuring:entropy_wisp"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:void_rift",
+                                            "weight": 30
+                                        },
+                                        {
+                                            "id": "adventuring:entropy_wisp",
+                                            "weight": 35
+                                        },
+                                        {
+                                            "id": "adventuring:chaos_elemental",
+                                            "weight": 35
+                                        }
+                                    ],
+                                    "exit": [
+                                        "adventuring:void_rift",
+                                        "adventuring:entropy_wisp",
+                                        "adventuring:chaos_elemental"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:chaos_elemental",
+                                            "weight": 30
+                                        },
+                                        {
+                                            "id": "adventuring:reality_shredder",
+                                            "weight": 35
+                                        },
+                                        {
+                                            "id": "adventuring:void_stalker",
+                                            "weight": 35
+                                        }
+                                    ],
+                                    "exit": [
+                                        "adventuring:chaos_elemental",
+                                        "adventuring:reality_shredder",
+                                        "adventuring:void_stalker"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:reality_shredder",
+                                            "weight": 30
+                                        },
+                                        {
+                                            "id": "adventuring:void_stalker",
+                                            "weight": 35
+                                        },
+                                        {
+                                            "id": "adventuring:chaos_knight",
+                                            "weight": 35
+                                        }
+                                    ],
+                                    "exit": [
+                                        "adventuring:reality_shredder",
+                                        "adventuring:void_stalker",
+                                        "adventuring:chaos_knight"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:chaos_knight",
+                                            "weight": 30
+                                        },
+                                        {
+                                            "id": "adventuring:entropy_lord",
+                                            "weight": 35
+                                        },
+                                        {
+                                            "id": "adventuring:void_herald",
+                                            "weight": 35
+                                        }
+                                    ],
+                                    "exit": [
+                                        "adventuring:chaos_knight",
+                                        "adventuring:entropy_lord",
+                                        "adventuring:void_herald"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:entropy_lord",
+                                            "weight": 35
+                                        },
+                                        {
+                                            "id": "adventuring:void_herald",
+                                            "weight": 65
+                                        }
+                                    ],
+                                    "exit": [
+                                        "adventuring:void_herald",
+                                        "adventuring:void_herald",
+                                        "adventuring:the_chaos_incarnate"
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "monsters": [
+                        {
+                            "id": "chaos_spawn",
+                            "name": "Chaos Spawn",
+                            "media": "melvor:assets/media/monsters/rune_knight.png",
+                            "tags": [
+                                "elemental",
+                                "chaos"
+                            ],
+                            "xp": 850,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 110
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 48
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 60
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 52
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 55
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 65
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 50
+                                }
+                            ],
+                            "generator": "adventuring:rift_chaos_bolt",
+                            "spender": "adventuring:reality_warp",
+                            "passives": [],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 425,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:chaos_essence",
+                                    "qty": 4,
+                                    "weight": 55
+                                },
+                                {
+                                    "id": "adventuring:void_fragment",
+                                    "qty": 3,
+                                    "weight": 30
+                                }
+                            ]
+                        },
+                        {
+                            "id": "void_rift",
+                            "name": "Void Rift",
+                            "media": "melvor:assets/media/monsters/strange_eyed_monster.png",
+                            "tags": [
+                                "elemental",
+                                "void"
+                            ],
+                            "xp": 830,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 95
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 38
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 70
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 42
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 60
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 80
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 45
+                                }
+                            ],
+                            "generator": "adventuring:rift_void_pulse",
+                            "spender": "adventuring:dimensional_tear",
+                            "passives": [],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 405,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:void_fragment",
+                                    "qty": 4,
+                                    "weight": 50
+                                },
+                                {
+                                    "id": "adventuring:entropy_dust",
+                                    "qty": 3,
+                                    "weight": 35
+                                }
+                            ]
+                        },
+                        {
+                            "id": "entropy_wisp",
+                            "name": "Entropy Wisp",
+                            "media": "melvor:assets/media/monsters/banshee.png",
+                            "tags": [
+                                "elemental",
+                                "chaos"
+                            ],
+                            "xp": 820,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 85
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 35
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 80
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 38
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 45
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 85
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 55
+                                }
+                            ],
+                            "generator": "adventuring:entropy_drain",
+                            "spender": "adventuring:decay",
+                            "passives": [],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 395,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:entropy_dust",
+                                    "qty": 4,
+                                    "weight": 55
+                                },
+                                {
+                                    "id": "adventuring:chaos_essence",
+                                    "qty": 3,
+                                    "weight": 30
+                                }
+                            ]
+                        },
+                        {
+                            "id": "chaos_elemental",
+                            "name": "Chaos Elemental",
+                            "media": "melvor:assets/media/monsters/water_monster.png#shade=cyan",
+                            "tags": [
+                                "elemental",
+                                "chaos"
+                            ],
+                            "xp": 880,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 120
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 50
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 55
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 56
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 60
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 75
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 48
+                                }
+                            ],
+                            "generator": "adventuring:chaotic_frenzy",
+                            "spender": "adventuring:chaotic_storm",
+                            "passives": [],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 460,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:chaos_essence",
+                                    "qty": 5,
+                                    "weight": 45
+                                },
+                                {
+                                    "id": "adventuring:reality_shard",
+                                    "qty": 1,
+                                    "weight": 35
+                                }
+                            ]
+                        },
+                        {
+                            "id": "reality_shredder",
+                            "name": "Reality Shredder",
+                            "media": "melvor:assets/media/monsters/bounty_hunter.png",
+                            "tags": [
+                                "humanoid",
+                                "void"
+                            ],
+                            "xp": 900,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 115
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 45
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 75
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 60
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 55
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 60
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 42
+                                }
+                            ],
+                            "generator": "adventuring:shred_reality",
+                            "spender": "adventuring:dimension_slice",
+                            "passives": [],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 480,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:void_fragment",
+                                    "qty": 5,
+                                    "weight": 45
+                                },
+                                {
+                                    "id": "adventuring:reality_shard",
+                                    "qty": 2,
+                                    "weight": 40
+                                }
+                            ]
+                        },
+                        {
+                            "id": "void_stalker",
+                            "name": "Void Stalker",
+                            "media": "melvor:assets/media/monsters/hunting_greater_dragon.png",
+                            "tags": [
+                                "beast",
+                                "void"
+                            ],
+                            "xp": 920,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 130
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 52
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 68
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 58
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 65
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 55
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 50
+                                }
+                            ],
+                            "generator": "adventuring:rift_void_strike",
+                            "spender": "adventuring:null_zone",
+                            "passives": [],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 500,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:void_fragment",
+                                    "qty": 5,
+                                    "weight": 50
+                                },
+                                {
+                                    "id": "adventuring:entropy_dust",
+                                    "qty": 4,
+                                    "weight": 35
+                                }
+                            ]
+                        },
+                        {
+                            "id": "chaos_knight",
+                            "name": "Chaos Knight",
+                            "media": "melvor:assets/media/monsters/black_knight.png#shade=red",
+                            "tags": [
+                                "humanoid",
+                                "chaos"
+                            ],
+                            "xp": 960,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 145
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 62
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 50
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 68
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 45
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 70
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 55
+                                }
+                            ],
+                            "generator": "adventuring:chaos_blade",
+                            "spender": "adventuring:reality_crush",
+                            "passives": [],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 535,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:chaos_essence",
+                                    "qty": 6,
+                                    "weight": 45
+                                },
+                                {
+                                    "id": "adventuring:reality_shard",
+                                    "qty": 3,
+                                    "weight": 40
+                                }
+                            ]
+                        },
+                        {
+                            "id": "entropy_lord",
+                            "name": "Entropy Lord",
+                            "media": "melvor:assets/media/monsters/dark_wizard.png",
+                            "tags": [
+                                "humanoid",
+                                "mage",
+                                "chaos"
+                            ],
+                            "xp": 980,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 125
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 48
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 60
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 52
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 55
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 95
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 65
+                                }
+                            ],
+                            "generator": "adventuring:entropy_bolt",
+                            "spender": "adventuring:heat_death",
+                            "passives": [],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 550,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:entropy_dust",
+                                    "qty": 6,
+                                    "weight": 45
+                                },
+                                {
+                                    "id": "adventuring:reality_shard",
+                                    "qty": 3,
+                                    "weight": 40
+                                }
+                            ]
+                        },
+                        {
+                            "id": "void_herald",
+                            "name": "Void Herald",
+                            "media": "melvor:assets/media/monsters/angel.png#shade=black",
+                            "tags": [
+                                "humanoid",
+                                "void",
+                                "boss"
+                            ],
+                            "xp": 1000,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 138
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 55
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 65
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 60
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 70
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 85
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 60
+                                }
+                            ],
+                            "generator": "adventuring:herald_call",
+                            "spender": "adventuring:void_proclamation",
+                            "passives": [],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 570,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:void_fragment",
+                                    "qty": 6,
+                                    "weight": 40
+                                },
+                                {
+                                    "id": "adventuring:chaos_core",
+                                    "qty": 1,
+                                    "weight": 25
+                                },
+                                {
+                                    "id": "adventuring:reality_shard",
+                                    "qty": 3,
+                                    "weight": 20
+                                }
+                            ]
+                        },
+                        {
+                            "id": "the_chaos_incarnate",
+                            "name": "The Chaos Incarnate",
+                            "media": "melvor:assets/media/monsters/dark_wizard.png#shade=red",
+                            "tags": [
+                                "elemental",
+                                "chaos",
+                                "boss"
+                            ],
+                            "xp": 1500,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 320
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 72
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 75
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 75
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 80
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 100
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 75
+                                }
+                            ],
+                            "generator": "adventuring:chaos_incarnation",
+                            "spender": "adventuring:end_of_reality",
+                            "passives": [
+                                "adventuring:chaotic_instability",
+                                "adventuring:void_corruption"
+                            ],
+                            "loot": [
+                                {
+                                    "id": "adventuring:chaos_core",
+                                    "qty": 3,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:chaos_essence",
+                                    "qty": 12,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:void_fragment",
+                                    "qty": 10,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:entropy_dust",
+                                    "qty": 10,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:reality_shard",
+                                    "qty": 6,
+                                    "weight": 100
+                                }
+                            ]
+                        }
+                    ],
+                    "generators": [
+                        {
+                            "id": "rift_chaos_bolt",
+                            "name": "Rift Chaos Bolt",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "energy": 30,
+                            "hits": [
+                                {
+                                    "target": "random",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 18,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "value": 0.6
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "rift_void_pulse",
+                            "name": "Rift Void Pulse",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "energy": 28,
+                            "hits": [
+                                {
+                                    "target": "single_enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 20,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "value": 0.7
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "entropy_drain",
+                            "name": "Entropy Drain",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "energy": 32,
+                            "hits": [
+                                {
+                                    "target": "single_enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 16,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "value": 0.65
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:weaken",
+                                            "stacks": 2
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "chaotic_frenzy",
+                            "name": "Chaotic Frenzy",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "energy": 30,
+                            "hits": [
+                                {
+                                    "target": "single_enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 22,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "value": 0.5
+                                                    },
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "value": 0.4
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "shred_reality",
+                            "name": "Shred Reality",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "energy": 35,
+                            "hits": [
+                                {
+                                    "target": "single_enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 25,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "value": 0.8
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:vulnerability",
+                                            "stacks": 1
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "rift_void_strike",
+                            "name": "Rift Void Strike",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "energy": 32,
+                            "hits": [
+                                {
+                                    "target": "single_enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 24,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "value": 0.7
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "chaos_blade",
+                            "name": "Chaos Blade",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "energy": 35,
+                            "hits": [
+                                {
+                                    "target": "single_enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 28,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "value": 0.85
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "entropy_bolt",
+                            "name": "Entropy Bolt",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "energy": 30,
+                            "hits": [
+                                {
+                                    "target": "single_enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 26,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "value": 0.9
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "herald_call",
+                            "name": "Herald's Call",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "energy": 35,
+                            "hits": [
+                                {
+                                    "target": "single_enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 28,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "value": 0.8
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:fear",
+                                            "stacks": 1
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "chaos_incarnation",
+                            "name": "Chaos Incarnation",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "energy": 40,
+                            "hits": [
+                                {
+                                    "target": "random",
+                                    "party": "enemy",
+                                    "repeat": 3,
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 20,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "value": 0.5
+                                                    },
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "value": 0.5
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "spenders": [
+                        {
+                            "id": "reality_warp",
+                            "name": "Reality Warp",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 75,
+                            "hits": [
+                                {
+                                    "target": "all_enemies",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 30,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "value": 0.7
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:slow",
+                                            "stacks": 2
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "dimensional_tear",
+                            "name": "Dimensional Tear",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 70,
+                            "hits": [
+                                {
+                                    "target": "single_enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 45,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "value": 1.0
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "decay",
+                            "name": "Decay",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 65,
+                            "hits": [
+                                {
+                                    "target": "all_enemies",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 25,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "value": 0.8
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:poison",
+                                            "stacks": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "chaotic_storm",
+                            "name": "Chaotic Storm",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 80,
+                            "hits": [
+                                {
+                                    "target": "all_enemies",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 35,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "value": 0.9
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "dimension_slice",
+                            "name": "Dimension Slice",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 85,
+                            "hits": [
+                                {
+                                    "target": "single_enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 55,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "value": 1.1
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:bleed",
+                                            "stacks": 2
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "null_zone",
+                            "name": "Null Zone",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 80,
+                            "hits": [
+                                {
+                                    "target": "all_enemies",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 40,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "value": 0.8
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:weaken",
+                                            "stacks": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "reality_crush",
+                            "name": "Reality Crush",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 90,
+                            "hits": [
+                                {
+                                    "target": "single_enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 60,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "value": 1.2
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "heat_death",
+                            "name": "Heat Death",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 95,
+                            "hits": [
+                                {
+                                    "target": "all_enemies",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 50,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "value": 1.1
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:burn",
+                                            "stacks": 4
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "void_proclamation",
+                            "name": "Void Proclamation",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 90,
+                            "hits": [
+                                {
+                                    "target": "all_enemies",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 45,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "value": 1.0
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:fear",
+                                            "stacks": 2
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:vulnerability",
+                                            "stacks": 2
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "end_of_reality",
+                            "name": "End of Reality",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 100,
+                            "hits": [
+                                {
+                                    "target": "all_enemies",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 60,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "value": 0.8
+                                                    },
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "value": 0.8
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:slow",
+                                            "stacks": 3
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:weaken",
+                                            "stacks": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "materials": [
+                        {
+                            "id": "chaos_essence",
+                            "name": "Chaos Essence",
+                            "media": "melvor:assets/media/bank/rune_chaos.png",
+                            "category": "adventuring:monster_drops"
+                        },
+                        {
+                            "id": "void_fragment",
+                            "name": "Void Fragment",
+                            "media": "melvor:assets/media/bank/obsidian_edge.png",
+                            "category": "adventuring:monster_drops"
+                        },
+                        {
+                            "id": "entropy_dust",
+                            "name": "Entropy Dust",
+                            "media": "melvor:assets/media/bank/stardust.png",
+                            "category": "adventuring:monster_drops"
+                        },
+                        {
+                            "id": "reality_shard",
+                            "name": "Reality Shard",
+                            "media": "melvor:assets/media/bank/diamond.png#shade=cyan",
+                            "category": "adventuring:monster_drops"
+                        },
+                        {
+                            "id": "chaos_core",
+                            "name": "Chaos Core",
+                            "media": "melvor:assets/media/bank/ring_gold_topaz.png#shade=brown",
+                            "category": "adventuring:boss_drops"
+                        }
+                    ]
+                }
             }
-        }]
+        ]
     }
 }

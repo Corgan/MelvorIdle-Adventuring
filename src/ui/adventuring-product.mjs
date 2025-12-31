@@ -9,7 +9,7 @@ export class AdventuringProduct extends NamespacedObject {
         this.game = game;
 
         this.outputType = data.outputType || 'item';
-        this._output = data.item || data.material || data.consumable || data.baseItem;
+        this._output = data.item || data.material || data.consumable;
         this.count = data.count;
 
         this.requirements = data.requirements;
@@ -34,6 +34,8 @@ export class AdventuringProduct extends NamespacedObject {
     }
 
     postDataRegistration() {
+        if (this.output) return;
+        
         this._reqChecker = new RequirementsChecker(this.manager, this.requirements);
         
         switch(this.outputType) {
@@ -42,9 +44,6 @@ export class AdventuringProduct extends NamespacedObject {
                 break;
             case 'consumable':
                 this.output = this.manager.consumableTypes.getObjectByID(this._output);
-                break;
-            case 'baseItem':
-                this.output = this.manager.baseItems.getObjectByID(this._output);
                 break;
             case 'item':
             default:

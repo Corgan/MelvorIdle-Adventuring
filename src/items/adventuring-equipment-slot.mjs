@@ -269,8 +269,7 @@ export class AdventuringEquipmentSlot {
         this.component.icon.src = media;
         this.component.icon.classList.toggle('opacity-40', !this.empty && this.occupied);
 
-        if(this.component.tooltip !== undefined)
-            this.component.tooltip.setContent(tooltip);
+        this.component.setTooltipContent(tooltip);
 
         this.renderQueue.icon = false;
     }

@@ -5,6 +5,7 @@ const { describeEffect } = await loadModule('src/core/adventuring-utils.mjs');
 
 const { AdventuringOverviewElement } = await loadModule('src/ui/components/adventuring-overview.mjs');
 const { AdventuringOverviewButtonElement } = await loadModule('src/ui/components/adventuring-overview-button.mjs');
+const { AdventuringEffectIconElement } = await loadModule('src/ui/components/adventuring-effect-icon.mjs');
 
 class AdventuringOverviewButton {
     constructor(manager, game, data) {
@@ -270,22 +271,9 @@ export class AdventuringOverview {
 
         // Render effect icons
         effects.forEach(effect => {
-            const icon = document.createElement('div');
-            icon.className = 'adventuring-buff-icon m-1';
-            if(effect.colorClass) {
-                icon.classList.add(effect.colorClass);
-            }
-            icon.innerHTML = `<img src="${effect.media}" class="skill-icon-xs" alt="${effect.name}">`;
+            const icon = new AdventuringEffectIconElement();
             this.component.effectsContainer.appendChild(icon);
-            
-            // Initialize tippy tooltip (same settings as rest of mod)
-            if(typeof tippy !== 'undefined') {
-                tippy(icon, {
-                    content: effect.tooltip,
-                    allowHTML: true,
-                    hideOnClick: false
-                });
-            }
+            icon.setEffect(effect);
         });
 
         this.renderQueue.buffs = false;

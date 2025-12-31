@@ -364,7 +364,7 @@ export class AdventuringArmory extends AdventuringPage {
                 const cost = this.selectedItem.getCost(material);
                 const owned = material.count;
                 
-                component.setTooltipContent(TooltipBuilder.forMaterial(material).build());
+                component.setTooltipContent(TooltipBuilder.forMaterial(material, this.manager).build());
         
                 component.icon.src = material.media;
                 component.count.textContent = cost;

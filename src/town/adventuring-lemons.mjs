@@ -3,6 +3,7 @@ const { loadModule } = mod.getContext(import.meta);
 const { AdventuringPage } = await loadModule('src/ui/adventuring-page.mjs');
 
 const { AdventuringLemonsElement } = await loadModule('src/town/components/adventuring-lemons.mjs');
+const { AdventuringStatCardElement } = await loadModule('src/ui/components/adventuring-stat-card.mjs');
 
 // Lemon wisdom and jokes
 const LEMON_QUOTES = [
@@ -180,22 +181,24 @@ export class AdventuringLemons extends AdventuringPage {
 
         // Stats display
         if(this.component.stats) {
-            this.component.stats.innerHTML = `
-                <div class="row">
-                    <div class="col-4 text-center">
-                        <h4 class="text-warning">${this.lemonadesConsumed}</h4>
-                        <small class="text-muted">Lemonades Consumed</small>
-                    </div>
-                    <div class="col-4 text-center">
-                        <h4 class="text-warning">${this.lemonsSquashed}</h4>
-                        <small class="text-muted">Lemons Squashed</small>
-                    </div>
-                    <div class="col-4 text-center">
-                        <h4 class="text-warning">${this.secretsFound.size}/${LEMON_SECRETS.length}</h4>
-                        <small class="text-muted">Secrets Found</small>
-                    </div>
-                </div>
-            `;
+            this.component.stats.replaceChildren();
+            const row = document.createElement('div');
+            row.className = 'row';
+            
+            const stats = [
+                { value: this.lemonadesConsumed, label: 'Lemonades Consumed' },
+                { value: this.lemonsSquashed, label: 'Lemons Squashed' },
+                { value: `${this.secretsFound.size}/${LEMON_SECRETS.length}`, label: 'Secrets Found' }
+            ];
+            
+            stats.forEach(stat => {
+                const card = new AdventuringStatCardElement();
+                card.setColumnClass('col-4');
+                card.setStat({ value: stat.value, label: stat.label });
+                row.appendChild(card);
+            });
+            
+            this.component.stats.appendChild(row);
         }
 
         // Secrets display

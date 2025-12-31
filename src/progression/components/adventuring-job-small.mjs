@@ -1,4 +1,9 @@
-export class AdventuringJobSmallElement extends HTMLElement {
+const { loadModule } = mod.getContext(import.meta);
+
+const { AdventuringTooltipElement } = await loadModule('src/core/adventuring-tooltip-element.mjs');
+const { AdventuringJobSelectorBtnElement } = await loadModule('src/progression/components/adventuring-job-selector-btn.mjs');
+
+export class AdventuringJobSmallElement extends AdventuringTooltipElement {
     constructor() {
         super();
         this._content = new DocumentFragment();
@@ -8,26 +13,16 @@ export class AdventuringJobSmallElement extends HTMLElement {
         this.icon = getElementFromFragment(this._content, 'icon', 'img');
         
         this.selectorPopup = null;
-    }
-
-    mount(parent) {
-        parent.append(this);
+        this._tooltipTarget = this.styling;
     }
 
     connectedCallback() {
         this.appendChild(this._content);
-        this.tooltip = tippy(this.styling, {
-            content: '',
-            allowHTML: true,
-            hideOnClick: false
-        });
+        super.connectedCallback();
     }
 
     disconnectedCallback() {
-        if (this.tooltip !== undefined) {
-            this.tooltip.destroy();
-            this.tooltip = undefined;
-        }
+        super.disconnectedCallback();
         if (this.selectorPopup !== undefined) {
             this.selectorPopup.destroy();
             this.selectorPopup = undefined;
@@ -74,7 +69,10 @@ export class AdventuringJobSmallElement extends HTMLElement {
         // Header
         const header = document.createElement('div');
         header.className = 'text-center mb-2 pb-2 border-bottom border-dark';
-        header.innerHTML = `<strong class="text-white">${this.selectorType === 'combatJob' ? 'Select Combat Job' : 'Select Passive Job'}</strong>`;
+        const headerText = document.createElement('strong');
+        headerText.className = 'text-white';
+        headerText.textContent = this.selectorType === 'combatJob' ? 'Select Combat Job' : 'Select Passive Job';
+        header.appendChild(headerText);
         container.appendChild(header);
         
         // Job grid
@@ -101,50 +99,19 @@ export class AdventuringJobSmallElement extends HTMLElement {
     }
 
     createJobButton(job) {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'position-relative m-1';
-        
         const isSelected = this.selectorCharacter[this.selectorType] === job;
+        const masteryLevel = this.skill.getMasteryLevel(job);
         
-        const btn = document.createElement('div');
-        btn.className = `d-flex flex-column align-items-center p-2 rounded pointer-enabled ${isSelected ? 'adventuring-selected' : 'bg-combat-inner-dark'}`;
-        btn.style.width = '60px';
-        btn.style.cursor = 'pointer';
-        
-        const icon = document.createElement('img');
-        icon.className = 'skill-icon-xs mb-1';
-        icon.src = job.media;
-        btn.appendChild(icon);
-        
-        const name = document.createElement('small');
-        name.className = 'text-white text-center';
-        name.style.fontSize = '10px';
-        name.style.lineHeight = '1.1';
-        name.textContent = job.name;
-        btn.appendChild(name);
-        
-        const level = document.createElement('small');
-        level.className = 'text-muted';
-        level.style.fontSize = '9px';
-        level.textContent = `Lv.${this.skill.getMasteryLevel(job)}`;
-        btn.appendChild(level);
-        
-        // Click to select
-        btn.onclick = (e) => {
-            e.stopPropagation();
-            this.selectJob(job);
-        };
-        
-        // Hover tooltip with job details
-        tippy(btn, {
-            content: job.tooltip,
-            allowHTML: true,
-            placement: 'top',
-            delay: [200, 0]
+        const btn = new AdventuringJobSelectorBtnElement();
+        btn.setJob({
+            job,
+            masteryLevel,
+            isSelected,
+            tooltipContent: job.tooltip,
+            onSelect: (selectedJob) => this.selectJob(selectedJob)
         });
         
-        wrapper.appendChild(btn);
-        return wrapper;
+        return btn;
     }
 
     selectJob(job) {

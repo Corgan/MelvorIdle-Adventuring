@@ -105,7 +105,7 @@ export class AdventuringMonster extends MasteryAction {
     }
 
     get name() {
-        return this.unlocked ? this._name : "???";
+        return this._name;
     }
 
     get media() {
@@ -125,31 +125,7 @@ export class AdventuringMonster extends MasteryAction {
     }
 
     get tooltip() {
-        const tooltip = TooltipBuilder.create()
-            .header(this.name, this.media);
-
-        if(this.unlocked) {
-            tooltip.masteryProgressFor(this.manager, this);
-            
-            // Get mastery bonuses from modifier system
-            const dropRateBonus = this.manager.modifiers.getBonus('drop_rate_percent', { action: this });
-            const dropQtyBonus = this.manager.modifiers.getBonus('drop_quantity_percent', { action: this });
-            
-            if(dropRateBonus > 0 || dropQtyBonus > 0) {
-                tooltip.separator();
-                if(dropRateBonus > 0) {
-                    tooltip.bonus(`+${dropRateBonus}% Drop Rate`);
-                }
-                if(dropQtyBonus > 0) {
-                    tooltip.bonus(`+${dropQtyBonus}% Drop Quantity`);
-                }
-            }
-            
-            // Next milestone
-            tooltip.nextMilestone(this.manager, this);
-        }
-        
-        return tooltip.build();
+        return TooltipBuilder.forMonster(this, this.manager).build();
     }
 
     onLoad() {
@@ -197,10 +173,7 @@ export class AdventuringMonster extends MasteryAction {
         if(!this.renderQueue.tooltip)
             return;
 
-        if(this.component.tooltip === undefined)
-            return;
-
-        this.component.tooltip.setContent(this.tooltip);
+        this.component.setTooltipContent(this.tooltip);
 
         this.renderQueue.tooltip = false;
     }

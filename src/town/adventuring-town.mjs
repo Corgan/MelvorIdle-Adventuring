@@ -17,16 +17,10 @@ export class AdventuringTown extends AdventuringPage {
     }
 
     get name() {
-        if(this.building !== undefined) {
-            return this.building.name;
-        }
         return "Town";
     }
 
     get media() {
-        if(this.building !== undefined) {
-            return this.building.media;
-        }
         return cdnMedia("assets/media/skills/township/Town_Hall.svg");
     }
 
@@ -127,13 +121,9 @@ export class AdventuringTown extends AdventuringPage {
     }
 
     go() {
-        if(this.building !== undefined && this.building.page !== undefined) {
-            if(!this.building.active) {
-                this.building.go();
-            }
-        } else {
-            super.go();
-        }
+        // Always go to main town page, clear any building selection
+        this.building = undefined;
+        super.go();
     }
 
     setBuilding(building) {
@@ -141,8 +131,12 @@ export class AdventuringTown extends AdventuringPage {
             building = this.manager.buildings.getObjectByID(building);
         if(building === undefined || building.page !== undefined)
             this.building = building;
-        if(this.active)
+        if(building && building.page !== undefined) {
+            // Go to the building's subpage directly
+            building.go();
+        } else if(this.active) {
             this.go();
+        }
     }
 
     onShow() {

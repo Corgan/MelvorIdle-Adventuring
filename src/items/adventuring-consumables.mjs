@@ -420,40 +420,38 @@ export class AdventuringConsumables extends AdventuringPage {
 
     /**
      * Apply a consumable effect
+     * Note: All percent values in effect.amount are whole numbers (10 = 10%)
      */
     applyEffect(consumable, effect) {
         switch(effect.type) {
             case 'heal_percent':
                 this.manager.party.all.forEach(member => {
                     if(!member.dead) {
-                        const healAmount = Math.floor(member.stats.maxHitpoints * effect.amount);
+                        const healAmount = Math.floor(member.stats.maxHitpoints * effect.amount / 100);
                         member.heal({ amount: healAmount });
                     }
                 });
                 break;
             case 'buff_damage':
                 // Apply damage buff as aura to all party members
-                const damagePercent = Math.floor(effect.amount * 100);
                 this.manager.party.alive.forEach(member => {
-                    member.buff('adventuring:consumable_damage', { amount: damagePercent }, member);
+                    member.buff('adventuring:consumable_damage', { amount: effect.amount }, member);
                 });
-                this.manager.log.add(`${consumable.name} grants +${damagePercent}% damage to the party!`);
+                this.manager.log.add(`${consumable.name} grants +${effect.amount}% damage to the party!`);
                 break;
             case 'buff_defense':
                 // Apply defense buff as fortify aura
-                const defensePercent = Math.floor(effect.amount * 100);
                 this.manager.party.alive.forEach(member => {
-                    member.buff('adventuring:fortify', { amount: defensePercent }, member);
+                    member.buff('adventuring:fortify', { amount: effect.amount }, member);
                 });
-                this.manager.log.add(`${consumable.name} grants +${defensePercent}% damage reduction to the party!`);
+                this.manager.log.add(`${consumable.name} grants +${effect.amount}% damage reduction to the party!`);
                 break;
             case 'buff_speed':
                 // Apply speed buff as haste aura
-                const speedPercent = Math.floor(effect.amount * 100);
                 this.manager.party.alive.forEach(member => {
-                    member.buff('adventuring:haste', { amount: speedPercent }, member);
+                    member.buff('adventuring:haste', { amount: effect.amount }, member);
                 });
-                this.manager.log.add(`${consumable.name} grants +${speedPercent}% speed to the party!`);
+                this.manager.log.add(`${consumable.name} grants +${effect.amount}% speed to the party!`);
                 break;
         }
     }
@@ -532,7 +530,7 @@ export class AdventuringConsumables extends AdventuringPage {
                 
                 // Color based on affordability
                 const owned = this.manager.stash.materialCounts.get(material) || 0;
-                comp.setTooltipContent(TooltipBuilder.forMaterial({ name: material.name, media: material.media, count: owned }).build());
+                comp.setTooltipContent(TooltipBuilder.forMaterial(material, this.manager).build());
                 comp.icon.src = material.media;
                 comp.count.textContent = qty;
                 

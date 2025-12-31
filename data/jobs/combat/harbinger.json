@@ -2,243 +2,319 @@
     "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
     "namespace": "adventuring",
     "data": {
-        "skillData": [{
-            "skillID": "adventuring:Adventuring",
-            "data": {
-                "jobs": [
-                    {
-                        "id": "harbinger",
-                        "tier": 5,
-                        "name": "Harbinger",
-                        "media": "melvor:assets/media/skills/combat/attack.svg#tint=darkred",
-                        "requirements": [
-                            { "type": "job_level", "job": "adventuring:berserker", "level": 25 },
-                            { "type": "job_level", "job": "adventuring:warlock", "level": 20 },
-                            { "type": "area_mastery", "area": "adventuring:demons_domain", "level": 50 }
-                        ],
-                        "isMilestoneReward": true,
-                        "allowedItems": [
-                            "adventuring:helm",
-                            "adventuring:platebody",
-                            "adventuring:platelegs",
-                            "adventuring:gauntlets",
-                            "adventuring:sabatons",
-                            "adventuring:amulet",
-                            "adventuring:ring",
-                            "adventuring:cape",
-                            "adventuring:sword2h",
-                            "adventuring:axe",
-                            "adventuring:staff"
-                        ],
-                        "scaling": [
-                            { "id": "adventuring:hitpoints", "value": 2.0 },
-                            { "id": "adventuring:defence", "value": 0.5 },
-                            { "id": "adventuring:agility", "value": 0.75 },
-                            { "id": "adventuring:strength", "value": 2.5 },
-                            { "id": "adventuring:magic", "value": 2.0 }
-                        ]
-                    }
-                ],
-                "generators": [
-                    {
-                        "id": "blood_ritual",
-                        "name": "Blood Ritual",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:harbinger", "level": 1 }
-                        ],
-                        "energy": 25,
-                        "selfDamage": 0.15,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "element": "dark",
-                                        "amount": {
-                                            "base": 30,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "value": 0.5 },
-                                                { "id": "adventuring:magic", "value": 0.4 }
-                                            ]
+        "skillData": [
+            {
+                "skillID": "adventuring:Adventuring",
+                "data": {
+                    "jobs": [
+                        {
+                            "id": "harbinger",
+                            "tier": 5,
+                            "name": "Harbinger",
+                            "media": "melvor:assets/media/skills/combat/attack.svg#tint=darkred",
+                            "requirements": [
+                                {
+                                    "type": "job_level",
+                                    "job": "adventuring:berserker",
+                                    "level": 25
+                                },
+                                {
+                                    "type": "job_level",
+                                    "job": "adventuring:warlock",
+                                    "level": 20
+                                },
+                                {
+                                    "type": "area_mastery",
+                                    "area": "adventuring:demons_domain",
+                                    "level": 50
+                                }
+                            ],
+                            "isMilestoneReward": true,
+                            "allowedItems": [
+                                "adventuring:helm",
+                                "adventuring:platebody",
+                                "adventuring:platelegs",
+                                "adventuring:gauntlets",
+                                "adventuring:sabatons",
+                                "adventuring:amulet",
+                                "adventuring:ring",
+                                "adventuring:cape",
+                                "adventuring:sword2h",
+                                "adventuring:axe",
+                                "adventuring:staff"
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 2.0
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 0.5
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 0.75
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 2.5
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 2.0
+                                }
+                            ]
+                        }
+                    ],
+                    "generators": [
+                        {
+                            "id": "blood_ritual",
+                            "name": "Blood Ritual",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:harbinger",
+                                    "level": 1
+                                }
+                            ],
+                            "energy": 25,
+                            "selfDamage": 0.15,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "element": "dark",
+                                            "amount": {
+                                                "base": 30,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "value": 0.5
+                                                    },
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "value": 0.4
+                                                    }
+                                                ]
+                                            }
                                         }
-                                    }
-                                ]
-                            },
-                            {
-                                "target": "self",
-                                "effects": [
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:bloodlust",
-                                        "stacks": {
-                                            "base": 3,
-                                            "scaling": []
+                                    ]
+                                },
+                                {
+                                    "target": "self",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "id": "adventuring:bloodlust",
+                                            "stacks": {
+                                                "base": 3,
+                                                "scaling": []
+                                            }
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "soul_reaver",
-                        "name": "Soul Reaver",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:harbinger", "level": 10 }
-                        ],
-                        "energy": 35,
-                        "hits": [
-                            {
-                                "target": "aoe",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "element": "dark",
-                                        "lifesteal": 0.5,
-                                        "amount": {
-                                            "base": 18,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "value": 0.3 },
-                                                { "id": "adventuring:magic", "value": 0.3 }
-                                            ]
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "soul_reaver",
+                            "name": "Soul Reaver",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:harbinger",
+                                    "level": 10
+                                }
+                            ],
+                            "energy": 35,
+                            "hits": [
+                                {
+                                    "target": "aoe",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "element": "dark",
+                                            "lifesteal": 0.5,
+                                            "amount": {
+                                                "base": 18,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "value": 0.3
+                                                    },
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "value": 0.3
+                                                    }
+                                                ]
+                                            }
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "chaos_strike",
-                        "name": "Chaos Strike",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:harbinger", "level": 20 }
-                        ],
-                        "energy": 30,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "element": "chaos",
-                                        "variance": 0.5,
-                                        "amount": {
-                                            "base": 35,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "value": 0.6 },
-                                                { "id": "adventuring:magic", "value": 0.4 }
-                                            ]
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "chaos_strike",
+                            "name": "Chaos Strike",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:harbinger",
+                                    "level": 20
+                                }
+                            ],
+                            "energy": 30,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "element": "chaos",
+                                            "variance": 0.5,
+                                            "amount": {
+                                                "base": 35,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "value": 0.6
+                                                    },
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "value": 0.4
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "random_debuff",
+                                            "stacks": {
+                                                "base": 2,
+                                                "scaling": []
+                                            }
                                         }
-                                    },
-                                    {
-                                        "type": "random_debuff",
-                                        "stacks": {
-                                            "base": 2,
-                                            "scaling": []
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "spenders": [
+                        {
+                            "id": "apocalypse",
+                            "name": "Apocalypse",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:harbinger",
+                                    "level": 30
+                                }
+                            ],
+                            "selfDamage": 0.25,
+                            "hits": [
+                                {
+                                    "target": "aoe",
+                                    "party": "ally",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "id": "adventuring:berserk",
+                                            "stacks": {
+                                                "base": 5,
+                                                "scaling": []
+                                            }
+                                        },
+                                        {
+                                            "type": "buff",
+                                            "id": "adventuring:might",
+                                            "stacks": {
+                                                "base": 5,
+                                                "scaling": []
+                                            }
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ],
-                "spenders": [
-                    {
-                        "id": "apocalypse",
-                        "name": "Apocalypse",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:harbinger", "level": 30 }
-                        ],
-                        "energy": 100,
-                        "selfDamage": 0.25,
-                        "hits": [
-                            {
-                                "target": "aoe",
-                                "party": "ally",
-                                "effects": [
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:berserk",
-                                        "stacks": {
-                                            "base": 5,
-                                            "scaling": []
+                                    ]
+                                },
+                                {
+                                    "target": "aoe",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "element": "dark",
+                                            "amount": {
+                                                "base": 50,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "value": 0.7
+                                                    },
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "value": 0.5
+                                                    }
+                                                ]
+                                            }
                                         }
-                                    },
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:might",
-                                        "stacks": {
-                                            "base": 5,
-                                            "scaling": []
+                                    ]
+                                }
+                            ],
+                            "cost": 100
+                        },
+                        {
+                            "id": "embrace_oblivion",
+                            "name": "Embrace Oblivion",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:harbinger",
+                                    "level": 40
+                                }
+                            ],
+                            "sacrificeToOne": true,
+                            "hits": [
+                                {
+                                    "target": "aoe",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "element": "dark",
+                                            "scaleSacrifice": true,
+                                            "amount": {
+                                                "base": 20,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:hitpoints",
+                                                        "value": 1.5
+                                                    }
+                                                ]
+                                            }
                                         }
-                                    }
-                                ]
-                            },
-                            {
-                                "target": "aoe",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "element": "dark",
-                                        "amount": {
-                                            "base": 50,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "value": 0.7 },
-                                                { "id": "adventuring:magic", "value": 0.5 }
-                                            ]
+                                    ]
+                                },
+                                {
+                                    "target": "self",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "id": "adventuring:undying",
+                                            "stacks": {
+                                                "base": 2,
+                                                "scaling": []
+                                            }
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "embrace_oblivion",
-                        "name": "Embrace Oblivion",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:harbinger", "level": 40 }
-                        ],
-                        "energy": 100,
-                        "sacrificeToOne": true,
-                        "hits": [
-                            {
-                                "target": "aoe",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "element": "dark",
-                                        "scaleSacrifice": true,
-                                        "amount": {
-                                            "base": 20,
-                                            "scaling": [
-                                                { "id": "adventuring:hitpoints", "value": 1.5 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            },
-                            {
-                                "target": "self",
-                                "effects": [
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:undying",
-                                        "stacks": {
-                                            "base": 2,
-                                            "scaling": []
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ]
+                                    ]
+                                }
+                            ],
+                            "cost": 100
+                        }
+                    ]
+                }
             }
-        }]
+        ]
     }
 }

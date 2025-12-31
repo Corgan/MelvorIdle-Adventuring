@@ -163,35 +163,7 @@ export class AdventuringConsumable extends NamespacedObject {
     }
 
     get tooltip() {
-        const typeLabel = this.type ? (this.type.charAt(0).toUpperCase() + this.type.slice(1)) : 'Consumable';
-        const tooltip = TooltipBuilder.create()
-            .header(this.name, this.media)
-            .subheader(typeLabel)
-            .hint(this.description)
-            .separator();
-        
-        if(this.isTavernDrink) {
-            // Show runs remaining for tavern drinks (charges = runs)
-            if(this.charges > 0) {
-                tooltip.bonus(`Active: ${this.charges} runs remaining`);
-            }
-        } else {
-            // Show charges for charge-based consumables
-            tooltip.warning(`Charges: ${this.charges}/${this.maxCharges}`);
-        }
-        
-        if(this.materials !== undefined && this.materials.size > 0 && this.charges < this.maxCharges) {
-            tooltip.separator().hint('Craft Cost:');
-            const costItems = [];
-            this.materials.forEach((qty, material) => {
-                const owned = material.count;
-                const color = owned >= qty ? 'text-success' : 'text-danger';
-                costItems.push(tooltip.iconValue(material.media, `<span class="${color}">${qty}</span> <small class="text-muted">(${owned})</small>`));
-            });
-            tooltip.statRow(...costItems);
-        }
-        
-        return tooltip.build();
+        return TooltipBuilder.forConsumable(this).build();
     }
 
     postDataRegistration() {
@@ -301,8 +273,7 @@ export class AdventuringConsumable extends NamespacedObject {
 
     renderTooltip() {
         if(!this.renderQueue.tooltip) return;
-        if(this.component.tooltip === undefined) return;
-        this.component.tooltip.setContent(this.tooltip);
+        this.component.setTooltipContent(this.tooltip);
         this.renderQueue.tooltip = false;
     }
 

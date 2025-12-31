@@ -116,7 +116,7 @@ export class AdventuringAbility extends NamespacedObject {
         
         // Achievement abilities are unlocked via achievement completion
         if(this.isAchievementAbility)
-            return this.manager.unlockedAchievementAbilities.has(this.id);
+            return this.manager.achievementManager.isAbilityUnlocked(this.id);
         
         // Use RequirementsChecker for standard job_level requirements
         // Note: For unlocked, we treat current_job_level same as job_level
@@ -134,7 +134,7 @@ export class AdventuringAbility extends NamespacedObject {
         
         // Achievement abilities can be equipped by anyone once unlocked
         if(this.isAchievementAbility) {
-            return this.manager.unlockedAchievementAbilities.has(this.id);
+            return this.manager.achievementManager.isAbilityUnlocked(this.id);
         }
         
         // Use RequirementsChecker with character context for current_job_level

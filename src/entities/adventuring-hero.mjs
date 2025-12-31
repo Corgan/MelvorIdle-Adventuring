@@ -5,6 +5,7 @@ const { AdventuringEquipment } = await loadModule('src/items/adventuring-equipme
 const { AdventuringStats } = await loadModule('src/core/adventuring-stats.mjs');
 const { AdventuringCard } = await loadModule('src/progression/adventuring-card.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
+const { AdventuringPassiveBadgeElement } = await loadModule('src/entities/components/adventuring-passive-badge.mjs');
 
 class AdventuringHeroRenderQueue extends AdventuringCharacterRenderQueue {
     constructor() {
@@ -265,14 +266,12 @@ export class AdventuringHero extends AdventuringCharacter {
 
         this.component.jobs.show();
         this.component.combatJob.icon.src = this.combatJob.media;
-        if(this.component.combatJob.tooltip !== undefined)
-            this.component.combatJob.tooltip.setContent(this.combatJob.tooltip);
+        this.component.combatJob.setTooltipContent(this.combatJob.tooltip);
         this.component.combatJob.styling.classList.toggle('pointer-enabled', !this.locked);
         this.component.combatJob.styling.classList.toggle('bg-combat-inner-dark', this.locked);
 
         this.component.passiveJob.icon.src = this.passiveJob.media;
-        if(this.component.passiveJob.tooltip !== undefined)
-            this.component.passiveJob.tooltip.setContent(this.passiveJob.tooltip);
+        this.component.passiveJob.setTooltipContent(this.passiveJob.tooltip);
         this.component.passiveJob.styling.classList.toggle('pointer-enabled', !this.locked);
         this.component.passiveJob.styling.classList.toggle('bg-combat-inner-dark', this.locked);
 
@@ -316,11 +315,6 @@ export class AdventuringHero extends AdventuringCharacter {
             this.component.passiveAbilitiesList.replaceChildren();
             
             activePassives.forEach(passive => {
-                const badge = document.createElement('div');
-                badge.className = 'bg-dark rounded p-1 px-2 m-1 d-flex align-items-center pointer-enabled';
-                badge.style.border = '1px solid rgba(255, 255, 255, 0.2)';
-                badge.innerHTML = `<small class="text-warning font-w600">${passive.name}</small>`;
-                
                 // Build tooltip using TooltipBuilder
                 const tooltip = new TooltipBuilder();
                 tooltip.header(passive.name, passive.media);
@@ -337,13 +331,9 @@ export class AdventuringHero extends AdventuringCharacter {
                     }
                 }
                 
-                tippy(badge, {
-                    content: tooltip.build(),
-                    allowHTML: true,
-                    placement: 'top'
-                });
-                
+                const badge = new AdventuringPassiveBadgeElement();
                 this.component.passiveAbilitiesList.appendChild(badge);
+                badge.setPassive(passive.name, tooltip.build());
             });
         }
 
@@ -355,8 +345,7 @@ export class AdventuringHero extends AdventuringCharacter {
             return;
 
         this.component.generator.nameText.textContent = this.generator.name;
-        if(this.component.generator.tooltip !== undefined)
-            this.component.generator.tooltip.setContent(this.component.generator.buildAbilityTooltip(this.generator));
+        this.component.generator.setTooltipContent(this.component.generator.buildAbilityTooltip(this.generator));
         this.component.generator.styling.classList.toggle('pointer-enabled', !this.locked);
         this.component.generator.styling.classList.toggle('bg-combat-inner-dark', this.locked);
         this.component.generator.styling.classList.toggle('bg-combat-menu-selected', this.generator === this.action && this.highlight);
@@ -369,8 +358,7 @@ export class AdventuringHero extends AdventuringCharacter {
             return;
 
         this.component.spender.nameText.textContent = this.spender.name;
-        if(this.component.spender.tooltip !== undefined)
-            this.component.spender.tooltip.setContent(this.component.spender.buildAbilityTooltip(this.spender));
+        this.component.spender.setTooltipContent(this.component.spender.buildAbilityTooltip(this.spender));
         this.component.spender.styling.classList.toggle('pointer-enabled', !this.locked);
         this.component.spender.styling.classList.toggle('bg-combat-inner-dark', this.locked);
         this.component.spender.styling.classList.toggle('bg-combat-menu-selected', this.spender === this.action && this.highlight);

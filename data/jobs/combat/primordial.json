@@ -2,268 +2,356 @@
     "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
     "namespace": "adventuring",
     "data": {
-        "skillData": [{
-            "skillID": "adventuring:Adventuring",
-            "data": {
-                "jobs": [
-                    {
-                        "id": "primordial",
-                        "tier": 5,
-                        "name": "Primordial",
-                        "media": "melvor:assets/media/skills/magic/magic.svg#tint=rainbow",
-                        "requirements": [
-                            { "type": "job_level", "job": "adventuring:elementalist", "level": 25 },
-                            { "type": "job_level", "job": "adventuring:wizard", "level": 20 },
-                            { "type": "area_mastery", "area": "adventuring:elemental_plane", "level": 50 }
-                        ],
-                        "isMilestoneReward": true,
-                        "allowedItems": [
-                            "adventuring:hat",
-                            "adventuring:robes",
-                            "adventuring:bottoms",
-                            "adventuring:mitts",
-                            "adventuring:slippers",
-                            "adventuring:amulet",
-                            "adventuring:ring",
-                            "adventuring:cape",
-                            "adventuring:staff",
-                            "adventuring:wand",
-                            "adventuring:spellbook"
-                        ],
-                        "scaling": [
-                            { "id": "adventuring:hitpoints", "value": 1.25 },
-                            { "id": "adventuring:defence", "value": 0.5 },
-                            { "id": "adventuring:agility", "value": 0.75 },
-                            { "id": "adventuring:magic", "value": 4.0 }
-                        ]
-                    }
-                ],
-                "generators": [
-                    {
-                        "id": "elemental_convergence",
-                        "name": "Elemental Convergence",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:primordial", "level": 1 }
-                        ],
-                        "energy": 35,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "element": "fire",
-                                        "amount": {
-                                            "base": 12,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "value": 0.3 }
-                                            ]
+        "skillData": [
+            {
+                "skillID": "adventuring:Adventuring",
+                "data": {
+                    "jobs": [
+                        {
+                            "id": "primordial",
+                            "tier": 5,
+                            "name": "Primordial",
+                            "media": "melvor:assets/media/skills/magic/magic.svg#tint=rainbow",
+                            "requirements": [
+                                {
+                                    "type": "job_level",
+                                    "job": "adventuring:elementalist",
+                                    "level": 25
+                                },
+                                {
+                                    "type": "job_level",
+                                    "job": "adventuring:wizard",
+                                    "level": 20
+                                },
+                                {
+                                    "type": "area_mastery",
+                                    "area": "adventuring:elemental_plane",
+                                    "level": 50
+                                }
+                            ],
+                            "isMilestoneReward": true,
+                            "allowedItems": [
+                                "adventuring:hat",
+                                "adventuring:robes",
+                                "adventuring:bottoms",
+                                "adventuring:mitts",
+                                "adventuring:slippers",
+                                "adventuring:amulet",
+                                "adventuring:ring",
+                                "adventuring:cape",
+                                "adventuring:staff",
+                                "adventuring:wand",
+                                "adventuring:spellbook"
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 1.25
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 0.5
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 0.75
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 4.0
+                                }
+                            ]
+                        }
+                    ],
+                    "generators": [
+                        {
+                            "id": "elemental_convergence",
+                            "name": "Elemental Convergence",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:primordial",
+                                    "level": 1
+                                }
+                            ],
+                            "energy": 35,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "element": "fire",
+                                            "amount": {
+                                                "base": 12,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "value": 0.3
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "damage",
+                                            "element": "frost",
+                                            "amount": {
+                                                "base": 12,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "value": 0.3
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "damage",
+                                            "element": "lightning",
+                                            "amount": {
+                                                "base": 12,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "value": 0.3
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:burn",
+                                            "stacks": {
+                                                "base": 1,
+                                                "scaling": []
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:chill",
+                                            "stacks": {
+                                                "base": 1,
+                                                "scaling": []
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:shock",
+                                            "stacks": {
+                                                "base": 1,
+                                                "scaling": []
+                                            }
                                         }
-                                    },
-                                    {
-                                        "type": "damage",
-                                        "element": "frost",
-                                        "amount": {
-                                            "base": 12,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "value": 0.3 }
-                                            ]
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "primal_mastery",
+                            "name": "Primal Mastery",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:primordial",
+                                    "level": 10
+                                }
+                            ],
+                            "energy": 30,
+                            "hits": [
+                                {
+                                    "target": "self",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "id": "adventuring:focus",
+                                            "stacks": {
+                                                "base": 4,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "value": 0.1
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "buff",
+                                            "id": "adventuring:empower",
+                                            "stacks": {
+                                                "base": 3,
+                                                "scaling": []
+                                            }
                                         }
-                                    },
-                                    {
-                                        "type": "damage",
-                                        "element": "lightning",
-                                        "amount": {
-                                            "base": 12,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "value": 0.3 }
-                                            ]
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "elemental_barrage",
+                            "name": "Elemental Barrage",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:primordial",
+                                    "level": 20
+                                }
+                            ],
+                            "energy": 40,
+                            "hits": [
+                                {
+                                    "target": "random",
+                                    "party": "enemy",
+                                    "repeat": 6,
+                                    "delay": 100,
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "element": "random",
+                                            "amount": {
+                                                "base": 10,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "value": 0.25
+                                                    }
+                                                ]
+                                            }
                                         }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:burn",
-                                        "stacks": { "base": 1, "scaling": [] }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:chill",
-                                        "stacks": { "base": 1, "scaling": [] }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:shock",
-                                        "stacks": { "base": 1, "scaling": [] }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "primal_mastery",
-                        "name": "Primal Mastery",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:primordial", "level": 10 }
-                        ],
-                        "energy": 30,
-                        "hits": [
-                            {
-                                "target": "self",
-                                "effects": [
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:focus",
-                                        "stacks": {
-                                            "base": 4,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "value": 0.1 }
-                                            ]
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "spenders": [
+                        {
+                            "id": "cataclysm",
+                            "name": "Cataclysm",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:primordial",
+                                    "level": 30
+                                }
+                            ],
+                            "hits": [
+                                {
+                                    "target": "aoe",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "element": "fire",
+                                            "amount": {
+                                                "base": 25,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "value": 0.4
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "damage",
+                                            "element": "frost",
+                                            "amount": {
+                                                "base": 25,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "value": 0.4
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "damage",
+                                            "element": "lightning",
+                                            "amount": {
+                                                "base": 25,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "value": 0.4
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "damage",
+                                            "element": "nature",
+                                            "amount": {
+                                                "base": 25,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "value": 0.4
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "damage",
+                                            "element": "dark",
+                                            "amount": {
+                                                "base": 25,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "value": 0.4
+                                                    }
+                                                ]
+                                            }
                                         }
-                                    },
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:empower",
-                                        "stacks": {
-                                            "base": 3,
-                                            "scaling": []
+                                    ]
+                                }
+                            ],
+                            "cost": 100
+                        },
+                        {
+                            "id": "primordial_form",
+                            "name": "Primordial Form",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:primordial",
+                                    "level": 40
+                                }
+                            ],
+                            "hits": [
+                                {
+                                    "target": "self",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "id": "adventuring:immunity",
+                                            "stacks": {
+                                                "base": 3,
+                                                "scaling": []
+                                            }
+                                        },
+                                        {
+                                            "type": "buff",
+                                            "id": "adventuring:arcane_power",
+                                            "stacks": {
+                                                "base": 5,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "value": 0.1
+                                                    }
+                                                ]
+                                            }
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "elemental_barrage",
-                        "name": "Elemental Barrage",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:primordial", "level": 20 }
-                        ],
-                        "energy": 40,
-                        "hits": [
-                            {
-                                "target": "random",
-                                "party": "enemy",
-                                "repeat": 6,
-                                "delay": 100,
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "element": "random",
-                                        "amount": {
-                                            "base": 10,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "value": 0.25 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ],
-                "spenders": [
-                    {
-                        "id": "cataclysm",
-                        "name": "Cataclysm",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:primordial", "level": 30 }
-                        ],
-                        "energy": 100,
-                        "hits": [
-                            {
-                                "target": "aoe",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "element": "fire",
-                                        "amount": {
-                                            "base": 25,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "value": 0.4 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "damage",
-                                        "element": "frost",
-                                        "amount": {
-                                            "base": 25,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "value": 0.4 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "damage",
-                                        "element": "lightning",
-                                        "amount": {
-                                            "base": 25,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "value": 0.4 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "damage",
-                                        "element": "nature",
-                                        "amount": {
-                                            "base": 25,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "value": 0.4 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "damage",
-                                        "element": "dark",
-                                        "amount": {
-                                            "base": 25,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "value": 0.4 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "primordial_form",
-                        "name": "Primordial Form",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:primordial", "level": 40 }
-                        ],
-                        "energy": 80,
-                        "hits": [
-                            {
-                                "target": "self",
-                                "effects": [
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:immunity",
-                                        "stacks": {
-                                            "base": 3,
-                                            "scaling": []
-                                        }
-                                    },
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:arcane_power",
-                                        "stacks": {
-                                            "base": 5,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "value": 0.1 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ]
+                                    ]
+                                }
+                            ],
+                            "cost": 80
+                        }
+                    ]
+                }
             }
-        }]
+        ]
     }
 }

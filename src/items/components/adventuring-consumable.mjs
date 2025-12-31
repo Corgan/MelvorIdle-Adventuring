@@ -1,4 +1,8 @@
-export class AdventuringConsumableElement extends HTMLElement {
+const { loadModule } = mod.getContext(import.meta);
+
+const { AdventuringTooltipElement } = await loadModule('src/core/adventuring-tooltip-element.mjs');
+
+export class AdventuringConsumableElement extends AdventuringTooltipElement {
     constructor() {
         super();
         this._content = new DocumentFragment();
@@ -8,26 +12,17 @@ export class AdventuringConsumableElement extends HTMLElement {
         this.border = getElementFromFragment(this._content, 'border', 'div');
         this.icon = getElementFromFragment(this._content, 'icon', 'img');
         this.charges = getElementFromFragment(this._content, 'charges', 'small');
+        
+        this._tooltipTarget = this.clickable;
     }
 
     connectedCallback() {
         this.appendChild(this._content);
-        this.tooltip = tippy(this.clickable, {
-            content: '',
-            allowHTML: true,
-            hideOnClick: false
-        });
+        super.connectedCallback();
     }
 
     disconnectedCallback() {
-        if (this.tooltip !== undefined) {
-            this.tooltip.destroy();
-            this.tooltip = undefined;
-        }
-    }
-
-    mount(parent) {
-        parent.appendChild(this);
+        super.disconnectedCallback();
     }
 }
 window.customElements.define('adventuring-consumable', AdventuringConsumableElement);

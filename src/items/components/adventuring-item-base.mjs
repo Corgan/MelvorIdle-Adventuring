@@ -1,4 +1,8 @@
-export class AdventuringItemBaseElement extends HTMLElement {
+const { loadModule } = mod.getContext(import.meta);
+
+const { AdventuringTooltipElement } = await loadModule('src/core/adventuring-tooltip-element.mjs');
+
+export class AdventuringItemBaseElement extends AdventuringTooltipElement {
     constructor() {
         super();
         this._content = new DocumentFragment();
@@ -10,26 +14,17 @@ export class AdventuringItemBaseElement extends HTMLElement {
         this.icon = getElementFromFragment(this._content, 'icon', 'img');
         this.upgrade = getElementFromFragment(this._content, 'upgrade', 'small');
         this.newBadge = getElementFromFragment(this._content, 'new-badge', 'span');
+        
+        this._tooltipTarget = this.clickable;
     }
 
     connectedCallback() {
         this.appendChild(this._content);
-        this.tooltip = tippy(this.clickable, {
-            content: '',
-            allowHTML: true,
-            hideOnClick: false
-        });
+        super.connectedCallback();
     }
 
     disconnectedCallback() {
-        if (this.tooltip !== undefined) {
-            this.tooltip.destroy();
-            this.tooltip = undefined;
-        }
-    }
-
-    mount(parent) {
-        parent.appendChild(this);
+        super.disconnectedCallback();
     }
 }
 window.customElements.define('adventuring-item-base', AdventuringItemBaseElement);

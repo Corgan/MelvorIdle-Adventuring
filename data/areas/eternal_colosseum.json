@@ -2,663 +2,1238 @@
     "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
     "namespace": "adventuring",
     "data": {
-        "skillData": [{
-            "skillID": "adventuring:Adventuring",
-            "data": {
-                "passives": [
-                    {
-                        "id": "gladiators_fury",
-                        "name": "Gladiator's Fury",
-                        "effects": [
-                            {
-                                "trigger": "encounter_start",
-                                "type": "buff",
-                                "target": "self",
-                                "buff": "adventuring:might",
-                                "stacks": { "base": 3, "scaling": [] }
-                            },
-                            {
-                                "trigger": "encounter_start",
-                                "type": "buff",
-                                "target": "self",
-                                "buff": "adventuring:haste",
-                                "stacks": { "base": 2, "scaling": [] }
-                            }
-                        ]
-                    },
-                    {
-                        "id": "champions_pride",
-                        "name": "Champion's Pride",
-                        "effects": [
-                            {
-                                "trigger": "after_damage_received",
-                                "type": "buff",
-                                "target": "self",
-                                "buff": "adventuring:barrier",
-                                "stacks": { "base": 2, "scaling": [] },
-                                "chance": 35
-                            }
-                        ]
-                    },
-                    {
-                        "id": "eternal_champion",
-                        "name": "Eternal Champion",
-                        "effects": [
-                            {
-                                "trigger": "encounter_start",
-                                "type": "buff",
-                                "target": "self",
-                                "buff": "adventuring:might",
-                                "stacks": { "base": 10, "scaling": [] }
-                            },
-                            {
-                                "trigger": "encounter_start",
-                                "type": "buff",
-                                "target": "self",
-                                "buff": "adventuring:fortify",
-                                "stacks": { "base": 8, "scaling": [] }
-                            },
-                            {
-                                "trigger": "on_kill",
-                                "type": "heal",
-                                "target": "self",
-                                "amount": { "base": 25, "scaling": [] }
-                            }
-                        ]
-                    }
-                ],
-                "areas": [
-                    {
-                        "id": "eternal_colosseum",
-                        "name": "Eternal Colosseum",
-                        "media": "melvor:assets/media/skills/combat/combat.svg",
-                        "requirements": [
-                            { "type": "skill_level", "level": 90 }
-                        ],
-                        "height": 16,
-                        "width": 9,
-                        "floors": [
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:arena_slave", "weight": 60 },
-                                    { "id": "adventuring:pit_fighter", "weight": 40 }
-                                ],
-                                "exit": ["adventuring:arena_slave", "adventuring:arena_slave", "adventuring:pit_fighter"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:arena_slave", "weight": 30 },
-                                    { "id": "adventuring:pit_fighter", "weight": 35 },
-                                    { "id": "adventuring:gladiator", "weight": 35 }
-                                ],
-                                "exit": ["adventuring:pit_fighter", "adventuring:gladiator", "adventuring:gladiator"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:pit_fighter", "weight": 25 },
-                                    { "id": "adventuring:gladiator", "weight": 40 },
-                                    { "id": "adventuring:arena_beast", "weight": 35 }
-                                ],
-                                "exit": ["adventuring:gladiator", "adventuring:arena_beast", "adventuring:arena_beast"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:gladiator", "weight": 25 },
-                                    { "id": "adventuring:arena_beast", "weight": 35 },
-                                    { "id": "adventuring:veteran_champion", "weight": 40 }
-                                ],
-                                "exit": ["adventuring:arena_beast", "adventuring:veteran_champion", "adventuring:veteran_champion"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:arena_beast", "weight": 25 },
-                                    { "id": "adventuring:veteran_champion", "weight": 35 },
-                                    { "id": "adventuring:arena_mage", "weight": 40 }
-                                ],
-                                "exit": ["adventuring:veteran_champion", "adventuring:arena_mage", "adventuring:arena_mage"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:veteran_champion", "weight": 30 },
-                                    { "id": "adventuring:arena_mage", "weight": 35 },
-                                    { "id": "adventuring:colosseum_executioner", "weight": 35 }
-                                ],
-                                "exit": ["adventuring:arena_mage", "adventuring:colosseum_executioner", "adventuring:colosseum_executioner"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:arena_mage", "weight": 30 },
-                                    { "id": "adventuring:colosseum_executioner", "weight": 70 }
-                                ],
-                                "exit": ["adventuring:colosseum_executioner", "adventuring:colosseum_executioner", "adventuring:the_eternal_champion"]
-                            }
-                        ]
-                    }
-                ],
-                "monsters": [
-                    {
-                        "id": "arena_slave",
-                        "name": "Arena Slave",
-                        "media": "melvor:assets/media/monsters/bandit.png",
-                        "tags": ["humanoid", "gladiator"],
-                        "xp": 220,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 145 },
-                            { "id": "adventuring:defence", "value": 68 },
-                            { "id": "adventuring:agility", "value": 75 },
-                            { "id": "adventuring:strength", "value": 88 },
-                            { "id": "adventuring:ranged", "value": 55 },
-                            { "id": "adventuring:magic", "value": 45 },
-                            { "id": "adventuring:prayer", "value": 40 }
-                        ],
-                        "generator": "adventuring:desperate_swing",
-                        "spender": "adventuring:survival_instinct",
-                        "passives": [],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 38, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 5, "weight": 25 },
-                            { "id": "adventuring:arena_token", "qty": 2, "weight": 45 }
-                        ]
-                    },
-                    {
-                        "id": "pit_fighter",
-                        "name": "Pit Fighter",
-                        "media": "melvor:assets/media/monsters/fierce_devil.png",
-                        "tags": ["humanoid", "gladiator"],
-                        "xp": 240,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 165 },
-                            { "id": "adventuring:defence", "value": 75 },
-                            { "id": "adventuring:agility", "value": 82 },
-                            { "id": "adventuring:strength", "value": 95 },
-                            { "id": "adventuring:ranged", "value": 60 },
-                            { "id": "adventuring:magic", "value": 50 },
-                            { "id": "adventuring:prayer", "value": 45 }
-                        ],
-                        "generator": "adventuring:brutal_combo",
-                        "spender": "adventuring:finishing_blow",
-                        "passives": ["adventuring:gladiators_fury"],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 42, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 5, "weight": 22 },
-                            { "id": "adventuring:arena_token", "qty": 3, "weight": 40 },
-                            { "id": "adventuring:champions_blood", "qty": 1, "weight": 18 }
-                        ]
-                    },
-                    {
-                        "id": "gladiator",
-                        "name": "Gladiator",
-                        "media": "melvor:assets/media/monsters/raging_horned_elite.png",
-                        "tags": ["humanoid", "gladiator"],
-                        "xp": 265,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 185 },
-                            { "id": "adventuring:defence", "value": 85 },
-                            { "id": "adventuring:agility", "value": 78 },
-                            { "id": "adventuring:strength", "value": 102 },
-                            { "id": "adventuring:ranged", "value": 62 },
-                            { "id": "adventuring:magic", "value": 55 },
-                            { "id": "adventuring:prayer", "value": 52 }
-                        ],
-                        "generator": "adventuring:gladius_strike",
-                        "spender": "adventuring:champions_bash",
-                        "passives": ["adventuring:champions_pride"],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 48, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 6, "weight": 20 },
-                            { "id": "adventuring:arena_token", "qty": 3, "weight": 35 },
-                            { "id": "adventuring:glory_medal", "qty": 1, "weight": 20 }
-                        ]
-                    },
-                    {
-                        "id": "arena_beast",
-                        "name": "Arena Beast",
-                        "media": "melvor:assets/media/monsters/griffin.png",
-                        "tags": ["beast", "gladiator"],
-                        "xp": 285,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 200 },
-                            { "id": "adventuring:defence", "value": 72 },
-                            { "id": "adventuring:agility", "value": 92 },
-                            { "id": "adventuring:strength", "value": 108 },
-                            { "id": "adventuring:ranged", "value": 58 },
-                            { "id": "adventuring:magic", "value": 48 },
-                            { "id": "adventuring:prayer", "value": 42 }
-                        ],
-                        "generator": "adventuring:savage_bite",
-                        "spender": "adventuring:frenzy",
-                        "passives": [],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 52, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 6, "weight": 25 },
-                            { "id": "adventuring:arena_token", "qty": 4, "weight": 35 },
-                            { "id": "adventuring:beast_fang", "qty": 2, "weight": 28 }
-                        ]
-                    },
-                    {
-                        "id": "veteran_champion",
-                        "name": "Veteran Champion",
-                        "media": "melvor:assets/media/monsters/seething_horned_elite.png",
-                        "tags": ["humanoid", "gladiator"],
-                        "xp": 310,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 225 },
-                            { "id": "adventuring:defence", "value": 95 },
-                            { "id": "adventuring:agility", "value": 75 },
-                            { "id": "adventuring:strength", "value": 112 },
-                            { "id": "adventuring:ranged", "value": 68 },
-                            { "id": "adventuring:magic", "value": 62 },
-                            { "id": "adventuring:prayer", "value": 58 }
-                        ],
-                        "generator": "adventuring:gladiators_precision",
-                        "spender": "adventuring:execution",
-                        "passives": ["adventuring:gladiators_fury", "adventuring:champions_pride"],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 58, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 6, "weight": 22 },
-                            { "id": "adventuring:champions_blood", "qty": 2, "weight": 32 },
-                            { "id": "adventuring:glory_medal", "qty": 2, "weight": 25 }
-                        ]
-                    },
-                    {
-                        "id": "arena_mage",
-                        "name": "Arena Mage",
-                        "media": "melvor:assets/media/monsters/dark_horned_elite.png",
-                        "tags": ["humanoid", "mage", "gladiator"],
-                        "xp": 335,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 195 },
-                            { "id": "adventuring:defence", "value": 70 },
-                            { "id": "adventuring:agility", "value": 72 },
-                            { "id": "adventuring:strength", "value": 65 },
-                            { "id": "adventuring:ranged", "value": 60 },
-                            { "id": "adventuring:magic", "value": 115 },
-                            { "id": "adventuring:prayer", "value": 78 }
-                        ],
-                        "generator": "adventuring:arena_bolt",
-                        "spender": "adventuring:crowd_favorite",
-                        "passives": ["adventuring:champions_pride"],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 62, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 6, "weight": 20 },
-                            { "id": "adventuring:arena_token", "qty": 5, "weight": 35 },
-                            { "id": "adventuring:eternal_essence", "qty": 1, "weight": 22 }
-                        ]
-                    },
-                    {
-                        "id": "colosseum_executioner",
-                        "name": "Colosseum Executioner",
-                        "media": "melvor:assets/media/monsters/infernal_lord.png",
-                        "tags": ["humanoid", "gladiator"],
-                        "xp": 365,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 260 },
-                            { "id": "adventuring:defence", "value": 98 },
-                            { "id": "adventuring:agility", "value": 65 },
-                            { "id": "adventuring:strength", "value": 125 },
-                            { "id": "adventuring:ranged", "value": 55 },
-                            { "id": "adventuring:magic", "value": 68 },
-                            { "id": "adventuring:prayer", "value": 72 }
-                        ],
-                        "generator": "adventuring:executioners_swing",
-                        "spender": "adventuring:decapitate",
-                        "passives": ["adventuring:gladiators_fury"],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 68, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 7, "weight": 25 },
-                            { "id": "adventuring:champions_blood", "qty": 3, "weight": 35 },
-                            { "id": "adventuring:eternal_essence", "qty": 2, "weight": 28 }
-                        ]
-                    },
-                    {
-                        "id": "the_eternal_champion",
-                        "name": "The Eternal Champion",
-                        "media": "melvor:assets/media/monsters/malcs.png",
-                        "tags": ["humanoid", "gladiator", "boss"],
-                        "isBoss": true,
-                        "xp": 900,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 600 },
-                            { "id": "adventuring:defence", "value": 110 },
-                            { "id": "adventuring:agility", "value": 82 },
-                            { "id": "adventuring:strength", "value": 135 },
-                            { "id": "adventuring:ranged", "value": 78 },
-                            { "id": "adventuring:magic", "value": 85 },
-                            { "id": "adventuring:prayer", "value": 92 }
-                        ],
-                        "generator": "adventuring:legendary_combo",
-                        "spender": "adventuring:glory_or_death",
-                        "passives": ["adventuring:eternal_champion", "adventuring:champions_pride"],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 200, "weight": 100 },
-                            { "id": "adventuring:big_parts", "qty": 6, "weight": 100 },
-                            { "id": "adventuring:arena_token", "qty": 25, "weight": 100 },
-                            { "id": "adventuring:champions_blood", "qty": 12, "weight": 100 },
-                            { "id": "adventuring:glory_medal", "qty": 8, "weight": 85 },
-                            { "id": "adventuring:eternal_essence", "qty": 5, "weight": 80 },
-                            { "id": "adventuring:champions_crown", "qty": 1, "weight": 100 }
-                        ]
-                    }
-                ],
-                "materials": [
-                    {
-                        "id": "arena_token",
-                        "name": "Arena Token",
-                        "media": "melvor:assets/media/bank/gold_topaz_ring.png",
-                        "category": "adventuring:monster_drops"
-                    },
-                    {
-                        "id": "champions_blood",
-                        "name": "Champion's Blood",
-                        "media": "melvor:assets/media/bank/blood_rune.png",
-                        "category": "adventuring:monster_drops"
-                    },
-                    {
-                        "id": "glory_medal",
-                        "name": "Glory Medal",
-                        "media": "melvor:assets/media/bank/gold_bar.png",
-                        "category": "adventuring:monster_drops"
-                    },
-                    {
-                        "id": "beast_fang",
-                        "name": "Beast Fang",
-                        "media": "melvor:assets/media/bank/ancient_claw.png",
-                        "category": "adventuring:monster_drops"
-                    },
-                    {
-                        "id": "eternal_essence",
-                        "name": "Eternal Essence",
-                        "media": "melvor:assets/media/bank/stardust.png",
-                        "category": "adventuring:monster_drops"
-                    },
-                    {
-                        "id": "champions_crown",
-                        "name": "Champion's Crown",
-                        "media": "melvor:assets/media/bank/crown_of_rhaelyx.png",
-                        "category": "adventuring:boss_drops"
-                    }
-                ],
-                "generators": [
-                    {
-                        "id": "desperate_swing",
-                        "name": "Desperate Swing",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "energy": 25,
-                        "hits": [
-                            {
-                                "target": "single_enemy",
-                                "effects": [
-                                    { "type": "damage", "damage_type": "strength", "amount": 14, "scaling": 0.6 }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "brutal_combo",
-                        "name": "Brutal Combo",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "energy": 28,
-                        "hits": [
-                            {
-                                "target": "single_enemy",
-                                "effects": [
-                                    { "type": "damage", "damage_type": "strength", "amount": 10, "scaling": 0.45 }
-                                ]
-                            },
-                            {
-                                "target": "single_enemy",
-                                "effects": [
-                                    { "type": "damage", "damage_type": "strength", "amount": 10, "scaling": 0.45 }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "gladius_strike",
-                        "name": "Gladius Strike",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "energy": 30,
-                        "hits": [
-                            {
-                                "target": "single_enemy",
-                                "effects": [
-                                    { "type": "damage", "damage_type": "strength", "amount": 20, "scaling": 0.75 },
-                                    { "type": "debuff", "id": "adventuring:bleed", "stacks": 1 }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "savage_bite",
-                        "name": "Savage Bite",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "energy": 26,
-                        "hits": [
-                            {
-                                "target": "single_enemy",
-                                "effects": [
-                                    { "type": "damage", "damage_type": "strength", "amount": 22, "scaling": 0.8 }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "gladiators_precision",
-                        "name": "Gladiator's Precision",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "energy": 32,
-                        "hits": [
-                            {
-                                "target": "single_enemy",
-                                "effects": [
-                                    { "type": "damage", "damage_type": "strength", "amount": 24, "scaling": 0.85 },
-                                    { "type": "buff", "id": "adventuring:might", "target": "self", "stacks": 1 }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "arena_bolt",
-                        "name": "Arena Bolt",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "energy": 30,
-                        "hits": [
-                            {
-                                "target": "single_enemy",
-                                "effects": [
-                                    { "type": "damage", "damage_type": "magic", "amount": 22, "scaling": 0.8 }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "executioners_swing",
-                        "name": "Executioner's Swing",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "energy": 35,
-                        "hits": [
-                            {
-                                "target": "single_enemy",
-                                "effects": [
-                                    { "type": "damage", "damage_type": "strength", "amount": 30, "scaling": 1.0 }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "legendary_combo",
-                        "name": "Legendary Combo",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "energy": 40,
-                        "hits": [
-                            {
-                                "target": "single_enemy",
-                                "effects": [
-                                    { "type": "damage", "damage_type": "strength", "amount": 18, "scaling": 0.6 }
-                                ]
-                            },
-                            {
-                                "target": "single_enemy",
-                                "effects": [
-                                    { "type": "damage", "damage_type": "strength", "amount": 18, "scaling": 0.6 }
-                                ]
-                            },
-                            {
-                                "target": "single_enemy",
-                                "effects": [
-                                    { "type": "damage", "damage_type": "strength", "amount": 18, "scaling": 0.6 }
-                                ]
-                            }
-                        ]
-                    }
-                ],
-                "spenders": [
-                    {
-                        "id": "survival_instinct",
-                        "name": "Survival Instinct",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 55,
-                        "hits": [
-                            {
-                                "target": "self",
-                                "effects": [
-                                    { "type": "buff", "id": "adventuring:evasion", "stacks": 3 },
-                                    { "type": "heal", "amount": 15, "scaling": 0.5 }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "finishing_blow",
-                        "name": "Finishing Blow",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 65,
-                        "hits": [
-                            {
-                                "target": "single_enemy",
-                                "effects": [
-                                    { "type": "damage", "damage_type": "strength", "amount": 32, "scaling": 1.1 }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "champions_bash",
-                        "name": "Champion's Bash",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 70,
-                        "hits": [
-                            {
-                                "target": "single_enemy",
-                                "effects": [
-                                    { "type": "damage", "damage_type": "defence", "amount": 25, "scaling": 0.9 },
-                                    { "type": "debuff", "id": "adventuring:stun", "stacks": 1 }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "frenzy",
-                        "name": "Frenzy",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 75,
-                        "hits": [
-                            {
-                                "target": "random",
-                                "count": 4,
-                                "effects": [
-                                    { "type": "damage", "damage_type": "strength", "amount": 12, "scaling": 0.5 }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "execution",
-                        "name": "Execution",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 85,
-                        "hits": [
-                            {
-                                "target": "single_enemy",
-                                "effects": [
-                                    { "type": "damage", "damage_type": "strength", "amount": 45, "scaling": 1.3 }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "crowd_favorite",
-                        "name": "Crowd Favorite",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 80,
-                        "hits": [
-                            {
-                                "target": "all_enemies",
-                                "effects": [
-                                    { "type": "damage", "damage_type": "magic", "amount": 28, "scaling": 0.95 }
-                                ]
-                            },
-                            {
-                                "target": "self",
-                                "effects": [
-                                    { "type": "buff", "id": "adventuring:might", "stacks": 2 }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "decapitate",
-                        "name": "Decapitate",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 95,
-                        "hits": [
-                            {
-                                "target": "single_enemy",
-                                "effects": [
-                                    { "type": "damage", "damage_type": "strength", "amount": 55, "scaling": 1.5 }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "glory_or_death",
-                        "name": "Glory or Death",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 120,
-                        "hits": [
-                            {
-                                "target": "all_enemies",
-                                "effects": [
-                                    { "type": "damage", "damage_type": "strength", "amount": 40, "scaling": 1.2 }
-                                ]
-                            },
-                            {
-                                "target": "self",
-                                "effects": [
-                                    { "type": "buff", "id": "adventuring:might", "stacks": 5 },
-                                    { "type": "buff", "id": "adventuring:haste", "stacks": 3 }
-                                ]
-                            }
-                        ]
-                    }
-                ]
+        "skillData": [
+            {
+                "skillID": "adventuring:Adventuring",
+                "data": {
+                    "passives": [
+                        {
+                            "id": "gladiators_fury",
+                            "name": "Gladiator's Fury",
+                            "effects": [
+                                {
+                                    "trigger": "encounter_start",
+                                    "type": "buff",
+                                    "target": "self",
+                                    "buff": "adventuring:might",
+                                    "stacks": {
+                                        "base": 3,
+                                        "scaling": []
+                                    }
+                                },
+                                {
+                                    "trigger": "encounter_start",
+                                    "type": "buff",
+                                    "target": "self",
+                                    "buff": "adventuring:haste",
+                                    "stacks": {
+                                        "base": 2,
+                                        "scaling": []
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "id": "champions_pride",
+                            "name": "Champion's Pride",
+                            "effects": [
+                                {
+                                    "trigger": "after_damage_received",
+                                    "type": "buff",
+                                    "target": "self",
+                                    "buff": "adventuring:barrier",
+                                    "stacks": {
+                                        "base": 2,
+                                        "scaling": []
+                                    },
+                                    "chance": 35
+                                }
+                            ]
+                        },
+                        {
+                            "id": "eternal_champion",
+                            "name": "Eternal Champion",
+                            "effects": [
+                                {
+                                    "trigger": "encounter_start",
+                                    "type": "buff",
+                                    "target": "self",
+                                    "buff": "adventuring:might",
+                                    "stacks": {
+                                        "base": 10,
+                                        "scaling": []
+                                    }
+                                },
+                                {
+                                    "trigger": "encounter_start",
+                                    "type": "buff",
+                                    "target": "self",
+                                    "buff": "adventuring:fortify",
+                                    "stacks": {
+                                        "base": 8,
+                                        "scaling": []
+                                    }
+                                },
+                                {
+                                    "trigger": "on_kill",
+                                    "type": "heal",
+                                    "target": "self",
+                                    "amount": {
+                                        "base": 25,
+                                        "scaling": []
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    "areas": [
+                        {
+                            "id": "eternal_colosseum",
+                            "name": "Eternal Colosseum",
+                            "media": "melvor:assets/media/skills/combat/combat.svg#shade=red",
+                            "requirements": [
+                                {
+                                    "type": "skill_level",
+                                    "level": 90
+                                }
+                            ],
+                            "height": 16,
+                            "width": 9,
+                            "floors": [
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:arena_slave",
+                                            "weight": 60
+                                        },
+                                        {
+                                            "id": "adventuring:pit_fighter",
+                                            "weight": 40
+                                        }
+                                    ],
+                                    "exit": [
+                                        "adventuring:arena_slave",
+                                        "adventuring:arena_slave",
+                                        "adventuring:pit_fighter"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:arena_slave",
+                                            "weight": 30
+                                        },
+                                        {
+                                            "id": "adventuring:pit_fighter",
+                                            "weight": 35
+                                        },
+                                        {
+                                            "id": "adventuring:gladiator",
+                                            "weight": 35
+                                        }
+                                    ],
+                                    "exit": [
+                                        "adventuring:pit_fighter",
+                                        "adventuring:gladiator",
+                                        "adventuring:gladiator"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:pit_fighter",
+                                            "weight": 25
+                                        },
+                                        {
+                                            "id": "adventuring:gladiator",
+                                            "weight": 40
+                                        },
+                                        {
+                                            "id": "adventuring:arena_beast",
+                                            "weight": 35
+                                        }
+                                    ],
+                                    "exit": [
+                                        "adventuring:gladiator",
+                                        "adventuring:arena_beast",
+                                        "adventuring:arena_beast"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:gladiator",
+                                            "weight": 25
+                                        },
+                                        {
+                                            "id": "adventuring:arena_beast",
+                                            "weight": 35
+                                        },
+                                        {
+                                            "id": "adventuring:veteran_champion",
+                                            "weight": 40
+                                        }
+                                    ],
+                                    "exit": [
+                                        "adventuring:arena_beast",
+                                        "adventuring:veteran_champion",
+                                        "adventuring:veteran_champion"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:arena_beast",
+                                            "weight": 25
+                                        },
+                                        {
+                                            "id": "adventuring:veteran_champion",
+                                            "weight": 35
+                                        },
+                                        {
+                                            "id": "adventuring:arena_mage",
+                                            "weight": 40
+                                        }
+                                    ],
+                                    "exit": [
+                                        "adventuring:veteran_champion",
+                                        "adventuring:arena_mage",
+                                        "adventuring:arena_mage"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:veteran_champion",
+                                            "weight": 30
+                                        },
+                                        {
+                                            "id": "adventuring:arena_mage",
+                                            "weight": 35
+                                        },
+                                        {
+                                            "id": "adventuring:colosseum_executioner",
+                                            "weight": 35
+                                        }
+                                    ],
+                                    "exit": [
+                                        "adventuring:arena_mage",
+                                        "adventuring:colosseum_executioner",
+                                        "adventuring:colosseum_executioner"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:arena_mage",
+                                            "weight": 30
+                                        },
+                                        {
+                                            "id": "adventuring:colosseum_executioner",
+                                            "weight": 70
+                                        }
+                                    ],
+                                    "exit": [
+                                        "adventuring:colosseum_executioner",
+                                        "adventuring:colosseum_executioner",
+                                        "adventuring:the_eternal_champion"
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "monsters": [
+                        {
+                            "id": "arena_slave",
+                            "name": "Arena Slave",
+                            "media": "melvor:assets/media/monsters/bandit.png",
+                            "tags": [
+                                "humanoid",
+                                "gladiator"
+                            ],
+                            "xp": 220,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 75
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 55
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 75
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 72
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 55
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 45
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 40
+                                }
+                            ],
+                            "generator": "adventuring:desperate_swing",
+                            "spender": "adventuring:survival_instinct",
+                            "passives": [],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 38,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 5,
+                                    "weight": 25
+                                },
+                                {
+                                    "id": "adventuring:arena_token",
+                                    "qty": 2,
+                                    "weight": 45
+                                }
+                            ]
+                        },
+                        {
+                            "id": "pit_fighter",
+                            "name": "Pit Fighter",
+                            "media": "melvor:assets/media/monsters/fierce_devil.png",
+                            "tags": [
+                                "humanoid",
+                                "gladiator"
+                            ],
+                            "xp": 240,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 85
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 60
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 82
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 78
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 60
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 50
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 45
+                                }
+                            ],
+                            "generator": "adventuring:brutal_combo",
+                            "spender": "adventuring:finishing_blow",
+                            "passives": [
+                                "adventuring:gladiators_fury"
+                            ],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 42,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 5,
+                                    "weight": 22
+                                },
+                                {
+                                    "id": "adventuring:arena_token",
+                                    "qty": 3,
+                                    "weight": 40
+                                },
+                                {
+                                    "id": "adventuring:champions_blood",
+                                    "qty": 1,
+                                    "weight": 18
+                                }
+                            ]
+                        },
+                        {
+                            "id": "gladiator",
+                            "name": "Gladiator",
+                            "media": "melvor:assets/media/monsters/raging_horned_elite.png",
+                            "tags": [
+                                "humanoid",
+                                "gladiator"
+                            ],
+                            "xp": 265,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 95
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 68
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 78
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 84
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 62
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 55
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 52
+                                }
+                            ],
+                            "generator": "adventuring:gladius_strike",
+                            "spender": "adventuring:champions_bash",
+                            "passives": [
+                                "adventuring:champions_pride"
+                            ],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 48,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 6,
+                                    "weight": 20
+                                },
+                                {
+                                    "id": "adventuring:arena_token",
+                                    "qty": 3,
+                                    "weight": 35
+                                },
+                                {
+                                    "id": "adventuring:glory_medal",
+                                    "qty": 1,
+                                    "weight": 20
+                                }
+                            ]
+                        },
+                        {
+                            "id": "arena_beast",
+                            "name": "Arena Beast",
+                            "media": "melvor:assets/media/monsters/griffin.png",
+                            "tags": [
+                                "beast",
+                                "gladiator"
+                            ],
+                            "xp": 285,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 100
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 58
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 92
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 88
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 58
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 48
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 42
+                                }
+                            ],
+                            "generator": "adventuring:savage_bite",
+                            "spender": "adventuring:frenzy",
+                            "passives": [],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 52,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 6,
+                                    "weight": 25
+                                },
+                                {
+                                    "id": "adventuring:arena_token",
+                                    "qty": 4,
+                                    "weight": 35
+                                },
+                                {
+                                    "id": "adventuring:beast_fang",
+                                    "qty": 2,
+                                    "weight": 28
+                                }
+                            ]
+                        },
+                        {
+                            "id": "veteran_champion",
+                            "name": "Veteran Champion",
+                            "media": "melvor:assets/media/monsters/seething_horned_elite.png",
+                            "tags": [
+                                "humanoid",
+                                "gladiator"
+                            ],
+                            "xp": 310,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 115
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 76
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 75
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 92
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 68
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 62
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 58
+                                }
+                            ],
+                            "generator": "adventuring:gladiators_precision",
+                            "spender": "adventuring:execution",
+                            "passives": [
+                                "adventuring:gladiators_fury",
+                                "adventuring:champions_pride"
+                            ],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 58,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 6,
+                                    "weight": 22
+                                },
+                                {
+                                    "id": "adventuring:champions_blood",
+                                    "qty": 2,
+                                    "weight": 32
+                                },
+                                {
+                                    "id": "adventuring:glory_medal",
+                                    "qty": 2,
+                                    "weight": 25
+                                }
+                            ]
+                        },
+                        {
+                            "id": "arena_mage",
+                            "name": "Arena Mage",
+                            "media": "melvor:assets/media/monsters/dark_horned_elite.png",
+                            "tags": [
+                                "humanoid",
+                                "mage",
+                                "gladiator"
+                            ],
+                            "xp": 335,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 100
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 58
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 72
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 55
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 60
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 115
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 78
+                                }
+                            ],
+                            "generator": "adventuring:arena_bolt",
+                            "spender": "adventuring:crowd_favorite",
+                            "passives": [
+                                "adventuring:champions_pride"
+                            ],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 62,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 6,
+                                    "weight": 20
+                                },
+                                {
+                                    "id": "adventuring:arena_token",
+                                    "qty": 5,
+                                    "weight": 35
+                                },
+                                {
+                                    "id": "adventuring:eternal_essence",
+                                    "qty": 1,
+                                    "weight": 22
+                                }
+                            ]
+                        },
+                        {
+                            "id": "colosseum_executioner",
+                            "name": "Colosseum Executioner",
+                            "media": "melvor:assets/media/monsters/fierce_devil.png#shade=red",
+                            "tags": [
+                                "humanoid",
+                                "gladiator"
+                            ],
+                            "xp": 365,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 130
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 78
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 65
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 102
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 55
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 68
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 72
+                                }
+                            ],
+                            "generator": "adventuring:executioners_swing",
+                            "spender": "adventuring:decapitate",
+                            "passives": [
+                                "adventuring:gladiators_fury"
+                            ],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 68,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 7,
+                                    "weight": 25
+                                },
+                                {
+                                    "id": "adventuring:champions_blood",
+                                    "qty": 3,
+                                    "weight": 35
+                                },
+                                {
+                                    "id": "adventuring:eternal_essence",
+                                    "qty": 2,
+                                    "weight": 28
+                                }
+                            ]
+                        },
+                        {
+                            "id": "the_eternal_champion",
+                            "name": "The Eternal Champion",
+                            "media": "melvor:assets/media/monsters/malcs_leader.png",
+                            "tags": [
+                                "humanoid",
+                                "gladiator",
+                                "boss"
+                            ],
+                            "isBoss": true,
+                            "xp": 900,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 280
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 88
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 82
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 110
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 78
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 85
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 92
+                                }
+                            ],
+                            "generator": "adventuring:legendary_combo",
+                            "spender": "adventuring:glory_or_death",
+                            "passives": [
+                                "adventuring:eternal_champion",
+                                "adventuring:champions_pride"
+                            ],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 200,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:big_parts",
+                                    "qty": 6,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:arena_token",
+                                    "qty": 25,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:champions_blood",
+                                    "qty": 12,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:glory_medal",
+                                    "qty": 8,
+                                    "weight": 85
+                                },
+                                {
+                                    "id": "adventuring:eternal_essence",
+                                    "qty": 5,
+                                    "weight": 80
+                                },
+                                {
+                                    "id": "adventuring:champions_crown",
+                                    "qty": 1,
+                                    "weight": 100
+                                }
+                            ]
+                        }
+                    ],
+                    "materials": [
+                        {
+                            "id": "arena_token",
+                            "name": "Arena Token",
+                            "media": "melvor:assets/media/bank/ring_gold_topaz.png",
+                            "category": "adventuring:monster_drops"
+                        },
+                        {
+                            "id": "champions_blood",
+                            "name": "Champion's Blood",
+                            "media": "melvor:assets/media/bank/rune_havoc.png#shade=red",
+                            "category": "adventuring:monster_drops"
+                        },
+                        {
+                            "id": "glory_medal",
+                            "name": "Glory Medal",
+                            "media": "melvor:assets/media/bank/gold_bar.png",
+                            "category": "adventuring:monster_drops"
+                        },
+                        {
+                            "id": "beast_fang",
+                            "name": "Beast Fang",
+                            "media": "melvor:assets/media/bank/weapon_claw_ancient.png",
+                            "category": "adventuring:monster_drops"
+                        },
+                        {
+                            "id": "eternal_essence",
+                            "name": "Eternal Essence",
+                            "media": "melvor:assets/media/bank/stardust.png",
+                            "category": "adventuring:monster_drops"
+                        },
+                        {
+                            "id": "champions_crown",
+                            "name": "Champion's Crown",
+                            "media": "melvor:assets/media/bank/crown_of_rhaelyx.png",
+                            "category": "adventuring:boss_drops"
+                        }
+                    ],
+                    "generators": [
+                        {
+                            "id": "desperate_swing",
+                            "name": "Desperate Swing",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "energy": 25,
+                            "hits": [
+                                {
+                                    "target": "single_enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "damage_type": "strength",
+                                            "amount": 14,
+                                            "scaling": 0.6
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "brutal_combo",
+                            "name": "Brutal Combo",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "energy": 28,
+                            "hits": [
+                                {
+                                    "target": "single_enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "damage_type": "strength",
+                                            "amount": 10,
+                                            "scaling": 0.45
+                                        }
+                                    ]
+                                },
+                                {
+                                    "target": "single_enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "damage_type": "strength",
+                                            "amount": 10,
+                                            "scaling": 0.45
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "gladius_strike",
+                            "name": "Gladius Strike",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "energy": 30,
+                            "hits": [
+                                {
+                                    "target": "single_enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "damage_type": "strength",
+                                            "amount": 20,
+                                            "scaling": 0.75
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:bleed",
+                                            "stacks": 1
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "savage_bite",
+                            "name": "Savage Bite",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "energy": 26,
+                            "hits": [
+                                {
+                                    "target": "single_enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "damage_type": "strength",
+                                            "amount": 22,
+                                            "scaling": 0.8
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "gladiators_precision",
+                            "name": "Gladiator's Precision",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "energy": 32,
+                            "hits": [
+                                {
+                                    "target": "single_enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "damage_type": "strength",
+                                            "amount": 24,
+                                            "scaling": 0.85
+                                        },
+                                        {
+                                            "type": "buff",
+                                            "id": "adventuring:might",
+                                            "target": "self",
+                                            "stacks": 1
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "arena_bolt",
+                            "name": "Arena Bolt",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "energy": 30,
+                            "hits": [
+                                {
+                                    "target": "single_enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "damage_type": "magic",
+                                            "amount": 22,
+                                            "scaling": 0.8
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "executioners_swing",
+                            "name": "Executioner's Swing",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "energy": 35,
+                            "hits": [
+                                {
+                                    "target": "single_enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "damage_type": "strength",
+                                            "amount": 30,
+                                            "scaling": 1.0
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "legendary_combo",
+                            "name": "Legendary Combo",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "energy": 40,
+                            "hits": [
+                                {
+                                    "target": "single_enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "damage_type": "strength",
+                                            "amount": 18,
+                                            "scaling": 0.6
+                                        }
+                                    ]
+                                },
+                                {
+                                    "target": "single_enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "damage_type": "strength",
+                                            "amount": 18,
+                                            "scaling": 0.6
+                                        }
+                                    ]
+                                },
+                                {
+                                    "target": "single_enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "damage_type": "strength",
+                                            "amount": 18,
+                                            "scaling": 0.6
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "spenders": [
+                        {
+                            "id": "survival_instinct",
+                            "name": "Survival Instinct",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 55,
+                            "hits": [
+                                {
+                                    "target": "self",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "id": "adventuring:evasion",
+                                            "stacks": 3
+                                        },
+                                        {
+                                            "type": "heal",
+                                            "amount": 15,
+                                            "scaling": 0.5
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "finishing_blow",
+                            "name": "Finishing Blow",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 65,
+                            "hits": [
+                                {
+                                    "target": "single_enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "damage_type": "strength",
+                                            "amount": 32,
+                                            "scaling": 1.1
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "champions_bash",
+                            "name": "Champion's Bash",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 70,
+                            "hits": [
+                                {
+                                    "target": "single_enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "damage_type": "defence",
+                                            "amount": 25,
+                                            "scaling": 0.9
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:stun",
+                                            "stacks": 1
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "frenzy",
+                            "name": "Frenzy",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 75,
+                            "hits": [
+                                {
+                                    "target": "random",
+                                    "count": 4,
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "damage_type": "strength",
+                                            "amount": 12,
+                                            "scaling": 0.5
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "execution",
+                            "name": "Execution",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 85,
+                            "hits": [
+                                {
+                                    "target": "single_enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "damage_type": "strength",
+                                            "amount": 45,
+                                            "scaling": 1.3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "crowd_favorite",
+                            "name": "Crowd Favorite",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 80,
+                            "hits": [
+                                {
+                                    "target": "all_enemies",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "damage_type": "magic",
+                                            "amount": 28,
+                                            "scaling": 0.95
+                                        }
+                                    ]
+                                },
+                                {
+                                    "target": "self",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "id": "adventuring:might",
+                                            "stacks": 2
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "decapitate",
+                            "name": "Decapitate",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 95,
+                            "hits": [
+                                {
+                                    "target": "single_enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "damage_type": "strength",
+                                            "amount": 55,
+                                            "scaling": 1.5
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "glory_or_death",
+                            "name": "Glory or Death",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 120,
+                            "hits": [
+                                {
+                                    "target": "all_enemies",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "damage_type": "strength",
+                                            "amount": 40,
+                                            "scaling": 1.2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "target": "self",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "id": "adventuring:might",
+                                            "stacks": 5
+                                        },
+                                        {
+                                            "type": "buff",
+                                            "id": "adventuring:haste",
+                                            "stacks": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
             }
-        }]
+        ]
     }
 }

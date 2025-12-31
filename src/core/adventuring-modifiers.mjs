@@ -11,7 +11,7 @@ const { createEffect, EffectCache } = await loadModule('src/core/adventuring-uti
  * - Achievement rewards
  * - Mastery effects (monster/area/job/equipment)
  * 
- * All bonuses use the standard effect format: { trigger: 'passive', type, value }
+ * All bonuses use the standard effect format: { trigger: 'passive', type: stat.id, value }
  * Effect types use simple names with positive/negative values:
  *   - drop_rate_percent: +10 = 10% more drops
  *   - upgrade_cost_percent: -25 = 25% cheaper upgrades
@@ -118,13 +118,14 @@ export class AdventuringModifiers {
         
         if (!this.manager.achievementManager) return effects;
         
-        const bonuses = this.manager.achievementBonuses || {};
+        // Achievement bonuses are now derived from completed achievements
         
         // Convert achievement bonuses to standard effects
-        for (const [type, value] of Object.entries(bonuses)) {
+        for (const stat of this.manager.stats.allObjects) {
+            const value = this.manager.achievementManager.getStatBonus(stat.id);
             if (value !== 0) {
                 effects.push(createEffect(
-                    { trigger: 'passive', type, value },
+                    { trigger: 'passive', type: stat.id, value },
                     this.manager.achievementManager,
                     'Achievement Bonus'
                 ));
@@ -252,67 +253,32 @@ export class AdventuringModifiers {
      * Get milestone damage bonus vs monster types (as decimal multiplier)
      */
     getMilestoneDamageBonusVsType(tags) {
-        if (!this.manager.milestoneModifiers) return 0;
-        let bonus = 0;
-        for (const tag of tags) {
-            const tagName = typeof tag === 'string' ? tag : tag.id;
-            const cleanTag = tagName.replace('adventuring:', '');
-            const modifiers = this.manager.milestoneModifiers[cleanTag];
-            if (modifiers && modifiers.damage_bonus_vs_type) {
-                bonus += modifiers.damage_bonus_vs_type;
-            }
-        }
-        return bonus / 100;
+        // Milestone bonuses now handled by mastery system
+        return 0;
     }
     
     /**
      * Get milestone damage reduction vs monster types (as decimal multiplier)
      */
     getMilestoneDamageReductionVsType(tags) {
-        if (!this.manager.milestoneModifiers) return 0;
-        let reduction = 0;
-        for (const tag of tags) {
-            const tagName = typeof tag === 'string' ? tag : tag.id;
-            const cleanTag = tagName.replace('adventuring:', '');
-            const modifiers = this.manager.milestoneModifiers[cleanTag];
-            if (modifiers && modifiers.damage_reduction_vs_type) {
-                reduction += modifiers.damage_reduction_vs_type;
-            }
-        }
-        return reduction / 100;
+        // Milestone bonuses now handled by mastery system
+        return 0;
     }
     
     /**
      * Get milestone XP bonus vs monster types (as decimal multiplier)
      */
     getMilestoneXPBonusVsType(tags) {
-        if (!this.manager.milestoneModifiers) return 0;
-        let bonus = 0;
-        for (const tag of tags) {
-            const tagName = typeof tag === 'string' ? tag : tag.id;
-            const cleanTag = tagName.replace('adventuring:', '');
-            const modifiers = this.manager.milestoneModifiers[cleanTag];
-            if (modifiers && modifiers.exp_bonus_vs_type) {
-                bonus += modifiers.exp_bonus_vs_type;
-            }
-        }
-        return bonus / 100;
+        // Milestone bonuses now handled by mastery system
+        return 0;
     }
     
     /**
      * Get milestone material bonus for monster types (as decimal multiplier)
      */
     getMilestoneMaterialBonus(tags) {
-        if (!this.manager.milestoneMaterialBonuses) return 0;
-        let bonus = 0;
-        for (const tag of tags) {
-            const tagName = typeof tag === 'string' ? tag : tag.id;
-            const cleanTag = tagName.replace('adventuring:', '');
-            if (this.manager.milestoneMaterialBonuses[cleanTag]) {
-                bonus += this.manager.milestoneMaterialBonuses[cleanTag];
-            }
-        }
-        return bonus / 100;
+        // Milestone bonuses now handled by mastery system
+        return 0;
     }
     
     /**

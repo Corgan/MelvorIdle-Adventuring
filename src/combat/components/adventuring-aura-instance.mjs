@@ -1,4 +1,8 @@
-export class AdventuringAuraInstanceElement extends HTMLElement {
+const { loadModule } = mod.getContext(import.meta);
+
+const { AdventuringTooltipElement, createTooltip } = await loadModule('src/core/adventuring-tooltip-element.mjs');
+
+export class AdventuringAuraInstanceElement extends AdventuringTooltipElement {
     constructor() {
         super();
         this._content = new DocumentFragment();
@@ -10,25 +14,17 @@ export class AdventuringAuraInstanceElement extends HTMLElement {
         this.border = getElementFromFragment(this._content, 'border', 'div');
         
         this.auraInstance = null;
-    }
-
-    mount(parent) {
-        parent.append(this);
+        // Don't set _tooltipTarget - we manage tooltip manually for auras
     }
 
     connectedCallback() {
         this.appendChild(this._content);
         // Only create tooltip if it doesn't exist (survives DOM reordering)
-        if(this.tooltip === undefined) {
-            this.tooltip = tippy(this.styling, {
-                content: '',
-                allowHTML: true,
-                hideOnClick: false,
-                interactive: true
-            });
+        if (this.tooltip === undefined) {
+            this.tooltip = createTooltip(this.styling, '', { interactive: true });
         }
         // Queue tooltip render so it gets filled with correct content
-        if(this.auraInstance) {
+        if (this.auraInstance) {
             this.auraInstance.renderQueue.tooltip = true;
         }
     }

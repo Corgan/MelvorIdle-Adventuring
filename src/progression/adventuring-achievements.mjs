@@ -12,6 +12,101 @@ class AchievementRenderQueue {
 }
 
 /**
+ * Achievement statistics class - tracks all stat-based progress
+ */
+export class AchievementStats {
+    constructor() {
+        this.totalKills = 0;
+        this.killsByTag = {};
+        this.totalClears = 0;
+        this.heroicClears = 0;
+        this.mythicClears = 0;
+        this.bestEndlessWave = 0;
+        this.totalMaterials = 0;
+        this.totalCurrencyEarned = 0;
+        this.uniqueMonstersSeen = 0;
+        this.flawlessWins = 0;
+        this.fastWins = {};
+        this.lastStandWins = 0;
+        this.totalDamage = 0;
+        this.totalHealing = 0;
+        this.slayerTasksCompleted = 0;
+    }
+
+    /**
+     * Encode stats to save
+     */
+    encode(writer) {
+        writer.writeUint32(this.totalKills);
+        writer.writeUint32(this.totalClears);
+        writer.writeUint32(this.heroicClears);
+        writer.writeUint32(this.mythicClears);
+        writer.writeUint32(this.bestEndlessWave);
+        writer.writeUint32(this.totalMaterials);
+        writer.writeUint32(this.totalCurrencyEarned);
+        writer.writeUint32(this.uniqueMonstersSeen);
+        writer.writeUint32(this.flawlessWins);
+        writer.writeUint32(this.lastStandWins);
+        writer.writeFloat64(this.totalDamage);
+        writer.writeFloat64(this.totalHealing);
+        writer.writeUint32(this.slayerTasksCompleted);
+        
+        // Write kills by tag
+        const tagEntries = Object.entries(this.killsByTag);
+        writer.writeUint16(tagEntries.length);
+        for(const [tag, count] of tagEntries) {
+            writer.writeString(tag);
+            writer.writeUint32(count);
+        }
+        
+        // Write fast wins
+        const fastEntries = Object.entries(this.fastWins);
+        writer.writeUint16(fastEntries.length);
+        for(const [rounds, count] of fastEntries) {
+            writer.writeUint8(parseInt(rounds));
+            writer.writeUint32(count);
+        }
+    }
+
+    /**
+     * Decode stats from save
+     */
+    decode(reader, version) {
+        this.totalKills = reader.getUint32();
+        this.totalClears = reader.getUint32();
+        this.heroicClears = reader.getUint32();
+        this.mythicClears = reader.getUint32();
+        this.bestEndlessWave = reader.getUint32();
+        this.totalMaterials = reader.getUint32();
+        this.totalCurrencyEarned = reader.getUint32();
+        this.uniqueMonstersSeen = reader.getUint32();
+        this.flawlessWins = reader.getUint32();
+        this.lastStandWins = reader.getUint32();
+        this.totalDamage = reader.getFloat64();
+        this.totalHealing = reader.getFloat64();
+        this.slayerTasksCompleted = reader.getUint32();
+        
+        // Read kills by tag
+        this.killsByTag = {};
+        const tagCount = reader.getUint16();
+        for(let i = 0; i < tagCount; i++) {
+            const tag = reader.getString();
+            const count = reader.getUint32();
+            this.killsByTag[tag] = count;
+        }
+        
+        // Read fast wins
+        this.fastWins = {};
+        const fastCount = reader.getUint16();
+        for(let i = 0; i < fastCount; i++) {
+            const rounds = reader.getUint8();
+            const count = reader.getUint32();
+            this.fastWins[rounds] = count;
+        }
+    }
+}
+
+/**
  * Achievement category for grouping achievements
  */
 export class AdventuringAchievementCategory extends NamespacedObject {
@@ -74,27 +169,27 @@ export class AdventuringAchievement extends NamespacedObject {
      */
     getProgress() {
         const req = this.requirement;
-        const stats = this.manager.achievementStats;
+        const stats = this.manager.achievementManager.stats;
         
         switch(req.type) {
             case 'total_kills':
-                return stats.totalKills || 0;
+                return stats.totalKills;
             case 'kills_by_tag':
-                return (stats.killsByTag && stats.killsByTag[req.tag]) || 0;
+                return stats.killsByTag[req.tag] || 0;
             case 'total_clears':
-                return stats.totalClears || 0;
+                return stats.totalClears;
             case 'heroic_clears':
-                return stats.heroicClears || 0;
+                return stats.heroicClears;
             case 'mythic_clears':
-                return stats.mythicClears || 0;
+                return stats.mythicClears;
             case 'endless_wave':
-                return stats.bestEndlessWave || 0;
+                return stats.bestEndlessWave;
             case 'total_materials':
-                return stats.totalMaterials || 0;
+                return stats.totalMaterials;
             case 'total_currency':
-                return stats.totalCurrencyEarned || 0;
+                return stats.totalCurrencyEarned;
             case 'unique_monsters':
-                return stats.uniqueMonstersSeen || 0;
+                return stats.uniqueMonstersSeen;
             case 'learned_abilities':
                 return this.manager.learnedAbilities ? this.manager.learnedAbilities.size : 0;
             case 'job_level':
@@ -104,17 +199,17 @@ export class AdventuringAchievement extends NamespacedObject {
             case 'area_mastery':
                 return this._getHighestAreaMastery();
             case 'flawless_wins':
-                return stats.flawlessWins || 0;
+                return stats.flawlessWins;
             case 'fast_wins':
-                return (stats.fastWins && stats.fastWins[req.rounds]) || 0;
+                return stats.fastWins[req.rounds] || 0;
             case 'last_stand_wins':
-                return stats.lastStandWins || 0;
+                return stats.lastStandWins;
             case 'total_damage':
-                return stats.totalDamage || 0;
+                return stats.totalDamage;
             case 'total_healing':
-                return stats.totalHealing || 0;
+                return stats.totalHealing;
             case 'slayer_tasks':
-                return stats.slayerTasksCompleted || 0;
+                return stats.slayerTasksCompleted;
             case 'job_unlocked':
                 return this._isJobUnlocked(req.job) ? 1 : 0;
             case 'all_jobs_tier':
@@ -135,7 +230,7 @@ export class AdventuringAchievement extends NamespacedObject {
      * Check if this achievement is complete
      */
     isComplete() {
-        return this.manager.completedAchievements.has(this.id);
+        return this.manager.achievementManager.completedAchievements.has(this);
     }
 
     /**
@@ -240,82 +335,146 @@ export class AdventuringAchievement extends NamespacedObject {
                     const stat = this.manager.stats.getObjectByID(reward.stat);
                     if(stat) parts.push(`+${reward.value} ${stat.name} (permanent)`);
                     break;
+                case 'ability':
+                    const ability = this.manager.getAbilityByID(reward.id);
+                    if(ability) parts.push(`Unlock: ${ability.name}`);
+                    break;
             }
         }
         return parts.join(', ');
     }
+
+    /**
+     * Get the ability reward if this achievement grants one
+     */
+    getAbilityReward() {
+        const abilityReward = this.rewards.find(r => r.type === 'ability');
+        if(!abilityReward) return null;
+        return this.manager.getAbilityByID(abilityReward.id);
+    }
 }
 
 /**
- * Achievement manager - handles tracking, completion, and rewards
+ * Achievement manager - handles tracking, completion, rewards, and permanent bonuses
+ * Accessible via manager.achievementManager
  */
 export class AchievementManager {
     constructor(manager, game) {
         this.manager = manager;
         this.game = game;
         this.renderQueue = new AchievementRenderQueue();
+        
+        // Achievement stats
+        this.stats = new AchievementStats();
+        
+        // Completed achievements - stored as NamespacedObject Set
+        this.completedAchievements = new Set();
+        
+        // Effect cache for permanent bonuses from achievements
+        this.bonusEffects = null; // Will be initialized when EffectCache is available
     }
 
     /**
      * Initialize the achievement system
      */
     init() {
-        // Ensure achievement stats object exists
-        if(!this.manager.achievementStats) {
-            this.manager.achievementStats = this._createDefaultStats();
-        }
-        
-        // Ensure completed achievements set exists
-        if(!this.manager.completedAchievements) {
-            this.manager.completedAchievements = new Set();
-        }
-        
-        // Ensure permanent stat bonuses object exists
-        if(!this.manager.achievementBonuses) {
-            this.manager.achievementBonuses = {};
+        // Create effect cache for permanent bonuses
+        const { EffectCache } = loadModule('src/core/adventuring-utils.mjs');
+        if(typeof EffectCache !== 'undefined') {
+            this.bonusEffects = new EffectCache();
+            this.bonusEffects.registerSource('achievements', () => this._getAchievementEffects());
         }
     }
 
     /**
-     * Create default stats object
+     * Get permanent effects from completed achievements
+     * @returns {StandardEffect[]}
      */
-    _createDefaultStats() {
-        return {
-            totalKills: 0,
-            killsByTag: {},
-            totalClears: 0,
-            heroicClears: 0,
-            mythicClears: 0,
-            bestEndlessWave: 0,
-            totalMaterials: 0,
-            totalCurrencyEarned: 0,
-            uniqueMonstersSeen: 0,
-            flawlessWins: 0,
-            fastWins: {},
-            lastStandWins: 0,
-            totalDamage: 0,
-            totalHealing: 0,
-            slayerTasksCompleted: 0
-        };
+    _getAchievementEffects() {
+        const effects = [];
+        
+        for(const achievement of this.completedAchievements) {
+            for(const reward of achievement.rewards) {
+                if(reward.type === 'permanent_stat') {
+                    // Convert permanent stat bonus to StandardEffect format
+                    effects.push({
+                        id: `achievement:${achievement.localID}:${reward.stat}`,
+                        trigger: 'passive',
+                        effectType: 'stat_bonus',
+                        stat: reward.stat,
+                        value: reward.value,
+                        source: achievement
+                    });
+                }
+            }
+        }
+        
+        return effects;
+    }
+
+    /**
+     * Rebuild bonus effects cache
+     */
+    rebuildBonuses() {
+        if(this.bonusEffects) {
+            this.bonusEffects.invalidate('achievements');
+        }
+    }
+
+    /**
+     * Get permanent stat bonus from completed achievements
+     */
+    getStatBonus(statId) {
+        let total = 0;
+        for(const achievement of this.completedAchievements) {
+            for(const reward of achievement.rewards) {
+                if(reward.type === 'permanent_stat' && reward.stat === statId) {
+                    total += reward.value;
+                }
+            }
+        }
+        return total;
+    }
+
+    /**
+     * Get all unlocked achievement abilities (derived from completedAchievements)
+     */
+    get unlockedAbilities() {
+        const abilities = new Set();
+        for(const achievement of this.completedAchievements) {
+            const ability = achievement.getAbilityReward();
+            if(ability) {
+                abilities.add(ability.id);
+            }
+        }
+        return abilities;
+    }
+
+    /**
+     * Check if an ability is unlocked from achievements
+     */
+    isAbilityUnlocked(abilityId) {
+        for(const achievement of this.completedAchievements) {
+            const ability = achievement.getAbilityReward();
+            if(ability && ability.id === abilityId) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
      * Record a monster kill
      */
     recordKill(monster) {
-        const stats = this.manager.achievementStats;
-        stats.totalKills = (stats.totalKills || 0) + 1;
+        this.stats.totalKills++;
         
         // Track by tag
-        if(!stats.killsByTag) stats.killsByTag = {};
         if(monster.tags) {
             for(const tag of monster.tags) {
                 const tagId = typeof tag === 'string' ? tag : tag.id;
                 const tagName = tagId.replace('adventuring:', '');
-                stats.killsByTag[tagName] = (stats.killsByTag[tagName] || 0) + 1;
-                
-                // Check mastery milestones for this tag
-                this.checkMasteryMilestones(tagName, stats.killsByTag[tagName]);
+                this.stats.killsByTag[tagName] = (this.stats.killsByTag[tagName] || 0) + 1;
             }
         }
         
@@ -323,120 +482,19 @@ export class AchievementManager {
     }
 
     /**
-     * Check and unlock mastery milestones for a specific tag
-     */
-    checkMasteryMilestones(tagName, killCount) {
-        // Ensure unlocked milestones structure exists
-        if(!this.manager.unlockedMilestones[tagName]) {
-            this.manager.unlockedMilestones[tagName] = new Set();
-        }
-        
-        const unlocked = this.manager.unlockedMilestones[tagName];
-        
-        // Check each milestone
-        for(const milestone of this.manager.masteryMilestones) {
-            // Skip if already unlocked for this tag
-            if(unlocked.has(milestone.id)) continue;
-            
-            // Check if kill count meets the threshold
-            if(killCount >= milestone.level) {
-                unlocked.add(milestone.id);
-                this.grantMilestoneRewards(tagName, milestone);
-                this.manager.log.add(`Mastery Milestone: ${milestone.name} (${tagName})!`, 'important');
-            }
-        }
-    }
-
-    /**
-     * Grant rewards for a mastery milestone
-     */
-    grantMilestoneRewards(tagName, milestone) {
-        for(const reward of milestone.rewards) {
-            switch(reward.type) {
-                case 'modifier':
-                    // Store tag-specific modifiers
-                    if(!this.manager.milestoneModifiers) {
-                        this.manager.milestoneModifiers = {};
-                    }
-                    if(!this.manager.milestoneModifiers[tagName]) {
-                        this.manager.milestoneModifiers[tagName] = {};
-                    }
-                    const currentValue = this.manager.milestoneModifiers[tagName][reward.id] || 0;
-                    this.manager.milestoneModifiers[tagName][reward.id] = currentValue + reward.value;
-                    break;
-                    
-                case 'material_bonus':
-                    // Store material bonuses by tag
-                    if(!this.manager.milestoneMaterialBonuses) {
-                        this.manager.milestoneMaterialBonuses = {};
-                    }
-                    if(!this.manager.milestoneMaterialBonuses[tagName]) {
-                        this.manager.milestoneMaterialBonuses[tagName] = 0;
-                    }
-                    this.manager.milestoneMaterialBonuses[tagName] += reward.value;
-                    break;
-                    
-                case 'unlock':
-                    // Track general unlocks
-                    if(!this.manager.milestoneUnlocks) {
-                        this.manager.milestoneUnlocks = new Set();
-                    }
-                    this.manager.milestoneUnlocks.add(reward.id);
-                    break;
-                    
-                case 'cosmetic':
-                    // Track cosmetic unlocks
-                    if(!this.manager.milestoneCosmeticUnlocks) {
-                        this.manager.milestoneCosmeticUnlocks = new Set();
-                    }
-                    this.manager.milestoneCosmeticUnlocks.add(`${tagName}:${reward.id}`);
-                    break;
-                    
-                case 'ability':
-                    // Store ability bonuses by tag
-                    if(!this.manager.milestoneAbilities) {
-                        this.manager.milestoneAbilities = {};
-                    }
-                    if(!this.manager.milestoneAbilities[tagName]) {
-                        this.manager.milestoneAbilities[tagName] = {};
-                    }
-                    this.manager.milestoneAbilities[tagName][reward.id] = reward.value;
-                    break;
-            }
-        }
-    }
-
-    /**
-     * Get damage bonus against a monster with specific tags
-     * @deprecated Use manager.modifiers.getMilestoneDamageBonusVsType() or getTotalDamageBonusVsType()
-     */
-    getMilestoneDamageBonus(tags) {
-        return this.manager.modifiers.getMilestoneDamageBonusVsType(tags);
-    }
-
-    /**
-     * Get damage reduction against a monster with specific tags
-     * @deprecated Use manager.modifiers.getMilestoneDamageReductionVsType() or getTotalDamageReductionVsType()
-     */
-    getMilestoneDamageReduction(tags) {
-        return this.manager.modifiers.getMilestoneDamageReductionVsType(tags);
-    }
-
-    /**
      * Record a dungeon clear
      */
     recordDungeonClear(area, difficulty, isEndless, endlessWave) {
-        const stats = this.manager.achievementStats;
-        stats.totalClears = (stats.totalClears || 0) + 1;
+        this.stats.totalClears++;
         
         if(difficulty === 'heroic') {
-            stats.heroicClears = (stats.heroicClears || 0) + 1;
+            this.stats.heroicClears++;
         } else if(difficulty === 'mythic') {
-            stats.mythicClears = (stats.mythicClears || 0) + 1;
+            this.stats.mythicClears++;
         }
         
-        if(isEndless && endlessWave > (stats.bestEndlessWave || 0)) {
-            stats.bestEndlessWave = endlessWave;
+        if(isEndless && endlessWave > this.stats.bestEndlessWave) {
+            this.stats.bestEndlessWave = endlessWave;
         }
         
         this.checkAchievements();
@@ -446,8 +504,7 @@ export class AchievementManager {
      * Record materials collected
      */
     recordMaterials(qty) {
-        const stats = this.manager.achievementStats;
-        stats.totalMaterials = (stats.totalMaterials || 0) + qty;
+        this.stats.totalMaterials += qty;
         this.checkAchievements();
     }
 
@@ -455,8 +512,7 @@ export class AchievementManager {
      * Record currency earned
      */
     recordCurrency(qty) {
-        const stats = this.manager.achievementStats;
-        stats.totalCurrencyEarned = (stats.totalCurrencyEarned || 0) + qty;
+        this.stats.totalCurrencyEarned += qty;
         this.checkAchievements();
     }
 
@@ -464,8 +520,7 @@ export class AchievementManager {
      * Record a new unique monster seen
      */
     recordUniqueMonster() {
-        const stats = this.manager.achievementStats;
-        stats.uniqueMonstersSeen = (stats.uniqueMonstersSeen || 0) + 1;
+        this.stats.uniqueMonstersSeen++;
         this.checkAchievements();
     }
 
@@ -473,23 +528,20 @@ export class AchievementManager {
      * Record combat stats
      */
     recordCombatEnd(flawless, rounds, lastStand, totalDamage, totalHealing) {
-        const stats = this.manager.achievementStats;
-        
         if(flawless) {
-            stats.flawlessWins = (stats.flawlessWins || 0) + 1;
+            this.stats.flawlessWins++;
         }
         
         if(rounds <= 3) {
-            if(!stats.fastWins) stats.fastWins = {};
-            stats.fastWins[3] = (stats.fastWins[3] || 0) + 1;
+            this.stats.fastWins[3] = (this.stats.fastWins[3] || 0) + 1;
         }
         
         if(lastStand) {
-            stats.lastStandWins = (stats.lastStandWins || 0) + 1;
+            this.stats.lastStandWins++;
         }
         
-        stats.totalDamage = (stats.totalDamage || 0) + totalDamage;
-        stats.totalHealing = (stats.totalHealing || 0) + totalHealing;
+        this.stats.totalDamage += totalDamage;
+        this.stats.totalHealing += totalHealing;
         
         this.checkAchievements();
     }
@@ -498,8 +550,7 @@ export class AchievementManager {
      * Record slayer task completion
      */
     recordSlayerTask() {
-        const stats = this.manager.achievementStats;
-        stats.slayerTasksCompleted = (stats.slayerTasksCompleted || 0) + 1;
+        this.stats.slayerTasksCompleted++;
         this.checkAchievements();
     }
 
@@ -527,13 +578,16 @@ export class AchievementManager {
     completeAchievement(achievement) {
         if(achievement.isComplete()) return;
         
-        // Mark as complete
-        this.manager.completedAchievements.add(achievement.id);
+        // Mark as complete (stores the actual object)
+        this.completedAchievements.add(achievement);
         
-        // Grant rewards
+        // Grant rewards (except permanent_stat and ability, which are derived)
         for(const reward of achievement.rewards) {
             this.grantReward(reward);
         }
+        
+        // Rebuild bonus effects cache
+        this.rebuildBonuses();
         
         // Show notification
         if(typeof notifyPlayer === 'function') {
@@ -545,7 +599,7 @@ export class AchievementManager {
     }
 
     /**
-     * Grant a single reward
+     * Grant a single reward (only material/currency rewards, not permanent bonuses or abilities)
      */
     grantReward(reward) {
         switch(reward.type) {
@@ -563,31 +617,9 @@ export class AchievementManager {
                 }
                 break;
                 
-            case 'permanent_stat':
-                // Add to permanent bonuses
-                if(!this.manager.achievementBonuses) {
-                    this.manager.achievementBonuses = {};
-                }
-                const statId = reward.stat;
-                this.manager.achievementBonuses[statId] = 
-                    (this.manager.achievementBonuses[statId] || 0) + reward.value;
-                break;
-                
-            case 'ability':
-                // Unlock an achievement ability (works like Blue Mage learning)
-                if(reward.id && !this.manager.unlockedAchievementAbilities.has(reward.id)) {
-                    this.manager.unlockedAchievementAbilities.add(reward.id);
-                }
-                break;
+            // permanent_stat and ability are now derived from completedAchievements
+            // No need to store them separately
         }
-    }
-
-    /**
-     * Get permanent stat bonus from achievements
-     */
-    getStatBonus(statId) {
-        if(!this.manager.achievementBonuses) return 0;
-        return this.manager.achievementBonuses[statId] || 0;
     }
 
     /**
@@ -602,7 +634,7 @@ export class AchievementManager {
      */
     getCompletionStats() {
         const total = this.manager.achievements.allObjects.length;
-        const completed = this.manager.completedAchievements.size;
+        const completed = this.completedAchievements.size;
         return { total, completed, percent: Math.floor((completed / total) * 100) };
     }
 
@@ -610,208 +642,24 @@ export class AchievementManager {
      * Encode for save
      */
     encode(writer) {
-        const stats = this.manager.achievementStats || this._createDefaultStats();
+        // Encode stats
+        this.stats.encode(writer);
         
-        // Write stats
-        writer.writeUint32(stats.totalKills || 0);
-        writer.writeUint32(stats.totalClears || 0);
-        writer.writeUint32(stats.heroicClears || 0);
-        writer.writeUint32(stats.mythicClears || 0);
-        writer.writeUint32(stats.bestEndlessWave || 0);
-        writer.writeUint32(stats.totalMaterials || 0);
-        writer.writeUint32(stats.totalCurrencyEarned || 0);
-        writer.writeUint32(stats.uniqueMonstersSeen || 0);
-        writer.writeUint32(stats.flawlessWins || 0);
-        writer.writeUint32(stats.lastStandWins || 0);
-        writer.writeFloat64(stats.totalDamage || 0);
-        writer.writeFloat64(stats.totalHealing || 0);
-        writer.writeUint32(stats.slayerTasksCompleted || 0);
-        
-        // Write kills by tag
-        const killsByTag = stats.killsByTag || {};
-        const tagEntries = Object.entries(killsByTag);
-        writer.writeUint16(tagEntries.length);
-        for(const [tag, count] of tagEntries) {
-            writer.writeString(tag);
-            writer.writeUint32(count);
-        }
-        
-        // Write fast wins
-        const fastWins = stats.fastWins || {};
-        const fastEntries = Object.entries(fastWins);
-        writer.writeUint16(fastEntries.length);
-        for(const [rounds, count] of fastEntries) {
-            writer.writeUint8(parseInt(rounds));
-            writer.writeUint32(count);
-        }
-        
-        // Write completed achievements
-        const completed = [...(this.manager.completedAchievements || [])];
-        writer.writeUint16(completed.length);
-        for(const id of completed) {
-            writer.writeString(id);
-        }
-        
-        // Write permanent bonuses
-        const bonuses = this.manager.achievementBonuses || {};
-        const bonusEntries = Object.entries(bonuses);
-        writer.writeUint16(bonusEntries.length);
-        for(const [stat, value] of bonusEntries) {
-            writer.writeString(stat);
-            writer.writeInt32(value);
-        }
-        
-        // Write unlocked achievement abilities
-        const abilities = [...(this.manager.unlockedAchievementAbilities || [])];
-        writer.writeUint16(abilities.length);
-        for(const id of abilities) {
-            writer.writeString(id);
-        }
-        
-        // Write unlocked milestones by tag
-        const milestones = this.manager.unlockedMilestones || {};
-        const milestoneEntries = Object.entries(milestones);
-        writer.writeUint16(milestoneEntries.length);
-        for(const [tag, milestoneSet] of milestoneEntries) {
-            writer.writeString(tag);
-            const milestoneIds = [...milestoneSet];
-            writer.writeUint16(milestoneIds.length);
-            for(const id of milestoneIds) {
-                writer.writeString(id);
-            }
-        }
-        
-        // Write milestone modifiers
-        const modifiers = this.manager.milestoneModifiers || {};
-        const modEntries = Object.entries(modifiers);
-        writer.writeUint16(modEntries.length);
-        for(const [tag, mods] of modEntries) {
-            writer.writeString(tag);
-            const modPairs = Object.entries(mods);
-            writer.writeUint16(modPairs.length);
-            for(const [modId, value] of modPairs) {
-                writer.writeString(modId);
-                writer.writeInt32(value);
-            }
-        }
-        
-        // Write milestone material bonuses
-        const matBonuses = this.manager.milestoneMaterialBonuses || {};
-        const matEntries = Object.entries(matBonuses);
-        writer.writeUint16(matEntries.length);
-        for(const [tag, value] of matEntries) {
-            writer.writeString(tag);
-            writer.writeInt32(value);
-        }
+        // Encode completed achievements as NamespacedObject set
+        writer.writeSet(this.completedAchievements, writeNamespacedObject);
     }
 
     /**
      * Decode from save
      */
     decode(reader, version) {
-        const stats = this._createDefaultStats();
+        // Decode stats
+        this.stats.decode(reader, version);
         
-        // Read stats
-        stats.totalKills = reader.getUint32();
-        stats.totalClears = reader.getUint32();
-        stats.heroicClears = reader.getUint32();
-        stats.mythicClears = reader.getUint32();
-        stats.bestEndlessWave = reader.getUint32();
-        stats.totalMaterials = reader.getUint32();
-        stats.totalCurrencyEarned = reader.getUint32();
-        stats.uniqueMonstersSeen = reader.getUint32();
-        stats.flawlessWins = reader.getUint32();
-        stats.lastStandWins = reader.getUint32();
-        stats.totalDamage = reader.getFloat64();
-        stats.totalHealing = reader.getFloat64();
-        stats.slayerTasksCompleted = reader.getUint32();
+        // Decode completed achievements as NamespacedObject set
+        this.completedAchievements = reader.getSet(readNamespacedObject(this.manager.achievements));
         
-        // Read kills by tag
-        stats.killsByTag = {};
-        const tagCount = reader.getUint16();
-        for(let i = 0; i < tagCount; i++) {
-            const tag = reader.getString();
-            const count = reader.getUint32();
-            stats.killsByTag[tag] = count;
-        }
-        
-        // Read fast wins
-        stats.fastWins = {};
-        const fastCount = reader.getUint16();
-        for(let i = 0; i < fastCount; i++) {
-            const rounds = reader.getUint8();
-            const count = reader.getUint32();
-            stats.fastWins[rounds] = count;
-        }
-        
-        this.manager.achievementStats = stats;
-        
-        // Read completed achievements
-        this.manager.completedAchievements = new Set();
-        const completedCount = reader.getUint16();
-        for(let i = 0; i < completedCount; i++) {
-            const id = reader.getString();
-            this.manager.completedAchievements.add(id);
-        }
-        
-        // Read permanent bonuses
-        this.manager.achievementBonuses = {};
-        const bonusCount = reader.getUint16();
-        for(let i = 0; i < bonusCount; i++) {
-            const stat = reader.getString();
-            const value = reader.getInt32();
-            this.manager.achievementBonuses[stat] = value;
-        }
-        
-        // Read unlocked achievement abilities
-        this.manager.unlockedAchievementAbilities = new Set();
-        const abilityCount = reader.getUint16();
-        for(let i = 0; i < abilityCount; i++) {
-            const id = reader.getString();
-            this.manager.unlockedAchievementAbilities.add(id);
-        }
-        
-        // Read unlocked milestones by tag (if present in save)
-        try {
-            this.manager.unlockedMilestones = {};
-            const milestoneTagCount = reader.getUint16();
-            for(let i = 0; i < milestoneTagCount; i++) {
-                const tag = reader.getString();
-                const milestoneCount = reader.getUint16();
-                this.manager.unlockedMilestones[tag] = new Set();
-                for(let j = 0; j < milestoneCount; j++) {
-                    const milestoneId = reader.getString();
-                    this.manager.unlockedMilestones[tag].add(milestoneId);
-                }
-            }
-            
-            // Read milestone modifiers
-            this.manager.milestoneModifiers = {};
-            const modTagCount = reader.getUint16();
-            for(let i = 0; i < modTagCount; i++) {
-                const tag = reader.getString();
-                const modCount = reader.getUint16();
-                this.manager.milestoneModifiers[tag] = {};
-                for(let j = 0; j < modCount; j++) {
-                    const modId = reader.getString();
-                    const value = reader.getInt32();
-                    this.manager.milestoneModifiers[tag][modId] = value;
-                }
-            }
-            
-            // Read milestone material bonuses
-            this.manager.milestoneMaterialBonuses = {};
-            const matBonusCount = reader.getUint16();
-            for(let i = 0; i < matBonusCount; i++) {
-                const tag = reader.getString();
-                const value = reader.getInt32();
-                this.manager.milestoneMaterialBonuses[tag] = value;
-            }
-        } catch(e) {
-            // Old save format without milestones - initialize empty
-            this.manager.unlockedMilestones = {};
-            this.manager.milestoneModifiers = {};
-            this.manager.milestoneMaterialBonuses = {};
-        }
+        // Rebuild bonus effects from loaded achievements
+        this.rebuildBonuses();
     }
 }

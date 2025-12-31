@@ -2,366 +2,662 @@
     "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
     "namespace": "adventuring",
     "data": {
-        "skillData": [{
-            "skillID": "adventuring:Adventuring",
-            "data": {
-                "passives": [
-                    {
-                        "id": "knights_valor",
-                        "name": "Knight's Valor",
-                        "effects": [
-                            {
-                                "trigger": "encounter_start",
-                                "type": "buff",
-                                "id": "adventuring:protection",
-                                "target": "self",
-                                "stacks": { "base": 2, "scaling": [] }
-                            }
-                        ]
-                    }
-                ],
-                "areas": [
-                    {
-                        "id": "knights_fortress",
-                        "name": "Knight's Fortress",
-                        "media": "melvor:assets/media/monsters/black_knight.png",
-                        "requirements": [
-                            { "type": "skill_level", "level": 52 }
-                        ],
-                        "height": 9,
-                        "width": 7,
-                        "floors": [
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:steel_knight", "weight": 100 }
-                                ],
-                                "exit": ["adventuring:steel_knight", "adventuring:steel_knight", "adventuring:steel_knight"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:steel_knight", "weight": 60 },
-                                    { "id": "adventuring:mithril_knight", "weight": 40 }
-                                ],
-                                "exit": ["adventuring:steel_knight", "adventuring:steel_knight", "adventuring:mithril_knight"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:steel_knight", "weight": 30 },
-                                    { "id": "adventuring:mithril_knight", "weight": 70 }
-                                ],
-                                "exit": ["adventuring:mithril_knight", "adventuring:mithril_knight", "adventuring:mithril_knight"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:mithril_knight", "weight": 60 },
-                                    { "id": "adventuring:adamant_knight", "weight": 40 }
-                                ],
-                                "exit": ["adventuring:mithril_knight", "adventuring:mithril_knight", "adventuring:adamant_knight"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:mithril_knight", "weight": 30 },
-                                    { "id": "adventuring:adamant_knight", "weight": 70 }
-                                ],
-                                "exit": ["adventuring:adamant_knight", "adventuring:adamant_knight", "adventuring:adamant_knight"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:adamant_knight", "weight": 60 },
-                                    { "id": "adventuring:rune_knight", "weight": 40 }
-                                ],
-                                "exit": ["adventuring:adamant_knight", "adventuring:adamant_knight", "adventuring:rune_knight"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:adamant_knight", "weight": 30 },
-                                    { "id": "adventuring:rune_knight", "weight": 70 }
-                                ],
-                                "exit": ["adventuring:rune_knight", "adventuring:rune_knight", "adventuring:rune_knight"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:rune_knight", "weight": 100 }
-                                ],
-                                "exit": ["adventuring:rune_knight", "adventuring:rune_knight", "adventuring:black_knight"]
-                            }
-                        ]
-                    }
-                ],
-                "monsters": [
-                    {
-                        "id": "steel_knight",
-                        "name": "Steel Knight",
-                        "media": "melvor:assets/media/monsters/steel_knight.png",
-                        "tags": ["knight", "humanoid"],
-                        "xp": 72,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 65 },
-                            { "id": "adventuring:defence", "value": 45 },
-                            { "id": "adventuring:agility", "value": 28 },
-                            { "id": "adventuring:strength", "value": 42 },
-                            { "id": "adventuring:ranged", "value": 25 },
-                            { "id": "adventuring:magic", "value": 22 },
-                            { "id": "adventuring:prayer", "value": 30 }
-                        ],
-                        "generator": "adventuring:sword_slash",
-                        "spender": "adventuring:iron_slam",
-                        "passives": [],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 45, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 14, "weight": 40 },
-                            { "id": "adventuring:knights_crest", "qty": 1, "weight": 25 }
-                        ]
-                    },
-                    {
-                        "id": "mithril_knight",
-                        "name": "Mithril Knight",
-                        "media": "melvor:assets/media/monsters/mithril_knight.png",
-                        "tags": ["knight", "humanoid"],
-                        "xp": 85,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 78 },
-                            { "id": "adventuring:defence", "value": 52 },
-                            { "id": "adventuring:agility", "value": 32 },
-                            { "id": "adventuring:strength", "value": 48 },
-                            { "id": "adventuring:ranged", "value": 28 },
-                            { "id": "adventuring:magic", "value": 25 },
-                            { "id": "adventuring:prayer", "value": 35 }
-                        ],
-                        "generator": "adventuring:sword_slash",
-                        "spender": "adventuring:heavy_strike",
-                        "passives": ["adventuring:knights_valor"],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 52, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 16, "weight": 42 },
-                            { "id": "adventuring:knights_crest", "qty": 1, "weight": 30 }
-                        ]
-                    },
-                    {
-                        "id": "adamant_knight",
-                        "name": "Adamant Knight",
-                        "media": "melvor:assets/media/monsters/adamant_knight.png",
-                        "tags": ["knight", "humanoid"],
-                        "xp": 98,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 92 },
-                            { "id": "adventuring:defence", "value": 60 },
-                            { "id": "adventuring:agility", "value": 35 },
-                            { "id": "adventuring:strength", "value": 55 },
-                            { "id": "adventuring:ranged", "value": 32 },
-                            { "id": "adventuring:magic", "value": 28 },
-                            { "id": "adventuring:prayer", "value": 40 }
-                        ],
-                        "generator": "adventuring:sword_slash",
-                        "spender": "adventuring:heavy_strike",
-                        "passives": ["adventuring:knights_valor"],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 60, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 18, "weight": 45 },
-                            { "id": "adventuring:knights_crest", "qty": 2, "weight": 35 }
-                        ]
-                    },
-                    {
-                        "id": "rune_knight",
-                        "name": "Rune Knight",
-                        "media": "melvor:assets/media/monsters/rune_knight.png",
-                        "tags": ["knight", "humanoid"],
-                        "xp": 112,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 105 },
-                            { "id": "adventuring:defence", "value": 68 },
-                            { "id": "adventuring:agility", "value": 38 },
-                            { "id": "adventuring:strength", "value": 62 },
-                            { "id": "adventuring:ranged", "value": 35 },
-                            { "id": "adventuring:magic", "value": 32 },
-                            { "id": "adventuring:prayer", "value": 45 }
-                        ],
-                        "generator": "adventuring:rune_blade",
-                        "spender": "adventuring:executioner_strike",
-                        "passives": ["adventuring:knights_valor"],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 70, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 20, "weight": 48 },
-                            { "id": "adventuring:knights_crest", "qty": 2, "weight": 40 }
-                        ]
-                    },
-                    {
-                        "id": "black_knight",
-                        "name": "Black Knight",
-                        "media": "melvor:assets/media/monsters/black_knight.png",
-                        "tags": ["knight", "humanoid", "boss"],
-                        "isBoss": true,
-                        "xp": 250,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 200 },
-                            { "id": "adventuring:defence", "value": 85 },
-                            { "id": "adventuring:agility", "value": 45 },
-                            { "id": "adventuring:strength", "value": 78 },
-                            { "id": "adventuring:ranged", "value": 42 },
-                            { "id": "adventuring:magic", "value": 40 },
-                            { "id": "adventuring:prayer", "value": 55 }
-                        ],
-                        "generator": "adventuring:corrupted_edge",
-                        "spender": "adventuring:executioner_strike",
-                        "passives": ["adventuring:knights_valor"],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 150, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 32, "weight": 60 },
-                            { "id": "adventuring:big_parts", "qty": 12, "weight": 45 },
-                            { "id": "adventuring:knights_crest", "qty": 5, "weight": 55 }
-                        ]
-                    }
-                ],
-                "generators": [
-                    {
-                        "id": "sword_slash",
-                        "name": "Sword Slash",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "energy": 50,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 12,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "value": 1.0 }
-                                            ]
-                                        }
+        "skillData": [
+            {
+                "skillID": "adventuring:Adventuring",
+                "data": {
+                    "passives": [
+                        {
+                            "id": "knights_valor",
+                            "name": "Knight's Valor",
+                            "effects": [
+                                {
+                                    "trigger": "encounter_start",
+                                    "type": "buff",
+                                    "id": "adventuring:protection",
+                                    "target": "self",
+                                    "stacks": {
+                                        "base": 2,
+                                        "scaling": []
                                     }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "rune_blade",
-                        "name": "Rune Blade",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "energy": 55,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 15,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "value": 1.1 },
-                                                { "id": "adventuring:magic", "value": 0.3 }
-                                            ]
+                                }
+                            ]
+                        }
+                    ],
+                    "areas": [
+                        {
+                            "id": "knights_fortress",
+                            "name": "Knight's Fortress",
+                            "media": "melvor:assets/media/monsters/black_knight.png",
+                            "requirements": [
+                                {
+                                    "type": "skill_level",
+                                    "level": 52
+                                }
+                            ],
+                            "height": 9,
+                            "width": 7,
+                            "floors": [
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:steel_knight",
+                                            "weight": 100
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "corrupted_edge",
-                        "name": "Corrupted Edge",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "energy": 60,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 12,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "value": 0.9 }
-                                            ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:steel_knight",
+                                        "adventuring:steel_knight",
+                                        "adventuring:steel_knight"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:steel_knight",
+                                            "weight": 60
+                                        },
+                                        {
+                                            "id": "adventuring:mithril_knight",
+                                            "weight": 40
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ],
-                "spenders": [
-                    {
-                        "id": "iron_slam",
-                        "name": "Iron Slam",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 100,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 20,
-                                            "scaling": [
-                                                { "id": "adventuring:defence", "value": 1.3 }
-                                            ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:steel_knight",
+                                        "adventuring:steel_knight",
+                                        "adventuring:mithril_knight"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:steel_knight",
+                                            "weight": 30
+                                        },
+                                        {
+                                            "id": "adventuring:mithril_knight",
+                                            "weight": 70
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "heavy_strike",
-                        "name": "Heavy Strike",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 100,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 28,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "value": 1.6 }
-                                            ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:mithril_knight",
+                                        "adventuring:mithril_knight",
+                                        "adventuring:mithril_knight"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:mithril_knight",
+                                            "weight": 60
+                                        },
+                                        {
+                                            "id": "adventuring:adamant_knight",
+                                            "weight": 40
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "executioner_strike",
-                        "name": "Executioner Strike",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 100,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 38,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "value": 2.0 }
-                                            ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:mithril_knight",
+                                        "adventuring:mithril_knight",
+                                        "adventuring:adamant_knight"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:mithril_knight",
+                                            "weight": 30
+                                        },
+                                        {
+                                            "id": "adventuring:adamant_knight",
+                                            "weight": 70
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:adamant_knight",
+                                        "adventuring:adamant_knight",
+                                        "adventuring:adamant_knight"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:adamant_knight",
+                                            "weight": 60
+                                        },
+                                        {
+                                            "id": "adventuring:rune_knight",
+                                            "weight": 40
+                                        }
+                                    ],
+                                    "exit": [
+                                        "adventuring:adamant_knight",
+                                        "adventuring:adamant_knight",
+                                        "adventuring:rune_knight"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:adamant_knight",
+                                            "weight": 30
+                                        },
+                                        {
+                                            "id": "adventuring:rune_knight",
+                                            "weight": 70
+                                        }
+                                    ],
+                                    "exit": [
+                                        "adventuring:rune_knight",
+                                        "adventuring:rune_knight",
+                                        "adventuring:rune_knight"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:rune_knight",
+                                            "weight": 100
+                                        }
+                                    ],
+                                    "exit": [
+                                        "adventuring:rune_knight",
+                                        "adventuring:rune_knight",
+                                        "adventuring:black_knight"
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "monsters": [
+                        {
+                            "id": "steel_knight",
+                            "name": "Steel Knight",
+                            "media": "melvor:assets/media/monsters/steel_knight.png",
+                            "tags": [
+                                "knight",
+                                "humanoid"
+                            ],
+                            "xp": 72,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 48
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 38
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 28
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 35
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 25
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 22
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 30
+                                }
+                            ],
+                            "generator": "adventuring:sword_slash",
+                            "spender": "adventuring:iron_slam",
+                            "passives": [],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 45,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 14,
+                                    "weight": 40
+                                },
+                                {
+                                    "id": "adventuring:knights_crest",
+                                    "qty": 1,
+                                    "weight": 25
+                                }
+                            ]
+                        },
+                        {
+                            "id": "mithril_knight",
+                            "name": "Mithril Knight",
+                            "media": "melvor:assets/media/monsters/mithril_knight.png",
+                            "tags": [
+                                "knight",
+                                "humanoid"
+                            ],
+                            "xp": 85,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 58
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 42
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 32
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 40
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 28
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 25
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 35
+                                }
+                            ],
+                            "generator": "adventuring:sword_slash",
+                            "spender": "adventuring:heavy_strike",
+                            "passives": [
+                                "adventuring:knights_valor"
+                            ],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 52,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 16,
+                                    "weight": 42
+                                },
+                                {
+                                    "id": "adventuring:knights_crest",
+                                    "qty": 1,
+                                    "weight": 30
+                                }
+                            ]
+                        },
+                        {
+                            "id": "adamant_knight",
+                            "name": "Adamant Knight",
+                            "media": "melvor:assets/media/monsters/adamant_knight.png",
+                            "tags": [
+                                "knight",
+                                "humanoid"
+                            ],
+                            "xp": 98,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 68
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 48
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 35
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 45
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 32
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 28
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 40
+                                }
+                            ],
+                            "generator": "adventuring:sword_slash",
+                            "spender": "adventuring:heavy_strike",
+                            "passives": [
+                                "adventuring:knights_valor"
+                            ],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 60,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 18,
+                                    "weight": 45
+                                },
+                                {
+                                    "id": "adventuring:knights_crest",
+                                    "qty": 2,
+                                    "weight": 35
+                                }
+                            ]
+                        },
+                        {
+                            "id": "rune_knight",
+                            "name": "Rune Knight",
+                            "media": "melvor:assets/media/monsters/rune_knight.png",
+                            "tags": [
+                                "knight",
+                                "humanoid"
+                            ],
+                            "xp": 112,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 78
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 54
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 38
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 50
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 35
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 32
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 45
+                                }
+                            ],
+                            "generator": "adventuring:rune_blade",
+                            "spender": "adventuring:executioner_strike",
+                            "passives": [
+                                "adventuring:knights_valor"
+                            ],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 70,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 20,
+                                    "weight": 48
+                                },
+                                {
+                                    "id": "adventuring:knights_crest",
+                                    "qty": 2,
+                                    "weight": 40
+                                }
+                            ]
+                        },
+                        {
+                            "id": "black_knight",
+                            "name": "Black Knight",
+                            "media": "melvor:assets/media/monsters/black_knight.png",
+                            "tags": [
+                                "knight",
+                                "humanoid",
+                                "boss"
+                            ],
+                            "isBoss": true,
+                            "xp": 250,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 150
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 68
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 45
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 62
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 42
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 40
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 55
+                                }
+                            ],
+                            "generator": "adventuring:corrupted_edge",
+                            "spender": "adventuring:executioner_strike",
+                            "passives": [
+                                "adventuring:knights_valor"
+                            ],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 150,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 32,
+                                    "weight": 60
+                                },
+                                {
+                                    "id": "adventuring:big_parts",
+                                    "qty": 12,
+                                    "weight": 45
+                                },
+                                {
+                                    "id": "adventuring:knights_crest",
+                                    "qty": 5,
+                                    "weight": 55
+                                }
+                            ]
+                        }
+                    ],
+                    "generators": [
+                        {
+                            "id": "sword_slash",
+                            "name": "Sword Slash",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "energy": 50,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 12,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "value": 1.0
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "rune_blade",
+                            "name": "Rune Blade",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "energy": 55,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 15,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "value": 1.1
+                                                    },
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "value": 0.3
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "corrupted_edge",
+                            "name": "Corrupted Edge",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "energy": 60,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 12,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "value": 0.9
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "spenders": [
+                        {
+                            "id": "iron_slam",
+                            "name": "Iron Slam",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 100,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 20,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:defence",
+                                                        "value": 1.3
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "heavy_strike",
+                            "name": "Heavy Strike",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 100,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 28,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "value": 1.6
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "executioner_strike",
+                            "name": "Executioner Strike",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 100,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 38,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "value": 2.0
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
             }
-        }]
+        ]
     }
 }

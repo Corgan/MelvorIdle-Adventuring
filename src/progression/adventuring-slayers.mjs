@@ -4,6 +4,12 @@ const { AdventuringPage } = await loadModule('src/ui/adventuring-page.mjs');
 const { AdventuringSlayerTask, SlayerTaskGenerator } = await loadModule('src/progression/adventuring-slayer-task.mjs');
 const { AdventuringSlayersElement } = await loadModule('src/progression/components/adventuring-slayers.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
+const { getTemplateNode, getElementFromFragment } = await loadModule('src/core/adventuring-utils.mjs');
+const { AdventuringTaskRewardElement } = await loadModule('src/progression/components/adventuring-task-reward.mjs');
+const { AdventuringStatBadgeElement } = await loadModule('src/progression/components/adventuring-stat-badge.mjs');
+const { AdventuringAchievementRewardElement } = await loadModule('src/progression/components/adventuring-achievement-reward.mjs');
+const { AdventuringInfoMessageElement } = await loadModule('src/ui/components/adventuring-info-message.mjs');
+const { AdventuringEmptyStateElement } = await loadModule('src/ui/components/adventuring-empty-state.mjs');
 
 class SlayersRenderQueue {
     constructor() {
@@ -68,6 +74,13 @@ export class AdventuringSlayers extends AdventuringPage {
         if(this.active) {
             this.manager.town.setBuilding(undefined);
         }
+    }
+
+    destroyTippyIn(container) {
+        const elements = container.querySelectorAll('*');
+        elements.forEach(el => {
+            if(el._tippy) el._tippy.destroy();
+        });
     }
 
     onLoad() {
@@ -360,31 +373,17 @@ export class AdventuringSlayers extends AdventuringPage {
         for(const stat of statOrder) {
             const value = stats[stat.id] || 0;
             if(value > 0) {
-                const col = document.createElement('div');
-                col.className = 'col-auto p-2';
-                col.innerHTML = `
-                    <div class="${stat.color}">
-                        <i class="fa ${stat.icon} mr-1"></i>
-                        <span class="font-w600">+${value}</span>
-                        <small class="text-muted ml-1">${stat.name}</small>
-                    </div>
-                `;
-                this.component.achievementStats.appendChild(col);
+                const badge = new AdventuringStatBadgeElement();
+                badge.setStatData(stat.icon, stat.color, value, stat.name);
+                this.component.achievementStats.appendChild(badge);
             }
         }
 
         // Show currency earned
         if(stats.currency > 0) {
-            const col = document.createElement('div');
-            col.className = 'col-auto p-2';
-            col.innerHTML = `
-                <div class="text-warning">
-                    <i class="fa fa-coins mr-1"></i>
-                    <span class="font-w600">+${stats.currency}</span>
-                    <small class="text-muted ml-1">Gold</small>
-                </div>
-            `;
-            this.component.achievementStats.appendChild(col);
+            const badge = new AdventuringStatBadgeElement();
+            badge.setStatData('fa-coins', 'text-warning', stats.currency, 'Gold');
+            this.component.achievementStats.appendChild(badge);
         }
     }
 
@@ -523,22 +522,21 @@ export class AdventuringSlayers extends AdventuringPage {
 
         // Rewards
         for(const reward of achievement.rewards) {
-            const span = document.createElement('span');
-            span.className = 'd-inline-flex align-items-center mr-2';
+            const rewardEl = new AdventuringAchievementRewardElement();
 
             if(reward.type === 'currency') {
-                span.innerHTML = `${reward.qty} <img class="skill-icon-xxs ml-1" src="${this.manager.stash.currencyMedia}">`;
+                rewardEl.setCurrency(reward.qty, this.manager.stash.currencyMedia);
             } else if(reward.type === 'stat') {
                 const statName = reward.stat.replace('adventuring:', '').toUpperCase().slice(0, 3);
-                span.innerHTML = `<span class="text-success">+${reward.value} ${statName}</span>`;
+                rewardEl.setStat(reward.value, statName);
             } else if(reward.type === 'material') {
                 const mat = this.manager.materials.getObjectByID(reward.id);
                 if(mat) {
-                    span.innerHTML = `${reward.qty} <img class="skill-icon-xxs ml-1" src="${mat.media}">`;
+                    rewardEl.setMaterial(reward.qty, mat.media);
                 }
             }
 
-            rewards.appendChild(span);
+            rewards.appendChild(rewardEl);
         }
 
         // Claim button
@@ -609,20 +607,19 @@ export class AdventuringSlayers extends AdventuringPage {
         if(!this.renderQueue.availableTasks && !this.renderQueue.all)
             return;
 
-        // Clear existing
+        // Clear existing - destroy tippy instances first
+        this.destroyTippyIn(this.component.availableTasks);
         this.component.availableTasks.replaceChildren();
 
         // If no monsters have been seen, show a message
         if(!this.hasSeenMonsters()) {
-            const message = document.createElement('div');
-            message.className = 'col-12 text-center p-4';
-            message.innerHTML = `
-                <div class="text-muted mb-2">
-                    <i class="fa fa-map-signs fa-2x mb-2"></i>
-                </div>
-                <p class="text-warning mb-2">No tasks available yet!</p>
-                <p class="text-muted small">Visit the <strong>Chicken Coop</strong> and defeat some monsters first.<br>Then return here to pick up slayer tasks.</p>
-            `;
+            const message = new AdventuringInfoMessageElement();
+            message.setMessage({
+                icon: 'fa-map-signs',
+                title: 'No tasks available yet!',
+                titleClass: 'text-warning',
+                description: 'Visit the <strong>Chicken Coop</strong> and defeat some monsters first.<br>Then return here to pick up slayer tasks.'
+            });
             this.component.availableTasks.appendChild(message);
             this.component.refreshButton.classList.add('d-none');
         } else {
@@ -644,13 +641,13 @@ export class AdventuringSlayers extends AdventuringPage {
         if(!this.renderQueue.activeTasks && !this.renderQueue.all)
             return;
 
-        // Clear existing
+        // Clear existing - destroy tippy instances first
+        this.destroyTippyIn(this.component.activeTasks);
         this.component.activeTasks.replaceChildren();
 
         if(this.activeTasks.length === 0) {
-            const empty = document.createElement('div');
-            empty.className = 'col-12 text-center text-muted p-3';
-            empty.textContent = 'No active tasks. Accept a task from the board!';
+            const empty = new AdventuringEmptyStateElement();
+            empty.setFullWidthMessage('No active tasks. Accept a task from the board!');
             this.component.activeTasks.appendChild(empty);
         } else {
             this.activeTasks.forEach(task => {
@@ -664,142 +661,114 @@ export class AdventuringSlayers extends AdventuringPage {
     }
 
     /**
-     * Create a task card element
+     * Create a task card element using template
      */
     createTaskCard(task, mode) {
-        const col = document.createElement('div');
-        col.className = 'col-12 col-md-6 col-lg-4 p-2';
+        const frag = getTemplateNode('adventuring-slayer-task-template');
+        
+        const col = getElementFromFragment(frag, 'col', 'div');
+        const card = getElementFromFragment(frag, 'card', 'div');
+        const tierBadge = getElementFromFragment(frag, 'tierBadge', 'span');
+        const typeName = getElementFromFragment(frag, 'typeName', 'small');
+        const targetIcon = getElementFromFragment(frag, 'targetIcon', 'img');
+        const description = getElementFromFragment(frag, 'description', 'span');
+        const progressContainer = getElementFromFragment(frag, 'progressContainer', 'div');
+        const progressBar = getElementFromFragment(frag, 'progressBar', 'div');
+        const rewards = getElementFromFragment(frag, 'rewards', 'span');
+        const actionBtn = getElementFromFragment(frag, 'actionBtn', 'button');
 
-        const card = document.createElement('div');
-        card.className = 'block block-rounded-double bg-combat-inner-dark p-3';
+        // Completed border
         if(task.completed) {
             card.classList.add('border', 'border-success');
         }
 
-        // Header with tier indicator
-        const header = document.createElement('div');
-        header.className = 'd-flex justify-content-between align-items-center mb-2';
-        
-        const tierBadge = document.createElement('span');
+        // Tier badge
         tierBadge.className = `badge badge-${this.getTierColor(task.tier)}`;
         tierBadge.textContent = `Tier ${task.tier}`;
-        header.appendChild(tierBadge);
 
-        const typeIcon = document.createElement('small');
-        typeIcon.className = 'text-muted';
-        const typeName = task.taskType ? task.taskType.name : 'Task';
-        typeIcon.textContent = typeName;
-        header.appendChild(typeIcon);
+        // Type name
+        typeName.textContent = task.taskType ? task.taskType.name : 'Task';
 
-        card.appendChild(header);
+        // Target
+        targetIcon.src = task.targetMedia;
+        description.textContent = task.description;
 
-        // Target with icon
-        const target = document.createElement('div');
-        target.className = 'd-flex align-items-center mb-2';
-        
-        const icon = document.createElement('img');
-        icon.className = 'skill-icon-xs mr-2';
-        icon.src = task.targetMedia;
-        target.appendChild(icon);
-
-        const desc = document.createElement('span');
-        desc.className = 'text-white';
-        desc.textContent = task.description;
-        target.appendChild(desc);
-
-        card.appendChild(target);
-
-        // Progress bar (for active tasks)
+        // Progress (for active tasks)
         if(mode === 'active') {
-            const progressContainer = document.createElement('div');
-            progressContainer.className = 'mb-2';
-            
-            const progressBar = document.createElement('div');
-            progressBar.className = 'progress active-progress';
-            progressBar.style.height = '20px';
-            
-            const progressFill = document.createElement('div');
-            progressFill.className = `progress-bar ${task.completed ? 'bg-success' : 'bg-info'}`;
-            progressFill.style.width = `${task.progressPercent}%`;
-            progressFill.textContent = task.progressText;
-            
-            progressBar.appendChild(progressFill);
-            progressContainer.appendChild(progressBar);
-            card.appendChild(progressContainer);
+            progressContainer.classList.remove('d-none');
+            progressBar.className = `progress-bar ${task.completed ? 'bg-success' : 'bg-info'}`;
+            progressBar.style.width = `${task.progressPercent}%`;
+            progressBar.textContent = task.progressText;
         }
 
         // Rewards
-        const rewards = document.createElement('div');
-        rewards.className = 'small text-muted mb-2 d-flex align-items-center flex-wrap';
-        
-        const rewardsLabel = document.createElement('strong');
-        rewardsLabel.textContent = 'Rewards: ';
-        rewardsLabel.className = 'mr-1';
-        rewards.appendChild(rewardsLabel);
-        
+        this.renderTaskRewards(rewards, task);
+
+        // Action button
+        if(mode === 'available') {
+            actionBtn.className = 'btn btn-sm btn-block btn-primary';
+            actionBtn.textContent = 'Accept';
+            actionBtn.onclick = () => this.acceptTask(task);
+            if(this.activeTasks.length >= this.maxActiveTasks) {
+                actionBtn.disabled = true;
+                actionBtn.textContent = 'Task Limit Reached';
+            }
+        } else if(mode === 'active') {
+            if(task.completed) {
+                actionBtn.className = 'btn btn-sm btn-block btn-success';
+                actionBtn.textContent = 'Claim Rewards';
+                actionBtn.onclick = () => this.claimTask(task);
+            } else {
+                actionBtn.className = 'btn btn-sm btn-block btn-danger';
+                actionBtn.textContent = `Abandon (${this.abandonCost} gold)`;
+                actionBtn.onclick = () => this.abandonTask(task);
+            }
+        }
+
+        return col;
+    }
+
+    /**
+     * Render reward icons into container
+     */
+    renderTaskRewards(container, task) {
         task.rewards.forEach((r, i) => {
             if(i > 0) {
                 const comma = document.createElement('span');
                 comma.textContent = ', ';
                 comma.className = 'mr-1';
-                rewards.appendChild(comma);
+                container.appendChild(comma);
             }
             
-            const rewardSpan = document.createElement('span');
-            rewardSpan.className = 'd-inline-flex align-items-center';
+            const reward = new AdventuringTaskRewardElement();
+            container.appendChild(reward);
             
-            if(r.type === 'currency') {
-                rewardSpan.innerHTML = `${r.qty} <img class="skill-icon-xxs ml-1" src="${this.manager.stash.currencyMedia}">`;
-            } else if(r.type === 'xp') {
-                rewardSpan.textContent = `${r.qty} XP`;
-            } else if(r.type === 'material') {
-                const mat = this.manager.materials.getObjectByID(r.id);
-                if(mat) {
-                    const img = document.createElement('img');
-                    img.className = 'skill-icon-xxs ml-1';
-                    img.src = mat.media;
-                    rewardSpan.textContent = r.qty + ' ';
-                    rewardSpan.appendChild(img);
-                    
-                    const tooltip = TooltipBuilder.forMaterial(mat);
-                    tippy(rewardSpan, {
-                        content: tooltip.build(),
-                        allowHTML: true
-                    });
-                }
-            }
-            
-            rewards.appendChild(rewardSpan);
-        });
-        card.appendChild(rewards);
-
-        // Action button
-        const btn = document.createElement('button');
-        btn.className = 'btn btn-sm btn-block';
-        
-        if(mode === 'available') {
-            btn.className += ' btn-primary';
-            btn.textContent = 'Accept';
-            btn.onclick = () => this.acceptTask(task);
-            if(this.activeTasks.length >= this.maxActiveTasks) {
-                btn.disabled = true;
-                btn.textContent = 'Task Limit Reached';
-            }
-        } else if(mode === 'active') {
-            if(task.completed) {
-                btn.className += ' btn-success';
-                btn.textContent = 'Claim Rewards';
-                btn.onclick = () => this.claimTask(task);
+            if(r.rewardType?.localID === 'material' && r.item) {
+                // Material with icon and tooltip
+                reward.setReward({
+                    quantity: r.qty + ' ',
+                    iconSrc: r.item.media,
+                    tooltipContent: r.item.name
+                });
+            } else if(r.rewardType?.localID === 'job_xp' && r.item) {
+                // Job XP
+                reward.setReward({
+                    quantity: `${r.qty} ${r.item.name} XP`,
+                    colorClass: 'text-success'
+                });
+            } else if(r.rewardType?.localID === 'consumable' && r.item) {
+                // Consumable
+                reward.setReward({
+                    quantity: r.qty + ' ',
+                    iconSrc: r.item.media
+                });
             } else {
-                btn.className += ' btn-danger';
-                btn.textContent = `Abandon (${this.abandonCost} gold)`;
-                btn.onclick = () => this.abandonTask(task);
+                // Fallback
+                reward.setReward({
+                    quantity: `${r.qty}`
+                });
             }
-        }
-        card.appendChild(btn);
-
-        col.appendChild(card);
-        return col;
+        });
     }
 
     getTierColor(tier) {

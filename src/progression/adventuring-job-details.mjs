@@ -3,6 +3,7 @@ const { loadModule } = mod.getContext(import.meta);
 const { AdventuringPage } = await loadModule('src/ui/adventuring-page.mjs');
 const { AdventuringStats } = await loadModule('src/core/adventuring-stats.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
+const { AdventuringAbilityRowElement } = await loadModule('src/progression/components/adventuring-ability-row.mjs');
 
 const { AdventuringJobDetailsElement } = await loadModule('src/progression/components/adventuring-job-details.mjs');
 
@@ -104,112 +105,31 @@ export class AdventuringJobDetails extends AdventuringPage {
     }
 
     /**
-     * Get usable by text for an ability
-     */
-    getUsableByText(ability) {
-        if(!ability.requirements || ability.requirements.length === 0) return 'All';
-        const req = ability.requirements.find(r => r.type === 'job_level' || r.type === 'current_job_level');
-        if(!req) return 'All';
-        if(req.type === 'current_job_level') {
-            const job = this.manager.jobs.getObjectByID(req.job);
-            return job ? job.name : '???';
-        }
-        return 'All';
-    }
-
-    /**
      * Build tooltip for an ability
      */
     buildAbilityTooltip(ability, type) {
-        const tooltip = new TooltipBuilder();
-        const isUnlocked = ability.unlocked !== undefined ? ability.unlocked : true;
-        
-        // Name
-        tooltip.header(isUnlocked ? ability.name : '???');
-        
-        // Type badge
-        const typeColors = { generator: 'text-info', spender: 'text-warning', passive: 'text-success' };
-        const typeLabels = { generator: 'Generator', spender: 'Spender', passive: 'Passive' };
-        tooltip.info(`<span class="${typeColors[type]}">${typeLabels[type]}</span>`);
-        
-        // Usable by
-        const usableBy = this.getUsableByText(ability);
-        tooltip.separator().hint(`Usable by: ${usableBy}`);
-        
-        // Description with stats
-        tooltip.separator();
-        if(isUnlocked) {
-            tooltip.info(ability.getDescription ? ability.getDescription(undefined, true) : ability.description);
-        } else {
-            tooltip.warning('???');
-        }
-        
-        // Energy (for generators/spenders) - only show if unlocked
-        if(type !== 'passive' && isUnlocked) {
-            if(ability.energy !== undefined) {
-                tooltip.separator();
-                tooltip.bonus(`+${ability.energy} Energy`);
-            } else if(ability.cost !== undefined) {
-                tooltip.separator();
-                tooltip.penalty(`-${ability.cost} Energy`);
-            }
-        }
-        
-        // Unlock requirement
-        const unlockLevel = this.getUnlockLevel(ability);
-        if(unlockLevel > 0) {
-            const currentLevel = this.manager.getMasteryLevel(this.job);
-            tooltip.separator();
-            if(isUnlocked) {
-                tooltip.text(`Unlocked at Lv.${unlockLevel}`, 'text-success');
-            } else {
-                tooltip.warning(`Requires Lv.${unlockLevel} (${currentLevel}/${unlockLevel})`);
-            }
-        }
-        
-        return tooltip.build();
+        return TooltipBuilder.forAbility(ability, {
+            manager: this.manager,
+            type,
+            showUnlockLevel: true,
+            masteryAction: this.job
+        }).build();
     }
 
     /**
      * Create ability row element
      */
     createAbilityRow(ability, type) {
-        const row = document.createElement('div');
-        row.className = 'd-flex align-items-center p-2 mb-1 border-bottom border-dark pointer-enabled';
-        
         const isUnlocked = ability.unlocked !== undefined ? ability.unlocked : true;
+        const unlockLevel = this.getUnlockLevel(ability);
         
-        // Status indicator
-        const status = document.createElement('span');
-        status.className = isUnlocked ? 'text-success mr-2' : 'text-warning mr-2';
-        status.textContent = isUnlocked ? '\u2713' : '\u2717';
-        row.appendChild(status);
-        
-        // Name
-        const name = document.createElement('span');
-        name.className = isUnlocked ? 'font-w600' : 'font-w600 text-muted';
-        name.textContent = isUnlocked ? ability.name : '???';
-        row.appendChild(name);
-        
-        // Type badge
-        const badge = document.createElement('span');
-        const badgeColors = { generator: 'badge-info', spender: 'badge-warning', passive: 'badge-success' };
-        const badgeLabels = { generator: 'Generator', spender: 'Spender', passive: 'Passive' };
-        badge.className = `badge ${badgeColors[type]} ml-auto`;
-        badge.textContent = badgeLabels[type];
-        row.appendChild(badge);
-        
-        // Unlock level
-        const level = document.createElement('small');
-        level.className = 'text-muted ml-2';
-        level.textContent = `Lv.${this.getUnlockLevel(ability)}`;
-        row.appendChild(level);
-        
-        // Add tooltip
-        tippy(row, {
-            content: this.buildAbilityTooltip(ability, type),
-            allowHTML: true,
-            placement: 'right'
+        const row = new AdventuringAbilityRowElement();
+        row.setAbility({
+            name: isUnlocked ? ability.name : '???',
+            isUnlocked,
+            type,
+            unlockLevel,
+            tooltipContent: this.buildAbilityTooltip(ability, type)
         });
         
         // Mark as seen

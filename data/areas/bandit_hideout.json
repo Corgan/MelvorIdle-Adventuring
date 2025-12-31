@@ -2,255 +2,444 @@
     "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
     "namespace": "adventuring",
     "data": {
-        "skillData": [{
-            "skillID": "adventuring:Adventuring",
-            "data": {
-                "areas": [
-                    {
-                        "id": "bandit_hideout",
-                        "name": "Bandit Hideout",
-                        "media": "melvor:assets/media/monsters/bandit.png",
-                        "requirements": [
-                            { "type": "skill_level", "level": 25 }
-                        ],
-                        "height": 7,
-                        "width": 6,
-                        "floors": [
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:bandit_trainee", "weight": 100 }
-                                ],
-                                "exit": ["adventuring:bandit_trainee", "adventuring:bandit_trainee", "adventuring:bandit_trainee"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:bandit_trainee", "weight": 70 },
-                                    { "id": "adventuring:bandit", "weight": 30 }
-                                ],
-                                "exit": ["adventuring:bandit_trainee", "adventuring:bandit_trainee", "adventuring:bandit"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:bandit_trainee", "weight": 40 },
-                                    { "id": "adventuring:bandit", "weight": 60 }
-                                ],
-                                "exit": ["adventuring:bandit_trainee", "adventuring:bandit", "adventuring:bandit"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:bandit", "weight": 80 },
-                                    { "id": "adventuring:bandit_trainee", "weight": 20 }
-                                ],
-                                "exit": ["adventuring:bandit", "adventuring:bandit", "adventuring:bandit"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:bandit", "weight": 100 }
-                                ],
-                                "exit": ["adventuring:bandit", "adventuring:bandit", "adventuring:bandit"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:bandit", "weight": 100 }
-                                ],
-                                "exit": ["adventuring:bandit", "adventuring:bandit", "adventuring:bandit_leader"]
-                            }
-                        ]
-                    }
-                ],
-                "monsters": [
-                    {
-                        "id": "bandit_trainee",
-                        "name": "Bandit Trainee",
-                        "media": "melvor:assets/media/monsters/bandit_trainee.png",
-                        "tags": ["humanoid", "bandit"],
-                        "xp": 25,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 22 },
-                            { "id": "adventuring:defence", "value": 12 },
-                            { "id": "adventuring:agility", "value": 18 },
-                            { "id": "adventuring:strength", "value": 20 },
-                            { "id": "adventuring:ranged", "value": 15 },
-                            { "id": "adventuring:magic", "value": 8 },
-                            { "id": "adventuring:prayer", "value": 8 }
-                        ],
-                        "generator": "adventuring:quick_slash",
-                        "spender": "adventuring:cutthroat_strike",
-                        "passives": [],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 8, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 3, "weight": 18 },
-                            { "id": "adventuring:bandits_coin", "qty": 1, "weight": 25 }
-                        ]
-                    },
-                    {
-                        "id": "bandit",
-                        "name": "Bandit",
-                        "media": "melvor:assets/media/monsters/bandit.png",
-                        "tags": ["humanoid", "bandit"],
-                        "xp": 32,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 30 },
-                            { "id": "adventuring:defence", "value": 18 },
-                            { "id": "adventuring:agility", "value": 25 },
-                            { "id": "adventuring:strength", "value": 28 },
-                            { "id": "adventuring:ranged", "value": 22 },
-                            { "id": "adventuring:magic", "value": 12 },
-                            { "id": "adventuring:prayer", "value": 12 }
-                        ],
-                        "generator": "adventuring:quick_slash",
-                        "spender": "adventuring:gang_assault",
-                        "passives": [],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 12, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 4, "weight": 22 },
-                            { "id": "adventuring:bandits_coin", "qty": 1, "weight": 30 }
-                        ]
-                    },
-                    {
-                        "id": "bandit_leader",
-                        "name": "Bandit Leader",
-                        "media": "melvor:assets/media/monsters/bandit.png",
-                        "tags": ["humanoid", "bandit"],
-                        "xp": 80,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "value": 55 },
-                            { "id": "adventuring:defence", "value": 30 },
-                            { "id": "adventuring:agility", "value": 35 },
-                            { "id": "adventuring:strength", "value": 40 },
-                            { "id": "adventuring:ranged", "value": 32 },
-                            { "id": "adventuring:magic", "value": 18 },
-                            { "id": "adventuring:prayer", "value": 18 }
-                        ],
-                        "generator": "adventuring:quick_slash",
-                        "spender": "adventuring:coordinated_ambush",
-                        "passives": [],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 30, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 10, "weight": 40 },
-                            { "id": "adventuring:big_parts", "qty": 3, "weight": 30 },
-                            { "id": "adventuring:bandits_coin", "qty": 3, "weight": 50 }
-                        ]
-                    }
-                ],
-                "generators": [
-                    {
-                        "id": "quick_slash",
-                        "name": "Quick Slash",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "energy": 35,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 6,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "value": 0.8 },
-                                                { "id": "adventuring:agility", "value": 0.5 }
-                                            ]
+        "skillData": [
+            {
+                "skillID": "adventuring:Adventuring",
+                "data": {
+                    "areas": [
+                        {
+                            "id": "bandit_hideout",
+                            "name": "Bandit Hideout",
+                            "media": "melvor:assets/media/monsters/bandit.png",
+                            "requirements": [
+                                {
+                                    "type": "skill_level",
+                                    "level": 25
+                                }
+                            ],
+                            "height": 7,
+                            "width": 6,
+                            "floors": [
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:bandit_trainee",
+                                            "weight": 100
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ],
-                "spenders": [
-                    {
-                        "id": "cutthroat_strike",
-                        "name": "Cutthroat Strike",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 70,
-                        "hits": [
-                            {
-                                "target": "back",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 18,
-                                            "scaling": [
-                                                { "id": "adventuring:agility", "value": 1.8 }
-                                            ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:bandit_trainee",
+                                        "adventuring:bandit_trainee",
+                                        "adventuring:bandit_trainee"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:bandit_trainee",
+                                            "weight": 70
+                                        },
+                                        {
+                                            "id": "adventuring:bandit",
+                                            "weight": 30
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "coordinated_ambush",
-                        "name": "Coordinated Ambush",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 85,
-                        "hits": [
-                            {
-                                "target": "random",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 14,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "value": 1.2 }
-                                            ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:bandit_trainee",
+                                        "adventuring:bandit_trainee",
+                                        "adventuring:bandit"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:bandit_trainee",
+                                            "weight": 40
+                                        },
+                                        {
+                                            "id": "adventuring:bandit",
+                                            "weight": 60
                                         }
-                                    }
-                                ]
-                            },
-                            {
-                                "target": "back",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 10,
-                                            "scaling": [
-                                                { "id": "adventuring:agility", "value": 1 }
-                                            ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:bandit_trainee",
+                                        "adventuring:bandit",
+                                        "adventuring:bandit"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:bandit",
+                                            "weight": 80
+                                        },
+                                        {
+                                            "id": "adventuring:bandit_trainee",
+                                            "weight": 20
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "gang_assault",
-                        "name": "Gang Assault",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 100,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage",
-                                        "amount": {
-                                            "base": 22,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "value": 1.5 },
-                                                { "id": "adventuring:agility", "value": 0.8 }
-                                            ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:bandit",
+                                        "adventuring:bandit",
+                                        "adventuring:bandit"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:bandit",
+                                            "weight": 100
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:bandit",
+                                        "adventuring:bandit",
+                                        "adventuring:bandit"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:bandit",
+                                            "weight": 100
+                                        }
+                                    ],
+                                    "exit": [
+                                        "adventuring:bandit",
+                                        "adventuring:bandit",
+                                        "adventuring:bandit_leader"
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "monsters": [
+                        {
+                            "id": "bandit_trainee",
+                            "name": "Bandit Trainee",
+                            "media": "melvor:assets/media/monsters/bandit_trainee.png",
+                            "tags": [
+                                "humanoid",
+                                "bandit"
+                            ],
+                            "xp": 25,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 11
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 12
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 18
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 9
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 15
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 8
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 8
+                                }
+                            ],
+                            "generator": "adventuring:quick_slash",
+                            "spender": "adventuring:cutthroat_strike",
+                            "passives": [],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 8,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 3,
+                                    "weight": 18
+                                },
+                                {
+                                    "id": "adventuring:bandits_coin",
+                                    "qty": 1,
+                                    "weight": 25
+                                }
+                            ]
+                        },
+                        {
+                            "id": "bandit",
+                            "name": "Bandit",
+                            "media": "melvor:assets/media/monsters/bandit.png",
+                            "tags": [
+                                "humanoid",
+                                "bandit"
+                            ],
+                            "xp": 32,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 15
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 18
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 25
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 12
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 22
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 12
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 12
+                                }
+                            ],
+                            "generator": "adventuring:quick_slash",
+                            "spender": "adventuring:gang_assault",
+                            "passives": [],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 12,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 4,
+                                    "weight": 22
+                                },
+                                {
+                                    "id": "adventuring:bandits_coin",
+                                    "qty": 1,
+                                    "weight": 30
+                                }
+                            ]
+                        },
+                        {
+                            "id": "bandit_leader",
+                            "name": "Bandit Leader",
+                            "media": "melvor:assets/media/monsters/bandit.png",
+                            "tags": [
+                                "humanoid",
+                                "bandit"
+                            ],
+                            "xp": 80,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 27
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 30
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 35
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 18
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "value": 32
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "value": 18
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "value": 18
+                                }
+                            ],
+                            "generator": "adventuring:quick_slash",
+                            "spender": "adventuring:coordinated_ambush",
+                            "passives": [],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 30,
+                                    "weight": 100
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 10,
+                                    "weight": 40
+                                },
+                                {
+                                    "id": "adventuring:big_parts",
+                                    "qty": 3,
+                                    "weight": 30
+                                },
+                                {
+                                    "id": "adventuring:bandits_coin",
+                                    "qty": 3,
+                                    "weight": 50
+                                }
+                            ]
+                        }
+                    ],
+                    "generators": [
+                        {
+                            "id": "quick_slash",
+                            "name": "Quick Slash",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "energy": 35,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 6,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "value": 0.8
+                                                    },
+                                                    {
+                                                        "id": "adventuring:agility",
+                                                        "value": 0.5
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "spenders": [
+                        {
+                            "id": "cutthroat_strike",
+                            "name": "Cutthroat Strike",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 70,
+                            "hits": [
+                                {
+                                    "target": "back",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 18,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:agility",
+                                                        "value": 1.8
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "coordinated_ambush",
+                            "name": "Coordinated Ambush",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 85,
+                            "hits": [
+                                {
+                                    "target": "random",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 14,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "value": 1.2
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                },
+                                {
+                                    "target": "back",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 10,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:agility",
+                                                        "value": 1
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "gang_assault",
+                            "name": "Gang Assault",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 100,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 22,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "value": 1.5
+                                                    },
+                                                    {
+                                                        "id": "adventuring:agility",
+                                                        "value": 0.8
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
             }
-        }]
+        ]
     }
 }
