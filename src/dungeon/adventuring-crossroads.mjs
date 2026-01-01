@@ -25,7 +25,7 @@ export class AdventuringCrossroads extends AdventuringPage {
     }
 
     onShow() {
-        this.manager.party.all.forEach(member => member.setLocked(false));
+        this.manager.party.setAllLocked(false);
         // Trigger auto-repeat checkbox render for all areas
         this.areas.forEach(area => {
             area.renderQueue.autoRepeat = true;
@@ -33,7 +33,7 @@ export class AdventuringCrossroads extends AdventuringPage {
     }
 
     onHide() {
-        this.manager.party.all.forEach(member => member.setLocked(true));
+        this.manager.party.setAllLocked(true);
     }
 
     postDataRegistration() {

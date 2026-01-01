@@ -22,13 +22,13 @@ export class AdventuringBestiary extends AdventuringPage {
     }
 
     onShow() {
-        this.manager.party.all.forEach(member => member.setLocked(this.manager.isActive));
+        this.manager.party.setAllLocked(this.manager.isActive);
         // Mark all visible seen monsters as viewed
         this.markAllViewed();
     }
 
     onHide() {
-        this.manager.party.all.forEach(member => member.setLocked(this.manager.isActive));
+        this.manager.party.setAllLocked(this.manager.isActive);
     }
 
     /**

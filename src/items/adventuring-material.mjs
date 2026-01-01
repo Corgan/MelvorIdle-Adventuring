@@ -3,7 +3,7 @@ const { loadModule } = mod.getContext(import.meta);
 const { AdventuringMaterialElement } = await loadModule('src/items/components/adventuring-material.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
 
-const { AdventuringWeightedTable } = await loadModule('src/core/adventuring-utils.mjs');
+const { AdventuringWeightedTable, getLockedMedia } = await loadModule('src/core/adventuring-utils.mjs');
 
 class AdventuringMaterialRenderQueue {
     constructor(){
@@ -13,7 +13,7 @@ class AdventuringMaterialRenderQueue {
         this.newBadge = false;
     }
 
-    updateAll() {
+    queueAll() {
         this.name = true;
         this.icon = true;
         this.count = true;
@@ -42,7 +42,7 @@ export class AdventuringMaterial extends NamespacedObject {
     }
 
     get media() {
-        return this.unlocked ? this.getMediaURL(this._media) : this.getMediaURL('melvor:assets/media/main/question.png');
+        return getLockedMedia(this);
     }
 
     get count() {

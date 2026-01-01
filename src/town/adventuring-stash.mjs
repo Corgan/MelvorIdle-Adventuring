@@ -161,14 +161,14 @@ export class AdventuringStash extends AdventuringPage {
     }
 
     onShow() {
-        this.manager.party.all.forEach(member => member.setLocked(this.manager.isActive));
+        this.manager.party.setAllLocked(this.manager.isActive);
         
         // Mark all unlocked materials as seen when viewing stash
         this.markAllSeen();
     }
 
     onHide() {
-        this.manager.party.all.forEach(member => member.setLocked(this.manager.isActive));
+        this.manager.party.setAllLocked(this.manager.isActive);
     }
     
     /**

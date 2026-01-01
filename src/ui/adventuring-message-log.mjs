@@ -8,6 +8,9 @@ class AdventuringMessageLogRenderQueue {
     constructor() {
         this.messages = false;
     }
+    queueAll() {
+        this.messages = true;
+    }
 }
 
 export class AdventuringMessageLog {

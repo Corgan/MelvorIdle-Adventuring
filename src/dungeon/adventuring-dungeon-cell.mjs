@@ -9,6 +9,10 @@ class AdventuringDungeonCellRenderQueue {
         this.type = false;
         this.current = false;
     }
+    queueAll() {
+        this.type = true;
+        this.current = true;
+    }
 }
 
 export class AdventuringDungeonCell {

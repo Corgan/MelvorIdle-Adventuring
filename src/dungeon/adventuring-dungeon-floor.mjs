@@ -9,6 +9,9 @@ class AdventuringDungeonFloorRenderQueue {
     constructor() {
         this.cells = false;
     }
+    queueAll() {
+        this.cells = true;
+    }
 }
 
 export class AdventuringDungeonFloor {

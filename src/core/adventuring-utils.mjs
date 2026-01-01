@@ -47,6 +47,21 @@ function clamp(value, min, max) {
 }
 
 /**
+ * Default media URL for locked/unknown content
+ */
+const UNKNOWN_MEDIA = 'melvor:assets/media/main/question.png';
+
+/**
+ * Get media URL accounting for locked state
+ * Returns question mark media if locked, otherwise the actual media
+ * @param {object} obj - Object with unlocked, getMediaURL, and _media properties
+ * @returns {string} Media URL
+ */
+function getLockedMedia(obj) {
+    return obj.unlocked ? obj.getMediaURL(obj._media) : obj.getMediaURL(UNKNOWN_MEDIA);
+}
+
+/**
  * Calculate percentage
  * @param {number} value - Current value
  * @param {number} max - Maximum value
@@ -196,7 +211,7 @@ function createEffect(effectData, source, sourceName) {
         trigger: effectData.trigger || 'passive',
         type: effectData.type,
         stat: effectData.stat || effectData.id,  // stat effects use 'stat', auras use 'id'
-        value: effectData.value ?? effectData.amount ?? 0,
+        value: firstDefined(effectData.value, effectData.amount, 0),
         target: effectData.target,
         condition: effectData.condition || null,  // Condition object for conditional triggers
         chance: effectData.chance,  // Shorthand for simple chance conditions
@@ -941,6 +956,19 @@ function getAuraName(manager, auraId) {
 }
 
 /**
+ * Return the first defined value from a list of values.
+ * Used for display string fallbacks.
+ * @param  {...any} values - Values to check in order
+ * @returns {*} First defined value, or the last value if all undefined
+ */
+function firstDefined(...values) {
+    for (let i = 0; i < values.length; i++) {
+        if (values[i] !== undefined) return values[i];
+    }
+    return values[values.length - 1];
+}
+
+/**
  * Effect description registry - maps effect types to description generator functions.
  * Each function receives: (effect, value, stacks, amount, manager, helpers)
  * - effect: The full effect object
@@ -954,52 +982,52 @@ const effectDescriptionRegistry = new Map([
     // Stat modifiers
     ['increase_stat_flat', (effect, value, stacks, amount, manager, helpers) => 
         effect.perStack 
-            ? `+${value ?? amount ?? 1} ${helpers.stat(effect.stat || effect.id)} per stack` 
+            ? `+${firstDefined(value, amount, 1)} ${helpers.stat(effect.stat || effect.id)} per stack` 
             : `${helpers.sign(value)}${value} ${helpers.stat(effect.stat || effect.id)}`],
     ['increase_stat_percent', (effect, value, stacks, amount, manager, helpers) => 
         effect.perStack 
-            ? `+${value ?? amount ?? 1}% ${helpers.stat(effect.stat || effect.id)} per stack` 
+            ? `+${firstDefined(value, amount, 1)}% ${helpers.stat(effect.stat || effect.id)} per stack` 
             : `${helpers.sign(value)}${value}% ${helpers.stat(effect.stat || effect.id)}`],
     
     // Damage/Healing
     ['damage', (effect, value, stacks, amount, manager, helpers) => 
-        effect.perStack ? `Deal ${value ?? amount ?? 1} damage per stack` : `Deal ${value ?? amount ?? '?'} damage`],
+        effect.perStack ? `Deal ${firstDefined(value, amount, 1)} damage per stack` : `Deal ${firstDefined(value, amount, '?')} damage`],
     ['heal', (effect, value, stacks, amount, manager, helpers) => 
-        effect.perStack ? `Heal ${value ?? amount ?? effect.count ?? 1} HP per stack` : `Heal ${value ?? amount ?? effect.count ?? '?'} HP`],
+        effect.perStack ? `Heal ${firstDefined(value, amount, effect.count, 1)} HP per stack` : `Heal ${firstDefined(value, amount, effect.count, '?')} HP`],
     ['heal_percent', (effect, value, stacks, amount, manager, helpers) => 
-        `Restore ${helpers.percent(value ?? amount)}% HP`],
+        `Restore ${helpers.percent(firstDefined(value, amount))}% HP`],
     ['lifesteal', (effect, value, stacks, amount, manager, helpers) => 
         effect.perStack 
-            ? `Heal ${helpers.percent(value ?? amount ?? 0)}% of damage per stack` 
-            : `Heal for ${helpers.percent(value ?? amount ?? 0)}% of damage dealt`],
+            ? `Heal ${helpers.percent(firstDefined(value, amount, 0))}% of damage per stack` 
+            : `Heal for ${helpers.percent(firstDefined(value, amount, 0))}% of damage dealt`],
     
     // Damage modifiers
     ['damage_buff', (effect, value, stacks, amount, manager, helpers) => 
-        effect.perStack ? `+${value ?? amount ?? 1} Damage per stack` : `${helpers.sign(value ?? amount)}${value ?? amount} Damage`],
+        effect.perStack ? `+${firstDefined(value, amount, 1)} Damage per stack` : `${helpers.sign(firstDefined(value, amount))}${firstDefined(value, amount)} Damage`],
     ['increase_damage', (effect, value, stacks, amount, manager, helpers) => 
-        effect.perStack ? `+${value ?? amount ?? 1} Damage per stack` : `${helpers.sign(value ?? amount)}${value ?? amount} Damage`],
+        effect.perStack ? `+${firstDefined(value, amount, 1)} Damage per stack` : `${helpers.sign(firstDefined(value, amount))}${firstDefined(value, amount)} Damage`],
     ['increase_damage_percent', (effect, value, stacks, amount, manager, helpers) => 
-        effect.perStack ? `+${value ?? amount ?? 1}% Damage per stack` : `${helpers.sign(value ?? amount)}${value ?? amount}% Damage`],
+        effect.perStack ? `+${firstDefined(value, amount, 1)}% Damage per stack` : `${helpers.sign(firstDefined(value, amount))}${firstDefined(value, amount)}% Damage`],
     ['reduce_stat_percent', (effect, value, stacks, amount, manager, helpers) => 
         effect.perStack 
-            ? `-${value ?? amount ?? 1}% ${helpers.stat(effect.id)} per stack` 
-            : `-${value ?? amount}% ${helpers.stat(effect.id)}`],
+            ? `-${firstDefined(value, amount, 1)}% ${helpers.stat(effect.id)} per stack` 
+            : `-${firstDefined(value, amount)}% ${helpers.stat(effect.id)}`],
     ['defense_buff', (effect, value, stacks, amount, manager, helpers) => 
-        `${helpers.sign(value ?? amount)}${value ?? amount} Defense`],
+        `${helpers.sign(firstDefined(value, amount))}${firstDefined(value, amount)} Defense`],
     ['speed_buff', (effect, value, stacks, amount, manager, helpers) => 
-        `${helpers.sign(value ?? amount)}${value ?? amount} Speed`],
+        `${helpers.sign(firstDefined(value, amount))}${firstDefined(value, amount)} Speed`],
     
     // Buffs/Debuffs
     ['buff', (effect, value, stacks, amount, manager, helpers) => 
-        `Apply ${stacks ?? 1} ${helpers.aura(effect.id || effect.aura || effect.buff)}`],
+        `Apply ${firstDefined(stacks, 1)} ${helpers.aura(effect.id || effect.aura || effect.buff)}`],
     ['debuff', (effect, value, stacks, amount, manager, helpers) => 
-        `Apply ${stacks ?? 1} ${helpers.aura(effect.id || effect.aura || effect.debuff)}`],
+        `Apply ${firstDefined(stacks, 1)} ${helpers.aura(effect.id || effect.aura || effect.debuff)}`],
     ['cleanse', (effect, value, stacks, amount, manager, helpers) => 
         effect.id ? `Remove ${helpers.aura(effect.id)}` : 'Cleanse debuffs'],
     
     // Energy
     ['energy', (effect, value, stacks, amount, manager, helpers) => 
-        `${helpers.sign(value ?? amount)}${value ?? amount} Energy`],
+        `${helpers.sign(firstDefined(value, amount))}${firstDefined(value, amount)} Energy`],
     ['energy_gain_bonus', (effect, value, stacks, amount, manager, helpers) => 
         `+${value}% energy from generators`],
     
@@ -1013,18 +1041,18 @@ const effectDescriptionRegistry = new Map([
     
     // Revival
     ['revive', (effect, value, stacks, amount, manager, helpers) => 
-        `Revive with ${amount ?? effect.hpPercent ?? 100}% HP`],
+        `Revive with ${firstDefined(amount, effect.hpPercent, 100)}% HP`],
     ['revive_all', (effect, value, stacks, amount, manager, helpers) => 
-        `Revive with ${amount ?? effect.hpPercent ?? 100}% HP`],
+        `Revive with ${firstDefined(amount, effect.hpPercent, 100)}% HP`],
     
     // Tile effects
     ['teleport', () => 'Teleport to a random tile'],
     ['loot', () => 'Contains random loot'],
-    ['xp', (effect, value, stacks, amount, manager, helpers) => `Grant ${amount ?? value} Job XP`],
+    ['xp', (effect, value, stacks, amount, manager, helpers) => `Grant ${firstDefined(amount, value)} Job XP`],
     
     // Percentage-based damage
     ['damage_percent', (effect, value, stacks, amount, manager, helpers) => 
-        `Deal ${amount ?? value}% HP damage`],
+        `Deal ${firstDefined(amount, value)}% HP damage`],
     ['damage_bonus', (effect, value, stacks, amount, manager, helpers) => 
         `+${helpers.percent(value)}% damage`],
     ['damage_reduction', (effect, value, stacks, amount, manager, helpers) => 
@@ -1057,16 +1085,16 @@ const effectDescriptionRegistry = new Map([
     // Reflect
     ['reflect_damage', (effect, value, stacks, amount, manager, helpers) => 
         effect.perStack 
-            ? `Reflect ${helpers.percent(amount ?? value)}% damage per stack` 
-            : `Reflect ${helpers.percent(value ?? amount)}% damage taken`],
+            ? `Reflect ${helpers.percent(firstDefined(amount, value))}% damage per stack` 
+            : `Reflect ${helpers.percent(firstDefined(value, amount))}% damage taken`],
     
     // Spell echo
     ['spell_echo', (effect, value, stacks, amount, manager, helpers) => 
-        `${effect.chance ?? value}% chance to cast spells twice`],
+        `${firstDefined(effect.chance, value)}% chance to cast spells twice`],
     
     // Execute
     ['execute', (effect, value, stacks, amount, manager, helpers) => 
-        `Execute enemies below ${helpers.percent(effect.threshold ?? value ?? 20)}% HP`],
+        `Execute enemies below ${helpers.percent(firstDefined(effect.threshold, value, 20))}% HP`],
     
     // All stat bonus
     ['all_stat_bonus', (effect, value, stacks, amount, manager, helpers) => 
@@ -1078,15 +1106,15 @@ const effectDescriptionRegistry = new Map([
     
     // Random buffs/debuffs
     ['random_buffs', (effect, value, stacks, amount, manager, helpers) => {
-        const count = effect.count ?? 1;
-        const stackCount = stacks ?? 1;
+        const count = firstDefined(effect.count, 1);
+        const stackCount = firstDefined(stacks, 1);
         return count === 1 
             ? `Apply a random buff (${stackCount} stack${stackCount !== 1 ? 's' : ''})` 
             : `Apply ${count} random buffs (${stackCount} stack${stackCount !== 1 ? 's' : ''} each)`;
     }],
     ['random_debuffs', (effect, value, stacks, amount, manager, helpers) => {
-        const count = effect.count ?? 1;
-        const stackCount = stacks ?? 1;
+        const count = firstDefined(effect.count, 1);
+        const stackCount = firstDefined(stacks, 1);
         return count === 1 
             ? `Apply a random debuff (${stackCount} stack${stackCount !== 1 ? 's' : ''})` 
             : `Apply ${count} random debuffs (${stackCount} stack${stackCount !== 1 ? 's' : ''} each)`;
@@ -1108,7 +1136,7 @@ const effectDescriptionRegistry = new Map([
     
     // Enemy stat debuff
     ['enemy_stat_debuff', (effect, value, stacks, amount, manager, helpers) => {
-        const debuffVal = Math.abs(helpers.percent(value ?? amount ?? 0));
+        const debuffVal = Math.abs(helpers.percent(firstDefined(value, amount, 0)));
         return `Reduce enemy ${helpers.stat(effect.stat || effect.id)} by ${debuffVal}%`;
     }],
     
@@ -1128,11 +1156,11 @@ const effectDescriptionRegistry = new Map([
     ['summon_attack_speed', (effect, value) => `+${value}% summon attack speed`],
     
     // Ward/Charm
-    ['ward', (effect, value, stacks) => `Block next ${stacks ?? 1} attacks`],
+    ['ward', (effect, value, stacks) => `Block next ${firstDefined(stacks, 1)} attacks`],
     ['charm', (effect) => `Charm target for ${effect.duration || 1} turns`],
     
     // Double cast
-    ['double_cast', (effect, value) => `${effect.chance ?? value}% chance to cast twice`],
+    ['double_cast', (effect, value) => `${firstDefined(effect.chance, value)}% chance to cast twice`],
     
     // Mastery unlocks
     ['unlock_auto_run', () => 'Unlock Auto-Run'],
@@ -1165,30 +1193,30 @@ const effectDescriptionRegistry = new Map([
     
     // Consumable effects
     ['heal_on_low_hp', (effect, value, stacks, amount) => 
-        `Heal ${amount ?? effect.healAmount ?? '?'} HP when below ${effect.threshold ?? '?'}% HP`],
+        `Heal ${firstDefined(amount, effect.healAmount, '?')} HP when below ${firstDefined(effect.threshold, '?')}% HP`],
     ['proc_debuff', (effect, value, stacks, amount, manager, helpers) => {
         const debuffName = manager?.auras?.getObjectByID(effect.debuff)?.name || effect.debuff?.split(':').pop() || 'Unknown';
-        return `${effect.chance ?? '?'}% chance to apply ${stacks ?? 1} ${debuffName}`;
+        return `${firstDefined(effect.chance, '?')}% chance to apply ${firstDefined(stacks, 1)} ${debuffName}`;
     }],
     ['heal_on_floor_start', (effect, value, stacks, amount) => 
-        `Heal ${amount ?? effect.healAmount ?? '?'} HP at floor start`],
+        `Heal ${firstDefined(amount, effect.healAmount, '?')} HP at floor start`],
     ['heal_after_combat', (effect, value, stacks, amount) => 
-        `Heal ${amount ?? effect.healAmount ?? '?'} HP after combat`],
+        `Heal ${firstDefined(amount, effect.healAmount, '?')} HP after combat`],
     ['on_damage', (effect) => 
-        `Heal ${effect.heal_percent ?? effect.healPercent ?? 0}% of damage dealt`],
+        `Heal ${firstDefined(effect.heal_percent, effect.healPercent, 0)}% of damage dealt`],
     
     // Aura internal effects
     ['remove', () => ''],
-    ['remove_stacks', (effect, value, stacks, amount) => `Remove ${effect.count ?? amount ?? 1} stack(s)`],
-    ['reduce_amount', (effect, value, stacks, amount) => `Reduce damage by ${amount ?? 1} per stack`],
-    ['absorb_damage', (effect, value, stacks, amount) => `Absorb ${amount ?? 1} damage per stack`],
+    ['remove_stacks', (effect, value, stacks, amount) => `Remove ${firstDefined(effect.count, amount, 1)} stack(s)`],
+    ['reduce_amount', (effect, value, stacks, amount) => `Reduce damage by ${firstDefined(amount, 1)} per stack`],
+    ['absorb_damage', (effect, value, stacks, amount) => `Absorb ${firstDefined(amount, 1)} damage per stack`],
     ['skip', () => 'Skip turn'],
-    ['chance_skip', (effect, value, stacks, amount) => `${amount ?? 0}% chance to skip turn`],
+    ['chance_skip', (effect, value, stacks, amount) => `${firstDefined(amount, 0)}% chance to skip turn`],
     ['untargetable', () => 'Cannot be targeted'],
     ['evade', () => 'Evade next attack'],
-    ['chance_dodge', (effect, value, stacks, amount) => `${amount ?? 0}% chance to dodge`],
-    ['chance_miss', (effect, value, stacks, amount) => `${amount ?? 0}% chance to miss`],
-    ['chance_hit_ally', (effect, value, stacks, amount) => `${amount ?? 0}% chance to hit ally instead`],
+    ['chance_dodge', (effect, value, stacks, amount) => `${firstDefined(amount, 0)}% chance to dodge`],
+    ['chance_miss', (effect, value, stacks, amount) => `${firstDefined(amount, 0)}% chance to miss`],
+    ['chance_hit_ally', (effect, value, stacks, amount) => `${firstDefined(amount, 0)}% chance to hit ally instead`],
     ['force_target', () => 'Force enemies to target this character'],
     ['prevent_ability', () => 'Cannot use spenders'],
     ['prevent_debuff', () => 'Immune to next debuff'],
@@ -1196,18 +1224,18 @@ const effectDescriptionRegistry = new Map([
     ['prevent_death', (effect) => 
         `Prevent death${effect.healPercent ? `, heal ${Math.round(effect.healPercent * 100)}% HP` : ''}`],
     ['reduce_damage_percent', (effect, value, stacks, amount) => 
-        `${amount ?? 0}% damage reduction${effect.perStack ? ' per stack' : ''}`],
+        `${firstDefined(amount, 0)}% damage reduction${effect.perStack ? ' per stack' : ''}`],
     ['reduce_heal_percent', (effect, value, stacks, amount) => 
-        `-${amount ?? 0}% healing received${effect.perStack ? ' per stack' : ''}`],
-    ['heal_party', (effect, value, stacks, amount) => `Heal party for ${amount ?? 0} HP`],
+        `-${firstDefined(amount, 0)}% healing received${effect.perStack ? ' per stack' : ''}`],
+    ['heal_party', (effect, value, stacks, amount) => `Heal party for ${firstDefined(amount, 0)} HP`],
     
     // Chaos effects
     ['chaos_damage', (effect) => 
         `Chaotic damage (${effect.bonusDamageChance || 0}% bonus, ${effect.healEnemyChance || 0}% heal enemy)`],
     
     // Percentage stat modifiers
-    ['ability_damage_percent', (effect, value, stacks, amount) => `+${amount ?? 0}% ability damage`],
-    ['buff_damage', (effect, value, stacks, amount) => `+${amount ?? 0} damage`],
+    ['ability_damage_percent', (effect, value, stacks, amount) => `+${firstDefined(amount, 0)}% ability damage`],
+    ['buff_damage', (effect, value, stacks, amount) => `+${firstDefined(amount, 0)} damage`],
     
     // Immunities
     ['effect_immunity', (effect) => {
@@ -1267,7 +1295,7 @@ const effectDescriptionRegistry = new Map([
     
     // Enemy buffs
     ['enemy_buff', (effect, value, stacks, amount, manager, helpers) => 
-        `Enemies gain ${stacks ?? 1} ${helpers.aura(effect.id)}`],
+        `Enemies gain ${firstDefined(stacks, 1)} ${helpers.aura(effect.id)}`],
 ]);
 
 /**
@@ -1314,7 +1342,7 @@ function describeEffect(effect, manager, displayMode = false) {
     // Convenience getters for common fields
     const amount = getVal('amount');
     const stacks = getVal('stacks');
-    const value = effect.value ?? amount; // value takes precedence if present
+    const value = firstDefined(effect.value, amount); // value takes precedence if present
     
     const statName = (statId) => {
         const stat = manager?.stats?.getObjectByID(statId);
@@ -1584,7 +1612,8 @@ function formatTriggerSuffix(trigger) {
         'after_ability_cast': 'after using an ability'
     };
     
-    return suffixes[trigger] ?? trigger.replace(/_/g, ' ');
+    const suffix = suffixes[trigger];
+    return suffix !== undefined ? suffix : trigger.replace(/_/g, ' ');
 }
 
 /**
@@ -2467,6 +2496,9 @@ export {
     // RenderQueue base classes
     AdventuringMasteryRenderQueue,
     AdventuringBadgeRenderQueue,
-    AdventuringEquipmentRenderQueue
+    AdventuringEquipmentRenderQueue,
+    // Media helpers
+    UNKNOWN_MEDIA,
+    getLockedMedia
 }
 

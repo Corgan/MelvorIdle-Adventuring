@@ -13,7 +13,7 @@ class AdventuringConsumablesRenderQueue {
         this.details = false;
         this.list = false;
     }
-    updateAll() {
+    queueAll() {
         this.slots = true;
         this.details = true;
         this.list = true;

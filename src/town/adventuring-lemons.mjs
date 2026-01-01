@@ -80,7 +80,7 @@ export class AdventuringLemons extends AdventuringPage {
     }
 
     onShow() {
-        this.manager.party.all.forEach(member => member.setLocked(false));
+        this.manager.party.setAllLocked(false);
         this.timesVisited++;
         this.currentQuote = this.getRandomQuote();
         this.renderQueue.all = true;
@@ -92,7 +92,7 @@ export class AdventuringLemons extends AdventuringPage {
     }
 
     onHide() {
-        this.manager.party.all.forEach(member => member.setLocked(true));
+        this.manager.party.setAllLocked(true);
     }
 
     postDataRegistration() {

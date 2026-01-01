@@ -14,6 +14,12 @@ class AdventuringJobDetailsRenderQueue {
         this.abilities = false;
         this.scaling = false;
     }
+    queueAll() {
+        this.name = true;
+        this.icon = true;
+        this.abilities = true;
+        this.scaling = true;
+    }
 }
 
 export class AdventuringJobDetails extends AdventuringPage {
@@ -43,11 +49,11 @@ export class AdventuringJobDetails extends AdventuringPage {
     }
 
     onShow() {
-        this.manager.party.all.forEach(member => member.setLocked(false));
+        this.manager.party.setAllLocked(false);
     }
 
     onHide() {
-        this.manager.party.all.forEach(member => member.setLocked(true));
+        this.manager.party.setAllLocked(true);
     }
 
     setJob(job) {

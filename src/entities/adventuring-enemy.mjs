@@ -1,6 +1,7 @@
 const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringCharacter, AdventuringCharacterRenderQueue } = await loadModule('src/core/adventuring-character.mjs');
+const { UNKNOWN_MEDIA } = await loadModule('src/core/adventuring-utils.mjs');
 
 class AdventuringEnemyRenderQueue extends AdventuringCharacterRenderQueue {
     constructor() {
@@ -135,7 +136,7 @@ export class AdventuringEnemy extends AdventuringCharacter {
     }
 
     get media() {
-        return this.base !== undefined ? this.base.media : this.getMediaURL('melvor:assets/media/main/question.png');
+        return this.base !== undefined ? this.base.media : this.getMediaURL(UNKNOWN_MEDIA);
     }
 
     /**

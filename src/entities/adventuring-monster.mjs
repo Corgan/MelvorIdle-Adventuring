@@ -1,7 +1,7 @@
 const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringMasteryAction } = await loadModule('src/core/adventuring-mastery-action.mjs');
-const { AdventuringWeightedTable, addMasteryXPWithBonus, AdventuringBadgeRenderQueue } = await loadModule('src/core/adventuring-utils.mjs');
+const { AdventuringWeightedTable, addMasteryXPWithBonus, AdventuringBadgeRenderQueue, getLockedMedia, UNKNOWN_MEDIA } = await loadModule('src/core/adventuring-utils.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
 
 const { AdventuringMonsterElement } = await loadModule('src/entities/components/adventuring-monster.mjs');
@@ -33,7 +33,7 @@ export class AdventuringMonster extends AdventuringMasteryAction {
     }
 
     get media() {
-        return this.unlocked ? this.getMediaURL(this._media) : this.getMediaURL('melvor:assets/media/main/question.png');
+        return getLockedMedia(this);
     }
 
     get level() {
@@ -109,7 +109,7 @@ export class AdventuringMonster extends AdventuringMasteryAction {
         if(this.unlocked) {
             this.component.icon.src = this.media;
         } else {
-            this.component.icon.src = this.getMediaURL('melvor:assets/media/main/question.png');
+            this.component.icon.src = this.getMediaURL(UNKNOWN_MEDIA);
         }
 
         this.renderQueue.icon = false;

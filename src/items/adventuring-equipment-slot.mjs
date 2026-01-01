@@ -10,7 +10,7 @@ class AdventuringEquipmentSlotRenderQueue {
         this.selected = false;
         this.clickable = false;
     }
-    updateAll() {
+    queueAll() {
         this.icon = true;
         this.highlight = true;
         this.upgrade = true;

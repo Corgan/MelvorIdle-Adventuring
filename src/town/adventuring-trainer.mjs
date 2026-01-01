@@ -44,11 +44,11 @@ export class AdventuringTrainer extends AdventuringPage {
     }
 
     onShow() {
-        this.manager.party.all.forEach(member => member.setLocked(false));
+        this.manager.party.setAllLocked(false);
     }
 
     onHide() {
-        this.manager.party.all.forEach(member => member.setLocked(true));
+        this.manager.party.setAllLocked(true);
     }
 
     /**

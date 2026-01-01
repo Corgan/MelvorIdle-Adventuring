@@ -6,6 +6,9 @@ class AdventuringWorkOrderRenderQueue {
     constructor() {
         this.update = false;
     }
+    queueAll() {
+        this.update = true;
+    }
 }
 
 export class AdventuringWorkOrder {

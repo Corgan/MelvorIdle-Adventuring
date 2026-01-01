@@ -79,15 +79,18 @@ export class AdventuringJobSmallElement extends AdventuringTooltipElement {
         const grid = document.createElement('div');
         grid.className = 'd-flex flex-wrap justify-content-center';
         
-        let jobs;
-        if(this.selectorType === 'combatJob') {
-            jobs = this.skill.jobs.allObjects.filter(job => job.unlocked && (job.id === "adventuring:none" || !job.isPassive));
-            jobs = jobs.filter(job => this.selectorCharacter.combatJob === job || job.allowMultiple || !this.skill.party.all.map(member => member.combatJob).includes(job));
-        }
-        if(this.selectorType === 'passiveJob') {
-            jobs = this.skill.jobs.allObjects.filter(job => job.unlocked && (job.id === "adventuring:none" || job.isPassive));
-            jobs = jobs.filter(job => this.selectorCharacter.passiveJob === job || job.allowMultiple || !this.skill.party.all.map(member => member.passiveJob).includes(job));
-        }
+        // Unified job filtering logic
+        const isPassiveSelector = this.selectorType === 'passiveJob';
+        const jobProp = isPassiveSelector ? 'passiveJob' : 'combatJob';
+        
+        let jobs = this.skill.jobs.allObjects.filter(job => 
+            job.unlocked && (job.id === "adventuring:none" || job.isPassive === isPassiveSelector)
+        );
+        jobs = jobs.filter(job => 
+            this.selectorCharacter[jobProp] === job || 
+            job.allowMultiple || 
+            !this.skill.party.all.map(member => member[jobProp]).includes(job)
+        );
         
         jobs.forEach(job => {
             const jobBtn = this.createJobButton(job);

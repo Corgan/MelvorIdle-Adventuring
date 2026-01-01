@@ -1,7 +1,7 @@
 const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringScalableEffect } = await loadModule('src/combat/adventuring-scalable-effect.mjs');
-const { getAuraName } = await loadModule('src/core/adventuring-utils.mjs');
+const { getAuraName, UNKNOWN_MEDIA } = await loadModule('src/core/adventuring-utils.mjs');
 
 /**
  * Effect types for difficulties:
@@ -89,7 +89,7 @@ export class AdventuringDifficulty extends NamespacedObject {
     }
 
     get media() {
-        return this.manager.getMediaURL(this._media || 'melvor:assets/media/main/question.png');
+        return this.manager.getMediaURL(this._media || UNKNOWN_MEDIA);
     }
 
     /**

@@ -6,6 +6,11 @@ class SlayerTaskRenderQueue {
         this.reward = false;
         this.all = false;
     }
+    queueAll() {
+        this.progress = true;
+        this.reward = true;
+        this.all = true;
+    }
 }
 
 /**

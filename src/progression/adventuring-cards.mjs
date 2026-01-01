@@ -7,6 +7,9 @@ class AdventuringCardsRenderQueue {
         this.cards = new Set();
         this.update = false;
     }
+    queueAll() {
+        this.update = true;
+    }
 }
 
 export class AdventuringCards {

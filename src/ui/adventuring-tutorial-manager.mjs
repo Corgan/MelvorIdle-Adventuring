@@ -362,16 +362,12 @@ export class AdventuringTutorialManager {
      * Display the current step of the active tutorial
      */
     showCurrentStep() {
-        console.log('[Tutorial] showCurrentStep - activeTutorial:', this.activeTutorial ? this.activeTutorial.id : 'none', 'stepIndex:', this.activeStepIndex);
-        
         if(!this.activeTutorial) {
-            console.log('[Tutorial] No active tutorial, returning');
             return;
         }
 
         // Don't show tutorial until game is fully loaded
         if(!confirmedLoaded) {
-            console.log('[Tutorial] Game not fully loaded, waiting');
             this.component.hide();
             this.scheduleRetry();
             return;
@@ -379,7 +375,6 @@ export class AdventuringTutorialManager {
 
         // Don't show tutorial if window is not in focus
         if(!inFocus) {
-            console.log('[Tutorial] Window not in focus, waiting');
             this.component.hide();
             // Don't retry here - onPageVisible will handle it when focus returns
             return;
@@ -387,7 +382,6 @@ export class AdventuringTutorialManager {
 
         // Don't show tutorial while loading offline progress
         if(loadingOfflineProgress) {
-            console.log('[Tutorial] Loading offline progress, waiting');
             this.component.hide();
             this.scheduleRetry();
             return;
@@ -395,7 +389,6 @@ export class AdventuringTutorialManager {
 
         // Don't show tutorial if Swal (offline progress summary, etc.) is visible
         if(Swal.isVisible()) {
-            console.log('[Tutorial] Swal is visible, waiting');
             this.component.hide();
             this.scheduleRetry();
             return;
@@ -404,7 +397,6 @@ export class AdventuringTutorialManager {
         // Don't show tutorial if offline loading modal is visible
         const offlineModal = document.getElementById('modal-offline-loading');
         if(offlineModal && offlineModal.classList.contains('show')) {
-            console.log('[Tutorial] Offline loading modal is visible, waiting');
             this.component.hide();
             this.scheduleRetry();
             return;
@@ -412,24 +404,20 @@ export class AdventuringTutorialManager {
 
         // Check if we can display this tutorial in current state
         if(!this.canDisplay(this.activeTutorial)) {
-            console.log('[Tutorial] canDisplay returned false');
             // Hide tooltip and wait for state change
             this.component.hide();
             return;
         }
 
         var step = this.activeTutorial.steps[this.activeStepIndex];
-        console.log('[Tutorial] Step:', step ? JSON.stringify({ target: step.target, message: step.message }) : 'undefined');
         
         if(!step) {
-            console.log('[Tutorial] No step at index, completing tutorial');
             this.completeTutorial();
             return;
         }
 
         // Auto-skip steps whose targets are already active
         if(this.shouldSkipStep(step)) {
-            console.log('[Tutorial] Skipping step - target already active');
             this.activeStepIndex++;
             this.showCurrentStep();
             return;
@@ -437,18 +425,15 @@ export class AdventuringTutorialManager {
 
         // Resolve target element (even for informational steps, so tooltip can point at target)
         var targetElement = step.target ? this.resolveTarget(step.target) : null;
-        console.log('[Tutorial] Resolved target:', targetElement ? targetElement.tagName : 'null', 'informational:', !!step.informational);
         
         if(!step.informational && !targetElement) {
             // Target not found - check if we're on the wrong page
             if(!this.isOnCorrectPageForTarget(step.target)) {
                 // Wrong page - wait for page change event, don't poll
-                console.log('[Tutorial] Target requires different page, waiting for page change');
                 this.component.hide();
                 return;
             }
             // Right page but element not rendered yet - schedule a limited retry
-            console.log('[Tutorial] Target not found, scheduling retry');
             this.scheduleRetry();
             return;
         }
@@ -456,13 +441,11 @@ export class AdventuringTutorialManager {
         // For informational steps with target, also check if target is available
         if(step.informational && step.target && !targetElement) {
             if(!this.isOnCorrectPageForTarget(step.target)) {
-                console.log('[Tutorial] Informational target requires different page, waiting for page change');
                 this.component.hide();
                 // Resume timers while waiting for page change - we're not showing a tooltip
                 this.resumeTimers();
                 return;
             }
-            console.log('[Tutorial] Informational target not found, scheduling retry');
             this.scheduleRetry();
             return;
         }
@@ -475,7 +458,6 @@ export class AdventuringTutorialManager {
             this.pauseTimers();
         }
 
-        console.log('[Tutorial] Showing tooltip with message:', step.message);
         // Show the tooltip
         this.component.show(targetElement, step.message, step.position, step.informational);
 
@@ -701,12 +683,10 @@ export class AdventuringTutorialManager {
 
             case 'autoRepeat':
                 // Auto-repeat checkbox on an area - only valid on crossroads page
-                console.log('[Tutorial] autoRepeat resolver - activePage:', this.manager.overview.activePage);
                 if(this.manager.overview.activePage !== 'crossroads') return null;
                 if(value === 'any') {
                     // Find first area with auto-repeat unlocked
                     for(var ar of this.manager.crossroads.areas) {
-                        console.log('[Tutorial] Checking area:', ar.id, 'unlocked:', ar.autoRepeatUnlocked, 'component:', !!ar.component, 'container:', ar.component?.autoRepeatContainer);
                         if(ar.autoRepeatUnlocked && ar.component && ar.component.autoRepeatContainer) {
                             return ar.component.autoRepeatContainer;
                         }
@@ -793,8 +773,6 @@ export class AdventuringTutorialManager {
      * Advance to the next step
      */
     advanceStep() {
-        console.log('[Tutorial] advanceStep called - current stepIndex:', this.activeStepIndex);
-        
         // Clean up
         this.clearRetry();
         if(this._currentClickHandler && this._currentTargetElement) {
@@ -804,10 +782,8 @@ export class AdventuringTutorialManager {
         }
 
         this.activeStepIndex++;
-        console.log('[Tutorial] New stepIndex:', this.activeStepIndex, 'total steps:', this.activeTutorial ? this.activeTutorial.steps.length : 0);
 
         if(this.activeStepIndex >= this.activeTutorial.steps.length) {
-            console.log('[Tutorial] All steps complete, completing tutorial');
             // Resume timers before completing
             this.resumeTimers();
             this.completeTutorial();
@@ -817,7 +793,6 @@ export class AdventuringTutorialManager {
             if(!nextStep || !nextStep.informational) {
                 this.resumeTimers();
             }
-            console.log('[Tutorial] Calling showCurrentStep for next step');
             this.showCurrentStep();
         }
     }
@@ -826,7 +801,6 @@ export class AdventuringTutorialManager {
      * Pause dungeon and combat timers for informational steps
      */
     pauseTimers() {
-        console.log('[Tutorial] pauseTimers called, setting timersPaused = true');
         this.manager.timersPaused = true;
     }
 
@@ -834,7 +808,6 @@ export class AdventuringTutorialManager {
      * Resume timers that were paused by an informational step
      */
     resumeTimers() {
-        console.log('[Tutorial] resumeTimers called, setting timersPaused = false');
         this.manager.timersPaused = false;
     }
 

@@ -16,6 +16,11 @@ class AdventuringWorkshopRenderQueue {
         this.workOrders = false;
         this.products = false;
     }
+    queueAll() {
+        this.storedItems = true;
+        this.workOrders = true;
+        this.products = true;
+    }
 }
 
 export class AdventuringWorkshop extends AdventuringPage {
@@ -324,12 +329,12 @@ export class AdventuringWorkshop extends AdventuringPage {
     }
 
     onShow() {
-        this.manager.party.all.forEach(member => member.setLocked(false));
+        this.manager.party.setAllLocked(false);
         this.clearSelectedProduct();
     }
 
     onHide() {
-        this.manager.party.all.forEach(member => member.setLocked(true));
+        this.manager.party.setAllLocked(true);
     }
 
     postDataRegistration() {

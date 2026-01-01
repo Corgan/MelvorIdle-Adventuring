@@ -10,7 +10,7 @@ class AdventuringCardRenderQueue {
         this.highlight = false;
         this.fade = false;
     }
-    updateAll() {
+    queueAll() {
         this.name = true;
         this.action = true;
         this.icon = true;

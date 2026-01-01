@@ -4,7 +4,7 @@ const { AdventuringMasteryAction } = await loadModule('src/core/adventuring-mast
 const { AdventuringAreaElement } = await loadModule('src/dungeon/components/adventuring-area.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
 
-const { AdventuringWeightedTable, addMasteryXPWithBonus, RequirementsChecker, AdventuringMasteryRenderQueue } = await loadModule('src/core/adventuring-utils.mjs');
+const { AdventuringWeightedTable, addMasteryXPWithBonus, RequirementsChecker, AdventuringMasteryRenderQueue, getLockedMedia, UNKNOWN_MEDIA } = await loadModule('src/core/adventuring-utils.mjs');
 
 /**
  * Area-specific RenderQueue with autoRepeat support
@@ -174,7 +174,7 @@ export class AdventuringArea extends AdventuringMasteryAction {
     }
 
     get media() {
-        return this.unlocked ? this.getMediaURL(this._media) : this.getMediaURL('melvor:assets/media/main/question.png');
+        return getLockedMedia(this);
     }
 
     get level() {
@@ -417,7 +417,7 @@ export class AdventuringArea extends AdventuringMasteryAction {
         if(this.unlocked) {
             this.component.icon.src = this.media;
         } else {
-            this.component.icon.src = this.getMediaURL('melvor:assets/media/main/question.png');
+            this.component.icon.src = this.getMediaURL(UNKNOWN_MEDIA);
         }
 
         this.renderQueue.icon = false;

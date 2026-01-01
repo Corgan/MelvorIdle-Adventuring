@@ -17,6 +17,12 @@ class SlayersRenderQueue {
         this.achievements = false;
         this.all = false;
     }
+    queueAll() {
+        this.availableTasks = true;
+        this.activeTasks = true;
+        this.achievements = true;
+        this.all = true;
+    }
 }
 
 export class AdventuringSlayers extends AdventuringPage {
@@ -90,7 +96,7 @@ export class AdventuringSlayers extends AdventuringPage {
     }
 
     onShow() {
-        this.manager.party.all.forEach(member => member.setLocked(false));
+        this.manager.party.setAllLocked(false);
         
         // Ensure we always have 5 available tasks
         this.fillAvailableTasks();
@@ -99,7 +105,7 @@ export class AdventuringSlayers extends AdventuringPage {
     }
 
     onHide() {
-        this.manager.party.all.forEach(member => member.setLocked(true));
+        this.manager.party.setAllLocked(true);
     }
 
     postDataRegistration() {

@@ -12,7 +12,7 @@ class AdventuringArmoryRenderQueue {
     constructor(){
         this.details = false;
     }
-    updateAll() {
+    queueAll() {
         this.details = true;
     }
 }

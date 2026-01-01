@@ -2,7 +2,7 @@ const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringWorkshop } = await loadModule('src/town/adventuring-workshop.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
-const { RequirementsChecker } = await loadModule('src/core/adventuring-utils.mjs');
+const { RequirementsChecker, getLockedMedia, UNKNOWN_MEDIA } = await loadModule('src/core/adventuring-utils.mjs');
 
 const { AdventuringBuildingElement } = await loadModule('src/town/components/adventuring-building.mjs');
 
@@ -77,7 +77,7 @@ export class AdventuringBuilding extends NamespacedObject {
     }
 
     get media() {
-        return this.unlocked ? this.getMediaURL(this._media) : this.getMediaURL('melvor:assets/media/main/question.png');
+        return getLockedMedia(this);
     }
 
     get unlocked() {
@@ -149,7 +149,7 @@ export class AdventuringBuilding extends NamespacedObject {
         if(this.unlocked) {
             this.component.icon.src = this.media;
         } else {
-            this.component.icon.src = this.getMediaURL('melvor:assets/media/main/question.png');
+            this.component.icon.src = this.getMediaURL(UNKNOWN_MEDIA);
         }
 
         this.renderQueue.icon = false;

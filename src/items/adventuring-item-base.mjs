@@ -3,7 +3,7 @@ const { loadModule } = mod.getContext(import.meta);
 const { AdventuringMasteryAction } = await loadModule('src/core/adventuring-mastery-action.mjs');
 const { AdventuringItemBaseElement } = await loadModule('src/items/components/adventuring-item-base.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
-const { RequirementsChecker, formatRequirements, describeEffect, describeEffectFull, formatTrigger, AdventuringEquipmentRenderQueue, buildDescription } = await loadModule('src/core/adventuring-utils.mjs');
+const { RequirementsChecker, formatRequirements, describeEffect, describeEffectFull, formatTrigger, AdventuringEquipmentRenderQueue, buildDescription, getLockedMedia } = await loadModule('src/core/adventuring-utils.mjs');
 
 const { AdventuringStats } = await loadModule('src/core/adventuring-stats.mjs');
 
@@ -191,7 +191,7 @@ export class AdventuringItemBase extends AdventuringMasteryAction {
     }
 
     get media() {
-        return this.unlocked ? this.getMediaURL(this._media) : this.getMediaURL('melvor:assets/media/main/question.png');
+        return getLockedMedia(this);
     }
 
     get level() {

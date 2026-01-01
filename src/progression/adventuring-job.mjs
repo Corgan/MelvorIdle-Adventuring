@@ -5,7 +5,7 @@ const { AdventuringStats } = await loadModule('src/core/adventuring-stats.mjs');
 const { AdventuringJobElement } = await loadModule('src/progression/components/adventuring-job.mjs');
 const { AdventuringJobSummaryElement } = await loadModule('src/progression/components/adventuring-job-summary.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
-const { addMasteryXPWithBonus, RequirementsChecker, AdventuringMasteryRenderQueue } = await loadModule('src/core/adventuring-utils.mjs');
+const { addMasteryXPWithBonus, RequirementsChecker, AdventuringMasteryRenderQueue, getLockedMedia, UNKNOWN_MEDIA } = await loadModule('src/core/adventuring-utils.mjs');
 
 export class AdventuringJob extends AdventuringMasteryAction {
     constructor(namespace, data, manager, game) {
@@ -53,7 +53,7 @@ export class AdventuringJob extends AdventuringMasteryAction {
     }
 
     get media() {
-        return this.unlocked ? this.getMediaURL(this._media) : this.getMediaURL('melvor:assets/media/main/question.png');
+        return getLockedMedia(this);
     }
 
     get level() {
@@ -187,7 +187,7 @@ export class AdventuringJob extends AdventuringMasteryAction {
             this.component.icon.src = this.media;
             this.summary.icon.src = this.media;
         } else {
-            this.component.icon.src = this.getMediaURL('melvor:assets/media/main/question.png');
+            this.component.icon.src = this.getMediaURL(UNKNOWN_MEDIA);
         }
 
         this.renderQueue.icon = false;

@@ -9,7 +9,7 @@ class AdventuringTavernDrinkRenderQueue {
         this.charges = false;
         this.tooltip = false;
     }
-    updateAll() {
+    queueAll() {
         this.icon = true;
         this.charges = true;
         this.tooltip = true;
