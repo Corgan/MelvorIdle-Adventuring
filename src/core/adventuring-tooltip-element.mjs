@@ -37,6 +37,7 @@ export class AdventuringTooltipElement extends HTMLElement {
         super();
         this._tooltipTarget = null;
         this._tooltipOptions = {};
+        this._pendingTooltipContent = null;
     }
 
     /**
@@ -47,6 +48,11 @@ export class AdventuringTooltipElement extends HTMLElement {
     connectedCallback() {
         if (this._tooltipTarget) {
             this.tooltip = createTooltip(this._tooltipTarget, '', this._tooltipOptions);
+            // Apply any pending content that was set before connection
+            if (this._pendingTooltipContent !== null) {
+                this.tooltip.setContent(this._pendingTooltipContent);
+                this._pendingTooltipContent = null;
+            }
         }
     }
 
@@ -69,6 +75,9 @@ export class AdventuringTooltipElement extends HTMLElement {
     setTooltipContent(content) {
         if (this.tooltip) {
             this.tooltip.setContent(content);
+        } else {
+            // Store for when tooltip is created in connectedCallback
+            this._pendingTooltipContent = content;
         }
     }
 

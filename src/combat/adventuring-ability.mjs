@@ -80,8 +80,14 @@ export class AdventuringAbility extends NamespacedObject {
             this.energy = data.energy;
         if(data.cost)
             this.cost = data.cost;
+        if(data.learnType)
+            this.learnType = data.learnType;
+        if(data.learnBonus !== undefined)
+            this.learnBonus = data.learnBonus;
         this.isEnemy = data.isEnemy === true;
-        this.isAchievementAbility = data.isAchievementAbility === true;
+        // Auto-detect achievement abilities by checking requirements
+        this.isAchievementAbility = data.isAchievementAbility === true || 
+            (data.requirements && data.requirements.some(r => r.type === 'achievement_completion'));
         this.requirements = data.requirements;
         this.highlight = false;
 
@@ -141,10 +147,22 @@ export class AdventuringAbility extends NamespacedObject {
         return this._reqChecker?.check({ character }) ?? true;
     }
 
-    getDescription(stats, isDesc=false) {
+    /**
+     * Get the ability description with effect values.
+     * 
+     * Display modes:
+     * - 'total': Just totals (25) - for tooltips/ability-small
+     * - 'scaled': Base + scaled value (5 + 20 icon) - for ability selector
+     * - 'multiplier': Base + multiplier (5 + 0.5 icon) - for job overview
+     * - false: Raw numbers for logic
+     * 
+     * @param {object} stats - Stats source for scaling calculations
+     * @param {string} displayMode - Display mode: 'total', 'scaled', 'multiplier', or falsy for raw
+     */
+    getDescription(stats, displayMode) {
         // If we have a template description, use it with placeholders
         if(this._descriptionTemplate) {
-            const replacements = buildHitEffectReplacements(this.hits, stats, isDesc);
+            const replacements = buildHitEffectReplacements(this.hits, stats, displayMode);
             let desc = parseDescription(this._descriptionTemplate, replacements);
             if(this.flavorText) {
                 desc = `${desc}\n\n${this.flavorText}`;
@@ -160,14 +178,15 @@ export class AdventuringAbility extends NamespacedObject {
                 const effectObj = {
                     type: effect.type,
                     trigger: effect.trigger || 'on_hit',
-                    value: effect.getAmount ? effect.getAmount(stats, isDesc) : (effect.amount?.base || effect.amount || 0),
-                    stacks: effect.getStacks ? effect.getStacks(stats, isDesc) : (effect.stacks?.base || effect.stacks || 0),
+                    value: effect.getAmount ? effect.getAmount(stats, displayMode) : (effect.amount?.base || effect.amount || 0),
+                    stacks: effect.getStacks ? effect.getStacks(stats, displayMode) : (effect.stacks?.base || effect.stacks || 0),
                     id: effect.id,
                     target: hit.target,
+                    party: hit.party,
                     condition: effect.condition,
                     chance: effect.chance
                 };
-                effectDescs.push(describeEffectFull(effectObj, this.manager));
+                effectDescs.push(describeEffectFull(effectObj, this.manager, { displayMode }));
             });
         });
         
@@ -214,9 +233,11 @@ export class AdventuringAbility extends NamespacedObject {
             if(this.renderQueue.descriptionCharacter)
                 stats = this.renderQueue.descriptionCharacter.stats;
 
-            this.component.description.innerHTML = this.getDescription(stats, true);
+            // Ability selector: show base + scaled value (5 + 20 icon)
+            this.component.description.innerHTML = this.getDescription(stats, 'scaled');
             
-            this.details.description.innerHTML = this.getDescription(undefined, true);
+            // Job overview/details: show base + multiplier (5 + 0.5 icon)
+            this.details.description.innerHTML = this.getDescription(undefined, 'multiplier');
 
         } else {
             this.details.description.textContent = "???";

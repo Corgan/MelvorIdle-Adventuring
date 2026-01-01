@@ -40,9 +40,11 @@ export class AdventuringAbilityRowElement extends AdventuringTooltipElement {
      * @param {string} options.tooltipContent - HTML content for tooltip
      */
     setAbility({ name, isUnlocked, type, unlockLevel, tooltipContent }) {
-        // Status indicator
-        this.status.className = isUnlocked ? 'text-success mr-2' : 'text-warning mr-2';
-        this.status.textContent = isUnlocked ? '\u2713' : '\u2717';
+        // Status indicator (use Font Awesome icons instead of unicode)
+        this.status.className = isUnlocked 
+            ? 'fas fa-check text-success mr-2' 
+            : 'fas fa-lock text-warning mr-2';
+        this.status.textContent = '';
         
         // Name
         this.nameText.className = isUnlocked ? 'font-w600' : 'font-w600 text-muted';

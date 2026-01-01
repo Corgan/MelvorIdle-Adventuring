@@ -8,7 +8,7 @@ const { AdventuringWorkshopElement } = await loadModule('src/town/components/adv
 const { AdventuringStoredItemElement } = await loadModule('src/items/components/adventuring-stored-item.mjs');
 const { AdventuringMaterialCostElement } = await loadModule('src/ui/components/adventuring-material-cost.mjs');
 const { AdventuringRequirementElement } = await loadModule('src/ui/components/adventuring-requirement.mjs');
-const { AdventuringDropdownOptionElement } = await loadModule('src/ui/components/adventuring-dropdown-option.mjs');
+const { AdventuringWorkshopProductElement } = await loadModule('src/town/components/adventuring-workshop-product.mjs');
 
 class AdventuringWorkshopRenderQueue {
     constructor() {
@@ -39,12 +39,85 @@ export class AdventuringWorkshop extends AdventuringPage {
         }
         this.storedItems = new Map();
         this.itemComponents = [];
-        this.dropdownOptions = new Map();
+        this.productElements = new Map();
+
+        // UI state for product selection
+        this.selectedOutputType = 'item'; // 'item', 'material', 'consumable', 'conversion'
+        this.selectedTier = 1;
+        this.selectedProduct = undefined;
 
         this.renderQueue = new AdventuringWorkshopRenderQueue();
 
         this.component.back.onclick = () => this.back();
         this.component.submit.onclick = () => this.submitWorkOrder();
+        
+        // Set up output type tab handlers
+        this.component.tabItem.onclick = () => this.setOutputType('item');
+        this.component.tabMaterial.onclick = () => this.setOutputType('material');
+        this.component.tabConsumable.onclick = () => this.setOutputType('consumable');
+        this.component.tabConversion.onclick = () => this.setOutputType('conversion');
+        
+        // Set up tier button handlers
+        this.component.tierButtons.forEach((btn, i) => {
+            btn.onclick = () => this.setTier(i + 1);
+        });
+    }
+
+    /**
+     * Set the selected output type and update UI
+     */
+    setOutputType(type) {
+        this.selectedOutputType = type;
+        this.selectedProduct = undefined;
+        
+        // Update tab button states
+        this.component.tabItem.classList.toggle('btn-info', type === 'item');
+        this.component.tabItem.classList.toggle('btn-outline-info', type !== 'item');
+        this.component.tabItem.classList.toggle('active', type === 'item');
+        
+        this.component.tabMaterial.classList.toggle('btn-info', type === 'material');
+        this.component.tabMaterial.classList.toggle('btn-outline-info', type !== 'material');
+        this.component.tabMaterial.classList.toggle('active', type === 'material');
+        
+        this.component.tabConsumable.classList.toggle('btn-info', type === 'consumable');
+        this.component.tabConsumable.classList.toggle('btn-outline-info', type !== 'consumable');
+        this.component.tabConsumable.classList.toggle('active', type === 'consumable');
+        
+        this.component.tabConversion.classList.toggle('btn-info', type === 'conversion');
+        this.component.tabConversion.classList.toggle('btn-outline-info', type !== 'conversion');
+        this.component.tabConversion.classList.toggle('active', type === 'conversion');
+        
+        this.renderQueue.products = true;
+        this.render();
+    }
+
+    /**
+     * Set the selected tier and update UI
+     */
+    setTier(tier) {
+        const previousTier = this.selectedTier;
+        this.selectedTier = tier;
+        
+        // Update tier button states
+        this.component.tierButtons.forEach((btn, i) => {
+            const isActive = (i + 1) === tier;
+            btn.classList.toggle('btn-info', isActive);
+            btn.classList.toggle('btn-outline-info', !isActive);
+            btn.classList.toggle('active', isActive);
+        });
+        
+        // If we had a product selected, keep it selected (it's the same product, just different tier)
+        // Update the cost display to reflect the new tier
+        if (this.selectedProduct && this.selectedProduct.hasTiers && this.selectedProduct.hasTier(tier)) {
+            this.updateCostDisplay();
+            this.updateRequirementsDisplay();
+            // Update the selected product display with new tier info
+            this.component.selectedProductIcon.src = this.selectedProduct.getMedia(tier);
+            this.component.selectedProductName.textContent = this.selectedProduct.getName(tier);
+        }
+        
+        this.renderQueue.products = true;
+        this.render();
     }
 
     back() {
@@ -98,11 +171,39 @@ export class AdventuringWorkshop extends AdventuringPage {
     }
 
     selectProduct(product) {
-        this.component.productButton.textContent = product.name;
         this.selectedProduct = product;
+        
+        // Show selected product display
+        this.component.selectedProductDisplay.classList.remove('d-none');
+        this.component.noProductSelected.classList.add('d-none');
+        
+        // Update product info based on current tier
+        const tier = this.selectedTier;
+        if (product.hasTiers) {
+            this.component.selectedProductIcon.src = product.getMedia(tier);
+            this.component.selectedProductName.textContent = product.getName(tier);
+        } else {
+            this.component.selectedProductIcon.src = product.media;
+            this.component.selectedProductName.textContent = product.name;
+        }
+        
+        // Reset count to 1
+        this.component.count.value = 1;
+        
         this.renderQueue.products = true;
         this.updateCostDisplay();
         this.updateRequirementsDisplay();
+    }
+
+    /**
+     * Clear the selected product
+     */
+    clearSelectedProduct() {
+        this.selectedProduct = undefined;
+        this.component.selectedProductDisplay.classList.add('d-none');
+        this.component.noProductSelected.classList.remove('d-none');
+        this.component.costDisplay.replaceChildren();
+        this.component.requirementsDisplay.classList.add('d-none');
     }
 
     /**
@@ -119,7 +220,11 @@ export class AdventuringWorkshop extends AdventuringPage {
             return;
         }
 
-        if(!this.selectedProduct.materials || this.selectedProduct.materials.length === 0) {
+        // Get materials for the current tier
+        const tier = this.selectedTier;
+        const materials = this.selectedProduct.getMaterials(tier);
+
+        if(!materials || materials.length === 0) {
             const free = document.createElement('span');
             free.className = 'text-success small';
             free.textContent = 'No materials required';
@@ -127,7 +232,7 @@ export class AdventuringWorkshop extends AdventuringPage {
             return;
         }
 
-        this.selectedProduct.materials.forEach(mat => {
+        materials.forEach(mat => {
             const material = this.manager.materials.getObjectByID(mat.id);
             if(!material) return;
             
@@ -144,12 +249,15 @@ export class AdventuringWorkshop extends AdventuringPage {
      * Update the requirements display for the selected product
      */
     updateRequirementsDisplay() {
-        if(!this.selectedProduct || !this.selectedProduct.requirements || this.selectedProduct.requirements.length === 0) {
+        const tier = this.selectedTier;
+        const requirements = this.selectedProduct?.getRequirements(tier) || [];
+        
+        if(!this.selectedProduct || requirements.length === 0) {
             this.component.requirementsDisplay.classList.add('d-none');
             return;
         }
 
-        const formatted = formatRequirements(this.selectedProduct.requirements, this.manager);
+        const formatted = formatRequirements(requirements, this.manager);
         
         if(formatted.length > 0) {
             this.component.requirementsDisplay.replaceChildren();
@@ -177,26 +285,30 @@ export class AdventuringWorkshop extends AdventuringPage {
         if(count === 0 || count < 1)
             return;
         
+        // Pass the selected tier to the work order
+        const tier = this.selectedTier;
+        
         let orders = [...this.workOrders.values()];
         for(let order of orders) {
             if(order.active)
                 continue;
-            order.submit(product, count);
+            order.submit(product, count, tier);
             break;
         }
 
-        this.selectedProduct = undefined;
-        this.component.count.value = 0;
+        this.clearSelectedProduct();
+        this.component.count.value = 1;
 
         this.renderQueue.products = true;
+        this.render();
     }
 
     hasWorkOrders(character) {
-        return [...this.workOrders].filter(order => order.active && order.product.canMake(character)).length > 0;
+        return [...this.workOrders].filter(order => order.active && order.product.canMake(character, order.tier)).length > 0;
     }
 
     doWork(character) {
-        let order = [...this.workOrders].find(order => order.active && order.product.canMake(character))
+        let order = [...this.workOrders].find(order => order.active && order.product.canMake(character, order.tier))
         if(order !== undefined)
             order.progress();
     }
@@ -209,10 +321,16 @@ export class AdventuringWorkshop extends AdventuringPage {
         this.workOrders.forEach(order => {
             order.renderQueue.update = true;
         });
+        
+        // Reset UI state
+        this.setOutputType('item');
+        this.setTier(1);
+        this.clearSelectedProduct();
     }
 
     onShow() {
         this.manager.party.all.forEach(member => member.setLocked(false));
+        this.clearSelectedProduct();
     }
 
     onHide() {
@@ -242,19 +360,63 @@ export class AdventuringWorkshop extends AdventuringPage {
         if(!this.renderQueue.products)
             return;
 
-        let existing = [...this.workOrders.keys()].filter(order => order.active).map(order => order.product);
-        this.component.productRecipeOptions.textContent = '';
-        this.products.forEach(product => {
-            let productContainer = this.dropdownOptions.get(product);
-            if(productContainer === undefined) {
-                productContainer = new AdventuringDropdownOptionElement();
-                this.dropdownOptions.set(product, productContainer);
-            }
-            this.component.productRecipeOptions.appendChild(productContainer);
-            productContainer.setFromItem(product, () => this.selectProduct(product));
+        // Clear product list
+        this.component.productList.replaceChildren();
+        
+        // Filter products by output type
+        // For consumables with tiers, show all consumable products (tier selection is separate)
+        const filteredProducts = this.products.filter(product => {
+            if(this.selectedOutputType === 'item' && product.outputType !== 'item') return false;
+            if(this.selectedOutputType === 'material' && product.outputType !== 'material') return false;
+            if(this.selectedOutputType === 'consumable' && product.outputType !== 'consumable') return false;
+            if(this.selectedOutputType === 'conversion' && product.outputType !== 'conversion') return false;
+            return true;
         });
-        if(this.selectedProduct === undefined)
-            this.component.productButton.textContent = 'Select Product';
+        
+        // Get active orders to show which products are in use
+        const activeProducts = [...this.workOrders].filter(order => order.active).map(order => order.product);
+        
+        // Render filtered products using AdventuringWorkshopProductElement
+        filteredProducts.forEach(product => {
+            let productEl = this.productElements.get(product);
+            if(productEl === undefined) {
+                productEl = createElement('adventuring-workshop-product');
+                this.productElements.set(product, productEl);
+            }
+            
+            // Get display info based on tier for tiered products
+            const tier = this.selectedTier;
+            const isSelected = this.selectedProduct === product;
+            const isActive = activeProducts.includes(product);
+            
+            if (product.hasTiers) {
+                productEl.setProduct({
+                    iconSrc: product.getMedia(tier),
+                    name: product.getName(tier),
+                    selected: isSelected,
+                    active: isActive
+                });
+            } else {
+                productEl.setProduct({
+                    iconSrc: product.media,
+                    name: product.name,
+                    selected: isSelected,
+                    active: isActive
+                });
+            }
+            
+            productEl.clickable.onclick = () => this.selectProduct(product);
+            
+            this.component.productList.appendChild(productEl);
+        });
+        
+        // Show empty state if no products
+        if(filteredProducts.length === 0) {
+            const emptyMsg = document.createElement('div');
+            emptyMsg.className = 'text-muted text-center w-100 py-3';
+            emptyMsg.textContent = 'No products available for this type';
+            this.component.productList.appendChild(emptyMsg);
+        }
 
         this.renderQueue.products = false;
     }

@@ -75,18 +75,20 @@ export class AdventuringModifiers {
     getConsumableEffects() {
         const effects = [];
         
-        if (!this.manager.consumables || !this.manager.consumables.slots) return effects;
+        if (!this.manager.consumables || !this.manager.consumables.equipped) return effects;
         
-        this.manager.consumables.slots.forEach(slot => {
-            const consumable = slot.consumable;
-            if (!consumable || slot.charges <= 0) return;
-            if (consumable.triggerType !== 'passive') return;
+        this.manager.consumables.equipped.forEach(({ consumable, tier }) => {
+            if (!consumable) return;
+            const charges = this.manager.consumables.getCharges(consumable, tier);
+            if (charges <= 0) return;
             
-            if (consumable.effects) {
-                consumable.effects.forEach(effectData => {
-                    effects.push(createEffect(effectData, consumable, consumable.name));
-                });
-            }
+            const tierEffects = consumable.getTierEffects(tier);
+            tierEffects.forEach(effectData => {
+                // Only include passive effects here - triggered effects handled separately
+                if (effectData.trigger === 'passive') {
+                    effects.push(createEffect(effectData, consumable, consumable.getTierName(tier)));
+                }
+            });
         });
         
         return effects;

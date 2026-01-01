@@ -192,7 +192,7 @@ export class AdventuringArea extends MasteryAction {
         if(!difficulty) return;
         
         // Check if this difficulty is unlocked
-        if(!difficulty.isUnlocked(this.level)) {
+        if(!difficulty.isUnlocked(this)) {
             this.manager.log.add(`${difficulty.name} mode requires Mastery Level ${difficulty.unlockLevel}!`);
             return;
         }
@@ -257,6 +257,31 @@ export class AdventuringArea extends MasteryAction {
 
     get unlocked() {
         return this._reqChecker?.check() ?? true;
+    }
+
+    /**
+     * Get all unique monsters that can appear in this area.
+     * Collects monsters from all floors and deduplicates.
+     * @returns {AdventuringMonster[]}
+     */
+    get monsters() {
+        if (!this.floors) return [];
+        
+        const seen = new Set();
+        const monsters = [];
+        
+        for (const floor of this.floors) {
+            if (!floor.monsters) continue;
+            for (const entry of floor.monsters) {
+                if (seen.has(entry.id)) continue;
+                seen.add(entry.id);
+                
+                const monster = this.manager.monsters.getObjectByID(entry.id);
+                if (monster) monsters.push(monster);
+            }
+        }
+        
+        return monsters;
     }
 
     get category() {

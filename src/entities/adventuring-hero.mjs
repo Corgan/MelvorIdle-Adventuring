@@ -140,7 +140,12 @@ export class AdventuringHero extends AdventuringCharacter {
         // Register equipment as an effect source
         this.effectCache.registerSource('equipment', () => this.equipment.getEffects());
         
-        // Register consumables (tavern drinks apply to all heroes)
+        // Register tavern drinks (passive run-length effects)
+        this.effectCache.registerSource('tavern', () => 
+            this.manager.tavern ? this.manager.tavern.getEffects() : []
+        );
+        
+        // Register consumables (triggered effects)
         this.effectCache.registerSource('consumables', () => 
             this.manager.consumables ? this.manager.consumables.getEffects() : []
         );
@@ -172,6 +177,30 @@ export class AdventuringHero extends AdventuringCharacter {
                 
                 // Use the shared effect processor
                 extra = this.processTriggeredEffect(effect, amount, extra, item.name);
+            });
+        }
+        
+        // Check consumables for triggered effects (consumables apply to party)
+        if(this.manager.consumables) {
+            // Build context for condition evaluation
+            const context = {
+                character: this,
+                target: extra.target || null,
+                party: this.manager.party?.members || [],
+                manager: this.manager
+            };
+            
+            let consumableEffects = this.manager.consumables.trigger(type, context);
+            consumableEffects.forEach(({ consumable, effect, amount, chance }) => {
+                // Roll for chance-based effects
+                if(Math.random() * 100 > chance) return;
+                
+                // Use the shared effect processor
+                extra = this.processTriggeredEffect(effect, amount, extra, consumable.name);
+                
+                // All consumables consume a charge when triggered
+                this.manager.consumables.removeCharges(consumable, 1);
+                this.manager.log.add(`${consumable.name} consumed a charge.`);
             });
         }
         

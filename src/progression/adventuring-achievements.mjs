@@ -193,6 +193,11 @@ export class AdventuringAchievement extends NamespacedObject {
             case 'learned_abilities':
                 return this.manager.learnedAbilities ? this.manager.learnedAbilities.size : 0;
             case 'job_level':
+                // If job is specified, check that specific job's level
+                if(req.job) {
+                    return this._getSpecificJobLevel(req.job);
+                }
+                // Otherwise check highest job level
                 return this._getHighestJobLevel();
             case 'jobs_at_level':
                 return this._getJobsAtLevel(req.level);
@@ -214,6 +219,13 @@ export class AdventuringAchievement extends NamespacedObject {
                 return this._isJobUnlocked(req.job) ? 1 : 0;
             case 'all_jobs_tier':
                 return this._areAllJobsUnlockedAtTier(req.tier) ? 1 : 0;
+            // New requirement types for flat job level system
+            case 'any_passive_job_level':
+                return this._getHighestPassiveJobLevel();
+            case 'all_passive_jobs_level':
+                return this._getAllPassiveJobsAtLevel(req.level) ? 1 : 0;
+            case 'specific_job_level':
+                return this._getSpecificJobLevel(req.job);
             default:
                 return 0;
         }
@@ -223,7 +235,14 @@ export class AdventuringAchievement extends NamespacedObject {
      * Get required target for completion
      */
     getTarget() {
-        return this.requirement.target;
+        const req = this.requirement;
+        // Some requirements use 'level' instead of 'target'
+        if(req.level !== undefined) return req.level;
+        // Boolean checks (job_unlocked, all_passive_jobs_level, etc.) use target: 1
+        if(req.type === 'job_unlocked' || req.type === 'all_jobs_tier' || req.type === 'all_passive_jobs_level') {
+            return 1;
+        }
+        return req.target || 1;
     }
 
     /**
@@ -303,6 +322,42 @@ export class AdventuringAchievement extends NamespacedObject {
         );
         if(tierJobs.length === 0) return false;
         return tierJobs.every(job => this._isJobUnlocked(job.id));
+    }
+
+    /**
+     * Helper: Get highest passive job level
+     */
+    _getHighestPassiveJobLevel() {
+        let highest = 0;
+        for(const job of this.manager.jobs.allObjects) {
+            if(job.id === 'adventuring:none' || !job.isPassive) continue;
+            const level = this.manager.getMasteryLevel(job) || 1;
+            if(level > highest) highest = level;
+        }
+        return highest;
+    }
+
+    /**
+     * Helper: Check if all passive jobs are at or above a level
+     */
+    _getAllPassiveJobsAtLevel(targetLevel) {
+        const passiveJobs = this.manager.jobs.allObjects.filter(job => 
+            job.id !== 'adventuring:none' && job.isPassive
+        );
+        if(passiveJobs.length === 0) return false;
+        return passiveJobs.every(job => {
+            const level = this.manager.getMasteryLevel(job) || 1;
+            return level >= targetLevel;
+        });
+    }
+
+    /**
+     * Helper: Get a specific job's level
+     */
+    _getSpecificJobLevel(jobId) {
+        const job = this.manager.jobs.getObjectByID(jobId);
+        if(!job) return 0;
+        return this.manager.getMasteryLevel(job) || 1;
     }
 
     /**
@@ -646,7 +701,9 @@ export class AchievementManager {
         this.stats.encode(writer);
         
         // Encode completed achievements as NamespacedObject set
-        writer.writeSet(this.completedAchievements, writeNamespacedObject);
+        writer.writeSet(this.completedAchievements, (achievement, w) => {
+            w.writeNamespacedObject(achievement);
+        });
     }
 
     /**
@@ -657,7 +714,12 @@ export class AchievementManager {
         this.stats.decode(reader, version);
         
         // Decode completed achievements as NamespacedObject set
-        this.completedAchievements = reader.getSet(readNamespacedObject(this.manager.achievements));
+        reader.getSet((r) => {
+            const achievement = r.getNamespacedObject(this.manager.achievements);
+            if (achievement && typeof achievement !== 'string') {
+                this.completedAchievements.add(achievement);
+            }
+        });
         
         // Rebuild bonus effects from loaded achievements
         this.rebuildBonuses();

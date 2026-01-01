@@ -233,25 +233,25 @@ export class AdventuringOverview {
             }
         }
 
-        // 2. Equipped consumables (non-tavern drinks) - always visible
+        // 2. Equipped consumables - always visible
         const equipped = this.manager.consumables.equipped;
-        equipped.forEach(consumable => {
-            if(consumable && !consumable.isTavernDrink) {
+        equipped.forEach(({ consumable, tier }) => {
+            if(consumable) {
                 effects.push({
-                    name: consumable.name,
-                    media: consumable.media,
-                    tooltip: this.buildConsumableTooltip(consumable, false)
+                    name: consumable.getTierName(tier),
+                    media: consumable.getTierMedia(tier),
+                    tooltip: this.buildConsumableTooltip(consumable, tier)
                 });
             }
         });
 
         // 3. Active tavern drinks - always visible
-        const tavernDrinks = this.manager.consumables.getActiveTavernDrinks();
-        tavernDrinks.forEach(({ consumable, runsRemaining }) => {
+        const tavernDrinks = this.manager.tavern.getActiveDrinks();
+        tavernDrinks.forEach(({ drink, runsRemaining }) => {
             effects.push({
-                name: consumable.name,
-                media: consumable.media,
-                tooltip: this.buildConsumableTooltip(consumable, true, runsRemaining)
+                name: drink.name,
+                media: drink.media,
+                tooltip: this.buildTavernDrinkTooltip(drink, runsRemaining)
             });
         });
 
@@ -280,41 +280,65 @@ export class AdventuringOverview {
     }
 
     /**
-     * Build tooltip HTML for a consumable buff
+     * Build tooltip HTML for a consumable buff at a specific tier
      */
-    buildConsumableTooltip(consumable, isTavernDrink, runsRemaining = 0) {
+    buildConsumableTooltip(consumable, tier) {
         const lines = [];
-        lines.push(`<div class="font-w700">${consumable.name}</div>`);
-        lines.push(`<div class="text-muted font-size-sm">${consumable.type.charAt(0).toUpperCase() + consumable.type.slice(1)}</div>`);
+        lines.push(`<div class="font-w700">${consumable.getTierName(tier)}</div>`);
+        lines.push(`<div class="text-muted font-size-sm">${consumable.type ? consumable.type.charAt(0).toUpperCase() + consumable.type.slice(1) : 'Consumable'}</div>`);
         
-        if(consumable.description) {
+        const description = consumable.getTierDescription(tier);
+        if(description) {
             lines.push(`<hr class="my-1">`);
-            lines.push(`<div class="text-info">${consumable.description}</div>`);
+            lines.push(`<div class="text-info">${description}</div>`);
         }
         
         // Show effects
-        if(consumable.effects && consumable.effects.length > 0) {
+        const tierEffects = consumable.getTierEffects(tier);
+        if(tierEffects && tierEffects.length > 0) {
             lines.push(`<hr class="my-1">`);
-            consumable.effects.forEach(effect => {
+            tierEffects.forEach(effect => {
                 const desc = describeEffect(effect, this.manager);
                 lines.push(`<div class="text-success">${desc}</div>`);
             });
         }
         
         // Show trigger type
-        if(consumable.triggerType) {
+        if(tierEffects && tierEffects.length > 0) {
+            const triggerTypes = [...new Set(tierEffects.map(e => e.trigger))];
             lines.push(`<hr class="my-1">`);
-            const triggerText = consumable.triggerType === 'passive' ? 'Triggers automatically' : 'Activated when conditions met';
+            const triggerText = triggerTypes.includes('passive') ? 'Triggers automatically' : 'Activated when conditions met';
             lines.push(`<div class="text-muted font-size-sm">${triggerText}</div>`);
         }
         
-        // Show charges/runs
+        // Show charges for this tier
         lines.push(`<hr class="my-1">`);
-        if(isTavernDrink) {
-            lines.push(`<div class="text-warning">${runsRemaining} run${runsRemaining !== 1 ? 's' : ''} remaining</div>`);
-        } else {
-            lines.push(`<div class="text-muted">Charges: ${consumable.charges}/${consumable.maxCharges}</div>`);
+        const charges = this.manager.consumables.getCharges(consumable, tier);
+        lines.push(`<div class="text-muted">Charges: ${charges}/${consumable.maxCharges}</div>`);
+        
+        return lines.join('');
+    }
+
+    /**
+     * Build tooltip HTML for a tavern drink
+     */
+    buildTavernDrinkTooltip(drink, runsRemaining) {
+        const lines = [];
+        lines.push(`<div class="font-w700">${drink.name}</div>`);
+        lines.push(`<div class="text-muted font-size-sm">Tavern Drink</div>`);
+        
+        // Show effects
+        if(drink.effects && drink.effects.length > 0) {
+            lines.push(`<hr class="my-1">`);
+            drink.effects.forEach(effect => {
+                const desc = describeEffect(effect, this.manager);
+                lines.push(`<div class="text-success">${desc}</div>`);
+            });
         }
+        
+        // Show runs remaining
+        lines.push(`<hr class="my-1">`);
+        lines.push(`<div class="text-warning">${runsRemaining} run${runsRemaining !== 1 ? 's' : ''} remaining</div>`);
         
         return lines.join('');
     }

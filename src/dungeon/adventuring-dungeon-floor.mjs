@@ -304,28 +304,13 @@ export class AdventuringDungeonFloor {
     }
 
     complete() {
-        // Trigger floor_end effects before healing/transitioning
+        // Trigger floor_end effects before transitioning
         this.manager.party.all.forEach(member => {
             member.trigger('floor_end', {});
         });
         
         this.manager.dungeon.progress++;
         this.manager.overview.renderQueue.status = true;
-
-        // Heal and revive party between floors (but not between encounters within a floor)
-        // This provides a checkpoint system while keeping floor-level tension
-        this.manager.party.all.forEach(member => {
-            if (member.dead) {
-                // Revive dead members to full HP
-                member.dead = false;
-                member.hitpoints = member.maxHitpoints;
-                member.renderQueue.hitpoints = true;
-            } else {
-                // Heal living members to full HP
-                member.hitpoints = member.maxHitpoints;
-                member.renderQueue.hitpoints = true;
-            }
-        });
 
         if(this.manager.dungeon.progress >= this.manager.dungeon.numFloors) {
             this.manager.dungeon.complete();

@@ -382,10 +382,9 @@ export class AdventuringItemBase extends MasteryAction {
             let trigger = formatTrigger(effect.trigger);
             let desc = describeEffect(effect, this.manager);
             
-            // Add chance if applicable
-            if(effect.chance !== undefined && effect.chance < 1) {
-                const chancePercent = Math.round(effect.chance * 100);
-                desc = `${chancePercent}% chance: ${desc}`;
+            // Add chance if applicable (chance is whole percent, 100 = always)
+            if(effect.chance !== undefined && effect.chance < 100) {
+                desc = `${effect.chance}% chance: ${desc}`;
             }
             
             // Combine trigger and description for non-passive effects

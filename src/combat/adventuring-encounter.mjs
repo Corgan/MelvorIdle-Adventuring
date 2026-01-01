@@ -338,6 +338,8 @@ export class AdventuringEncounter extends AdventuringPage {
                             if(effect.type === "damage") {
                                 // Check for miss (Blind debuff)
                                 let missCheck = this.currentTurn.trigger('before_damage_delivered', { target: target, ...builtEffect });
+                                // Also trigger before_damage_dealt for consumables that use this naming
+                                missCheck = this.currentTurn.trigger('before_damage_dealt', { target: target, ...missCheck });
                                 if(missCheck.missed) {
                                     this.manager.log.add(`${this.currentTurn.name}'s attack misses ${target.name}!`);
                                     return; // Skip this effect
@@ -427,6 +429,13 @@ export class AdventuringEncounter extends AdventuringPage {
                                 
                                 // Trigger lifesteal with damage dealt
                                 builtEffect = this.currentTurn.trigger('after_damage_delivered', { target: target, damageDealt: damageDealt, ...builtEffect });
+                                // Also trigger after_damage_dealt for consumables that use this naming
+                                builtEffect = this.currentTurn.trigger('after_damage_dealt', { target: target, damageDealt: damageDealt, ...builtEffect });
+                                
+                                // Check if target died and trigger on_kill
+                                if(target.dead) {
+                                    this.currentTurn.trigger('on_kill', { target: target, damageDealt: damageDealt });
+                                }
                             } else if (effect.type === "heal") {
                                 builtEffect = target.trigger('after_heal_received', { attacker: this.currentTurn, ...builtEffect });
                                 builtEffect = this.currentTurn.trigger('after_heal_delivered', { target: target, ...builtEffect });
@@ -671,14 +680,13 @@ export class AdventuringEncounter extends AdventuringPage {
         if(!this.currentAction.learnType)
             return;
         
-        // Check if character has the Slayer job
+        // Check if character has the Slayer job as combat job (must be active to learn)
         const slayerJob = this.manager.jobs.getObjectByID('adventuring:slayer');
         if(!slayerJob)
             return;
         
-        const hasSlayerJob = this.currentTurn.combatJob === slayerJob || 
-                             this.currentTurn.passiveJob === slayerJob;
-        if(!hasSlayerJob)
+        // Only the combat job can use learning abilities
+        if(this.currentTurn.combatJob !== slayerJob)
             return;
         
         // Get targets that were hit (from hitHistory)
@@ -701,37 +709,21 @@ export class AdventuringEncounter extends AdventuringPage {
         if(!targetEnemy)
             return;
         
-        // Get the ability to potentially learn based on learnType
-        const learnType = this.currentAction.learnType; // 'generator' or 'spender'
-        const abilityToLearn = learnType === 'generator' ? targetEnemy.generator : targetEnemy.spender;
-        
-        if(!abilityToLearn || !abilityToLearn.isEnemy)
-            return;
-        
-        // Check if already learned
-        if(this.manager.learnedAbilities.has(abilityToLearn.id))
-            return;
-        
-        // Calculate learn chance
-        // Base: 10% + 0.5% per Slayer level + learnBonus from ability
-        const slayerLevel = this.manager.getMasteryLevel(slayerJob);
+        // Use the Grimoire to try learning
+        const learnType = this.currentAction.learnType;
         const learnBonus = this.currentAction.learnBonus || 0;
         
-        // Apply monster mastery bonus to learn chance
-        const masteryBonus = this.manager.modifiers.getAbilityLearnChanceBonus();
+        // Grimoire handles the roll, logging, and notification
+        const learned = this.manager.grimoire.tryLearn(
+            this.currentTurn,
+            targetEnemy,
+            learnType,
+            learnBonus
+        );
         
-        const baseChance = 0.10 + (slayerLevel * 0.005) + learnBonus + masteryBonus;
-        const learnChance = Math.min(baseChance, 0.75); // Cap at 75%
-        
-        // Roll for learning
-        if(Math.random() < learnChance) {
-            this.manager.learnedAbilities.add(abilityToLearn.id);
-            this.manager.log.add(`${this.currentTurn.name} learned ${abilityToLearn.name}!`);
-            
-            // Show notification
-            if(typeof notifyPlayer === 'function') {
-                notifyPlayer(this.manager, `Learned: ${abilityToLearn.name}`, 'success');
-            }
+        // Also add to old learnedAbilities Set for backward compatibility
+        if(learned) {
+            this.manager.learnedAbilities.add(learned.id);
         }
     }
 

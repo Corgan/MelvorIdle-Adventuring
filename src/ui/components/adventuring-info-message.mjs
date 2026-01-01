@@ -11,7 +11,7 @@ export class AdventuringInfoMessageElement extends HTMLElement {
         this.container = getElementFromFragment(this._content, 'container', 'div');
         this.iconWrap = getElementFromFragment(this._content, 'iconWrap', 'div');
         this.icon = getElementFromFragment(this._content, 'icon', 'i');
-        this.title = getElementFromFragment(this._content, 'title', 'p');
+        this.titleText = getElementFromFragment(this._content, 'title', 'p');
         this.description = getElementFromFragment(this._content, 'description', 'p');
     }
 
@@ -29,8 +29,8 @@ export class AdventuringInfoMessageElement extends HTMLElement {
      */
     setMessage({ icon, title, titleClass = 'text-warning', description = '' }) {
         this.icon.className = `fa ${icon} fa-2x mb-2`;
-        this.title.textContent = title;
-        this.title.className = `${titleClass} mb-2`;
+        this.titleText.textContent = title;
+        this.titleText.className = `${titleClass} mb-2`;
         
         if (description) {
             this.description.innerHTML = description;

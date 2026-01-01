@@ -3,6 +3,7 @@ const { loadModule } = mod.getContext(import.meta);
 const { AdventuringPage } = await loadModule('src/ui/adventuring-page.mjs');
 const { AdventuringConsumablesElement } = await loadModule('src/items/components/adventuring-consumables.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
+const { evaluateCondition } = await loadModule('src/core/adventuring-utils.mjs');
 
 const MAX_EQUIPPED_CONSUMABLES = 3;
 
@@ -10,13 +11,23 @@ class ConsumablesRenderQueue {
     constructor() {
         this.slots = false;
         this.details = false;
+        this.list = false;
     }
     updateAll() {
         this.slots = true;
         this.details = true;
+        this.list = true;
     }
 }
 
+/**
+ * Manager for consumables with tier-based charge tracking.
+ * 
+ * Charge storage: Map<consumable, Map<tier, count>>
+ * Equipped storage: Array of { consumable, tier } objects
+ * 
+ * Only one tier of a consumable can be equipped at a time.
+ */
 export class AdventuringConsumables extends AdventuringPage {
     constructor(manager, game) {
         super(manager, game);
@@ -26,21 +37,31 @@ export class AdventuringConsumables extends AdventuringPage {
         this.component = createElement('adventuring-consumables');
         this.renderQueue = new ConsumablesRenderQueue();
 
-        this.charges = new Map();           // Map<Consumable, number> - charge counts
-        this.equipped = [];                 // Array of equipped consumables (max 3)
-        this.usedThisRun = new Set();       // Track once-per-run consumables
+        // Charges: Map<Consumable, Map<tier, count>>
+        this.charges = new Map();
+        
+        // Equipped: Array of { consumable, tier } (max 3)
+        this.equipped = [];
+        
+        // Track once-per-run consumables
+        this.usedThisRun = new Set();
 
         this.consumables = [];
         this.selectedConsumable = undefined;
-        this.materialComponents = [];       // Reusable material components for cost display
+        this.selectedTier = 1; // Currently selected tier for viewing/equipping
 
         this.component.back.onclick = () => this.back();
-        this.component.craftButton.onclick = () => this.craftSelected();
         this.component.equipButton.onclick = () => this.toggleEquipSelected();
+        
+        // Set up tier button click handlers
+        for (let i = 0; i < 4; i++) {
+            const tier = i + 1;
+            this.component.tierButtonElements[i].onclick = () => this.selectTier(tier);
+        }
     }
 
     back() {
-        if(this.active) {
+        if (this.active) {
             this.manager.town.setBuilding(undefined);
         }
     }
@@ -51,7 +72,7 @@ export class AdventuringConsumables extends AdventuringPage {
 
     onLoad() {
         super.onLoad();
-        this.renderQueue.slots = true;
+        this.renderQueue.list = true;
     }
 
     onShow() {
@@ -63,209 +84,261 @@ export class AdventuringConsumables extends AdventuringPage {
     }
 
     postDataRegistration() {
-        this.consumables = this.manager.consumableTypes.allObjects.filter(c => !c.isTavernDrink);
+        this.consumables = this.manager.consumableTypes.allObjects;
 
-        // Mount consumables to the UI and set up click handlers for selection
+        // Group consumables by source job
+        const consumablesByJob = new Map();
         this.consumables.forEach(consumable => {
-            consumable.component.mount(this.component.items);
-            consumable.component.clickable.onclick = () => this.selectConsumable(consumable);
+            const job = consumable.sourceJob;
+            if (!job) return;
+            if (!consumablesByJob.has(job)) {
+                consumablesByJob.set(job, []);
+            }
+            consumablesByJob.get(job).push(consumable);
+        });
+        
+        // Create sections for each job
+        consumablesByJob.forEach((jobConsumables, job) => {
+            // Create section container
+            const section = document.createElement('div');
+            section.className = 'mb-3';
+            
+            // Create simple header
+            const header = document.createElement('h6');
+            header.className = 'font-w600 text-muted mb-2';
+            header.textContent = job.name;
+            
+            // Create content container
+            const content = document.createElement('div');
+            content.className = 'row no-gutters';
+            
+            // Mount consumables into this section
+            jobConsumables.forEach(consumable => {
+                consumable.component.mount(content);
+                consumable.component.clickable.onclick = () => this.selectConsumable(consumable);
+            });
+            
+            section.appendChild(header);
+            section.appendChild(content);
+            this.component.jobSections.appendChild(section);
         });
 
         // Setup slot click handlers for unequipping
-        for(let i = 0; i < MAX_EQUIPPED_CONSUMABLES; i++) {
+        for (let i = 0; i < MAX_EQUIPPED_CONSUMABLES; i++) {
             const slot = this.component.slots[i];
-            if(slot) {
+            if (slot) {
                 slot.onclick = () => {
-                    if(this.equipped[i]) {
-                        this.unequip(this.equipped[i]);
+                    if (this.equipped[i]) {
+                        this.unequip(this.equipped[i].consumable);
                     }
                 };
             }
         }
     }
+    
+    // =========================================
+    // Selection & UI
+    // =========================================
 
     /**
      * Select a consumable to view in the details panel
      */
-    selectConsumable(consumable) {
+    selectConsumable(consumable, tier = 1) {
         this.selectedConsumable = consumable;
+        this.selectedTier = tier;
         this.renderQueue.details = true;
         this.render();
     }
 
     /**
-     * Craft one charge of the selected consumable
+     * Select a specific tier of the currently selected consumable
      */
-    craftSelected() {
-        if(!this.selectedConsumable) return;
-        if(this.selectedConsumable.craft()) {
-            this.renderQueue.details = true;
-            this.render();
-        }
-    }
-
-    /**
-     * Toggle equip/unequip for the selected consumable
-     */
-    toggleEquipSelected() {
-        if(!this.selectedConsumable) return;
-        if(this.isEquipped(this.selectedConsumable)) {
-            this.unequip(this.selectedConsumable);
-        } else {
-            this.equip(this.selectedConsumable);
-        }
+    selectTier(tier) {
+        this.selectedTier = tier;
+        this.updateTierButtonStates();
         this.renderQueue.details = true;
         this.render();
-    }
-
-    /**
-     * Get charge count for a consumable
-     */
-    getCharges(consumable) {
-        return this.charges.get(consumable) || 0;
-    }
-
-    /**
-     * Add charges to a consumable
-     */
-    addCharges(consumable, amount) {
-        const current = this.getCharges(consumable);
-        const newCharges = Math.min(current + amount, consumable.maxCharges);
-        this.charges.set(consumable, newCharges);
-        consumable.renderQueue.updateAll();
-        
-        // Invalidate effect cache if this consumable is equipped
-        if(this.isEquipped(consumable)) {
-            this.invalidateAllHeroEffects();
-        }
-    }
-
-    /**
-     * Remove charges from a consumable
-     */
-    removeCharges(consumable, amount) {
-        const current = this.getCharges(consumable);
-        const newCharges = Math.max(current - amount, 0);
-        this.charges.set(consumable, newCharges);
-        consumable.renderQueue.updateAll();
-
-        // Auto-unequip if no charges left (only for non-tavern consumables)
-        // Note: unequip() already invalidates the cache
-        if(newCharges <= 0 && !consumable.isTavernDrink && this.isEquipped(consumable)) {
-            this.unequip(consumable);
-        }
-        // Invalidate effect cache if tavern drink or equipped consumable charges changed
-        else if(consumable.isTavernDrink || this.isEquipped(consumable)) {
-            this.invalidateAllHeroEffects();
-        }
-    }
-
-    // =========================================
-    // Tavern drink methods (use charges system)
-    // =========================================
-
-    /**
-     * Add charges to a tavern drink (called when purchasing)
-     */
-    addTavernDrinkCharges(consumable, amount) {
-        const current = this.getCharges(consumable);
-        this.charges.set(consumable, current + amount);
-        consumable.renderQueue.updateAll();
-        this.manager.overview.renderQueue.buffs = true;
-        
-        // Invalidate effect cache for all heroes
-        this.invalidateAllHeroEffects();
     }
     
     /**
-     * Invalidate effect cache for all heroes.
-     * Called when tavern drinks change.
+     * Update visual state of tier buttons
+     */
+    updateTierButtonStates() {
+        for (let i = 0; i < 4; i++) {
+            const btn = this.component.tierButtonElements[i];
+            const tier = i + 1;
+            if (tier === this.selectedTier) {
+                btn.classList.remove('btn-outline-info');
+                btn.classList.add('btn-info', 'active');
+            } else {
+                btn.classList.remove('btn-info', 'active');
+                btn.classList.add('btn-outline-info');
+            }
+        }
+    }
+
+    /**
+     * Toggle equip/unequip for the selected consumable at the selected tier
+     */
+    toggleEquipSelected() {
+        if (!this.selectedConsumable) return;
+        
+        if (this.isEquipped(this.selectedConsumable)) {
+            this.unequip(this.selectedConsumable);
+        } else {
+            this.equip(this.selectedConsumable, this.selectedTier);
+        }
+        this.renderQueue.details = true;
+        this.render();
+    }
+
+    // =========================================
+    // Charge Management (Tier-based)
+    // =========================================
+
+    /**
+     * Get charge count for a consumable at a specific tier
+     */
+    getCharges(consumable, tier) {
+        const tierMap = this.charges.get(consumable);
+        if (!tierMap) return 0;
+        return tierMap.get(tier) || 0;
+    }
+
+    /**
+     * Get total charges across all tiers for a consumable
+     */
+    getTotalCharges(consumable) {
+        const tierMap = this.charges.get(consumable);
+        if (!tierMap) return 0;
+        let total = 0;
+        for (const count of tierMap.values()) {
+            total += count;
+        }
+        return total;
+    }
+
+    /**
+     * Add charges to a consumable at a specific tier
+     */
+    addCharges(consumable, tier, amount) {
+        let tierMap = this.charges.get(consumable);
+        if (!tierMap) {
+            tierMap = new Map();
+            this.charges.set(consumable, tierMap);
+        }
+        
+        const current = tierMap.get(tier) || 0;
+        tierMap.set(tier, current + amount);
+        
+        consumable.renderQueue.updateAll();
+        
+        // Invalidate effect cache if this consumable is equipped at this tier
+        const equipped = this.getEquippedEntry(consumable);
+        if (equipped && equipped.tier === tier) {
+            this.invalidateAllHeroEffects();
+        }
+        
+        this.renderQueue.slots = true;
+        this.manager.overview.renderQueue.buffs = true;
+    }
+
+    /**
+     * Remove charges from a consumable at a specific tier
+     */
+    removeCharges(consumable, tier, amount) {
+        const tierMap = this.charges.get(consumable);
+        if (!tierMap) return;
+        
+        const current = tierMap.get(tier) || 0;
+        const newCharges = Math.max(current - amount, 0);
+        tierMap.set(tier, newCharges);
+        
+        consumable.renderQueue.updateAll();
+
+        // Auto-unequip if no charges left and this tier is equipped
+        const equipped = this.getEquippedEntry(consumable);
+        if (newCharges <= 0 && equipped && equipped.tier === tier) {
+            this.unequip(consumable);
+        } else if (equipped && equipped.tier === tier) {
+            this.invalidateAllHeroEffects();
+        }
+        
+        this.renderQueue.slots = true;
+    }
+
+    /**
+     * Invalidate effect cache for all heroes
      */
     invalidateAllHeroEffects() {
-        if(this.manager.party) {
+        if (this.manager.party) {
             this.manager.party.all.forEach(hero => {
-                if(hero.effectCache) {
+                if (hero.effectCache) {
                     hero.invalidateEffects('consumables');
                 }
             });
         }
     }
 
+    // =========================================
+    // Equipment Management
+    // =========================================
+
     /**
-     * Consume one charge from all active tavern drinks (called at dungeon end)
+     * Get the equipped entry for a consumable
+     * @returns {{ consumable, tier } | undefined}
      */
-    consumeTavernDrinkCharges() {
-        for(const consumable of this.manager.consumableTypes.allObjects) {
-            if(consumable.isTavernDrink && this.getCharges(consumable) > 0) {
-                this.removeCharges(consumable, 1);
-            }
-        }
+    getEquippedEntry(consumable) {
+        return this.equipped.find(e => e.consumable === consumable);
     }
 
     /**
-     * Get all active tavern drinks with their remaining charges
-     */
-    getActiveTavernDrinks() {
-        const active = [];
-        for(const consumable of this.manager.consumableTypes.allObjects) {
-            if(consumable.isTavernDrink) {
-                const charges = this.getCharges(consumable);
-                if(charges > 0) {
-                    active.push({ consumable, runsRemaining: charges });
-                }
-            }
-        }
-        return active;
-    }
-
-    /**
-     * Get all effects from active tavern drinks.
-     * Effects are pre-built in standardized format during consumable registration.
-     * These effects apply to the party (all heroes).
-     * @returns {StandardEffect[]} Array of standardized effects
-     */
-    getEffects() {
-        const effects = [];
-        
-        for(const consumable of this.manager.consumableTypes.allObjects) {
-            if(consumable.isTavernDrink && this.getCharges(consumable) > 0) {
-                effects.push(...consumable.effects);
-            }
-        }
-        
-        return effects;
-    }
-
-    /**
-     * Check if a consumable is equipped
+     * Check if a consumable is equipped (any tier)
      */
     isEquipped(consumable) {
-        return this.equipped.includes(consumable);
+        return this.getEquippedEntry(consumable) !== undefined;
     }
 
     /**
-     * Equip a consumable to a slot
+     * Get the equipped tier for a consumable (0 if not equipped)
      */
-    equip(consumable) {
-        if(this.equipped.length >= MAX_EQUIPPED_CONSUMABLES) {
+    getEquippedTier(consumable) {
+        const entry = this.getEquippedEntry(consumable);
+        return entry ? entry.tier : 0;
+    }
+
+    /**
+     * Equip a consumable at a specific tier
+     */
+    equip(consumable, tier) {
+        if (this.equipped.length >= MAX_EQUIPPED_CONSUMABLES) {
             this.manager.log.add(`Cannot equip more than ${MAX_EQUIPPED_CONSUMABLES} consumables.`);
             return false;
         }
-        if(this.isEquipped(consumable)) {
-            return false;
+        
+        // Check if already equipped
+        if (this.isEquipped(consumable)) {
+            // If equipped at a different tier, unequip first
+            const entry = this.getEquippedEntry(consumable);
+            if (entry.tier !== tier) {
+                this.unequip(consumable);
+            } else {
+                return false; // Already equipped at this tier
+            }
         }
-        if(this.getCharges(consumable) <= 0) {
-            this.manager.log.add(`${consumable.name} has no charges.`);
+        
+        // Check charges
+        if (this.getCharges(consumable, tier) <= 0) {
+            this.manager.log.add(`${consumable.getTierName(tier)} has no charges.`);
             return false;
         }
 
-        this.equipped.push(consumable);
+        this.equipped.push({ consumable, tier });
         consumable.renderQueue.equipped = true;
         this.renderQueue.slots = true;
         this.manager.overview.renderQueue.buffs = true;
-        this.manager.log.add(`Equipped ${consumable.name}`);
+        this.manager.log.add(`Equipped ${consumable.getTierName(tier)}`);
         
-        // Invalidate effect cache for all heroes
         this.invalidateAllHeroEffects();
         return true;
     }
@@ -274,105 +347,142 @@ export class AdventuringConsumables extends AdventuringPage {
      * Unequip a consumable
      */
     unequip(consumable) {
-        const index = this.equipped.indexOf(consumable);
-        if(index === -1) return false;
+        const index = this.equipped.findIndex(e => e.consumable === consumable);
+        if (index === -1) return false;
 
+        const entry = this.equipped[index];
         this.equipped.splice(index, 1);
         consumable.renderQueue.equipped = true;
         this.renderQueue.slots = true;
         this.manager.overview.renderQueue.buffs = true;
         
-        // Invalidate effect cache for all heroes
         this.invalidateAllHeroEffects();
         return true;
     }
 
+    // =========================================
+    // Effects
+    // =========================================
+
     /**
-     * Called when starting a new dungeon run
+     * Get all effects from equipped consumables with passive triggers.
+     * @returns {StandardEffect[]} Array of standardized effects
      */
-    onDungeonStart() {
-        this.usedThisRun.clear();
+    getEffects() {
+        const effects = [];
         
-        // Note: dungeon_start effects removed - strength elixirs now apply at encounter_start
+        for (const { consumable, tier } of this.equipped) {
+            if (this.getCharges(consumable, tier) > 0) {
+                const tierEffects = consumable.getTierEffects(tier);
+                const passiveEffects = tierEffects.filter(e => e.trigger === 'passive');
+                effects.push(...passiveEffects);
+            }
+        }
+        
+        return effects;
     }
 
     /**
-     * Called when a dungeon run ends
+     * Trigger consumable effects for a specific trigger type.
+     * @param {string} triggerType - The trigger type (e.g., 'on_hit', 'after_damage_dealt')
+     * @param {Object} context - Context object with character, target, party, manager
+     * @returns {Array<{consumable, tier, effect, amount, chance}>}
      */
+    trigger(triggerType, context = {}) {
+        const results = [];
+        
+        for (const { consumable, tier } of this.equipped) {
+            if (this.getCharges(consumable, tier) <= 0) continue;
+            
+            const tierEffects = consumable.getTierEffects(tier);
+            for (const effect of tierEffects) {
+                if (effect.trigger !== triggerType) continue;
+                
+                // Check condition if present
+                if (effect.condition) {
+                    if (!evaluateCondition(effect.condition, context)) continue;
+                }
+                
+                results.push({
+                    consumable: consumable,
+                    tier: tier,
+                    effect: effect,
+                    amount: effect.amount || 0,
+                    chance: effect.chance || 100
+                });
+            }
+        }
+        
+        return results;
+    }
+
+    // =========================================
+    // Dungeon Lifecycle
+    // =========================================
+
+    onDungeonStart() {
+        this.usedThisRun.clear();
+    }
+
     onDungeonEnd() {
-        // Get preservation chance from mastery pool
         const preserveChance = this.manager.modifiers.getConsumablePreservationChance();
 
         // Consume charges from equipped consumables that have consume_at_run_end effects
-        this.equipped.forEach(consumable => {
-            const hasRunEndConsumption = consumable.effects.some(e => e.consume_at_run_end);
-            if(hasRunEndConsumption) {
-                if(preserveChance > 0 && Math.random() < preserveChance) {
-                    // Preserved! Charge not consumed
-                    this.manager.log.add(`${consumable.name} preserved!`);
+        for (const { consumable, tier } of [...this.equipped]) {
+            const tierEffects = consumable.getTierEffects(tier);
+            const hasRunEndConsumption = tierEffects.some(e => e.consume_at_run_end);
+            
+            if (hasRunEndConsumption) {
+                if (preserveChance > 0 && Math.random() < preserveChance) {
+                    this.manager.log.add(`${consumable.getTierName(tier)} preserved!`);
                 } else {
                     consumable.useCharge();
                 }
             }
-        });
+        }
         
-        // Consume one charge from active tavern drinks
-        this.consumeTavernDrinkCharges();
-        
+        this.manager.tavern.consumeCharges();
         this.usedThisRun.clear();
     }
 
-    /**
-     * Called at the start of each floor
-     */
     onFloorStart() {
-        this.equipped.forEach(consumable => {
-            consumable.effects.forEach(effect => {
-                if(effect.trigger === 'floor_start') {
-                    // Check if this effect only triggers when someone is injured
-                    if(effect.only_if_injured) {
+        for (const { consumable, tier } of this.equipped) {
+            const tierEffects = consumable.getTierEffects(tier);
+            for (const effect of tierEffects) {
+                if (effect.trigger === 'floor_start') {
+                    if (effect.only_if_injured) {
                         const anyoneInjured = this.manager.party.all.some(m => !m.dead && m.hitpoints < m.stats.maxHitpoints);
-                        if(!anyoneInjured) return;
+                        if (!anyoneInjured) continue;
                     }
-                    this.applyEffect(consumable, effect);
+                    this.applyEffect(consumable, tier, effect);
                 }
-            });
-        });
+            }
+        }
     }
 
-    /**
-     * Called at the start of each encounter
-     */
     onEncounterStart() {
-        // Apply consumable effects as auras to party members
-        this.equipped.forEach(consumable => {
-            consumable.effects.forEach(effect => {
-                if(effect.trigger === 'encounter_start') {
-                    this.applyEffect(consumable, effect);
+        for (const { consumable, tier } of this.equipped) {
+            const tierEffects = consumable.getTierEffects(tier);
+            for (const effect of tierEffects) {
+                if (effect.trigger === 'encounter_start') {
+                    this.applyEffect(consumable, tier, effect);
                 }
-            });
-        });
+            }
+        }
     }
 
-    /**
-     * Called when a party member takes damage
-     * Returns true if a heal was triggered
-     */
     onCharacterDamaged(member) {
-        if(member.dead) return false;
+        if (member.dead) return false;
         
         const hpPercent = member.hitpoints / member.stats.maxHitpoints;
         
-        for(const consumable of this.equipped) {
-            for(const effect of consumable.effects) {
-                if(effect.trigger === 'on_damage' && effect.type === 'heal_on_low_hp') {
-                    // Check if below threshold
-                    if(hpPercent < effect.threshold) {
-                        // Heal the member
+        for (const { consumable, tier } of this.equipped) {
+            const tierEffects = consumable.getTierEffects(tier);
+            for (const effect of tierEffects) {
+                if (effect.trigger === 'on_damage' && effect.type === 'heal_on_low_hp') {
+                    if (hpPercent < effect.threshold / 100) {
                         member.heal({ amount: effect.healAmount });
-                        this.manager.log.add(`${consumable.name} healed ${member.name} for ${effect.healAmount} HP!`);
-                        
-                        // Use a charge
+                        this.manager.log.add(`${consumable.getTierName(tier)} healed ${member.name} for ${effect.healAmount} HP!`);
                         consumable.useCharge();
                         return true;
                     }
@@ -382,35 +492,27 @@ export class AdventuringConsumables extends AdventuringPage {
         return false;
     }
 
-    /**
-     * Called when all party members die (before game over)
-     * Returns true if party was revived
-     */
     onPartyWipe() {
-        // Check if all party members are dead
         const allDead = this.manager.party.all.every(member => member.dead);
-        if(!allDead) return false;
+        if (!allDead) return false;
         
-        for(const consumable of this.equipped) {
-            for(const effect of consumable.effects) {
-                if(effect.trigger === 'party_wipe' && effect.type === 'revive_all') {
-                    // Check once_per_run
-                    if(effect.once_per_run && this.usedThisRun.has(consumable.id)) {
+        for (const { consumable, tier } of this.equipped) {
+            const tierEffects = consumable.getTierEffects(tier);
+            for (const effect of tierEffects) {
+                if (effect.trigger === 'party_wipe' && effect.type === 'revive_all') {
+                    if (effect.once_per_run && this.usedThisRun.has(consumable.id)) {
                         continue;
                     }
                     
-                    // require_all_dead is now always enforced (checked above)
-                    
-                    // Revive all party members
                     const amount = effect.amount;
                     this.manager.party.all.forEach(member => {
-                        if(member.dead) {
+                        if (member.dead) {
                             member.revive({ amount });
                         }
                     });
 
                     this.usedThisRun.add(consumable.id);
-                    this.manager.log.add(`${consumable.name} revived the party!`);
+                    this.manager.log.add(`${consumable.getTierName(tier)} revived the party!`);
                     return true;
                 }
             }
@@ -418,43 +520,42 @@ export class AdventuringConsumables extends AdventuringPage {
         return false;
     }
 
-    /**
-     * Apply a consumable effect
-     * Note: All percent values in effect.amount are whole numbers (10 = 10%)
-     */
-    applyEffect(consumable, effect) {
-        switch(effect.type) {
+    applyEffect(consumable, tier, effect) {
+        const tierName = consumable.getTierName(tier);
+        
+        switch (effect.type) {
             case 'heal_percent':
                 this.manager.party.all.forEach(member => {
-                    if(!member.dead) {
+                    if (!member.dead) {
                         const healAmount = Math.floor(member.stats.maxHitpoints * effect.amount / 100);
                         member.heal({ amount: healAmount });
                     }
                 });
                 break;
             case 'buff_damage':
-                // Apply damage buff as aura to all party members
                 this.manager.party.alive.forEach(member => {
                     member.buff('adventuring:consumable_damage', { amount: effect.amount }, member);
                 });
-                this.manager.log.add(`${consumable.name} grants +${effect.amount}% damage to the party!`);
+                this.manager.log.add(`${tierName} grants +${effect.amount}% damage to the party!`);
                 break;
             case 'buff_defense':
-                // Apply defense buff as fortify aura
                 this.manager.party.alive.forEach(member => {
                     member.buff('adventuring:fortify', { amount: effect.amount }, member);
                 });
-                this.manager.log.add(`${consumable.name} grants +${effect.amount}% damage reduction to the party!`);
+                this.manager.log.add(`${tierName} grants +${effect.amount}% damage reduction to the party!`);
                 break;
             case 'buff_speed':
-                // Apply speed buff as haste aura
                 this.manager.party.alive.forEach(member => {
                     member.buff('adventuring:haste', { amount: effect.amount }, member);
                 });
-                this.manager.log.add(`${consumable.name} grants +${effect.amount}% speed to the party!`);
+                this.manager.log.add(`${tierName} grants +${effect.amount}% speed to the party!`);
                 break;
         }
     }
+
+    // =========================================
+    // Rendering
+    // =========================================
 
     render() {
         this.consumables.forEach(c => c.render());
@@ -463,15 +564,15 @@ export class AdventuringConsumables extends AdventuringPage {
     }
 
     renderSlots() {
-        if(!this.renderQueue.slots) return;
+        if (!this.renderQueue.slots) return;
 
-        for(let i = 0; i < MAX_EQUIPPED_CONSUMABLES; i++) {
+        for (let i = 0; i < MAX_EQUIPPED_CONSUMABLES; i++) {
             const slot = this.component.slots[i];
-            const consumable = this.equipped[i];
+            const entry = this.equipped[i];
             
-            if(slot) {
-                if(consumable) {
-                    slot.querySelector('img').src = consumable.media;
+            if (slot) {
+                if (entry) {
+                    slot.querySelector('img').src = entry.consumable.getTierMedia(entry.tier);
                     slot.querySelector('img').classList.remove('invisible');
                     slot.classList.add('pointer-enabled');
                 } else {
@@ -485,87 +586,54 @@ export class AdventuringConsumables extends AdventuringPage {
     }
 
     renderDetails() {
-        if(!this.renderQueue.details) return;
+        if (!this.renderQueue.details) return;
         
         const consumable = this.selectedConsumable;
-        if(!consumable) {
+        const tier = this.selectedTier;
+        
+        if (!consumable) {
             this.component.hideDetails();
             this.renderQueue.details = false;
             return;
         }
         
         this.component.showDetails();
+        this.updateTierButtonStates();
         
-        // Basic info
-        this.component.detailIcon.src = consumable.media;
-        this.component.detailName.textContent = consumable.name;
-        this.component.detailDescription.textContent = consumable.description || '';
+        // Basic info for selected tier
+        this.component.detailIcon.src = consumable.getTierMedia(tier);
+        this.component.detailName.textContent = consumable.getTierName(tier);
+        this.component.detailDescription.textContent = consumable.getTierDescription(tier);
         
         // Effects
         this.component.detailEffects.innerHTML = '';
-        const effectText = consumable.effectText;
-        if(effectText) {
+        const effectText = consumable.getTierEffectText(tier);
+        if (effectText) {
             const effectDiv = document.createElement('div');
             effectDiv.className = 'text-success';
             effectDiv.textContent = effectText;
             this.component.detailEffects.appendChild(effectDiv);
         }
         
-        // Charges
-        this.component.detailCharges.textContent = `${consumable.charges} / ${consumable.maxCharges}`;
-        
-        // Crafting materials
-        this.materialComponents.forEach(comp => comp.remove());
-        
-        let componentCount = 0;
-        if(consumable.materials && consumable.materials.size > 0) {
-            for(const [material, qty] of consumable.materials) {
-                let comp = this.materialComponents[componentCount];
-                if(comp === undefined) {
-                    comp = createElement('adventuring-material');
-                    this.materialComponents[componentCount] = comp;
-                }
-                
-                comp.mount(this.component.detailMaterials);
-                
-                // Color based on affordability
-                const owned = this.manager.stash.materialCounts.get(material) || 0;
-                comp.setTooltipContent(TooltipBuilder.forMaterial(material, this.manager).build());
-                comp.icon.src = material.media;
-                comp.count.textContent = qty;
-                
-                if(owned >= qty) {
-                    comp.border.classList.remove('border-danger');
-                    comp.border.classList.add('border-success');
-                } else {
-                    comp.border.classList.remove('border-success');
-                    comp.border.classList.add('border-danger');
-                }
-                
-                componentCount++;
-            }
-        }
-        
-        // Craft button
-        const canCraft = consumable.charges < consumable.maxCharges && 
-                         consumable.materials && 
-                         consumable.materials.size > 0 &&
-                         [...consumable.materials].every(([mat, qty]) => 
-                             (this.manager.stash.materialCounts.get(mat) || 0) >= qty);
-        
-        this.component.craftButton.disabled = !canCraft;
-        this.component.craftButton.className = canCraft ? 'btn btn-primary mr-2' : 'btn btn-secondary mr-2';
+        // Charges for this tier
+        this.component.detailCharges.textContent = `${this.getCharges(consumable, tier)}`;
         
         // Equip button
-        if(this.isEquipped(consumable)) {
+        const equippedTier = this.getEquippedTier(consumable);
+        if (equippedTier === tier) {
             this.component.equipButton.textContent = 'Unequip';
             this.component.equipButton.className = 'btn btn-warning';
             this.component.equipButton.disabled = false;
-        } else if(consumable.charges <= 0) {
+        } else if (equippedTier > 0) {
+            // Equipped at different tier
+            this.component.equipButton.textContent = `Switch to Tier ${tier}`;
+            this.component.equipButton.className = 'btn btn-info';
+            this.component.equipButton.disabled = this.getCharges(consumable, tier) <= 0;
+        } else if (this.getCharges(consumable, tier) <= 0) {
             this.component.equipButton.textContent = 'Equip';
             this.component.equipButton.className = 'btn btn-secondary';
             this.component.equipButton.disabled = true;
-        } else if(this.equipped.length >= MAX_EQUIPPED_CONSUMABLES) {
+        } else if (this.equipped.length >= MAX_EQUIPPED_CONSUMABLES) {
             this.component.equipButton.textContent = 'Slots Full';
             this.component.equipButton.className = 'btn btn-secondary';
             this.component.equipButton.disabled = true;
@@ -578,40 +646,72 @@ export class AdventuringConsumables extends AdventuringPage {
         this.renderQueue.details = false;
     }
 
+    // =========================================
+    // Save/Load
+    // =========================================
+
     reset() {
         this.charges.clear();
         this.equipped = [];
         this.usedThisRun.clear();
         this.selectedConsumable = undefined;
+        this.selectedTier = 1;
         this.consumables.forEach(c => c.renderQueue.updateAll());
         this.renderQueue.updateAll();
     }
 
     encode(writer) {
-        // Encode all consumable charges (includes tavern drinks)
-        writer.writeComplexMap(this.charges, (key, value, writer) => {
-            writer.writeNamespacedObject(key);
-            writer.writeUint16(value);
-        });
-        // Encode equipped consumables
-        writer.writeArray(this.equipped, (consumable, writer) => {
+        // Encode charges: Map<Consumable, Map<tier, count>>
+        writer.writeUint16(this.charges.size);
+        for (const [consumable, tierMap] of this.charges) {
             writer.writeNamespacedObject(consumable);
+            writer.writeUint8(tierMap.size);
+            for (const [tier, count] of tierMap) {
+                writer.writeUint8(tier);
+                writer.writeUint16(count);
+            }
+        }
+        
+        // Encode equipped: Array of { consumable, tier }
+        writer.writeArray(this.equipped, (entry, writer) => {
+            writer.writeNamespacedObject(entry.consumable);
+            writer.writeUint8(entry.tier);
         });
+        
         return writer;
     }
 
     decode(reader, version) {
-        // Decode charges (includes tavern drinks)
-        reader.getComplexMap((reader) => {
-            const key = reader.getNamespacedObject(this.manager.consumableTypes);
-            const value = reader.getUint16();
-            if(typeof key !== "string")
-                this.charges.set(key, value);
-        });
-        // Decode equipped - use getArray to match writeArray
+        // Decode charges
+        this.charges.clear();
+        const numConsumables = reader.getUint16();
+        for (let i = 0; i < numConsumables; i++) {
+            const consumable = reader.getNamespacedObject(this.manager.consumableTypes);
+            const numTiers = reader.getUint8();
+            
+            if (typeof consumable !== "string" && consumable) {
+                const tierMap = new Map();
+                for (let j = 0; j < numTiers; j++) {
+                    const tier = reader.getUint8();
+                    const count = reader.getUint16();
+                    tierMap.set(tier, count);
+                }
+                this.charges.set(consumable, tierMap);
+            } else {
+                // Skip invalid consumable's tier data
+                for (let j = 0; j < numTiers; j++) {
+                    reader.getUint8();
+                    reader.getUint16();
+                }
+            }
+        }
+        
+        // Decode equipped
         this.equipped = reader.getArray((reader) => {
-            return reader.getNamespacedObject(this.manager.consumableTypes);
-        }).filter(c => typeof c !== "string" && this.getCharges(c) > 0);
+            const consumable = reader.getNamespacedObject(this.manager.consumableTypes);
+            const tier = reader.getUint8();
+            return { consumable, tier };
+        }).filter(e => typeof e.consumable !== "string" && e.consumable && this.getCharges(e.consumable, e.tier) > 0);
     }
 }
 

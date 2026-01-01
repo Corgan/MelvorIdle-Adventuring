@@ -19,6 +19,7 @@ export class AdventuringWorkOrder {
         this.renderQueue = new AdventuringWorkOrderRenderQueue();
 
         this.product = undefined;
+        this.tier = 1; // Track selected tier for tiered products
         this.count = 0;
         this.completed = 0;
         this.active = false;
@@ -30,6 +31,7 @@ export class AdventuringWorkOrder {
         if(order.active) {
             this.active = true;
             this.product = order.product;
+            this.tier = order.tier;
             this.completed = order.completed;
             this.count = order.count;
             this.renderQueue.update = true;
@@ -38,7 +40,7 @@ export class AdventuringWorkOrder {
     }
 
     progress() {
-        let { output, outputType, count } = this.product.create();
+        let { output, outputType, count } = this.product.create(this.tier);
         this.workshop.store(output, count, outputType);
 
         this.completed += 1;
@@ -47,8 +49,9 @@ export class AdventuringWorkOrder {
             this.clear();
     }
 
-    submit(product, count) {
+    submit(product, count, tier = 1) {
         this.product = product;
+        this.tier = tier;
         this.count = count;
         this.completed = 0;
         this.active = true;
@@ -60,6 +63,7 @@ export class AdventuringWorkOrder {
     clear() {
         this.active = false;
         this.product = undefined;
+        this.tier = 1;
         this.completed = 0;
         this.count = 0;
         this.renderQueue.update = true;
@@ -74,15 +78,15 @@ export class AdventuringWorkOrder {
         if(!this.product) return '';
         
         const canWork = this.manager.party.all.filter(member => 
-            this.product.canMake(member)
+            this.product.canMake(member, this.tier)
         );
         
         if(canWork.length === 0) {
-            return '<span class="text-warning">⚠ No party member can craft this</span>';
+            return '<span class="text-warning"><i class="fas fa-exclamation-triangle mr-1"></i>No party member can craft this</span>';
         }
         
         const names = canWork.map(m => m.name).join(', ');
-        return `<span class="text-success">✓ Can be crafted by: ${names}</span>`;
+        return `<span class="text-success"><i class="fas fa-check mr-1"></i>Can be crafted by: ${names}</span>`;
     }
 
     render() {
@@ -92,8 +96,14 @@ export class AdventuringWorkOrder {
         this.component.active.classList.toggle('d-none', !this.active)
         this.component.inactive.classList.toggle('d-none', this.active)
         if(this.active) {
-            this.component.icon.src = this.product.media;
-            this.component.nameText.textContent = this.product.name;
+            // Use tier-aware methods for consumables
+            if (this.product.outputType === 'consumable' && this.product.hasTiers) {
+                this.component.icon.src = this.product.getMedia(this.tier);
+                this.component.nameText.textContent = this.product.getName(this.tier);
+            } else {
+                this.component.icon.src = this.product.media;
+                this.component.nameText.textContent = this.product.name;
+            }
             this.component.progressText.textContent = `${this.completed} / ${this.count} completed`;
             
             // Update progress bar
@@ -111,6 +121,7 @@ export class AdventuringWorkOrder {
         writer.writeBoolean(this.active);
         if(this.active) {
             writer.writeNamespacedObject(this.product);
+            writer.writeUint32(this.tier);
             writer.writeUint32(this.count);
             writer.writeUint32(this.completed);
         }
@@ -120,6 +131,7 @@ export class AdventuringWorkOrder {
         this.active = reader.getBoolean();
         if(this.active) {
             this.product = reader.getNamespacedObject(this.manager.products);
+            this.tier = reader.getUint32();
             this.count = reader.getUint32();
             this.completed = reader.getUint32();
         }

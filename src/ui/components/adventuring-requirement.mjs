@@ -26,8 +26,8 @@ export class AdventuringRequirementElement extends HTMLElement {
      */
     setRequirement({ text, met, showIcon = true }) {
         if (showIcon) {
-            this.status.textContent = met ? '✓' : '✗';
-            this.status.className = `mr-1 ${met ? 'text-success' : 'text-danger'}`;
+            this.status.textContent = '';
+            this.status.className = `mr-1 ${met ? 'fas fa-check text-success' : 'fas fa-times text-danger'}`;
         } else {
             this.status.textContent = '';
             this.status.className = '';

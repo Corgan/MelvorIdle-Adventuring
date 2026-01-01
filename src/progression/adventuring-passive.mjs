@@ -55,19 +55,19 @@ export class AdventuringPassive extends NamespacedObject {
             return desc;
         }
         
-        // Auto-generate from effects
+        // Auto-generate from effects - use 'multiplier' mode for job overview display
         const effectDescs = this.effects.map(effect => {
             const effectObj = {
                 type: effect.type,
                 trigger: effect.trigger || 'passive',
-                value: effect.getAmount ? effect.getAmount(character?.stats, true) : (effect.amount?.base || effect.amount || 0),
-                stacks: effect.getStacks ? effect.getStacks(character?.stats, true) : (effect.stacks?.base || effect.stacks || 0),
+                value: effect.getAmount ? effect.getAmount(character?.stats, 'multiplier') : (effect.amount?.base || effect.amount || 0),
+                stacks: effect.getStacks ? effect.getStacks(character?.stats, 'multiplier') : (effect.stacks?.base || effect.stacks || 0),
                 id: effect.id,
                 target: effect.target,
                 condition: effect.condition,
                 chance: effect.chance
             };
-            return describeEffectFull(effectObj, this.manager);
+            return describeEffectFull(effectObj, this.manager, { displayMode: 'multiplier' });
         });
         
         let generated = effectDescs.join('. ');
@@ -123,47 +123,37 @@ export class AdventuringPassive extends NamespacedObject {
         const target = effect.target;
         const party = effect.party; // 'ally' or 'enemy'
 
-        // Determine which party to use based on explicit party or target suffix
+        // Determine which party to use based on explicit party field
         let targetPool;
         if(party === 'ally') {
             targetPool = allies;
         } else if(party === 'enemy') {
-            targetPool = enemies;
-        } else if(target?.endsWith('_ally')) {
-            targetPool = allies;
-        } else if(target?.endsWith('_enemy')) {
             targetPool = enemies;
         } else {
             // Default: buffs go to allies, debuffs go to enemies, self is self
             targetPool = allies;
         }
 
-        // Extract the base target type (remove _ally/_enemy suffix)
-        const baseTarget = target?.replace(/_ally$|_enemy$/, '') || 'self';
-
-        switch(baseTarget) {
+        switch(target) {
             case "self":
             case undefined:
                 return [character];
             case "all":
-            case "all_allies":
-            case "all_enemies":
-            case "aoe_ally":
-            case "aoe_enemy":
-            case "aoe":
                 return targetPool;
             case "front":
-            case "front_ally":
-            case "front_enemy":
                 return targetPool.length > 0 ? [targetPool[0]] : [];
+            case "back":
+                return targetPool.length > 0 ? [targetPool[targetPool.length - 1]] : [];
             case "lowest":
-            case "lowest_ally":
-            case "lowest_enemy":
                 return targetPool.length > 0 ? [targetPool.reduce((lowest, c) => c.hitpoints < lowest.hitpoints ? c : lowest)] : [];
             case "random":
-            case "random_ally":
-            case "random_enemy":
                 return targetPool.length > 0 ? [targetPool[Math.floor(Math.random() * targetPool.length)]] : [];
+            case "dead":
+                const deadPool = party === 'ally' ? encounter.manager.party.all.filter(c => c.dead) : encounter.party.all.filter(c => c.dead);
+                return deadPool;
+            case "attacker":
+                // For reactive effects, target the attacker (handled by context)
+                return [character];
             default:
                 return [character];
         }

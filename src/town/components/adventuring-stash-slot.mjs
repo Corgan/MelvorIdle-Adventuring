@@ -1,30 +1,21 @@
-export class AdventuringStashSlotElement extends HTMLElement {
+const { loadModule } = mod.getContext(import.meta);
+
+const { AdventuringTooltipElement } = await loadModule('src/core/adventuring-tooltip-element.mjs');
+
+export class AdventuringStashSlotElement extends AdventuringTooltipElement {
     constructor() {
         super();
         this._content = new DocumentFragment();
         this._content.append(getTemplateNode('adventuring-stash-slot-template'));
         
         this.icon = getElementFromFragment(this._content, 'icon', 'img');
-    }
-
-    mount(parent) {
-        parent.append(this);
+        
+        this._tooltipTarget = this.icon;
     }
 
     connectedCallback() {
         this.appendChild(this._content);
-        this.tooltip = tippy(this.icon, {
-            content: '',
-            allowHTML: true,
-            hideOnClick: false
-        });
-    }
-
-    disconnectedCallback() {
-        if (this.tooltip !== undefined) {
-            this.tooltip.destroy();
-            this.tooltip = undefined;
-        }
+        super.connectedCallback();
     }
 }
 window.customElements.define('adventuring-stash-slot', AdventuringStashSlotElement);

@@ -19,16 +19,26 @@ export class AdventuringStats extends Map {
         this.renderQueue = new AdventuringStatsRenderQueue();
     }
 
-    get(stat) {
+    get(statID) {
+        let stat = statID;
         if(typeof stat === "string")
-            stat = this.manager.stats.getObjectByID(stat);
+            stat = this.manager.stats.getObjectByID(statID);
+        if(stat === undefined) {
+            console.warn('AdventuringStats.get: Unknown stat', statID);
+            return 0;
+        }
         let value = super.get(stat);
         return value !== undefined ? value : 0;
     }
 
-    set(stat, value) {
-        if(typeof stat === "string")
-            stat = this.manager.stats.getObjectByID(stat);
+    set(statID, value) {
+        let stat = statID;
+        if(typeof statID === "string")
+            stat = this.manager.stats.getObjectByID(statID);
+        if(stat === undefined) {
+            console.warn('AdventuringStats.set: Unknown stat', statID);
+            return;
+        }
         super.set(stat, value);
     }
 

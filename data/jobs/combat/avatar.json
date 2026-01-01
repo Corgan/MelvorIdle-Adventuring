@@ -13,263 +13,218 @@
                             "name": "Avatar",
                             "media": "melvor:assets/media/skills/combat/combat.svg#tint=rainbow",
                             "scaling": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "value": 1.4
-                                },
-                                {
-                                    "id": "adventuring:defence",
-                                    "value": 1.2
-                                },
-                                {
-                                    "id": "adventuring:agility",
-                                    "value": 0.8
-                                },
-                                {
-                                    "id": "adventuring:strength",
-                                    "value": 1.0
-                                },
-                                {
-                                    "id": "adventuring:ranged",
-                                    "value": 0.8
-                                },
-                                {
-                                    "id": "adventuring:magic",
-                                    "value": 1.0
-                                },
-                                {
-                                    "id": "adventuring:prayer",
-                                    "value": 0.8
-                                }
+                                { "id": "adventuring:hitpoints", "value": 1.4 },
+                                { "id": "adventuring:defence", "value": 1.2 },
+                                { "id": "adventuring:agility", "value": 0.8 },
+                                { "id": "adventuring:strength", "value": 1.0 },
+                                { "id": "adventuring:ranged", "value": 0.8 },
+                                { "id": "adventuring:magic", "value": 1.0 },
+                                { "id": "adventuring:prayer", "value": 0.8 }
                             ],
                             "maxLevel": 30,
                             "requirements": [
-                                {
-                                    "type": "job_level",
-                                    "job": "adventuring:spellblade",
-                                    "level": 18
-                                },
-                                {
-                                    "type": "job_level",
-                                    "job": "adventuring:warden",
-                                    "level": 18
-                                },
-                                {
-                                    "type": "job_level",
-                                    "job": "adventuring:shaman",
-                                    "level": 15
-                                }
+                                { "type": "job_level", "job": "adventuring:spellblade", "level": 18 },
+                                { "type": "job_level", "job": "adventuring:warden", "level": 18 },
+                                { "type": "job_level", "job": "adventuring:shaman", "level": 15 }
+                            ]
+                        }
+                    ],
+                    "generators": [
+                        {
+                            "id": "avatars_wrath",
+                            "name": "Avatar's Wrath",
+                            "requirements": [
+                                { "type": "current_job_level", "job": "adventuring:avatar", "level": 1 }
                             ],
-                            "abilities": {
-                                "generator": [
-                                    {
-                                        "id": "avatars_wrath",
-                                        "name": "Avatar's Wrath",
-                                        "media": "melvor:assets/media/skills/combat/combat.svg#tint=rainbow",
-                                        "type": "attack",
-                                        "turns": 1,
-                                        "level": 1,
-                                        "target": {
-                                            "type": "enemy",
-                                            "count": 2
-                                        },
-                                        "damage": {
-                                            "type": "multi_stat",
-                                            "stats": [
-                                                "adventuring:strength",
-                                                "adventuring:magic"
-                                            ],
-                                            "scaling": 70
-                                        },
-                                        "effects": [
-                                            {
-                                                "type": "buff",
-                                                "id": "adventuring:might",
-                                                "target": "self",
-                                                "stacks": 3
-                                            },
-                                            {
-                                                "type": "buff",
-                                                "id": "adventuring:focus",
-                                                "target": "self",
-                                                "stacks": 2
+                            "energy": 8,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 15,
+                                                "scaling": [
+                                                    { "id": "adventuring:strength", "value": 0.35 },
+                                                    { "id": "adventuring:magic", "value": 0.35 }
+                                                ]
                                             }
-                                        ],
-                                        "resource": 8
-                                    },
-                                    {
-                                        "id": "divine_aegis",
-                                        "name": "Divine Aegis",
-                                        "media": "melvor:assets/media/skills/combat/defence.svg",
-                                        "type": "utility",
-                                        "turns": 1,
-                                        "level": 5,
-                                        "target": {
-                                            "type": "ally",
-                                            "count": "all"
-                                        },
-                                        "effects": [
-                                            {
-                                                "type": "buff",
-                                                "id": "adventuring:barrier",
-                                                "target": "target",
-                                                "stacks": 5
-                                            },
-                                            {
-                                                "type": "buff",
-                                                "id": "adventuring:fortify",
-                                                "target": "target",
-                                                "stacks": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "target": "random",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 15,
+                                                "scaling": [
+                                                    { "id": "adventuring:strength", "value": 0.35 },
+                                                    { "id": "adventuring:magic", "value": 0.35 }
+                                                ]
                                             }
-                                        ],
-                                        "resource": 7
-                                    },
-                                    {
-                                        "id": "spirit_call",
-                                        "name": "Spirit Call",
-                                        "media": "melvor:assets/media/skills/prayer/prayer.svg",
-                                        "type": "attack",
-                                        "turns": 1,
-                                        "level": 10,
-                                        "target": {
-                                            "type": "enemy",
-                                            "count": "all"
-                                        },
-                                        "damage": {
-                                            "type": "stat",
-                                            "stat": "adventuring:prayer",
-                                            "scaling": 85
-                                        },
-                                        "effects": [
-                                            {
-                                                "type": "debuff",
-                                                "id": "adventuring:weaken",
-                                                "target": "target",
-                                                "stacks": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "target": "self",
+                                    "party": "ally",
+                                    "effects": [
+                                        { "type": "buff", "id": "adventuring:might", "stacks": { "base": 3 } },
+                                        { "type": "buff", "id": "adventuring:focus", "stacks": { "base": 2 } }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "divine_aegis",
+                            "name": "Divine Aegis",
+                            "requirements": [
+                                { "type": "current_job_level", "job": "adventuring:avatar", "level": 5 }
+                            ],
+                            "energy": 7,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "ally",
+                                    "effects": [
+                                        { "type": "buff", "id": "adventuring:barrier", "stacks": { "base": 5 } },
+                                        { "type": "buff", "id": "adventuring:fortify", "stacks": { "base": 3 } }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "spirit_call",
+                            "name": "Spirit Call",
+                            "requirements": [
+                                { "type": "current_job_level", "job": "adventuring:avatar", "level": 10 }
+                            ],
+                            "energy": 6,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 12,
+                                                "scaling": [
+                                                    { "id": "adventuring:prayer", "value": 0.85 }
+                                                ]
                                             }
-                                        ],
-                                        "resource": 6
-                                    }
-                                ],
-                                "spender": [
-                                    {
-                                        "id": "primal_tempest",
-                                        "name": "Primal Tempest",
-                                        "media": "melvor:assets/media/skills/magic/magic.svg",
-                                        "type": "attack",
-                                        "turns": 1,
-                                        "level": 3,
-                                        "cost": 20,
-                                        "target": {
-                                            "type": "enemy",
-                                            "count": "all"
                                         },
-                                        "damage": {
-                                            "type": "multi_stat",
-                                            "stats": [
-                                                "adventuring:magic",
-                                                "adventuring:prayer"
-                                            ],
-                                            "scaling": 85
-                                        },
-                                        "effects": [
-                                            {
-                                                "type": "debuff",
-                                                "id": "adventuring:chill",
-                                                "target": "target",
-                                                "stacks": 4
-                                            },
-                                            {
-                                                "type": "debuff",
-                                                "id": "adventuring:burn",
-                                                "target": "target",
-                                                "stacks": 4
+                                        { "type": "debuff", "id": "adventuring:weaken", "stacks": { "base": 3 } }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "spenders": [
+                        {
+                            "id": "primal_tempest",
+                            "name": "Primal Tempest",
+                            "requirements": [
+                                { "type": "current_job_level", "job": "adventuring:avatar", "level": 3 }
+                            ],
+                            "cost": 20,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 20,
+                                                "scaling": [
+                                                    { "id": "adventuring:magic", "value": 0.42 },
+                                                    { "id": "adventuring:prayer", "value": 0.42 }
+                                                ]
                                             }
-                                        ]
-                                    },
-                                    {
-                                        "id": "avatars_blessing",
-                                        "name": "Avatar's Blessing",
-                                        "media": "melvor:assets/media/skills/prayer/prayer.svg",
-                                        "type": "utility",
-                                        "turns": 1,
-                                        "level": 12,
-                                        "cost": 25,
-                                        "target": {
-                                            "type": "ally",
-                                            "count": "all"
                                         },
-                                        "effects": [
-                                            {
-                                                "type": "heal",
-                                                "target": "target",
-                                                "amount": 45,
-                                                "scaling": 4.5
-                                            },
-                                            {
-                                                "type": "buff",
-                                                "id": "adventuring:might",
-                                                "target": "target",
-                                                "stacks": 6
-                                            },
-                                            {
-                                                "type": "buff",
-                                                "id": "adventuring:barrier",
-                                                "target": "target",
-                                                "stacks": 8
+                                        { "type": "debuff", "id": "adventuring:chill", "stacks": { "base": 4 } },
+                                        { "type": "debuff", "id": "adventuring:burn", "stacks": { "base": 4 } }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "avatars_blessing",
+                            "name": "Avatar's Blessing",
+                            "requirements": [
+                                { "type": "current_job_level", "job": "adventuring:avatar", "level": 12 }
+                            ],
+                            "cost": 25,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "ally",
+                                    "effects": [
+                                        {
+                                            "type": "heal",
+                                            "amount": {
+                                                "base": 45,
+                                                "scaling": [
+                                                    { "id": "adventuring:prayer", "value": 0.45 }
+                                                ]
                                             }
-                                        ]
-                                    },
-                                    {
-                                        "id": "transcendence",
-                                        "name": "Transcendence",
-                                        "media": "melvor:assets/media/skills/combat/combat.svg#tint=rainbow",
-                                        "type": "attack",
-                                        "turns": 2,
-                                        "level": 25,
-                                        "cost": 50,
-                                        "target": {
-                                            "type": "enemy",
-                                            "count": "all"
                                         },
-                                        "damage": {
-                                            "type": "multi_stat",
-                                            "stats": [
-                                                "adventuring:strength",
-                                                "adventuring:magic",
-                                                "adventuring:prayer"
-                                            ],
-                                            "scaling": 100
-                                        },
-                                        "effects": [
-                                            {
-                                                "type": "heal",
-                                                "target": "all_allies",
-                                                "amount": 60,
-                                                "scaling": 6.0
-                                            },
-                                            {
-                                                "type": "buff",
-                                                "id": "adventuring:might",
-                                                "target": "all_allies",
-                                                "stacks": 12
-                                            },
-                                            {
-                                                "type": "buff",
-                                                "id": "adventuring:barrier",
-                                                "target": "all_allies",
-                                                "stacks": 20
-                                            },
-                                            {
-                                                "type": "debuff",
-                                                "id": "adventuring:shred",
-                                                "target": "target",
-                                                "stacks": 15
+                                        { "type": "buff", "id": "adventuring:might", "stacks": { "base": 6 } },
+                                        { "type": "buff", "id": "adventuring:barrier", "stacks": { "base": 8 } }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "transcendence",
+                            "name": "Transcendence",
+                            "requirements": [
+                                { "type": "current_job_level", "job": "adventuring:avatar", "level": 25 }
+                            ],
+                            "cost": 50,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 30,
+                                                "scaling": [
+                                                    { "id": "adventuring:strength", "value": 0.33 },
+                                                    { "id": "adventuring:magic", "value": 0.33 },
+                                                    { "id": "adventuring:prayer", "value": 0.33 }
+                                                ]
                                             }
-                                        ]
-                                    }
-                                ]
-                            }
+                                        },
+                                        { "type": "debuff", "id": "adventuring:shred", "stacks": { "base": 15 } }
+                                    ]
+                                },
+                                {
+                                    "target": "all",
+                                    "party": "ally",
+                                    "effects": [
+                                        {
+                                            "type": "heal",
+                                            "amount": {
+                                                "base": 60,
+                                                "scaling": [
+                                                    { "id": "adventuring:prayer", "value": 0.6 }
+                                                ]
+                                            }
+                                        },
+                                        { "type": "buff", "id": "adventuring:might", "stacks": { "base": 12 } },
+                                        { "type": "buff", "id": "adventuring:barrier", "stacks": { "base": 20 } }
+                                    ]
+                                }
+                            ]
                         }
                     ]
                 }

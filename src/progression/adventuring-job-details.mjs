@@ -125,7 +125,7 @@ export class AdventuringJobDetails extends AdventuringPage {
         
         const row = new AdventuringAbilityRowElement();
         row.setAbility({
-            name: isUnlocked ? ability.name : '???',
+            name: ability.name,
             isUnlocked,
             type,
             unlockLevel,

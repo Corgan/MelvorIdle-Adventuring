@@ -74,9 +74,6 @@ export async function setup({ gameData, patch, loadTemplates, loadModule, loadSt
     await load('data/jobs/passive/archaeologist.json');
     await load('data/jobs/passive/cartographer.json');
 
-    // Passive job tiers (Master, Grandmaster, Legendary)
-    await load('data/jobs/passive/master_tiers.json');
-
     // Tier 2 combat jobs
     await load('data/jobs/combat/berserker.json');
     await load('data/jobs/combat/knight.json');
@@ -228,9 +225,8 @@ export async function setup({ gameData, patch, loadTemplates, loadModule, loadSt
     // Gauntlet areas
     await load('data/gauntlet.json');
 
-    // Consumables (includes tavern drinks)
-    await load('data/consumables.json');
-    await load('data/tavern.json');
+    // Tavern drinks (passive run-length effects)
+    await load('data/tavern-drinks.json');
 
     // Slayer task types
     await load('data/slayer-tasks.json');

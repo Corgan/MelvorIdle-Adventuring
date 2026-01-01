@@ -2,183 +2,223 @@
     "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
     "namespace": "adventuring",
     "data": {
-        "skillData": [{
-            "skillID": "adventuring:Adventuring",
-            "data": {
-                "jobs": [
-                    {
-                        "id": "shadowdancer",
-                        "tier": 5,
-                        "name": "Shadowdancer",
-                        "media": "melvor:assets/media/skills/thieving/thieving.png",
-                        "scaling": [
-                            { "id": "adventuring:hitpoints", "value": 1.0 },
-                            { "id": "adventuring:defence", "value": 0.5 },
-                            { "id": "adventuring:agility", "value": 2.0 },
-                            { "id": "adventuring:strength", "value": 0.8 },
-                            { "id": "adventuring:ranged", "value": 1.2 },
-                            { "id": "adventuring:magic", "value": 1.0 },
-                            { "id": "adventuring:prayer", "value": 0.3 }
-                        ],
-                        "maxLevel": 20,
-                        "requirements": [
-                            { "type": "job_level", "job": "adventuring:thief", "level": 12 },
-                            { "type": "job_level", "job": "adventuring:wizard", "level": 8 }
-                        ],
-                        "abilities": {
-                            "generator": [
-                                {
-                                    "id": "shadow_strike",
-                                    "name": "Shadow Strike",
-                                    "media": "melvor:assets/media/skills/thieving/thieving.png",
-                                    "type": "attack",
-                                    "turns": 1,
-                                    "level": 1,
-                                    "target": { "type": "enemy", "count": 1 },
-                                    "damage": {
-                                        "type": "stat",
-                                        "stat": "adventuring:agility",
-                                        "scaling": 95
-                                    },
-                                    "effects": [
-                                        {
-                                            "type": "buff",
-                                            "id": "adventuring:haste",
-                                            "target": "self",
-                                            "stacks": 2
-                                        }
-                                    ],
-                                    "resource": 6
-                                },
-                                {
-                                    "id": "phantom_blade",
-                                    "name": "Phantom Blade",
-                                    "media": "melvor:assets/media/skills/combat/attack.png",
-                                    "type": "attack",
-                                    "turns": 1,
-                                    "level": 5,
-                                    "target": { "type": "enemy", "count": 1 },
-                                    "damage": {
-                                        "type": "multi_stat",
-                                        "stats": ["adventuring:agility", "adventuring:magic"],
-                                        "scaling": 55
-                                    },
-                                    "effects": [
-                                        {
-                                            "type": "debuff",
-                                            "id": "adventuring:blind",
-                                            "target": "target",
-                                            "stacks": 2
-                                        }
-                                    ],
-                                    "resource": 5
-                                },
-                                {
-                                    "id": "fade",
-                                    "name": "Fade",
-                                    "media": "melvor:assets/media/skills/combat/defence.png",
-                                    "type": "utility",
-                                    "turns": 1,
-                                    "level": 10,
-                                    "target": { "type": "self", "count": 1 },
-                                    "effects": [
-                                        {
-                                            "type": "buff",
-                                            "id": "adventuring:evasion",
-                                            "target": "self",
-                                            "stacks": 5
-                                        },
-                                        {
-                                            "type": "buff",
-                                            "id": "adventuring:stealth",
-                                            "target": "self",
-                                            "stacks": 3
-                                        }
-                                    ],
-                                    "resource": 5
-                                }
+        "skillData": [
+            {
+                "skillID": "adventuring:Adventuring",
+                "data": {
+                    "jobs": [
+                        {
+                            "id": "shadowdancer",
+                            "tier": 5,
+                            "name": "Shadowdancer",
+                            "media": "melvor:assets/media/skills/thieving/thieving.png",
+                            "scaling": [
+                                { "id": "adventuring:hitpoints", "value": 1.0 },
+                                { "id": "adventuring:defence", "value": 0.5 },
+                                { "id": "adventuring:agility", "value": 2.0 },
+                                { "id": "adventuring:strength", "value": 0.8 },
+                                { "id": "adventuring:ranged", "value": 1.2 },
+                                { "id": "adventuring:magic", "value": 1.0 },
+                                { "id": "adventuring:prayer", "value": 0.3 }
                             ],
-                            "spender": [
+                            "maxLevel": 20,
+                            "requirements": [
+                                { "type": "job_level", "job": "adventuring:thief", "level": 12 },
+                                { "type": "job_level", "job": "adventuring:wizard", "level": 8 }
+                            ]
+                        }
+                    ],
+                    "generators": [
+                        {
+                            "id": "shadow_strike",
+                            "name": "Shadow Strike",
+                            "requirements": [
+                                { "type": "current_job_level", "job": "adventuring:shadowdancer", "level": 1 }
+                            ],
+                            "energy": 6,
+                            "hits": [
                                 {
-                                    "id": "shadow_dance",
-                                    "name": "Shadow Dance",
-                                    "media": "melvor:assets/media/skills/thieving/thieving.png",
-                                    "type": "attack",
-                                    "turns": 1,
-                                    "level": 3,
-                                    "cost": 14,
-                                    "target": { "type": "enemy", "count": 2 },
-                                    "damage": {
-                                        "type": "stat",
-                                        "stat": "adventuring:agility",
-                                        "scaling": 110
-                                    },
+                                    "target": "front",
+                                    "party": "enemy",
                                     "effects": [
                                         {
-                                            "type": "buff",
-                                            "id": "adventuring:haste",
-                                            "target": "self",
-                                            "stacks": 4
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 18,
+                                                "scaling": [
+                                                    { "id": "adventuring:agility", "value": 0.95 }
+                                                ]
+                                            }
                                         }
                                     ]
                                 },
                                 {
-                                    "id": "umbral_burst",
-                                    "name": "Umbral Burst",
-                                    "media": "melvor:assets/media/skills/combat/magic.png",
-                                    "type": "attack",
-                                    "turns": 1,
-                                    "level": 8,
-                                    "cost": 18,
-                                    "target": { "type": "enemy", "count": "all" },
-                                    "damage": {
-                                        "type": "multi_stat",
-                                        "stats": ["adventuring:agility", "adventuring:magic"],
-                                        "scaling": 60
-                                    },
+                                    "target": "self",
+                                    "party": "ally",
                                     "effects": [
-                                        {
-                                            "type": "debuff",
-                                            "id": "adventuring:blind",
-                                            "target": "target",
-                                            "stacks": 4
-                                        }
+                                        { "type": "buff", "id": "adventuring:haste", "stacks": { "base": 2 } }
                                     ]
-                                },
+                                }
+                            ]
+                        },
+                        {
+                            "id": "phantom_blade",
+                            "name": "Phantom Blade",
+                            "requirements": [
+                                { "type": "current_job_level", "job": "adventuring:shadowdancer", "level": 5 }
+                            ],
+                            "energy": 5,
+                            "hits": [
                                 {
-                                    "id": "phantom_strike",
-                                    "name": "Phantom Strike",
-                                    "media": "melvor:assets/media/skills/thieving/thieving.png",
-                                    "type": "attack",
-                                    "turns": 2,
-                                    "level": 15,
-                                    "cost": 35,
-                                    "target": { "type": "enemy", "count": 1 },
-                                    "damage": {
-                                        "type": "multi_stat",
-                                        "stats": ["adventuring:agility", "adventuring:magic"],
-                                        "scaling": 200
-                                    },
+                                    "target": "front",
+                                    "party": "enemy",
                                     "effects": [
                                         {
-                                            "type": "buff",
-                                            "id": "adventuring:evasion",
-                                            "target": "self",
-                                            "stacks": 8
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 12,
+                                                "scaling": [
+                                                    { "id": "adventuring:agility", "value": 0.28 },
+                                                    { "id": "adventuring:magic", "value": 0.28 }
+                                                ]
+                                            }
                                         },
-                                        {
-                                            "type": "buff",
-                                            "id": "adventuring:haste",
-                                            "target": "self",
-                                            "stacks": 6
-                                        }
+                                        { "type": "debuff", "id": "adventuring:blind", "stacks": { "base": 2 } }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "fade",
+                            "name": "Fade",
+                            "requirements": [
+                                { "type": "current_job_level", "job": "adventuring:shadowdancer", "level": 10 }
+                            ],
+                            "energy": 5,
+                            "hits": [
+                                {
+                                    "target": "self",
+                                    "party": "ally",
+                                    "effects": [
+                                        { "type": "buff", "id": "adventuring:evasion", "stacks": { "base": 5 } },
+                                        { "type": "buff", "id": "adventuring:stealth", "stacks": { "base": 3 } }
                                     ]
                                 }
                             ]
                         }
-                    }
-                ]
+                    ],
+                    "spenders": [
+                        {
+                            "id": "shadow_dance",
+                            "name": "Shadow Dance",
+                            "requirements": [
+                                { "type": "current_job_level", "job": "adventuring:shadowdancer", "level": 3 }
+                            ],
+                            "cost": 14,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 20,
+                                                "scaling": [
+                                                    { "id": "adventuring:agility", "value": 1.1 }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                },
+                                {
+                                    "target": "random",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 20,
+                                                "scaling": [
+                                                    { "id": "adventuring:agility", "value": 1.1 }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                },
+                                {
+                                    "target": "self",
+                                    "party": "ally",
+                                    "effects": [
+                                        { "type": "buff", "id": "adventuring:haste", "stacks": { "base": 4 } }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "umbral_burst",
+                            "name": "Umbral Burst",
+                            "requirements": [
+                                { "type": "current_job_level", "job": "adventuring:shadowdancer", "level": 8 }
+                            ],
+                            "cost": 18,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 14,
+                                                "scaling": [
+                                                    { "id": "adventuring:agility", "value": 0.3 },
+                                                    { "id": "adventuring:magic", "value": 0.3 }
+                                                ]
+                                            }
+                                        },
+                                        { "type": "debuff", "id": "adventuring:blind", "stacks": { "base": 4 } }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "phantom_strike",
+                            "name": "Phantom Strike",
+                            "requirements": [
+                                { "type": "current_job_level", "job": "adventuring:shadowdancer", "level": 15 }
+                            ],
+                            "cost": 35,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "amount": {
+                                                "base": 40,
+                                                "scaling": [
+                                                    { "id": "adventuring:agility", "value": 1.0 },
+                                                    { "id": "adventuring:magic", "value": 1.0 }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                },
+                                {
+                                    "target": "self",
+                                    "party": "ally",
+                                    "effects": [
+                                        { "type": "buff", "id": "adventuring:evasion", "stacks": { "base": 8 } },
+                                        { "type": "buff", "id": "adventuring:haste", "stacks": { "base": 6 } }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
             }
-        }]
+        ]
     }
 }

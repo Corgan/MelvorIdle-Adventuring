@@ -775,7 +775,7 @@
                             "effects": [
                                 {
                                     "trigger": "before_damage_delivered",
-                                    "type": "increase_crit_chance",
+                                    "type": "crit_chance",
                                     "amount": 25,
                                     "perStack": true
                                 },
@@ -939,7 +939,7 @@
                             "effects": [
                                 {
                                     "trigger": "xp_gain",
-                                    "type": "increase_xp_percent",
+                                    "type": "xp_percent",
                                     "amount": 25,
                                     "perStack": true
                                 },
@@ -962,7 +962,7 @@
                             "effects": [
                                 {
                                     "trigger": "loot_roll",
-                                    "type": "increase_loot_percent",
+                                    "type": "loot_percent",
                                     "amount": 25,
                                     "perStack": true
                                 },
@@ -1098,7 +1098,7 @@
                             "effects": [
                                 {
                                     "trigger": "stats",
-                                    "type": "increase_stat",
+                                    "type": "increase_stat_flat",
                                     "id": "adventuring:magic",
                                     "amount": 1
                                 },
@@ -1158,7 +1158,7 @@
                         {
                             "id": "reflect",
                             "name": "Reflect",
-                            "media": "melvor:assets/media/skills/magic/reflect.png",
+                            "media": "melvor:assets/media/bank/mirror_shield.png",
                             "effects": [
                                 {
                                     "trigger": "after_damage_received",
@@ -1335,7 +1335,7 @@
                             "effects": [
                                 {
                                     "trigger": "before_damage_delivered",
-                                    "type": "increase_crit_chance",
+                                    "type": "crit_chance",
                                     "amount": 10,
                                     "perStack": true
                                 },
@@ -1356,7 +1356,7 @@
                         {
                             "id": "stun",
                             "name": "Stunned",
-                            "media": "melvor:assets/media/status/null.png",
+                            "media": "melvor:assets/media/status/stunned.png",
                             "effects": [
                                 {
                                     "trigger": "turn_start",
@@ -1381,7 +1381,7 @@
                         {
                             "id": "bleed",
                             "name": "Bleeding",
-                            "media": "melvor:assets/media/bank/potion_hitpoints_i.png",
+                            "media": "melvor:assets/media/misc/blood.png",
                             "effects": [
                                 {
                                     "trigger": "turn_end",
@@ -1411,7 +1411,7 @@
                         {
                             "id": "burn",
                             "name": "Burning",
-                            "media": "melvor:assets/media/bank/burning_essence.png",
+                            "media": "melvor:assets/media/skills/magic/ignite.png",
                             "effects": [
                                 {
                                     "trigger": "turn_start",
@@ -1441,7 +1441,7 @@
                         {
                             "id": "shock",
                             "name": "Shocked",
-                            "media": "melvor:assets/media/skills/magic/surge_iii.png",
+                            "media": "melvor:assets/media/status/shocked.png",
                             "effects": [
                                 {
                                     "trigger": "after_ability_cast",
@@ -1469,7 +1469,7 @@
                         {
                             "id": "chill",
                             "name": "Chilled",
-                            "media": "melvor:assets/media/bank/water_shard.png",
+                            "media": "melvor:assets/media/status/frozen.png",
                             "effects": [
                                 {
                                     "trigger": "stats",
@@ -1521,7 +1521,7 @@
                         {
                             "id": "poison",
                             "name": "Poisoned",
-                            "media": "melvor:assets/media/bank/poison_powder.png",
+                            "media": "melvor:assets/media/status/poison.png",
                             "effects": [
                                 {
                                     "trigger": "turn_end",
@@ -1619,7 +1619,7 @@
                         {
                             "id": "fear",
                             "name": "Feared",
-                            "media": "melvor:assets/media/status/drowsy.png",
+                            "media": "melvor:assets/media/status/fear.png",
                             "effects": [
                                 {
                                     "trigger": "turn_start",
@@ -1669,7 +1669,7 @@
                         {
                             "id": "slow",
                             "name": "Slowed",
-                            "media": "melvor:assets/media/bank/water_shard.png",
+                            "media": "melvor:assets/media/status/slowed.png",
                             "effects": [
                                 {
                                     "trigger": "stats",
@@ -1839,6 +1839,30 @@
                                     "type": "remove"
                                 }
                             ],
+                            "combineMode": "stack"
+                        },
+                        {
+                            "id": "shred",
+                            "name": "Shredded",
+                            "media": "melvor:assets/media/status/evasion_decrease.png",
+                            "effects": [
+                                {
+                                    "trigger": "stats",
+                                    "type": "reduce_stat_percent",
+                                    "id": "adventuring:defence",
+                                    "amount": 3,
+                                    "perStack": true
+                                },
+                                {
+                                    "trigger": "encounter_end",
+                                    "type": "remove"
+                                },
+                                {
+                                    "trigger": "death",
+                                    "type": "remove"
+                                }
+                            ],
+                            "stackable": true,
                             "combineMode": "stack"
                         }
                     ],

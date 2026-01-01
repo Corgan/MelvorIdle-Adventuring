@@ -190,6 +190,9 @@ class AdventuringWeightedTable {
  */
 function createEffect(effectData, source, sourceName) {
     return {
+        // Spread original data first to preserve type-specific fields (healAmount, threshold, etc.)
+        ...effectData,
+        // Then apply standard field mappings (these may override spreaded values)
         trigger: effectData.trigger || 'passive',
         type: effectData.type,
         stat: effectData.stat || effectData.id,  // stat effects use 'stat', auras use 'id'
@@ -537,7 +540,7 @@ class RequirementsChecker {
      * Check if character's current job meets level requirement
      */
     _checkCurrentJobLevel(jobId, level, character) {
-        if(!character) return false;
+        if(!character) return this._checkJobLevel(jobId, level);
         
         // Check if character has this job equipped (combat or passive)
         const hasCombatJob = character.combatJob?.id === jobId;
@@ -901,95 +904,129 @@ function parseDescription(template, replacements) {
  * 
  * @param {object} effect - Effect object with type, value, stat, etc.
  * @param {object} manager - AdventuringManager for resolving stat names
+ * @param {string|boolean} displayMode - Display mode: 'total', 'scaled', 'multiplier', or legacy boolean
  * @returns {string} Human-readable description
  */
-function describeEffect(effect, manager) {
+function describeEffect(effect, manager, displayMode = false) {
     if(!effect) return '';
     
     // If effect has explicit description, use it
     if(effect.description) return effect.description;
     
     const sign = (val) => val >= 0 ? '+' : '';
+    // Convert decimal to percentage if needed (0.25 -> 25, but 25 stays 25)
+    const toPercent = (val) => {
+        if (val === undefined || val === null) return 0;
+        return Math.abs(val) < 1 && val !== 0 ? Math.round(val * 100) : val;
+    };
+    
+    // Extract value from effect - handles both raw data and AdventuringScalableEffect objects
+    // displayMode controls how scaling is shown: 'total', 'scaled', 'multiplier', or false for raw
+    const getVal = (key) => {
+        const raw = effect[key];
+        if (raw === undefined || raw === null) return undefined;
+        // If it's a primitive, use it directly
+        if (typeof raw !== 'object') return raw;
+        // If effect has a method for this value, use it
+        const methodName = key === 'amount' ? 'getAmount' : key === 'stacks' ? 'getStacks' : null;
+        if (methodName && typeof effect[methodName] === 'function') {
+            // Pass displayMode; use 'multiplier' as default for descriptions if no mode specified
+            return effect[methodName](null, displayMode !== false ? displayMode : 'multiplier');
+        }
+        // If it's an object with a base property (scalable format), use base
+        if (raw.base !== undefined) return raw.base;
+        // Last resort
+        return raw;
+    };
+    
+    // Convenience getters for common fields
+    const amount = getVal('amount');
+    const stacks = getVal('stacks');
+    const value = effect.value ?? amount; // value takes precedence if present
+    
     const statName = (statId) => {
         const stat = manager?.stats?.getObjectByID(statId);
-        return stat?.name || statId || 'Unknown';
+        // Return the actual name if found, otherwise return the raw ID for prettifying later
+        return stat?.name || null;
     };
+    // Prettify a stat ID (e.g., 'xp_bonus' -> 'XP Bonus', 'all' -> 'All Stats')
+    const prettifyStatId = (statId) => {
+        // Handle special cases
+        if (statId === 'all') return 'All Stats';
+        return statId?.split(':').pop()?.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) || 'Unknown';
+    };
+    // Get stat name with fallback to prettified ID
+    const getStatDisplay = (statId) => statName(statId) || prettifyStatId(statId);
     const auraName = (auraId) => {
         const aura = manager?.auras?.getObjectByID(auraId);
-        return aura?.name || auraId || 'Unknown';
+        return aura?.name || auraId?.split(':').pop() || 'Unknown';
     };
     
     switch(effect.type) {
         // Stat modifiers
         case 'increase_stat_flat':
-            if (effect.perStack) return `+${statName(effect.stat || effect.id)} per stack`;
-            return `${sign(effect.value)}${effect.value} ${statName(effect.stat || effect.id)}`;
+            if (effect.perStack) return `+${value ?? amount ?? 1} ${getStatDisplay(effect.stat || effect.id)} per stack`;
+            return `${sign(value)}${value} ${getStatDisplay(effect.stat || effect.id)}`;
         case 'increase_stat_percent':
-            if (effect.perStack) return `+% ${statName(effect.stat || effect.id)} per stack`;
-            const statPctVal = effect.value ?? effect.amount;
-            return `${sign(statPctVal)}${statPctVal}% ${statName(effect.stat || effect.id)}`;
+            if (effect.perStack) return `+${value ?? amount ?? 1}% ${getStatDisplay(effect.stat || effect.id)} per stack`;
+            return `${sign(value)}${value}% ${getStatDisplay(effect.stat || effect.id)}`;
         
         // Damage/Healing
         case 'damage':
-            if (effect.perStack) return 'Deal damage per stack';
-            return `Deal ${effect.value || effect.amount || '?'} damage`;
+            if (effect.perStack) return `Deal ${value ?? amount ?? 1} damage per stack`;
+            return `Deal ${value ?? amount ?? '?'} damage`;
         case 'heal':
-            if (effect.perStack) return 'Heal per stack';
-            return `Heal ${effect.value || effect.amount || effect.count || '?'} HP`;
+            if (effect.perStack) return `Heal ${value ?? amount ?? effect.count ?? 1} HP per stack`;
+            return `Heal ${value ?? amount ?? effect.count ?? '?'} HP`;
         case 'heal_percent':
-            const healPct = typeof effect.value === 'number' 
-                ? effect.value 
-                : (typeof effect.amount === 'number' && effect.amount <= 1 
-                    ? Math.round(effect.amount * 100) 
-                    : (effect.amount || 0));
-            return `Restore ${healPct}% HP`;
+            // Amount may be decimal (0.02 = 2%) or whole (50 = 50%)
+            return `Restore ${toPercent(value ?? amount)}% HP`;
         case 'lifesteal':
-            if (effect.perStack) return 'Lifesteal % per stack';
-            return `Heal for ${effect.value || effect.amount || '?'}% of damage dealt`;
+            if (effect.perStack) return `Heal ${toPercent(value ?? amount ?? 0)}% of damage per stack`;
+            return `Heal for ${toPercent(value ?? amount ?? 0)}% of damage dealt`;
         
         // Damage modifiers
         case 'damage_buff':
         case 'increase_damage':
-            if (effect.perStack) return '+Damage per stack';
-            return `${sign(effect.value || effect.amount)}${effect.value || effect.amount} Damage`;
+            if (effect.perStack) return `+${value ?? amount ?? 1} Damage per stack`;
+            return `${sign(value ?? amount)}${value ?? amount} Damage`;
         case 'increase_damage_percent':
-            if (effect.perStack) return '+% Damage per stack';
-            const dmgPctVal = effect.value ?? effect.amount;
-            return `${sign(dmgPctVal)}${dmgPctVal}% Damage`;
+            if (effect.perStack) return `+${value ?? amount ?? 1}% Damage per stack`;
+            return `${sign(value ?? amount)}${value ?? amount}% Damage`;
         case 'reduce_stat_percent':
-            if (effect.perStack) return `-% ${statName(effect.id)} per stack`;
-            return `-${effect.value || effect.amount}% ${statName(effect.id)}`;
+            if (effect.perStack) return `-${value ?? amount ?? 1}% ${getStatDisplay(effect.id)} per stack`;
+            return `-${value ?? amount}% ${getStatDisplay(effect.id)}`;
         case 'defense_buff':
-            return `${sign(effect.value || effect.amount)}${effect.value || effect.amount} Defense`;
+            return `${sign(value ?? amount)}${value ?? amount} Defense`;
         case 'speed_buff':
-            return `${sign(effect.value || effect.amount)}${effect.value || effect.amount} Speed`;
+            return `${sign(value ?? amount)}${value ?? amount} Speed`;
         
         // Buffs/Debuffs - unified types with target field
         case 'buff':
-            return `Apply ${effect.stacks || 1} ${auraName(effect.id || effect.aura || effect.buff)}`;
+            return `Apply ${stacks ?? 1} ${auraName(effect.id || effect.aura || effect.buff)}`;
         case 'debuff':
-            return `Apply ${effect.stacks || 1} ${auraName(effect.id || effect.aura || effect.debuff)}`;
+            return `Apply ${stacks ?? 1} ${auraName(effect.id || effect.aura || effect.debuff)}`;
         case 'cleanse':
             return effect.id ? `Remove ${auraName(effect.id)}` : 'Cleanse debuffs';
         
         // Energy
         case 'energy':
-            return `${sign(effect.value || effect.amount)}${effect.value || effect.amount} Energy`;
+            return `${sign(value ?? amount)}${value ?? amount} Energy`;
         case 'energy_gain_bonus':
-            return `+${effect.value}% energy from generators`;
+            return `+${value}% energy from generators`;
         
         // Multipliers
         case 'xp_multiplier':
-            return `${sign((effect.value - 1) * 100)}${Math.round((effect.value - 1) * 100)}% XP`;
+            return `${sign((value - 1) * 100)}${Math.round((value - 1) * 100)}% XP`;
         case 'loot_multiplier':
-            return `${sign((effect.value - 1) * 100)}${Math.round((effect.value - 1) * 100)}% Loot`;
+            return `${sign((value - 1) * 100)}${Math.round((value - 1) * 100)}% Loot`;
         case 'enemy_stat_multiplier':
-            return `Enemy Stats: ${sign((effect.value - 1) * 100)}${Math.round((effect.value - 1) * 100)}%`;
+            return `Enemy Stats: ${sign((value - 1) * 100)}${Math.round((value - 1) * 100)}%`;
         
-        // Revival
+        // Revival (amount already extracted by getVal helper)
         case 'revive':
         case 'revive_all':
-            return `Revive with ${effect.hpPercent ? Math.round(effect.hpPercent * 100) + '%' : 'full'} HP`;
+            return `Revive with ${amount ?? effect.hpPercent ?? 100}% HP`;
         
         // Tile-specific effects
         case 'teleport':
@@ -997,135 +1034,116 @@ function describeEffect(effect, manager) {
         case 'loot':
             return 'Contains random loot';
         case 'xp':
-            return `Grant ${effect.amount || effect.value} Job XP`;
+            return `Grant ${amount ?? value} Job XP`;
         
-        // Percentage-based damage (tiles use amount as decimal 0-1)
+        // Percentage-based damage (amount is whole percent)
         case 'damage_percent':
-            const dmgPct = typeof effect.amount === 'number' && effect.amount <= 1 
-                ? Math.round(effect.amount * 100) 
-                : (effect.amount || effect.value);
-            return `Deal ${dmgPct}% HP damage`;
+            return `Deal ${amount ?? value}% HP damage`;
         
         // Conditional/bonus damage
         case 'damage_bonus':
-            return `+${effect.value}% damage`;
+            return `+${toPercent(value)}% damage`;
         case 'damage_reduction':
-            return `${effect.value}% damage reduction`;
+            return `${toPercent(value)}% damage reduction`;
         
         // Immunity
         case 'immunity':
-        case 'debuff_immunity':
-            return `Immune to ${auraName(effect.debuff || effect.id)}`;
+            const immuneTo = effect.debuff || effect.id;
+            if (immuneTo) {
+                return `Immune to ${auraName(immuneTo)}`;
+            }
+            return 'Immune to debuffs';
         
         // Crit
         case 'crit_chance':
-        case 'crit_chance_bonus':
-            return `+${effect.value}% critical chance`;
+            return `+${toPercent(value)}% critical chance`;
         case 'crit_damage':
-        case 'crit_damage_bonus':
-            return `+${effect.value}% critical damage`;
+            return `+${toPercent(value)}% critical damage`;
         
         // Cost reduction
         case 'cost_reduction':
-        case 'ability_cost_reduction':
-            return `-${effect.value}% ability cost`;
+            return `-${toPercent(value)}% ability cost`;
         
         // Dodge
         case 'dodge_chance':
-            return `${effect.value}% dodge chance`;
+            return `${toPercent(value)}% dodge chance`;
         
         // Healing modifiers
         case 'healing_bonus':
-            return `+${effect.value}% healing done`;
+            return `+${toPercent(value)}% healing done`;
         case 'healing_received':
-            return `+${effect.value}% healing received`;
+            return `+${toPercent(value)}% healing received`;
         
         // Damage reflection
         case 'reflect_damage':
-            if (effect.perStack) return `Reflect % damage per stack`;
-            return `Reflect ${effect.value ?? effect.amount}% damage taken`;
+            if (effect.perStack) return `Reflect ${toPercent(amount ?? value)}% damage per stack`;
+            return `Reflect ${toPercent(value ?? amount)}% damage taken`;
         
         // Spell echo
         case 'spell_echo':
-            return `${effect.chance || effect.value}% chance to cast spells twice`;
+            return `${effect.chance ?? value}% chance to cast spells twice`;
         
         // Execute
         case 'execute':
-            return `Execute enemies below ${effect.threshold}% HP`;
+            return `Execute enemies below ${toPercent(effect.threshold ?? value ?? 20)}% HP`;
         
         // All stat bonus
         case 'all_stat_bonus':
-            return `+${effect.value}% all stats`;
+            return `+${value}% all stats`;
         
         // Party healing
         case 'heal_party_percent':
-            return `Heal party for ${effect.value}% max HP`;
+            return `Heal party for ${value}% max HP`;
         
         // Random buffs/debuffs
-        case 'random_buffs':
-            return `Apply ${effect.count} random buffs (${effect.stacks} stacks)`;
-        case 'random_debuffs':
-            return `Apply ${effect.count} random debuffs (${effect.stacks} stacks)`;
-        
-
-        // Singular versions
-        case 'random_buff':
-            return `Apply random buff (${effect.stacks || 1} stacks)`;
-        case 'random_debuff':
-            return `Apply random debuff (${effect.stacks || 1} stacks)`;
+        case 'random_buffs': {
+            const count = effect.count ?? 1;
+            const stackCount = stacks ?? 1;
+            return count === 1 
+                ? `Apply a random buff (${stackCount} stack${stackCount !== 1 ? 's' : ''})` 
+                : `Apply ${count} random buffs (${stackCount} stack${stackCount !== 1 ? 's' : ''} each)`;
+        }
+        case 'random_debuffs': {
+            const count = effect.count ?? 1;
+            const stackCount = stacks ?? 1;
+            return count === 1 
+                ? `Apply a random debuff (${stackCount} stack${stackCount !== 1 ? 's' : ''})` 
+                : `Apply ${count} random debuffs (${stackCount} stack${stackCount !== 1 ? 's' : ''} each)`;
+        }
 
         // Dispel effects
         case 'dispel':
         case 'dispel_buff':
-            return `Remove ${effect.count || 1} buff(s) from target`;
+            const dispelCount = effect.count || 1;
+            return dispelCount === 'all' ? 'Remove all buffs from target' : `Remove ${dispelCount} buff${dispelCount !== 1 ? 's' : ''} from target`;
         case 'dispel_debuff':
-            return `Remove ${effect.count || 1} debuff(s)`;
+            const debuffCount = effect.count || 1;
+            return debuffCount === 'all' ? 'Cleanse all debuffs' : `Cleanse ${debuffCount} debuff${debuffCount !== 1 ? 's' : ''}`;
 
         // Enemy stat debuff
         case 'enemy_stat_debuff':
-            return `Reduce enemy ${statName(effect.stat || effect.id)} by ${effect.value || effect.amount}%`;
+            // Use absolute value since "Reduce" already implies negative
+            const debuffVal = Math.abs(toPercent(value ?? amount ?? 0));
+            return `Reduce enemy ${getStatDisplay(effect.stat || effect.id)} by ${debuffVal}%`;
 
         // Cleanse variants
         case 'cleanse_debuff':
-        case 'cleanse_random_debuff':
-            return `Cleanse ${effect.count || 1} debuff(s)`;
-        case 'cleanse_all_allies':
-            return `Cleanse all allies`;
-
-        // Buff all allies
-        case 'buff_all_allies':
-            return `Buff all allies with ${auraName(effect.id)}`;
-
-        // Apply variants
-        case 'apply_buff':
-            return `Apply ${effect.stacks || 1} ${auraName(effect.id)}`;
-        case 'apply_debuff':
-            return `Apply ${effect.stacks || 1} ${auraName(effect.id)} to target`;
-        case 'apply_debuff_all':
-            return `Apply ${effect.stacks || 1} ${auraName(effect.id)} to all enemies`;
-
-        // Damage variants
-        case 'damage_all':
-        case 'damage_all_enemies':
-            return `Deal ${effect.value || effect.amount || '?'} damage to all enemies`;
+        case 'cleanse_random_debuff': {
+            const cleanseCount = effect.count || 1;
+            return cleanseCount === 1 ? 'Cleanse a debuff' : `Cleanse ${cleanseCount} debuffs`;
+        }
 
         // Summon effects
         case 'summon':
             return `Summon a companion`;
         case 'summon_power_bonus':
-            return `+${effect.value}% summon power`;
+            return `+${value}% summon power`;
         case 'summon_attack_speed':
-            return `+${effect.value}% summon attack speed`;
-
-        // Armor pierce
-        case 'armor_pierce':
-        case 'armour_penetration':
-        case 'ignore_defence':
-            return `Ignore ${effect.value || effect.amount}% defense`;
+            return `+${value}% summon attack speed`;
 
         // Ward
         case 'ward':
-            return `Block next ${effect.stacks || 1} attacks`;
+            return `Block next ${stacks ?? 1} attacks`;
 
         // Charm
         case 'charm':
@@ -1133,7 +1151,7 @@ function describeEffect(effect, manager) {
 
         // Double cast
         case 'double_cast':
-            return `${effect.chance || effect.value}% chance to cast twice`;
+            return `${effect.chance ?? value}% chance to cast twice`;
 
         // Mastery unlock effects
         case 'unlock_auto_run':
@@ -1150,42 +1168,181 @@ function describeEffect(effect, manager) {
 
         // Mastery stat bonuses
         case 'job_stats_percent':
-            return `+${effect.value}% Job Stats`;
+            return `+${value}% Job Stats`;
         case 'drop_rate_percent':
-            return `+${effect.value}% Drop Rate`;
+            return `+${value}% Drop Rate`;
         case 'drop_quantity_percent':
-            return `+${effect.value}% Drop Quantity`;
+            return `+${value}% Drop Quantity`;
         case 'explore_speed_percent':
-            return `+${effect.value}% Explore Speed`;
+            return `+${value}% Explore Speed`;
         case 'trap_spawn_rate_percent':
-            return `${effect.value > 0 ? '+' : ''}${effect.value}% Trap Spawn Rate`;
+            return `${value > 0 ? '+' : ''}${value}% Trap Spawn Rate`;
         case 'fountain_spawn_rate_percent':
-            return `+${effect.value}% Fountain Spawn Rate`;
+            return `+${value}% Fountain Spawn Rate`;
         case 'treasure_spawn_rate_percent':
-            return `+${effect.value}% Treasure Spawn Rate`;
+            return `+${value}% Treasure Spawn Rate`;
         case 'shrine_spawn_rate_percent':
-            return `+${effect.value}% Shrine Spawn Rate`;
+            return `+${value}% Shrine Spawn Rate`;
         case 'ability_learn_chance_percent':
-            return `+${effect.value}% Ability Learn Chance`;
+            return `+${value}% Ability Learn Chance`;
         case 'equipment_xp_percent':
-            return `+${effect.value}% Equipment XP`;
+            return `+${value}% Equipment XP`;
         case 'upgrade_cost_percent':
-            return `${effect.value > 0 ? '+' : ''}${effect.value}% Upgrade Cost`;
+            return `${value > 0 ? '+' : ''}${value}% Upgrade Cost`;
         case 'equipment_stats_percent':
-            return `+${effect.value}% Equipment Stats`;
+            return `+${value}% Equipment Stats`;
 
         // Generic percentage bonuses (used by tooltip helpers)
         case 'xp_percent':
-            return `+${effect.value}% XP`;
+            return `+${value}% XP`;
         case 'loot_percent':
-            return `+${effect.value}% Loot`;
+            return `+${value}% Loot`;
         case 'enemy_stats_percent':
-            return `Enemy Stats: +${effect.value}%`;
+            return `Enemy Stats: +${value}%`;
+        
+        // Consumable effects (threshold/chance are whole percent)
+        case 'heal_on_low_hp':
+            return `Heal ${amount ?? effect.healAmount ?? '?'} HP when below ${effect.threshold ?? '?'}% HP`;
+        case 'proc_debuff':
+            const debuffName = manager?.auras?.getObjectByID(effect.debuff)?.name || effect.debuff?.split(':').pop() || 'Unknown';
+            return `${effect.chance ?? '?'}% chance to apply ${stacks ?? 1} ${debuffName}`;
+        case 'heal_on_floor_start':
+            return `Heal ${amount ?? effect.healAmount ?? '?'} HP at floor start`;
+        case 'heal_after_combat':
+            return `Heal ${amount ?? effect.healAmount ?? '?'} HP after combat`;
+        case 'on_damage':
+            return `Heal ${effect.heal_percent ?? effect.healPercent ?? 0}% of damage dealt`;
+
+        // Aura internal effects (stack management)
+        case 'remove':
+            return 'Remove aura';
+        case 'remove_stacks':
+            return `Remove ${effect.count ?? amount ?? 1} stack(s)`;
+        case 'reduce_amount':
+            return `Reduce damage by ${amount ?? 1} per stack`;
+        case 'absorb_damage':
+            return `Absorb ${amount ?? 1} damage per stack`;
+        case 'skip':
+            return 'Skip turn';
+        case 'chance_skip':
+            return `${amount ?? 0}% chance to skip turn`;
+        case 'untargetable':
+            return 'Cannot be targeted';
+        case 'evade':
+            return 'Evade next attack';
+        case 'chance_dodge':
+            return `${amount ?? 0}% chance to dodge`;
+        case 'chance_miss':
+            return `${amount ?? 0}% chance to miss`;
+        case 'chance_hit_ally':
+            return `${amount ?? 0}% chance to hit ally instead`;
+        case 'force_target':
+            return 'Force enemies to target this character';
+        case 'prevent_ability':
+            return 'Cannot use spenders';
+        case 'prevent_debuff':
+            return 'Immune to next debuff';
+        case 'prevent_lethal':
+            return 'Cannot be killed';
+        case 'prevent_death':
+            return `Prevent death${effect.healPercent ? `, heal ${Math.round(effect.healPercent * 100)}% HP` : ''}`;
+        case 'increase_damage_percent':
+            return `+${amount ?? 0}% damage${effect.perStack ? ' per stack' : ''}`;
+        case 'reduce_damage_percent':
+            return `${amount ?? 0}% damage reduction${effect.perStack ? ' per stack' : ''}`;
+        case 'reduce_heal_percent':
+            return `-${amount ?? 0}% healing received${effect.perStack ? ' per stack' : ''}`;
+        case 'heal_party':
+            return `Heal party for ${amount ?? 0} HP`;
+        
+        // Death prevention/survival
+        case 'prevent_death':
+            return `Prevent death${effect.healPercent ? `, heal ${Math.round(effect.healPercent * 100)}% HP` : ''}`;
+        
+        // Chaos effects
+        case 'chaos_damage':
+            return `Chaotic damage (${effect.bonusDamageChance || 0}% bonus, ${effect.healEnemyChance || 0}% heal enemy)`;
+        
+        // Percentage stat modifiers
+        case 'ability_damage_percent':
+            return `+${amount ?? 0}% ability damage`;
+        case 'buff_damage':
+            return `+${amount ?? 0} damage`;
+        
+        // Immunities
+        case 'effect_immunity':
+            const effects = effect.effects || [effect.effect];
+            return `Immune to ${effects.join(', ')}`;
+        case 'immune_displacement':
+            return 'Immune to displacement';
+        case 'prevent_enemy_teleport':
+            return 'Enemies cannot teleport';
+        
+        // Buff application
+        case 'apply_effect':
+            return `Apply ${effect.effect}${effect.chance ? ` (${effect.chance}% chance)` : ''}`;
+
+        // Stat/passive bonuses
+        case 'stat_bonus':
+            // Prettify stat name if not in registry (e.g., 'xp_bonus' -> 'XP Bonus')
+            const statBonusName = getStatDisplay(effect.stat) !== 'Unknown' 
+                ? getStatDisplay(effect.stat) 
+                : (effect.stat?.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) || 'Stat');
+            return `+${value}% ${statBonusName}`;
+        case 'modifier':
+            // passive can be a string ID or an object with a name
+            const passiveId = typeof effect.passive === 'string' ? effect.passive : effect.passive?.id;
+            const passiveName = manager?.passives?.getObjectByID(passiveId)?.name 
+                || effect.passive?.name 
+                || passiveId?.split(':').pop() 
+                || 'modifier';
+            return `Apply ${passiveName}`;
+        case 'resistance':
+            const element = effect.element?.charAt(0).toUpperCase() + effect.element?.slice(1) || 'Elemental';
+            return `+${toPercent(value)}% ${element} Resistance`;
+        case 'all_resistance':
+            return `+${toPercent(value)}% All Resistance`;
+        case 'reflect':
+            return `Reflect ${toPercent(value)}% damage`;
+        
+        // XP/Loot bonuses
+        case 'xp_bonus':
+            return `+${value}% XP`;
+        case 'loot_bonus':
+            return `+${value}% Loot`;
+        case 'loot_quality_bonus':
+            return `+${value}% Loot Quality`;
+        case 'rare_drop_bonus':
+            return `+${value}% Rare Drop Chance`;
+        case 'material_drop_bonus':
+            return `+${value}% Material Drops`;
+        
+        // Energy bonuses
+        case 'energy_bonus':
+            return `+${value}% Energy`;
+        case 'energy_regen_bonus':
+            return `+${value}% Energy Regen`;
+        
+        // Damage bonuses
+        case 'spell_damage_bonus':
+            return `+${toPercent(value)}% Spell Damage`;
+        case 'extra_target':
+            return `Hit ${value} extra target(s)`;
+        case 'damage_bonus_vs_debuff':
+            return `+${value}% damage vs debuffed enemies`;
+        
+        // Duration modifiers
+        case 'debuff_duration_reduction':
+            return `${value}% shorter debuff duration`;
+        
+        // Enemy buffs (from difficulty)
+        case 'enemy_buff':
+            return `Enemies gain ${stacks ?? 1} ${auraName(effect.id)}`;
 
         default:
             // Try to generate something reasonable
             if(effect.value !== undefined) {
-                return `${effect.type}: ${effect.value}`;
+                return `${effect.type}: ${value}`;
             }
             return effect.type || 'Unknown effect';
     }
@@ -1230,29 +1387,104 @@ function formatTrigger(trigger) {
 }
 
 /**
- * Generate a full effect description including trigger.
- * Use this when you need "At round start: Heal 5 HP" style descriptions.
+ * Format target type into human-readable text.
+ * Handles both simple targets and target+party combinations.
+ * 
+ * @param {string} target - Target type (e.g., 'front', 'all', 'random')
+ * @param {string} party - Party type (e.g., 'enemy', 'ally')
+ * @returns {string} Human-readable target description
+ */
+function formatTarget(target, party) {
+    if(!target || target === 'self') return '';
+    
+    // Map of target types to human-readable base names
+    const targetNames = {
+        // Simple targets (no party needed)
+        'self': 'self',
+        'attacker': 'attacker',
+        'target': 'target',
+        'hit_target': 'target',
+        'heal_target': 'target',
+        'dead': 'dead',
+        
+        // Position-based targets
+        'front': 'front',
+        'back': 'back',
+        
+        // Selection-based targets
+        'all': 'all',
+        'random': 'random',
+        'lowest': 'lowest HP'
+    };
+    
+    // Check for explicit mapping first
+    if(targetNames[target]) {
+        const baseName = targetNames[target];
+        // If the base name is a special target that doesn't need party info, return as-is
+        if(baseName === 'attacker' || baseName === 'target') {
+            return baseName;
+        }
+        // Combine with party if provided, default to 'enemy' for combat targets
+        const effectiveParty = party || 'enemy';
+        if(effectiveParty === 'enemy') {
+            if(baseName === 'all') return 'all enemies';
+            if(baseName === 'front') return 'front enemy';
+            if(baseName === 'back') return 'back enemy';
+            if(baseName === 'random') return 'random enemy';
+            if(baseName === 'lowest HP') return 'lowest HP enemy';
+            if(baseName === 'dead') return 'dead enemy';
+            return `${baseName} enemy`;
+        }
+        if(effectiveParty === 'ally') {
+            if(baseName === 'all') return 'all allies';
+            if(baseName === 'front') return 'front ally';
+            if(baseName === 'back') return 'back ally';
+            if(baseName === 'random') return 'random ally';
+            if(baseName === 'lowest HP') return 'lowest HP ally';
+            if(baseName === 'dead') return 'dead ally';
+            return `${baseName} ally`;
+        }
+        return baseName;
+    }
+    
+    // Fallback: replace underscores with spaces
+    return target.replace(/_/g, ' ');
+}
+
+/**
+ * Generate a full effect description including trigger and target.
+ * Trigger is placed naturally at the end: "Deal 10 damage when hit" instead of "On hit: Deal 10 damage"
  * 
  * @param {object} effect - Effect object with type, trigger, value, etc.
  * @param {object} manager - AdventuringManager for resolving names
  * @param {object} options - Options for formatting
- * @param {boolean} options.includeTrigger - Whether to include trigger prefix (default: true)
+ * @param {boolean} options.includeTrigger - Whether to include trigger info (default: true)
  * @param {boolean} options.includeChance - Whether to include chance info (default: true)
+ * @param {string} options.target - Target from parent hit (if effect doesn't have one)
+ * @param {string} options.party - Party from parent hit (if effect doesn't have one)
+ * @param {string|boolean} options.displayMode - Display mode: 'total', 'scaled', 'multiplier', or false
  * @returns {string} Full effect description
  */
 function describeEffectFull(effect, manager, options = {}) {
-    const { includeTrigger = true, includeChance = true } = options;
+    const { includeTrigger = true, includeChance = true, displayMode = false } = options;
     
-    let desc = describeEffect(effect, manager);
+    let desc = describeEffect(effect, manager, displayMode);
     
-    // Add trigger prefix if not passive
-    if(includeTrigger && effect.trigger && effect.trigger !== 'passive') {
-        desc = `${formatTrigger(effect.trigger)}: ${desc}`;
+    // Add target info - use effect's target or fall back to options
+    const target = effect.target || options.target;
+    const party = effect.party || options.party;
+    if(target && target !== 'self') {
+        const targetName = formatTarget(target, party);
+        // Only add if not already implied in the description
+        if(targetName && !desc.toLowerCase().includes(targetName.toLowerCase())) {
+            desc = `${desc} to ${targetName}`;
+        }
     }
     
-    // Add chance suffix if present (unless it's in condition)
-    if(includeChance && effect.chance && effect.chance < 100) {
-        desc = `${desc} (${effect.chance}% chance)`;
+    // Add chance if present (unless it's 100% or already shown in description)
+    const chance = effect.chance || options.chance;
+    if(includeChance && chance && chance < 100 && !desc.includes('% chance')) {
+        desc = `${desc} (${chance}% chance)`;
     }
     
     // Add condition suffix if present
@@ -1263,26 +1495,206 @@ function describeEffectFull(effect, manager, options = {}) {
         }
     }
     
-    // Add target info if targeting enemies
-    if(effect.target && effect.target !== 'self') {
-        const targetNames = {
-            'all_enemies': 'all enemies',
-            'random_enemy': 'random enemy',
-            'front_enemy': 'front enemy',
-            'back_enemy': 'back enemy',
-            'lowest_enemy': 'lowest HP enemy',
-            'all_allies': 'all allies',
-            'random_ally': 'random ally',
-            'lowest_ally': 'lowest HP ally'
-        };
-        const targetName = targetNames[effect.target] || effect.target.replace(/_/g, ' ');
-        // Only add if not already implied in the description
-        if(!desc.toLowerCase().includes(targetName.toLowerCase())) {
-            desc = `${desc} to ${targetName}`;
+    // Add trigger as a natural suffix (not a prefix)
+    // Skip if the description already contains condition text like "when below X%" to avoid "when below 50% HP when damaged"
+    const trigger = effect.trigger || options.trigger;
+    const descLower = desc.toLowerCase();
+    const hasWhenClause = descLower.includes('when below') || descLower.includes('when above');
+    if(includeTrigger && trigger && trigger !== 'passive' && trigger !== 'on_use' && !hasWhenClause) {
+        const triggerSuffix = formatTriggerSuffix(trigger);
+        if(triggerSuffix) {
+            desc = `${desc} ${triggerSuffix}`;
         }
     }
     
     return desc;
+}
+
+/**
+ * Format a trigger as a suffix phrase for natural reading.
+ * E.g., "on_kill" -> "on kill", "round_start" -> "each round"
+ * 
+ * @param {string} trigger - Trigger type
+ * @returns {string} Natural suffix phrase
+ */
+function formatTriggerSuffix(trigger) {
+    if(!trigger || trigger === 'passive' || trigger === 'on_use') return '';
+    
+    const suffixes = {
+        'turn_start': 'each turn',
+        'turn_end': 'at end of turn',
+        'round_start': 'each round',
+        'round_end': 'at end of round',
+        'before_damage_dealt': 'before dealing damage',
+        'before_damage_delivered': 'before dealing damage',
+        'after_damage_dealt': 'after dealing damage',
+        'after_damage_delivered': 'after dealing damage',
+        'before_damage_received': 'before taking damage',
+        'after_damage_received': 'after taking damage',
+        'on_hit': 'on hit',
+        'on_miss': 'on miss',
+        'on_crit': 'on critical hit',
+        'on_kill': 'on kill',
+        'on_death': 'on death',
+        'encounter_start': 'at start of combat',
+        'encounter_end': 'at end of combat',
+        'floor_start': 'at start of floor',
+        'floor_end': 'at end of floor',
+        'dungeon_start': 'at start of dungeon',
+        'dungeon_end': 'at end of dungeon',
+        'enemy_spawn': 'when enemy spawns',
+        'ability_used': 'when using ability',
+        'party_wipe': 'when party wipes',
+        'on_damage': 'when damaged',
+        'low_health': 'when low on health',
+        'on_low_health': 'when low on health',
+        'on_ally_death': 'when ally dies',
+        'ally_death': 'when ally dies',
+        'on_heal': 'when healing',
+        'on_generator': 'when using generator',
+        'on_spender': 'when using spender',
+        'on_dodge': 'when dodging',
+        'on_debuff_applied': 'when debuffed',
+        'on_spell_cast': 'when casting spell',
+        'on_spell_hit': 'when spell hits',
+        'on_magic_hit': 'when magic hits',
+        'on_fatal_hit': 'on fatal hit',
+        'on_attack': 'on attack',
+        'on_ability': 'when using ability',
+        'on_damage_taken': 'when taking damage',
+        'xp_gain': 'when gaining XP',
+        'loot_roll': 'when rolling loot',
+        'stats': '',  // Internal trigger, don't show
+        'targeting': '',  // Internal trigger, don't show
+        'death': '',  // Internal, handled separately
+        'before_debuff_received': 'before receiving debuff',
+        'before_heal_received': 'before receiving heal',
+        'before_spender_cast': 'before using spender',
+        'after_ability_cast': 'after using ability'
+    };
+    
+    return suffixes[trigger] ?? trigger.replace(/_/g, ' ');
+}
+
+/**
+ * Combine multiple effects into a single description with "and".
+ * Also handles aura-specific cleanup by summarizing removal effects.
+ * 
+ * When effects share the same target and trigger, factors them out:
+ * "Deal 10 damage and apply 2 Bleeding to front enemy" instead of
+ * "Deal 10 damage to front enemy and apply 2 Bleeding to front enemy"
+ * 
+ * @param {Array} effects - Array of effects
+ * @param {object} manager - AdventuringManager
+ * @param {object} options - Options passed to describeEffectFull
+ * @param {boolean} options.isAura - Whether this is for an aura (filters removal effects)
+ * @returns {string} Combined description
+ */
+function describeEffects(effects, manager, options = {}) {
+    if (!effects || effects.length === 0) return '';
+    
+    const { isAura = false } = options;
+    
+    // Separate main effects from cleanup effects (for auras)
+    let mainEffects = effects;
+    let hasRemoval = false;
+    
+    if (isAura) {
+        mainEffects = effects.filter(e => {
+            // Filter out removal/cleanup effects for auras
+            if (e.type === 'remove' || e.type === 'remove_stacks') {
+                hasRemoval = true;
+                return false;  // Always hide remove/remove_stacks for auras
+            }
+            return true;
+        });
+    }
+    
+    if (mainEffects.length === 0) {
+        return isAura && hasRemoval ? 'Removed at end of combat.' : '';
+    }
+    
+    // Helper to get effective target/trigger for an effect
+    const getTarget = (e) => e.target || options.target;
+    const getParty = (e) => e.party || options.party;
+    const getTrigger = (e) => e.trigger || options.trigger;
+    
+    // Check if all effects share the same target and trigger
+    const firstTarget = getTarget(mainEffects[0]);
+    const firstParty = getParty(mainEffects[0]);
+    const firstTrigger = getTrigger(mainEffects[0]);
+    
+    const allSameTarget = mainEffects.every(e => 
+        getTarget(e) === firstTarget && getParty(e) === firstParty
+    );
+    const allSameTrigger = mainEffects.every(e => getTrigger(e) === firstTrigger);
+    
+    // Helper to lowercase the first letter (for combining with "and")
+    const lowercaseFirst = (str) => str.charAt(0).toLowerCase() + str.slice(1);
+    
+    let combined;
+    
+    if (allSameTarget && allSameTrigger) {
+        // Factor out shared target and trigger - describe effects without them first
+        const descriptions = mainEffects.map(e => 
+            describeEffectFull(e, manager, { 
+                ...options, 
+                includeTrigger: false,
+                // Don't add target in individual descriptions
+                target: null,
+                party: null
+            })
+        );
+        
+        // Combine effect descriptions
+        if (descriptions.length === 1) {
+            combined = descriptions[0];
+        } else if (descriptions.length === 2) {
+            combined = `${descriptions[0]} and ${lowercaseFirst(descriptions[1])}`;
+        } else {
+            const first = descriptions.shift();
+            const last = descriptions.pop();
+            const middle = descriptions.map(d => lowercaseFirst(d)).join(', ');
+            combined = `${first}, ${middle}, and ${lowercaseFirst(last)}`;
+        }
+        
+        // Add shared target at the end
+        if (firstTarget && firstTarget !== 'self') {
+            const targetName = formatTarget(firstTarget, firstParty);
+            if (targetName && !combined.toLowerCase().includes(targetName.toLowerCase())) {
+                combined = `${combined} to ${targetName}`;
+            }
+        }
+        
+        // Add shared trigger at the end
+        if (firstTrigger && firstTrigger !== 'passive' && firstTrigger !== 'on_use') {
+            const triggerSuffix = formatTriggerSuffix(firstTrigger);
+            if (triggerSuffix && !combined.toLowerCase().includes('when below') && !combined.toLowerCase().includes('when above')) {
+                combined = `${combined} ${triggerSuffix}`;
+            }
+        }
+    } else {
+        // Different targets/triggers - describe each fully
+        const descriptions = mainEffects.map(e => describeEffectFull(e, manager, options));
+        
+        if (descriptions.length === 1) {
+            combined = descriptions[0];
+        } else if (descriptions.length === 2) {
+            combined = `${descriptions[0]} and ${lowercaseFirst(descriptions[1])}`;
+        } else {
+            const first = descriptions.shift();
+            const last = descriptions.pop();
+            const middle = descriptions.map(d => lowercaseFirst(d)).join(', ');
+            combined = `${first}, ${middle}, and ${lowercaseFirst(last)}`;
+        }
+    }
+    
+    // Add removal note for auras
+    if (isAura && hasRemoval && combined) {
+        combined += '. Removed at end of combat.';
+    }
+    
+    return combined;
 }
 
 /**
@@ -1291,17 +1703,17 @@ function describeEffectFull(effect, manager, options = {}) {
  * 
  * @param {Array} effects - Array of effects with getAmount/getStacks methods
  * @param {object} context - Context to pass to getAmount/getStacks (stats, instance, etc.)
- * @param {boolean} isDesc - Whether this is for description display (vs calculation)
+ * @param {string|boolean} displayMode - Display mode: 'total', 'scaled', 'multiplier', or legacy boolean
  * @returns {object} Replacements object for parseDescription
  */
-function buildEffectReplacements(effects, context, isDesc = false) {
+function buildEffectReplacements(effects, context, displayMode = false) {
     const replacements = {};
     effects.forEach((effect, i) => {
         if(effect.getAmount) {
-            replacements[`effect.${i}.amount`] = effect.getAmount(context, isDesc);
+            replacements[`effect.${i}.amount`] = effect.getAmount(context, displayMode);
         }
         if(effect.getStacks) {
-            replacements[`effect.${i}.stacks`] = effect.getStacks(context, isDesc);
+            replacements[`effect.${i}.stacks`] = effect.getStacks(context, displayMode);
         }
     });
     return replacements;
@@ -1312,18 +1724,18 @@ function buildEffectReplacements(effects, context, isDesc = false) {
  * 
  * @param {Array} hits - Array of ability hits containing effects
  * @param {object} stats - Stats context for getAmount/getStacks
- * @param {boolean} isDesc - Whether this is for description display
+ * @param {string|boolean} displayMode - Display mode: 'total', 'scaled', 'multiplier', or legacy boolean
  * @returns {object} Replacements object for parseDescription
  */
-function buildHitEffectReplacements(hits, stats, isDesc = false) {
+function buildHitEffectReplacements(hits, stats, displayMode = false) {
     const replacements = {};
     hits.forEach((hit, i) => {
         hit.effects.forEach((effect, e) => {
             if(effect.getAmount) {
-                replacements[`hit.${i}.effect.${e}.amount`] = effect.getAmount(stats, isDesc);
+                replacements[`hit.${i}.effect.${e}.amount`] = effect.getAmount(stats, displayMode);
             }
             if(effect.getStacks) {
-                replacements[`hit.${i}.effect.${e}.stacks`] = effect.getStacks(stats, isDesc);
+                replacements[`hit.${i}.effect.${e}.stacks`] = effect.getStacks(stats, displayMode);
             }
         });
     });
@@ -1335,8 +1747,47 @@ function buildHitEffectReplacements(hits, stats, isDesc = false) {
 // ============================================================================
 
 /**
+ * Simple effect instance wrapper for equipment/consumable effects.
+ * Provides the same interface as aura instances so both can use the unified processor.
+ */
+class SimpleEffectInstance {
+    constructor(amount, sourceName, stacks = 1) {
+        this.amount = amount;
+        this.stacks = stacks;
+        this.base = { name: sourceName, consume: false };
+        this.source = null;
+        this.age = 0;
+        this._isSimple = true; // Flag to identify simple instances
+    }
+    
+    // No-op for simple instances (no stack management)
+    remove_stacks(count) { }
+    remove() { }
+}
+
+/**
+ * Get the amount from an effect, handling both aura effects (with getAmount method)
+ * and simple effects (raw JSON with amount property).
+ * @param {object} effect - The effect object
+ * @param {object} instance - The effect instance (aura or simple)
+ * @returns {number} The calculated amount
+ */
+function getEffectAmount(effect, instance) {
+    // Simple instance - amount is pre-calculated and stored on instance
+    if(instance._isSimple) {
+        return instance.amount;
+    }
+    // Aura effect - use getAmount method if available
+    if(effect.getAmount) {
+        return effect.getAmount(instance);
+    }
+    // Fallback to raw amount
+    return effect.amount || 0;
+}
+
+/**
  * Centralized effect processor with registered handlers.
- * Replaces the large switch statement in character.trigger().
+ * Handles effects from auras, equipment, and consumables with a unified interface.
  */
 class EffectProcessor {
     constructor() {
@@ -1347,14 +1798,14 @@ class EffectProcessor {
     /**
      * Register a handler for an effect type
      * @param {string} type - Effect type (e.g., 'damage', 'heal', 'buff')
-     * @param {Function} handler - Handler function(effect, context) => void
+     * @param {Function} handler - Handler function(effect, instance, context) => extra
      */
     register(type, handler) {
         this.handlers.set(type, handler);
     }
     
     /**
-     * Process an effect
+     * Process an effect from an aura (has instance with getAmount method)
      * @param {object} resolved - Resolved effect from aura trigger { effect, instance }
      * @param {object} context - Processing context { character, extra, manager }
      * @returns {object} Modified extra object
@@ -1372,7 +1823,27 @@ class EffectProcessor {
     }
     
     /**
-     * Process multiple resolved effects
+     * Process an effect from equipment/consumables (pre-calculated amount)
+     * @param {object} effect - The effect object
+     * @param {number} amount - Pre-calculated effect amount
+     * @param {string} sourceName - Name of the source for logging
+     * @param {object} context - Processing context { character, extra, manager }
+     * @returns {object} Modified extra object
+     */
+    processSimple(effect, amount, sourceName, context) {
+        const handler = this.handlers.get(effect.type);
+        
+        if(handler) {
+            // Create a simple instance wrapper
+            const instance = new SimpleEffectInstance(amount, sourceName, effect.stacks || 1);
+            return handler(effect, instance, context);
+        }
+        
+        return context.extra;
+    }
+    
+    /**
+     * Process multiple resolved effects from auras
      * @param {Array} resolvedEffects - Array of { effect, instance }
      * @param {object} context - Processing context
      * @returns {object} Modified extra object
@@ -1398,12 +1869,12 @@ function createDefaultEffectProcessor() {
         return ctx.extra;
     });
     
-    // Shield/block damage
+    // Shield/block damage (flat amount)
     processor.register('reduce_amount', (effect, instance, ctx) => {
-        const builtEffect = { amount: effect.getAmount(instance) };
-        const reduce = Math.min(ctx.extra.amount || 0, builtEffect.amount);
+        const amount = getEffectAmount(effect, instance);
+        const reduce = Math.min(ctx.extra.amount || 0, amount);
         ctx.extra.amount -= reduce;
-        if(instance.base.consume) {
+        if(instance.base && instance.base.consume) {
             instance.remove_stacks(reduce);
         }
         return ctx.extra;
@@ -1411,20 +1882,94 @@ function createDefaultEffectProcessor() {
     
     // Damage or heal (with target resolution)
     const damageOrHeal = (effect, instance, ctx) => {
-        const builtEffect = { amount: effect.getAmount(instance) };
+        const amount = getEffectAmount(effect, instance);
+        const builtEffect = { amount };
         const target = effect.target || 'self';
         
         if(target === 'self' || target === undefined) {
-            ctx.manager.log.add(`${ctx.character.name} receives ${builtEffect.amount} ${effect.type} from ${instance.base.name}`);
+            ctx.manager.log.add(`${ctx.character.name} receives ${amount} ${effect.type} from ${instance.base.name}`);
             ctx.character.applyEffect(effect, builtEffect, ctx.character);
         } else if(target === 'attacker' && ctx.extra.attacker) {
-            ctx.manager.log.add(`${ctx.extra.attacker.name} receives ${builtEffect.amount} ${effect.type} from ${instance.base.name}`);
+            ctx.manager.log.add(`${ctx.extra.attacker.name} receives ${amount} ${effect.type} from ${instance.base.name}`);
             ctx.extra.attacker.applyEffect(effect, builtEffect, ctx.character);
+        } else if(target === 'target' && ctx.extra.target) {
+            ctx.manager.log.add(`${ctx.extra.target.name} receives ${amount} ${effect.type} from ${instance.base.name}`);
+            ctx.extra.target.applyEffect(effect, builtEffect, ctx.character);
         }
         return ctx.extra;
     };
     processor.register('damage', damageOrHeal);
     processor.register('heal', damageOrHeal);
+    
+    // Heal percent of max HP
+    processor.register('heal_percent', (effect, instance, ctx) => {
+        const amount = getEffectAmount(effect, instance);
+        const healAmount = Math.ceil(ctx.character.maxHitpoints * (amount / 100));
+        ctx.character.heal({ amount: healAmount }, ctx.character);
+        ctx.manager.log.add(`${ctx.character.name} heals for ${healAmount} from ${instance.base.name}`);
+        return ctx.extra;
+    });
+    
+    // Heal entire party for percent of max HP
+    processor.register('heal_party_percent', (effect, instance, ctx) => {
+        const amount = getEffectAmount(effect, instance);
+        if(ctx.manager.party) {
+            ctx.manager.party.heroes.forEach(hero => {
+                if(!hero.dead) {
+                    const healAmount = Math.ceil(hero.maxHitpoints * (amount / 100));
+                    hero.heal({ amount: healAmount }, ctx.character);
+                }
+            });
+            ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} heals the party`);
+        }
+        return ctx.extra;
+    });
+    
+    // Apply buff aura
+    processor.register('buff', (effect, instance, ctx) => {
+        const stacks = instance.stacks || effect.stacks || 1;
+        const builtEffect = { stacks };
+        const target = effect.target || 'self';
+        
+        if(target === 'self' || target === undefined) {
+            ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} applies ${effect.id}`);
+            ctx.character.auras.add(effect.id, builtEffect, ctx.character);
+        } else if(target === 'attacker' && ctx.extra.attacker) {
+            ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} applies ${effect.id} to ${ctx.extra.attacker.name}`);
+            ctx.extra.attacker.auras.add(effect.id, builtEffect, ctx.character);
+        }
+        return ctx.extra;
+    });
+    
+    // Apply debuff aura
+    processor.register('debuff', (effect, instance, ctx) => {
+        const stacks = instance.stacks || effect.stacks || 1;
+        const builtEffect = { stacks };
+        const target = effect.target || 'target';
+        
+        let targetChar = null;
+        if(target === 'self') {
+            targetChar = ctx.character;
+        } else if(target === 'attacker' && ctx.extra.attacker) {
+            targetChar = ctx.extra.attacker;
+        } else if(target === 'target' && ctx.extra.target) {
+            targetChar = ctx.extra.target;
+        }
+        
+        if(targetChar && !targetChar.dead) {
+            ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} applies ${effect.id} to ${targetChar.name}`);
+            targetChar.auras.add(effect.id, builtEffect, ctx.character);
+        }
+        return ctx.extra;
+    });
+    
+    // Energy gain
+    processor.register('energy', (effect, instance, ctx) => {
+        const amount = getEffectAmount(effect, instance);
+        ctx.character.energy = Math.min(ctx.character.maxEnergy, ctx.character.energy + amount);
+        ctx.character.renderQueue.energy = true;
+        return ctx.extra;
+    });
     
     // Stack manipulation
     processor.register('remove_stacks', (effect, instance, ctx) => {
@@ -1439,13 +1984,10 @@ function createDefaultEffectProcessor() {
     });
     
     processor.register('remove', (effect, instance, ctx) => {
-        // If effect has an age condition, it triggers that many times before removing
-        // age=3 means the effect triggers at age 0, 1, 2, then removes at age 3
         if (effect.age !== undefined) {
             if (instance.age >= effect.age) {
                 instance.remove();
             }
-            // Otherwise the effect just triggers but doesn't remove yet
         } else {
             instance.remove();
         }
@@ -1454,36 +1996,36 @@ function createDefaultEffectProcessor() {
     
     // Damage modifiers
     processor.register('increase_damage', (effect, instance, ctx) => {
-        const builtEffect = { amount: effect.getAmount(instance) };
-        ctx.extra.amount = (ctx.extra.amount || 0) + builtEffect.amount;
+        const amount = getEffectAmount(effect, instance);
+        ctx.extra.amount = (ctx.extra.amount || 0) + amount;
         return ctx.extra;
     });
     
     processor.register('increase_damage_percent', (effect, instance, ctx) => {
-        const builtEffect = { amount: effect.getAmount(instance) };
-        const increase = Math.ceil((ctx.extra.amount || 0) * (builtEffect.amount / 100));
+        const amount = getEffectAmount(effect, instance);
+        const increase = Math.ceil((ctx.extra.amount || 0) * (amount / 100));
         ctx.extra.amount = (ctx.extra.amount || 0) + increase;
         return ctx.extra;
     });
     
     processor.register('reduce_damage_percent', (effect, instance, ctx) => {
-        const builtEffect = { amount: effect.getAmount(instance) };
-        const reduction = Math.ceil((ctx.extra.amount || 0) * (builtEffect.amount / 100));
+        const amount = getEffectAmount(effect, instance);
+        const reduction = Math.ceil((ctx.extra.amount || 0) * (amount / 100));
         ctx.extra.amount = Math.max(0, (ctx.extra.amount || 0) - reduction);
         return ctx.extra;
     });
     
     processor.register('reduce_heal_percent', (effect, instance, ctx) => {
-        const builtEffect = { amount: effect.getAmount(instance) };
-        const reduction = Math.ceil((ctx.extra.amount || 0) * (builtEffect.amount / 100));
+        const amount = getEffectAmount(effect, instance);
+        const reduction = Math.ceil((ctx.extra.amount || 0) * (amount / 100));
         ctx.extra.amount = Math.max(0, (ctx.extra.amount || 0) - reduction);
         return ctx.extra;
     });
     
     // Chance-based effects
     processor.register('chance_skip', (effect, instance, ctx) => {
-        const builtEffect = { amount: effect.getAmount(instance) };
-        if(Math.random() * 100 < builtEffect.amount) {
+        const amount = getEffectAmount(effect, instance);
+        if(Math.random() * 100 < amount) {
             ctx.extra.skip = true;
             ctx.manager.log.add(`${ctx.character.name} is overcome with ${instance.base.name}!`);
         }
@@ -1491,8 +2033,8 @@ function createDefaultEffectProcessor() {
     });
     
     processor.register('chance_dodge', (effect, instance, ctx) => {
-        const builtEffect = { amount: effect.getAmount(instance) };
-        if(Math.random() * 100 < builtEffect.amount) {
+        const amount = getEffectAmount(effect, instance);
+        if(Math.random() * 100 < amount) {
             ctx.extra.amount = 0;
             ctx.extra.dodged = true;
             ctx.manager.log.add(`${ctx.character.name} dodges the attack!`);
@@ -1501,8 +2043,8 @@ function createDefaultEffectProcessor() {
     });
     
     processor.register('chance_miss', (effect, instance, ctx) => {
-        const builtEffect = { amount: effect.getAmount(instance) };
-        if(Math.random() * 100 < builtEffect.amount) {
+        const amount = getEffectAmount(effect, instance);
+        if(Math.random() * 100 < amount) {
             ctx.extra.amount = 0;
             ctx.extra.missed = true;
             ctx.manager.log.add(`${ctx.character.name} misses due to ${instance.base.name}!`);
@@ -1511,8 +2053,8 @@ function createDefaultEffectProcessor() {
     });
     
     processor.register('chance_hit_ally', (effect, instance, ctx) => {
-        const builtEffect = { amount: effect.getAmount(instance) };
-        if(Math.random() * 100 < builtEffect.amount) {
+        const amount = getEffectAmount(effect, instance);
+        if(Math.random() * 100 < amount) {
             ctx.extra.hitAlly = true;
             ctx.manager.log.add(`${ctx.character.name} is confused and attacks an ally!`);
         }
@@ -1536,6 +2078,18 @@ function createDefaultEffectProcessor() {
         return ctx.extra;
     });
     
+    processor.register('prevent_death', (effect, instance, ctx) => {
+        if(effect.oncePerEncounter && instance._preventDeathUsed) {
+            return ctx.extra;
+        }
+        ctx.extra.prevented = true;
+        if(effect.oncePerEncounter) {
+            instance._preventDeathUsed = true;
+        }
+        ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} prevents death!`);
+        return ctx.extra;
+    });
+    
     processor.register('force_target', (effect, instance, ctx) => {
         if(instance.source) {
             ctx.extra.forcedTarget = instance.source;
@@ -1545,8 +2099,8 @@ function createDefaultEffectProcessor() {
     
     // Lifesteal
     processor.register('lifesteal', (effect, instance, ctx) => {
-        const builtEffect = { amount: effect.getAmount(instance) };
-        const healAmount = Math.ceil((ctx.extra.damageDealt || 0) * (builtEffect.amount / 100));
+        const amount = getEffectAmount(effect, instance);
+        const healAmount = Math.ceil((ctx.extra.damageDealt || 0) * (amount / 100));
         if(healAmount > 0) {
             ctx.character.heal({ amount: healAmount }, ctx.character);
             ctx.manager.log.add(`${ctx.character.name} heals for ${healAmount} from ${instance.base.name}`);
@@ -1554,17 +2108,90 @@ function createDefaultEffectProcessor() {
         return ctx.extra;
     });
     
+    // Reflect damage
+    processor.register('reflect_damage', (effect, instance, ctx) => {
+        const amount = getEffectAmount(effect, instance);
+        if(ctx.extra.damageReceived && ctx.extra.attacker) {
+            const reflectAmount = Math.ceil(ctx.extra.damageReceived * (amount / 100));
+            ctx.extra.attacker.damage({ amount: reflectAmount }, ctx.character);
+            ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} reflects ${reflectAmount} damage`);
+        }
+        return ctx.extra;
+    });
+    
+    // Cleanse debuffs
+    processor.register('cleanse', (effect, instance, ctx) => {
+        const amount = getEffectAmount(effect, instance) || effect.count || 999;
+        const target = effect.target === 'self' || effect.target === undefined ? ctx.character : 
+                      (effect.target === 'attacker' ? ctx.extra.attacker : ctx.extra.target);
+        if(target && !target.dead && target.auras) {
+            let removed = 0;
+            for(const auraInstance of [...target.auras.auras.values()]) {
+                if(auraInstance.base && auraInstance.base.isDebuff && removed < amount) {
+                    auraInstance.stacks = 0;
+                    removed++;
+                }
+            }
+            if(removed > 0) {
+                target.auras.cleanAuras();
+                target.auras.renderQueue.auras = true;
+                if(target.effectCache) {
+                    target.invalidateEffects('auras');
+                }
+                ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} cleanses ${removed} debuff(s) from ${target.name}`);
+            }
+        }
+        return ctx.extra;
+    });
+    
+    // Random buffs
+    processor.register('random_buffs', (effect, instance, ctx) => {
+        const buffPool = [
+            'adventuring:might', 'adventuring:fortify', 'adventuring:haste',
+            'adventuring:regeneration', 'adventuring:barrier', 'adventuring:focus',
+            'adventuring:arcane_power', 'adventuring:stealth'
+        ];
+        const count = effect.count || 1;
+        const stacks = instance.stacks || effect.stacks || 1;
+        for(let i = 0; i < count; i++) {
+            const buffId = buffPool[Math.floor(Math.random() * buffPool.length)];
+            ctx.character.auras.add(buffId, { stacks }, ctx.character);
+        }
+        ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} grants ${count} random buffs`);
+        return ctx.extra;
+    });
+    
+    // Random debuffs
+    processor.register('random_debuffs', (effect, instance, ctx) => {
+        const debuffPool = [
+            'adventuring:weaken', 'adventuring:slow', 'adventuring:blind',
+            'adventuring:poison', 'adventuring:burn', 'adventuring:decay',
+            'adventuring:vulnerability', 'adventuring:chill'
+        ];
+        const count = effect.count || 1;
+        const stacks = instance.stacks || effect.stacks || 1;
+        const target = effect.target === 'attacker' ? ctx.extra.attacker : ctx.extra.target;
+        if(target && !target.dead) {
+            for(let i = 0; i < count; i++) {
+                const debuffId = debuffPool[Math.floor(Math.random() * debuffPool.length)];
+                target.auras.add(debuffId, { stacks }, ctx.character);
+            }
+            ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} applies ${count} random debuffs to ${target.name}`);
+        }
+        return ctx.extra;
+    });
+    
     // XP and loot bonuses
     processor.register('increase_xp_percent', (effect, instance, ctx) => {
-        const builtEffect = { amount: effect.getAmount(instance) };
-        const increase = Math.ceil((ctx.extra.amount || 0) * (builtEffect.amount / 100));
+        const amount = getEffectAmount(effect, instance);
+        const increase = Math.ceil((ctx.extra.amount || 0) * (amount / 100));
         ctx.extra.amount = (ctx.extra.amount || 0) + increase;
         return ctx.extra;
     });
     
     processor.register('increase_loot_percent', (effect, instance, ctx) => {
-        const builtEffect = { amount: effect.getAmount(instance) };
-        const increase = Math.ceil((ctx.extra.amount || 0) * (builtEffect.amount / 100));
+        const amount = getEffectAmount(effect, instance);
+        const increase = Math.ceil((ctx.extra.amount || 0) * (amount / 100));
         ctx.extra.amount = (ctx.extra.amount || 0) + increase;
         return ctx.extra;
     });
@@ -1631,9 +2258,15 @@ export {
     parseDescription,
     describeEffect,
     describeEffectFull,
+    describeEffects,
     formatTrigger,
+    formatTriggerSuffix,
+    formatTarget,
     buildEffectReplacements,
     buildHitEffectReplacements,
+    // Effect processing (unified)
+    SimpleEffectInstance,
+    getEffectAmount,
     EffectProcessor,
     defaultEffectProcessor,
     addMasteryXPWithBonus,

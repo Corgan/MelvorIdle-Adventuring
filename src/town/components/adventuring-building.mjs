@@ -1,4 +1,8 @@
-export class AdventuringBuildingElement extends HTMLElement {
+const { loadModule } = mod.getContext(import.meta);
+
+const { AdventuringTooltipElement } = await loadModule('src/core/adventuring-tooltip-element.mjs');
+
+export class AdventuringBuildingElement extends AdventuringTooltipElement {
     constructor() {
         super();
         this._content = new DocumentFragment();
@@ -6,26 +10,13 @@ export class AdventuringBuildingElement extends HTMLElement {
 
         this.clickable = getElementFromFragment(this._content, 'clickable', 'div');
         this.icon = getElementFromFragment(this._content, 'icon', 'img');
-    }
-
-    mount(parent) {
-        parent.append(this);
+        
+        this._tooltipTarget = this.clickable;
     }
 
     connectedCallback() {
         this.appendChild(this._content);
-        this.tooltip = tippy(this.clickable, {
-            content: '',
-            allowHTML: true,
-            hideOnClick: false
-        });
-    }
-
-    disconnectedCallback() {
-        if (this.tooltip !== undefined) {
-            this.tooltip.destroy();
-            this.tooltip = undefined;
-        }
+        super.connectedCallback();
     }
 }
 window.customElements.define('adventuring-building', AdventuringBuildingElement);

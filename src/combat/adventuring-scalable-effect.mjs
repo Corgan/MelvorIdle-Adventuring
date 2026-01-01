@@ -83,20 +83,24 @@ export class AdventuringScalableEffect {
         return false;
     }
 
-    getAmount(source, isDesc=false) {
+    /**
+     * Get the amount value, with optional display formatting.
+     * 
+     * Display modes:
+     * - 'total': Just the total number (25) - for tooltips
+     * - 'scaled': Base + scaled value with icon (5 + 20 icon) - for ability selector
+     * - 'multiplier': Base + multiplier with icon (5 + 0.5 icon) - for job overview
+     * - false/undefined: Raw calculated number for combat logic
+     * 
+     * @param {object} source - Stats source (character or stats map)
+     * @param {string} displayMode - Display mode: 'total', 'scaled', 'multiplier', or falsy for raw
+     * @returns {number|string} Calculated amount or formatted string
+     */
+    getAmount(source, displayMode) {
         let amount = this.amount !== undefined && this.amount.base !== undefined ? this.amount.base : 0;
-        if(isDesc) {
-            let ret = amount;
-            if(this.amount !== undefined && this.amount.scaling !== undefined) {
-                let showScale = source === undefined || !this._hasStats(source);
-                ret += [...this.amount.scaling].reduce((str, [stat, scale]) => {
-                    let value = showScale ? scale : Math.floor(this._getStatValue(source, stat) * scale);
-                    let statImg = `<img class="skill-icon-xxs" style="height: .66rem; width: .66rem; margin-top: 0;" src="${stat.media}">`
-                    return str + ` + ${value} ${statImg}`;
-                }, '');
-            }
-            return ret;
-        } else {
+        
+        // No display mode - return raw number
+        if (!displayMode) {
             if(this.amount !== undefined && this.amount.scaling !== undefined && source !== undefined) {
                 amount += [...this.amount.scaling].reduce((bonus, [stat, scale]) => {
                     return bonus + (this._getStatValue(source, stat) * scale)
@@ -104,27 +108,85 @@ export class AdventuringScalableEffect {
             }
             return Math.floor(amount);
         }
+        
+        // Display modes
+        const hasScaling = this.amount !== undefined && this.amount.scaling !== undefined && this.amount.scaling.size > 0;
+        
+        if (!hasScaling) {
+            return amount; // No scaling, just return base
+        }
+        
+        if (displayMode === 'total') {
+            // Calculate total and return as number
+            if (source) {
+                amount += [...this.amount.scaling].reduce((bonus, [stat, scale]) => {
+                    return bonus + (this._getStatValue(source, stat) * scale)
+                }, 0);
+            }
+            return Math.floor(amount);
+        }
+        
+        // Build formatted string with icons
+        let ret = amount;
+        for (const [stat, scale] of this.amount.scaling) {
+            const statImg = `<img class="skill-icon-xxs" style="height: .66rem; width: .66rem; margin-top: 0;" src="${stat.media}">`;
+            
+            if (displayMode === 'multiplier') {
+                // Show the multiplier itself (0.5)
+                ret += ` + ${scale} ${statImg}`;
+            } else if (displayMode === 'scaled') {
+                // Show calculated value from stats
+                const value = source ? Math.floor(this._getStatValue(source, stat) * scale) : scale;
+                ret += ` + ${value} ${statImg}`;
+            }
+        }
+        return ret;
     }
 
-    getStacks(source, isDesc=false) {
+    /**
+     * Get the stacks value, with optional display formatting.
+     * See getAmount for display mode documentation.
+     */
+    getStacks(source, displayMode) {
         let stacks = this.stacks !== undefined && this.stacks.base !== undefined ? this.stacks.base : 0;
-        if(isDesc) {
-            let ret = stacks;
-            if(this.stacks !== undefined && this.stacks.scaling !== undefined) {
-                let showScale = source === undefined || !this._hasStats(source);
-                ret += [...this.stacks.scaling].reduce((str, [stat, scale]) => {
-                    let value = showScale ? scale : Math.floor(this._getStatValue(source, stat) * scale);
-                    let statImg = `<img class="skill-icon-xxs" style="height: .66rem; width: .66rem; margin-top: 0;" src="${stat.media}">`
-                    return str + ` + ${value} ${statImg}`;
-                }, '');
-            }
-            return ret;
-        } else {
+        
+        // No display mode - return raw number
+        if (!displayMode) {
             if(this.stacks !== undefined && this.stacks.scaling !== undefined && source !== undefined)
                 stacks += [...this.stacks.scaling].reduce((bonus, [stat, scale]) => {
                     return bonus + (this._getStatValue(source, stat) * scale)
                 }, 0);
             return Math.floor(stacks);
         }
+        
+        // Display modes
+        const hasScaling = this.stacks !== undefined && this.stacks.scaling !== undefined && this.stacks.scaling.size > 0;
+        
+        if (!hasScaling) {
+            return stacks;
+        }
+        
+        if (displayMode === 'total') {
+            if (source) {
+                stacks += [...this.stacks.scaling].reduce((bonus, [stat, scale]) => {
+                    return bonus + (this._getStatValue(source, stat) * scale)
+                }, 0);
+            }
+            return Math.floor(stacks);
+        }
+        
+        // Build formatted string with icons
+        let ret = stacks;
+        for (const [stat, scale] of this.stacks.scaling) {
+            const statImg = `<img class="skill-icon-xxs" style="height: .66rem; width: .66rem; margin-top: 0;" src="${stat.media}">`;
+            
+            if (displayMode === 'multiplier') {
+                ret += ` + ${scale} ${statImg}`;
+            } else if (displayMode === 'scaled') {
+                const value = source ? Math.floor(this._getStatValue(source, stat) * scale) : scale;
+                ret += ` + ${value} ${statImg}`;
+            }
+        }
+        return ret;
     }
 }

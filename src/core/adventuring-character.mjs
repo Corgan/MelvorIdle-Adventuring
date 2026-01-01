@@ -3,7 +3,7 @@ const { loadModule } = mod.getContext(import.meta);
 const { AdventuringCard } = await loadModule('src/progression/adventuring-card.mjs');
 const { AdventuringStats } = await loadModule('src/core/adventuring-stats.mjs');
 const { AdventuringAuras } = await loadModule('src/combat/adventuring-auras.mjs');
-const { createEffect, EffectCache, defaultEffectProcessor } = await loadModule('src/core/adventuring-utils.mjs');
+const { createEffect, EffectCache, defaultEffectProcessor, SimpleEffectInstance } = await loadModule('src/core/adventuring-utils.mjs');
 
 const { AdventuringCharacterElement } = await loadModule('src/core/components/adventuring-character.mjs');
 
@@ -170,7 +170,8 @@ class AdventuringCharacter {
     }
 
     /**
-     * Process a triggered effect (from equipment, items, etc.)
+     * Process a triggered effect (from equipment, consumables, etc.)
+     * Uses the unified defaultEffectProcessor for consistent handling.
      * @param {object} effect - The effect to process
      * @param {number} amount - Calculated effect amount
      * @param {object} extra - Extra context (attacker, target, damageDealt, etc.)
@@ -178,96 +179,14 @@ class AdventuringCharacter {
      * @returns {object} Modified extra object
      */
     processTriggeredEffect(effect, amount, extra, sourceName) {
-        const builtEffect = { amount: amount, stacks: effect.stacks || 1 };
+        // Use the unified processor with a simple instance wrapper
+        const context = {
+            character: this,
+            manager: this.manager,
+            extra: extra
+        };
         
-        if(effect.type === "damage" || effect.type === "heal") {
-            if(effect.target === "self" || effect.target === undefined) {
-                this.manager.log.add(`${this.name}'s ${sourceName} triggers ${effect.type} for ${amount}`);
-                this.applyEffect(effect, builtEffect, this);
-            } else if(effect.target === "attacker" && extra.attacker) {
-                this.manager.log.add(`${this.name}'s ${sourceName} deals ${amount} ${effect.type} to ${extra.attacker.name}`);
-                extra.attacker.applyEffect(effect, builtEffect, this);
-            }
-        } else if(effect.type === "buff" || effect.type === "debuff") {
-            if(effect.target === "self" || effect.target === undefined) {
-                this.manager.log.add(`${this.name}'s ${sourceName} applies ${effect.id}`);
-                this.auras.add(effect.id, builtEffect, this);
-            } else if(effect.target === "attacker" && extra.attacker) {
-                this.manager.log.add(`${this.name}'s ${sourceName} applies ${effect.id} to ${extra.attacker.name}`);
-                extra.attacker.auras.add(effect.id, builtEffect, this);
-            }
-        } else if(effect.type === "increase_damage") {
-            extra.amount = (extra.amount || 0) + amount;
-        } else if(effect.type === "increase_damage_percent") {
-            let increase = Math.ceil((extra.amount || 0) * (amount / 100));
-            extra.amount = (extra.amount || 0) + increase;
-        } else if(effect.type === "lifesteal") {
-            if(extra.damageDealt) {
-                let healAmount = Math.ceil(extra.damageDealt * (amount / 100));
-                this.heal({ amount: healAmount }, this);
-                this.manager.log.add(`${this.name}'s ${sourceName} heals for ${healAmount}`);
-            }
-        } else if(effect.type === "energy") {
-            this.energy = Math.min(this.maxEnergy, this.energy + amount);
-            this.renderQueue.energy = true;
-        } else if(effect.type === "heal_percent") {
-            // Heal percentage of max HP
-            let healAmount = Math.ceil(this.maxHitpoints * (amount / 100));
-            this.heal({ amount: healAmount }, this);
-            this.manager.log.add(`${this.name}'s ${sourceName} heals for ${healAmount}`);
-        } else if(effect.type === "heal_party_percent") {
-            // Heal entire party for percentage of their max HP
-            if(this.manager.party) {
-                this.manager.party.heroes.forEach(hero => {
-                    if(!hero.dead) {
-                        let healAmount = Math.ceil(hero.maxHitpoints * (amount / 100));
-                        hero.heal({ amount: healAmount }, this);
-                    }
-                });
-                this.manager.log.add(`${this.name}'s ${sourceName} heals the party`);
-            }
-        } else if(effect.type === "random_buffs") {
-            // Apply random buffs from preset pool
-            const buffPool = [
-                'adventuring:might', 'adventuring:fortify', 'adventuring:haste',
-                'adventuring:regeneration', 'adventuring:barrier', 'adventuring:focus',
-                'adventuring:arcane_power', 'adventuring:stealth'
-            ];
-            const count = effect.count || 1;
-            const stacks = effect.stacks || 1;
-            for(let i = 0; i < count; i++) {
-                const buffId = buffPool[Math.floor(Math.random() * buffPool.length)];
-                this.auras.add(buffId, { stacks }, this);
-            }
-            this.manager.log.add(`${this.name}'s ${sourceName} grants ${count} random buffs`);
-        } else if(effect.type === "random_debuffs") {
-            // Apply random debuffs to target from preset pool
-            const debuffPool = [
-                'adventuring:weaken', 'adventuring:slow', 'adventuring:blind',
-                'adventuring:poison', 'adventuring:burn', 'adventuring:decay',
-                'adventuring:vulnerability', 'adventuring:chill'
-            ];
-            const count = effect.count || 1;
-            const stacks = effect.stacks || 1;
-            const target = effect.target === 'attacker' ? extra.attacker : extra.target;
-            if(target && !target.dead) {
-                for(let i = 0; i < count; i++) {
-                    const debuffId = debuffPool[Math.floor(Math.random() * debuffPool.length)];
-                    target.auras.add(debuffId, { stacks }, this);
-                }
-                this.manager.log.add(`${this.name}'s ${sourceName} applies ${count} random debuffs to ${target.name}`);
-            }
-        } else if(effect.type === "reflect_damage") {
-            // Reflect damage is handled passively in damage calculation
-            // Just log for triggered version
-            if(extra.damageReceived && extra.attacker) {
-                let reflectAmount = Math.ceil(extra.damageReceived * (amount / 100));
-                extra.attacker.damage({ amount: reflectAmount }, this);
-                this.manager.log.add(`${this.name}'s ${sourceName} reflects ${reflectAmount} damage`);
-            }
-        }
-        
-        return extra;
+        return defaultEffectProcessor.processSimple(effect, amount, sourceName, context);
     }
 
     buff(id, builtEffect, character) {
@@ -387,6 +306,16 @@ class AdventuringCharacter {
             this.hitpoints = 0;
             this.setEnergy(0);
             if(!this.dead) {
+                // Check for prevent_death effects
+                let preventCheck = this.trigger('before_death', { prevented: false });
+                if(preventCheck.prevented) {
+                    // Death was prevented - restore to 1 HP
+                    this.hitpoints = 1;
+                    this.manager.log.add(`${this.name} cheated death!`);
+                    this.renderQueue.hitpoints = true;
+                    return;
+                }
+                
                 this.dead = true;
 
                 this.onDeath();

@@ -355,14 +355,16 @@ export class TooltipBuilder {
      * @param {string} [options.type] - Ability type: 'generator', 'spender', or 'passive'
      * @param {boolean} [options.showUnlockLevel=false] - Whether to show unlock level info
      * @param {Object} [options.masteryAction] - Action to check mastery level for unlock requirements
+     * @param {boolean} [options.hideIfLocked=false] - Whether to show ??? for locked abilities (grimoire mode)
      * @returns {TooltipBuilder} This builder for chaining
      */
     static forAbility(ability, options = {}) {
-        const { character, manager, type, showUnlockLevel = false, masteryAction } = options;
+        const { character, manager, type, showUnlockLevel = false, masteryAction, hideIfLocked = false, forceShowDescription = false } = options;
         const isUnlocked = ability.unlocked !== undefined ? ability.unlocked : true;
+        const showDetails = isUnlocked || !hideIfLocked || forceShowDescription;
         
         const tooltip = TooltipBuilder.create()
-            .header(isUnlocked ? ability.name : '???');
+            .header(showDetails ? ability.name : '???');
         
         // Type badge if provided
         if(type) {
@@ -374,7 +376,16 @@ export class TooltipBuilder {
         // Usable by section (before description when type is provided)
         if(manager && type) {
             const req = ability.requirements?.find(r => r.type === 'job_level' || r.type === 'current_job_level');
-            if(req) {
+            if(ability.isEnemy) {
+                // Enemy abilities are usable only by Slayer
+                const slayerJob = manager.jobs.getObjectByID('adventuring:slayer');
+                tooltip.separator();
+                if(slayerJob) {
+                    tooltip.hint(`Usable by: <img class="skill-icon-xxs mr-1" src="${slayerJob.media}">${slayerJob.name}`);
+                } else {
+                    tooltip.hint(`Usable by: Slayer`);
+                }
+            } else if(req) {
                 const job = manager.jobs.getObjectByID(req.job);
                 if(job) {
                     tooltip.separator();
@@ -390,10 +401,10 @@ export class TooltipBuilder {
             }
         }
         
-        // Description with stats
+        // Description with stats - use 'total' mode for clean tooltip display
         tooltip.separator();
-        if(isUnlocked) {
-            const desc = ability.getDescription ? ability.getDescription(character, true) : ability.description;
+        if(isUnlocked || forceShowDescription) {
+            const desc = ability.getDescription ? ability.getDescription(character, 'total') : ability.description;
             tooltip.info(desc);
         } else {
             tooltip.warning('???');
@@ -413,7 +424,16 @@ export class TooltipBuilder {
         // Usable by section (after description when no type is provided - combat selector style)
         if(manager && !type) {
             const req = ability.requirements?.find(r => r.type === 'job_level' || r.type === 'current_job_level');
-            if(req) {
+            if(ability.isEnemy) {
+                // Enemy abilities are usable only by Slayer
+                const slayerJob = manager.jobs.getObjectByID('adventuring:slayer');
+                tooltip.separator();
+                if(slayerJob) {
+                    tooltip.hint(`Usable by: <img class="skill-icon-xxs mr-1" src="${slayerJob.media}">${slayerJob.name}`);
+                } else {
+                    tooltip.hint(`Usable by: Slayer`);
+                }
+            } else if(req) {
                 const job = manager.jobs.getObjectByID(req.job);
                 if(job) {
                     tooltip.separator();
@@ -605,37 +625,99 @@ export class TooltipBuilder {
     }
 
     /**
-     * Create a consumable tooltip showing name, type, description, charges, and cost.
-     * @param {Object} consumable - Consumable object with name, media, type, description, charges, etc.
+     * Create a consumable tooltip showing name, type, description, and total charges across all tiers.
+     * @param {Object} consumable - Tiered consumable object with name, media, type, etc.
      * @returns {TooltipBuilder} This builder for chaining
      */
     static forConsumable(consumable) {
         const typeLabel = consumable.type ? (consumable.type.charAt(0).toUpperCase() + consumable.type.slice(1)) : 'Consumable';
         const tooltip = TooltipBuilder.create()
             .header(consumable.name, consumable.media)
-            .subheader(typeLabel)
-            .hint(consumable.description)
-            .separator();
+            .subheader(typeLabel);
         
-        if(consumable.isTavernDrink) {
-            // Show runs remaining for tavern drinks (charges = runs)
-            if(consumable.charges > 0) {
-                tooltip.bonus(`Active: ${consumable.charges} runs remaining`);
-            }
-        } else {
-            // Show charges for charge-based consumables
-            tooltip.warning(`Charges: ${consumable.charges}/${consumable.maxCharges}`);
+        // Show source job if defined
+        if (consumable.sourceJob) {
+            tooltip.hint(`Source: ${consumable.sourceJob.name}`);
         }
         
-        if(consumable.materials !== undefined && consumable.materials.size > 0 && consumable.charges < consumable.maxCharges) {
+        tooltip.separator();
+        
+        // Show total charges across all tiers
+        const totalCharges = consumable.totalCharges;
+        tooltip.warning(`Total Charges: ${totalCharges}`);
+        
+        // Show equipped tier if any
+        const equippedTier = consumable.equippedTier;
+        if (equippedTier > 0) {
+            tooltip.bonus(`Equipped: ${consumable.getTierName(equippedTier)}`);
+        }
+        
+        // Show tier summary
+        tooltip.separator().hint('Tiers:');
+        for (let tier = 1; tier <= 4; tier++) {
+            const tierData = consumable.tiers.get(tier);
+            if (tierData) {
+                const charges = consumable.getCharges(tier);
+                const mark = equippedTier === tier ? ' ✓' : '';
+                tooltip.text(`${consumable.getTierName(tier)}: ${charges}${mark}`, 'text-muted');
+            }
+        }
+        
+        return tooltip;
+    }
+
+    /**
+     * Create a tooltip for a specific tier of a tiered consumable.
+     * @param {Object} consumable - Tiered consumable object
+     * @param {number} tier - The tier (1-4)
+     * @returns {TooltipBuilder} This builder for chaining
+     */
+    static forConsumableTier(consumable, tier) {
+        const typeLabel = consumable.type ? (consumable.type.charAt(0).toUpperCase() + consumable.type.slice(1)) : 'Consumable';
+        const tierName = consumable.getTierName(tier);
+        const tierMedia = consumable.getTierMedia(tier);
+        const tierDesc = consumable.getTierDescription(tier);
+        const charges = consumable.getCharges(tier);
+        const materials = consumable.getTierMaterials(tier);
+        
+        const tooltip = TooltipBuilder.create()
+            .header(tierName, tierMedia)
+            .subheader(typeLabel)
+            .hint(tierDesc)
+            .separator();
+        
+        // Show charges
+        tooltip.warning(`Charges: ${charges}`);
+        
+        if(materials !== undefined && materials.size > 0) {
             tooltip.separator().hint('Craft Cost:');
             const costItems = [];
-            consumable.materials.forEach((qty, material) => {
-                const owned = material.count;
+            materials.forEach((qty, material) => {
+                const owned = material.count || 0;
                 const color = owned >= qty ? 'text-success' : 'text-danger';
                 costItems.push(tooltip.iconValue(material.media, `<span class="${color}">${qty}</span> <small class="text-muted">(${owned})</small>`));
             });
             tooltip.statRow(...costItems);
+        }
+        
+        return tooltip;
+    }
+
+    /**
+     * Create a tavern drink tooltip showing name, description, and runs remaining.
+     * @param {Object} drink - TavernDrink object with name, media, description
+     * @param {number} runsRemaining - Number of runs remaining
+     * @returns {TooltipBuilder} This builder for chaining
+     */
+    static forTavernDrink(drink, runsRemaining) {
+        const tooltip = TooltipBuilder.create()
+            .header(drink.name, drink.media)
+            .subheader('Tavern Drink')
+            .hint(drink.description)
+            .separator();
+        
+        if(runsRemaining > 0) {
+            tooltip.bonus(`Active: ${runsRemaining} runs remaining`);
         }
         
         return tooltip;
@@ -670,11 +752,14 @@ export class TooltipBuilder {
         if(addSeparator) this.separator();
         const statItems = [];
         stats.forEach((value, stat) => {
+            if(!stat || !stat.media) return; // Skip invalid stats
             const prefix = value >= 0 ? '+' : '';
             const color = value >= 0 ? 'text-success' : 'text-danger';
             statItems.push(this.iconValue(stat.media, `${prefix}${value}`, color));
         });
-        this.statRow(...statItems);
+        if(statItems.length > 0) {
+            this.statRow(...statItems);
+        }
         return this;
     }
 

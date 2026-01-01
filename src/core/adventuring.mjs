@@ -30,6 +30,7 @@ const { AdventuringJobDetails } = await loadModule('src/progression/adventuring-
 
 const { AdventuringArmory } = await loadModule('src/items/adventuring-armory.mjs');
 const { AdventuringTavern } = await loadModule('src/town/adventuring-tavern.mjs');
+const { AdventuringTavernDrink } = await loadModule('src/town/adventuring-tavern-drink.mjs');
 const { AdventuringSlayers } = await loadModule('src/progression/adventuring-slayers.mjs');
 const { AdventuringLemons } = await loadModule('src/town/adventuring-lemons.mjs');
 const { AdventuringConsumables } = await loadModule('src/items/adventuring-consumables.mjs');
@@ -53,6 +54,7 @@ const { AdventuringTutorial } = await loadModule('src/ui/adventuring-tutorial.mj
 const { AdventuringTutorialManager } = await loadModule('src/ui/adventuring-tutorial-manager.mjs');
 const { AdventuringEquipmentSet } = await loadModule('src/items/adventuring-equipment-set.mjs');
 const { AdventuringModifiers } = await loadModule('src/core/adventuring-modifiers.mjs');
+const { AdventuringGrimoire } = await loadModule('src/slayer/adventuring-grimoire.mjs');
 
 const { AdventuringPageElement } = await loadModule('src/core/components/adventuring.mjs');
 
@@ -65,7 +67,7 @@ class AdventuringRenderQueue extends MasterySkillRenderQueue {
 export class Adventuring extends SkillWithMastery {
     constructor(namespace, game) {
         super(namespace, 'Adventuring', game);
-        this.version = 4;
+        this.version = 5;
         this.saveVersion = -1;
         this._media = 'melvor:assets/media/main/adventure.svg';
         this.renderQueue = new AdventuringRenderQueue();
@@ -110,6 +112,7 @@ export class Adventuring extends SkillWithMastery {
         this.baseItems = new NamespaceRegistry(this.game.registeredNamespaces);
         this.consumableTypes = new NamespaceRegistry(this.game.registeredNamespaces);
         this.consumableCategories = new NamespaceRegistry(this.game.registeredNamespaces);
+        this.tavernDrinks = new NamespaceRegistry(this.game.registeredNamespaces);
         this.categories = new NamespaceRegistry(this.game.registeredNamespaces);
         this.equipmentSets = new NamespaceRegistry(this.game.registeredNamespaces);
         this.masteryCategories = new NamespaceRegistry(this.game.registeredNamespaces);
@@ -143,6 +146,7 @@ export class Adventuring extends SkillWithMastery {
 
         this.stash = new AdventuringStash(this, this.game);
         this.bestiary = new AdventuringBestiary(this, this.game);
+        this.grimoire = new AdventuringGrimoire(this, this.game);
         this.crossroads = new AdventuringCrossroads(this, this.game);
         this.dungeon = new AdventuringDungeon(this, this.game);
         this.encounter = new AdventuringEncounter(this, this.game);
@@ -249,6 +253,7 @@ export class Adventuring extends SkillWithMastery {
         this.monsters.forEach(monster => monster.onLoad());
         this.materials.forEach(material => material.onLoad());
         this.consumableTypes.forEach(consumable => consumable.onLoad());
+        this.tavernDrinks.forEach(drink => drink.onLoad());
 
         this.pages.onLoad();
 
@@ -804,6 +809,13 @@ export class Adventuring extends SkillWithMastery {
             });
         }
 
+        if(data.tavernDrinks !== undefined) {
+            data.tavernDrinks.forEach(data => {
+                let drink = new AdventuringTavernDrink(namespace, data, this, this.game);
+                this.tavernDrinks.registerObject(drink);
+            });
+        }
+
         if(data.equipmentSets !== undefined) {
             data.equipmentSets.forEach(data => {
                 let set = new AdventuringEquipmentSet(namespace, data, this, this.game);
@@ -849,6 +861,7 @@ export class Adventuring extends SkillWithMastery {
         this.materials.forEach(material => material.postDataRegistration());
         this.baseItems.forEach(baseItem => baseItem.postDataRegistration());
         this.consumableTypes.forEach(consumable => consumable.postDataRegistration());
+        this.tavernDrinks.forEach(drink => drink.postDataRegistration());
         this.equipmentSets.forEach(set => set.postDataRegistration());
 
         // Build source lookup tables for tooltips
@@ -991,6 +1004,9 @@ export class Adventuring extends SkillWithMastery {
         // Encode achievement state (version 13+)
         this.achievementManager.encode(writer);
 
+        // Encode grimoire state (version 5+)
+        this.grimoire.encode(writer);
+
         let end = writer.byteOffset;
         //console.log(`Wrote ${end-start} bytes for Adventuring save`);
         return writer;
@@ -1055,6 +1071,11 @@ export class Adventuring extends SkillWithMastery {
 
             // Decode achievement state (version 13+)
             this.achievementManager.decode(reader, version);
+
+            // Decode grimoire state (version 5+)
+            if(this.saveVersion >= 5) {
+                this.grimoire.decode(reader, version);
+            }
         } catch(e) { // Something's fucky, dump all progress and skip past the trash save data
             console.log(e);
             reader.byteOffset = start;

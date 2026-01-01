@@ -4,7 +4,6 @@ const { AdventuringPage } = await loadModule('src/ui/adventuring-page.mjs');
 const { AdventuringSlayerTask, SlayerTaskGenerator } = await loadModule('src/progression/adventuring-slayer-task.mjs');
 const { AdventuringSlayersElement } = await loadModule('src/progression/components/adventuring-slayers.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
-const { getTemplateNode, getElementFromFragment } = await loadModule('src/core/adventuring-utils.mjs');
 const { AdventuringTaskRewardElement } = await loadModule('src/progression/components/adventuring-task-reward.mjs');
 const { AdventuringStatBadgeElement } = await loadModule('src/progression/components/adventuring-stat-badge.mjs');
 const { AdventuringAchievementRewardElement } = await loadModule('src/progression/components/adventuring-achievement-reward.mjs');
@@ -350,7 +349,7 @@ export class AdventuringSlayers extends AdventuringPage {
      */
     renderAchievementSummary() {
         const total = this.manager.achievements.allObjects.length;
-        const completed = this.manager.completedAchievements.size;
+        const completed = this.manager.achievementManager.completedAchievements.size;
         const percent = total > 0 ? Math.floor((completed / total) * 100) : 0;
 
         this.component.achievementSummary.textContent = `${completed} / ${total} Complete`;
@@ -360,21 +359,12 @@ export class AdventuringSlayers extends AdventuringPage {
         const stats = this.getAchievementStatTotals();
         this.component.achievementStats.replaceChildren();
 
-        const statOrder = [
-            { id: 'hitpoints', name: 'HP', icon: 'fa-heart', color: 'text-danger' },
-            { id: 'strength', name: 'STR', icon: 'fa-fist-raised', color: 'text-warning' },
-            { id: 'defence', name: 'DEF', icon: 'fa-shield-alt', color: 'text-info' },
-            { id: 'agility', name: 'AGI', icon: 'fa-running', color: 'text-success' },
-            { id: 'magic', name: 'MAG', icon: 'fa-magic', color: 'text-primary' },
-            { id: 'ranged', name: 'RNG', icon: 'fa-bullseye', color: 'text-warning' },
-            { id: 'prayer', name: 'PRA', icon: 'fa-pray', color: 'text-light' }
-        ];
-
-        for(const stat of statOrder) {
-            const value = stats[stat.id] || 0;
+        // Use actual stat definitions from the registry
+        for(const stat of this.manager.stats.allObjects) {
+            const value = stats[stat.localID] || 0;
             if(value > 0) {
                 const badge = new AdventuringStatBadgeElement();
-                badge.setStatData(stat.icon, stat.color, value, stat.name);
+                badge.setStatDataFromStat(stat, value);
                 this.component.achievementStats.appendChild(badge);
             }
         }
@@ -558,24 +548,8 @@ export class AdventuringSlayers extends AdventuringPage {
     claimAchievement(achievement) {
         if(achievement.isComplete() || !achievement.isMet()) return;
 
-        // Mark as complete
-        this.manager.completedAchievements.add(achievement.id);
-
-        // Grant rewards
-        for(const reward of achievement.rewards) {
-            if(reward.type === 'currency') {
-                const currency = this.manager.materials.getObjectByID('adventuring:currency');
-                this.manager.stash.add(currency, reward.qty);
-            } else if(reward.type === 'stat') {
-                // Permanent stat bonuses are applied via the achievement system
-                // They're calculated in getAchievementStatTotals and applied to party
-            } else if(reward.type === 'material') {
-                const mat = this.manager.materials.getObjectByID(reward.id);
-                if(mat) {
-                    this.manager.stash.add(mat, reward.qty);
-                }
-            }
-        }
+        // Mark as complete and grant rewards through achievementManager
+        this.manager.achievementManager.completeAchievement(achievement);
 
         this.manager.log.add(`Achievement unlocked: ${achievement.name}!`);
         this.renderQueue.achievements = true;

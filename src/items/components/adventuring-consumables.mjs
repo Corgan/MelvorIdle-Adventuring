@@ -6,8 +6,10 @@ export class AdventuringConsumablesElement extends HTMLElement {
 
         this.page = getElementFromFragment(this._content, 'page', 'div');
         this.back = getElementFromFragment(this._content, 'back', 'button');
-        this.items = getElementFromFragment(this._content, 'items', 'div');
         this.slotsContainer = getElementFromFragment(this._content, 'slots', 'div');
+        
+        // Collapsible job sections container
+        this.jobSections = getElementFromFragment(this._content, 'job-sections', 'div');
         
         // Get individual slot elements
         this.slots = [];
@@ -24,9 +26,14 @@ export class AdventuringConsumablesElement extends HTMLElement {
         this.detailDescription = getElementFromFragment(this._content, 'detail-description', 'p');
         this.detailEffects = getElementFromFragment(this._content, 'detail-effects', 'div');
         this.detailCharges = getElementFromFragment(this._content, 'detail-charges', 'span');
-        this.detailMaterials = getElementFromFragment(this._content, 'detail-materials', 'div');
-        this.craftButton = getElementFromFragment(this._content, 'craft-button', 'button');
         this.equipButton = getElementFromFragment(this._content, 'equip-button', 'button');
+        
+        // Tier buttons
+        this.tierButtons = getElementFromFragment(this._content, 'tier-buttons', 'div');
+        this.tierButtonElements = [];
+        for(let i = 1; i <= 4; i++) {
+            this.tierButtonElements.push(getElementFromFragment(this._content, `tier-${i}`, 'button'));
+        }
     }
 
     connectedCallback() {
