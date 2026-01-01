@@ -34,11 +34,17 @@ const LEMON_SECRETS = [
     "The Lemon Stall has been here longer than the town itself. We're not sure how.",
 ];
 
-class LemonRenderQueue {
+class AdventuringLemonRenderQueue {
     constructor() {
         this.all = false;
         this.quote = false;
         this.stats = false;
+    }
+
+    queueAll() {
+        this.all = true;
+        this.quote = true;
+        this.stats = true;
     }
 }
 
@@ -48,7 +54,7 @@ export class AdventuringLemons extends AdventuringPage {
         this.manager = manager;
         this.game = game;
         this.component = createElement('adventuring-lemons');
-        this.renderQueue = new LemonRenderQueue();
+        this.renderQueue = new AdventuringLemonRenderQueue();
 
         // Lemon statistics
         this.lemonadesConsumed = 0;

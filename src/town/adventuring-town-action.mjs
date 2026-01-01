@@ -59,6 +59,7 @@ export class AdventuringTownAction extends NamespacedObject {
     }
 
     canDo(character) {
-        return this._reqChecker?.check({ character }) ?? true;
+        if (this._reqChecker === undefined) return true;
+        return this._reqChecker.check({ character });
     }
 }

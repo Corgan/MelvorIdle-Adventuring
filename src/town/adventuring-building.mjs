@@ -81,7 +81,8 @@ export class AdventuringBuilding extends NamespacedObject {
     }
 
     get unlocked() {
-        return this._reqChecker?.check() ?? true;
+        if (this._reqChecker === undefined) return true;
+        return this._reqChecker.check();
     }
 
     get tooltip() {

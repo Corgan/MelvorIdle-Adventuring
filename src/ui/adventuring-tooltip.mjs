@@ -178,7 +178,7 @@ export class TooltipBuilder {
         effects.forEach(e => {
             const description = describeEffect(e, manager);
             // Negative values or penalty types get penalty styling
-            const isPenalty = e.value < 0 || e.type?.includes('enemy_') || e.type?.includes('_cost');
+            const isPenalty = e.value < 0 || (e.type !== undefined && (e.type.includes('enemy_') || e.type.includes('_cost')));
             if(isPenalty) {
                 this.penalty(description);
             } else {
@@ -200,10 +200,10 @@ export class TooltipBuilder {
         this.subheader(`${difficulty.name} Mode`, difficulty.color);
         
         // Use the difficulty's tooltip effects method
-        const effects = difficulty.getTooltipEffects?.() || [];
+        const effects = difficulty.getTooltipEffects !== undefined ? difficulty.getTooltipEffects() : [];
         effects.forEach(e => {
             const description = describeEffect(e, manager);
-            const isPenalty = e.type?.includes('enemy_') || e.value < 0;
+            const isPenalty = (e.type !== undefined && e.type.includes('enemy_')) || e.value < 0;
             if(isPenalty) {
                 this.penalty(description);
             } else {
@@ -318,7 +318,7 @@ export class TooltipBuilder {
             .text(`Owned: ${material.count}`, 'text-center');
         
         // Add source hints if manager is available
-        if(manager?.materialSources) {
+        if(manager !== undefined && manager.materialSources !== undefined) {
             tooltip.sourceHint(manager.materialSources.get(material), 'Drops from');
         }
         
@@ -375,10 +375,10 @@ export class TooltipBuilder {
         
         // Usable by section (before description when type is provided)
         if(manager && type) {
-            const req = ability.requirements?.find(r => r.type === 'job_level' || r.type === 'current_job_level');
+            const req = ability.requirements !== undefined ? ability.requirements.find(r => r.type === 'job_level' || r.type === 'current_job_level') : undefined;
             if(ability.isEnemy) {
                 // Enemy abilities are usable only by Slayer
-                const slayerJob = manager.jobs.getObjectByID('adventuring:slayer');
+                const slayerJob = manager.cached.slayerJob;
                 tooltip.separator();
                 if(slayerJob) {
                     tooltip.hint(`Usable by: <img class="skill-icon-xxs mr-1" src="${slayerJob.media}">${slayerJob.name}`);
@@ -423,10 +423,10 @@ export class TooltipBuilder {
         
         // Usable by section (after description when no type is provided - combat selector style)
         if(manager && !type) {
-            const req = ability.requirements?.find(r => r.type === 'job_level' || r.type === 'current_job_level');
+            const req = ability.requirements !== undefined ? ability.requirements.find(r => r.type === 'job_level' || r.type === 'current_job_level') : undefined;
             if(ability.isEnemy) {
                 // Enemy abilities are usable only by Slayer
-                const slayerJob = manager.jobs.getObjectByID('adventuring:slayer');
+                const slayerJob = manager.cached.slayerJob;
                 tooltip.separator();
                 if(slayerJob) {
                     tooltip.hint(`Usable by: <img class="skill-icon-xxs mr-1" src="${slayerJob.media}">${slayerJob.name}`);
@@ -454,7 +454,7 @@ export class TooltipBuilder {
         
         // Unlock requirement with progress
         if(showUnlockLevel && masteryAction && manager) {
-            const req = ability.requirements?.find(r => r.type === 'job_level' || r.type === 'current_job_level');
+            const req = ability.requirements !== undefined ? ability.requirements.find(r => r.type === 'job_level' || r.type === 'current_job_level') : undefined;
             if(req) {
                 const currentLevel = manager.getMasteryLevel(masteryAction);
                 tooltip.separator();
@@ -558,7 +558,9 @@ export class TooltipBuilder {
         }
         
         // Source hints - which areas contain this monster
-        tooltip.sourceHint(manager.monsterSources?.get(monster), 'Found in');
+        if (manager.monsterSources !== undefined) {
+            tooltip.sourceHint(manager.monsterSources.get(monster), 'Found in');
+        }
         
         return tooltip;
     }
@@ -592,8 +594,11 @@ export class TooltipBuilder {
             // Next milestone
             const nextMilestone = area.getNextMilestone();
             if(nextMilestone) {
-                const description = nextMilestone.description || 
-                    (nextMilestone.effects?.map(e => describeEffect(e, manager)).join(', ') || 'Unknown');
+                let description = nextMilestone.description;
+                if (!description && nextMilestone.effects !== undefined) {
+                    description = nextMilestone.effects.map(e => describeEffect(e, manager)).join(', ');
+                }
+                if (!description) description = 'Unknown';
                 tooltip.separator().nextUnlock(nextMilestone.level, description);
             } else {
                 tooltip.separator().warning('Mastered!');
@@ -772,7 +777,7 @@ export class TooltipBuilder {
      */
     usableByJobs(jobs, manager, addSeparator = true) {
         if(!jobs || jobs.length === 0) return this;
-        const validJobs = jobs.filter(job => job.id !== "adventuring:none");
+        const validJobs = jobs.filter(job => job !== manager.cached.noneJob);
         if(validJobs.length === 0 || validJobs.length >= manager.jobs.size) return this;
         
         if(addSeparator) this.separator();
@@ -815,15 +820,18 @@ export class TooltipBuilder {
      */
     nextMilestone(manager, action, addSeparator = true) {
         const level = manager.getMasteryLevel(action);
-        const categoryId = action.category?.id;
+        const categoryId = action.category !== undefined ? action.category.id : undefined;
         if(!categoryId) return this;
         
         const nextMilestone = manager.getNextMasteryUnlock(level, categoryId);
         if(nextMilestone) {
             if(addSeparator) this.separator();
             // Generate description from effects if not explicitly provided
-            const description = nextMilestone.description || 
-                (nextMilestone.effects?.map(e => describeEffect(e, manager)).join(', ') || 'Unknown');
+            let description = nextMilestone.description;
+            if (!description && nextMilestone.effects !== undefined) {
+                description = nextMilestone.effects.map(e => describeEffect(e, manager)).join(', ');
+            }
+            if (!description) description = 'Unknown';
             this.nextUnlock(nextMilestone.level, description);
         } else if(level >= 99) {
             if(addSeparator) this.separator();

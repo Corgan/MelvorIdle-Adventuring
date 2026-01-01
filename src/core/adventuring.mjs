@@ -507,7 +507,9 @@ export class Adventuring extends SkillWithMastery {
 
     getErrorLog() {
         let log = `Is Active: ${this.isActive}\n`;
-        log += `Current Page: ${this.pages.current?.constructor?.name || 'none'}\n`;
+        const currentPage = this.pages.current;
+        const pageName = currentPage !== undefined && currentPage.constructor !== undefined ? currentPage.constructor.name : 'none';
+        log += `Current Page: ${pageName}\n`;
         log += this.party.getErrorLog();
         log += this.dungeon.getErrorLog();
         log += this.encounter.getErrorLog();
@@ -568,7 +570,8 @@ export class Adventuring extends SkillWithMastery {
         // Check tutorial triggers on mastery level up
         if(newLevel > oldLevel) {
             let category = 'other';
-            if(action instanceof this.jobs.registeredObjects.values().next().value?.constructor) {
+            const firstJob = this.jobs.registeredObjects.values().next().value;
+            if(firstJob !== undefined && action instanceof firstJob.constructor) {
                 category = 'job';
             } else if(this.areas.allObjects.includes(action)) {
                 category = 'area';
@@ -871,6 +874,22 @@ export class Adventuring extends SkillWithMastery {
             this.passivesByJob.set(job.id, jobPassives);
         });
         
+        // Cache frequently accessed objects to avoid repeated lookups
+        this.cached = {
+            noneJob: this.jobs.getObjectByID('adventuring:none'),
+            slayerJob: this.jobs.getObjectByID('adventuring:slayer'),
+            noneItem: this.baseItems.getObjectByID('adventuring:none'),
+            noneItemSlot: this.itemSlots.getObjectByID('adventuring:none'),
+            slayerCoins: this.materials.getObjectByID('adventuring:slayer_coins'),
+            currency: this.materials.getObjectByID('adventuring:currency'),
+            defaultGenerator: this.generators.getObjectByID('adventuring:basic_attack'),
+            defaultSpender: this.spenders.getObjectByID('adventuring:basic_strike')
+        };
+        
+        // Cache job lists for filtering
+        this.combatJobs = this.jobs.allObjects.filter(job => job.id !== 'adventuring:none' && !job.isPassive);
+        this.passiveJobs = this.jobs.allObjects.filter(job => job.id !== 'adventuring:none' && job.isPassive);
+        
         this.auras.forEach(aura => aura.postDataRegistration());
         this.materials.forEach(material => material.postDataRegistration());
         this.baseItems.forEach(baseItem => baseItem.postDataRegistration());
@@ -950,7 +969,7 @@ export class Adventuring extends SkillWithMastery {
         // Material -> Monsters lookup
         this.materialSources = new Map();
         this.monsters.forEach(monster => {
-            if(!monster.lootGenerator?.table) return;
+            if(monster.lootGenerator === undefined || monster.lootGenerator.table === undefined) return;
             monster.lootGenerator.table.forEach(entry => {
                 const material = this.materials.getObjectByID(entry.id);
                 if(!material) return;
@@ -971,7 +990,9 @@ export class Adventuring extends SkillWithMastery {
      * @returns {AdventuringPassive[]} Array of passives unlocked by this job
      */
     getPassivesForJob(job) {
-        return this.passivesByJob?.get(job.id) ?? [];
+        if (this.passivesByJob === undefined) return [];
+        const passives = this.passivesByJob.get(job.id);
+        return passives !== undefined ? passives : [];
     }
 
     /**
@@ -980,7 +1001,9 @@ export class Adventuring extends SkillWithMastery {
      * @returns {AdventuringAbility|undefined}
      */
     getAbilityByID(id) {
-        return this.generators.getObjectByID(id) ?? this.spenders.getObjectByID(id);
+        const gen = this.generators.getObjectByID(id);
+        if (gen !== undefined) return gen;
+        return this.spenders.getObjectByID(id);
     }
 
     encode(writer) {

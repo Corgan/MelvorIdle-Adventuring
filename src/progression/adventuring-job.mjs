@@ -1,31 +1,20 @@
 const { loadModule } = mod.getContext(import.meta);
 
+const { AdventuringMasteryAction } = await loadModule('src/core/adventuring-mastery-action.mjs');
 const { AdventuringStats } = await loadModule('src/core/adventuring-stats.mjs');
 const { AdventuringJobElement } = await loadModule('src/progression/components/adventuring-job.mjs');
 const { AdventuringJobSummaryElement } = await loadModule('src/progression/components/adventuring-job-summary.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
-const { addMasteryXPWithBonus, RequirementsChecker } = await loadModule('src/core/adventuring-utils.mjs');
+const { addMasteryXPWithBonus, RequirementsChecker, AdventuringMasteryRenderQueue } = await loadModule('src/core/adventuring-utils.mjs');
 
-class AdventuringJobRenderQueue {
-    constructor(){
-        this.name = false;
-        this.tooltip = false;
-        this.icon = false;
-        this.clickable = false;
-        this.mastery = false;
-    }
-}
-
-export class AdventuringJob extends MasteryAction {
+export class AdventuringJob extends AdventuringMasteryAction {
     constructor(namespace, data, manager, game) {
-        super(namespace, data, game);
-        this.manager = manager;
-        this.game = game;
+        super(namespace, data, manager, game);
 
         this.component = createElement('adventuring-job');
         this.summary = createElement('adventuring-job-summary');
         this.summary.setJob(this);
-        this.renderQueue = new AdventuringJobRenderQueue();
+        this.renderQueue = new AdventuringMasteryRenderQueue();
 
         this._name = data.name;
 
@@ -53,66 +42,10 @@ export class AdventuringJob extends MasteryAction {
             if(this.unlocked)
                 this.viewDetails();
         }
-        
-        // Mastery effects cache - rebuilt on level up
-        this._masteryEffectsCache = null;
-        this._masteryCacheLevel = -1;
     }
 
-    /**
-     * Get the mastery category for jobs
-     */
-    get masteryCategory() {
-        return this.manager.masteryCategories.getObjectByID('adventuring:jobs');
-    }
-
-    /**
-     * Get cached mastery effects for this job's current level.
-     * Rebuilds cache if level changed.
-     */
-    get masteryEffects() {
-        const currentLevel = this.level;
-        if (this._masteryEffectsCache === null || this._masteryCacheLevel !== currentLevel) {
-            this._rebuildMasteryCache();
-        }
-        return this._masteryEffectsCache;
-    }
-
-    /**
-     * Rebuild the mastery effects cache from the category milestones
-     */
-    _rebuildMasteryCache() {
-        const category = this.masteryCategory;
-        this._masteryCacheLevel = this.level;
-        this._masteryEffectsCache = category ? category.getEffectsAtLevel(this.level) : [];
-    }
-
-    /**
-     * Invalidate mastery cache (called on level up)
-     */
-    invalidateMasteryCache() {
-        this._masteryEffectsCache = null;
-        this._masteryCacheLevel = -1;
-    }
-
-    /**
-     * Check if this job has a specific mastery effect type
-     * @param {string} effectType - The effect type to check for
-     * @returns {boolean}
-     */
-    hasMasteryEffect(effectType) {
-        return this.masteryEffects.some(e => e.type === effectType);
-    }
-
-    /**
-     * Get the total value of a specific mastery effect type
-     * @param {string} effectType - The effect type to sum
-     * @returns {number}
-     */
-    getMasteryEffectValue(effectType) {
-        return this.masteryEffects
-            .filter(e => e.type === effectType)
-            .reduce((sum, e) => sum + (e.value || 0), 0);
+    get masteryCategoryId() {
+        return 'adventuring:jobs';
     }
 
     get name() {
@@ -128,7 +61,8 @@ export class AdventuringJob extends MasteryAction {
     }
 
     get unlocked() {
-        return this._reqChecker?.check() ?? true;
+        if (this._reqChecker === undefined) return true;
+        return this._reqChecker.check();
     }
 
     /**

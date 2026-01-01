@@ -214,7 +214,7 @@ export class AdventuringAuras {
         if (!this.aurasByBase.has(aura.id)) {
             this.aurasByBase.set(aura.id, new Map());
         }
-        const sourceKey = source ?? '_default';
+        const sourceKey = source !== undefined ? source : '_default';
         this.aurasByBase.get(aura.id).set(sourceKey, instance);
     }
     
@@ -223,7 +223,7 @@ export class AdventuringAuras {
      */
     _removeFromCache(aura, source) {
         if (!aura || !this.aurasByBase.has(aura.id)) return;
-        const sourceKey = source ?? '_default';
+        const sourceKey = source !== undefined ? source : '_default';
         const instances = this.aurasByBase.get(aura.id);
         instances.delete(sourceKey);
         if (instances.size === 0) {

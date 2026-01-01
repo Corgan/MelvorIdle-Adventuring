@@ -41,7 +41,7 @@ export class AdventuringAuraInstance {
                     .header(this.base.name, this.base.media);
                 
                 // Show aura type (buff/debuff)
-                const isBuff = this.base.isBuff ?? false;
+                const isBuff = this.base.isBuff !== undefined ? this.base.isBuff : false;
                 const typeText = isBuff ? 'Buff' : 'Debuff';
                 tooltip.subheader(typeText);
                 
@@ -76,13 +76,13 @@ export class AdventuringAuraInstance {
                     baseType: typeof this.base,
                     stacks: this.stacks,
                     amount: this.amount,
-                    source: this.source?.name || this.source
+                    source: this.source !== undefined ? this.source.name : this.source
                 });
             }
         } catch(e) {
             console.warn('[Aura Tooltip] Error rendering:', e, {
                 base: this.base,
-                baseName: this.base?.name,
+                baseName: this.base !== undefined ? this.base.name : undefined,
                 stacks: this.stacks,
                 amount: this.amount
             });
@@ -123,14 +123,16 @@ export class AdventuringAuraInstance {
         this.auras.renderQueue.auras = true;
         
         // Invalidate effect cache
-        this.auras.character?.invalidateEffects?.('auras');
+        if (this.auras.character !== undefined && this.auras.character.invalidateEffects !== undefined) {
+            this.auras.character.invalidateEffects('auras');
+        }
     }
 
     setStacks(stacks) {
         this.stacks = stacks;
         
         // Enforce maxStacks if defined
-        if(this.base?.maxStacks !== undefined) {
+        if(this.base !== undefined && this.base.maxStacks !== undefined) {
             this.stacks = Math.min(this.stacks, this.base.maxStacks);
         }
         
@@ -141,7 +143,9 @@ export class AdventuringAuraInstance {
         this.auras.renderQueue.auras = true;
         
         // Invalidate effect cache
-        this.auras.character?.invalidateEffects?.('auras');
+        if (this.auras.character !== undefined && this.auras.character.invalidateEffects !== undefined) {
+            this.auras.character.invalidateEffects('auras');
+        }
     }
 
     remove() {
@@ -154,7 +158,9 @@ export class AdventuringAuraInstance {
         this.auras.renderQueue.auras = true;
         
         // Invalidate effect cache
-        this.auras.character?.invalidateEffects?.('auras');
+        if (this.auras.character !== undefined && this.auras.character.invalidateEffects !== undefined) {
+            this.auras.character.invalidateEffects('auras');
+        }
     }
 
     remove_stacks(count) {
@@ -167,7 +173,9 @@ export class AdventuringAuraInstance {
         this.auras.renderQueue.auras = true;
         
         // Invalidate effect cache
-        this.auras.character?.invalidateEffects?.('auras');
+        if (this.auras.character !== undefined && this.auras.character.invalidateEffects !== undefined) {
+            this.auras.character.invalidateEffects('auras');
+        }
     }
 
     render() {
@@ -187,8 +195,8 @@ export class AdventuringAuraInstance {
         } else {
             this.component.classList.remove('d-none');
             this.component.icon.src = this.base.media;
-            this.component.border.classList.toggle('border-info', this.base.isBuff ?? false);
-            this.component.border.classList.toggle('border-danger', this.base.isDebuff ?? false);
+            this.component.border.classList.toggle('border-info', this.base.isBuff !== undefined ? this.base.isBuff : false);
+            this.component.border.classList.toggle('border-danger', this.base.isDebuff !== undefined ? this.base.isDebuff : false);
         }
 
         this.renderQueue.icon = false;

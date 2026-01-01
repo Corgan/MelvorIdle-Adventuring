@@ -129,7 +129,7 @@ export class AdventuringAura extends NamespacedObject {
                 type: effect.type,
                 trigger: effect.trigger || 'passive',
                 value: effect.getAmount ? effect.getAmount(instance) : (this.amount || 0),
-                stacks: effect.getStacks ? effect.getStacks(instance) : (instance?.stacks || this.stacks || 0),
+                stacks: effect.getStacks ? effect.getStacks(instance) : (instance !== undefined ? (instance.stacks || 0) : (this.stacks || 0)),
                 id: effect.id,
                 target: effect.target,
                 condition: effect.condition

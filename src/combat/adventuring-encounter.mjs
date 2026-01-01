@@ -676,8 +676,8 @@ export class AdventuringEncounter extends AdventuringPage {
             return;
         
         // Check if character has the Slayer job as combat job (must be active to learn)
-        const slayerJob = this.manager.jobs.getObjectByID('adventuring:slayer');
-        if(!slayerJob)
+        const slayerJob = this.manager.cached.slayerJob;
+        if(slayerJob === undefined)
             return;
         
         // Only the combat job can use learning abilities
@@ -788,8 +788,8 @@ export class AdventuringEncounter extends AdventuringPage {
         let log = `Encounter:\n`;
         log += `  Is Fighting: ${this.isFighting}\n`;
         log += `  Round: ${this.roundCounter}\n`;
-        log += `  Current Turn: ${this.currentTurn?.name || 'none'}\n`;
-        log += `  Current Action: ${this.currentAction?.id || 'none'}\n`;
+        log += `  Current Turn: ${this.currentTurn !== undefined ? this.currentTurn.name : 'none'}\n`;
+        log += `  Current Action: ${this.currentAction !== undefined ? this.currentAction.id : 'none'}\n`;
         log += `  Turn Timer Active: ${this.turnTimer.isActive}\n`;
         log += `  Hit Timer Active: ${this.hitTimer.isActive}\n`;
         log += `  Current Round Order: [${this.currentRoundOrder.map(c => c.name).join(', ')}]\n`;

@@ -56,7 +56,7 @@ class DungeonEffectCache {
         this.cachedEffects = [];
         
         // 1. Gather difficulty effects
-        const difficulty = this.dungeon.area?.getDifficulty();
+        const difficulty = this.dungeon.area !== undefined ? this.dungeon.area.getDifficulty() : undefined;
         if(difficulty) {
             this.cachedEffects.push(...difficulty.getEffects());
         }
@@ -155,7 +155,7 @@ class DungeonEffectCache {
      */
     gatherPartyEnemyEffects() {
         const manager = this.dungeon.manager;
-        if(!manager?.party) return;
+        if(manager === undefined || manager.party === undefined) return;
         
         // Collect effects from all party members
         for(const hero of manager.party.all) {
@@ -309,21 +309,30 @@ export class AdventuringDungeon extends AdventuringPage {
      * Check if currently in endless mode based on area difficulty
      */
     get isEndless() {
-        return this.area?.getDifficulty()?.isEndless ?? false;
+        if (this.area === undefined) return false;
+        const difficulty = this.area.getDifficulty();
+        if (difficulty === undefined) return false;
+        return difficulty.isEndless !== undefined ? difficulty.isEndless : false;
     }
 
     /**
      * Get the wave generation configuration from the current difficulty
      */
     get waveGeneration() {
-        return this.area?.getDifficulty()?.waveGeneration ?? null;
+        if (this.area === undefined) return null;
+        const difficulty = this.area.getDifficulty();
+        if (difficulty === undefined) return null;
+        return difficulty.waveGeneration !== undefined ? difficulty.waveGeneration : null;
     }
 
     /**
      * Get the wave scaling configuration from the current difficulty
      */
     get waveScaling() {
-        return this.area?.getDifficulty()?.waveScaling ?? null;
+        if (this.area === undefined) return null;
+        const difficulty = this.area.getDifficulty();
+        if (difficulty === undefined) return null;
+        return difficulty.waveScaling !== undefined ? difficulty.waveScaling : null;
     }
 
     /**
@@ -333,7 +342,7 @@ export class AdventuringDungeon extends AdventuringPage {
     getEndlessStatMultiplier() {
         const scaling = this.waveScaling;
         if(!scaling) return 1.0;
-        const perWave = (scaling.statPercentPerWave ?? 5) / 100;
+        const perWave = (scaling.statPercentPerWave !== undefined ? scaling.statPercentPerWave : 5) / 100;
         return 1.0 + (this.endlessWave * perWave);
     }
 
@@ -344,7 +353,7 @@ export class AdventuringDungeon extends AdventuringPage {
     getEndlessRewardMultiplier() {
         const scaling = this.waveScaling;
         if(!scaling) return 1.0;
-        const perWave = (scaling.rewardPercentPerWave ?? 2) / 100;
+        const perWave = (scaling.rewardPercentPerWave !== undefined ? scaling.rewardPercentPerWave : 2) / 100;
         return 1.0 + (this.endlessWave * perWave);
     }
 
@@ -353,12 +362,12 @@ export class AdventuringDungeon extends AdventuringPage {
      * For infinite modes, floors are selected based on waveGeneration.floorSelection
      */
     get currentFloor() {
-        if (!this.area?.floors?.length) return undefined;
+        if (this.area === undefined || this.area.floors === undefined || !this.area.floors.length) return undefined;
         
         const waveGen = this.waveGeneration;
-        if (waveGen?.type === 'infinite') {
+        if (waveGen !== undefined && waveGen.type === 'infinite') {
             const floors = this.area.floors;
-            const selection = waveGen.floorSelection ?? 'first';
+            const selection = waveGen.floorSelection !== undefined ? waveGen.floorSelection : 'first';
             
             switch (selection) {
                 case 'cycle':
@@ -543,10 +552,10 @@ export class AdventuringDungeon extends AdventuringPage {
         // For infinite modes, numFloors represents floors per wave
         // For standard modes, numFloors is the total floor count
         const difficulty = area.getDifficulty();
-        if (difficulty?.waveGeneration?.type === 'infinite') {
-            this.numFloors = difficulty.waveGeneration.floorsPerWave ?? 1;
+        if (difficulty !== undefined && difficulty.waveGeneration !== undefined && difficulty.waveGeneration.type === 'infinite') {
+            this.numFloors = difficulty.waveGeneration.floorsPerWave !== undefined ? difficulty.waveGeneration.floorsPerWave : 1;
         } else {
-            this.numFloors = this.area.floors?.length ?? 1;
+            this.numFloors = this.area.floors !== undefined ? this.area.floors.length : 1;
         }
 
         if(this.currentFloor !== undefined)
@@ -825,7 +834,7 @@ export class AdventuringDungeon extends AdventuringPage {
 
     getErrorLog() {
         let log = `Dungeon:\n`;
-        log += `  Area: ${this.area?.id || 'none'}\n`;
+        log += `  Area: ${this.area !== undefined ? this.area.id : 'none'}\n`;
         log += `  Progress: ${this.progress}/${this.numFloors}\n`;
         log += `  ExploreTimer Active: ${this.exploreTimer.isActive}\n`;
         log += `  Floor Position: ${this.floor.position}\n`;

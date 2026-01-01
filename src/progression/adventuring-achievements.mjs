@@ -3,11 +3,17 @@ const { loadModule } = mod.getContext(import.meta);
 /**
  * Render queue for achievement UI updates
  */
-class AchievementRenderQueue {
+class AdventuringAchievementRenderQueue {
     constructor() {
         this.progress = false;
         this.completed = false;
         this.all = false;
+    }
+
+    queueAll() {
+        this.progress = true;
+        this.completed = true;
+        this.all = true;
     }
 }
 
@@ -271,8 +277,9 @@ export class AdventuringAchievement extends NamespacedObject {
      */
     _getHighestJobLevel() {
         let highest = 0;
+        const noneJob = this.manager.cached.noneJob;
         for(const job of this.manager.jobs.allObjects) {
-            if(job.id === 'adventuring:none') continue;
+            if(job === noneJob) continue;
             const level = job.level || 1;
             if(level > highest) highest = level;
         }
@@ -284,8 +291,9 @@ export class AdventuringAchievement extends NamespacedObject {
      */
     _getJobsAtLevel(targetLevel) {
         let count = 0;
+        const noneJob = this.manager.cached.noneJob;
         for(const job of this.manager.jobs.allObjects) {
-            if(job.id === 'adventuring:none') continue;
+            if(job === noneJob) continue;
             const level = job.level || 1;
             if(level >= targetLevel) count++;
         }
@@ -317,8 +325,9 @@ export class AdventuringAchievement extends NamespacedObject {
      * Helper: Check if all jobs of a tier are unlocked
      */
     _areAllJobsUnlockedAtTier(tier) {
+        const noneJob = this.manager.cached.noneJob;
         const tierJobs = this.manager.jobs.allObjects.filter(job => 
-            job.id !== 'adventuring:none' && job.tier === tier
+            job !== noneJob && job.tier === tier
         );
         if(tierJobs.length === 0) return false;
         return tierJobs.every(job => this._isJobUnlocked(job.id));
@@ -329,8 +338,9 @@ export class AdventuringAchievement extends NamespacedObject {
      */
     _getHighestPassiveJobLevel() {
         let highest = 0;
+        const noneJob = this.manager.cached.noneJob;
         for(const job of this.manager.jobs.allObjects) {
-            if(job.id === 'adventuring:none' || !job.isPassive) continue;
+            if(job === noneJob || !job.isPassive) continue;
             const level = this.manager.getMasteryLevel(job) || 1;
             if(level > highest) highest = level;
         }
@@ -341,8 +351,9 @@ export class AdventuringAchievement extends NamespacedObject {
      * Helper: Check if all passive jobs are at or above a level
      */
     _getAllPassiveJobsAtLevel(targetLevel) {
+        const noneJob = this.manager.cached.noneJob;
         const passiveJobs = this.manager.jobs.allObjects.filter(job => 
-            job.id !== 'adventuring:none' && job.isPassive
+            job !== noneJob && job.isPassive
         );
         if(passiveJobs.length === 0) return false;
         return passiveJobs.every(job => {
@@ -417,7 +428,7 @@ export class AchievementManager {
     constructor(manager, game) {
         this.manager = manager;
         this.game = game;
-        this.renderQueue = new AchievementRenderQueue();
+        this.renderQueue = new AdventuringAchievementRenderQueue();
         
         // Achievement stats
         this.stats = new AchievementStats();

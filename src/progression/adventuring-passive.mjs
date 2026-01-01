@@ -1,7 +1,7 @@
 const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringScalableEffect } = await loadModule('src/combat/adventuring-scalable-effect.mjs');
-const { RequirementsChecker, parseDescription, buildEffectReplacements, describeEffectFull, getAuraName } = await loadModule('src/core/adventuring-utils.mjs');
+const { RequirementsChecker, parseDescription, buildEffectReplacements, describeEffectFull, getAuraName, buildDescription } = await loadModule('src/core/adventuring-utils.mjs');
 
 class AdventuringPassiveEffect extends AdventuringScalableEffect {
     constructor(manager, game, passive, data) {
@@ -29,15 +29,18 @@ export class AdventuringPassive extends NamespacedObject {
     }
 
     get unlocked() {
-        return this._reqChecker?.check() ?? true;
+        if (this._reqChecker === undefined) return true;
+        return this._reqChecker.check();
     }
 
     unlockedBy(job) {
-        return this._reqChecker?.referencesJob(job.id) ?? false;
+        if (this._reqChecker === undefined) return false;
+        return this._reqChecker.referencesJob(job.id);
     }
 
     canEquip(character) {
-        return this._reqChecker?.check({ character }) ?? true;
+        if (this._reqChecker === undefined) return true;
+        return this._reqChecker.check({ character });
     }
 
     /**
@@ -45,37 +48,16 @@ export class AdventuringPassive extends NamespacedObject {
      * If no template provided, auto-generates from effects
      */
     getDescription(character) {
-        // If we have a template description, use it with placeholders
-        if(this._descriptionTemplate) {
-            const replacements = buildEffectReplacements(this.effects, character?.stats, true);
-            let desc = parseDescription(this._descriptionTemplate, replacements);
-            if(this.flavorText) {
-                desc = `${desc}\n\n${this.flavorText}`;
-            }
-            return desc;
-        }
-        
-        // Auto-generate from effects - use 'total' mode for passive badge display
-        const effectDescs = this.effects.map(effect => {
-            const effectObj = {
-                type: effect.type,
-                trigger: effect.trigger || 'passive',
-                value: effect.getAmount ? effect.getAmount(character?.stats, 'total') : (effect.amount?.base || effect.amount || 0),
-                stacks: effect.getStacks ? effect.getStacks(character?.stats, 'total') : (effect.stacks?.base || effect.stacks || 0),
-                id: effect.id,
-                target: effect.target,
-                party: effect.party,
-                condition: effect.condition,
-                chance: effect.chance
-            };
-            return describeEffectFull(effectObj, this.manager, { displayMode: 'total' });
+        return buildDescription({
+            effects: this.effects,
+            manager: this.manager,
+            template: this._descriptionTemplate,
+            flavorText: this.flavorText,
+            stats: character?.stats,
+            displayMode: 'total',
+            includeTrigger: true,
+            buildReplacements: buildEffectReplacements
         });
-        
-        let generated = effectDescs.join('. ');
-        if(this.flavorText) {
-            generated = generated ? `${generated}.\n\n${this.flavorText}` : this.flavorText;
-        }
-        return generated || 'No effect.';
     }
 
     // Apply this passive's effects to a character

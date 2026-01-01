@@ -95,7 +95,7 @@ export class AdventuringSlayerTaskType extends NamespacedObject {
         const idx = Math.min(tier - 1, 4);
         
         const materialType = manager.rewardTypes.getObjectByID('adventuring:material');
-        const slayerCoins = manager.materials.getObjectByID('adventuring:slayer_coins');
+        const slayerCoins = manager.cached.slayerCoins;
         
         // Slayer Coins reward (slayer coins is a currency material)
         const baseCurrency = this.baseRewards.currency[idx];
@@ -108,7 +108,7 @@ export class AdventuringSlayerTaskType extends NamespacedObject {
 
         // Job XP reward - pick a random unlocked job (excluding 'none')
         const jobXpType = manager.rewardTypes.getObjectByID('adventuring:job_xp');
-        const unlockedJobs = manager.jobs.allObjects.filter(j => j.unlocked && j.id !== 'adventuring:none');
+        const unlockedJobs = manager.jobs.allObjects.filter(j => j.unlocked && j !== manager.cached.noneJob);
         if(unlockedJobs.length > 0) {
             const job = unlockedJobs[Math.floor(Math.random() * unlockedJobs.length)];
             const baseXP = this.baseRewards.xp[idx];

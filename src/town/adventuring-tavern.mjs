@@ -9,11 +9,17 @@ const { AdventuringEmptyStateElement } = await loadModule('src/ui/components/adv
 
 const MAX_EQUIPPED_DRINKS = 3;
 
-class TavernRenderQueue {
+class AdventuringTavernRenderQueue {
     constructor() {
         this.drinks = false;
         this.equipped = false;
         this.all = false;
+    }
+
+    queueAll() {
+        this.drinks = true;
+        this.equipped = true;
+        this.all = true;
     }
 }
 
@@ -27,7 +33,7 @@ export class AdventuringTavern extends AdventuringPage {
         this.manager = manager;
         this.game = game;
         this.component = createElement('adventuring-tavern');
-        this.renderQueue = new TavernRenderQueue();
+        this.renderQueue = new AdventuringTavernRenderQueue();
 
         // Charges per drink (Map<TavernDrink, number>)
         this.charges = new Map();

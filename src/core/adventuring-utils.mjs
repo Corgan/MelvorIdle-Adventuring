@@ -503,14 +503,16 @@ class RequirementsChecker {
             case 'current_job_level':
                 return this._checkCurrentJobLevel(req.job, req.level, character);
                 
-            case 'slayer_tasks_completed':
-                return (this.manager.slayers?.totalTasksCompleted || 0) >= req.count;
+            case 'slayer_tasks_completed': {
+                const totalTasks = this.manager.slayers !== undefined ? this.manager.slayers.totalTasksCompleted : 0;
+                return totalTasks >= req.count;
+            }
                 
             case 'current_job':
                 return this._hasCurrentJob(req.job, character);
                 
             case 'dead':
-                return character?.dead ?? false;
+                return character !== undefined ? character.dead : false;
                 
             case 'comparison':
                 return this._checkComparison(req, character);
@@ -527,7 +529,8 @@ class RequirementsChecker {
                 
             case 'achievement_completion': {
                 // Check if the required achievement is completed
-                const achievement = this.manager.achievements?.getObjectByID(req.id);
+                if (this.manager.achievements === undefined) return false;
+                const achievement = this.manager.achievements.getObjectByID(req.id);
                 return achievement ? achievement.isComplete : false;
             }
 
@@ -553,8 +556,8 @@ class RequirementsChecker {
         if(!character) return this._checkJobLevel(jobId, level);
         
         // Check if character has this job equipped (combat or passive)
-        const hasCombatJob = character.combatJob?.id === jobId;
-        const hasPassiveJob = character.passiveJob?.id === jobId;
+        const hasCombatJob = character.combatJob !== undefined && character.combatJob.id === jobId;
+        const hasPassiveJob = character.passiveJob !== undefined && character.passiveJob.id === jobId;
         
         if(!hasCombatJob && !hasPassiveJob) return false;
         
@@ -569,7 +572,9 @@ class RequirementsChecker {
      */
     _hasCurrentJob(jobId, character) {
         if(!character) return false;
-        return (character.combatJob?.id === jobId) || (character.passiveJob?.id === jobId);
+        const combatMatch = character.combatJob !== undefined && character.combatJob.id === jobId;
+        const passiveMatch = character.passiveJob !== undefined && character.passiveJob.id === jobId;
+        return combatMatch || passiveMatch;
     }
     
     /**
@@ -583,7 +588,7 @@ class RequirementsChecker {
         
         // Handle legacy 'operand' format
         const operand = req.property || req.operand;
-        const target = req.value ?? req.amount;
+        const target = req.value !== undefined ? req.value : req.amount;
         
         switch(operand) {
             case 'hitpoints_percent':
@@ -602,7 +607,8 @@ class RequirementsChecker {
             case 'material_count': {
                 const material = this.manager.materials.getObjectByID(req.material);
                 if(!material) return false;
-                value = this.manager.stash.materialCounts.get(material) ?? 0;
+                const count = this.manager.stash.materialCounts.get(material);
+                value = count !== undefined ? count : 0;
                 break;
             }
             default:
@@ -663,42 +669,42 @@ function formatRequirement(req, manager, context = {}) {
         
         case 'melvor_skill_level': {
             const skill = manager.game.skills.getObjectByID(req.skill);
-            const skillName = skill?.name || req.skill;
+            const skillName = skill !== undefined ? skill.name : req.skill;
             text = `${skillName} Level ${req.level}`;
             break;
         }
             
         case 'job_level': {
             const job = manager.jobs.getObjectByID(req.job);
-            const jobName = job?.name || req.job;
+            const jobName = job !== undefined ? job.name : req.job;
             text = `${jobName} Level ${req.level}`;
             break;
         }
         
         case 'current_job': {
             const job = manager.jobs.getObjectByID(req.job);
-            const jobName = job?.name || req.job;
+            const jobName = job !== undefined ? job.name : req.job;
             text = `Requires ${jobName} equipped`;
             break;
         }
         
         case 'current_job_level': {
             const job = manager.jobs.getObjectByID(req.job);
-            const jobName = job?.name || req.job;
+            const jobName = job !== undefined ? job.name : req.job;
             text = `${jobName} Level ${req.level} (equipped)`;
             break;
         }
         
         case 'area_mastery': {
             const area = manager.areas.getObjectByID(req.area);
-            const areaName = area?.name || req.area;
+            const areaName = area !== undefined ? area.name : req.area;
             text = `${areaName} Mastery ${req.level}`;
             break;
         }
         
         case 'item_upgrade': {
             const item = manager.baseItems.getObjectByID(req.item);
-            const itemName = item?.name || req.item;
+            const itemName = item !== undefined ? item.name : req.item;
             text = `${itemName} +${req.level}`;
             break;
         }
@@ -709,7 +715,7 @@ function formatRequirement(req, manager, context = {}) {
         
         case 'comparison': {
             const operand = req.property || req.operand;
-            const target = req.value ?? req.amount;
+            const target = req.value !== undefined ? req.value : req.amount;
             const opSymbol = { '<': '<', 'lt': '<', '>': '>', 'gt': '>', '==': '=', 'eq': '=' }[req.operator] || req.operator;
             text = `${operand.replace(/_/g, ' ')} ${opSymbol} ${target}`;
             break;
@@ -853,10 +859,12 @@ function describeCondition(condition, manager) {
     if(!condition) return '';
     
     const auraName = (auraId) => {
-        const aura = manager?.auras?.getObjectByID(auraId) || 
-                     manager?.buffs?.getObjectByID(auraId) || 
-                     manager?.debuffs?.getObjectByID(auraId);
-        return aura?.name || auraId || 'Unknown';
+        if (manager === undefined) return auraId || 'Unknown';
+        let aura = undefined;
+        if (manager.auras !== undefined) aura = manager.auras.getObjectByID(auraId);
+        if (aura === undefined && manager.buffs !== undefined) aura = manager.buffs.getObjectByID(auraId);
+        if (aura === undefined && manager.debuffs !== undefined) aura = manager.debuffs.getObjectByID(auraId);
+        return aura !== undefined ? aura.name : (auraId || 'Unknown');
     };
     
     switch(condition.type) {
@@ -925,8 +933,11 @@ function parseDescription(template, replacements) {
  */
 function getAuraName(manager, auraId) {
     if (!auraId) return 'Unknown';
-    const aura = manager?.auras?.getObjectByID(auraId);
-    return aura?.name || auraId.split(':').pop() || 'Unknown';
+    if (manager === undefined || manager.auras === undefined) {
+        return auraId.split(':').pop() || 'Unknown';
+    }
+    const aura = manager.auras.getObjectByID(auraId);
+    return aura !== undefined ? aura.name : (auraId.split(':').pop() || 'Unknown');
 }
 
 /**
@@ -2226,6 +2237,195 @@ function addMasteryXPWithBonus(manager, action, baseXP, options = {}) {
     return modifiedXP;
 }
 
+/**
+ * Build a description from effects, with optional template and flavor text.
+ * This helper standardizes description generation across items, passives, abilities, etc.
+ * 
+ * @param {Object} config - Configuration object
+ * @param {Array} [config.effects] - Array of effects to describe (flat mode)
+ * @param {Array} [config.hits] - Array of hit objects with { target, party, effects[] } (ability mode)
+ * @param {Object} config.manager - The adventuring manager (for describeEffectFull)
+ * @param {string} [config.template] - Optional description template with placeholders
+ * @param {string} [config.flavorText] - Optional flavor text to append
+ * @param {Object} [config.stats] - Stats source for scaling calculations
+ * @param {string} [config.displayMode] - Display mode: 'total', 'scaled', 'multiplier'
+ * @param {boolean} [config.includeTrigger=true] - Whether to include trigger text
+ * @param {Function} [config.buildReplacements] - Custom replacement builder function
+ * @returns {string} The formatted description
+ */
+function buildDescription(config) {
+    const {
+        effects,
+        hits,
+        manager,
+        template,
+        flavorText,
+        stats,
+        displayMode = 'total',
+        includeTrigger = true,
+        buildReplacements
+    } = config;
+    
+    let desc = '';
+    
+    // If we have a template, use it with replacements
+    if (template !== undefined && template !== null) {
+        const source = hits !== undefined ? hits : effects;
+        const replacements = buildReplacements 
+            ? buildReplacements(source, stats, displayMode)
+            : buildEffectReplacements(effects, stats, true);
+        desc = parseDescription(template, replacements);
+    } 
+    // Hits mode - for abilities with multiple hits
+    else if (hits !== undefined && hits.length > 0) {
+        const hitDescs = [];
+        for (let i = 0; i < hits.length; i++) {
+            const hit = hits[i];
+            if (hit.effects === undefined || hit.effects.length === 0) continue;
+            
+            const hitEffectDescs = [];
+            for (let j = 0; j < hit.effects.length; j++) {
+                const effect = hit.effects[j];
+                const effectObj = {
+                    type: effect.type,
+                    trigger: effect.trigger !== undefined ? effect.trigger : 'on_use',
+                    value: effect.getAmount !== undefined 
+                        ? effect.getAmount(stats, displayMode) 
+                        : (effect.amount !== undefined && effect.amount.base !== undefined 
+                            ? effect.amount.base 
+                            : (effect.amount !== undefined ? effect.amount : (effect.value !== undefined ? effect.value : 0))),
+                    stacks: effect.getStacks !== undefined 
+                        ? effect.getStacks(stats, displayMode) 
+                        : (effect.stacks !== undefined && effect.stacks.base !== undefined 
+                            ? effect.stacks.base 
+                            : (effect.stacks !== undefined ? effect.stacks : 0)),
+                    id: effect.id,
+                    target: hit.target,
+                    party: hit.party,
+                    condition: effect.condition,
+                    chance: effect.chance
+                };
+                hitEffectDescs.push(describeEffectFull(effectObj, manager, { displayMode, includeTrigger: false }));
+            }
+            if (hitEffectDescs.length > 0) {
+                hitDescs.push(hitEffectDescs.join(' and '));
+            }
+        }
+        desc = hitDescs.join('. ');
+        if (desc !== '') {
+            desc = desc + '.';
+        }
+    }
+    // Flat effects mode
+    else if (effects !== undefined && effects.length > 0) {
+        const effectDescs = [];
+        for (let i = 0; i < effects.length; i++) {
+            const effect = effects[i];
+            const effectObj = {
+                type: effect.type,
+                trigger: effect.trigger !== undefined ? effect.trigger : 'passive',
+                value: effect.getAmount !== undefined 
+                    ? effect.getAmount(stats, displayMode) 
+                    : (effect.amount !== undefined && effect.amount.base !== undefined 
+                        ? effect.amount.base 
+                        : (effect.amount !== undefined ? effect.amount : (effect.value !== undefined ? effect.value : 0))),
+                stacks: effect.getStacks !== undefined 
+                    ? effect.getStacks(stats, displayMode) 
+                    : (effect.stacks !== undefined && effect.stacks.base !== undefined 
+                        ? effect.stacks.base 
+                        : (effect.stacks !== undefined ? effect.stacks : 0)),
+                id: effect.id,
+                target: effect.target,
+                party: effect.party,
+                condition: effect.condition,
+                chance: effect.chance
+            };
+            effectDescs.push(describeEffectFull(effectObj, manager, { displayMode, includeTrigger }));
+        }
+        desc = effectDescs.join('. ');
+        if (desc !== '') {
+            desc = desc + '.';
+        }
+    }
+    
+    // Append flavor text if present
+    if (flavorText !== undefined && flavorText !== null && flavorText !== '') {
+        desc = desc !== '' ? `${desc}\n\n${flavorText}` : flavorText;
+    }
+    
+    return desc !== '' ? desc : '';
+}
+
+/**
+ * Base RenderQueue class for mastery actions with common properties.
+ * Provides: name, tooltip, icon, clickable, mastery
+ */
+class AdventuringMasteryRenderQueue {
+    constructor() {
+        this.name = false;
+        this.tooltip = false;
+        this.icon = false;
+        this.clickable = false;
+        this.mastery = false;
+    }
+
+    /**
+     * Queue all common properties for re-render
+     */
+    queueAll() {
+        this.name = true;
+        this.tooltip = true;
+        this.icon = true;
+        this.clickable = true;
+        this.mastery = true;
+    }
+}
+
+/**
+ * Extended RenderQueue with newBadge support.
+ * Used by entities that can show a "new" badge when first unlocked.
+ */
+class AdventuringBadgeRenderQueue extends AdventuringMasteryRenderQueue {
+    constructor() {
+        super();
+        this.newBadge = false;
+    }
+
+    queueAll() {
+        super.queueAll();
+        this.newBadge = true;
+    }
+}
+
+/**
+ * RenderQueue for equipment items.
+ * Adds: upgrade, selected, highlight, equipped
+ */
+class AdventuringEquipmentRenderQueue extends AdventuringBadgeRenderQueue {
+    constructor() {
+        super();
+        // Override - equipment doesn't use name/clickable/mastery in same way
+        this.name = undefined;
+        this.clickable = undefined;
+        this.mastery = undefined;
+        
+        this.upgrade = false;
+        this.selected = false;
+        this.highlight = false;
+        this.equipped = false;
+    }
+
+    queueAll() {
+        this.tooltip = true;
+        this.icon = true;
+        this.newBadge = true;
+        this.upgrade = true;
+        this.selected = true;
+        this.highlight = true;
+        this.equipped = true;
+    }
+}
+
 export { 
     AdventuringWeightedTable,
     randomElement,
@@ -2254,6 +2454,7 @@ export {
     formatTarget,
     buildEffectReplacements,
     buildHitEffectReplacements,
+    buildDescription,
     // Effect processing (unified)
     SimpleEffectInstance,
     getEffectAmount,
@@ -2262,6 +2463,10 @@ export {
     addMasteryXPWithBonus,
     // Condition system
     evaluateCondition,
-    describeCondition
+    describeCondition,
+    // RenderQueue base classes
+    AdventuringMasteryRenderQueue,
+    AdventuringBadgeRenderQueue,
+    AdventuringEquipmentRenderQueue
 }
 

@@ -1,35 +1,29 @@
 const { loadModule } = mod.getContext(import.meta);
 
+const { AdventuringMasteryAction } = await loadModule('src/core/adventuring-mastery-action.mjs');
 const { AdventuringAreaElement } = await loadModule('src/dungeon/components/adventuring-area.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
 
-const { AdventuringWeightedTable, addMasteryXPWithBonus, RequirementsChecker } = await loadModule('src/core/adventuring-utils.mjs');
+const { AdventuringWeightedTable, addMasteryXPWithBonus, RequirementsChecker, AdventuringMasteryRenderQueue } = await loadModule('src/core/adventuring-utils.mjs');
 
-class AdventuringAreaRenderQueue {
+/**
+ * Area-specific RenderQueue with autoRepeat support
+ */
+class AdventuringAreaRenderQueue extends AdventuringMasteryRenderQueue {
     constructor(){
-        this.name = false;
-        this.tooltip = false;
-        this.icon = false;
-        this.clickable = false;
-        this.mastery = false;
+        super();
         this.autoRepeat = false;
     }
 
     queueAll() {
-        this.name = true;
-        this.tooltip = true;
-        this.icon = true;
-        this.clickable = true;
-        this.mastery = true;
+        super.queueAll();
         this.autoRepeat = true;
     }
 }
 
-export class AdventuringArea extends MasteryAction {
+export class AdventuringArea extends AdventuringMasteryAction {
     constructor(namespace, data, manager, game) {
-        super(namespace, data, game);
-        this.manager = manager;
-        this.game = game;
+        super(namespace, data, manager, game);
 
         this.component = createElement('adventuring-area');
         this.renderQueue = new AdventuringAreaRenderQueue();
@@ -93,66 +87,10 @@ export class AdventuringArea extends MasteryAction {
         // Mastery aura id (looked up during postDataRegistration)
         this._masteryAuraId = data.masteryAuraId;
         this.masteryAura = null;
-        
-        // Mastery effects cache - rebuilt on level up
-        this._masteryEffectsCache = null;
-        this._masteryCacheLevel = -1;
     }
 
-    /**
-     * Get the mastery category for areas
-     */
-    get masteryCategory() {
-        return this.manager.masteryCategories.getObjectByID('adventuring:areas');
-    }
-
-    /**
-     * Get cached mastery effects for this area's current level.
-     * Rebuilds cache if level changed.
-     */
-    get masteryEffects() {
-        const currentLevel = this.level;
-        if (this._masteryEffectsCache === null || this._masteryCacheLevel !== currentLevel) {
-            this._rebuildMasteryCache();
-        }
-        return this._masteryEffectsCache;
-    }
-
-    /**
-     * Rebuild the mastery effects cache from the category milestones
-     */
-    _rebuildMasteryCache() {
-        const category = this.masteryCategory;
-        this._masteryCacheLevel = this.level;
-        this._masteryEffectsCache = category ? category.getEffectsAtLevel(this.level) : [];
-    }
-
-    /**
-     * Invalidate mastery cache (called on level up)
-     */
-    invalidateMasteryCache() {
-        this._masteryEffectsCache = null;
-        this._masteryCacheLevel = -1;
-    }
-
-    /**
-     * Check if this area has a specific mastery effect type
-     * @param {string} effectType - The effect type to check for
-     * @returns {boolean}
-     */
-    hasMasteryEffect(effectType) {
-        return this.masteryEffects.some(e => e.type === effectType);
-    }
-
-    /**
-     * Get the total value of a specific mastery effect type
-     * @param {string} effectType - The effect type to sum
-     * @returns {number}
-     */
-    getMasteryEffectValue(effectType) {
-        return this.masteryEffects
-            .filter(e => e.type === effectType)
-            .reduce((sum, e) => sum + (e.value || 0), 0);
+    get masteryCategoryId() {
+        return 'adventuring:areas';
     }
 
     /**
@@ -256,7 +194,8 @@ export class AdventuringArea extends MasteryAction {
     }
 
     get unlocked() {
-        return this._reqChecker?.check() ?? true;
+        if (this._reqChecker === undefined) return true;
+        return this._reqChecker.check();
     }
 
     /**

@@ -7,7 +7,7 @@ const { evaluateCondition } = await loadModule('src/core/adventuring-utils.mjs')
 
 const MAX_EQUIPPED_CONSUMABLES = 3;
 
-class ConsumablesRenderQueue {
+class AdventuringConsumablesRenderQueue {
     constructor() {
         this.slots = false;
         this.details = false;
@@ -35,7 +35,7 @@ export class AdventuringConsumables extends AdventuringPage {
         this.game = game;
 
         this.component = createElement('adventuring-consumables');
-        this.renderQueue = new ConsumablesRenderQueue();
+        this.renderQueue = new AdventuringConsumablesRenderQueue();
 
         // Charges: Map<Consumable, Map<tier, count>>
         this.charges = new Map();

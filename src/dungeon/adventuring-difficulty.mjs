@@ -63,21 +63,21 @@ export class AdventuringDifficulty extends NamespacedObject {
      * Check if this difficulty uses infinite wave generation
      */
     get isInfinite() {
-        return this.waveGeneration?.type === 'infinite';
+        return this.waveGeneration !== undefined && this.waveGeneration.type === 'infinite';
     }
 
     /**
      * Get floors per wave (default 1 for infinite modes)
      */
     get floorsPerWave() {
-        return this.waveGeneration?.floorsPerWave ?? 1;
+        return this.waveGeneration !== undefined && this.waveGeneration.floorsPerWave !== undefined ? this.waveGeneration.floorsPerWave : 1;
     }
 
     /**
      * Get floor selection strategy
      */
     get floorSelection() {
-        return this.waveGeneration?.floorSelection ?? 'first';
+        return this.waveGeneration !== undefined && this.waveGeneration.floorSelection !== undefined ? this.waveGeneration.floorSelection : 'first';
     }
 
     get name() {
@@ -97,15 +97,29 @@ export class AdventuringDifficulty extends NamespacedObject {
      * @returns {StandardEffect[]} Array of standardized effects
      */
     getEffects() {
-        return this.effects.map(effect => ({
-            trigger: effect.trigger,
-            type: effect.type,
-            value: effect.amount?.base || effect.getAmount?.() || 1,
-            stacks: effect.stacks?.base || effect.getStacks?.() || 1,
-            aura: effect.id,  // For buff/debuff effects, this is the aura ID
-            source: this,
-            sourceName: this.name
-        }));
+        return this.effects.map(effect => {
+            let value = 1;
+            if (effect.amount !== undefined && effect.amount.base !== undefined) {
+                value = effect.amount.base;
+            } else if (effect.getAmount !== undefined) {
+                value = effect.getAmount();
+            }
+            let stacks = 1;
+            if (effect.stacks !== undefined && effect.stacks.base !== undefined) {
+                stacks = effect.stacks.base;
+            } else if (effect.getStacks !== undefined) {
+                stacks = effect.getStacks();
+            }
+            return {
+                trigger: effect.trigger,
+                type: effect.type,
+                value: value,
+                stacks: stacks,
+                aura: effect.id,  // For buff/debuff effects, this is the aura ID
+                source: this,
+                sourceName: this.name
+            };
+        });
     }
 
     /**

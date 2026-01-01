@@ -165,7 +165,7 @@ export class AdventuringEquipment {
 
     postDataRegistration() {
         this.manager.itemSlots.forEach(slot => {
-            if(slot.id !== "adventuring:none")
+            if(slot !== this.manager.cached.noneItemSlot)
                 this.slots.set(slot, new AdventuringEquipmentSlot(this.manager, this.game, this, slot))
         });
         

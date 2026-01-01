@@ -25,8 +25,8 @@ export class AdventuringEquipmentSlot {
         this.manager = manager;
         this.equipment = equipment;
         this.slotType = slotType;
-        this.occupiedBy = this.manager.itemSlots.getObjectByID("adventuring:none");
-        this.item = this.manager.baseItems.getObjectByID("adventuring:none");
+        this.occupiedBy = this.manager.cached.noneItemSlot;
+        this.item = this.manager.cached.noneItem;
         this.highlight = false;
         this.clickable = false;
         this.selected = false;
@@ -51,7 +51,7 @@ export class AdventuringEquipmentSlot {
     canEquip(item, swapSlot) {
         if(item === undefined)
             return false;
-        if(item === this.manager.baseItems.getObjectByID("adventuring:none"))
+        if(item === this.manager.cached.noneItem)
             return true;
         if(!item.unlocked || item.upgradeLevel === 0)
             return false;
@@ -154,7 +154,7 @@ export class AdventuringEquipmentSlot {
     setOccupied(slot) {
         this.item.renderQueue.equipped = true;
 
-        this.item = this.manager.baseItems.getObjectByID("adventuring:none");
+        this.item = this.manager.cached.noneItem;
         this.occupiedBy = slot;
         this.renderQueue.icon = true;
         this.renderQueue.valid = true;
@@ -170,7 +170,7 @@ export class AdventuringEquipmentSlot {
 
         this.item = item;
         this.item.renderQueue.equipped = true;
-        this.occupiedBy = this.manager.itemSlots.getObjectByID("adventuring:none");
+        this.occupiedBy = this.manager.cached.noneItemSlot;
         this.item.occupies.forEach(slot => {
             let equipmentSlot = this.equipment.slots.get(slot);
             equipmentSlot.setOccupied(this.slotType);
@@ -192,8 +192,8 @@ export class AdventuringEquipmentSlot {
             equipmentSlot.setEmpty();
         });
 
-        this.item = this.manager.baseItems.getObjectByID("adventuring:none");
-        this.occupiedBy = this.manager.itemSlots.getObjectByID("adventuring:none");
+        this.item = this.manager.cached.noneItem;
+        this.occupiedBy = this.manager.cached.noneItemSlot;
         this.renderQueue.icon = true;
         this.renderQueue.valid = true;
         this.renderQueue.upgrade = true;
@@ -205,12 +205,11 @@ export class AdventuringEquipmentSlot {
     }
 
     get empty() {
-        return this.item === this.manager.baseItems.getObjectByID("adventuring:none") && !this.occupied;
+        return this.item === this.manager.cached.noneItem && !this.occupied;
     }
 
     get occupied() {
-        let emptySlot = this.manager.itemSlots.getObjectByID("adventuring:none");
-        return this.occupiedBy !== emptySlot;
+        return this.occupiedBy !== this.manager.cached.noneItemSlot;
     }
     
     get stats() {

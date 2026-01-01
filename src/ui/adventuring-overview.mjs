@@ -69,12 +69,19 @@ class AdventuringOverviewButton {
     }
 }
 
-class OverviewRenderQueue {
+class AdventuringOverviewRenderQueue {
     constructor() {
         this.status = false;
         this.buttons = false;
         this.turnProgressBar = false;
         this.buffs = false;
+    }
+
+    queueAll() {
+        this.status = true;
+        this.buttons = true;
+        this.turnProgressBar = true;
+        this.buffs = true;
     }
 }
 
@@ -83,7 +90,7 @@ export class AdventuringOverview {
         this.manager = manager;
         this.game = game;
 
-        this.renderQueue = new OverviewRenderQueue();
+        this.renderQueue = new AdventuringOverviewRenderQueue();
         this.component = createElement('adventuring-overview');
 
         this.buttons = new Set();
@@ -222,7 +229,7 @@ export class AdventuringOverview {
 
         // 1. Current difficulty mode (only when in dungeon)
         if(this.manager.isActive) {
-            const difficulty = this.manager.dungeon.area?.getDifficulty();
+            const difficulty = this.manager.dungeon.area !== undefined ? this.manager.dungeon.area.getDifficulty() : undefined;
             if(difficulty) {
                 effects.push({
                     name: difficulty.name,

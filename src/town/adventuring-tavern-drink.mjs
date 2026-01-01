@@ -3,7 +3,7 @@ const { loadModule } = mod.getContext(import.meta);
 const { createEffect, describeEffect } = await loadModule('src/core/adventuring-utils.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
 
-class TavernDrinkRenderQueue {
+class AdventuringTavernDrinkRenderQueue {
     constructor() {
         this.icon = false;
         this.charges = false;
@@ -43,7 +43,7 @@ export class AdventuringTavernDrink extends NamespacedObject {
             materials: new Map()
         };
 
-        this.renderQueue = new TavernDrinkRenderQueue();
+        this.renderQueue = new AdventuringTavernDrinkRenderQueue();
     }
 
     get name() {
@@ -118,15 +118,15 @@ export class AdventuringTavernDrink extends NamespacedObject {
         const stash = this.manager.stash;
         
         if(this.cost.currency > 0) {
-            const currency = this.manager.materials.getObjectByID('adventuring:currency');
-            if(!currency || stash.getCount(currency) < this.cost.currency * runs) {
+            const currency = this.manager.cached.currency;
+            if(currency === undefined || stash.getCount(currency) < this.cost.currency * runs) {
                 return false;
             }
         }
         
         if(this.cost.slayerCoins > 0) {
-            const slayerCoins = this.manager.materials.getObjectByID('adventuring:slayer_coins');
-            if(!slayerCoins || stash.getCount(slayerCoins) < this.cost.slayerCoins * runs) {
+            const slayerCoins = this.manager.cached.slayerCoins;
+            if(slayerCoins === undefined || stash.getCount(slayerCoins) < this.cost.slayerCoins * runs) {
                 return false;
             }
         }
@@ -153,13 +153,13 @@ export class AdventuringTavernDrink extends NamespacedObject {
 
         // Deduct currency
         if(this.cost.currency > 0) {
-            const currency = this.manager.materials.getObjectByID('adventuring:currency');
+            const currency = this.manager.cached.currency;
             stash.remove(currency, this.cost.currency * runs);
         }
         
         // Deduct slayer coins
         if(this.cost.slayerCoins > 0) {
-            const slayerCoins = this.manager.materials.getObjectByID('adventuring:slayer_coins');
+            const slayerCoins = this.manager.cached.slayerCoins;
             stash.remove(slayerCoins, this.cost.slayerCoins * runs);
         }
         

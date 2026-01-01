@@ -41,7 +41,7 @@ export class AdventuringProduct extends NamespacedObject {
      */
     getMaterials(tier) {
         const tierData = this.getTierData(tier);
-        return tierData?.materials || [];
+        return tierData !== undefined && tierData.materials !== undefined ? tierData.materials : [];
     }
 
     /**
@@ -49,35 +49,41 @@ export class AdventuringProduct extends NamespacedObject {
      */
     getRequirements(tier) {
         const tierData = this.getTierData(tier);
-        return tierData?.requirements || [];
+        return tierData !== undefined && tierData.requirements !== undefined ? tierData.requirements : [];
     }
 
     /**
      * Get name for display - tier-specific for consumables and conversions
      */
     getName(tier = 1) {
-        if (this.outputType === 'consumable' && this.output?.getTierName) {
+        if (this.outputType === 'consumable' && this.output !== undefined && this.output.getTierName !== undefined) {
             return this.output.getTierName(tier);
         }
         if (this.outputType === 'conversion') {
             const tierData = this.getTierData(tier);
-            return tierData?.outputMaterial?.name ?? 'Unknown';
+            if (tierData !== undefined && tierData.outputMaterial !== undefined && tierData.outputMaterial.name !== undefined) {
+                return tierData.outputMaterial.name;
+            }
+            return 'Unknown';
         }
-        return this.output?.name ?? 'Unknown';
+        return this.output !== undefined && this.output.name !== undefined ? this.output.name : 'Unknown';
     }
 
     /**
      * Get media for display - tier-specific for consumables and conversions
      */
     getMedia(tier = 1) {
-        if (this.outputType === 'consumable' && this.output?.getTierMedia) {
+        if (this.outputType === 'consumable' && this.output !== undefined && this.output.getTierMedia !== undefined) {
             return this.output.getTierMedia(tier);
         }
         if (this.outputType === 'conversion') {
             const tierData = this.getTierData(tier);
-            return tierData?.outputMaterial?.media ?? 'assets/media/main/question.png';
+            if (tierData !== undefined && tierData.outputMaterial !== undefined && tierData.outputMaterial.media !== undefined) {
+                return tierData.outputMaterial.media;
+            }
+            return 'assets/media/main/question.png';
         }
-        return this.output?.media ?? 'assets/media/main/question.png';
+        return this.output !== undefined && this.output.media !== undefined ? this.output.media : 'assets/media/main/question.png';
     }
 
     // Legacy getters for backwards compatibility (use tier 1)
@@ -129,7 +135,7 @@ export class AdventuringProduct extends NamespacedObject {
                     }
                 }
                 // Use first tier's material as default output for display
-                this.output = this.tiers[0]?.outputMaterial;
+                this.output = this.tiers[0] !== undefined ? this.tiers[0].outputMaterial : undefined;
                 break;
             case 'material':
                 this.output = this.manager.materials.getObjectByID(this._output);
@@ -201,8 +207,10 @@ export class AdventuringProduct extends NamespacedObject {
         }
         
         // Check requirements
-        const checker = this._reqCheckers?.get(tier);
-        return checker?.check({ character }) ?? true;
+        if (this._reqCheckers === undefined) return true;
+        const checker = this._reqCheckers.get(tier);
+        if (checker === undefined) return true;
+        return checker.check({ character });
     }
 
     /**

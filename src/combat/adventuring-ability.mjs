@@ -2,7 +2,7 @@ const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringStats } = await loadModule('src/core/adventuring-stats.mjs');
 const { AdventuringScalableEffect } = await loadModule('src/combat/adventuring-scalable-effect.mjs');
-const { RequirementsChecker, buildHitEffectReplacements, parseDescription, describeEffectFull } = await loadModule('src/core/adventuring-utils.mjs');
+const { RequirementsChecker, buildHitEffectReplacements, buildDescription } = await loadModule('src/core/adventuring-utils.mjs');
 
 const { AdventuringAbilityElement } = await loadModule('src/combat/components/adventuring-ability.mjs');
 const { AdventuringAbilityDetailsElement } = await loadModule('src/combat/components/adventuring-ability-details.mjs');
@@ -112,7 +112,8 @@ export class AdventuringAbility extends NamespacedObject {
      */
     unlockedBy(job) {
         if(this.isEnemy) return false;
-        return this._reqChecker?.referencesJob(job.id) ?? false;
+        if (this._reqChecker === undefined) return false;
+        return this._reqChecker.referencesJob(job.id);
     }
 
     get unlocked() {
@@ -126,15 +127,16 @@ export class AdventuringAbility extends NamespacedObject {
         
         // Use RequirementsChecker for standard job_level requirements
         // Note: For unlocked, we treat current_job_level same as job_level
-        return this._reqChecker?.check() ?? true;
+        if (this._reqChecker === undefined) return true;
+        return this._reqChecker.check();
     }
 
     canEquip(character) {
         // Blue Mage (Slayer) can equip learned enemy abilities
         if(this.isEnemy) {
             if(!this.manager.learnedAbilities.has(this.id)) return false;
-            const slayerJob = this.manager.jobs.getObjectByID('adventuring:slayer');
-            if(!slayerJob) return false;
+            const slayerJob = this.manager.cached.slayerJob;
+            if(slayerJob === undefined) return false;
             return (character.combatJob === slayerJob) || (character.passiveJob === slayerJob);
         }
         
@@ -144,7 +146,8 @@ export class AdventuringAbility extends NamespacedObject {
         }
         
         // Use RequirementsChecker with character context for current_job_level
-        return this._reqChecker?.check({ character }) ?? true;
+        if (this._reqChecker === undefined) return true;
+        return this._reqChecker.check({ character });
     }
 
     /**
@@ -160,48 +163,17 @@ export class AdventuringAbility extends NamespacedObject {
      * @param {string} displayMode - Display mode: 'total', 'scaled', 'multiplier', or falsy for raw
      */
     getDescription(stats, displayMode) {
-        // If we have a template description, use it with placeholders
-        if(this._descriptionTemplate) {
-            const replacements = buildHitEffectReplacements(this.hits, stats, displayMode);
-            let desc = parseDescription(this._descriptionTemplate, replacements);
-            if(this.flavorText) {
-                desc = `${desc}\n\n${this.flavorText}`;
-            }
-            return desc;
-        }
-        
-        // Auto-generate from hit effects
-        const effectDescs = [];
-        this.hits.forEach((hit, hitIndex) => {
-            // Group effects from the same hit together with "and"
-            const hitEffectDescs = [];
-            hit.effects.forEach(effect => {
-                // Build a simplified effect object for description
-                const effectObj = {
-                    type: effect.type,
-                    trigger: effect.trigger || 'on_use',
-                    value: effect.getAmount ? effect.getAmount(stats, displayMode) : (effect.amount?.base || effect.amount || 0),
-                    stacks: effect.getStacks ? effect.getStacks(stats, displayMode) : (effect.stacks?.base || effect.stacks || 0),
-                    id: effect.id,
-                    target: hit.target,
-                    party: hit.party,
-                    condition: effect.condition,
-                    chance: effect.chance
-                };
-                // Abilities don't need trigger suffixes - they're always "on use"
-                hitEffectDescs.push(describeEffectFull(effectObj, this.manager, { displayMode, includeTrigger: false }));
-            });
-            // Join effects within same hit with " and "
-            if(hitEffectDescs.length > 0) {
-                effectDescs.push(hitEffectDescs.join(' and '));
-            }
+        const desc = buildDescription({
+            hits: this.hits,
+            manager: this.manager,
+            template: this._descriptionTemplate,
+            flavorText: this.flavorText,
+            stats: stats,
+            displayMode: displayMode,
+            includeTrigger: false,
+            buildReplacements: buildHitEffectReplacements
         });
-        
-        let generated = effectDescs.join('. ');
-        if(this.flavorText) {
-            generated = generated ? `${generated}.\n\n${this.flavorText}` : this.flavorText;
-        }
-        return generated || 'No effect.';
+        return desc !== '' ? desc : 'No effect.';
     }
 
     setHighlight(highlight) {

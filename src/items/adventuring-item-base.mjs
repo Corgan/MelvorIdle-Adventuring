@@ -1,37 +1,15 @@
 const { loadModule } = mod.getContext(import.meta);
 
+const { AdventuringMasteryAction } = await loadModule('src/core/adventuring-mastery-action.mjs');
 const { AdventuringItemBaseElement } = await loadModule('src/items/components/adventuring-item-base.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
-const { RequirementsChecker, formatRequirements, describeEffect, describeEffectFull, formatTrigger } = await loadModule('src/core/adventuring-utils.mjs');
+const { RequirementsChecker, formatRequirements, describeEffect, describeEffectFull, formatTrigger, AdventuringEquipmentRenderQueue, buildDescription } = await loadModule('src/core/adventuring-utils.mjs');
 
 const { AdventuringStats } = await loadModule('src/core/adventuring-stats.mjs');
 
-class AdventuringItemBaseRenderQueue {
-    constructor(){
-        this.tooltip = false;
-        this.icon = false;
-        this.upgrade = false;
-        this.selected = false;
-        this.highlight = false;
-        this.equipped = false;
-        this.newBadge = false;
-    }
-    updateAll() {
-        this.tooltip = true;
-        this.icon = true;
-        this.upgrade = true;
-        this.selected = true;
-        this.highlight = true;
-        this.equipped = true;
-        this.newBadge = true;
-    }
-}
-
-export class AdventuringItemBase extends MasteryAction {
+export class AdventuringItemBase extends AdventuringMasteryAction {
     constructor(namespace, data, manager, game) {
-        super(namespace, data, game);
-        this.manager = manager;
-        this.game = game;
+        super(namespace, data, manager, game);
 
         this._name = data.name;
         this._media = data.media;
@@ -46,7 +24,7 @@ export class AdventuringItemBase extends MasteryAction {
         this.stats = new AdventuringStats(this.manager, this.game);
 
         this.component = createElement('adventuring-item-base');
-        this.renderQueue = new AdventuringItemBaseRenderQueue();
+        this.renderQueue = new AdventuringEquipmentRenderQueue();
 
         if(data.materials !== undefined) {
             this._materials = data.materials;
@@ -78,66 +56,10 @@ export class AdventuringItemBase extends MasteryAction {
         this.component.clickable.onclick = () => {
             this.slotClicked();
         }
-        
-        // Mastery effects cache - rebuilt on level up
-        this._masteryEffectsCache = null;
-        this._masteryCacheLevel = -1;
     }
 
-    /**
-     * Get the mastery category for equipment
-     */
-    get masteryCategory() {
-        return this.manager.masteryCategories.getObjectByID('adventuring:equipment');
-    }
-
-    /**
-     * Get cached mastery effects for this item's current level.
-     * Rebuilds cache if level changed.
-     */
-    get masteryEffects() {
-        const currentLevel = this.level;
-        if (this._masteryEffectsCache === null || this._masteryCacheLevel !== currentLevel) {
-            this._rebuildMasteryCache();
-        }
-        return this._masteryEffectsCache;
-    }
-
-    /**
-     * Rebuild the mastery effects cache from the category milestones
-     */
-    _rebuildMasteryCache() {
-        const category = this.masteryCategory;
-        this._masteryCacheLevel = this.level;
-        this._masteryEffectsCache = category ? category.getEffectsAtLevel(this.level) : [];
-    }
-
-    /**
-     * Invalidate mastery cache (called on level up)
-     */
-    invalidateMasteryCache() {
-        this._masteryEffectsCache = null;
-        this._masteryCacheLevel = -1;
-    }
-
-    /**
-     * Check if this item has a specific mastery effect type
-     * @param {string} effectType - The effect type to check for
-     * @returns {boolean}
-     */
-    hasMasteryEffect(effectType) {
-        return this.masteryEffects.some(e => e.type === effectType);
-    }
-
-    /**
-     * Get the total value of a specific mastery effect type
-     * @param {string} effectType - The effect type to sum
-     * @returns {number}
-     */
-    getMasteryEffectValue(effectType) {
-        return this.masteryEffects
-            .filter(e => e.type === effectType)
-            .reduce((sum, e) => sum + (e.value || 0), 0);
+    get masteryCategoryId() {
+        return 'adventuring:equipment';
     }
     
     /**
@@ -153,19 +75,12 @@ export class AdventuringItemBase extends MasteryAction {
                 : this.customDescription;
         }
         
-        // Generate from effects if any
-        if(this.effects && this.effects.length > 0) {
-            const effectDescs = this.effects.map(e => describeEffectFull(e, this.manager));
-            const generated = effectDescs.join('. ');
-            
-            if(this.flavorText) {
-                return generated ? `${generated}.\n\n${this.flavorText}` : this.flavorText;
-            }
-            return generated || '';
-        }
-        
-        // Just flavor text
-        return this.flavorText || '';
+        return buildDescription({
+            effects: this.effects,
+            manager: this.manager,
+            flavorText: this.flavorText,
+            includeTrigger: true
+        });
     }
 
     onLoad() {

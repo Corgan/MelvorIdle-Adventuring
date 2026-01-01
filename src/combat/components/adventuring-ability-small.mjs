@@ -131,7 +131,11 @@ export class AdventuringAbilitySmallElement extends AdventuringTooltipElement {
      * Check if the hero has Slayer as their combat job.
      */
     isSlayerActive() {
-        return this.selectorCharacter?.combatJob?.id === 'adventuring:slayer';
+        if (this.skill === undefined || this.skill.cached === undefined) return false;
+        const slayerJob = this.skill.cached.slayerJob;
+        if (slayerJob === undefined) return false;
+        if (this.selectorCharacter === undefined) return false;
+        return this.selectorCharacter.combatJob === slayerJob;
     }
 
     /**
@@ -139,7 +143,8 @@ export class AdventuringAbilitySmallElement extends AdventuringTooltipElement {
      * Shows job abilities + area drill-down for learned/discoverable abilities.
      */
     buildGrimoireSelectorContent() {
-        const grimoire = this.skill?.grimoire;
+        if (this.skill === undefined) return this.buildSelectorContent();
+        const grimoire = this.skill.grimoire;
         if(!grimoire) return this.buildSelectorContent();
         
         // If an area is selected, show detail view
@@ -155,7 +160,7 @@ export class AdventuringAbilitySmallElement extends AdventuringTooltipElement {
      * Build the area list view for the Grimoire.
      */
     buildGrimoireAreaListView() {
-        const grimoire = this.skill?.grimoire;
+        const grimoire = this.skill !== undefined ? this.skill.grimoire : undefined;
         const container = document.createElement('div');
         container.className = 'p-2 adventuring-scrollbar';
         container.style.maxHeight = '400px';
