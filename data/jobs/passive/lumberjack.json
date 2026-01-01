@@ -2,442 +2,2705 @@
     "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
     "namespace": "adventuring",
     "data": {
-        "skillData": [{
-            "skillID": "adventuring:Adventuring",
-            "data": {
-                "stats": [
-                    {
-                        "id": "woodcutting",
-                        "name": "Woodcutting",
-                        "media": "melvor:assets/media/skills/woodcutting/woodcutting.svg"
-                    }
-                ],
-                "jobs": [
-                    {
-                        "id": "lumberjack",
-                        "name": "Lumberjack",
-                        "media": "melvor:assets/media/skills/woodcutting/woodcutting.svg",
-                        "requirements": [
-                            { "type": "skill_level", "level": 5 }
-                        ],
-                        "isMilestoneReward": true,
-                        "isPassive": true,
-                        "scaling": [
-                            { "id": "adventuring:woodcutting", "value": 1 },
-                            { "id": "adventuring:strength", "value": 0.25 }
-                        ]
-                    }
-                ],
-                "materials": [
-                    {
-                        "id": "crude_wood",
-                        "name": "Crude Wood",
-                        "media": "melvor:assets/media/skills/township/wood.png",
-                        "category": "adventuring:salvage"
-                    },
-                    {
-                        "id": "refined_wood",
-                        "name": "Refined Wood",
-                        "media": "melvor:assets/media/bank/yew_tree_logs.png",
-                        "tier": 2,
-                        "category": "adventuring:salvage",
-                        "requirements": [
-                            { "type": "job_level", "job": "adventuring:master_lumberjack", "level": 1 }
-                        ]
-                    },
-                    {
-                        "id": "immaculate_wood",
-                        "name": "Immaculate Wood",
-                        "media": "melvor:assets/media/bank/redwood_tree_logs.png",
-                        "tier": 3,
-                        "category": "adventuring:salvage",
-                        "requirements": [
-                            { "type": "job_level", "job": "adventuring:grandmaster_lumberjack", "level": 1 }
-                        ]
-                    },
-                    {
-                        "id": "transcendent_wood",
-                        "name": "Transcendent Wood",
-                        "media": "melvor:assets/media/bank/logs_elderwood.png",
-                        "tier": 4,
-                        "category": "adventuring:salvage",
-                        "requirements": [
-                            { "type": "job_level", "job": "adventuring:legendary_lumberjack", "level": 1 }
-                        ]
-                    }
-                ],
-                "buildings": [
-                    {
-                        "id": "lumberyard",
-                        "type": "workshop",
-                        "name": "Lumberyard",
-                        "description": "Chop trees and process timber. Lumberjacks provide logs for crafting and firemaking.",
-                        "media": "melvor:assets/media/skills/township/Woodcutters_Camp.png",
-                        "requirements": [],
-                        "idle": ["Stealing some firewood", "Lifting Logs"],
-                        "actions": ["adventuring:work"],
-                        "products": [
-                            "adventuring:normal_logs",
-                            "adventuring:oak_logs",
-                            "adventuring:willow_logs",
-                            "adventuring:teak_logs",
-                            "adventuring:maple_logs",
-                            "adventuring:mahogany_logs",
-                            "adventuring:yew_logs",
-                            "adventuring:magic_logs",
-                            "adventuring:redwood_logs",
-                            "adventuring:oakbark_toughness",
-                            "adventuring:lumberjacks_vigor"
-                        ]
-                    }
-                ],
-                "products": [
-                    {
-                        "id": "normal_logs",
-                        "item": "melvorD:Normal_Logs",
-                        "outputType": "item",
-                        "count": 1,
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:lumberjack", "level": 1 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:crude_wood", "count": 1 }
-                        ]
-                    },
-                    {
-                        "id": "oak_logs",
-                        "item": "melvorD:Oak_Logs",
-                        "outputType": "item",
-                        "count": 1,
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:lumberjack", "level": 5 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:crude_wood", "count": 1 }
-                        ]
-                    },
-                    {
-                        "id": "willow_logs",
-                        "item": "melvorD:Willow_Logs",
-                        "outputType": "item",
-                        "count": 1,
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:lumberjack", "level": 10 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:crude_wood", "count": 1 }
-                        ]
-                    },
-                    {
-                        "id": "teak_logs",
-                        "item": "melvorD:Teak_Logs",
-                        "outputType": "item",
-                        "count": 1,
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:lumberjack", "level": 15 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:crude_wood", "count": 1 }
-                        ]
-                    },
-                    {
-                        "id": "maple_logs",
-                        "item": "melvorD:Maple_Logs",
-                        "outputType": "item",
-                        "count": 1,
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:lumberjack", "level": 20 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:crude_wood", "count": 1 }
-                        ]
-                    },
-                    {
-                        "id": "mahogany_logs",
-                        "item": "melvorD:Mahogany_Logs",
-                        "outputType": "item",
-                        "count": 1,
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:lumberjack", "level": 30 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:crude_wood", "count": 1 }
-                        ]
-                    },
-                    {
-                        "id": "yew_logs",
-                        "item": "melvorD:Yew_Logs",
-                        "outputType": "item",
-                        "count": 1,
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:lumberjack", "level": 40 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:crude_wood", "count": 1 }
-                        ]
-                    },
-                    {
-                        "id": "magic_logs",
-                        "item": "melvorD:Magic_Logs",
-                        "outputType": "item",
-                        "count": 1,
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:lumberjack", "level": 50 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:crude_wood", "count": 1 }
-                        ]
-                    },
-                    {
-                        "id": "redwood_logs",
-                        "item": "melvorD:Redwood_Logs",
-                        "outputType": "item",
-                        "count": 1,
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:lumberjack", "level": 60 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:crude_wood", "count": 1 }
-                        ]
-                    },
-                    {
-                        "id": "oakbark_toughness",
-                        "consumable": "adventuring:oakbark_toughness",
-                        "outputType": "consumable",
-                        "count": 1,
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:lumberjack", "level": 15 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:crude_wood", "count": 2 }
-                        ]
-                    },
-                    {
-                        "id": "lumberjacks_vigor",
-                        "consumable": "adventuring:lumberjacks_vigor",
-                        "outputType": "consumable",
-                        "count": 1,
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:lumberjack", "level": 10 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:crude_wood", "count": 2 }
-                        ]
-                    },
-                    {
-                        "id": "convert_crude_wood_to_refined",
-                        "material": "adventuring:refined_wood",
-                        "outputType": "material",
-                        "count": 1,
-                        "requirements": [
-                            { "type": "job_level", "job": "adventuring:master_lumberjack", "level": 10 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:crude_wood", "count": 5 }
-                        ]
-                    },
-                    {
-                        "id": "convert_refined_wood_to_immaculate",
-                        "material": "adventuring:immaculate_wood",
-                        "outputType": "material",
-                        "count": 1,
-                        "requirements": [
-                            { "type": "job_level", "job": "adventuring:grandmaster_lumberjack", "level": 10 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:refined_wood", "count": 5 }
-                        ]
-                    },
-                    {
-                        "id": "convert_immaculate_wood_to_transcendent",
-                        "material": "adventuring:transcendent_wood",
-                        "outputType": "material",
-                        "count": 1,
-                        "requirements": [
-                            { "type": "job_level", "job": "adventuring:legendary_lumberjack", "level": 10 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:immaculate_wood", "count": 5 }
-                        ]
-                    },
-                    {
-                        "id": "refined_oak_logs",
-                        "item": "melvorD:Oak_Logs",
-                        "outputType": "item",
-                        "count": 3,
-                        "requirements": [
-                            { "type": "skill_level", "level": 25 },
-                            { "type": "current_job_level", "job": "adventuring:master_lumberjack", "level": 1 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:refined_wood", "count": 1 }
-                        ]
-                    },
-                    {
-                        "id": "refined_willow_logs",
-                        "item": "melvorD:Willow_Logs",
-                        "outputType": "item",
-                        "count": 3,
-                        "requirements": [
-                            { "type": "skill_level", "level": 25 },
-                            { "type": "current_job_level", "job": "adventuring:master_lumberjack", "level": 10 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:refined_wood", "count": 1 }
-                        ]
-                    },
-                    {
-                        "id": "refined_maple_logs",
-                        "item": "melvorD:Maple_Logs",
-                        "outputType": "item",
-                        "count": 3,
-                        "requirements": [
-                            { "type": "skill_level", "level": 25 },
-                            { "type": "current_job_level", "job": "adventuring:master_lumberjack", "level": 20 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:refined_wood", "count": 1 }
-                        ]
-                    },
-                    {
-                        "id": "refined_yew_logs",
-                        "item": "melvorD:Yew_Logs",
-                        "outputType": "item",
-                        "count": 3,
-                        "requirements": [
-                            { "type": "skill_level", "level": 25 },
-                            { "type": "current_job_level", "job": "adventuring:master_lumberjack", "level": 30 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:refined_wood", "count": 1 }
-                        ]
-                    },
-                    {
-                        "id": "immaculate_yew_logs",
-                        "item": "melvorD:Yew_Logs",
-                        "outputType": "item",
-                        "count": 8,
-                        "requirements": [
-                            { "type": "skill_level", "level": 50 },
-                            { "type": "current_job_level", "job": "adventuring:grandmaster_lumberjack", "level": 1 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:immaculate_wood", "count": 1 }
-                        ]
-                    },
-                    {
-                        "id": "immaculate_magic_logs",
-                        "item": "melvorD:Magic_Logs",
-                        "outputType": "item",
-                        "count": 8,
-                        "requirements": [
-                            { "type": "skill_level", "level": 50 },
-                            { "type": "current_job_level", "job": "adventuring:grandmaster_lumberjack", "level": 15 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:immaculate_wood", "count": 1 }
-                        ]
-                    },
-                    {
-                        "id": "immaculate_redwood_logs",
-                        "item": "melvorD:Redwood_Logs",
-                        "outputType": "item",
-                        "count": 8,
-                        "requirements": [
-                            { "type": "skill_level", "level": 50 },
-                            { "type": "current_job_level", "job": "adventuring:grandmaster_lumberjack", "level": 30 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:immaculate_wood", "count": 1 }
-                        ]
-                    },
-                    {
-                        "id": "transcendent_redwood_logs",
-                        "item": "melvorD:Redwood_Logs",
-                        "outputType": "item",
-                        "count": 20,
-                        "requirements": [
-                            { "type": "skill_level", "level": 75 },
-                            { "type": "current_job_level", "job": "adventuring:legendary_lumberjack", "level": 1 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:transcendent_wood", "count": 1 }
-                        ]
-                    }
-                ],
-                "tiles": [
-                    {
-                        "id": "forest",
-                        "name": "Forest",
-                        "media": "melvor:assets/media/skills/woodcutting/normal_tree.svg",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:lumberjack", "level": 1 }
-                        ],
-                        "weight": 10,
-                        "floor_max": 1,
-                        "dungeon_max": 1,
-                        "effects": [
-                            { "type": "xp", "amount": 30, "job": "adventuring:lumberjack" },
-                            {
-                                "type": "loot",
-                                "pool": [
-                                    { "id": "adventuring:crude_wood", "qty": 1, "weight": 100 }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "sacred_grove",
-                        "name": "Sacred Grove",
-                        "media": "melvor:assets/media/skills/woodcutting/woodcutting.svg",
-                        "requirements": [
-                            { "type": "job_level", "job": "adventuring:master_lumberjack", "level": 1 }
-                        ],
-                        "weight": 8,
-                        "floor_max": 1,
-                        "dungeon_max": 2,
-                        "effects": [
-                            { "type": "xp", "amount": 100, "job": "adventuring:lumberjack" },
-                            { "type": "xp", "amount": 50, "job": "adventuring:master_lumberjack" },
-                            { "type": "xp", "amount": 50, "job": "adventuring:herbalist" },
-                            {
-                                "type": "loot",
-                                "pool": [
-                                    { "id": "adventuring:crude_wood", "qty": 3, "weight": 40 },
-                                    { "id": "adventuring:refined_wood", "qty": 2, "weight": 25 },
-                                    { "id": "adventuring:crude_herb", "qty": 2, "weight": 30 },
-                                    { "id": "adventuring:refined_herb", "qty": 1, "weight": 5 }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "world_tree_heart",
-                        "name": "World Tree's Heart",
-                        "media": "melvor:assets/media/skills/woodcutting/woodcutting.svg",
-                        "requirements": [
-                            { "type": "job_level", "job": "adventuring:legendary_lumberjack", "level": 1 }
-                        ],
-                        "weight": 3,
-                        "floor_max": 1,
-                        "dungeon_max": 1,
-                        "effects": [
-                            { "type": "xp", "amount": 250, "job": "adventuring:legendary_lumberjack" },
-                            { "type": "xp", "amount": 100, "job": "adventuring:grandmaster_lumberjack" },
-                            { "type": "heal", "amount": 100 },
-                            {
-                                "type": "loot",
-                                "pool": [
-                                    { "id": "adventuring:refined_wood", "qty": 3, "weight": 40 },
-                                    { "id": "adventuring:immaculate_wood", "qty": 2, "weight": 40 },
-                                    { "id": "adventuring:transcendent_wood", "qty": 1, "weight": 20 }
-                                ]
-                            }
-                        ]
-                    }
-                ]
+        "skillData": [
+            {
+                "skillID": "adventuring:Adventuring",
+                "data": {
+                    "stats": [
+                        {
+                            "id": "woodcutting",
+                            "name": "Woodcutting",
+                            "media": "melvor:assets/media/skills/woodcutting/woodcutting.svg"
+                        }
+                    ],
+                    "jobs": [
+                        {
+                            "id": "lumberjack",
+                            "name": "Lumberjack",
+                            "media": "melvor:assets/media/skills/woodcutting/woodcutting.svg",
+                            "requirements": [
+                                {
+                                    "type": "skill_level",
+                                    "level": 5
+                                }
+                            ],
+                            "isMilestoneReward": true,
+                            "isPassive": true,
+                            "scaling": [
+                                {
+                                    "id": "adventuring:woodcutting",
+                                    "value": 1
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 0.25
+                                }
+                            ]
+                        }
+                    ],
+                    "materials": [
+                        {
+                            "id": "crude_timber",
+                            "name": "Crude Timber",
+                            "media": "melvor:assets/media/skills/woodcutting/woodcutting.svg",
+                            "category": "adventuring:salvage"
+                        },
+                        {
+                            "id": "refined_timber",
+                            "name": "Refined Timber",
+                            "media": "melvor:assets/media/bank/logs_oak.png",
+                            "tier": 2,
+                            "category": "adventuring:salvage",
+                            "requirements": [
+                                {
+                                    "type": "job_level",
+                                    "job": "adventuring:lumberjack",
+                                    "level": 25
+                                }
+                            ]
+                        },
+                        {
+                            "id": "immaculate_timber",
+                            "name": "Immaculate Timber",
+                            "media": "melvor:assets/media/bank/logs_magic.png",
+                            "tier": 3,
+                            "category": "adventuring:salvage",
+                            "requirements": [
+                                {
+                                    "type": "job_level",
+                                    "job": "adventuring:lumberjack",
+                                    "level": 50
+                                }
+                            ]
+                        },
+                        {
+                            "id": "transcendent_timber",
+                            "name": "Transcendent Timber",
+                            "media": "melvor:assets/media/bank/logs_redwood.png",
+                            "tier": 4,
+                            "category": "adventuring:salvage",
+                            "requirements": [
+                                {
+                                    "type": "job_level",
+                                    "job": "adventuring:lumberjack",
+                                    "level": 75
+                                }
+                            ]
+                        },
+                        {
+                            "id": "ancient_sap",
+                            "name": "Ancient Sap",
+                            "media": "melvor:assets/media/skills/woodcutting/woodcutting.svg",
+                            "category": "adventuring:special"
+                        }
+                    ],
+                    "buildings": [
+                        {
+                            "id": "lumber_mill",
+                            "type": "workshop",
+                            "name": "Lumber Mill",
+                            "description": "Process timber into usable wood. Lumberjacks supply materials for construction.",
+                            "media": "melvor:assets/media/skills/township/Wood_Workshop.png",
+                            "requirements": [],
+                            "idle": [
+                                "Chopping wood",
+                                "Sharpening axes"
+                            ],
+                            "actions": [
+                                "adventuring:work"
+                            ],
+                            "products": [
+                                "adventuring:normal_logs",
+                                "adventuring:oak_logs",
+                                "adventuring:willow_logs",
+                                "adventuring:teak_logs",
+                                "adventuring:maple_logs",
+                                "adventuring:mahogany_logs",
+                                "adventuring:yew_logs",
+                                "adventuring:magic_logs",
+                                "adventuring:redwood_logs",
+                                "adventuring:craft_ancient_sap",
+                                "adventuring:convert_crude_to_refined_timber",
+                                "adventuring:convert_refined_to_immaculate_timber",
+                                "adventuring:convert_immaculate_to_transcendent_timber",
+                                "adventuring:convert_transcendent_to_immaculate_timber",
+                                "adventuring:convert_immaculate_to_refined_timber",
+                                "adventuring:convert_refined_to_crude_timber",
+                                "adventuring:craft_lumberjacks_vigor",
+                                "adventuring:craft_executioner_axe",
+                                "adventuring:craft_sap_drain",
+                                "adventuring:craft_forest_renewal",
+                                "adventuring:craft_timber_strike",
+                                "adventuring:craft_redwood_resilience",
+                                "adventuring:craft_heavy_lumber",
+                                "adventuring:craft_oaken_might"
+                            ]
+                        }
+                    ],
+                    "products": [
+                        {
+                            "id": "normal_logs",
+                            "item": "melvorD:Normal_Logs",
+                            "outputType": "item",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_timber",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 3,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_timber",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 8,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_timber",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 20,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_timber",
+                                            "count": 1
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "oak_logs",
+                            "item": "melvorD:Oak_Logs",
+                            "outputType": "item",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 1
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Woodcutting",
+                                            "level": 10
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_timber",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 3,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 25
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Woodcutting",
+                                            "level": 10
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_timber",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 8,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 50
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Woodcutting",
+                                            "level": 10
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_timber",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 20,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 75
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Woodcutting",
+                                            "level": 10
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_timber",
+                                            "count": 1
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "willow_logs",
+                            "item": "melvorD:Willow_Logs",
+                            "outputType": "item",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 1
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Woodcutting",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_timber",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 3,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 25
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Woodcutting",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_timber",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 8,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 50
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Woodcutting",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_timber",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 20,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 75
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Woodcutting",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_timber",
+                                            "count": 1
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "teak_logs",
+                            "item": "melvorD:Teak_Logs",
+                            "outputType": "item",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 1
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Woodcutting",
+                                            "level": 35
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_timber",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 3,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 25
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Woodcutting",
+                                            "level": 35
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_timber",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 8,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 50
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Woodcutting",
+                                            "level": 35
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_timber",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 20,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 75
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Woodcutting",
+                                            "level": 35
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_timber",
+                                            "count": 1
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "maple_logs",
+                            "item": "melvorD:Maple_Logs",
+                            "outputType": "item",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 1
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Woodcutting",
+                                            "level": 45
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_timber",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 3,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 25
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Woodcutting",
+                                            "level": 45
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_timber",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 8,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 50
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Woodcutting",
+                                            "level": 45
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_timber",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 20,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 75
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Woodcutting",
+                                            "level": 45
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_timber",
+                                            "count": 1
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "mahogany_logs",
+                            "item": "melvorD:Mahogany_Logs",
+                            "outputType": "item",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 1
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Woodcutting",
+                                            "level": 55
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_timber",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 3,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 25
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Woodcutting",
+                                            "level": 55
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_timber",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 8,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 50
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Woodcutting",
+                                            "level": 55
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_timber",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 20,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 75
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Woodcutting",
+                                            "level": 55
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_timber",
+                                            "count": 1
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "yew_logs",
+                            "item": "melvorD:Yew_Logs",
+                            "outputType": "item",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 1
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Woodcutting",
+                                            "level": 60
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_timber",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 3,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 25
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Woodcutting",
+                                            "level": 60
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_timber",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 8,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 50
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Woodcutting",
+                                            "level": 60
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_timber",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 20,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 75
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Woodcutting",
+                                            "level": 60
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_timber",
+                                            "count": 1
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "magic_logs",
+                            "item": "melvorD:Magic_Logs",
+                            "outputType": "item",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 1
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Woodcutting",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_timber",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 3,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 25
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Woodcutting",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_timber",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 8,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 50
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Woodcutting",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_timber",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 20,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 75
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Woodcutting",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_timber",
+                                            "count": 1
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "redwood_logs",
+                            "item": "melvorD:Redwood_Logs",
+                            "outputType": "item",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 1
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Woodcutting",
+                                            "level": 90
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_timber",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 3,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 25
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Woodcutting",
+                                            "level": 90
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_timber",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 8,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 50
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Woodcutting",
+                                            "level": 90
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_timber",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 20,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 75
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Woodcutting",
+                                            "level": 90
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_timber",
+                                            "count": 1
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "craft_ancient_sap",
+                            "material": "adventuring:ancient_sap",
+                            "outputType": "material",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 2,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_timber",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 4,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_timber",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 6,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_timber",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 8,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_timber",
+                                            "count": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "convert_crude_to_refined_timber",
+                            "outputType": "conversion",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "material": "adventuring:refined_timber",
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_timber",
+                                            "count": 5
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "convert_refined_to_immaculate_timber",
+                            "outputType": "conversion",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "material": "adventuring:immaculate_timber",
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_timber",
+                                            "count": 5
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "convert_immaculate_to_transcendent_timber",
+                            "outputType": "conversion",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "material": "adventuring:transcendent_timber",
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_timber",
+                                            "count": 5
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "convert_transcendent_to_immaculate_timber",
+                            "outputType": "conversion",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "material": "adventuring:immaculate_timber",
+                                    "count": 3,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_timber",
+                                            "count": 1
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "convert_immaculate_to_refined_timber",
+                            "outputType": "conversion",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "material": "adventuring:refined_timber",
+                                    "count": 3,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_timber",
+                                            "count": 1
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "convert_refined_to_crude_timber",
+                            "outputType": "conversion",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "material": "adventuring:crude_timber",
+                                    "count": 3,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_timber",
+                                            "count": 1
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "craft_lumberjacks_vigor",
+                            "consumable": "adventuring:lumberjacks_vigor",
+                            "outputType": "consumable",
+                            "count": 1,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_timber",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_timber",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_timber",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_timber",
+                                            "count": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "craft_executioner_axe",
+                            "consumable": "adventuring:executioner_axe",
+                            "outputType": "consumable",
+                            "count": 1,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_timber",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_timber",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_timber",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_timber",
+                                            "count": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "craft_sap_drain",
+                            "consumable": "adventuring:sap_drain",
+                            "outputType": "consumable",
+                            "count": 1,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_timber",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_timber",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_timber",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_timber",
+                                            "count": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "craft_forest_renewal",
+                            "consumable": "adventuring:forest_renewal",
+                            "outputType": "consumable",
+                            "count": 1,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_timber",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_timber",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_timber",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_timber",
+                                            "count": 2
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "craft_timber_strike",
+                            "consumable": "adventuring:timber_strike",
+                            "outputType": "consumable",
+                            "count": 1,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_timber",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_timber",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_timber",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_timber",
+                                            "count": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "craft_redwood_resilience",
+                            "consumable": "adventuring:redwood_resilience",
+                            "outputType": "consumable",
+                            "count": 1,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_timber",
+                                            "count": 5
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_timber",
+                                            "count": 5
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_timber",
+                                            "count": 5
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_timber",
+                                            "count": 5
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "craft_heavy_lumber",
+                            "consumable": "adventuring:heavy_lumber",
+                            "outputType": "consumable",
+                            "count": 1,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_timber",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_timber",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_timber",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_timber",
+                                            "count": 2
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "craft_oaken_might",
+                            "consumable": "adventuring:oaken_might",
+                            "outputType": "consumable",
+                            "count": 1,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_timber",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_timber",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_timber",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:lumberjack",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_timber",
+                                            "count": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "tiles": [
+                        {
+                            "id": "dead_stump",
+                            "name": "Dead Stump",
+                            "media": "melvor:assets/media/skills/woodcutting/woodcutting.svg",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:lumberjack",
+                                    "level": 1
+                                }
+                            ],
+                            "weight": 10,
+                            "floor_max": 1,
+                            "dungeon_max": 1,
+                            "effects": [
+                                {
+                                    "type": "xp",
+                                    "amount": 30,
+                                    "job": "adventuring:lumberjack"
+                                },
+                                {
+                                    "type": "loot",
+                                    "pool": [
+                                        {
+                                            "id": "adventuring:crude_timber",
+                                            "qty": 1,
+                                            "weight": 100
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "lumber_cache",
+                            "name": "Lumber Cache",
+                            "media": "melvor:assets/media/skills/woodcutting/woodcutting.svg",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:lumberjack",
+                                    "level": 25
+                                }
+                            ],
+                            "weight": 8,
+                            "floor_max": 1,
+                            "dungeon_max": 2,
+                            "effects": [
+                                {
+                                    "type": "xp",
+                                    "amount": 75,
+                                    "job": "adventuring:lumberjack"
+                                },
+                                {
+                                    "type": "loot",
+                                    "pool": [
+                                        {
+                                            "id": "adventuring:crude_timber",
+                                            "qty": 2,
+                                            "weight": 60
+                                        },
+                                        {
+                                            "id": "adventuring:refined_timber",
+                                            "qty": 1,
+                                            "weight": 40
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "ancient_grove",
+                            "name": "Ancient Grove",
+                            "media": "melvor:assets/media/skills/woodcutting/woodcutting.svg",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:lumberjack",
+                                    "level": 50
+                                }
+                            ],
+                            "weight": 5,
+                            "floor_max": 1,
+                            "dungeon_max": 2,
+                            "effects": [
+                                {
+                                    "type": "xp",
+                                    "amount": 150,
+                                    "job": "adventuring:lumberjack"
+                                },
+                                {
+                                    "type": "loot",
+                                    "pool": [
+                                        {
+                                            "id": "adventuring:crude_timber",
+                                            "qty": 1,
+                                            "weight": 30
+                                        },
+                                        {
+                                            "id": "adventuring:refined_timber",
+                                            "qty": 1,
+                                            "weight": 45
+                                        },
+                                        {
+                                            "id": "adventuring:immaculate_timber",
+                                            "qty": 1,
+                                            "weight": 25
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "world_tree_root",
+                            "name": "World Tree Root",
+                            "media": "melvor:assets/media/skills/woodcutting/woodcutting.svg",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:lumberjack",
+                                    "level": 75
+                                }
+                            ],
+                            "weight": 3,
+                            "floor_max": 1,
+                            "dungeon_max": 2,
+                            "effects": [
+                                {
+                                    "type": "xp",
+                                    "amount": 300,
+                                    "job": "adventuring:lumberjack"
+                                },
+                                {
+                                    "type": "loot",
+                                    "pool": [
+                                        {
+                                            "id": "adventuring:crude_timber",
+                                            "qty": 1,
+                                            "weight": 15
+                                        },
+                                        {
+                                            "id": "adventuring:refined_timber",
+                                            "qty": 1,
+                                            "weight": 30
+                                        },
+                                        {
+                                            "id": "adventuring:immaculate_timber",
+                                            "qty": 1,
+                                            "weight": 35
+                                        },
+                                        {
+                                            "id": "adventuring:transcendent_timber",
+                                            "qty": 1,
+                                            "weight": 20
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "consumableTypes": [
+                        {
+                            "id": "lumberjacks_vigor",
+                            "name": "Lumberjack's Vigor",
+                            "media": "melvor:assets/media/skills/woodcutting/woodcutting.svg",
+                            "type": "wood",
+                            "sourceJob": "adventuring:lumberjack",
+                            "maxCharges": 3,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "nameSuffix": "I",
+                                    "media": "melvor:assets/media/skills/woodcutting/woodcutting.svg",
+                                    "flavorText": "The strength of a tree flows through you.",
+                                    "effects": [
+                                        {
+                                            "type": "increase_damage_percent",
+                                            "trigger": "before_damage_dealt",
+                                            "amount": 15,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_wood",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "nameSuffix": "II",
+                                    "media": "melvor:assets/media/skills/woodcutting/woodcutting.svg",
+                                    "flavorText": "The might of the forest empowers you.",
+                                    "effects": [
+                                        {
+                                            "type": "increase_damage_percent",
+                                            "trigger": "before_damage_dealt",
+                                            "amount": 25,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_wood",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "nameSuffix": "III",
+                                    "media": "melvor:assets/media/skills/woodcutting/woodcutting.svg",
+                                    "flavorText": "Ancient wood grants tremendous power.",
+                                    "effects": [
+                                        {
+                                            "type": "increase_damage_percent",
+                                            "trigger": "before_damage_dealt",
+                                            "amount": 40,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_wood",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "nameSuffix": "IV",
+                                    "media": "melvor:assets/media/skills/woodcutting/woodcutting.svg",
+                                    "flavorText": "The World Tree's might is yours.",
+                                    "effects": [
+                                        {
+                                            "type": "increase_damage_percent",
+                                            "trigger": "before_damage_dealt",
+                                            "amount": 60,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_wood",
+                                            "count": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "executioner_axe",
+                            "name": "Executioner's Axe",
+                            "media": "melvor:assets/media/bank/logs_hornbeam.png",
+                            "type": "wood",
+                            "sourceJob": "adventuring:lumberjack",
+                            "maxCharges": 3,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "nameSuffix": "I",
+                                    "media": "melvor:assets/media/bank/logs_hornbeam.png",
+                                    "flavorText": "Finish the wounded with deadly force.",
+                                    "effects": [
+                                        {
+                                            "type": "increase_damage_percent",
+                                            "trigger": "before_damage_dealt",
+                                            "condition": {
+                                                "type": "enemy_hp_below",
+                                                "threshold": 30
+                                            },
+                                            "amount": 40,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_wood",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "nameSuffix": "II",
+                                    "media": "melvor:assets/media/bank/logs_hornbeam.png",
+                                    "flavorText": "No mercy for the weak.",
+                                    "effects": [
+                                        {
+                                            "type": "increase_damage_percent",
+                                            "trigger": "before_damage_dealt",
+                                            "condition": {
+                                                "type": "enemy_hp_below",
+                                                "threshold": 30
+                                            },
+                                            "amount": 60,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_wood",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "nameSuffix": "III",
+                                    "media": "melvor:assets/media/bank/logs_hornbeam.png",
+                                    "flavorText": "Execute with ruthless efficiency.",
+                                    "effects": [
+                                        {
+                                            "type": "increase_damage_percent",
+                                            "trigger": "before_damage_dealt",
+                                            "condition": {
+                                                "type": "enemy_hp_below",
+                                                "threshold": 30
+                                            },
+                                            "amount": 85,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_wood",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "nameSuffix": "IV",
+                                    "media": "melvor:assets/media/bank/logs_hornbeam.png",
+                                    "flavorText": "The final blow is always fatal.",
+                                    "effects": [
+                                        {
+                                            "type": "increase_damage_percent",
+                                            "trigger": "before_damage_dealt",
+                                            "condition": {
+                                                "type": "enemy_hp_below",
+                                                "threshold": 30
+                                            },
+                                            "amount": 120,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_wood",
+                                            "count": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "sap_drain",
+                            "name": "Sap Drain",
+                            "media": "melvor:assets/media/bank/logs_maple.png",
+                            "type": "wood",
+                            "sourceJob": "adventuring:lumberjack",
+                            "maxCharges": 3,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "nameSuffix": "I",
+                                    "media": "melvor:assets/media/bank/logs_maple.png",
+                                    "flavorText": "Drain life essence like tree sap.",
+                                    "effects": [
+                                        {
+                                            "type": "lifesteal",
+                                            "trigger": "after_damage_dealt",
+                                            "amount": 8,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_wood",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "nameSuffix": "II",
+                                    "media": "melvor:assets/media/bank/logs_maple.png",
+                                    "flavorText": "Absorb vitality from your foes.",
+                                    "effects": [
+                                        {
+                                            "type": "lifesteal",
+                                            "trigger": "after_damage_dealt",
+                                            "amount": 14,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_wood",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "nameSuffix": "III",
+                                    "media": "melvor:assets/media/bank/logs_maple.png",
+                                    "flavorText": "Drink deeply from the wellspring of life.",
+                                    "effects": [
+                                        {
+                                            "type": "lifesteal",
+                                            "trigger": "after_damage_dealt",
+                                            "amount": 22,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_wood",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "nameSuffix": "IV",
+                                    "media": "melvor:assets/media/bank/logs_maple.png",
+                                    "flavorText": "Every strike restores your spirit.",
+                                    "effects": [
+                                        {
+                                            "type": "lifesteal",
+                                            "trigger": "after_damage_dealt",
+                                            "amount": 32,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_wood",
+                                            "count": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "forest_renewal",
+                            "name": "Forest Renewal",
+                            "media": "melvor:assets/media/bank/logs_oak.png",
+                            "type": "wood",
+                            "sourceJob": "adventuring:lumberjack",
+                            "maxCharges": 5,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "nameSuffix": "I",
+                                    "media": "melvor:assets/media/bank/logs_oak.png",
+                                    "flavorText": "Nature's healing after each kill.",
+                                    "effects": [
+                                        {
+                                            "type": "heal",
+                                            "trigger": "on_kill",
+                                            "amount": 6,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_wood",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "nameSuffix": "II",
+                                    "media": "melvor:assets/media/bank/logs_oak.png",
+                                    "flavorText": "The grove restores your vitality.",
+                                    "effects": [
+                                        {
+                                            "type": "heal",
+                                            "trigger": "on_kill",
+                                            "amount": 12,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_wood",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "nameSuffix": "III",
+                                    "media": "melvor:assets/media/bank/logs_oak.png",
+                                    "flavorText": "Ancient forests mend your wounds.",
+                                    "effects": [
+                                        {
+                                            "type": "heal",
+                                            "trigger": "on_kill",
+                                            "amount": 20,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_wood",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "nameSuffix": "IV",
+                                    "media": "melvor:assets/media/bank/logs_oak.png",
+                                    "flavorText": "The World Tree's blessing heals all.",
+                                    "effects": [
+                                        {
+                                            "type": "heal",
+                                            "trigger": "on_kill",
+                                            "amount": 32,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_wood",
+                                            "count": 2
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "timber_strike",
+                            "name": "Timber Strike",
+                            "media": "melvor:assets/media/bank/logs_willow.png",
+                            "type": "wood",
+                            "sourceJob": "adventuring:lumberjack",
+                            "maxCharges": 3,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "nameSuffix": "I",
+                                    "media": "melvor:assets/media/bank/logs_willow.png",
+                                    "flavorText": "Critical hits fell enemies like trees.",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "trigger": "on_crit",
+                                            "amount": 8,
+                                            "target": "target"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_wood",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "nameSuffix": "II",
+                                    "media": "melvor:assets/media/bank/logs_willow.png",
+                                    "flavorText": "Crits bring down the mighty.",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "trigger": "on_crit",
+                                            "amount": 15,
+                                            "target": "target"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_wood",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "nameSuffix": "III",
+                                    "media": "melvor:assets/media/bank/logs_willow.png",
+                                    "flavorText": "TIMBER! The enemy falls.",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "trigger": "on_crit",
+                                            "amount": 25,
+                                            "target": "target"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_wood",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "nameSuffix": "IV",
+                                    "media": "melvor:assets/media/bank/logs_willow.png",
+                                    "flavorText": "Nothing withstands the crash.",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "trigger": "on_crit",
+                                            "amount": 40,
+                                            "target": "target"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_wood",
+                                            "count": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "redwood_resilience",
+                            "name": "Redwood Resilience",
+                            "media": "melvor:assets/media/bank/logs_redwood.png",
+                            "type": "wood",
+                            "sourceJob": "adventuring:lumberjack",
+                            "maxCharges": 1,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "nameSuffix": "I",
+                                    "media": "melvor:assets/media/bank/logs_redwood.png",
+                                    "flavorText": "The redwood's endurance saves you.",
+                                    "effects": [
+                                        {
+                                            "type": "prevent_death",
+                                            "trigger": "before_death",
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_wood",
+                                            "count": 5
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "nameSuffix": "II",
+                                    "media": "melvor:assets/media/bank/logs_redwood.png",
+                                    "flavorText": "Ancient wood defies death.",
+                                    "effects": [
+                                        {
+                                            "type": "prevent_death",
+                                            "trigger": "before_death",
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_wood",
+                                            "count": 5
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "nameSuffix": "III",
+                                    "media": "melvor:assets/media/bank/logs_redwood.png",
+                                    "flavorText": "The forest refuses to let you fall.",
+                                    "effects": [
+                                        {
+                                            "type": "prevent_death",
+                                            "trigger": "before_death",
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_wood",
+                                            "count": 5
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "nameSuffix": "IV",
+                                    "media": "melvor:assets/media/bank/logs_redwood.png",
+                                    "flavorText": "Immortal as the World Tree.",
+                                    "effects": [
+                                        {
+                                            "type": "prevent_death",
+                                            "trigger": "before_death",
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_wood",
+                                            "count": 5
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "heavy_lumber",
+                            "name": "Heavy Lumber",
+                            "media": "melvor:assets/media/bank/logs_elderwood.png",
+                            "type": "wood",
+                            "sourceJob": "adventuring:lumberjack",
+                            "maxCharges": 5,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "nameSuffix": "I",
+                                    "media": "melvor:assets/media/bank/logs_elderwood.png",
+                                    "flavorText": "Heavy wood adds weight to your blows.",
+                                    "effects": [
+                                        {
+                                            "type": "increase_damage",
+                                            "trigger": "before_damage_dealt",
+                                            "amount": 4,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_wood",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "nameSuffix": "II",
+                                    "media": "melvor:assets/media/bank/logs_elderwood.png",
+                                    "flavorText": "Ironwood strikes hit harder.",
+                                    "effects": [
+                                        {
+                                            "type": "increase_damage",
+                                            "trigger": "before_damage_dealt",
+                                            "amount": 8,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_wood",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "nameSuffix": "III",
+                                    "media": "melvor:assets/media/bank/logs_elderwood.png",
+                                    "flavorText": "Enchanted lumber deals crushing blows.",
+                                    "effects": [
+                                        {
+                                            "type": "increase_damage",
+                                            "trigger": "before_damage_dealt",
+                                            "amount": 14,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_wood",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "nameSuffix": "IV",
+                                    "media": "melvor:assets/media/bank/logs_elderwood.png",
+                                    "flavorText": "World Tree wood shatters all.",
+                                    "effects": [
+                                        {
+                                            "type": "increase_damage",
+                                            "trigger": "before_damage_dealt",
+                                            "amount": 22,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_wood",
+                                            "count": 2
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "oaken_might",
+                            "name": "Oaken Might",
+                            "media": "melvor:assets/media/bank/logs_oak.png",
+                            "type": "wood",
+                            "sourceJob": "adventuring:lumberjack",
+                            "maxCharges": 3,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "nameSuffix": "I",
+                                    "media": "melvor:assets/media/bank/logs_oak.png",
+                                    "flavorText": "Oak's strength empowers each kill.",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "trigger": "on_kill",
+                                            "id": "adventuring:might",
+                                            "stacks": 3,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_wood",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "nameSuffix": "II",
+                                    "media": "melvor:assets/media/bank/logs_oak.png",
+                                    "flavorText": "Forest power surges with victory.",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "trigger": "on_kill",
+                                            "id": "adventuring:might",
+                                            "stacks": 5,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_wood",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "nameSuffix": "III",
+                                    "media": "melvor:assets/media/bank/logs_oak.png",
+                                    "flavorText": "Ancient oak's fury builds with kills.",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "trigger": "on_kill",
+                                            "id": "adventuring:might",
+                                            "stacks": 8,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_wood",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "nameSuffix": "IV",
+                                    "media": "melvor:assets/media/bank/logs_oak.png",
+                                    "flavorText": "World Tree's might stacks with kills.",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "trigger": "on_kill",
+                                            "id": "adventuring:might",
+                                            "stacks": 12,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_wood",
+                                            "count": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
             }
-        }]
+        ]
     }
 }
-

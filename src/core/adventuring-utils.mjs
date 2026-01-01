@@ -486,6 +486,16 @@ class RequirementsChecker {
         switch(req.type) {
             case 'skill_level':
                 return this.manager.level >= req.level;
+            
+            case 'melvor_skill_level': {
+                // Check if player has required level in a Melvor skill
+                const skill = this.manager.game.skills.getObjectByID(req.skill);
+                if (!skill) {
+                    console.warn(`[Adventuring] Unknown Melvor skill: ${req.skill}`);
+                    return true; // Don't block if skill not found
+                }
+                return skill.level >= req.level;
+            }
                 
             case 'job_level':
                 return this._checkJobLevel(req.job, req.level);
@@ -523,7 +533,7 @@ class RequirementsChecker {
 
             default:
                 console.warn(`Unknown requirement type: ${req.type}`);
-                return true;
+                return false; // Fail safe: unknown requirements should block, not pass
         }
     }
     
@@ -650,6 +660,13 @@ function formatRequirement(req, manager, context = {}) {
         case 'skill_level':
             text = `Adventuring Level ${req.level}`;
             break;
+        
+        case 'melvor_skill_level': {
+            const skill = manager.game.skills.getObjectByID(req.skill);
+            const skillName = skill?.name || req.skill;
+            text = `${skillName} Level ${req.level}`;
+            break;
+        }
             
         case 'job_level': {
             const job = manager.jobs.getObjectByID(req.job);
@@ -899,6 +916,350 @@ function parseDescription(template, replacements) {
 }
 
 /**
+ * Get the display name for an aura/buff/debuff.
+ * Looks up the aura in the registry and falls back to prettifying the ID.
+ * 
+ * @param {object} manager - AdventuringManager for lookups
+ * @param {string} auraId - The aura ID to look up
+ * @returns {string} Human-readable aura name
+ */
+function getAuraName(manager, auraId) {
+    if (!auraId) return 'Unknown';
+    const aura = manager?.auras?.getObjectByID(auraId);
+    return aura?.name || auraId.split(':').pop() || 'Unknown';
+}
+
+/**
+ * Effect description registry - maps effect types to description generator functions.
+ * Each function receives: (effect, value, stacks, amount, manager, helpers)
+ * - effect: The full effect object
+ * - value: Resolved value (effect.value ?? amount)
+ * - stacks: Resolved stacks count
+ * - amount: Resolved amount
+ * - manager: AdventuringManager for lookups
+ * - helpers: { sign, percent, stat, aura, prettify }
+ */
+const effectDescriptionRegistry = new Map([
+    // Stat modifiers
+    ['increase_stat_flat', (effect, value, stacks, amount, manager, helpers) => 
+        effect.perStack 
+            ? `+${value ?? amount ?? 1} ${helpers.stat(effect.stat || effect.id)} per stack` 
+            : `${helpers.sign(value)}${value} ${helpers.stat(effect.stat || effect.id)}`],
+    ['increase_stat_percent', (effect, value, stacks, amount, manager, helpers) => 
+        effect.perStack 
+            ? `+${value ?? amount ?? 1}% ${helpers.stat(effect.stat || effect.id)} per stack` 
+            : `${helpers.sign(value)}${value}% ${helpers.stat(effect.stat || effect.id)}`],
+    
+    // Damage/Healing
+    ['damage', (effect, value, stacks, amount, manager, helpers) => 
+        effect.perStack ? `Deal ${value ?? amount ?? 1} damage per stack` : `Deal ${value ?? amount ?? '?'} damage`],
+    ['heal', (effect, value, stacks, amount, manager, helpers) => 
+        effect.perStack ? `Heal ${value ?? amount ?? effect.count ?? 1} HP per stack` : `Heal ${value ?? amount ?? effect.count ?? '?'} HP`],
+    ['heal_percent', (effect, value, stacks, amount, manager, helpers) => 
+        `Restore ${helpers.percent(value ?? amount)}% HP`],
+    ['lifesteal', (effect, value, stacks, amount, manager, helpers) => 
+        effect.perStack 
+            ? `Heal ${helpers.percent(value ?? amount ?? 0)}% of damage per stack` 
+            : `Heal for ${helpers.percent(value ?? amount ?? 0)}% of damage dealt`],
+    
+    // Damage modifiers
+    ['damage_buff', (effect, value, stacks, amount, manager, helpers) => 
+        effect.perStack ? `+${value ?? amount ?? 1} Damage per stack` : `${helpers.sign(value ?? amount)}${value ?? amount} Damage`],
+    ['increase_damage', (effect, value, stacks, amount, manager, helpers) => 
+        effect.perStack ? `+${value ?? amount ?? 1} Damage per stack` : `${helpers.sign(value ?? amount)}${value ?? amount} Damage`],
+    ['increase_damage_percent', (effect, value, stacks, amount, manager, helpers) => 
+        effect.perStack ? `+${value ?? amount ?? 1}% Damage per stack` : `${helpers.sign(value ?? amount)}${value ?? amount}% Damage`],
+    ['reduce_stat_percent', (effect, value, stacks, amount, manager, helpers) => 
+        effect.perStack 
+            ? `-${value ?? amount ?? 1}% ${helpers.stat(effect.id)} per stack` 
+            : `-${value ?? amount}% ${helpers.stat(effect.id)}`],
+    ['defense_buff', (effect, value, stacks, amount, manager, helpers) => 
+        `${helpers.sign(value ?? amount)}${value ?? amount} Defense`],
+    ['speed_buff', (effect, value, stacks, amount, manager, helpers) => 
+        `${helpers.sign(value ?? amount)}${value ?? amount} Speed`],
+    
+    // Buffs/Debuffs
+    ['buff', (effect, value, stacks, amount, manager, helpers) => 
+        `Apply ${stacks ?? 1} ${helpers.aura(effect.id || effect.aura || effect.buff)}`],
+    ['debuff', (effect, value, stacks, amount, manager, helpers) => 
+        `Apply ${stacks ?? 1} ${helpers.aura(effect.id || effect.aura || effect.debuff)}`],
+    ['cleanse', (effect, value, stacks, amount, manager, helpers) => 
+        effect.id ? `Remove ${helpers.aura(effect.id)}` : 'Cleanse debuffs'],
+    
+    // Energy
+    ['energy', (effect, value, stacks, amount, manager, helpers) => 
+        `${helpers.sign(value ?? amount)}${value ?? amount} Energy`],
+    ['energy_gain_bonus', (effect, value, stacks, amount, manager, helpers) => 
+        `+${value}% energy from generators`],
+    
+    // Multipliers
+    ['xp_multiplier', (effect, value, stacks, amount, manager, helpers) => 
+        `${helpers.sign((value - 1) * 100)}${Math.round((value - 1) * 100)}% XP`],
+    ['loot_multiplier', (effect, value, stacks, amount, manager, helpers) => 
+        `${helpers.sign((value - 1) * 100)}${Math.round((value - 1) * 100)}% Loot`],
+    ['enemy_stat_multiplier', (effect, value, stacks, amount, manager, helpers) => 
+        `Enemy Stats: ${helpers.sign((value - 1) * 100)}${Math.round((value - 1) * 100)}%`],
+    
+    // Revival
+    ['revive', (effect, value, stacks, amount, manager, helpers) => 
+        `Revive with ${amount ?? effect.hpPercent ?? 100}% HP`],
+    ['revive_all', (effect, value, stacks, amount, manager, helpers) => 
+        `Revive with ${amount ?? effect.hpPercent ?? 100}% HP`],
+    
+    // Tile effects
+    ['teleport', () => 'Teleport to a random tile'],
+    ['loot', () => 'Contains random loot'],
+    ['xp', (effect, value, stacks, amount, manager, helpers) => `Grant ${amount ?? value} Job XP`],
+    
+    // Percentage-based damage
+    ['damage_percent', (effect, value, stacks, amount, manager, helpers) => 
+        `Deal ${amount ?? value}% HP damage`],
+    ['damage_bonus', (effect, value, stacks, amount, manager, helpers) => 
+        `+${helpers.percent(value)}% damage`],
+    ['damage_reduction', (effect, value, stacks, amount, manager, helpers) => 
+        `${helpers.percent(value)}% damage reduction`],
+    
+    // Immunity
+    ['immunity', (effect, value, stacks, amount, manager, helpers) => {
+        const immuneTo = effect.debuff || effect.id;
+        return immuneTo ? `Immune to ${helpers.aura(immuneTo)}` : 'Immune to debuffs';
+    }],
+    
+    // Crit
+    ['crit_chance', (effect, value, stacks, amount, manager, helpers) => 
+        `+${helpers.percent(value)}% critical chance`],
+    ['crit_damage', (effect, value, stacks, amount, manager, helpers) => 
+        `+${helpers.percent(value)}% critical damage`],
+    
+    // Cost/Dodge
+    ['cost_reduction', (effect, value, stacks, amount, manager, helpers) => 
+        `-${helpers.percent(value)}% ability cost`],
+    ['dodge_chance', (effect, value, stacks, amount, manager, helpers) => 
+        `${helpers.percent(value)}% dodge chance`],
+    
+    // Healing modifiers
+    ['healing_bonus', (effect, value, stacks, amount, manager, helpers) => 
+        `+${helpers.percent(value)}% healing done`],
+    ['healing_received', (effect, value, stacks, amount, manager, helpers) => 
+        `+${helpers.percent(value)}% healing received`],
+    
+    // Reflect
+    ['reflect_damage', (effect, value, stacks, amount, manager, helpers) => 
+        effect.perStack 
+            ? `Reflect ${helpers.percent(amount ?? value)}% damage per stack` 
+            : `Reflect ${helpers.percent(value ?? amount)}% damage taken`],
+    
+    // Spell echo
+    ['spell_echo', (effect, value, stacks, amount, manager, helpers) => 
+        `${effect.chance ?? value}% chance to cast spells twice`],
+    
+    // Execute
+    ['execute', (effect, value, stacks, amount, manager, helpers) => 
+        `Execute enemies below ${helpers.percent(effect.threshold ?? value ?? 20)}% HP`],
+    
+    // All stat bonus
+    ['all_stat_bonus', (effect, value, stacks, amount, manager, helpers) => 
+        `+${value}% all stats`],
+    
+    // Party healing
+    ['heal_party_percent', (effect, value, stacks, amount, manager, helpers) => 
+        `Heal party for ${value}% max HP`],
+    
+    // Random buffs/debuffs
+    ['random_buffs', (effect, value, stacks, amount, manager, helpers) => {
+        const count = effect.count ?? 1;
+        const stackCount = stacks ?? 1;
+        return count === 1 
+            ? `Apply a random buff (${stackCount} stack${stackCount !== 1 ? 's' : ''})` 
+            : `Apply ${count} random buffs (${stackCount} stack${stackCount !== 1 ? 's' : ''} each)`;
+    }],
+    ['random_debuffs', (effect, value, stacks, amount, manager, helpers) => {
+        const count = effect.count ?? 1;
+        const stackCount = stacks ?? 1;
+        return count === 1 
+            ? `Apply a random debuff (${stackCount} stack${stackCount !== 1 ? 's' : ''})` 
+            : `Apply ${count} random debuffs (${stackCount} stack${stackCount !== 1 ? 's' : ''} each)`;
+    }],
+    
+    // Dispel effects
+    ['dispel', (effect, value, stacks, amount, manager, helpers) => {
+        const dispelCount = effect.count || 1;
+        return dispelCount === 'all' ? 'Remove all buffs from target' : `Remove ${dispelCount} buff${dispelCount !== 1 ? 's' : ''} from target`;
+    }],
+    ['dispel_buff', (effect, value, stacks, amount, manager, helpers) => {
+        const dispelCount = effect.count || 1;
+        return dispelCount === 'all' ? 'Remove all buffs from target' : `Remove ${dispelCount} buff${dispelCount !== 1 ? 's' : ''} from target`;
+    }],
+    ['dispel_debuff', (effect, value, stacks, amount, manager, helpers) => {
+        const debuffCount = effect.count || 1;
+        return debuffCount === 'all' ? 'Cleanse all debuffs' : `Cleanse ${debuffCount} debuff${debuffCount !== 1 ? 's' : ''}`;
+    }],
+    
+    // Enemy stat debuff
+    ['enemy_stat_debuff', (effect, value, stacks, amount, manager, helpers) => {
+        const debuffVal = Math.abs(helpers.percent(value ?? amount ?? 0));
+        return `Reduce enemy ${helpers.stat(effect.stat || effect.id)} by ${debuffVal}%`;
+    }],
+    
+    // Cleanse variants
+    ['cleanse_debuff', (effect, value, stacks, amount, manager, helpers) => {
+        const cleanseCount = effect.count || 1;
+        return cleanseCount === 1 ? 'Cleanse a debuff' : `Cleanse ${cleanseCount} debuffs`;
+    }],
+    ['cleanse_random_debuff', (effect, value, stacks, amount, manager, helpers) => {
+        const cleanseCount = effect.count || 1;
+        return cleanseCount === 1 ? 'Cleanse a debuff' : `Cleanse ${cleanseCount} debuffs`;
+    }],
+    
+    // Summon effects
+    ['summon', () => 'Summon a companion'],
+    ['summon_power_bonus', (effect, value) => `+${value}% summon power`],
+    ['summon_attack_speed', (effect, value) => `+${value}% summon attack speed`],
+    
+    // Ward/Charm
+    ['ward', (effect, value, stacks) => `Block next ${stacks ?? 1} attacks`],
+    ['charm', (effect) => `Charm target for ${effect.duration || 1} turns`],
+    
+    // Double cast
+    ['double_cast', (effect, value) => `${effect.chance ?? value}% chance to cast twice`],
+    
+    // Mastery unlocks
+    ['unlock_auto_run', () => 'Unlock Auto-Run'],
+    ['unlock_difficulty', (effect) => {
+        const diffId = effect.difficultyID?.split(':').pop() || 'Unknown';
+        return `Unlock ${diffId.charAt(0).toUpperCase() + diffId.slice(1)} Mode`;
+    }],
+    ['unlock_mastery_aura', () => 'Unlock Mastery Aura'],
+    ['unlock_multi_job_assignment', () => 'Unlock Multi-Job Assignment'],
+    ['unlock_mastered_variant', () => 'Unlock Mastered Variant'],
+    
+    // Mastery stat bonuses
+    ['job_stats_percent', (effect, value) => `+${value}% Job Stats`],
+    ['drop_rate_percent', (effect, value) => `+${value}% Drop Rate`],
+    ['drop_quantity_percent', (effect, value) => `+${value}% Drop Quantity`],
+    ['explore_speed_percent', (effect, value) => `+${value}% Explore Speed`],
+    ['trap_spawn_rate_percent', (effect, value) => `${value > 0 ? '+' : ''}${value}% Trap Spawn Rate`],
+    ['fountain_spawn_rate_percent', (effect, value) => `+${value}% Fountain Spawn Rate`],
+    ['treasure_spawn_rate_percent', (effect, value) => `+${value}% Treasure Spawn Rate`],
+    ['shrine_spawn_rate_percent', (effect, value) => `+${value}% Shrine Spawn Rate`],
+    ['ability_learn_chance_percent', (effect, value) => `+${value}% Ability Learn Chance`],
+    ['equipment_xp_percent', (effect, value) => `+${value}% Equipment XP`],
+    ['upgrade_cost_percent', (effect, value) => `${value > 0 ? '+' : ''}${value}% Upgrade Cost`],
+    ['equipment_stats_percent', (effect, value) => `+${value}% Equipment Stats`],
+    
+    // Generic percentage bonuses
+    ['xp_percent', (effect, value) => `+${value}% XP`],
+    ['loot_percent', (effect, value) => `+${value}% Loot`],
+    ['enemy_stats_percent', (effect, value) => `Enemy Stats: +${value}%`],
+    
+    // Consumable effects
+    ['heal_on_low_hp', (effect, value, stacks, amount) => 
+        `Heal ${amount ?? effect.healAmount ?? '?'} HP when below ${effect.threshold ?? '?'}% HP`],
+    ['proc_debuff', (effect, value, stacks, amount, manager, helpers) => {
+        const debuffName = manager?.auras?.getObjectByID(effect.debuff)?.name || effect.debuff?.split(':').pop() || 'Unknown';
+        return `${effect.chance ?? '?'}% chance to apply ${stacks ?? 1} ${debuffName}`;
+    }],
+    ['heal_on_floor_start', (effect, value, stacks, amount) => 
+        `Heal ${amount ?? effect.healAmount ?? '?'} HP at floor start`],
+    ['heal_after_combat', (effect, value, stacks, amount) => 
+        `Heal ${amount ?? effect.healAmount ?? '?'} HP after combat`],
+    ['on_damage', (effect) => 
+        `Heal ${effect.heal_percent ?? effect.healPercent ?? 0}% of damage dealt`],
+    
+    // Aura internal effects
+    ['remove', () => ''],
+    ['remove_stacks', (effect, value, stacks, amount) => `Remove ${effect.count ?? amount ?? 1} stack(s)`],
+    ['reduce_amount', (effect, value, stacks, amount) => `Reduce damage by ${amount ?? 1} per stack`],
+    ['absorb_damage', (effect, value, stacks, amount) => `Absorb ${amount ?? 1} damage per stack`],
+    ['skip', () => 'Skip turn'],
+    ['chance_skip', (effect, value, stacks, amount) => `${amount ?? 0}% chance to skip turn`],
+    ['untargetable', () => 'Cannot be targeted'],
+    ['evade', () => 'Evade next attack'],
+    ['chance_dodge', (effect, value, stacks, amount) => `${amount ?? 0}% chance to dodge`],
+    ['chance_miss', (effect, value, stacks, amount) => `${amount ?? 0}% chance to miss`],
+    ['chance_hit_ally', (effect, value, stacks, amount) => `${amount ?? 0}% chance to hit ally instead`],
+    ['force_target', () => 'Force enemies to target this character'],
+    ['prevent_ability', () => 'Cannot use spenders'],
+    ['prevent_debuff', () => 'Immune to next debuff'],
+    ['prevent_lethal', () => 'Cannot be killed'],
+    ['prevent_death', (effect) => 
+        `Prevent death${effect.healPercent ? `, heal ${Math.round(effect.healPercent * 100)}% HP` : ''}`],
+    ['reduce_damage_percent', (effect, value, stacks, amount) => 
+        `${amount ?? 0}% damage reduction${effect.perStack ? ' per stack' : ''}`],
+    ['reduce_heal_percent', (effect, value, stacks, amount) => 
+        `-${amount ?? 0}% healing received${effect.perStack ? ' per stack' : ''}`],
+    ['heal_party', (effect, value, stacks, amount) => `Heal party for ${amount ?? 0} HP`],
+    
+    // Chaos effects
+    ['chaos_damage', (effect) => 
+        `Chaotic damage (${effect.bonusDamageChance || 0}% bonus, ${effect.healEnemyChance || 0}% heal enemy)`],
+    
+    // Percentage stat modifiers
+    ['ability_damage_percent', (effect, value, stacks, amount) => `+${amount ?? 0}% ability damage`],
+    ['buff_damage', (effect, value, stacks, amount) => `+${amount ?? 0} damage`],
+    
+    // Immunities
+    ['effect_immunity', (effect) => {
+        const effects = effect.effects || [effect.effect];
+        return `Immune to ${effects.join(', ')}`;
+    }],
+    ['immune_displacement', () => 'Immune to displacement'],
+    ['prevent_enemy_teleport', () => 'Enemies cannot teleport'],
+    
+    // Buff application
+    ['apply_effect', (effect, value) => 
+        `Apply ${effect.effect}${effect.chance ? ` (${effect.chance}% chance)` : ''}`],
+    
+    // Stat/passive bonuses
+    ['stat_bonus', (effect, value, stacks, amount, manager, helpers) => {
+        const statBonusName = helpers.stat(effect.stat) !== 'Unknown' 
+            ? helpers.stat(effect.stat) 
+            : (effect.stat?.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) || 'Stat');
+        return `+${value}% ${statBonusName}`;
+    }],
+    ['modifier', (effect, value, stacks, amount, manager, helpers) => {
+        const passiveId = typeof effect.passive === 'string' ? effect.passive : effect.passive?.id;
+        const passiveName = manager?.passives?.getObjectByID(passiveId)?.name 
+            || effect.passive?.name 
+            || passiveId?.split(':').pop() 
+            || 'modifier';
+        return `Apply ${passiveName}`;
+    }],
+    ['resistance', (effect, value, stacks, amount, manager, helpers) => {
+        const element = effect.element?.charAt(0).toUpperCase() + effect.element?.slice(1) || 'Elemental';
+        return `+${helpers.percent(value)}% ${element} Resistance`;
+    }],
+    ['all_resistance', (effect, value, stacks, amount, manager, helpers) => 
+        `+${helpers.percent(value)}% All Resistance`],
+    ['reflect', (effect, value, stacks, amount, manager, helpers) => 
+        `Reflect ${helpers.percent(value)}% damage`],
+    
+    // XP/Loot bonuses
+    ['xp_bonus', (effect, value) => `+${value}% XP`],
+    ['loot_bonus', (effect, value) => `+${value}% Loot`],
+    ['loot_quality_bonus', (effect, value) => `+${value}% Loot Quality`],
+    ['rare_drop_bonus', (effect, value) => `+${value}% Rare Drop Chance`],
+    ['material_drop_bonus', (effect, value) => `+${value}% Material Drops`],
+    
+    // Energy bonuses
+    ['energy_bonus', (effect, value) => `+${value}% Energy`],
+    ['energy_regen_bonus', (effect, value) => `+${value}% Energy Regen`],
+    
+    // Damage bonuses
+    ['spell_damage_bonus', (effect, value, stacks, amount, manager, helpers) => 
+        `+${helpers.percent(value)}% Spell Damage`],
+    ['extra_target', (effect, value) => `Hit ${value} extra target(s)`],
+    ['damage_bonus_vs_debuff', (effect, value) => `+${value}% damage vs debuffed enemies`],
+    
+    // Duration modifiers
+    ['debuff_duration_reduction', (effect, value) => `${value}% shorter debuff duration`],
+    
+    // Enemy buffs
+    ['enemy_buff', (effect, value, stacks, amount, manager, helpers) => 
+        `Enemies gain ${stacks ?? 1} ${helpers.aura(effect.id)}`],
+]);
+
+/**
  * Generate a human-readable description for an effect.
  * Centralizes effect description logic for use across tooltips, logs, etc.
  * 
@@ -962,390 +1323,26 @@ function describeEffect(effect, manager, displayMode = false) {
         return aura?.name || auraId?.split(':').pop() || 'Unknown';
     };
     
-    switch(effect.type) {
-        // Stat modifiers
-        case 'increase_stat_flat':
-            if (effect.perStack) return `+${value ?? amount ?? 1} ${getStatDisplay(effect.stat || effect.id)} per stack`;
-            return `${sign(value)}${value} ${getStatDisplay(effect.stat || effect.id)}`;
-        case 'increase_stat_percent':
-            if (effect.perStack) return `+${value ?? amount ?? 1}% ${getStatDisplay(effect.stat || effect.id)} per stack`;
-            return `${sign(value)}${value}% ${getStatDisplay(effect.stat || effect.id)}`;
-        
-        // Damage/Healing
-        case 'damage':
-            if (effect.perStack) return `Deal ${value ?? amount ?? 1} damage per stack`;
-            return `Deal ${value ?? amount ?? '?'} damage`;
-        case 'heal':
-            if (effect.perStack) return `Heal ${value ?? amount ?? effect.count ?? 1} HP per stack`;
-            return `Heal ${value ?? amount ?? effect.count ?? '?'} HP`;
-        case 'heal_percent':
-            // Amount may be decimal (0.02 = 2%) or whole (50 = 50%)
-            return `Restore ${toPercent(value ?? amount)}% HP`;
-        case 'lifesteal':
-            if (effect.perStack) return `Heal ${toPercent(value ?? amount ?? 0)}% of damage per stack`;
-            return `Heal for ${toPercent(value ?? amount ?? 0)}% of damage dealt`;
-        
-        // Damage modifiers
-        case 'damage_buff':
-        case 'increase_damage':
-            if (effect.perStack) return `+${value ?? amount ?? 1} Damage per stack`;
-            return `${sign(value ?? amount)}${value ?? amount} Damage`;
-        case 'increase_damage_percent':
-            if (effect.perStack) return `+${value ?? amount ?? 1}% Damage per stack`;
-            return `${sign(value ?? amount)}${value ?? amount}% Damage`;
-        case 'reduce_stat_percent':
-            if (effect.perStack) return `-${value ?? amount ?? 1}% ${getStatDisplay(effect.id)} per stack`;
-            return `-${value ?? amount}% ${getStatDisplay(effect.id)}`;
-        case 'defense_buff':
-            return `${sign(value ?? amount)}${value ?? amount} Defense`;
-        case 'speed_buff':
-            return `${sign(value ?? amount)}${value ?? amount} Speed`;
-        
-        // Buffs/Debuffs - unified types with target field
-        case 'buff':
-            return `Apply ${stacks ?? 1} ${auraName(effect.id || effect.aura || effect.buff)}`;
-        case 'debuff':
-            return `Apply ${stacks ?? 1} ${auraName(effect.id || effect.aura || effect.debuff)}`;
-        case 'cleanse':
-            return effect.id ? `Remove ${auraName(effect.id)}` : 'Cleanse debuffs';
-        
-        // Energy
-        case 'energy':
-            return `${sign(value ?? amount)}${value ?? amount} Energy`;
-        case 'energy_gain_bonus':
-            return `+${value}% energy from generators`;
-        
-        // Multipliers
-        case 'xp_multiplier':
-            return `${sign((value - 1) * 100)}${Math.round((value - 1) * 100)}% XP`;
-        case 'loot_multiplier':
-            return `${sign((value - 1) * 100)}${Math.round((value - 1) * 100)}% Loot`;
-        case 'enemy_stat_multiplier':
-            return `Enemy Stats: ${sign((value - 1) * 100)}${Math.round((value - 1) * 100)}%`;
-        
-        // Revival (amount already extracted by getVal helper)
-        case 'revive':
-        case 'revive_all':
-            return `Revive with ${amount ?? effect.hpPercent ?? 100}% HP`;
-        
-        // Tile-specific effects
-        case 'teleport':
-            return 'Teleport to a random tile';
-        case 'loot':
-            return 'Contains random loot';
-        case 'xp':
-            return `Grant ${amount ?? value} Job XP`;
-        
-        // Percentage-based damage (amount is whole percent)
-        case 'damage_percent':
-            return `Deal ${amount ?? value}% HP damage`;
-        
-        // Conditional/bonus damage
-        case 'damage_bonus':
-            return `+${toPercent(value)}% damage`;
-        case 'damage_reduction':
-            return `${toPercent(value)}% damage reduction`;
-        
-        // Immunity
-        case 'immunity':
-            const immuneTo = effect.debuff || effect.id;
-            if (immuneTo) {
-                return `Immune to ${auraName(immuneTo)}`;
-            }
-            return 'Immune to debuffs';
-        
-        // Crit
-        case 'crit_chance':
-            return `+${toPercent(value)}% critical chance`;
-        case 'crit_damage':
-            return `+${toPercent(value)}% critical damage`;
-        
-        // Cost reduction
-        case 'cost_reduction':
-            return `-${toPercent(value)}% ability cost`;
-        
-        // Dodge
-        case 'dodge_chance':
-            return `${toPercent(value)}% dodge chance`;
-        
-        // Healing modifiers
-        case 'healing_bonus':
-            return `+${toPercent(value)}% healing done`;
-        case 'healing_received':
-            return `+${toPercent(value)}% healing received`;
-        
-        // Damage reflection
-        case 'reflect_damage':
-            if (effect.perStack) return `Reflect ${toPercent(amount ?? value)}% damage per stack`;
-            return `Reflect ${toPercent(value ?? amount)}% damage taken`;
-        
-        // Spell echo
-        case 'spell_echo':
-            return `${effect.chance ?? value}% chance to cast spells twice`;
-        
-        // Execute
-        case 'execute':
-            return `Execute enemies below ${toPercent(effect.threshold ?? value ?? 20)}% HP`;
-        
-        // All stat bonus
-        case 'all_stat_bonus':
-            return `+${value}% all stats`;
-        
-        // Party healing
-        case 'heal_party_percent':
-            return `Heal party for ${value}% max HP`;
-        
-        // Random buffs/debuffs
-        case 'random_buffs': {
-            const count = effect.count ?? 1;
-            const stackCount = stacks ?? 1;
-            return count === 1 
-                ? `Apply a random buff (${stackCount} stack${stackCount !== 1 ? 's' : ''})` 
-                : `Apply ${count} random buffs (${stackCount} stack${stackCount !== 1 ? 's' : ''} each)`;
-        }
-        case 'random_debuffs': {
-            const count = effect.count ?? 1;
-            const stackCount = stacks ?? 1;
-            return count === 1 
-                ? `Apply a random debuff (${stackCount} stack${stackCount !== 1 ? 's' : ''})` 
-                : `Apply ${count} random debuffs (${stackCount} stack${stackCount !== 1 ? 's' : ''} each)`;
-        }
-
-        // Dispel effects
-        case 'dispel':
-        case 'dispel_buff':
-            const dispelCount = effect.count || 1;
-            return dispelCount === 'all' ? 'Remove all buffs from target' : `Remove ${dispelCount} buff${dispelCount !== 1 ? 's' : ''} from target`;
-        case 'dispel_debuff':
-            const debuffCount = effect.count || 1;
-            return debuffCount === 'all' ? 'Cleanse all debuffs' : `Cleanse ${debuffCount} debuff${debuffCount !== 1 ? 's' : ''}`;
-
-        // Enemy stat debuff
-        case 'enemy_stat_debuff':
-            // Use absolute value since "Reduce" already implies negative
-            const debuffVal = Math.abs(toPercent(value ?? amount ?? 0));
-            return `Reduce enemy ${getStatDisplay(effect.stat || effect.id)} by ${debuffVal}%`;
-
-        // Cleanse variants
-        case 'cleanse_debuff':
-        case 'cleanse_random_debuff': {
-            const cleanseCount = effect.count || 1;
-            return cleanseCount === 1 ? 'Cleanse a debuff' : `Cleanse ${cleanseCount} debuffs`;
-        }
-
-        // Summon effects
-        case 'summon':
-            return `Summon a companion`;
-        case 'summon_power_bonus':
-            return `+${value}% summon power`;
-        case 'summon_attack_speed':
-            return `+${value}% summon attack speed`;
-
-        // Ward
-        case 'ward':
-            return `Block next ${stacks ?? 1} attacks`;
-
-        // Charm
-        case 'charm':
-            return `Charm target for ${effect.duration || 1} turns`;
-
-        // Double cast
-        case 'double_cast':
-            return `${effect.chance ?? value}% chance to cast twice`;
-
-        // Mastery unlock effects
-        case 'unlock_auto_run':
-            return 'Unlock Auto-Run';
-        case 'unlock_difficulty':
-            const diffId = effect.difficultyID?.split(':').pop() || 'Unknown';
-            return `Unlock ${diffId.charAt(0).toUpperCase() + diffId.slice(1)} Mode`;
-        case 'unlock_mastery_aura':
-            return 'Unlock Mastery Aura';
-        case 'unlock_multi_job_assignment':
-            return 'Unlock Multi-Job Assignment';
-        case 'unlock_mastered_variant':
-            return 'Unlock Mastered Variant';
-
-        // Mastery stat bonuses
-        case 'job_stats_percent':
-            return `+${value}% Job Stats`;
-        case 'drop_rate_percent':
-            return `+${value}% Drop Rate`;
-        case 'drop_quantity_percent':
-            return `+${value}% Drop Quantity`;
-        case 'explore_speed_percent':
-            return `+${value}% Explore Speed`;
-        case 'trap_spawn_rate_percent':
-            return `${value > 0 ? '+' : ''}${value}% Trap Spawn Rate`;
-        case 'fountain_spawn_rate_percent':
-            return `+${value}% Fountain Spawn Rate`;
-        case 'treasure_spawn_rate_percent':
-            return `+${value}% Treasure Spawn Rate`;
-        case 'shrine_spawn_rate_percent':
-            return `+${value}% Shrine Spawn Rate`;
-        case 'ability_learn_chance_percent':
-            return `+${value}% Ability Learn Chance`;
-        case 'equipment_xp_percent':
-            return `+${value}% Equipment XP`;
-        case 'upgrade_cost_percent':
-            return `${value > 0 ? '+' : ''}${value}% Upgrade Cost`;
-        case 'equipment_stats_percent':
-            return `+${value}% Equipment Stats`;
-
-        // Generic percentage bonuses (used by tooltip helpers)
-        case 'xp_percent':
-            return `+${value}% XP`;
-        case 'loot_percent':
-            return `+${value}% Loot`;
-        case 'enemy_stats_percent':
-            return `Enemy Stats: +${value}%`;
-        
-        // Consumable effects (threshold/chance are whole percent)
-        case 'heal_on_low_hp':
-            return `Heal ${amount ?? effect.healAmount ?? '?'} HP when below ${effect.threshold ?? '?'}% HP`;
-        case 'proc_debuff':
-            const debuffName = manager?.auras?.getObjectByID(effect.debuff)?.name || effect.debuff?.split(':').pop() || 'Unknown';
-            return `${effect.chance ?? '?'}% chance to apply ${stacks ?? 1} ${debuffName}`;
-        case 'heal_on_floor_start':
-            return `Heal ${amount ?? effect.healAmount ?? '?'} HP at floor start`;
-        case 'heal_after_combat':
-            return `Heal ${amount ?? effect.healAmount ?? '?'} HP after combat`;
-        case 'on_damage':
-            return `Heal ${effect.heal_percent ?? effect.healPercent ?? 0}% of damage dealt`;
-
-        // Aura internal effects (stack management)
-        case 'remove':
-            return 'Remove aura';
-        case 'remove_stacks':
-            return `Remove ${effect.count ?? amount ?? 1} stack(s)`;
-        case 'reduce_amount':
-            return `Reduce damage by ${amount ?? 1} per stack`;
-        case 'absorb_damage':
-            return `Absorb ${amount ?? 1} damage per stack`;
-        case 'skip':
-            return 'Skip turn';
-        case 'chance_skip':
-            return `${amount ?? 0}% chance to skip turn`;
-        case 'untargetable':
-            return 'Cannot be targeted';
-        case 'evade':
-            return 'Evade next attack';
-        case 'chance_dodge':
-            return `${amount ?? 0}% chance to dodge`;
-        case 'chance_miss':
-            return `${amount ?? 0}% chance to miss`;
-        case 'chance_hit_ally':
-            return `${amount ?? 0}% chance to hit ally instead`;
-        case 'force_target':
-            return 'Force enemies to target this character';
-        case 'prevent_ability':
-            return 'Cannot use spenders';
-        case 'prevent_debuff':
-            return 'Immune to next debuff';
-        case 'prevent_lethal':
-            return 'Cannot be killed';
-        case 'prevent_death':
-            return `Prevent death${effect.healPercent ? `, heal ${Math.round(effect.healPercent * 100)}% HP` : ''}`;
-        case 'increase_damage_percent':
-            return `+${amount ?? 0}% damage${effect.perStack ? ' per stack' : ''}`;
-        case 'reduce_damage_percent':
-            return `${amount ?? 0}% damage reduction${effect.perStack ? ' per stack' : ''}`;
-        case 'reduce_heal_percent':
-            return `-${amount ?? 0}% healing received${effect.perStack ? ' per stack' : ''}`;
-        case 'heal_party':
-            return `Heal party for ${amount ?? 0} HP`;
-        
-        // Death prevention/survival
-        case 'prevent_death':
-            return `Prevent death${effect.healPercent ? `, heal ${Math.round(effect.healPercent * 100)}% HP` : ''}`;
-        
-        // Chaos effects
-        case 'chaos_damage':
-            return `Chaotic damage (${effect.bonusDamageChance || 0}% bonus, ${effect.healEnemyChance || 0}% heal enemy)`;
-        
-        // Percentage stat modifiers
-        case 'ability_damage_percent':
-            return `+${amount ?? 0}% ability damage`;
-        case 'buff_damage':
-            return `+${amount ?? 0} damage`;
-        
-        // Immunities
-        case 'effect_immunity':
-            const effects = effect.effects || [effect.effect];
-            return `Immune to ${effects.join(', ')}`;
-        case 'immune_displacement':
-            return 'Immune to displacement';
-        case 'prevent_enemy_teleport':
-            return 'Enemies cannot teleport';
-        
-        // Buff application
-        case 'apply_effect':
-            return `Apply ${effect.effect}${effect.chance ? ` (${effect.chance}% chance)` : ''}`;
-
-        // Stat/passive bonuses
-        case 'stat_bonus':
-            // Prettify stat name if not in registry (e.g., 'xp_bonus' -> 'XP Bonus')
-            const statBonusName = getStatDisplay(effect.stat) !== 'Unknown' 
-                ? getStatDisplay(effect.stat) 
-                : (effect.stat?.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) || 'Stat');
-            return `+${value}% ${statBonusName}`;
-        case 'modifier':
-            // passive can be a string ID or an object with a name
-            const passiveId = typeof effect.passive === 'string' ? effect.passive : effect.passive?.id;
-            const passiveName = manager?.passives?.getObjectByID(passiveId)?.name 
-                || effect.passive?.name 
-                || passiveId?.split(':').pop() 
-                || 'modifier';
-            return `Apply ${passiveName}`;
-        case 'resistance':
-            const element = effect.element?.charAt(0).toUpperCase() + effect.element?.slice(1) || 'Elemental';
-            return `+${toPercent(value)}% ${element} Resistance`;
-        case 'all_resistance':
-            return `+${toPercent(value)}% All Resistance`;
-        case 'reflect':
-            return `Reflect ${toPercent(value)}% damage`;
-        
-        // XP/Loot bonuses
-        case 'xp_bonus':
-            return `+${value}% XP`;
-        case 'loot_bonus':
-            return `+${value}% Loot`;
-        case 'loot_quality_bonus':
-            return `+${value}% Loot Quality`;
-        case 'rare_drop_bonus':
-            return `+${value}% Rare Drop Chance`;
-        case 'material_drop_bonus':
-            return `+${value}% Material Drops`;
-        
-        // Energy bonuses
-        case 'energy_bonus':
-            return `+${value}% Energy`;
-        case 'energy_regen_bonus':
-            return `+${value}% Energy Regen`;
-        
-        // Damage bonuses
-        case 'spell_damage_bonus':
-            return `+${toPercent(value)}% Spell Damage`;
-        case 'extra_target':
-            return `Hit ${value} extra target(s)`;
-        case 'damage_bonus_vs_debuff':
-            return `+${value}% damage vs debuffed enemies`;
-        
-        // Duration modifiers
-        case 'debuff_duration_reduction':
-            return `${value}% shorter debuff duration`;
-        
-        // Enemy buffs (from difficulty)
-        case 'enemy_buff':
-            return `Enemies gain ${stacks ?? 1} ${auraName(effect.id)}`;
-
-        default:
-            // Try to generate something reasonable
-            if(effect.value !== undefined) {
-                return `${effect.type}: ${value}`;
-            }
-            return effect.type || 'Unknown effect';
+    // Build helpers object for registry functions
+    const helpers = {
+        sign,
+        percent: toPercent,
+        stat: getStatDisplay,
+        aura: auraName,
+        prettify: prettifyStatId
+    };
+    
+    // Look up description generator from registry
+    const describer = effectDescriptionRegistry.get(effect.type);
+    if (describer) {
+        return describer(effect, value, stacks, amount, manager, helpers);
     }
+    
+    // Fallback for unknown effect types
+    if (effect.value !== undefined) {
+        return `${effect.type}: ${value}`;
+    }
+    return effect.type || 'Unknown effect';
 }
 
 /**
@@ -1473,7 +1470,11 @@ function describeEffectFull(effect, manager, options = {}) {
     // Add target info - use effect's target or fall back to options
     const target = effect.target || options.target;
     const party = effect.party || options.party;
-    if(target && target !== 'self') {
+    
+    // For self-targeting damage, explicitly say "to self"
+    if (target === 'self' && effect.type === 'damage') {
+        desc = `${desc} to self`;
+    } else if(target && target !== 'self') {
         const targetName = formatTarget(target, party);
         // Only add if not already implied in the description
         if(targetName && !desc.toLowerCase().includes(targetName.toLowerCase())) {
@@ -1522,9 +1523,9 @@ function formatTriggerSuffix(trigger) {
     
     const suffixes = {
         'turn_start': 'each turn',
-        'turn_end': 'at end of turn',
+        'turn_end': 'at the end of the turn',
         'round_start': 'each round',
-        'round_end': 'at end of round',
+        'round_end': 'at the end of the round',
         'before_damage_dealt': 'before dealing damage',
         'before_damage_delivered': 'before dealing damage',
         'after_damage_dealt': 'after dealing damage',
@@ -1536,41 +1537,40 @@ function formatTriggerSuffix(trigger) {
         'on_crit': 'on critical hit',
         'on_kill': 'on kill',
         'on_death': 'on death',
-        'encounter_start': 'at start of combat',
-        'encounter_end': 'at end of combat',
-        'floor_start': 'at start of floor',
-        'floor_end': 'at end of floor',
-        'dungeon_start': 'at start of dungeon',
-        'dungeon_end': 'at end of dungeon',
-        'enemy_spawn': 'when enemy spawns',
-        'ability_used': 'when using ability',
-        'party_wipe': 'when party wipes',
+        'encounter_start': 'at the start of combat',
+        'encounter_end': 'at the end of combat',
+        'floor_start': 'at the start of a floor',
+        'floor_end': 'at the end of the floor',
+        'dungeon_start': 'at the start of a dungeon',
+        'dungeon_end': 'at the end of the dungeon',
+        'enemy_spawn': 'when an enemy spawns',
+        'ability_used': 'when using an ability',
+        'party_wipe': 'when the party wipes',
         'on_damage': 'when damaged',
         'low_health': 'when low on health',
         'on_low_health': 'when low on health',
-        'on_ally_death': 'when ally dies',
-        'ally_death': 'when ally dies',
+        'on_ally_death': 'when an ally dies',
+        'ally_death': 'when an ally dies',
         'on_heal': 'when healing',
-        'on_generator': 'when using generator',
-        'on_spender': 'when using spender',
+        'on_generator': 'when using a generator',
+        'on_spender': 'when using a spender',
         'on_dodge': 'when dodging',
         'on_debuff_applied': 'when debuffed',
-        'on_spell_cast': 'when casting spell',
-        'on_spell_hit': 'when spell hits',
-        'on_magic_hit': 'when magic hits',
+        'on_spell_cast': 'when casting a spell',
+        'on_spell_hit': 'when a spell hits',
         'on_fatal_hit': 'on fatal hit',
         'on_attack': 'on attack',
-        'on_ability': 'when using ability',
+        'on_ability': 'when using an ability',
         'on_damage_taken': 'when taking damage',
         'xp_gain': 'when gaining XP',
         'loot_roll': 'when rolling loot',
         'stats': '',  // Internal trigger, don't show
         'targeting': '',  // Internal trigger, don't show
         'death': '',  // Internal, handled separately
-        'before_debuff_received': 'before receiving debuff',
-        'before_heal_received': 'before receiving heal',
-        'before_spender_cast': 'before using spender',
-        'after_ability_cast': 'after using ability'
+        'before_debuff_received': 'before receiving a debuff',
+        'before_heal_received': 'before receiving a heal',
+        'before_spender_cast': 'before using a spender',
+        'after_ability_cast': 'after using an ability'
     };
     
     return suffixes[trigger] ?? trigger.replace(/_/g, ' ');
@@ -1597,21 +1597,15 @@ function describeEffects(effects, manager, options = {}) {
     
     // Separate main effects from cleanup effects (for auras)
     let mainEffects = effects;
-    let hasRemoval = false;
     
     if (isAura) {
         mainEffects = effects.filter(e => {
             // Filter out removal/cleanup effects for auras
             if (e.type === 'remove' || e.type === 'remove_stacks') {
-                hasRemoval = true;
                 return false;  // Always hide remove/remove_stacks for auras
             }
             return true;
         });
-    }
-    
-    if (mainEffects.length === 0) {
-        return isAura && hasRemoval ? 'Removed at end of combat.' : '';
     }
     
     // Helper to get effective target/trigger for an effect
@@ -1687,11 +1681,6 @@ function describeEffects(effects, manager, options = {}) {
             const middle = descriptions.map(d => lowercaseFirst(d)).join(', ');
             combined = `${first}, ${middle}, and ${lowercaseFirst(last)}`;
         }
-    }
-    
-    // Add removal note for auras
-    if (isAura && hasRemoval && combined) {
-        combined += '. Removed at end of combat.';
     }
     
     return combined;
@@ -2246,6 +2235,7 @@ export {
     toPercent,
     resolveTargets,
     sortByAgility,
+    getAuraName,
     createEffect,
     filterEffectsByTrigger,
     filterEffectsByType,

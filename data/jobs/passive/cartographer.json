@@ -2,196 +2,1881 @@
     "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
     "namespace": "adventuring",
     "data": {
-        "skillData": [{
-            "skillID": "adventuring:Adventuring",
-            "data": {
-                "stats": [
-                    {
-                        "id": "cartography",
-                        "name": "Cartography",
-                        "media": "melvor:assets/media/skills/cartography/cartography.svg"
-                    }
-                ],
-                "jobs": [
-                    {
-                        "id": "cartographer",
-                        "name": "Cartographer",
-                        "media": "melvor:assets/media/skills/cartography/cartography.svg",
-                        "requirements": [
-                            { "type": "skill_level", "level": 35 }
-                        ],
-                        "isMilestoneReward": true,
-                        "isPassive": true,
-                        "scaling": [
-                            { "id": "adventuring:cartography", "value": 1 }
-                        ]
-                    }
-                ],
-                "materials": [
-                    {
-                        "id": "blank_parchment",
-                        "name": "Blank Parchment",
-                        "media": "melvor:assets/media/skills/cartography/cartography.svg",
-                        "category": "adventuring:salvage"
-                    }
-                ],
-                "buildings": [
-                    {
-                        "id": "map_room",
-                        "type": "workshop",
-                        "name": "Map Room",
-                        "description": "Chart unexplored territories and secret passages. Cartographers create maps for navigating dungeons.",
-                        "media": "melvor:assets/media/skills/cartography/cartography.svg",
-                        "requirements": [],
-                        "idle": ["Charting territories", "Drawing coastlines"],
-                        "actions": ["adventuring:work"],
-                        "products": [
-                            "adventuring:dungeon_map",
-                            "adventuring:treasure_map",
-                            "adventuring:escape_route",
-                            "adventuring:secret_passage_map"
-                        ]
-                    }
-                ],
-                "materials": [
-                    {
-                        "id": "dungeon_map",
-                        "name": "Dungeon Map",
-                        "media": "melvor:assets/media/bank/skill_scroll.png#shade=brown",
-                        "category": "adventuring:salvage"
-                    },
-                    {
-                        "id": "treasure_map",
-                        "name": "Treasure Map",
-                        "media": "melvor:assets/media/bank/skill_scroll.png#shade=tan",
-                        "category": "adventuring:salvage"
-                    },
-                    {
-                        "id": "escape_route",
-                        "name": "Escape Route",
-                        "media": "melvor:assets/media/bank/skill_scroll.png",
-                        "category": "adventuring:salvage"
-                    },
-                    {
-                        "id": "secret_passage_map",
-                        "name": "Secret Passage Map",
-                        "media": "melvor:assets/media/bank/skill_scroll.png#shade=purple",
-                        "category": "adventuring:salvage"
-                    }
-                ],
-                "products": [
-                    {
-                        "id": "dungeon_map",
-                        "name": "Dungeon Map",
-                        "outputType": "material",
-                        "material": "adventuring:dungeon_map",
-                        "count": 1,
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:cartographer", "level": 1 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:blank_parchment", "count": 2 }
-                        ]
-                    },
-                    {
-                        "id": "treasure_map",
-                        "name": "Treasure Map",
-                        "outputType": "material",
-                        "material": "adventuring:treasure_map",
-                        "count": 1,
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:cartographer", "level": 20 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:blank_parchment", "count": 4 }
-                        ]
-                    },
-                    {
-                        "id": "escape_route",
-                        "name": "Escape Route",
-                        "outputType": "material",
-                        "material": "adventuring:escape_route",
-                        "count": 1,
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:cartographer", "level": 35 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:blank_parchment", "count": 3 }
-                        ]
-                    },
-                    {
-                        "id": "secret_passage_map",
-                        "name": "Secret Passage Map",
-                        "outputType": "material",
-                        "material": "adventuring:secret_passage_map",
-                        "count": 1,
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:cartographer", "level": 50 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:blank_parchment", "count": 5 }
-                        ]
-                    }
-                ],
-                "workOrders": [
-                    {
-                        "id": "dungeon_map",
-                        "building": "adventuring:map_room",
-                        "product": "adventuring:dungeon_map",
-                        "materials": [
-                            { "id": "adventuring:blank_parchment", "qty": 2 }
-                        ],
-                        "requirements": [
-                            { "type": "job_level", "job": "adventuring:cartographer", "level": 1 }
-                        ],
-                        "scaling": [
-                            { "id": "adventuring:cartography", "value": 0.2 }
-                        ]
-                    },
-                    {
-                        "id": "treasure_map",
-                        "building": "adventuring:map_room",
-                        "product": "adventuring:treasure_map",
-                        "materials": [
-                            { "id": "adventuring:blank_parchment", "qty": 4 }
-                        ],
-                        "requirements": [
-                            { "type": "job_level", "job": "adventuring:cartographer", "level": 20 }
-                        ],
-                        "scaling": [
-                            { "id": "adventuring:cartography", "value": 0.25 }
-                        ]
-                    },
-                    {
-                        "id": "escape_route",
-                        "building": "adventuring:map_room",
-                        "product": "adventuring:escape_route",
-                        "materials": [
-                            { "id": "adventuring:blank_parchment", "qty": 3 }
-                        ],
-                        "requirements": [
-                            { "type": "job_level", "job": "adventuring:cartographer", "level": 35 }
-                        ],
-                        "scaling": [
-                            { "id": "adventuring:cartography", "value": 0.3 }
-                        ]
-                    },
-                    {
-                        "id": "secret_passage_map",
-                        "building": "adventuring:map_room",
-                        "product": "adventuring:secret_passage_map",
-                        "materials": [
-                            { "id": "adventuring:blank_parchment", "qty": 5 }
-                        ],
-                        "requirements": [
-                            { "type": "job_level", "job": "adventuring:cartographer", "level": 50 }
-                        ],
-                        "scaling": [
-                            { "id": "adventuring:cartography", "value": 0.35 }
-                        ]
-                    }
-                ]
+        "skillData": [
+            {
+                "skillID": "adventuring:Adventuring",
+                "data": {
+                    "stats": [
+                        {
+                            "id": "cartography",
+                            "name": "Cartography",
+                            "media": "melvor:assets/media/skills/cartography/cartography.svg"
+                        }
+                    ],
+                    "jobs": [
+                        {
+                            "id": "cartographer",
+                            "name": "Cartographer",
+                            "media": "melvor:assets/media/skills/cartography/cartography.svg",
+                            "requirements": [
+                                {
+                                    "type": "skill_level",
+                                    "level": 35
+                                }
+                            ],
+                            "isMilestoneReward": true,
+                            "isPassive": true,
+                            "scaling": [
+                                {
+                                    "id": "adventuring:cartography",
+                                    "value": 1
+                                }
+                            ]
+                        }
+                    ],
+                    "materials": [
+                        {
+                            "id": "crude_map",
+                            "name": "Crude Map",
+                            "media": "melvor:assets/media/skills/cartography/cartography.svg",
+                            "category": "adventuring:salvage"
+                        },
+                        {
+                            "id": "refined_map",
+                            "name": "Refined Map",
+                            "media": "melvor:assets/media/skills/cartography/cartography.svg",
+                            "tier": 2,
+                            "category": "adventuring:salvage",
+                            "requirements": [
+                                {
+                                    "type": "job_level",
+                                    "job": "adventuring:cartographer",
+                                    "level": 25
+                                }
+                            ]
+                        },
+                        {
+                            "id": "immaculate_map",
+                            "name": "Immaculate Map",
+                            "media": "melvor:assets/media/skills/cartography/cartography.svg",
+                            "tier": 3,
+                            "category": "adventuring:salvage",
+                            "requirements": [
+                                {
+                                    "type": "job_level",
+                                    "job": "adventuring:cartographer",
+                                    "level": 50
+                                }
+                            ]
+                        },
+                        {
+                            "id": "transcendent_map",
+                            "name": "Transcendent Map",
+                            "media": "melvor:assets/media/skills/cartography/cartography.svg",
+                            "tier": 4,
+                            "category": "adventuring:salvage",
+                            "requirements": [
+                                {
+                                    "type": "job_level",
+                                    "job": "adventuring:cartographer",
+                                    "level": 75
+                                }
+                            ]
+                        },
+                        {
+                            "id": "discovery_token",
+                            "name": "Discovery Token",
+                            "media": "melvor:assets/media/skills/cartography/cartography.svg",
+                            "category": "adventuring:special"
+                        }
+                    ],
+                    "buildings": [
+                        {
+                            "id": "cartography_table",
+                            "type": "workshop",
+                            "name": "Cartography Table",
+                            "description": "Chart maps and discover new locations. Cartographers reveal hidden areas.",
+                            "media": "melvor:assets/media/skills/township/Academy.png",
+                            "requirements": [],
+                            "idle": [
+                                "Drawing maps",
+                                "Measuring distances"
+                            ],
+                            "actions": [
+                                "adventuring:work"
+                            ],
+                            "products": [
+                                "adventuring:craft_discovery_token",
+                                "adventuring:convert_crude_to_refined_map",
+                                "adventuring:convert_refined_to_immaculate_map",
+                                "adventuring:convert_immaculate_to_transcendent_map",
+                                "adventuring:convert_transcendent_to_immaculate_map",
+                                "adventuring:convert_immaculate_to_refined_map",
+                                "adventuring:convert_refined_to_crude_map",
+                                "adventuring:craft_evasive_maneuver",
+                                "adventuring:craft_ambush_tactics",
+                                "adventuring:craft_swift_scout",
+                                "adventuring:craft_explorers_vitality",
+                                "adventuring:craft_disorienting_strike",
+                                "adventuring:craft_clean_escape",
+                                "adventuring:craft_shadow_step",
+                                "adventuring:craft_emergency_exit"
+                            ]
+                        }
+                    ],
+                    "products": [
+                        {
+                            "id": "craft_discovery_token",
+                            "material": "adventuring:discovery_token",
+                            "outputType": "material",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 2,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:cartographer",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_map",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 4,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:cartographer",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_map",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 6,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:cartographer",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_map",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 8,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:cartographer",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_map",
+                                            "count": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "convert_crude_to_refined_map",
+                            "outputType": "conversion",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "material": "adventuring:refined_map",
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:cartographer",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_map",
+                                            "count": 5
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "convert_refined_to_immaculate_map",
+                            "outputType": "conversion",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "material": "adventuring:immaculate_map",
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:cartographer",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_map",
+                                            "count": 5
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "convert_immaculate_to_transcendent_map",
+                            "outputType": "conversion",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "material": "adventuring:transcendent_map",
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:cartographer",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_map",
+                                            "count": 5
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "convert_transcendent_to_immaculate_map",
+                            "outputType": "conversion",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "material": "adventuring:immaculate_map",
+                                    "count": 3,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:cartographer",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_map",
+                                            "count": 1
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "convert_immaculate_to_refined_map",
+                            "outputType": "conversion",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "material": "adventuring:refined_map",
+                                    "count": 3,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:cartographer",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_map",
+                                            "count": 1
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "convert_refined_to_crude_map",
+                            "outputType": "conversion",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "material": "adventuring:crude_map",
+                                    "count": 3,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:cartographer",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_map",
+                                            "count": 1
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "craft_evasive_maneuver",
+                            "consumable": "adventuring:evasive_maneuver",
+                            "outputType": "consumable",
+                            "count": 1,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:cartographer",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_map",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:cartographer",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_map",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:cartographer",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_map",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:cartographer",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_map",
+                                            "count": 2
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "craft_ambush_tactics",
+                            "consumable": "adventuring:ambush_tactics",
+                            "outputType": "consumable",
+                            "count": 1,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:cartographer",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_map",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:cartographer",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_map",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:cartographer",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_map",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:cartographer",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_map",
+                                            "count": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "craft_swift_scout",
+                            "consumable": "adventuring:swift_scout",
+                            "outputType": "consumable",
+                            "count": 1,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:cartographer",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_map",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:cartographer",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_map",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:cartographer",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_map",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:cartographer",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_map",
+                                            "count": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "craft_explorers_vitality",
+                            "consumable": "adventuring:explorers_vitality",
+                            "outputType": "consumable",
+                            "count": 1,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:cartographer",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_map",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:cartographer",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_map",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:cartographer",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_map",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:cartographer",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_map",
+                                            "count": 2
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "craft_disorienting_strike",
+                            "consumable": "adventuring:disorienting_strike",
+                            "outputType": "consumable",
+                            "count": 1,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:cartographer",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_map",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:cartographer",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_map",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:cartographer",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_map",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:cartographer",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_map",
+                                            "count": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "craft_clean_escape",
+                            "consumable": "adventuring:clean_escape",
+                            "outputType": "consumable",
+                            "count": 1,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:cartographer",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_map",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:cartographer",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_map",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:cartographer",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_map",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:cartographer",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_map",
+                                            "count": 2
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "craft_shadow_step",
+                            "consumable": "adventuring:shadow_step",
+                            "outputType": "consumable",
+                            "count": 1,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:cartographer",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_map",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:cartographer",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_map",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:cartographer",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_map",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:cartographer",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_map",
+                                            "count": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "craft_emergency_exit",
+                            "consumable": "adventuring:emergency_exit",
+                            "outputType": "consumable",
+                            "count": 1,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:cartographer",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_map",
+                                            "count": 4
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:cartographer",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_map",
+                                            "count": 4
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:cartographer",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_map",
+                                            "count": 4
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:cartographer",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_map",
+                                            "count": 4
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "tiles": [
+                        {
+                            "id": "landmark",
+                            "name": "Landmark",
+                            "media": "melvor:assets/media/skills/cartography/cartography.svg",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:cartographer",
+                                    "level": 1
+                                }
+                            ],
+                            "weight": 10,
+                            "floor_max": 1,
+                            "dungeon_max": 1,
+                            "effects": [
+                                {
+                                    "type": "xp",
+                                    "amount": 30,
+                                    "job": "adventuring:cartographer"
+                                },
+                                {
+                                    "type": "loot",
+                                    "pool": [
+                                        {
+                                            "id": "adventuring:crude_map",
+                                            "qty": 1,
+                                            "weight": 100
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "survey_point",
+                            "name": "Survey Point",
+                            "media": "melvor:assets/media/skills/cartography/cartography.svg",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:cartographer",
+                                    "level": 25
+                                }
+                            ],
+                            "weight": 8,
+                            "floor_max": 1,
+                            "dungeon_max": 2,
+                            "effects": [
+                                {
+                                    "type": "xp",
+                                    "amount": 75,
+                                    "job": "adventuring:cartographer"
+                                },
+                                {
+                                    "type": "loot",
+                                    "pool": [
+                                        {
+                                            "id": "adventuring:crude_map",
+                                            "qty": 2,
+                                            "weight": 60
+                                        },
+                                        {
+                                            "id": "adventuring:refined_map",
+                                            "qty": 1,
+                                            "weight": 40
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "hidden_path",
+                            "name": "Hidden Path",
+                            "media": "melvor:assets/media/skills/cartography/cartography.svg",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:cartographer",
+                                    "level": 50
+                                }
+                            ],
+                            "weight": 5,
+                            "floor_max": 1,
+                            "dungeon_max": 2,
+                            "effects": [
+                                {
+                                    "type": "xp",
+                                    "amount": 150,
+                                    "job": "adventuring:cartographer"
+                                },
+                                {
+                                    "type": "loot",
+                                    "pool": [
+                                        {
+                                            "id": "adventuring:crude_map",
+                                            "qty": 1,
+                                            "weight": 30
+                                        },
+                                        {
+                                            "id": "adventuring:refined_map",
+                                            "qty": 1,
+                                            "weight": 45
+                                        },
+                                        {
+                                            "id": "adventuring:immaculate_map",
+                                            "qty": 1,
+                                            "weight": 25
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "uncharted_territory",
+                            "name": "Uncharted Territory",
+                            "media": "melvor:assets/media/skills/cartography/cartography.svg",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:cartographer",
+                                    "level": 75
+                                }
+                            ],
+                            "weight": 3,
+                            "floor_max": 1,
+                            "dungeon_max": 2,
+                            "effects": [
+                                {
+                                    "type": "xp",
+                                    "amount": 300,
+                                    "job": "adventuring:cartographer"
+                                },
+                                {
+                                    "type": "loot",
+                                    "pool": [
+                                        {
+                                            "id": "adventuring:crude_map",
+                                            "qty": 1,
+                                            "weight": 15
+                                        },
+                                        {
+                                            "id": "adventuring:refined_map",
+                                            "qty": 1,
+                                            "weight": 30
+                                        },
+                                        {
+                                            "id": "adventuring:immaculate_map",
+                                            "qty": 1,
+                                            "weight": 35
+                                        },
+                                        {
+                                            "id": "adventuring:transcendent_map",
+                                            "qty": 1,
+                                            "weight": 20
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "consumableTypes": [
+                        {
+                            "id": "evasive_maneuver",
+                            "name": "Evasive Maneuver",
+                            "media": "melvor:assets/media/bank/prayer_scroll.png#shade=brown",
+                            "type": "map",
+                            "sourceJob": "adventuring:cartographer",
+                            "maxCharges": 3,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "nameSuffix": "I",
+                                    "media": "melvor:assets/media/bank/prayer_scroll.png#shade=brown",
+                                    "flavorText": "Map knowledge helps you sidestep attacks.",
+                                    "effects": [
+                                        {
+                                            "type": "chance_dodge",
+                                            "trigger": "before_damage_received",
+                                            "condition": {
+                                                "type": "chance",
+                                                "value": 20
+                                            },
+                                            "amount": 100,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:dungeon_map",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "nameSuffix": "II",
+                                    "media": "melvor:assets/media/bank/prayer_scroll.png#shade=yellow",
+                                    "flavorText": "Treasure maps reveal escape routes.",
+                                    "effects": [
+                                        {
+                                            "type": "chance_dodge",
+                                            "trigger": "before_damage_received",
+                                            "condition": {
+                                                "type": "chance",
+                                                "value": 28
+                                            },
+                                            "amount": 100,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:treasure_map",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "nameSuffix": "III",
+                                    "media": "melvor:assets/media/bank/wizards_scroll.png",
+                                    "flavorText": "Escape routes make you hard to hit.",
+                                    "effects": [
+                                        {
+                                            "type": "chance_dodge",
+                                            "trigger": "before_damage_received",
+                                            "condition": {
+                                                "type": "chance",
+                                                "value": 38
+                                            },
+                                            "amount": 100,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:escape_route",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "nameSuffix": "IV",
+                                    "media": "melvor:assets/media/bank/wizards_scroll.png#shade=purple",
+                                    "flavorText": "Secret passages grant incredible evasion.",
+                                    "effects": [
+                                        {
+                                            "type": "chance_dodge",
+                                            "trigger": "before_damage_received",
+                                            "condition": {
+                                                "type": "chance",
+                                                "value": 50
+                                            },
+                                            "amount": 100,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:secret_passage_map",
+                                            "count": 2
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "ambush_tactics",
+                            "name": "Ambush Tactics",
+                            "media": "melvor:assets/media/bank/prayer_scroll.png#shade=red",
+                            "type": "map",
+                            "sourceJob": "adventuring:cartographer",
+                            "maxCharges": 3,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "nameSuffix": "I",
+                                    "media": "melvor:assets/media/bank/prayer_scroll.png#shade=red",
+                                    "flavorText": "Strike first against healthy foes.",
+                                    "effects": [
+                                        {
+                                            "type": "increase_damage_percent",
+                                            "trigger": "before_damage_dealt",
+                                            "condition": {
+                                                "type": "enemy_hp_above",
+                                                "value": 80
+                                            },
+                                            "amount": 25,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:dungeon_map",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "nameSuffix": "II",
+                                    "media": "melvor:assets/media/bank/prayer_scroll.png#shade=orange",
+                                    "flavorText": "Treasure hunting reveals ambush points.",
+                                    "effects": [
+                                        {
+                                            "type": "increase_damage_percent",
+                                            "trigger": "before_damage_dealt",
+                                            "condition": {
+                                                "type": "enemy_hp_above",
+                                                "value": 80
+                                            },
+                                            "amount": 40,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:treasure_map",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "nameSuffix": "III",
+                                    "media": "melvor:assets/media/bank/wizards_scroll.png#shade=red",
+                                    "flavorText": "Escape routes double as attack vectors.",
+                                    "effects": [
+                                        {
+                                            "type": "increase_damage_percent",
+                                            "trigger": "before_damage_dealt",
+                                            "condition": {
+                                                "type": "enemy_hp_above",
+                                                "value": 80
+                                            },
+                                            "amount": 60,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:escape_route",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "nameSuffix": "IV",
+                                    "media": "melvor:assets/media/bank/wizards_scroll.png#shade=orange",
+                                    "flavorText": "Secret passages enable devastating ambushes.",
+                                    "effects": [
+                                        {
+                                            "type": "increase_damage_percent",
+                                            "trigger": "before_damage_dealt",
+                                            "condition": {
+                                                "type": "enemy_hp_above",
+                                                "value": 80
+                                            },
+                                            "amount": 85,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:secret_passage_map",
+                                            "count": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "swift_scout",
+                            "name": "Swift Scout",
+                            "media": "melvor:assets/media/skills/cartography/cartography.svg",
+                            "type": "map",
+                            "sourceJob": "adventuring:cartographer",
+                            "maxCharges": 3,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "nameSuffix": "I",
+                                    "media": "melvor:assets/media/skills/cartography/cartography.svg",
+                                    "flavorText": "Slaying enemies grants quick reflexes.",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "trigger": "on_kill",
+                                            "id": "adventuring:haste",
+                                            "stacks": 3,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:dungeon_map",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "nameSuffix": "II",
+                                    "media": "melvor:assets/media/skills/cartography/cartography.svg",
+                                    "flavorText": "Slaying enemies sharpens your speed.",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "trigger": "on_kill",
+                                            "id": "adventuring:haste",
+                                            "stacks": 5,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:treasure_map",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "nameSuffix": "III",
+                                    "media": "melvor:assets/media/skills/cartography/cartography.svg",
+                                    "flavorText": "Slaying enemies teaches rapid movement.",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "trigger": "on_kill",
+                                            "id": "adventuring:haste",
+                                            "stacks": 8,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:escape_route",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "nameSuffix": "IV",
+                                    "media": "melvor:assets/media/skills/cartography/cartography.svg",
+                                    "flavorText": "Slaying enemies grants lightning speed.",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "trigger": "on_kill",
+                                            "id": "adventuring:haste",
+                                            "stacks": 12,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:secret_passage_map",
+                                            "count": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "explorers_vitality",
+                            "name": "Explorer's Vitality",
+                            "media": "melvor:assets/media/bank/prayer_scroll.png#shade=green",
+                            "type": "map",
+                            "sourceJob": "adventuring:cartographer",
+                            "maxCharges": 3,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "nameSuffix": "I",
+                                    "media": "melvor:assets/media/bank/prayer_scroll.png#shade=green",
+                                    "flavorText": "Taking damage renews your vigor.",
+                                    "effects": [
+                                        {
+                                            "type": "heal_percent",
+                                            "trigger": "after_damage_received",
+                                            "amount": 5,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:dungeon_map",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "nameSuffix": "II",
+                                    "media": "melvor:assets/media/bank/prayer_scroll.png#shade=teal",
+                                    "flavorText": "Wounds trigger restorative magic.",
+                                    "effects": [
+                                        {
+                                            "type": "heal_percent",
+                                            "trigger": "after_damage_received",
+                                            "amount": 8,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:treasure_map",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "nameSuffix": "III",
+                                    "media": "melvor:assets/media/bank/wizards_scroll.png#shade=green",
+                                    "flavorText": "Damage awakens healing springs.",
+                                    "effects": [
+                                        {
+                                            "type": "heal_percent",
+                                            "trigger": "after_damage_received",
+                                            "amount": 12,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:escape_route",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "nameSuffix": "IV",
+                                    "media": "melvor:assets/media/bank/wizards_scroll.png#shade=teal",
+                                    "flavorText": "Wounds trigger powerful restorative magic.",
+                                    "effects": [
+                                        {
+                                            "type": "heal_percent",
+                                            "trigger": "after_damage_received",
+                                            "amount": 18,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:secret_passage_map",
+                                            "count": 2
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "disorienting_strike",
+                            "name": "Disorienting Strike",
+                            "media": "melvor:assets/media/bank/prayer_scroll.png#shade=pink",
+                            "type": "map",
+                            "sourceJob": "adventuring:cartographer",
+                            "maxCharges": 3,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "nameSuffix": "I",
+                                    "media": "melvor:assets/media/bank/prayer_scroll.png#shade=pink",
+                                    "flavorText": "Critical hits blind your enemies.",
+                                    "effects": [
+                                        {
+                                            "type": "debuff",
+                                            "trigger": "on_crit",
+                                            "id": "adventuring:blind",
+                                            "stacks": 3,
+                                            "target": "target"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:dungeon_map",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "nameSuffix": "II",
+                                    "media": "melvor:assets/media/bank/prayer_scroll.png#shade=purple",
+                                    "flavorText": "Precision strikes confuse your foes.",
+                                    "effects": [
+                                        {
+                                            "type": "debuff",
+                                            "trigger": "on_crit",
+                                            "id": "adventuring:blind",
+                                            "stacks": 5,
+                                            "target": "target"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:treasure_map",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "nameSuffix": "III",
+                                    "media": "melvor:assets/media/bank/wizards_scroll.png#shade=pink",
+                                    "flavorText": "Expert navigation blinds enemies on crits.",
+                                    "effects": [
+                                        {
+                                            "type": "debuff",
+                                            "trigger": "on_crit",
+                                            "id": "adventuring:blind",
+                                            "stacks": 8,
+                                            "target": "target"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:escape_route",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "nameSuffix": "IV",
+                                    "media": "melvor:assets/media/bank/wizards_scroll.png#shade=purple",
+                                    "flavorText": "Secret knowledge creates devastating blindness.",
+                                    "effects": [
+                                        {
+                                            "type": "debuff",
+                                            "trigger": "on_crit",
+                                            "id": "adventuring:blind",
+                                            "stacks": 12,
+                                            "target": "target"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:secret_passage_map",
+                                            "count": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "clean_escape",
+                            "name": "Clean Escape",
+                            "media": "melvor:assets/media/bank/prayer_scroll.png#shade=cyan",
+                            "type": "map",
+                            "sourceJob": "adventuring:cartographer",
+                            "maxCharges": 3,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "nameSuffix": "I",
+                                    "media": "melvor:assets/media/bank/prayer_scroll.png#shade=cyan",
+                                    "flavorText": "Victory cleanses afflictions.",
+                                    "effects": [
+                                        {
+                                            "type": "cleanse",
+                                            "trigger": "on_kill",
+                                            "amount": 1,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:dungeon_map",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "nameSuffix": "II",
+                                    "media": "melvor:assets/media/bank/prayer_scroll.png#shade=blue",
+                                    "flavorText": "Treasure hunting purifies the spirit.",
+                                    "effects": [
+                                        {
+                                            "type": "cleanse",
+                                            "trigger": "on_kill",
+                                            "amount": 2,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:treasure_map",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "nameSuffix": "III",
+                                    "media": "melvor:assets/media/bank/wizards_scroll.png#shade=cyan",
+                                    "flavorText": "Escape routes lead to cleansing waters.",
+                                    "effects": [
+                                        {
+                                            "type": "cleanse",
+                                            "trigger": "on_kill",
+                                            "amount": 3,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:escape_route",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "nameSuffix": "IV",
+                                    "media": "melvor:assets/media/bank/wizards_scroll.png#shade=blue",
+                                    "flavorText": "Secret passages contain purification magic.",
+                                    "effects": [
+                                        {
+                                            "type": "cleanse",
+                                            "trigger": "on_kill",
+                                            "amount": 5,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:secret_passage_map",
+                                            "count": 2
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "shadow_step",
+                            "name": "Shadow Step",
+                            "media": "melvor:assets/media/bank/prayer_scroll.png#shade=gray",
+                            "type": "map",
+                            "sourceJob": "adventuring:cartographer",
+                            "maxCharges": 3,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "nameSuffix": "I",
+                                    "media": "melvor:assets/media/bank/prayer_scroll.png#shade=gray",
+                                    "flavorText": "Slaying enemies reveals shadowy hiding spots.",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "trigger": "on_kill",
+                                            "id": "adventuring:evasion",
+                                            "stacks": 3,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:dungeon_map",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "nameSuffix": "II",
+                                    "media": "melvor:assets/media/bank/prayer_scroll.png#shade=dark",
+                                    "flavorText": "Slaying enemies shows concealed alcoves.",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "trigger": "on_kill",
+                                            "id": "adventuring:evasion",
+                                            "stacks": 5,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:treasure_map",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "nameSuffix": "III",
+                                    "media": "melvor:assets/media/bank/wizards_scroll.png#shade=gray",
+                                    "flavorText": "Slaying enemies leads through shadows.",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "trigger": "on_kill",
+                                            "id": "adventuring:evasion",
+                                            "stacks": 8,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:escape_route",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "nameSuffix": "IV",
+                                    "media": "melvor:assets/media/bank/wizards_scroll.png#shade=dark",
+                                    "flavorText": "Slaying enemies grants perfect concealment.",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "trigger": "on_kill",
+                                            "id": "adventuring:evasion",
+                                            "stacks": 12,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:secret_passage_map",
+                                            "count": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "emergency_exit",
+                            "name": "Emergency Exit",
+                            "media": "melvor:assets/media/bank/prayer_scroll.png#shade=yellow",
+                            "type": "map",
+                            "sourceJob": "adventuring:cartographer",
+                            "maxCharges": 1,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "nameSuffix": "I",
+                                    "media": "melvor:assets/media/bank/prayer_scroll.png#shade=yellow",
+                                    "flavorText": "Dungeon maps show basic emergency exits.",
+                                    "effects": [
+                                        {
+                                            "type": "prevent_death",
+                                            "trigger": "before_death",
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:dungeon_map",
+                                            "count": 4
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "nameSuffix": "II",
+                                    "media": "melvor:assets/media/bank/prayer_scroll.png#shade=gold",
+                                    "flavorText": "Treasure maps reveal safe houses.",
+                                    "effects": [
+                                        {
+                                            "type": "prevent_death",
+                                            "trigger": "before_death",
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:treasure_map",
+                                            "count": 4
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "nameSuffix": "III",
+                                    "media": "melvor:assets/media/bank/wizards_scroll.png#shade=yellow",
+                                    "flavorText": "Escape routes save your life.",
+                                    "effects": [
+                                        {
+                                            "type": "prevent_death",
+                                            "trigger": "before_death",
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:escape_route",
+                                            "count": 4
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "nameSuffix": "IV",
+                                    "media": "melvor:assets/media/bank/wizards_scroll.png#shade=gold",
+                                    "flavorText": "Secret passages grant multiple escapes from death.",
+                                    "effects": [
+                                        {
+                                            "type": "prevent_death",
+                                            "trigger": "before_death",
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:secret_passage_map",
+                                            "count": 4
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
             }
-        }]
+        ]
     }
 }

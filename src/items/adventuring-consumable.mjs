@@ -56,10 +56,7 @@ export class AdventuringConsumable extends NamespacedObject {
         this._sourceJobId = data.sourceJob; // Resolved in postDataRegistration
         this.sourceJob = null;
         
-        // Legacy support for category
-        this._categoryId = data.category;
         this.category = null;
-        this.type = data.type; // Legacy - use category instead
         
         this.customDescription = data.customDescription;
         
@@ -268,10 +265,6 @@ export class AdventuringConsumable extends NamespacedObject {
             this.sourceJob = this.manager.jobs.getObjectByID(this._sourceJobId);
         }
         
-        // Resolve category reference (legacy support)
-        if (this._categoryId) {
-            this.category = this.manager.consumableCategories.getObjectByID(this._categoryId);
-        }
         if (!this.category && this.type) {
             this.category = this.manager.consumableCategories.getObjectByID(`adventuring:${this.type}`);
         }

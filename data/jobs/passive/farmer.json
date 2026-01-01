@@ -2,363 +2,2601 @@
     "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
     "namespace": "adventuring",
     "data": {
-        "skillData": [{
-            "skillID": "adventuring:Adventuring",
-            "data": {
-                "stats": [
-                    {
-                        "id": "farming",
-                        "name": "Farming",
-                        "media": "melvor:assets/media/skills/farming/farming.svg"
-                    }
-                ],
-                "jobs": [
-                    {
-                        "id": "farmer",
-                        "name": "Farmer",
-                        "media": "melvor:assets/media/skills/farming/farming.svg",
-                        "requirements": [
-                            { "type": "skill_level", "level": 15 }
-                        ],
-                        "isMilestoneReward": true,
-                        "isPassive": true,
-                        "scaling": [
-                            { "id": "adventuring:farming", "value": 1 }
-                        ]
-                    }
-                ],
-                "materials": [
-                    {
-                        "id": "crude_seed",
-                        "name": "Crude Seed",
-                        "media": "melvor:assets/media/skills/farming/farming.svg",
-                        "category": "adventuring:salvage"
-                    },
-                    {
-                        "id": "refined_seed",
-                        "name": "Refined Seed",
-                        "media": "melvor:assets/media/bank/grass_seeds.png#shade=green",
-                        "tier": 2,
-                        "category": "adventuring:salvage",
-                        "requirements": [
-                            { "type": "job_level", "job": "adventuring:master_farmer", "level": 1 }
-                        ]
-                    },
-                    {
-                        "id": "immaculate_seed",
-                        "name": "Immaculate Seed",
-                        "media": "melvor:assets/media/bank/potato_seed.png#shade=orange",
-                        "tier": 3,
-                        "category": "adventuring:salvage",
-                        "requirements": [
-                            { "type": "job_level", "job": "adventuring:grandmaster_farmer", "level": 1 }
-                        ]
-                    },
-                    {
-                        "id": "transcendent_seed",
-                        "name": "Transcendent Seed",
-                        "media": "melvor:assets/media/bank/logs_elderwood.png",
-                        "tier": 4,
-                        "category": "adventuring:salvage",
-                        "requirements": [
-                            { "type": "job_level", "job": "adventuring:legendary_farmer", "level": 1 }
-                        ]
-                    }
-                ],
-                "buildings": [
-                    {
-                        "id": "farm",
-                        "type": "workshop",
-                        "name": "Farm",
-                        "description": "Cultivate crops and harvest seeds. Farmers grow ingredients for cooking and alchemy.",
-                        "media": "melvor:assets/media/skills/township/Farmland.png",
-                        "requirements": [],
-                        "idle": ["Tending crops", "Pulling weeds"],
-                        "actions": ["adventuring:work"],
-                        "products": [
-                            "adventuring:potato_seed",
-                            "adventuring:onion_seed",
-                            "adventuring:cabbage_seed",
-                            "adventuring:tomato_seed",
-                            "adventuring:sweetcorn_seed",
-                            "adventuring:strawberry_seed",
-                            "adventuring:watermelon_seed",
-                            "adventuring:snape_grass_seed",
-                            "adventuring:harvest_blessing",
-                            "adventuring:growth_tonic"
-                        ]
-                    }
-                ],
-                "products": [
-                    {
-                        "id": "potato_seed",
-                        "item": "melvorD:Potato_Seed",
-                        "outputType": "item",
-                        "count": 3,
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:farmer", "level": 1 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:crude_seed", "count": 1 }
-                        ]
-                    },
-                    {
-                        "id": "onion_seed",
-                        "item": "melvorD:Onion_Seed",
-                        "outputType": "item",
-                        "count": 3,
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:farmer", "level": 5 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:crude_seed", "count": 1 }
-                        ]
-                    },
-                    {
-                        "id": "cabbage_seed",
-                        "item": "melvorD:Cabbage_Seed",
-                        "outputType": "item",
-                        "count": 3,
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:farmer", "level": 10 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:crude_seed", "count": 1 }
-                        ]
-                    },
-                    {
-                        "id": "tomato_seed",
-                        "item": "melvorD:Tomato_Seed",
-                        "outputType": "item",
-                        "count": 3,
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:farmer", "level": 15 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:crude_seed", "count": 1 }
-                        ]
-                    },
-                    {
-                        "id": "sweetcorn_seed",
-                        "item": "melvorD:Sweetcorn_Seed",
-                        "outputType": "item",
-                        "count": 3,
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:farmer", "level": 20 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:crude_seed", "count": 1 }
-                        ]
-                    },
-                    {
-                        "id": "strawberry_seed",
-                        "item": "melvorD:Strawberry_Seed",
-                        "outputType": "item",
-                        "count": 3,
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:farmer", "level": 25 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:crude_seed", "count": 1 }
-                        ]
-                    },
-                    {
-                        "id": "watermelon_seed",
-                        "item": "melvorD:Watermelon_Seed",
-                        "outputType": "item",
-                        "count": 3,
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:farmer", "level": 35 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:crude_seed", "count": 1 }
-                        ]
-                    },
-                    {
-                        "id": "snape_grass_seed",
-                        "item": "melvorD:Snape_Grass_Seed",
-                        "outputType": "item",
-                        "count": 3,
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:farmer", "level": 45 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:crude_seed", "count": 1 }
-                        ]
-                    },
-                    {
-                        "id": "harvest_blessing",
-                        "consumable": "adventuring:harvest_blessing",
-                        "outputType": "consumable",
-                        "count": 1,
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:farmer", "level": 20 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:crude_seed", "count": 3 }
-                        ]
-                    },
-                    {
-                        "id": "growth_tonic",
-                        "consumable": "adventuring:growth_tonic",
-                        "outputType": "consumable",
-                        "count": 1,
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:farmer", "level": 15 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:crude_seed", "count": 2 }
-                        ]
-                    },
-                    {
-                        "id": "convert_crude_seed_to_refined",
-                        "material": "adventuring:refined_seed",
-                        "outputType": "material",
-                        "count": 1,
-                        "requirements": [
-                            { "type": "job_level", "job": "adventuring:master_farmer", "level": 10 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:crude_seed", "count": 5 }
-                        ]
-                    },
-                    {
-                        "id": "convert_refined_seed_to_immaculate",
-                        "material": "adventuring:immaculate_seed",
-                        "outputType": "material",
-                        "count": 1,
-                        "requirements": [
-                            { "type": "job_level", "job": "adventuring:grandmaster_farmer", "level": 10 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:refined_seed", "count": 5 }
-                        ]
-                    },
-                    {
-                        "id": "convert_immaculate_seed_to_transcendent",
-                        "material": "adventuring:transcendent_seed",
-                        "outputType": "material",
-                        "count": 1,
-                        "requirements": [
-                            { "type": "job_level", "job": "adventuring:legendary_farmer", "level": 10 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:immaculate_seed", "count": 5 }
-                        ]
-                    },
-                    {
-                        "id": "refined_carrot_seeds",
-                        "item": "melvorD:Carrot_Seeds",
-                        "outputType": "item",
-                        "count": 10,
-                        "requirements": [
-                            { "type": "skill_level", "level": 25 },
-                            { "type": "current_job_level", "job": "adventuring:master_farmer", "level": 1 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:refined_seed", "count": 1 }
-                        ]
-                    },
-                    {
-                        "id": "refined_strawberry_seeds",
-                        "item": "melvorD:Strawberry_Seed",
-                        "outputType": "item",
-                        "count": 10,
-                        "requirements": [
-                            { "type": "skill_level", "level": 25 },
-                            { "type": "current_job_level", "job": "adventuring:master_farmer", "level": 15 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:refined_seed", "count": 1 }
-                        ]
-                    },
-                    {
-                        "id": "refined_snape_grass_seeds",
-                        "item": "melvorD:Snape_Grass_Seed",
-                        "outputType": "item",
-                        "count": 10,
-                        "requirements": [
-                            { "type": "skill_level", "level": 25 },
-                            { "type": "current_job_level", "job": "adventuring:master_farmer", "level": 30 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:refined_seed", "count": 1 }
-                        ]
-                    },
-                    {
-                        "id": "immaculate_snape_grass_seeds",
-                        "item": "melvorD:Snape_Grass_Seed",
-                        "outputType": "item",
-                        "count": 25,
-                        "requirements": [
-                            { "type": "skill_level", "level": 50 },
-                            { "type": "current_job_level", "job": "adventuring:grandmaster_farmer", "level": 1 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:immaculate_seed", "count": 1 }
-                        ]
-                    },
-                    {
-                        "id": "transcendent_snape_grass_seeds",
-                        "item": "melvorD:Snape_Grass_Seed",
-                        "outputType": "item",
-                        "count": 60,
-                        "requirements": [
-                            { "type": "skill_level", "level": 75 },
-                            { "type": "current_job_level", "job": "adventuring:legendary_farmer", "level": 1 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:transcendent_seed", "count": 1 }
-                        ]
-                    }
-                ],
-                "tiles": [
-                    {
-                        "id": "seed_cache",
-                        "name": "Seed Cache",
-                        "media": "melvor:assets/media/skills/farming/farming.svg",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:farmer", "level": 1 }
-                        ],
-                        "weight": 10,
-                        "floor_max": 1,
-                        "dungeon_max": 1,
-                        "effects": [
-                            { "type": "xp", "amount": 30, "job": "adventuring:farmer" },
-                            {
-                                "type": "loot",
-                                "pool": [
-                                    { "id": "adventuring:crude_seed", "qty": 1, "weight": 100 }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "fertile_garden",
-                        "name": "Fertile Garden",
-                        "media": "melvor:assets/media/skills/farming/farming.svg",
-                        "requirements": [
-                            { "type": "job_level", "job": "adventuring:master_farmer", "level": 1 }
-                        ],
-                        "weight": 8,
-                        "floor_max": 1,
-                        "dungeon_max": 2,
-                        "effects": [
-                            { "type": "xp", "amount": 100, "job": "adventuring:farmer" },
-                            { "type": "xp", "amount": 50, "job": "adventuring:master_farmer" },
-                            {
-                                "type": "loot",
-                                "pool": [
-                                    { "id": "adventuring:crude_seed", "qty": 3, "weight": 60 },
-                                    { "id": "adventuring:refined_seed", "qty": 2, "weight": 35 },
-                                    { "id": "adventuring:immaculate_seed", "qty": 1, "weight": 5 }
-                                ]
-                            }
-                        ]
-                    }
-                ]
+        "skillData": [
+            {
+                "skillID": "adventuring:Adventuring",
+                "data": {
+                    "stats": [
+                        {
+                            "id": "farming",
+                            "name": "Farming",
+                            "media": "melvor:assets/media/skills/farming/farming.svg"
+                        }
+                    ],
+                    "jobs": [
+                        {
+                            "id": "farmer",
+                            "name": "Farmer",
+                            "media": "melvor:assets/media/skills/farming/farming.svg",
+                            "requirements": [
+                                {
+                                    "type": "skill_level",
+                                    "level": 15
+                                }
+                            ],
+                            "isMilestoneReward": true,
+                            "isPassive": true,
+                            "scaling": [
+                                {
+                                    "id": "adventuring:farming",
+                                    "value": 1
+                                }
+                            ]
+                        }
+                    ],
+                    "materials": [
+                        {
+                            "id": "crude_seed",
+                            "name": "Crude Seed",
+                            "media": "melvor:assets/media/skills/farming/farming.svg",
+                            "category": "adventuring:salvage"
+                        },
+                        {
+                            "id": "refined_seed",
+                            "name": "Refined Seed",
+                            "media": "melvor:assets/media/bank/seeds_potato.png",
+                            "tier": 2,
+                            "category": "adventuring:salvage",
+                            "requirements": [
+                                {
+                                    "type": "job_level",
+                                    "job": "adventuring:farmer",
+                                    "level": 25
+                                }
+                            ]
+                        },
+                        {
+                            "id": "immaculate_seed",
+                            "name": "Immaculate Seed",
+                            "media": "melvor:assets/media/bank/seeds_snape_grass.png",
+                            "tier": 3,
+                            "category": "adventuring:salvage",
+                            "requirements": [
+                                {
+                                    "type": "job_level",
+                                    "job": "adventuring:farmer",
+                                    "level": 50
+                                }
+                            ]
+                        },
+                        {
+                            "id": "transcendent_seed",
+                            "name": "Transcendent Seed",
+                            "media": "melvor:assets/media/bank/seeds_snape_grass.png",
+                            "tier": 4,
+                            "category": "adventuring:salvage",
+                            "requirements": [
+                                {
+                                    "type": "job_level",
+                                    "job": "adventuring:farmer",
+                                    "level": 75
+                                }
+                            ]
+                        },
+                        {
+                            "id": "fertile_soil",
+                            "name": "Fertile Soil",
+                            "media": "melvor:assets/media/skills/farming/farming.svg",
+                            "category": "adventuring:special"
+                        }
+                    ],
+                    "buildings": [
+                        {
+                            "id": "farm",
+                            "type": "workshop",
+                            "name": "Farm",
+                            "description": "Grow crops and harvest seeds. Farmers produce food and herbs.",
+                            "media": "melvor:assets/media/skills/township/Farm.png",
+                            "requirements": [],
+                            "idle": [
+                                "Watering plants",
+                                "Pulling weeds"
+                            ],
+                            "actions": [
+                                "adventuring:work"
+                            ],
+                            "products": [
+                                "adventuring:potato_seed",
+                                "adventuring:onion_seed",
+                                "adventuring:cabbage_seed",
+                                "adventuring:tomato_seed",
+                                "adventuring:sweetcorn_seed",
+                                "adventuring:strawberry_seed",
+                                "adventuring:watermelon_seed",
+                                "adventuring:snape_grass_seed",
+                                "adventuring:craft_fertile_soil",
+                                "adventuring:convert_crude_to_refined_seed",
+                                "adventuring:convert_refined_to_immaculate_seed",
+                                "adventuring:convert_immaculate_to_transcendent_seed",
+                                "adventuring:convert_transcendent_to_immaculate_seed",
+                                "adventuring:convert_immaculate_to_refined_seed",
+                                "adventuring:convert_refined_to_crude_seed",
+                                "adventuring:craft_harvest_bounty",
+                                "adventuring:craft_natures_blessing",
+                                "adventuring:craft_growth_energy",
+                                "adventuring:craft_poison_thorn",
+                                "adventuring:craft_regrowth",
+                                "adventuring:craft_weed_infestation",
+                                "adventuring:craft_root_barrier",
+                                "adventuring:craft_life_bloom"
+                            ]
+                        }
+                    ],
+                    "products": [
+                        {
+                            "id": "potato_seed",
+                            "item": "melvorD:Potato_Seed",
+                            "outputType": "item",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 2,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_seed",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 6,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_seed",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 16,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_seed",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 40,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_seed",
+                                            "count": 1
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "onion_seed",
+                            "item": "melvorD:Onion_Seed",
+                            "outputType": "item",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 2,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 1
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Farming",
+                                            "level": 5
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_seed",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 6,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 25
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Farming",
+                                            "level": 5
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_seed",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 16,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 50
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Farming",
+                                            "level": 5
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_seed",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 40,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 75
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Farming",
+                                            "level": 5
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_seed",
+                                            "count": 1
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "cabbage_seed",
+                            "item": "melvorD:Cabbage_Seed",
+                            "outputType": "item",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 2,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 1
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Farming",
+                                            "level": 10
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_seed",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 6,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 25
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Farming",
+                                            "level": 10
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_seed",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 16,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 50
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Farming",
+                                            "level": 10
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_seed",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 40,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 75
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Farming",
+                                            "level": 10
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_seed",
+                                            "count": 1
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "tomato_seed",
+                            "item": "melvorD:Tomato_Seed",
+                            "outputType": "item",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 2,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 1
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Farming",
+                                            "level": 15
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_seed",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 6,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 25
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Farming",
+                                            "level": 15
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_seed",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 16,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 50
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Farming",
+                                            "level": 15
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_seed",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 40,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 75
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Farming",
+                                            "level": 15
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_seed",
+                                            "count": 1
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "sweetcorn_seed",
+                            "item": "melvorD:Sweetcorn_Seed",
+                            "outputType": "item",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 2,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 1
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Farming",
+                                            "level": 20
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_seed",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 6,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 25
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Farming",
+                                            "level": 20
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_seed",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 16,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 50
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Farming",
+                                            "level": 20
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_seed",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 40,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 75
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Farming",
+                                            "level": 20
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_seed",
+                                            "count": 1
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "strawberry_seed",
+                            "item": "melvorD:Strawberry_Seed",
+                            "outputType": "item",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 2,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 1
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Farming",
+                                            "level": 31
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_seed",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 6,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 25
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Farming",
+                                            "level": 31
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_seed",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 16,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 50
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Farming",
+                                            "level": 31
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_seed",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 40,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 75
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Farming",
+                                            "level": 31
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_seed",
+                                            "count": 1
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "watermelon_seed",
+                            "item": "melvorD:Watermelon_Seed",
+                            "outputType": "item",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 2,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 1
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Farming",
+                                            "level": 47
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_seed",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 6,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 25
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Farming",
+                                            "level": 47
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_seed",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 16,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 50
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Farming",
+                                            "level": 47
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_seed",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 40,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 75
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Farming",
+                                            "level": 47
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_seed",
+                                            "count": 1
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "snape_grass_seed",
+                            "item": "melvorD:Snape_Grass_Seed",
+                            "outputType": "item",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 2,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 1
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Farming",
+                                            "level": 61
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_seed",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 6,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 25
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Farming",
+                                            "level": 61
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_seed",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 16,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 50
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Farming",
+                                            "level": 61
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_seed",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 40,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 75
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Farming",
+                                            "level": 61
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_seed",
+                                            "count": 1
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "craft_fertile_soil",
+                            "material": "adventuring:fertile_soil",
+                            "outputType": "material",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 2,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_seed",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 4,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_seed",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 6,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_seed",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 8,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_seed",
+                                            "count": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "convert_crude_to_refined_seed",
+                            "outputType": "conversion",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "material": "adventuring:refined_seed",
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_seed",
+                                            "count": 5
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "convert_refined_to_immaculate_seed",
+                            "outputType": "conversion",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "material": "adventuring:immaculate_seed",
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_seed",
+                                            "count": 5
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "convert_immaculate_to_transcendent_seed",
+                            "outputType": "conversion",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "material": "adventuring:transcendent_seed",
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_seed",
+                                            "count": 5
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "convert_transcendent_to_immaculate_seed",
+                            "outputType": "conversion",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "material": "adventuring:immaculate_seed",
+                                    "count": 3,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_seed",
+                                            "count": 1
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "convert_immaculate_to_refined_seed",
+                            "outputType": "conversion",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "material": "adventuring:refined_seed",
+                                    "count": 3,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_seed",
+                                            "count": 1
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "convert_refined_to_crude_seed",
+                            "outputType": "conversion",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "material": "adventuring:crude_seed",
+                                    "count": 3,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_seed",
+                                            "count": 1
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "craft_harvest_bounty",
+                            "consumable": "adventuring:harvest_bounty",
+                            "outputType": "consumable",
+                            "count": 1,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_seed",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_seed",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_seed",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_seed",
+                                            "count": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "craft_natures_blessing",
+                            "consumable": "adventuring:natures_blessing",
+                            "outputType": "consumable",
+                            "count": 1,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_seed",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_seed",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_seed",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_seed",
+                                            "count": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "craft_growth_energy",
+                            "consumable": "adventuring:growth_energy",
+                            "outputType": "consumable",
+                            "count": 1,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_seed",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_seed",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_seed",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_seed",
+                                            "count": 2
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "craft_poison_thorn",
+                            "consumable": "adventuring:poison_thorn",
+                            "outputType": "consumable",
+                            "count": 1,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_seed",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_seed",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_seed",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_seed",
+                                            "count": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "craft_regrowth",
+                            "consumable": "adventuring:regrowth",
+                            "outputType": "consumable",
+                            "count": 1,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_seed",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_seed",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_seed",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_seed",
+                                            "count": 2
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "craft_weed_infestation",
+                            "consumable": "adventuring:weed_infestation",
+                            "outputType": "consumable",
+                            "count": 1,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_seed",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_seed",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_seed",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_seed",
+                                            "count": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "craft_root_barrier",
+                            "consumable": "adventuring:root_barrier",
+                            "outputType": "consumable",
+                            "count": 1,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_seed",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_seed",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_seed",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_seed",
+                                            "count": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "craft_life_bloom",
+                            "consumable": "adventuring:life_bloom",
+                            "outputType": "consumable",
+                            "count": 1,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_seed",
+                                            "count": 5
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_seed",
+                                            "count": 5
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_seed",
+                                            "count": 5
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:farmer",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_seed",
+                                            "count": 5
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "tiles": [
+                        {
+                            "id": "wild_patch",
+                            "name": "Wild Patch",
+                            "media": "melvor:assets/media/skills/farming/farming.svg",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:farmer",
+                                    "level": 1
+                                }
+                            ],
+                            "weight": 10,
+                            "floor_max": 1,
+                            "dungeon_max": 1,
+                            "effects": [
+                                {
+                                    "type": "xp",
+                                    "amount": 30,
+                                    "job": "adventuring:farmer"
+                                },
+                                {
+                                    "type": "loot",
+                                    "pool": [
+                                        {
+                                            "id": "adventuring:crude_seed",
+                                            "qty": 1,
+                                            "weight": 100
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "overgrown_field",
+                            "name": "Overgrown Field",
+                            "media": "melvor:assets/media/skills/farming/farming.svg",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:farmer",
+                                    "level": 25
+                                }
+                            ],
+                            "weight": 8,
+                            "floor_max": 1,
+                            "dungeon_max": 2,
+                            "effects": [
+                                {
+                                    "type": "xp",
+                                    "amount": 75,
+                                    "job": "adventuring:farmer"
+                                },
+                                {
+                                    "type": "loot",
+                                    "pool": [
+                                        {
+                                            "id": "adventuring:crude_seed",
+                                            "qty": 2,
+                                            "weight": 60
+                                        },
+                                        {
+                                            "id": "adventuring:refined_seed",
+                                            "qty": 1,
+                                            "weight": 40
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "blessed_garden",
+                            "name": "Blessed Garden",
+                            "media": "melvor:assets/media/skills/farming/farming.svg",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:farmer",
+                                    "level": 50
+                                }
+                            ],
+                            "weight": 5,
+                            "floor_max": 1,
+                            "dungeon_max": 2,
+                            "effects": [
+                                {
+                                    "type": "xp",
+                                    "amount": 150,
+                                    "job": "adventuring:farmer"
+                                },
+                                {
+                                    "type": "loot",
+                                    "pool": [
+                                        {
+                                            "id": "adventuring:crude_seed",
+                                            "qty": 1,
+                                            "weight": 30
+                                        },
+                                        {
+                                            "id": "adventuring:refined_seed",
+                                            "qty": 1,
+                                            "weight": 45
+                                        },
+                                        {
+                                            "id": "adventuring:immaculate_seed",
+                                            "qty": 1,
+                                            "weight": 25
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "eternal_harvest",
+                            "name": "Eternal Harvest",
+                            "media": "melvor:assets/media/skills/farming/farming.svg",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:farmer",
+                                    "level": 75
+                                }
+                            ],
+                            "weight": 3,
+                            "floor_max": 1,
+                            "dungeon_max": 2,
+                            "effects": [
+                                {
+                                    "type": "xp",
+                                    "amount": 300,
+                                    "job": "adventuring:farmer"
+                                },
+                                {
+                                    "type": "loot",
+                                    "pool": [
+                                        {
+                                            "id": "adventuring:crude_seed",
+                                            "qty": 1,
+                                            "weight": 15
+                                        },
+                                        {
+                                            "id": "adventuring:refined_seed",
+                                            "qty": 1,
+                                            "weight": 30
+                                        },
+                                        {
+                                            "id": "adventuring:immaculate_seed",
+                                            "qty": 1,
+                                            "weight": 35
+                                        },
+                                        {
+                                            "id": "adventuring:transcendent_seed",
+                                            "qty": 1,
+                                            "weight": 20
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "consumableTypes": [
+                        {
+                            "id": "harvest_bounty",
+                            "name": "Harvest Bounty",
+                            "media": "melvor:assets/media/bank/carrot.png",
+                            "type": "food",
+                            "sourceJob": "adventuring:farmer",
+                            "maxCharges": 3,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "nameSuffix": "I",
+                                    "media": "melvor:assets/media/bank/carrot.png",
+                                    "flavorText": "Victory brings bountiful healing.",
+                                    "effects": [
+                                        {
+                                            "type": "heal_party_percent",
+                                            "trigger": "on_kill",
+                                            "amount": 5,
+                                            "target": "party"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_seed",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "nameSuffix": "II",
+                                    "media": "melvor:assets/media/bank/carrot.png",
+                                    "flavorText": "Triumphant feasts heal allies.",
+                                    "effects": [
+                                        {
+                                            "type": "heal_party_percent",
+                                            "trigger": "on_kill",
+                                            "amount": 8,
+                                            "target": "party"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_seed",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "nameSuffix": "III",
+                                    "media": "melvor:assets/media/bank/carrot.png",
+                                    "flavorText": "Slain foes nourish the party.",
+                                    "effects": [
+                                        {
+                                            "type": "heal_party_percent",
+                                            "trigger": "on_kill",
+                                            "amount": 12,
+                                            "target": "party"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_seed",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "nameSuffix": "IV",
+                                    "media": "melvor:assets/media/bank/carrot.png",
+                                    "flavorText": "Each victory brings legendary healing.",
+                                    "effects": [
+                                        {
+                                            "type": "heal_party_percent",
+                                            "trigger": "on_kill",
+                                            "amount": 18,
+                                            "target": "party"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_seed",
+                                            "count": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "natures_blessing",
+                            "name": "Nature's Blessing",
+                            "media": "melvor:assets/media/bank/herb_seed_barrentoe.png#shade=green",
+                            "type": "seed",
+                            "sourceJob": "adventuring:farmer",
+                            "maxCharges": 3,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "nameSuffix": "I",
+                                    "media": "melvor:assets/media/bank/herb_seed_barrentoe.png#shade=green",
+                                    "flavorText": "Slaying enemies invokes nature's favor.",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "trigger": "on_kill",
+                                            "id": "adventuring:natures_blessing",
+                                            "stacks": 3,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_seed",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "nameSuffix": "II",
+                                    "media": "melvor:assets/media/bank/herb_seed_barrentoe.png#shade=green",
+                                    "flavorText": "Victory channels wild power.",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "trigger": "on_kill",
+                                            "id": "adventuring:natures_blessing",
+                                            "stacks": 5,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_seed",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "nameSuffix": "III",
+                                    "media": "melvor:assets/media/bank/herb_seed_barrentoe.png#shade=green",
+                                    "flavorText": "Fallen foes feed the forest's blessing.",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "trigger": "on_kill",
+                                            "id": "adventuring:natures_blessing",
+                                            "stacks": 8,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_seed",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "nameSuffix": "IV",
+                                    "media": "melvor:assets/media/bank/herb_seed_barrentoe.png#shade=green",
+                                    "flavorText": "Each kill empowers primal nature.",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "trigger": "on_kill",
+                                            "id": "adventuring:natures_blessing",
+                                            "stacks": 12,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_seed",
+                                            "count": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "growth_energy",
+                            "name": "Growth Energy",
+                            "media": "melvor:assets/media/skills/farming/farming.svg",
+                            "type": "seed",
+                            "sourceJob": "adventuring:farmer",
+                            "maxCharges": 5,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "nameSuffix": "I",
+                                    "media": "melvor:assets/media/skills/farming/farming.svg",
+                                    "flavorText": "Plant energy restores stamina.",
+                                    "effects": [
+                                        {
+                                            "type": "energy",
+                                            "trigger": "on_kill",
+                                            "amount": 5,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_seed",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "nameSuffix": "II",
+                                    "media": "melvor:assets/media/skills/farming/farming.svg",
+                                    "flavorText": "Natural growth fuels your abilities.",
+                                    "effects": [
+                                        {
+                                            "type": "energy",
+                                            "trigger": "on_kill",
+                                            "amount": 8,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_seed",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "nameSuffix": "III",
+                                    "media": "melvor:assets/media/skills/farming/farming.svg",
+                                    "flavorText": "The harvest empowers your spirit.",
+                                    "effects": [
+                                        {
+                                            "type": "energy",
+                                            "trigger": "on_kill",
+                                            "amount": 12,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_seed",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "nameSuffix": "IV",
+                                    "media": "melvor:assets/media/skills/farming/farming.svg",
+                                    "flavorText": "Primal growth fills you with power.",
+                                    "effects": [
+                                        {
+                                            "type": "energy",
+                                            "trigger": "on_kill",
+                                            "amount": 18,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_seed",
+                                            "count": 2
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "poison_thorn",
+                            "name": "Poison Thorn",
+                            "media": "melvor:assets/media/bank/seeds_tree_apple.png#shade=orange",
+                            "type": "seed",
+                            "sourceJob": "adventuring:farmer",
+                            "maxCharges": 3,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "nameSuffix": "I",
+                                    "media": "melvor:assets/media/bank/seeds_tree_apple.png#shade=orange",
+                                    "flavorText": "Venomous thorns poison enemies.",
+                                    "effects": [
+                                        {
+                                            "type": "debuff",
+                                            "trigger": "on_crit",
+                                            "id": "adventuring:poison",
+                                            "stacks": 3,
+                                            "target": "target"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_seed",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "nameSuffix": "II",
+                                    "media": "melvor:assets/media/bank/seeds_tree_apple.png#shade=orange",
+                                    "flavorText": "Toxic spines infect on crits.",
+                                    "effects": [
+                                        {
+                                            "type": "debuff",
+                                            "trigger": "on_crit",
+                                            "id": "adventuring:poison",
+                                            "stacks": 5,
+                                            "target": "target"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_seed",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "nameSuffix": "III",
+                                    "media": "melvor:assets/media/bank/seeds_tree_apple.png#shade=orange",
+                                    "flavorText": "Lethal venom spreads on crits.",
+                                    "effects": [
+                                        {
+                                            "type": "debuff",
+                                            "trigger": "on_crit",
+                                            "id": "adventuring:poison",
+                                            "stacks": 8,
+                                            "target": "target"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_seed",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "nameSuffix": "IV",
+                                    "media": "melvor:assets/media/bank/seeds_tree_apple.png#shade=orange",
+                                    "flavorText": "Deadly nature poison devastates.",
+                                    "effects": [
+                                        {
+                                            "type": "debuff",
+                                            "trigger": "on_crit",
+                                            "id": "adventuring:poison",
+                                            "stacks": 12,
+                                            "target": "target"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_seed",
+                                            "count": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "regrowth",
+                            "name": "Regrowth",
+                            "media": "melvor:assets/media/bank/potato.png",
+                            "type": "food",
+                            "sourceJob": "adventuring:farmer",
+                            "maxCharges": 5,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "nameSuffix": "I",
+                                    "media": "melvor:assets/media/bank/potato.png",
+                                    "flavorText": "Wounds trigger natural regeneration.",
+                                    "effects": [
+                                        {
+                                            "type": "heal",
+                                            "trigger": "after_damage_received",
+                                            "amount": 3,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_seed",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "nameSuffix": "II",
+                                    "media": "melvor:assets/media/bank/potato.png",
+                                    "flavorText": "Pain awakens plant vitality.",
+                                    "effects": [
+                                        {
+                                            "type": "heal",
+                                            "trigger": "after_damage_received",
+                                            "amount": 5,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_seed",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "nameSuffix": "III",
+                                    "media": "melvor:assets/media/bank/potato.png",
+                                    "flavorText": "Nature responds to every wound.",
+                                    "effects": [
+                                        {
+                                            "type": "heal",
+                                            "trigger": "after_damage_received",
+                                            "amount": 8,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_seed",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "nameSuffix": "IV",
+                                    "media": "melvor:assets/media/bank/potato.png",
+                                    "flavorText": "Damage triggers eternal regrowth.",
+                                    "effects": [
+                                        {
+                                            "type": "heal",
+                                            "trigger": "after_damage_received",
+                                            "amount": 12,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_seed",
+                                            "count": 2
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "weed_infestation",
+                            "name": "Weed Infestation",
+                            "media": "melvor:assets/media/bank/snape_grass.png",
+                            "type": "seed",
+                            "sourceJob": "adventuring:farmer",
+                            "maxCharges": 3,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "nameSuffix": "I",
+                                    "media": "melvor:assets/media/bank/snape_grass.png",
+                                    "flavorText": "Slain enemies spread weakening weeds.",
+                                    "effects": [
+                                        {
+                                            "type": "debuff",
+                                            "trigger": "on_kill",
+                                            "id": "adventuring:weaken",
+                                            "stacks": 3,
+                                            "target": "all_enemies"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_seed",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "nameSuffix": "II",
+                                    "media": "melvor:assets/media/bank/snape_grass.png",
+                                    "flavorText": "Victory spreads invasive vines.",
+                                    "effects": [
+                                        {
+                                            "type": "debuff",
+                                            "trigger": "on_kill",
+                                            "id": "adventuring:weaken",
+                                            "stacks": 5,
+                                            "target": "all_enemies"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_seed",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "nameSuffix": "III",
+                                    "media": "melvor:assets/media/bank/snape_grass.png",
+                                    "flavorText": "Fallen foes spread choking vines.",
+                                    "effects": [
+                                        {
+                                            "type": "debuff",
+                                            "trigger": "on_kill",
+                                            "id": "adventuring:weaken",
+                                            "stacks": 8,
+                                            "target": "all_enemies"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_seed",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "nameSuffix": "IV",
+                                    "media": "melvor:assets/media/bank/snape_grass.png",
+                                    "flavorText": "Each kill spreads primal weeds.",
+                                    "effects": [
+                                        {
+                                            "type": "debuff",
+                                            "trigger": "on_kill",
+                                            "id": "adventuring:weaken",
+                                            "stacks": 12,
+                                            "target": "all_enemies"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_seed",
+                                            "count": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "root_barrier",
+                            "name": "Root Barrier",
+                            "media": "melvor:assets/media/bank/potato.png",
+                            "type": "seed",
+                            "sourceJob": "adventuring:farmer",
+                            "maxCharges": 3,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "nameSuffix": "I",
+                                    "media": "melvor:assets/media/bank/potato.png",
+                                    "flavorText": "Slaying enemies strengthens your roots.",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "trigger": "on_kill",
+                                            "id": "adventuring:barrier",
+                                            "stacks": 3,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_seed",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "nameSuffix": "II",
+                                    "media": "melvor:assets/media/bank/potato.png",
+                                    "flavorText": "Victory deepens your root barrier.",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "trigger": "on_kill",
+                                            "id": "adventuring:barrier",
+                                            "stacks": 5,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_seed",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "nameSuffix": "III",
+                                    "media": "melvor:assets/media/bank/potato.png",
+                                    "flavorText": "Kills grow ancient protective roots.",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "trigger": "on_kill",
+                                            "id": "adventuring:barrier",
+                                            "stacks": 8,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_seed",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "nameSuffix": "IV",
+                                    "media": "melvor:assets/media/bank/potato.png",
+                                    "flavorText": "Each victory fortifies your roots.",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "trigger": "on_kill",
+                                            "id": "adventuring:barrier",
+                                            "stacks": 12,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_seed",
+                                            "count": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "life_bloom",
+                            "name": "Life Bloom",
+                            "media": "melvor:assets/media/bank/strawberry.png",
+                            "type": "seed",
+                            "sourceJob": "adventuring:farmer",
+                            "maxCharges": 1,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "nameSuffix": "I",
+                                    "media": "melvor:assets/media/bank/strawberry.png",
+                                    "flavorText": "Nature refuses to let you die.",
+                                    "effects": [
+                                        {
+                                            "type": "prevent_death",
+                                            "trigger": "before_death",
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_seed",
+                                            "count": 5
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "nameSuffix": "II",
+                                    "media": "melvor:assets/media/bank/strawberry.png",
+                                    "flavorText": "Life force blooms anew.",
+                                    "effects": [
+                                        {
+                                            "type": "prevent_death",
+                                            "trigger": "before_death",
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_seed",
+                                            "count": 5
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "nameSuffix": "III",
+                                    "media": "melvor:assets/media/bank/strawberry.png",
+                                    "flavorText": "The garden refuses your fall.",
+                                    "effects": [
+                                        {
+                                            "type": "prevent_death",
+                                            "trigger": "before_death",
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_seed",
+                                            "count": 5
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "nameSuffix": "IV",
+                                    "media": "melvor:assets/media/bank/strawberry.png",
+                                    "flavorText": "Eternal nature preserves you.",
+                                    "effects": [
+                                        {
+                                            "type": "prevent_death",
+                                            "trigger": "before_death",
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_seed",
+                                            "count": 5
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
             }
-        }]
+        ]
     }
 }
-

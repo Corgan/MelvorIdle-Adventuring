@@ -299,7 +299,6 @@ export class Adventuring extends SkillWithMastery {
             baseItem.renderQueue.tooltip = true;
             baseItem.renderQueue.upgrade = true;
             baseItem.renderQueue.icon = true;
-            baseItem.renderQueue.upgrade = true;
         });
 
         this.monsters.forEach(monster => {
@@ -344,7 +343,6 @@ export class Adventuring extends SkillWithMastery {
             baseItem.renderQueue.tooltip = true;
             baseItem.renderQueue.upgrade = true;
             baseItem.renderQueue.icon = true;
-            baseItem.renderQueue.upgrade = true;
         });
 
         this.monsters.forEach(monster => {
@@ -809,6 +807,14 @@ export class Adventuring extends SkillWithMastery {
             });
         }
 
+        // Also support consumableTypes key (used in job files)
+        if(data.consumableTypes !== undefined) {
+            data.consumableTypes.forEach(data => {
+                let consumable = new AdventuringConsumable(namespace, data, this, this.game);
+                this.consumableTypes.registerObject(consumable);
+            });
+        }
+
         if(data.tavernDrinks !== undefined) {
             data.tavernDrinks.forEach(data => {
                 let drink = new AdventuringTavernDrink(namespace, data, this, this.game);
@@ -857,6 +863,14 @@ export class Adventuring extends SkillWithMastery {
         this.generators.forEach(generator => generator.postDataRegistration());
         this.spenders.forEach(spender => spender.postDataRegistration());
         this.passives.forEach(passive => passive.postDataRegistration());
+        
+        // Build passives-by-job cache for O(1) lookup
+        this.passivesByJob = new Map();
+        this.jobs.forEach(job => {
+            const jobPassives = this.passives.allObjects.filter(p => p.unlockedBy(job));
+            this.passivesByJob.set(job.id, jobPassives);
+        });
+        
         this.auras.forEach(aura => aura.postDataRegistration());
         this.materials.forEach(material => material.postDataRegistration());
         this.baseItems.forEach(baseItem => baseItem.postDataRegistration());
@@ -949,6 +963,15 @@ export class Adventuring extends SkillWithMastery {
                 }
             });
         });
+    }
+
+    /**
+     * Get passives that are unlocked by a specific job (uses cached lookup)
+     * @param {AdventuringJob} job - The job to get passives for
+     * @returns {AdventuringPassive[]} Array of passives unlocked by this job
+     */
+    getPassivesForJob(job) {
+        return this.passivesByJob?.get(job.id) ?? [];
     }
 
     /**

@@ -95,6 +95,10 @@ export class AdventuringAbilitySmallElement extends AdventuringTooltipElement {
         this.skill = skill;
     }
 
+    setCharacter(character) {
+        this.character = character;
+    }
+
     attachSelector(character, type) {
         this.selectorType = type;
         this.selectorCharacter = character;

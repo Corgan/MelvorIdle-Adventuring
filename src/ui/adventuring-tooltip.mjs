@@ -359,7 +359,7 @@ export class TooltipBuilder {
      * @returns {TooltipBuilder} This builder for chaining
      */
     static forAbility(ability, options = {}) {
-        const { character, manager, type, showUnlockLevel = false, masteryAction, hideIfLocked = false, forceShowDescription = false } = options;
+        const { character, manager, type, showUnlockLevel = false, masteryAction, hideIfLocked = false, forceShowDescription = false, displayMode = 'total' } = options;
         const isUnlocked = ability.unlocked !== undefined ? ability.unlocked : true;
         const showDetails = isUnlocked || !hideIfLocked || forceShowDescription;
         
@@ -401,10 +401,10 @@ export class TooltipBuilder {
             }
         }
         
-        // Description with stats - use 'total' mode for clean tooltip display
+        // Description with stats - displayMode controls how scaling is shown
         tooltip.separator();
         if(isUnlocked || forceShowDescription) {
-            const desc = ability.getDescription ? ability.getDescription(character, 'total') : ability.description;
+            const desc = ability.getDescription ? ability.getDescription(character, displayMode) : ability.description;
             tooltip.info(desc);
         } else {
             tooltip.warning('???');

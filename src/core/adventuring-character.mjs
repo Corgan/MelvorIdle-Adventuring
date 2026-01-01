@@ -38,6 +38,7 @@ class AdventuringCharacter {
         this.party = party;
 
         this.component = createElement('adventuring-character');
+        this.component.setCharacter(this);
 
         this.card = new AdventuringCard(this.manager, this.game);
 

@@ -212,8 +212,11 @@ export class AdventuringHero extends AdventuringCharacter {
         this.renderQueue.name = true;
     }
 
-    setCombatJob(combatJob) {
-        this.combatJob = combatJob;
+    /**
+     * Common logic after changing a job (combat or passive)
+     * Recalculates stats, validates abilities, and queues renders
+     */
+    _onJobChange() {
         this.calculateStats();
 
         if(!this.generator.canEquip(this))
@@ -232,24 +235,14 @@ export class AdventuringHero extends AdventuringCharacter {
         this.manager.party.all.forEach(member => member.renderQueue.jobs = true);
     }
 
+    setCombatJob(combatJob) {
+        this.combatJob = combatJob;
+        this._onJobChange();
+    }
+
     setPassiveJob(passiveJob) {
         this.passiveJob = passiveJob;
-        this.calculateStats();
-
-        if(!this.generator.canEquip(this))
-            this.setGenerator(this.manager.generators.getObjectByID('adventuring:slap'));
-        
-        if(!this.spender.canEquip(this))
-            this.setSpender(this.manager.spenders.getObjectByID('adventuring:backhand'));
-
-        this.renderQueue.name = true;
-        this.renderQueue.icon = true;
-        this.renderQueue.passiveAbilities = true;
-        this.stats.renderQueue.stats = true;
-
-        this.equipment.slots.forEach(slot => slot.renderQueue.valid = true);
-
-        this.manager.party.all.forEach(member => member.renderQueue.jobs = true);
+        this._onJobChange();
     }
     
     render() {
@@ -320,19 +313,17 @@ export class AdventuringHero extends AdventuringCharacter {
         // Get passive abilities that this character has from their jobs
         const activePassives = [];
         
-        // Get passives from combatJob
+        // Get passives from combatJob (use cached lookup)
         if(this.combatJob && this.combatJob.id !== 'adventuring:none') {
-            const combatPassives = this.manager.passives.allObjects.filter(p => 
-                p.canEquip(this) && p.unlockedBy(this.combatJob)
-            );
+            const combatPassives = this.manager.getPassivesForJob(this.combatJob)
+                .filter(p => p.canEquip(this));
             activePassives.push(...combatPassives);
         }
         
-        // Get passives from passiveJob (if different)
+        // Get passives from passiveJob (if different, use cached lookup)
         if(this.passiveJob && this.passiveJob !== this.combatJob && this.passiveJob.id !== 'adventuring:none') {
-            const passiveJobPassives = this.manager.passives.allObjects.filter(p => 
-                p.canEquip(this) && p.unlockedBy(this.passiveJob) && !activePassives.includes(p)
-            );
+            const passiveJobPassives = this.manager.getPassivesForJob(this.passiveJob)
+                .filter(p => p.canEquip(this) && !activePassives.includes(p));
             activePassives.push(...passiveJobPassives);
         }
 

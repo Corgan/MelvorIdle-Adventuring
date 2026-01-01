@@ -1,6 +1,7 @@
 const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringScalableEffect } = await loadModule('src/combat/adventuring-scalable-effect.mjs');
+const { getAuraName } = await loadModule('src/core/adventuring-utils.mjs');
 
 /**
  * Effect types for difficulties:
@@ -284,10 +285,8 @@ export class AdventuringDifficulty extends NamespacedObject {
             lines.push('<hr class="my-1">');
             lines.push('<div class="text-info">Party Buffs:</div>');
             dungeonStartBuffs.forEach(effect => {
-                const aura = this.manager.auras.getObjectByID(effect.id);
-                if(aura) {
-                    lines.push(`<div class="text-muted">• ${aura.name} x${effect.getStacks()}</div>`);
-                }
+                const auraName = getAuraName(this.manager, effect.id);
+                lines.push(`<div class="text-muted">• ${auraName} x${effect.getStacks()}</div>`);
             });
         }
         
@@ -297,11 +296,9 @@ export class AdventuringDifficulty extends NamespacedObject {
             lines.push('<hr class="my-1">');
             lines.push('<div class="text-warning">Enemy Effects:</div>');
             enemySpawnEffects.forEach(effect => {
-                const aura = this.manager.auras.getObjectByID(effect.id);
-                if(aura) {
-                    const typeLabel = effect.type === 'enemy_buff' ? '' : '(debuff) ';
-                    lines.push(`<div class="text-muted">• ${typeLabel}${aura.name} x${effect.getStacks()}</div>`);
-                }
+                const auraName = getAuraName(this.manager, effect.id);
+                const typeLabel = effect.type === 'enemy_buff' ? '' : '(debuff) ';
+                lines.push(`<div class="text-muted">• ${typeLabel}${auraName} x${effect.getStacks()}</div>`);
             });
         }
         

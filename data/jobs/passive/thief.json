@@ -2,196 +2,1885 @@
     "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
     "namespace": "adventuring",
     "data": {
-        "skillData": [{
-            "skillID": "adventuring:Adventuring",
-            "data": {
-                "stats": [
-                    {
-                        "id": "thieving",
-                        "name": "Thieving",
-                        "media": "melvor:assets/media/skills/thieving/thieving.svg"
-                    }
-                ],
-                "jobs": [
-                    {
-                        "id": "thief",
-                        "name": "Thief",
-                        "media": "melvor:assets/media/skills/thieving/thieving.svg",
-                        "requirements": [
-                            { "type": "skill_level", "level": 20 }
-                        ],
-                        "isMilestoneReward": true,
-                        "isPassive": true,
-                        "scaling": [
-                            { "id": "adventuring:thieving", "value": 1 }
-                        ]
-                    }
-                ],
-                "materials": [
-                    {
-                        "id": "lockpick",
-                        "name": "Lockpick",
-                        "media": "melvor:assets/media/skills/thieving/thieving.svg",
-                        "category": "adventuring:salvage"
-                    }
-                ],
-                "buildings": [
-                    {
-                        "id": "thieves_den",
-                        "type": "workshop",
-                        "name": "Thieves' Den",
-                        "description": "A shadowy hideout for acquiring valuables. Thieves pilfer coins, gems, and other treasures.",
-                        "media": "melvor:assets/media/skills/thieving/thieving.svg",
-                        "requirements": [],
-                        "idle": ["Picking locks", "Casing targets"],
-                        "actions": ["adventuring:work"],
-                        "products": [
-                            "adventuring:stolen_jewelry",
-                            "adventuring:pickpocketed_coins",
-                            "adventuring:pilfered_key",
-                            "adventuring:swiped_gem"
-                        ]
-                    }
-                ],
-                "materials": [
-                    {
-                        "id": "stolen_jewelry",
-                        "name": "Stolen Jewelry",
-                        "media": "melvor:assets/media/bank/ring_of_wealth.png",
-                        "category": "adventuring:salvage"
-                    },
-                    {
-                        "id": "pickpocketed_coins",
-                        "name": "Pickpocketed Coins",
-                        "media": "melvor:assets/media/main/coins.png",
-                        "category": "adventuring:salvage"
-                    },
-                    {
-                        "id": "pilfered_key",
-                        "name": "Pilfered Key",
-                        "media": "melvor:assets/media/bank/gold_bar.png#shade=brown",
-                        "category": "adventuring:salvage"
-                    },
-                    {
-                        "id": "swiped_gem",
-                        "name": "Swiped Gem",
-                        "media": "melvor:assets/media/bank/ruby.png",
-                        "category": "adventuring:salvage"
-                    }
-                ],
-                "products": [
-                    {
-                        "id": "stolen_jewelry",
-                        "name": "Stolen Jewelry",
-                        "outputType": "material",
-                        "material": "adventuring:stolen_jewelry",
-                        "count": 1,
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:thief", "level": 1 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:lockpick", "count": 3 }
-                        ]
-                    },
-                    {
-                        "id": "pickpocketed_coins",
-                        "name": "Pickpocketed Coins",
-                        "outputType": "material",
-                        "material": "adventuring:pickpocketed_coins",
-                        "count": 1,
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:thief", "level": 10 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:lockpick", "count": 2 }
-                        ]
-                    },
-                    {
-                        "id": "pilfered_key",
-                        "name": "Pilfered Key",
-                        "outputType": "material",
-                        "material": "adventuring:pilfered_key",
-                        "count": 1,
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:thief", "level": 25 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:lockpick", "count": 5 }
-                        ]
-                    },
-                    {
-                        "id": "swiped_gem",
-                        "name": "Swiped Gem",
-                        "outputType": "material",
-                        "material": "adventuring:swiped_gem",
-                        "count": 1,
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:thief", "level": 40 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:lockpick", "count": 4 }
-                        ]
-                    }
-                ],
-                "workOrders": [
-                    {
-                        "id": "stolen_jewelry",
-                        "building": "adventuring:thieves_den",
-                        "product": "adventuring:stolen_jewelry",
-                        "materials": [
-                            { "id": "adventuring:lockpick", "qty": 3 }
-                        ],
-                        "requirements": [
-                            { "type": "job_level", "job": "adventuring:thief", "level": 1 }
-                        ],
-                        "scaling": [
-                            { "id": "adventuring:thieving", "value": 0.2 }
-                        ]
-                    },
-                    {
-                        "id": "pickpocketed_coins",
-                        "building": "adventuring:thieves_den",
-                        "product": "adventuring:pickpocketed_coins",
-                        "materials": [
-                            { "id": "adventuring:lockpick", "qty": 2 }
-                        ],
-                        "requirements": [
-                            { "type": "job_level", "job": "adventuring:thief", "level": 10 }
-                        ],
-                        "scaling": [
-                            { "id": "adventuring:thieving", "value": 0.25 }
-                        ]
-                    },
-                    {
-                        "id": "pilfered_key",
-                        "building": "adventuring:thieves_den",
-                        "product": "adventuring:pilfered_key",
-                        "materials": [
-                            { "id": "adventuring:lockpick", "qty": 5 }
-                        ],
-                        "requirements": [
-                            { "type": "job_level", "job": "adventuring:thief", "level": 25 }
-                        ],
-                        "scaling": [
-                            { "id": "adventuring:thieving", "value": 0.3 }
-                        ]
-                    },
-                    {
-                        "id": "swiped_gem",
-                        "building": "adventuring:thieves_den",
-                        "product": "adventuring:swiped_gem",
-                        "materials": [
-                            { "id": "adventuring:lockpick", "qty": 4 }
-                        ],
-                        "requirements": [
-                            { "type": "job_level", "job": "adventuring:thief", "level": 40 }
-                        ],
-                        "scaling": [
-                            { "id": "adventuring:thieving", "value": 0.35 }
-                        ]
-                    }
-                ]
+        "skillData": [
+            {
+                "skillID": "adventuring:Adventuring",
+                "data": {
+                    "stats": [
+                        {
+                            "id": "thieving",
+                            "name": "Thieving",
+                            "media": "melvor:assets/media/skills/thieving/thieving.svg"
+                        }
+                    ],
+                    "jobs": [
+                        {
+                            "id": "thief",
+                            "name": "Thief",
+                            "media": "melvor:assets/media/skills/thieving/thieving.svg",
+                            "requirements": [
+                                {
+                                    "type": "skill_level",
+                                    "level": 20
+                                }
+                            ],
+                            "isMilestoneReward": true,
+                            "isPassive": true,
+                            "scaling": [
+                                {
+                                    "id": "adventuring:thieving",
+                                    "value": 1
+                                }
+                            ]
+                        }
+                    ],
+                    "materials": [
+                        {
+                            "id": "crude_lockpick",
+                            "name": "Crude Lockpick",
+                            "media": "melvor:assets/media/skills/thieving/thieving.svg",
+                            "category": "adventuring:salvage"
+                        },
+                        {
+                            "id": "refined_lockpick",
+                            "name": "Refined Lockpick",
+                            "media": "melvor:assets/media/bank/gold_topaz_ring.png",
+                            "tier": 2,
+                            "category": "adventuring:salvage",
+                            "requirements": [
+                                {
+                                    "type": "job_level",
+                                    "job": "adventuring:thief",
+                                    "level": 25
+                                }
+                            ]
+                        },
+                        {
+                            "id": "immaculate_lockpick",
+                            "name": "Immaculate Lockpick",
+                            "media": "melvor:assets/media/bank/gold_diamond_ring.png",
+                            "tier": 3,
+                            "category": "adventuring:salvage",
+                            "requirements": [
+                                {
+                                    "type": "job_level",
+                                    "job": "adventuring:thief",
+                                    "level": 50
+                                }
+                            ]
+                        },
+                        {
+                            "id": "transcendent_lockpick",
+                            "name": "Transcendent Lockpick",
+                            "media": "melvor:assets/media/bank/gold_diamond_ring.png",
+                            "tier": 4,
+                            "category": "adventuring:salvage",
+                            "requirements": [
+                                {
+                                    "type": "job_level",
+                                    "job": "adventuring:thief",
+                                    "level": 75
+                                }
+                            ]
+                        },
+                        {
+                            "id": "shadow_dust",
+                            "name": "Shadow Dust",
+                            "media": "melvor:assets/media/skills/thieving/thieving.svg",
+                            "category": "adventuring:special"
+                        }
+                    ],
+                    "buildings": [
+                        {
+                            "id": "thieves_den",
+                            "type": "workshop",
+                            "name": "Thieves' Den",
+                            "description": "Plan heists and fence stolen goods. Thieves acquire rare items through less legitimate means.",
+                            "media": "melvor:assets/media/skills/township/Graveyard.png",
+                            "requirements": [],
+                            "idle": [
+                                "Picking pockets",
+                                "Casing the joint"
+                            ],
+                            "actions": [
+                                "adventuring:work"
+                            ],
+                            "products": [
+                                "adventuring:craft_shadow_dust",
+                                "adventuring:convert_crude_to_refined_lockpick",
+                                "adventuring:convert_refined_to_immaculate_lockpick",
+                                "adventuring:convert_immaculate_to_transcendent_lockpick",
+                                "adventuring:convert_transcendent_to_immaculate_lockpick",
+                                "adventuring:convert_immaculate_to_refined_lockpick",
+                                "adventuring:convert_refined_to_crude_lockpick",
+                                "adventuring:craft_crit_amplifier",
+                                "adventuring:craft_vampiric_strike",
+                                "adventuring:craft_adrenaline_rush",
+                                "adventuring:craft_evasive_instincts",
+                                "adventuring:craft_expose_weakness",
+                                "adventuring:craft_blood_frenzy",
+                                "adventuring:craft_sneak_attack",
+                                "adventuring:craft_escape_artist"
+                            ]
+                        }
+                    ],
+                    "products": [
+                        {
+                            "id": "craft_shadow_dust",
+                            "material": "adventuring:shadow_dust",
+                            "outputType": "material",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 2,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:thief",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_lockpick",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 4,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:thief",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_lockpick",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 6,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:thief",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_lockpick",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 8,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:thief",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_lockpick",
+                                            "count": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "convert_crude_to_refined_lockpick",
+                            "outputType": "conversion",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "material": "adventuring:refined_lockpick",
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:thief",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_lockpick",
+                                            "count": 5
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "convert_refined_to_immaculate_lockpick",
+                            "outputType": "conversion",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "material": "adventuring:immaculate_lockpick",
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:thief",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_lockpick",
+                                            "count": 5
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "convert_immaculate_to_transcendent_lockpick",
+                            "outputType": "conversion",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "material": "adventuring:transcendent_lockpick",
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:thief",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_lockpick",
+                                            "count": 5
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "convert_transcendent_to_immaculate_lockpick",
+                            "outputType": "conversion",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "material": "adventuring:immaculate_lockpick",
+                                    "count": 3,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:thief",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_lockpick",
+                                            "count": 1
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "convert_immaculate_to_refined_lockpick",
+                            "outputType": "conversion",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "material": "adventuring:refined_lockpick",
+                                    "count": 3,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:thief",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_lockpick",
+                                            "count": 1
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "convert_refined_to_crude_lockpick",
+                            "outputType": "conversion",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "material": "adventuring:crude_lockpick",
+                                    "count": 3,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:thief",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_lockpick",
+                                            "count": 1
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "craft_crit_amplifier",
+                            "consumable": "adventuring:crit_amplifier",
+                            "outputType": "consumable",
+                            "count": 1,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:thief",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_lockpick",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:thief",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_lockpick",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:thief",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_lockpick",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:thief",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_lockpick",
+                                            "count": 2
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "craft_vampiric_strike",
+                            "consumable": "adventuring:vampiric_strike",
+                            "outputType": "consumable",
+                            "count": 1,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:thief",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_lockpick",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:thief",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_lockpick",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:thief",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_lockpick",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:thief",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_lockpick",
+                                            "count": 2
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "craft_adrenaline_rush",
+                            "consumable": "adventuring:adrenaline_rush",
+                            "outputType": "consumable",
+                            "count": 1,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:thief",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_lockpick",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:thief",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_lockpick",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:thief",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_lockpick",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:thief",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_lockpick",
+                                            "count": 2
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "craft_evasive_instincts",
+                            "consumable": "adventuring:evasive_instincts",
+                            "outputType": "consumable",
+                            "count": 1,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:thief",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_lockpick",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:thief",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_lockpick",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:thief",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_lockpick",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:thief",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_lockpick",
+                                            "count": 2
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "craft_expose_weakness",
+                            "consumable": "adventuring:expose_weakness",
+                            "outputType": "consumable",
+                            "count": 1,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:thief",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_lockpick",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:thief",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_lockpick",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:thief",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_lockpick",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:thief",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_lockpick",
+                                            "count": 2
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "craft_blood_frenzy",
+                            "consumable": "adventuring:blood_frenzy",
+                            "outputType": "consumable",
+                            "count": 1,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:thief",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_lockpick",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:thief",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_lockpick",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:thief",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_lockpick",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:thief",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_lockpick",
+                                            "count": 2
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "craft_sneak_attack",
+                            "consumable": "adventuring:sneak_attack",
+                            "outputType": "consumable",
+                            "count": 1,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:thief",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_lockpick",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:thief",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_lockpick",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:thief",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_lockpick",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:thief",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_lockpick",
+                                            "count": 2
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "craft_escape_artist",
+                            "consumable": "adventuring:escape_artist",
+                            "outputType": "consumable",
+                            "count": 1,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:thief",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_lockpick",
+                                            "count": 4
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:thief",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_lockpick",
+                                            "count": 4
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:thief",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_lockpick",
+                                            "count": 4
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:thief",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_lockpick",
+                                            "count": 4
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "tiles": [
+                        {
+                            "id": "hidden_stash",
+                            "name": "Hidden Stash",
+                            "media": "melvor:assets/media/skills/thieving/thieving.svg",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:thief",
+                                    "level": 1
+                                }
+                            ],
+                            "weight": 10,
+                            "floor_max": 1,
+                            "dungeon_max": 1,
+                            "effects": [
+                                {
+                                    "type": "xp",
+                                    "amount": 30,
+                                    "job": "adventuring:thief"
+                                },
+                                {
+                                    "type": "loot",
+                                    "pool": [
+                                        {
+                                            "id": "adventuring:crude_lockpick",
+                                            "qty": 1,
+                                            "weight": 100
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "locked_chest",
+                            "name": "Locked Chest",
+                            "media": "melvor:assets/media/skills/thieving/thieving.svg",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:thief",
+                                    "level": 25
+                                }
+                            ],
+                            "weight": 8,
+                            "floor_max": 1,
+                            "dungeon_max": 2,
+                            "effects": [
+                                {
+                                    "type": "xp",
+                                    "amount": 75,
+                                    "job": "adventuring:thief"
+                                },
+                                {
+                                    "type": "loot",
+                                    "pool": [
+                                        {
+                                            "id": "adventuring:crude_lockpick",
+                                            "qty": 2,
+                                            "weight": 60
+                                        },
+                                        {
+                                            "id": "adventuring:refined_lockpick",
+                                            "qty": 1,
+                                            "weight": 40
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "secret_vault",
+                            "name": "Secret Vault",
+                            "media": "melvor:assets/media/skills/thieving/thieving.svg",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:thief",
+                                    "level": 50
+                                }
+                            ],
+                            "weight": 5,
+                            "floor_max": 1,
+                            "dungeon_max": 2,
+                            "effects": [
+                                {
+                                    "type": "xp",
+                                    "amount": 150,
+                                    "job": "adventuring:thief"
+                                },
+                                {
+                                    "type": "loot",
+                                    "pool": [
+                                        {
+                                            "id": "adventuring:crude_lockpick",
+                                            "qty": 1,
+                                            "weight": 30
+                                        },
+                                        {
+                                            "id": "adventuring:refined_lockpick",
+                                            "qty": 1,
+                                            "weight": 45
+                                        },
+                                        {
+                                            "id": "adventuring:immaculate_lockpick",
+                                            "qty": 1,
+                                            "weight": 25
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "legendary_hoard",
+                            "name": "Legendary Hoard",
+                            "media": "melvor:assets/media/skills/thieving/thieving.svg",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:thief",
+                                    "level": 75
+                                }
+                            ],
+                            "weight": 3,
+                            "floor_max": 1,
+                            "dungeon_max": 2,
+                            "effects": [
+                                {
+                                    "type": "xp",
+                                    "amount": 300,
+                                    "job": "adventuring:thief"
+                                },
+                                {
+                                    "type": "loot",
+                                    "pool": [
+                                        {
+                                            "id": "adventuring:crude_lockpick",
+                                            "qty": 1,
+                                            "weight": 15
+                                        },
+                                        {
+                                            "id": "adventuring:refined_lockpick",
+                                            "qty": 1,
+                                            "weight": 30
+                                        },
+                                        {
+                                            "id": "adventuring:immaculate_lockpick",
+                                            "qty": 1,
+                                            "weight": 35
+                                        },
+                                        {
+                                            "id": "adventuring:transcendent_lockpick",
+                                            "qty": 1,
+                                            "weight": 20
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "consumableTypes": [
+                        {
+                            "id": "crit_amplifier",
+                            "name": "Crit Amplifier",
+                            "media": "melvor:assets/media/bank/throwing_knife_bronze.png",
+                            "type": "tool",
+                            "sourceJob": "adventuring:thief",
+                            "maxCharges": 3,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "nameSuffix": "I",
+                                    "media": "melvor:assets/media/bank/throwing_knife_bronze.png",
+                                    "flavorText": "Critical strikes build deadly momentum.",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "trigger": "on_crit",
+                                            "id": "adventuring:might",
+                                            "stacks": 3,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:lockpick",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "nameSuffix": "II",
+                                    "media": "melvor:assets/media/bank/throwing_knife_steel.png",
+                                    "flavorText": "Refined technique stacks power.",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "trigger": "on_crit",
+                                            "id": "adventuring:might",
+                                            "stacks": 5,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:pickpocketed_coins",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "nameSuffix": "III",
+                                    "media": "melvor:assets/media/bank/throwing_knife_mithril.png",
+                                    "flavorText": "Premium crits build devastating power.",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "trigger": "on_crit",
+                                            "id": "adventuring:might",
+                                            "stacks": 8,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:stolen_jewelry",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "nameSuffix": "IV",
+                                    "media": "melvor:assets/media/bank/throwing_knife_adamant.png",
+                                    "flavorText": "Master assassin power stacking.",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "trigger": "on_crit",
+                                            "id": "adventuring:might",
+                                            "stacks": 12,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:swiped_gem",
+                                            "count": 2
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "vampiric_strike",
+                            "name": "Vampiric Strike",
+                            "media": "melvor:assets/media/bank/bronze_dagger.png#shade=red",
+                            "type": "tool",
+                            "sourceJob": "adventuring:thief",
+                            "maxCharges": 3,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "nameSuffix": "I",
+                                    "media": "melvor:assets/media/bank/bronze_dagger.png#shade=red",
+                                    "flavorText": "Critical strikes drain life.",
+                                    "effects": [
+                                        {
+                                            "type": "lifesteal",
+                                            "trigger": "on_crit",
+                                            "amount": 12,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:lockpick",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "nameSuffix": "II",
+                                    "media": "melvor:assets/media/bank/steel_dagger.png#shade=red",
+                                    "flavorText": "Refined technique drains more life.",
+                                    "effects": [
+                                        {
+                                            "type": "lifesteal",
+                                            "trigger": "on_crit",
+                                            "amount": 20,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:pickpocketed_coins",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "nameSuffix": "III",
+                                    "media": "melvor:assets/media/bank/mithril_dagger.png#shade=red",
+                                    "flavorText": "Premium technique vampirically sustains you.",
+                                    "effects": [
+                                        {
+                                            "type": "lifesteal",
+                                            "trigger": "on_crit",
+                                            "amount": 32,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:stolen_jewelry",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "nameSuffix": "IV",
+                                    "media": "melvor:assets/media/bank/rune_dagger.png#shade=red",
+                                    "flavorText": "Master assassin life drain is devastating.",
+                                    "effects": [
+                                        {
+                                            "type": "lifesteal",
+                                            "trigger": "on_crit",
+                                            "amount": 50,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:swiped_gem",
+                                            "count": 2
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "adrenaline_rush",
+                            "name": "Adrenaline Rush",
+                            "media": "melvor:assets/media/main/coins.png",
+                            "type": "charm",
+                            "sourceJob": "adventuring:thief",
+                            "maxCharges": 3,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "nameSuffix": "I",
+                                    "media": "melvor:assets/media/main/coins.png",
+                                    "flavorText": "Killing enemies grants energy.",
+                                    "effects": [
+                                        {
+                                            "type": "energy",
+                                            "trigger": "on_kill",
+                                            "amount": 1,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:lockpick",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "nameSuffix": "II",
+                                    "media": "melvor:assets/media/main/coins.png#shade=yellow",
+                                    "flavorText": "Better technique grants more energy.",
+                                    "effects": [
+                                        {
+                                            "type": "energy",
+                                            "trigger": "on_kill",
+                                            "amount": 2,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:pickpocketed_coins",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "nameSuffix": "III",
+                                    "media": "melvor:assets/media/main/coins.png#shade=purple",
+                                    "flavorText": "Premium technique floods you with energy.",
+                                    "effects": [
+                                        {
+                                            "type": "energy",
+                                            "trigger": "on_kill",
+                                            "amount": 3,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:stolen_jewelry",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "nameSuffix": "IV",
+                                    "media": "melvor:assets/media/main/coins.png#shade=gold",
+                                    "flavorText": "Master assassin kills grant tremendous energy.",
+                                    "effects": [
+                                        {
+                                            "type": "energy",
+                                            "trigger": "on_kill",
+                                            "amount": 4,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:swiped_gem",
+                                            "count": 2
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "evasive_instincts",
+                            "name": "Evasive Instincts",
+                            "media": "melvor:assets/media/bank/smoke_devil_horns.png",
+                            "type": "charm",
+                            "sourceJob": "adventuring:thief",
+                            "maxCharges": 3,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "nameSuffix": "I",
+                                    "media": "melvor:assets/media/bank/smoke_devil_horns.png",
+                                    "flavorText": "Dodge attacks when health is low.",
+                                    "effects": [
+                                        {
+                                            "type": "chance_dodge",
+                                            "trigger": "before_damage_received",
+                                            "condition": {
+                                                "type": "hp_below",
+                                                "threshold": 40
+                                            },
+                                            "amount": 25,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:lockpick",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "nameSuffix": "II",
+                                    "media": "melvor:assets/media/bank/smoke_devil_horns.png#shade=brown",
+                                    "flavorText": "Refined instincts activate sooner.",
+                                    "effects": [
+                                        {
+                                            "type": "chance_dodge",
+                                            "trigger": "before_damage_received",
+                                            "condition": {
+                                                "type": "hp_below",
+                                                "threshold": 50
+                                            },
+                                            "amount": 35,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:pickpocketed_coins",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "nameSuffix": "III",
+                                    "media": "melvor:assets/media/bank/smoke_devil_horns.png#shade=purple",
+                                    "flavorText": "Premium instincts grant exceptional evasion.",
+                                    "effects": [
+                                        {
+                                            "type": "chance_dodge",
+                                            "trigger": "before_damage_received",
+                                            "condition": {
+                                                "type": "hp_below",
+                                                "threshold": 60
+                                            },
+                                            "amount": 45,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:stolen_jewelry",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "nameSuffix": "IV",
+                                    "media": "melvor:assets/media/bank/smoke_devil_horns.png#shade=gold",
+                                    "flavorText": "Master thief instincts make you nearly untouchable.",
+                                    "effects": [
+                                        {
+                                            "type": "chance_dodge",
+                                            "trigger": "before_damage_received",
+                                            "condition": {
+                                                "type": "hp_below",
+                                                "threshold": 70
+                                            },
+                                            "amount": 55,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:swiped_gem",
+                                            "count": 2
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "expose_weakness",
+                            "name": "Expose Weakness",
+                            "media": "melvor:assets/media/bank/bronze_dagger.png#shade=blue",
+                            "type": "tool",
+                            "sourceJob": "adventuring:thief",
+                            "maxCharges": 3,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "nameSuffix": "I",
+                                    "media": "melvor:assets/media/bank/bronze_dagger.png#shade=blue",
+                                    "flavorText": "Critical strikes weaken enemies.",
+                                    "effects": [
+                                        {
+                                            "type": "debuff",
+                                            "trigger": "on_crit",
+                                            "id": "weaken",
+                                            "stacks": 1,
+                                            "target": "enemy"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:lockpick",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "nameSuffix": "II",
+                                    "media": "melvor:assets/media/bank/steel_dagger.png#shade=blue",
+                                    "flavorText": "Refined technique weakens more.",
+                                    "effects": [
+                                        {
+                                            "type": "debuff",
+                                            "trigger": "on_crit",
+                                            "id": "weaken",
+                                            "stacks": 2,
+                                            "target": "enemy"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:pickpocketed_coins",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "nameSuffix": "III",
+                                    "media": "melvor:assets/media/bank/mithril_dagger.png#shade=blue",
+                                    "flavorText": "Premium technique cripples enemy defenses.",
+                                    "effects": [
+                                        {
+                                            "type": "debuff",
+                                            "trigger": "on_crit",
+                                            "id": "weaken",
+                                            "stacks": 3,
+                                            "target": "enemy"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:stolen_jewelry",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "nameSuffix": "IV",
+                                    "media": "melvor:assets/media/bank/rune_dagger.png#shade=blue",
+                                    "flavorText": "Master assassin strikes devastate defenses.",
+                                    "effects": [
+                                        {
+                                            "type": "debuff",
+                                            "trigger": "on_crit",
+                                            "id": "weaken",
+                                            "stacks": 4,
+                                            "target": "enemy"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:swiped_gem",
+                                            "count": 2
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "blood_frenzy",
+                            "name": "Blood Frenzy",
+                            "media": "melvor:assets/media/bank/ring_of_wealth.png#shade=red",
+                            "type": "charm",
+                            "sourceJob": "adventuring:thief",
+                            "maxCharges": 3,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "nameSuffix": "I",
+                                    "media": "melvor:assets/media/bank/ring_of_wealth.png#shade=red",
+                                    "flavorText": "Killing enemies triggers bloodlust.",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "trigger": "on_kill",
+                                            "id": "bloodlust",
+                                            "stacks": 1,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:lockpick",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "nameSuffix": "II",
+                                    "media": "melvor:assets/media/bank/ring_of_wealth.png#shade=brown",
+                                    "flavorText": "Refined frenzy builds faster.",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "trigger": "on_kill",
+                                            "id": "bloodlust",
+                                            "stacks": 2,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:pickpocketed_coins",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "nameSuffix": "III",
+                                    "media": "melvor:assets/media/bank/ring_of_wealth.png#shade=purple",
+                                    "flavorText": "Premium frenzy is devastating.",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "trigger": "on_kill",
+                                            "id": "bloodlust",
+                                            "stacks": 3,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:stolen_jewelry",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "nameSuffix": "IV",
+                                    "media": "melvor:assets/media/bank/ring_of_wealth.png#shade=gold",
+                                    "flavorText": "Master assassin bloodlust is unstoppable.",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "trigger": "on_kill",
+                                            "id": "bloodlust",
+                                            "stacks": 4,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:swiped_gem",
+                                            "count": 2
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "sneak_attack",
+                            "name": "Sneak Attack",
+                            "media": "melvor:assets/media/bank/throwing_knife_bronze.png#shade=purple",
+                            "type": "tool",
+                            "sourceJob": "adventuring:thief",
+                            "maxCharges": 3,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "nameSuffix": "I",
+                                    "media": "melvor:assets/media/bank/throwing_knife_bronze.png#shade=purple",
+                                    "flavorText": "Chance to deal sneak attack damage.",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "trigger": "before_damage_dealt",
+                                            "condition": {
+                                                "type": "chance",
+                                                "value": 20
+                                            },
+                                            "amount": 15,
+                                            "target": "enemy"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:lockpick",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "nameSuffix": "II",
+                                    "media": "melvor:assets/media/bank/throwing_knife_steel.png#shade=purple",
+                                    "flavorText": "Refined technique strikes more often.",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "trigger": "before_damage_dealt",
+                                            "condition": {
+                                                "type": "chance",
+                                                "value": 25
+                                            },
+                                            "amount": 25,
+                                            "target": "enemy"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:pickpocketed_coins",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "nameSuffix": "III",
+                                    "media": "melvor:assets/media/bank/throwing_knife_mithril.png#shade=purple",
+                                    "flavorText": "Premium sneak attacks devastate enemies.",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "trigger": "before_damage_dealt",
+                                            "condition": {
+                                                "type": "chance",
+                                                "value": 30
+                                            },
+                                            "amount": 40,
+                                            "target": "enemy"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:stolen_jewelry",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "nameSuffix": "IV",
+                                    "media": "melvor:assets/media/bank/throwing_knife_adamant.png#shade=purple",
+                                    "flavorText": "Master assassin sneak attacks are lethal.",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "trigger": "before_damage_dealt",
+                                            "condition": {
+                                                "type": "chance",
+                                                "value": 35
+                                            },
+                                            "amount": 60,
+                                            "target": "enemy"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:swiped_gem",
+                                            "count": 2
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "escape_artist",
+                            "name": "Escape Artist",
+                            "media": "melvor:assets/media/skills/thieving/thieving.svg",
+                            "type": "charm",
+                            "sourceJob": "adventuring:thief",
+                            "maxCharges": 1,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "nameSuffix": "I",
+                                    "media": "melvor:assets/media/skills/thieving/thieving.svg",
+                                    "flavorText": "Thieves always have an exit strategy.",
+                                    "effects": [
+                                        {
+                                            "type": "prevent_death",
+                                            "trigger": "before_death",
+                                            "heal_percent": 15,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:lockpick",
+                                            "count": 4
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "nameSuffix": "II",
+                                    "media": "melvor:assets/media/skills/thieving/thieving.svg#shade=yellow",
+                                    "flavorText": "Better preparations save your life.",
+                                    "effects": [
+                                        {
+                                            "type": "prevent_death",
+                                            "trigger": "before_death",
+                                            "heal_percent": 25,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:pickpocketed_coins",
+                                            "count": 4
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "nameSuffix": "III",
+                                    "media": "melvor:assets/media/skills/thieving/thieving.svg#shade=purple",
+                                    "flavorText": "Premium escape plans work multiple times.",
+                                    "effects": [
+                                        {
+                                            "type": "prevent_death",
+                                            "trigger": "before_death",
+                                            "heal_percent": 35,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:stolen_jewelry",
+                                            "count": 4
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "nameSuffix": "IV",
+                                    "media": "melvor:assets/media/skills/thieving/thieving.svg#shade=gold",
+                                    "flavorText": "Master escape artist denies death.",
+                                    "effects": [
+                                        {
+                                            "type": "prevent_death",
+                                            "trigger": "before_death",
+                                            "heal_percent": 50,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:swiped_gem",
+                                            "count": 4
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
             }
-        }]
+        ]
     }
 }

@@ -2,196 +2,1873 @@
     "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
     "namespace": "adventuring",
     "data": {
-        "skillData": [{
-            "skillID": "adventuring:Adventuring",
-            "data": {
-                "stats": [
-                    {
-                        "id": "archaeology",
-                        "name": "Archaeology",
-                        "media": "melvor:assets/media/skills/archaeology/archaeology.svg"
-                    }
-                ],
-                "jobs": [
-                    {
-                        "id": "archaeologist",
-                        "name": "Archaeologist",
-                        "media": "melvor:assets/media/skills/archaeology/archaeology.svg",
-                        "requirements": [
-                            { "type": "skill_level", "level": 30 }
-                        ],
-                        "isMilestoneReward": true,
-                        "isPassive": true,
-                        "scaling": [
-                            { "id": "adventuring:archaeology", "value": 1 }
-                        ]
-                    }
-                ],
-                "materials": [
-                    {
-                        "id": "dig_site_map",
-                        "name": "Dig Site Map",
-                        "media": "melvor:assets/media/skills/archaeology/archaeology.svg",
-                        "category": "adventuring:salvage"
-                    }
-                ],
-                "buildings": [
-                    {
-                        "id": "excavation_site",
-                        "type": "workshop",
-                        "name": "Excavation Site",
-                        "description": "Unearth ancient artifacts and forgotten relics. Archaeologists discover treasures from the past.",
-                        "media": "melvor:assets/media/skills/archaeology/archaeology.svg",
-                        "requirements": [],
-                        "idle": ["Brushing artifacts", "Cataloging finds"],
-                        "actions": ["adventuring:work"],
-                        "products": [
-                            "adventuring:ancient_coin",
-                            "adventuring:fossil_fragment",
-                            "adventuring:relic_shard",
-                            "adventuring:ancient_tome"
-                        ]
-                    }
-                ],
-                "materials": [
-                    {
-                        "id": "ancient_coin",
-                        "name": "Ancient Coin",
-                        "media": "melvor:assets/media/bank/ring_gold_topaz.png",
-                        "category": "adventuring:salvage"
-                    },
-                    {
-                        "id": "fossil_fragment",
-                        "name": "Fossil Fragment",
-                        "media": "melvor:assets/media/bank/big_bones.png",
-                        "category": "adventuring:salvage"
-                    },
-                    {
-                        "id": "relic_shard",
-                        "name": "Relic Shard",
-                        "media": "melvor:assets/media/bank/ancient_claw_fragment.png",
-                        "category": "adventuring:salvage"
-                    },
-                    {
-                        "id": "ancient_tome",
-                        "name": "Ancient Tome",
-                        "media": "melvor:assets/media/bank/skill_scroll.png#shade=purple",
-                        "category": "adventuring:salvage"
-                    }
-                ],
-                "products": [
-                    {
-                        "id": "ancient_coin",
-                        "name": "Ancient Coin",
-                        "outputType": "material",
-                        "material": "adventuring:ancient_coin",
-                        "count": 1,
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:archaeologist", "level": 1 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:dig_site_map", "count": 2 }
-                        ]
-                    },
-                    {
-                        "id": "fossil_fragment",
-                        "name": "Fossil Fragment",
-                        "outputType": "material",
-                        "material": "adventuring:fossil_fragment",
-                        "count": 1,
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:archaeologist", "level": 15 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:dig_site_map", "count": 3 }
-                        ]
-                    },
-                    {
-                        "id": "relic_shard",
-                        "name": "Relic Shard",
-                        "outputType": "material",
-                        "material": "adventuring:relic_shard",
-                        "count": 1,
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:archaeologist", "level": 30 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:dig_site_map", "count": 4 }
-                        ]
-                    },
-                    {
-                        "id": "ancient_tome",
-                        "name": "Ancient Tome",
-                        "outputType": "material",
-                        "material": "adventuring:ancient_tome",
-                        "count": 1,
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:archaeologist", "level": 50 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:dig_site_map", "count": 5 }
-                        ]
-                    }
-                ],
-                "workOrders": [
-                    {
-                        "id": "ancient_coin",
-                        "building": "adventuring:excavation_site",
-                        "product": "adventuring:ancient_coin",
-                        "materials": [
-                            { "id": "adventuring:dig_site_map", "qty": 2 }
-                        ],
-                        "requirements": [
-                            { "type": "job_level", "job": "adventuring:archaeologist", "level": 1 }
-                        ],
-                        "scaling": [
-                            { "id": "adventuring:archaeology", "value": 0.2 }
-                        ]
-                    },
-                    {
-                        "id": "fossil_fragment",
-                        "building": "adventuring:excavation_site",
-                        "product": "adventuring:fossil_fragment",
-                        "materials": [
-                            { "id": "adventuring:dig_site_map", "qty": 3 }
-                        ],
-                        "requirements": [
-                            { "type": "job_level", "job": "adventuring:archaeologist", "level": 15 }
-                        ],
-                        "scaling": [
-                            { "id": "adventuring:archaeology", "value": 0.25 }
-                        ]
-                    },
-                    {
-                        "id": "relic_shard",
-                        "building": "adventuring:excavation_site",
-                        "product": "adventuring:relic_shard",
-                        "materials": [
-                            { "id": "adventuring:dig_site_map", "qty": 4 }
-                        ],
-                        "requirements": [
-                            { "type": "job_level", "job": "adventuring:archaeologist", "level": 30 }
-                        ],
-                        "scaling": [
-                            { "id": "adventuring:archaeology", "value": 0.3 }
-                        ]
-                    },
-                    {
-                        "id": "ancient_tome",
-                        "building": "adventuring:excavation_site",
-                        "product": "adventuring:ancient_tome",
-                        "materials": [
-                            { "id": "adventuring:dig_site_map", "qty": 5 }
-                        ],
-                        "requirements": [
-                            { "type": "job_level", "job": "adventuring:archaeologist", "level": 50 }
-                        ],
-                        "scaling": [
-                            { "id": "adventuring:archaeology", "value": 0.35 }
-                        ]
-                    }
-                ]
+        "skillData": [
+            {
+                "skillID": "adventuring:Adventuring",
+                "data": {
+                    "stats": [
+                        {
+                            "id": "archaeology",
+                            "name": "Archaeology",
+                            "media": "melvor:assets/media/skills/archaeology/archaeology.svg"
+                        }
+                    ],
+                    "jobs": [
+                        {
+                            "id": "archaeologist",
+                            "name": "Archaeologist",
+                            "media": "melvor:assets/media/skills/archaeology/archaeology.svg",
+                            "requirements": [
+                                {
+                                    "type": "skill_level",
+                                    "level": 30
+                                }
+                            ],
+                            "isMilestoneReward": true,
+                            "isPassive": true,
+                            "scaling": [
+                                {
+                                    "id": "adventuring:archaeology",
+                                    "value": 1
+                                }
+                            ]
+                        }
+                    ],
+                    "materials": [
+                        {
+                            "id": "crude_artifact",
+                            "name": "Crude Artifact",
+                            "media": "melvor:assets/media/skills/archaeology/archaeology.svg",
+                            "category": "adventuring:salvage"
+                        },
+                        {
+                            "id": "refined_artifact",
+                            "name": "Refined Artifact",
+                            "media": "melvor:assets/media/skills/archaeology/archaeology.svg",
+                            "tier": 2,
+                            "category": "adventuring:salvage",
+                            "requirements": [
+                                {
+                                    "type": "job_level",
+                                    "job": "adventuring:archaeologist",
+                                    "level": 25
+                                }
+                            ]
+                        },
+                        {
+                            "id": "immaculate_artifact",
+                            "name": "Immaculate Artifact",
+                            "media": "melvor:assets/media/skills/archaeology/archaeology.svg",
+                            "tier": 3,
+                            "category": "adventuring:salvage",
+                            "requirements": [
+                                {
+                                    "type": "job_level",
+                                    "job": "adventuring:archaeologist",
+                                    "level": 50
+                                }
+                            ]
+                        },
+                        {
+                            "id": "transcendent_artifact",
+                            "name": "Transcendent Artifact",
+                            "media": "melvor:assets/media/skills/archaeology/archaeology.svg",
+                            "tier": 4,
+                            "category": "adventuring:salvage",
+                            "requirements": [
+                                {
+                                    "type": "job_level",
+                                    "job": "adventuring:archaeologist",
+                                    "level": 75
+                                }
+                            ]
+                        },
+                        {
+                            "id": "ancient_relic",
+                            "name": "Ancient Relic",
+                            "media": "melvor:assets/media/skills/archaeology/archaeology.svg",
+                            "category": "adventuring:special"
+                        }
+                    ],
+                    "buildings": [
+                        {
+                            "id": "museum",
+                            "type": "workshop",
+                            "name": "Museum",
+                            "description": "Catalog and restore ancient artifacts. Archaeologists uncover lost treasures.",
+                            "media": "melvor:assets/media/skills/township/Academy.png",
+                            "requirements": [],
+                            "idle": [
+                                "Brushing dust",
+                                "Cataloging finds"
+                            ],
+                            "actions": [
+                                "adventuring:work"
+                            ],
+                            "products": [
+                                "adventuring:craft_ancient_relic",
+                                "adventuring:convert_crude_to_refined_artifact",
+                                "adventuring:convert_refined_to_immaculate_artifact",
+                                "adventuring:convert_immaculate_to_transcendent_artifact",
+                                "adventuring:convert_transcendent_to_immaculate_artifact",
+                                "adventuring:convert_immaculate_to_refined_artifact",
+                                "adventuring:convert_refined_to_crude_artifact",
+                                "adventuring:craft_confident_scholar",
+                                "adventuring:craft_ancient_blessings",
+                                "adventuring:craft_relic_restoration",
+                                "adventuring:craft_warding_relic",
+                                "adventuring:craft_divine_relic",
+                                "adventuring:craft_excavator_strike",
+                                "adventuring:craft_stone_skin",
+                                "adventuring:craft_artifact_of_immortality"
+                            ]
+                        }
+                    ],
+                    "products": [
+                        {
+                            "id": "craft_ancient_relic",
+                            "material": "adventuring:ancient_relic",
+                            "outputType": "material",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 2,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:archaeologist",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_artifact",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 4,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:archaeologist",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_artifact",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 6,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:archaeologist",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_artifact",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 8,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:archaeologist",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_artifact",
+                                            "count": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "convert_crude_to_refined_artifact",
+                            "outputType": "conversion",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "material": "adventuring:refined_artifact",
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:archaeologist",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_artifact",
+                                            "count": 5
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "convert_refined_to_immaculate_artifact",
+                            "outputType": "conversion",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "material": "adventuring:immaculate_artifact",
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:archaeologist",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_artifact",
+                                            "count": 5
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "convert_immaculate_to_transcendent_artifact",
+                            "outputType": "conversion",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "material": "adventuring:transcendent_artifact",
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:archaeologist",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_artifact",
+                                            "count": 5
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "convert_transcendent_to_immaculate_artifact",
+                            "outputType": "conversion",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "material": "adventuring:immaculate_artifact",
+                                    "count": 3,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:archaeologist",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_artifact",
+                                            "count": 1
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "convert_immaculate_to_refined_artifact",
+                            "outputType": "conversion",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "material": "adventuring:refined_artifact",
+                                    "count": 3,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:archaeologist",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_artifact",
+                                            "count": 1
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "convert_refined_to_crude_artifact",
+                            "outputType": "conversion",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "material": "adventuring:crude_artifact",
+                                    "count": 3,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:archaeologist",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_artifact",
+                                            "count": 1
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "craft_confident_scholar",
+                            "consumable": "adventuring:confident_scholar",
+                            "outputType": "consumable",
+                            "count": 1,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:archaeologist",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_artifact",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:archaeologist",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_artifact",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:archaeologist",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_artifact",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:archaeologist",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_artifact",
+                                            "count": 2
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "craft_ancient_blessings",
+                            "consumable": "adventuring:ancient_blessings",
+                            "outputType": "consumable",
+                            "count": 1,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:archaeologist",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_artifact",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:archaeologist",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_artifact",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:archaeologist",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_artifact",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:archaeologist",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_artifact",
+                                            "count": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "craft_relic_restoration",
+                            "consumable": "adventuring:relic_restoration",
+                            "outputType": "consumable",
+                            "count": 1,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:archaeologist",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_artifact",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:archaeologist",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_artifact",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:archaeologist",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_artifact",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:archaeologist",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_artifact",
+                                            "count": 2
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "craft_warding_relic",
+                            "consumable": "adventuring:warding_relic",
+                            "outputType": "consumable",
+                            "count": 1,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:archaeologist",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_artifact",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:archaeologist",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_artifact",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:archaeologist",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_artifact",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:archaeologist",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_artifact",
+                                            "count": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "craft_divine_relic",
+                            "consumable": "adventuring:divine_relic",
+                            "outputType": "consumable",
+                            "count": 1,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:archaeologist",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_artifact",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:archaeologist",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_artifact",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:archaeologist",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_artifact",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:archaeologist",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_artifact",
+                                            "count": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "craft_excavator_strike",
+                            "consumable": "adventuring:excavator_strike",
+                            "outputType": "consumable",
+                            "count": 1,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:archaeologist",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_artifact",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:archaeologist",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_artifact",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:archaeologist",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_artifact",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:archaeologist",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_artifact",
+                                            "count": 2
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "craft_stone_skin",
+                            "consumable": "adventuring:stone_skin",
+                            "outputType": "consumable",
+                            "count": 1,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:archaeologist",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_artifact",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:archaeologist",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_artifact",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:archaeologist",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_artifact",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:archaeologist",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_artifact",
+                                            "count": 2
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "craft_artifact_of_immortality",
+                            "consumable": "adventuring:artifact_of_immortality",
+                            "outputType": "consumable",
+                            "count": 1,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:archaeologist",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_artifact",
+                                            "count": 4
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:archaeologist",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_artifact",
+                                            "count": 4
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:archaeologist",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_artifact",
+                                            "count": 4
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:archaeologist",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_artifact",
+                                            "count": 4
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "tiles": [
+                        {
+                            "id": "dig_site",
+                            "name": "Dig Site",
+                            "media": "melvor:assets/media/skills/archaeology/archaeology.svg",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:archaeologist",
+                                    "level": 1
+                                }
+                            ],
+                            "weight": 10,
+                            "floor_max": 1,
+                            "dungeon_max": 1,
+                            "effects": [
+                                {
+                                    "type": "xp",
+                                    "amount": 30,
+                                    "job": "adventuring:archaeologist"
+                                },
+                                {
+                                    "type": "loot",
+                                    "pool": [
+                                        {
+                                            "id": "adventuring:crude_artifact",
+                                            "qty": 1,
+                                            "weight": 100
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "excavation_pit",
+                            "name": "Excavation Pit",
+                            "media": "melvor:assets/media/skills/archaeology/archaeology.svg",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:archaeologist",
+                                    "level": 25
+                                }
+                            ],
+                            "weight": 8,
+                            "floor_max": 1,
+                            "dungeon_max": 2,
+                            "effects": [
+                                {
+                                    "type": "xp",
+                                    "amount": 75,
+                                    "job": "adventuring:archaeologist"
+                                },
+                                {
+                                    "type": "loot",
+                                    "pool": [
+                                        {
+                                            "id": "adventuring:crude_artifact",
+                                            "qty": 2,
+                                            "weight": 60
+                                        },
+                                        {
+                                            "id": "adventuring:refined_artifact",
+                                            "qty": 1,
+                                            "weight": 40
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "ancient_ruins",
+                            "name": "Ancient Ruins",
+                            "media": "melvor:assets/media/skills/archaeology/archaeology.svg",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:archaeologist",
+                                    "level": 50
+                                }
+                            ],
+                            "weight": 5,
+                            "floor_max": 1,
+                            "dungeon_max": 2,
+                            "effects": [
+                                {
+                                    "type": "xp",
+                                    "amount": 150,
+                                    "job": "adventuring:archaeologist"
+                                },
+                                {
+                                    "type": "loot",
+                                    "pool": [
+                                        {
+                                            "id": "adventuring:crude_artifact",
+                                            "qty": 1,
+                                            "weight": 30
+                                        },
+                                        {
+                                            "id": "adventuring:refined_artifact",
+                                            "qty": 1,
+                                            "weight": 45
+                                        },
+                                        {
+                                            "id": "adventuring:immaculate_artifact",
+                                            "qty": 1,
+                                            "weight": 25
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "lost_civilization",
+                            "name": "Lost Civilization",
+                            "media": "melvor:assets/media/skills/archaeology/archaeology.svg",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:archaeologist",
+                                    "level": 75
+                                }
+                            ],
+                            "weight": 3,
+                            "floor_max": 1,
+                            "dungeon_max": 2,
+                            "effects": [
+                                {
+                                    "type": "xp",
+                                    "amount": 300,
+                                    "job": "adventuring:archaeologist"
+                                },
+                                {
+                                    "type": "loot",
+                                    "pool": [
+                                        {
+                                            "id": "adventuring:crude_artifact",
+                                            "qty": 1,
+                                            "weight": 15
+                                        },
+                                        {
+                                            "id": "adventuring:refined_artifact",
+                                            "qty": 1,
+                                            "weight": 30
+                                        },
+                                        {
+                                            "id": "adventuring:immaculate_artifact",
+                                            "qty": 1,
+                                            "weight": 35
+                                        },
+                                        {
+                                            "id": "adventuring:transcendent_artifact",
+                                            "qty": 1,
+                                            "weight": 20
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "consumableTypes": [
+                        {
+                            "id": "confident_scholar",
+                            "name": "Confident Scholar",
+                            "media": "melvor:assets/media/bank/ring_gold_topaz.png",
+                            "type": "relic",
+                            "sourceJob": "adventuring:archaeologist",
+                            "maxCharges": 3,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "nameSuffix": "I",
+                                    "media": "melvor:assets/media/bank/ring_gold_topaz.png",
+                                    "flavorText": "Strike with certainty while unharmed.",
+                                    "effects": [
+                                        {
+                                            "type": "increase_damage_percent",
+                                            "trigger": "before_damage_dealt",
+                                            "condition": {
+                                                "type": "hp_above",
+                                                "threshold": 80
+                                            },
+                                            "amount": 20,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:ancient_coin",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "nameSuffix": "II",
+                                    "media": "melvor:assets/media/bank/big_bones.png",
+                                    "flavorText": "Ancient knowledge empowers the prepared.",
+                                    "effects": [
+                                        {
+                                            "type": "increase_damage_percent",
+                                            "trigger": "before_damage_dealt",
+                                            "condition": {
+                                                "type": "hp_above",
+                                                "threshold": 80
+                                            },
+                                            "amount": 35,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:fossil_fragment",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "nameSuffix": "III",
+                                    "media": "melvor:assets/media/bank/ancient_claw_fragment.png",
+                                    "flavorText": "Relic wisdom guides devastating blows.",
+                                    "effects": [
+                                        {
+                                            "type": "increase_damage_percent",
+                                            "trigger": "before_damage_dealt",
+                                            "condition": {
+                                                "type": "hp_above",
+                                                "threshold": 80
+                                            },
+                                            "amount": 55,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:relic_shard",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "nameSuffix": "IV",
+                                    "media": "melvor:assets/media/bank/prayer_scroll.png#shade=purple",
+                                    "flavorText": "Ancient mastery unleashes unstoppable power.",
+                                    "effects": [
+                                        {
+                                            "type": "increase_damage_percent",
+                                            "trigger": "before_damage_dealt",
+                                            "condition": {
+                                                "type": "hp_above",
+                                                "threshold": 80
+                                            },
+                                            "amount": 80,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:ancient_tome",
+                                            "count": 2
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "ancient_blessings",
+                            "name": "Ancient Blessings",
+                            "media": "melvor:assets/media/bank/ring_gold_topaz.png#shade=green",
+                            "type": "relic",
+                            "sourceJob": "adventuring:archaeologist",
+                            "maxCharges": 3,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "nameSuffix": "I",
+                                    "media": "melvor:assets/media/bank/ring_gold_topaz.png#shade=green",
+                                    "flavorText": "Slaying enemies bestows ancient blessings.",
+                                    "effects": [
+                                        {
+                                            "type": "random_buffs",
+                                            "trigger": "on_kill",
+                                            "count": 1,
+                                            "stacks": 3,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:ancient_coin",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "nameSuffix": "II",
+                                    "media": "melvor:assets/media/bank/big_bones.png#shade=green",
+                                    "flavorText": "Slaying enemies channels spirits of the past.",
+                                    "effects": [
+                                        {
+                                            "type": "random_buffs",
+                                            "trigger": "on_kill",
+                                            "count": 1,
+                                            "stacks": 5,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:fossil_fragment",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "nameSuffix": "III",
+                                    "media": "melvor:assets/media/bank/ancient_claw_fragment.png#shade=green",
+                                    "flavorText": "Slaying enemies grants multiple blessings.",
+                                    "effects": [
+                                        {
+                                            "type": "random_buffs",
+                                            "trigger": "on_kill",
+                                            "count": 2,
+                                            "stacks": 4,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:relic_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "nameSuffix": "IV",
+                                    "media": "melvor:assets/media/bank/prayer_scroll.png#shade=gold",
+                                    "flavorText": "Slaying enemies grants legendary blessings.",
+                                    "effects": [
+                                        {
+                                            "type": "random_buffs",
+                                            "trigger": "on_kill",
+                                            "count": 2,
+                                            "stacks": 6,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:ancient_tome",
+                                            "count": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "relic_restoration",
+                            "name": "Relic Restoration",
+                            "media": "melvor:assets/media/bank/ring_gold_topaz.png#shade=cyan",
+                            "type": "relic",
+                            "sourceJob": "adventuring:archaeologist",
+                            "maxCharges": 5,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "nameSuffix": "I",
+                                    "media": "melvor:assets/media/bank/ring_gold_topaz.png#shade=cyan",
+                                    "flavorText": "Critical discoveries heal the body.",
+                                    "effects": [
+                                        {
+                                            "type": "heal",
+                                            "trigger": "on_crit",
+                                            "amount": 8,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:ancient_coin",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "nameSuffix": "II",
+                                    "media": "melvor:assets/media/bank/big_bones.png#shade=cyan",
+                                    "flavorText": "Fossil energy restores vitality on crits.",
+                                    "effects": [
+                                        {
+                                            "type": "heal",
+                                            "trigger": "on_crit",
+                                            "amount": 14,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:fossil_fragment",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "nameSuffix": "III",
+                                    "media": "melvor:assets/media/bank/ancient_claw_fragment.png#shade=cyan",
+                                    "flavorText": "Relic power mends critical wounds.",
+                                    "effects": [
+                                        {
+                                            "type": "heal",
+                                            "trigger": "on_crit",
+                                            "amount": 22,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:relic_shard",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "nameSuffix": "IV",
+                                    "media": "melvor:assets/media/bank/prayer_scroll.png#shade=cyan",
+                                    "flavorText": "Ancient wisdom grants great healing on crits.",
+                                    "effects": [
+                                        {
+                                            "type": "heal",
+                                            "trigger": "on_crit",
+                                            "amount": 35,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:ancient_tome",
+                                            "count": 2
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "warding_relic",
+                            "name": "Warding Relic",
+                            "media": "melvor:assets/media/bank/ring_gold_topaz.png#shade=blue",
+                            "type": "relic",
+                            "sourceJob": "adventuring:archaeologist",
+                            "maxCharges": 3,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "nameSuffix": "I",
+                                    "media": "melvor:assets/media/bank/ring_gold_topaz.png#shade=blue",
+                                    "flavorText": "Ancient wards deflect curses.",
+                                    "effects": [
+                                        {
+                                            "type": "prevent_debuff",
+                                            "trigger": "before_debuff_received",
+                                            "condition": {
+                                                "type": "chance",
+                                                "value": 25
+                                            },
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:ancient_coin",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "nameSuffix": "II",
+                                    "media": "melvor:assets/media/bank/big_bones.png#shade=blue",
+                                    "flavorText": "Fossilized wards repel afflictions.",
+                                    "effects": [
+                                        {
+                                            "type": "prevent_debuff",
+                                            "trigger": "before_debuff_received",
+                                            "condition": {
+                                                "type": "chance",
+                                                "value": 35
+                                            },
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:fossil_fragment",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "nameSuffix": "III",
+                                    "media": "melvor:assets/media/bank/ancient_claw_fragment.png#shade=blue",
+                                    "flavorText": "Relic protection blocks most debuffs.",
+                                    "effects": [
+                                        {
+                                            "type": "prevent_debuff",
+                                            "trigger": "before_debuff_received",
+                                            "condition": {
+                                                "type": "chance",
+                                                "value": 50
+                                            },
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:relic_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "nameSuffix": "IV",
+                                    "media": "melvor:assets/media/bank/prayer_scroll.png#shade=blue",
+                                    "flavorText": "Ancient tome wards grant near immunity.",
+                                    "effects": [
+                                        {
+                                            "type": "prevent_debuff",
+                                            "trigger": "before_debuff_received",
+                                            "condition": {
+                                                "type": "chance",
+                                                "value": 70
+                                            },
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:ancient_tome",
+                                            "count": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "divine_relic",
+                            "name": "Divine Relic",
+                            "media": "melvor:assets/media/bank/ring_gold_topaz.png#shade=yellow",
+                            "type": "relic",
+                            "sourceJob": "adventuring:archaeologist",
+                            "maxCharges": 3,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "nameSuffix": "I",
+                                    "media": "melvor:assets/media/bank/ring_gold_topaz.png#shade=yellow",
+                                    "flavorText": "Victory invokes divine protection.",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "trigger": "on_kill",
+                                            "id": "adventuring:divine_favor",
+                                            "stacks": 3,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:ancient_coin",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "nameSuffix": "II",
+                                    "media": "melvor:assets/media/bank/big_bones.png#shade=yellow",
+                                    "flavorText": "Fossil spirits bless your triumphs.",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "trigger": "on_kill",
+                                            "id": "adventuring:divine_favor",
+                                            "stacks": 5,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:fossil_fragment",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "nameSuffix": "III",
+                                    "media": "melvor:assets/media/bank/ancient_claw_fragment.png#shade=yellow",
+                                    "flavorText": "Relic power channels divine favor.",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "trigger": "on_kill",
+                                            "id": "adventuring:divine_favor",
+                                            "stacks": 8,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:relic_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "nameSuffix": "IV",
+                                    "media": "melvor:assets/media/bank/prayer_scroll.png#shade=yellow",
+                                    "flavorText": "Ancient tome wisdom grants godlike favor.",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "trigger": "on_kill",
+                                            "id": "adventuring:divine_favor",
+                                            "stacks": 12,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:ancient_tome",
+                                            "count": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "excavator_strike",
+                            "name": "Excavator's Strike",
+                            "media": "melvor:assets/media/bank/ring_gold_topaz.png#shade=red",
+                            "type": "relic",
+                            "sourceJob": "adventuring:archaeologist",
+                            "maxCharges": 3,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "nameSuffix": "I",
+                                    "media": "melvor:assets/media/bank/ring_gold_topaz.png#shade=red",
+                                    "flavorText": "Unearthed power devastates fallen foes.",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "trigger": "on_kill",
+                                            "amount": 15,
+                                            "target": "all_enemies"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:ancient_coin",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "nameSuffix": "II",
+                                    "media": "melvor:assets/media/bank/big_bones.png#shade=red",
+                                    "flavorText": "Fossil shards damage remaining enemies.",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "trigger": "on_kill",
+                                            "amount": 25,
+                                            "target": "all_enemies"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:fossil_fragment",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "nameSuffix": "III",
+                                    "media": "melvor:assets/media/bank/ancient_claw_fragment.png#shade=red",
+                                    "flavorText": "Relic power erupts on victory.",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "trigger": "on_kill",
+                                            "amount": 38,
+                                            "target": "all_enemies"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:relic_shard",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "nameSuffix": "IV",
+                                    "media": "melvor:assets/media/bank/prayer_scroll.png#shade=red",
+                                    "flavorText": "Ancient knowledge unleashes devastating waves.",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "trigger": "on_kill",
+                                            "amount": 55,
+                                            "target": "all_enemies"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:ancient_tome",
+                                            "count": 2
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "stone_skin",
+                            "name": "Stone Skin",
+                            "media": "melvor:assets/media/bank/ring_gold_topaz.png#shade=brown",
+                            "type": "relic",
+                            "sourceJob": "adventuring:archaeologist",
+                            "maxCharges": 5,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "nameSuffix": "I",
+                                    "media": "melvor:assets/media/bank/ring_gold_topaz.png#shade=brown",
+                                    "flavorText": "Ancient coins harden your skin.",
+                                    "effects": [
+                                        {
+                                            "type": "reduce_amount",
+                                            "trigger": "before_damage_received",
+                                            "amount": 3,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:ancient_coin",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "nameSuffix": "II",
+                                    "media": "melvor:assets/media/bank/big_bones.png#shade=brown",
+                                    "flavorText": "Fossilized armor blocks incoming blows.",
+                                    "effects": [
+                                        {
+                                            "type": "reduce_amount",
+                                            "trigger": "before_damage_received",
+                                            "amount": 6,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:fossil_fragment",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "nameSuffix": "III",
+                                    "media": "melvor:assets/media/bank/ancient_claw_fragment.png#shade=brown",
+                                    "flavorText": "Relic power creates stone-like protection.",
+                                    "effects": [
+                                        {
+                                            "type": "reduce_amount",
+                                            "trigger": "before_damage_received",
+                                            "amount": 10,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:relic_shard",
+                                            "count": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "nameSuffix": "IV",
+                                    "media": "melvor:assets/media/bank/prayer_scroll.png#shade=brown",
+                                    "flavorText": "Ancient wisdom grants impenetrable hide.",
+                                    "effects": [
+                                        {
+                                            "type": "reduce_amount",
+                                            "trigger": "before_damage_received",
+                                            "amount": 16,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:ancient_tome",
+                                            "count": 2
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "artifact_of_immortality",
+                            "name": "Artifact of Immortality",
+                            "media": "melvor:assets/media/bank/ring_gold_topaz.png#shade=gold",
+                            "type": "relic",
+                            "sourceJob": "adventuring:archaeologist",
+                            "maxCharges": 1,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "nameSuffix": "I",
+                                    "media": "melvor:assets/media/bank/ring_gold_topaz.png#shade=gold",
+                                    "flavorText": "Ancient coins hold a spark of eternal life.",
+                                    "effects": [
+                                        {
+                                            "type": "prevent_death",
+                                            "trigger": "before_death",
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:ancient_coin",
+                                            "count": 4
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "nameSuffix": "II",
+                                    "media": "melvor:assets/media/bank/big_bones.png#shade=gold",
+                                    "flavorText": "Fossils preserve life from ancient times.",
+                                    "effects": [
+                                        {
+                                            "type": "prevent_death",
+                                            "trigger": "before_death",
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:fossil_fragment",
+                                            "count": 4
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "nameSuffix": "III",
+                                    "media": "melvor:assets/media/bank/ancient_claw_fragment.png#shade=gold",
+                                    "flavorText": "Relics of the immortals deny death.",
+                                    "effects": [
+                                        {
+                                            "type": "prevent_death",
+                                            "trigger": "before_death",
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:relic_shard",
+                                            "count": 4
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "nameSuffix": "IV",
+                                    "media": "melvor:assets/media/bank/prayer_scroll.png#shade=gold",
+                                    "flavorText": "Ancient tome secrets grant true immortality.",
+                                    "effects": [
+                                        {
+                                            "type": "prevent_death",
+                                            "trigger": "before_death",
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:ancient_tome",
+                                            "count": 4
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
             }
-        }]
+        ]
     }
 }

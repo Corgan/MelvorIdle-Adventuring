@@ -1,5 +1,6 @@
 const { loadModule } = mod.getContext(import.meta);
 
+const { sortByAgility, resolveTargets } = await loadModule('src/core/adventuring-utils.mjs');
 const { AdventuringPage } = await loadModule('src/ui/adventuring-page.mjs');
 
 const { AdventuringGenerator } = await loadModule('src/dungeon/adventuring-generator.mjs');
@@ -77,10 +78,7 @@ export class AdventuringEncounter extends AdventuringPage {
     }
 
     startEncounter() {
-        this.currentRoundOrder = [...this.all].filter(c => !c.dead).sort((a,b) => {
-            let agility = this.manager.stats.getObjectByID("adventuring:agility");
-            return b.getEffectiveStat(agility) - a.getEffectiveStat(agility);
-        });
+        this.currentRoundOrder = sortByAgility([...this.all].filter(c => !c.dead), this.manager.stats);
         this.nextRoundOrder = [];
         this.roundCounter = 1;
         this.isFighting = true;
@@ -191,6 +189,121 @@ export class AdventuringEncounter extends AdventuringPage {
         this.updateTurnCards();
     }
 
+    /**
+     * Process damage effect modifiers (miss, dodge, bonus, reduction, crit)
+     * @param {Object} effect - The effect being applied
+     * @param {Object} builtEffect - The built effect with calculated amounts
+     * @param {Object} target - The target character
+     * @returns {Object|null} Modified builtEffect with isCrit flag, or null if skipped
+     */
+    _processDamageEffect(effect, builtEffect, target) {
+        // Check for miss (Blind debuff)
+        let missCheck = this.currentTurn.trigger('before_damage_delivered', { target, ...builtEffect });
+        missCheck = this.currentTurn.trigger('before_damage_dealt', { target, ...missCheck });
+        if(missCheck.missed) {
+            this.manager.log.add(`${this.currentTurn.name}'s attack misses ${target.name}!`);
+            return null;
+        }
+        builtEffect = missCheck;
+        
+        // Check for dodge (Evasion buff)
+        let dodgeCheck = target.trigger('before_damage_received', { attacker: this.currentTurn, ...builtEffect });
+        if(dodgeCheck.dodged) {
+            return null;
+        }
+        builtEffect = dodgeCheck;
+        
+        // Apply damage bonus from passive effects
+        const damageBonus = this.currentTurn.getPassiveBonus('damage_bonus');
+        if(damageBonus > 0) {
+            builtEffect.amount = Math.ceil(builtEffect.amount * (1 + damageBonus / 100));
+        }
+        
+        // Apply damage reduction from target's passive effects
+        const damageReduction = target.getPassiveBonus('damage_reduction');
+        if(damageReduction > 0) {
+            builtEffect.amount = Math.ceil(builtEffect.amount * (1 - damageReduction / 100));
+        }
+        
+        // Critical hit check
+        builtEffect.isCrit = false;
+        const critChance = this.currentTurn.getPassiveBonus('crit_chance');
+        if(critChance > 0 && Math.random() * 100 < critChance) {
+            builtEffect.isCrit = true;
+            const critDamageBonus = this.currentTurn.getPassiveBonus('crit_damage');
+            const critMultiplier = 1.5 + (critDamageBonus / 100);
+            builtEffect.amount = Math.ceil(builtEffect.amount * critMultiplier);
+        }
+        
+        return builtEffect;
+    }
+
+    /**
+     * Process healing effect modifiers
+     * @param {Object} effect - The effect being applied
+     * @param {Object} builtEffect - The built effect with calculated amounts
+     * @param {Object} target - The target character
+     * @returns {Object} Modified builtEffect
+     */
+    _processHealEffect(effect, builtEffect, target) {
+        // Apply healing bonus from caster
+        const healingBonus = this.currentTurn.getPassiveBonus('healing_bonus');
+        if(healingBonus > 0) {
+            builtEffect.amount = Math.ceil(builtEffect.amount * (1 + healingBonus / 100));
+        }
+        
+        // Apply healing received bonus to target
+        const healingReceived = target.getPassiveBonus('healing_received');
+        if(healingReceived > 0) {
+            builtEffect.amount = Math.ceil(builtEffect.amount * (1 + healingReceived / 100));
+        }
+        
+        builtEffect = this.currentTurn.trigger('before_heal_delivered', { target, ...builtEffect });
+        builtEffect = target.trigger('before_heal_received', { attacker: this.currentTurn, ...builtEffect });
+        return builtEffect;
+    }
+
+    /**
+     * Handle post-damage effects (execute, reflect, lifesteal, on_kill)
+     * @param {Object} target - The target that was damaged
+     * @param {number} damageDealt - Amount of damage dealt
+     * @param {Object} builtEffect - The built effect
+     * @param {boolean} isCrit - Whether this was a critical hit
+     */
+    _afterDamageDealt(target, damageDealt, builtEffect, isCrit) {
+        // Trigger on_crit if this was a critical hit
+        if(isCrit) {
+            this.currentTurn.trigger('on_crit', { target, damageDealt });
+        }
+        
+        target.trigger('after_damage_received', { attacker: this.currentTurn, damageReceived: damageDealt, ...builtEffect });
+        
+        // Check execute threshold
+        const executeThreshold = this.currentTurn.getPassiveBonus('execute');
+        if(executeThreshold > 0 && !target.dead && target.hitpointsPercent < executeThreshold) {
+            this.manager.log.add(`${this.currentTurn.name} executes ${target.name}!`);
+            target.hitpoints = 0;
+            target.damage({ amount: 0 }, this.currentTurn);
+        }
+        
+        // Check reflect damage
+        const reflectDamage = target.getPassiveBonus('reflect_damage');
+        if(reflectDamage > 0 && damageDealt > 0) {
+            const reflectAmount = Math.ceil(damageDealt * (reflectDamage / 100));
+            this.currentTurn.damage({ amount: reflectAmount }, target);
+            this.manager.log.add(`${target.name} reflects ${reflectAmount} damage to ${this.currentTurn.name}!`);
+        }
+        
+        // Trigger lifesteal with damage dealt
+        this.currentTurn.trigger('after_damage_delivered', { target, damageDealt, ...builtEffect });
+        this.currentTurn.trigger('after_damage_dealt', { target, damageDealt, ...builtEffect });
+        
+        // Check if target died and trigger on_kill
+        if(target.dead) {
+            this.currentTurn.trigger('on_kill', { target, damageDealt });
+        }
+    }
+
     processTurn() {
         // If timers are paused (e.g., tutorial informational step), restart timer and wait
         if(this.manager.timersPaused) {
@@ -256,42 +369,10 @@ export class AdventuringEncounter extends AdventuringPage {
         }
 
         let targets = [];
-        if(targetType === "none") {
-            targets = [];
-        } else if(targetType === "front") {
-            if(!targetParty.back.dead)
-                targets = [targetParty.back];
-            if(!targetParty.center.dead)
-                targets = [targetParty.center];
-            if(!targetParty.front.dead)
-                targets = [targetParty.front];
-        } else if(targetType === "back") {
-            if(!targetParty.front.dead)
-                targets = [targetParty.front];
-            if(!targetParty.center.dead)
-                targets = [targetParty.center];
-            if(!targetParty.back.dead)
-                targets = [targetParty.back];
-        } else if(targetType === "random") {
-            let potentialTargets = targetParty.all.filter(target => !target.dead);
-            targets = [potentialTargets[Math.floor(Math.random()*potentialTargets.length)]];
-        } else if(targetType === "aoe") {
-            targets = targetParty.all.filter(target => !target.dead);
-        } else if(targetType === "lowest") {
-            let aliveTargets = targetParty.all.filter(target => !target.dead);
-            if (aliveTargets.length > 0) {
-                let potentialTargets = aliveTargets.reduce((lowest, target) => {
-                    if(lowest === undefined || lowest.hitpointsPercent > target.hitpointsPercent)
-                        lowest = target;
-                    return lowest;
-                });
-                targets = [potentialTargets];
-            }
-        } else if(targetType === "self") {
+        if(targetType === "self") {
             targets = [this.currentTurn];
-        } else if(targetType === "dead") {
-            // For revive abilities - find dead allies
-            targets = targetParty.all.filter(target => target.dead);
+        } else {
+            targets = resolveTargets(targetType, targetParty);
         }
 
         // Check for taunt (force_target) - only for enemy targeting
@@ -334,62 +415,12 @@ export class AdventuringEncounter extends AdventuringPage {
 
                         let isCrit = false;
                         
-                        if(effect.type === "damage" || effect.type === "heal") {
-                            if(effect.type === "damage") {
-                                // Check for miss (Blind debuff)
-                                let missCheck = this.currentTurn.trigger('before_damage_delivered', { target: target, ...builtEffect });
-                                // Also trigger before_damage_dealt for consumables that use this naming
-                                missCheck = this.currentTurn.trigger('before_damage_dealt', { target: target, ...missCheck });
-                                if(missCheck.missed) {
-                                    this.manager.log.add(`${this.currentTurn.name}'s attack misses ${target.name}!`);
-                                    return; // Skip this effect
-                                }
-                                builtEffect = missCheck;
-                                
-                                // Check for dodge (Evasion buff)
-                                let dodgeCheck = target.trigger('before_damage_received', { attacker: this.currentTurn, ...builtEffect });
-                                if(dodgeCheck.dodged) {
-                                    return; // Skip this effect
-                                }
-                                builtEffect = dodgeCheck;
-                                
-                                // Apply damage bonus from passive effects
-                                const damageBonus = this.currentTurn.getPassiveBonus('damage_bonus');
-                                if(damageBonus > 0) {
-                                    builtEffect.amount = Math.ceil(builtEffect.amount * (1 + damageBonus / 100));
-                                }
-                                
-                                // Apply damage reduction from target's passive effects
-                                const damageReduction = target.getPassiveBonus('damage_reduction');
-                                if(damageReduction > 0) {
-                                    builtEffect.amount = Math.ceil(builtEffect.amount * (1 - damageReduction / 100));
-                                }
-                                
-                                // Critical hit check
-                                const critChance = this.currentTurn.getPassiveBonus('crit_chance');
-                                if(critChance > 0 && Math.random() * 100 < critChance) {
-                                    isCrit = true;
-                                    // Base crit is 1.5x, plus any crit_damage bonus
-                                    const critDamageBonus = this.currentTurn.getPassiveBonus('crit_damage');
-                                    const critMultiplier = 1.5 + (critDamageBonus / 100);
-                                    builtEffect.amount = Math.ceil(builtEffect.amount * critMultiplier);
-                                }
-                            } else if (effect.type === "heal") {
-                                // Apply healing bonus from caster
-                                const healingBonus = this.currentTurn.getPassiveBonus('healing_bonus');
-                                if(healingBonus > 0) {
-                                    builtEffect.amount = Math.ceil(builtEffect.amount * (1 + healingBonus / 100));
-                                }
-                                
-                                // Apply healing received bonus to target
-                                const healingReceived = target.getPassiveBonus('healing_received');
-                                if(healingReceived > 0) {
-                                    builtEffect.amount = Math.ceil(builtEffect.amount * (1 + healingReceived / 100));
-                                }
-                                
-                                builtEffect = this.currentTurn.trigger('before_heal_delivered', { target: target, ...builtEffect });
-                                builtEffect = target.trigger('before_heal_received', { attacker: this.currentTurn, ...builtEffect });
-                            }
+                        if(effect.type === "damage") {
+                            builtEffect = this._processDamageEffect(effect, builtEffect, target);
+                            if(!builtEffect) return; // Skipped (miss/dodge)
+                            isCrit = builtEffect.isCrit;
+                        } else if(effect.type === "heal") {
+                            builtEffect = this._processHealEffect(effect, builtEffect, target);
                         }
 
                         // Track damage for lifesteal
@@ -402,44 +433,11 @@ export class AdventuringEncounter extends AdventuringPage {
                         
                         target.applyEffect(effect, builtEffect, this.currentTurn);
                         
-                        if(effect.type === "damage" || effect.type === "heal") {
-                            if(effect.type === "damage") {
-                                // Trigger on_crit if this was a critical hit
-                                if(isCrit) {
-                                    this.currentTurn.trigger('on_crit', { target: target, damageDealt: damageDealt });
-                                }
-                                
-                                builtEffect = target.trigger('after_damage_received', { attacker: this.currentTurn, damageReceived: damageDealt, ...builtEffect });
-                                
-                                // Check execute threshold
-                                const executeThreshold = this.currentTurn.getPassiveBonus('execute');
-                                if(executeThreshold > 0 && !target.dead && target.hitpointsPercent < executeThreshold) {
-                                    this.manager.log.add(`${this.currentTurn.name} executes ${target.name}!`);
-                                    target.hitpoints = 0;
-                                    target.damage({ amount: 0 }, this.currentTurn); // Trigger death
-                                }
-                                
-                                // Check reflect damage
-                                const reflectDamage = target.getPassiveBonus('reflect_damage');
-                                if(reflectDamage > 0 && damageDealt > 0) {
-                                    const reflectAmount = Math.ceil(damageDealt * (reflectDamage / 100));
-                                    this.currentTurn.damage({ amount: reflectAmount }, target);
-                                    this.manager.log.add(`${target.name} reflects ${reflectAmount} damage to ${this.currentTurn.name}!`);
-                                }
-                                
-                                // Trigger lifesteal with damage dealt
-                                builtEffect = this.currentTurn.trigger('after_damage_delivered', { target: target, damageDealt: damageDealt, ...builtEffect });
-                                // Also trigger after_damage_dealt for consumables that use this naming
-                                builtEffect = this.currentTurn.trigger('after_damage_dealt', { target: target, damageDealt: damageDealt, ...builtEffect });
-                                
-                                // Check if target died and trigger on_kill
-                                if(target.dead) {
-                                    this.currentTurn.trigger('on_kill', { target: target, damageDealt: damageDealt });
-                                }
-                            } else if (effect.type === "heal") {
-                                builtEffect = target.trigger('after_heal_received', { attacker: this.currentTurn, ...builtEffect });
-                                builtEffect = this.currentTurn.trigger('after_heal_delivered', { target: target, ...builtEffect });
-                            }
+                        if(effect.type === "damage") {
+                            this._afterDamageDealt(target, damageDealt, builtEffect, isCrit);
+                        } else if(effect.type === "heal") {
+                            target.trigger('after_heal_received', { attacker: this.currentTurn, ...builtEffect });
+                            this.currentTurn.trigger('after_heal_delivered', { target, ...builtEffect });
                         }
                     });
 
@@ -531,10 +529,7 @@ export class AdventuringEncounter extends AdventuringPage {
         let resolvedEffects = this.currentTurn.trigger('turn_end');
 
         this.nextRoundOrder.push(this.currentTurn);
-        this.nextRoundOrder.sort((a,b) => {
-            let agility = this.manager.stats.getObjectByID("adventuring:agility");
-            return b.getEffectiveStat(agility) - a.getEffectiveStat(agility);
-        });
+        this.nextRoundOrder = sortByAgility(this.nextRoundOrder, this.manager.stats);
 
         this.removeDead();
 
@@ -640,18 +635,18 @@ export class AdventuringEncounter extends AdventuringPage {
 
     // Apply passives from character's combatJob and passiveJob
     applyJobPassives(character, triggerType) {
-        // Get passives from combatJob
+        // Get passives from combatJob (use cached lookup)
         if(character.combatJob !== undefined) {
-            this.manager.passives.allObjects.forEach(passive => {
-                if(passive.canEquip(character) && passive.unlockedBy(character.combatJob)) {
+            this.manager.getPassivesForJob(character.combatJob).forEach(passive => {
+                if(passive.canEquip(character)) {
                     passive.apply(character, triggerType, this);
                 }
             });
         }
         // Get passives from passiveJob (if it's a combat job with passives)
         if(character.passiveJob !== undefined && character.passiveJob !== character.combatJob) {
-            this.manager.passives.allObjects.forEach(passive => {
-                if(passive.canEquip(character) && passive.unlockedBy(character.passiveJob)) {
+            this.manager.getPassivesForJob(character.passiveJob).forEach(passive => {
+                if(passive.canEquip(character)) {
                     passive.apply(character, triggerType, this);
                 }
             });

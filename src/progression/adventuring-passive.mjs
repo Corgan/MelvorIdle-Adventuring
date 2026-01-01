@@ -1,7 +1,7 @@
 const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringScalableEffect } = await loadModule('src/combat/adventuring-scalable-effect.mjs');
-const { RequirementsChecker, parseDescription, buildEffectReplacements, describeEffectFull } = await loadModule('src/core/adventuring-utils.mjs');
+const { RequirementsChecker, parseDescription, buildEffectReplacements, describeEffectFull, getAuraName } = await loadModule('src/core/adventuring-utils.mjs');
 
 class AdventuringPassiveEffect extends AdventuringScalableEffect {
     constructor(manager, game, passive, data) {
@@ -55,19 +55,20 @@ export class AdventuringPassive extends NamespacedObject {
             return desc;
         }
         
-        // Auto-generate from effects - use 'multiplier' mode for job overview display
+        // Auto-generate from effects - use 'total' mode for passive badge display
         const effectDescs = this.effects.map(effect => {
             const effectObj = {
                 type: effect.type,
                 trigger: effect.trigger || 'passive',
-                value: effect.getAmount ? effect.getAmount(character?.stats, 'multiplier') : (effect.amount?.base || effect.amount || 0),
-                stacks: effect.getStacks ? effect.getStacks(character?.stats, 'multiplier') : (effect.stacks?.base || effect.stacks || 0),
+                value: effect.getAmount ? effect.getAmount(character?.stats, 'total') : (effect.amount?.base || effect.amount || 0),
+                stacks: effect.getStacks ? effect.getStacks(character?.stats, 'total') : (effect.stacks?.base || effect.stacks || 0),
                 id: effect.id,
                 target: effect.target,
+                party: effect.party,
                 condition: effect.condition,
                 chance: effect.chance
             };
-            return describeEffectFull(effectObj, this.manager, { displayMode: 'multiplier' });
+            return describeEffectFull(effectObj, this.manager, { displayMode: 'total' });
         });
         
         let generated = effectDescs.join('. ');
@@ -98,10 +99,10 @@ export class AdventuringPassive extends NamespacedObject {
                     
                 if(effect.type === "buff") {
                     target.buff(effect.id, builtEffect, character);
-                    this.manager.log.add(`${character.name}'s ${this.name} applies ${this.manager.auras.getObjectByID(effect.id)?.name || effect.id} to ${target.name}`);
+                    this.manager.log.add(`${character.name}'s ${this.name} applies ${getAuraName(this.manager, effect.id)} to ${target.name}`);
                 } else if(effect.type === "debuff") {
                     target.debuff(effect.id, builtEffect, character);
-                    this.manager.log.add(`${character.name}'s ${this.name} applies ${this.manager.auras.getObjectByID(effect.id)?.name || effect.id} to ${target.name}`);
+                    this.manager.log.add(`${character.name}'s ${this.name} applies ${getAuraName(this.manager, effect.id)} to ${target.name}`);
                 } else if(effect.type === "heal") {
                     target.heal(builtEffect, character);
                     this.manager.log.add(`${character.name}'s ${this.name} heals ${target.name} for ${builtEffect.amount}`);

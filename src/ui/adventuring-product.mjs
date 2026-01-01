@@ -171,6 +171,12 @@ export class AdventuringProduct extends NamespacedObject {
             this.manager.stash.add(tierData.outputMaterial, count);
         }
         
+        // For material outputs, add directly to stash
+        if (this.outputType === 'material' && this.output) {
+            this.manager.stash.add(this.output, count);
+        }
+        
+        // For item outputs, return data for workshop to handle (ship to bank)
         return { 
             output: this.outputType === 'conversion' ? tierData.outputMaterial : this.output,
             outputType: this.outputType,

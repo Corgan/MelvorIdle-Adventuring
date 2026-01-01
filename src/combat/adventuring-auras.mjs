@@ -18,6 +18,11 @@ export class AdventuringAuras {
         this.character = character;
 
         this.auras = new Set();
+        
+        // Map for O(1) lookup of aura instances by base aura
+        // Maps: aura.id -> Map(source -> instance) for bySource mode
+        //       or aura.id -> instance for stack/refresh modes
+        this.aurasByBase = new Map();
 
         this.effectByType = new Map();
 
@@ -105,6 +110,7 @@ export class AdventuringAuras {
         for(let aura of auras) {
             if(aura.stacks === 0) {
                 // stacks is already 0, so disconnectedCallback will destroy the tooltip
+                this._removeFromCache(aura.base, aura.source);
                 this.auras.delete(aura);
             }
         }
@@ -116,6 +122,7 @@ export class AdventuringAuras {
             aura.stacks = 0;
         }
         this.auras.clear();
+        this.aurasByBase.clear();
         this.effectByType.clear();
         this.renderQueue.auras = true;
         
@@ -170,6 +177,9 @@ export class AdventuringAuras {
             let instance = new AdventuringAuraInstance(this.manager, this.game, this, source);
             this.auras.add(instance);
             instance.setAura(aura, stacks);
+            
+            // Add to aurasByBase cache
+            this._addToCache(aura, instance, source);
         } else {
             // Update existing instance based on combineMode
             let newStacks = existing.stacks;
@@ -196,15 +206,49 @@ export class AdventuringAuras {
             this.character.invalidateEffects('auras');
         }
     }
+    
+    /**
+     * Add an instance to the aurasByBase cache
+     */
+    _addToCache(aura, instance, source) {
+        if (!this.aurasByBase.has(aura.id)) {
+            this.aurasByBase.set(aura.id, new Map());
+        }
+        const sourceKey = source ?? '_default';
+        this.aurasByBase.get(aura.id).set(sourceKey, instance);
+    }
+    
+    /**
+     * Remove an instance from the aurasByBase cache
+     */
+    _removeFromCache(aura, source) {
+        if (!aura || !this.aurasByBase.has(aura.id)) return;
+        const sourceKey = source ?? '_default';
+        const instances = this.aurasByBase.get(aura.id);
+        instances.delete(sourceKey);
+        if (instances.size === 0) {
+            this.aurasByBase.delete(aura.id);
+        }
+    }
 
     get(aura, source) {
         if(typeof aura === "string") 
             aura = this.manager.auras.getObjectByID(aura);
         
-        for(let auraInstance of this.auras.values()) {
-            if(auraInstance.base === aura && (source === undefined || source === auraInstance.source))
-                return auraInstance;
+        if (!aura) return undefined;
+        
+        // Use cache for O(1) lookup
+        const instances = this.aurasByBase.get(aura.id);
+        if (!instances) return undefined;
+        
+        if (source !== undefined) {
+            return instances.get(source);
         }
+        // If no source specified, return first matching instance
+        for (const instance of instances.values()) {
+            if (instance.base === aura) return instance;
+        }
+        return undefined;
     }
 
     onLoad() {

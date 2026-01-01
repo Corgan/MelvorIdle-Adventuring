@@ -75,5 +75,10 @@ export class AdventuringCharacterElement extends HTMLElement {
         this.combatJob.setSkill(skill);
         this.passiveJob.setSkill(skill);
     }
+
+    setCharacter(character) {
+        this.generator.setCharacter(character);
+        this.spender.setCharacter(character);
+    }
 }
 window.customElements.define('adventuring-character', AdventuringCharacterElement);

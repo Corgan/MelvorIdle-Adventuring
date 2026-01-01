@@ -173,11 +173,13 @@ export class AdventuringAbility extends NamespacedObject {
         // Auto-generate from hit effects
         const effectDescs = [];
         this.hits.forEach((hit, hitIndex) => {
+            // Group effects from the same hit together with "and"
+            const hitEffectDescs = [];
             hit.effects.forEach(effect => {
                 // Build a simplified effect object for description
                 const effectObj = {
                     type: effect.type,
-                    trigger: effect.trigger || 'on_hit',
+                    trigger: effect.trigger || 'on_use',
                     value: effect.getAmount ? effect.getAmount(stats, displayMode) : (effect.amount?.base || effect.amount || 0),
                     stacks: effect.getStacks ? effect.getStacks(stats, displayMode) : (effect.stacks?.base || effect.stacks || 0),
                     id: effect.id,
@@ -186,8 +188,13 @@ export class AdventuringAbility extends NamespacedObject {
                     condition: effect.condition,
                     chance: effect.chance
                 };
-                effectDescs.push(describeEffectFull(effectObj, this.manager, { displayMode }));
+                // Abilities don't need trigger suffixes - they're always "on use"
+                hitEffectDescs.push(describeEffectFull(effectObj, this.manager, { displayMode, includeTrigger: false }));
             });
+            // Join effects within same hit with " and "
+            if(hitEffectDescs.length > 0) {
+                effectDescs.push(hitEffectDescs.join(' and '));
+            }
         });
         
         let generated = effectDescs.join('. ');

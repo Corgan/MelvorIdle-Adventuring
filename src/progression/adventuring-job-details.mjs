@@ -112,7 +112,8 @@ export class AdventuringJobDetails extends AdventuringPage {
             manager: this.manager,
             type,
             showUnlockLevel: true,
-            masteryAction: this.job
+            masteryAction: this.job,
+            displayMode: 'multiplier'
         }).build();
     }
 
@@ -156,8 +157,7 @@ export class AdventuringJobDetails extends AdventuringPage {
             const spenders = this.manager.spenders.allObjects
                 .filter(s => s.unlockedBy(this.job))
                 .map(a => ({ ability: a, type: 'spender' }));
-            const passives = this.manager.passives.allObjects
-                .filter(p => p.unlockedBy(this.job))
+            const passives = this.manager.getPassivesForJob(this.job)
                 .map(a => ({ ability: a, type: 'passive' }));
             
             // Combine and sort by unlock level

@@ -2,324 +2,2317 @@
     "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
     "namespace": "adventuring",
     "data": {
-        "skillData": [{
-            "skillID": "adventuring:Adventuring",
-            "data": {
-                "stats": [
-                    {
-                        "id": "summoning",
-                        "name": "Summoning",
-                        "media": "melvor:assets/media/skills/summoning/summoning.svg"
-                    }
-                ],
-                "jobs": [
-                    {
-                        "id": "summoner",
-                        "name": "Summoner",
-                        "media": "melvor:assets/media/skills/summoning/summoning.svg",
-                        "requirements": [
-                            { "type": "skill_level", "level": 10 }
-                        ],
-                        "isMilestoneReward": true,
-                        "isPassive": true,
-                        "scaling": [
-                            { "id": "adventuring:summoning", "value": 1 }
-                        ]
-                    }
-                ],
-                "materials": [
-                    {
-                        "id": "crude_shard",
-                        "name": "Crude Shard",
-                        "media": "melvor:assets/media/skills/summoning/summoning.svg",
-                        "category": "adventuring:salvage"
-                    },
-                    {
-                        "id": "refined_shard",
-                        "name": "Refined Shard",
-                        "media": "melvor:assets/media/bank/summoning_shard_silver.png",
-                        "tier": 2,
-                        "category": "adventuring:salvage",
-                        "requirements": [
-                            { "type": "job_level", "job": "adventuring:master_summoner", "level": 1 }
-                        ]
-                    },
-                    {
-                        "id": "immaculate_shard",
-                        "name": "Immaculate Shard",
-                        "media": "melvor:assets/media/bank/summoning_shard_gold.png",
-                        "tier": 3,
-                        "category": "adventuring:salvage",
-                        "requirements": [
-                            { "type": "job_level", "job": "adventuring:grandmaster_summoner", "level": 1 }
-                        ]
-                    },
-                    {
-                        "id": "transcendent_shard",
-                        "name": "Transcendent Shard",
-                        "media": "melvor:assets/media/bank/logs_elderwood.png",
-                        "tier": 4,
-                        "category": "adventuring:salvage",
-                        "requirements": [
-                            { "type": "job_level", "job": "adventuring:legendary_summoner", "level": 1 }
-                        ]
-                    }
-                ],
-                "buildings": [
-                    {
-                        "id": "spirit_shrine",
-                        "type": "workshop",
-                        "name": "Spirit Shrine",
-                        "description": "Commune with elemental spirits. Summoners gather shards and create protective wards.",
-                        "media": "melvor:assets/media/skills/township/Chapel.png",
-                        "requirements": [],
-                        "idle": ["Drawing runes", "Communing with spirits"],
-                        "actions": ["adventuring:work"],
-                        "products": [
-                            "adventuring:air_shard",
-                            "adventuring:water_shard",
-                            "adventuring:earth_shard",
-                            "adventuring:fire_shard",
-                            "adventuring:spirit_bond_tonic",
-                            "adventuring:ethereal_ward"
-                        ]
-                    }
-                ],
-                "products": [
-                    {
-                        "id": "air_shard",
-                        "item": "melvorF:Air_Shard",
-                        "outputType": "item",
-                        "count": 5,
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:summoner", "level": 1 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:crude_shard", "count": 1 }
-                        ]
-                    },
-                    {
-                        "id": "water_shard",
-                        "item": "melvorF:Water_Shard",
-                        "outputType": "item",
-                        "count": 5,
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:summoner", "level": 10 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:crude_shard", "count": 1 }
-                        ]
-                    },
-                    {
-                        "id": "earth_shard",
-                        "item": "melvorF:Earth_Shard",
-                        "outputType": "item",
-                        "count": 5,
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:summoner", "level": 20 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:crude_shard", "count": 1 }
-                        ]
-                    },
-                    {
-                        "id": "fire_shard",
-                        "item": "melvorF:Fire_Shard",
-                        "outputType": "item",
-                        "count": 5,
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:summoner", "level": 30 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:crude_shard", "count": 1 }
-                        ]
-                    },
-                    {
-                        "id": "spirit_bond_tonic",
-                        "consumable": "adventuring:spirit_bond_tonic",
-                        "outputType": "consumable",
-                        "count": 1,
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:summoner", "level": 15 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:crude_shard", "count": 2 }
-                        ]
-                    },
-                    {
-                        "id": "ethereal_ward",
-                        "consumable": "adventuring:ethereal_ward",
-                        "outputType": "consumable",
-                        "count": 1,
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:summoner", "level": 25 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:crude_shard", "count": 3 }
-                        ]
-                    },
-                    {
-                        "id": "convert_crude_shard_to_refined",
-                        "material": "adventuring:refined_shard",
-                        "outputType": "material",
-                        "count": 1,
-                        "requirements": [
-                            { "type": "job_level", "job": "adventuring:master_summoner", "level": 10 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:crude_shard", "count": 5 }
-                        ]
-                    },
-                    {
-                        "id": "convert_refined_shard_to_immaculate",
-                        "material": "adventuring:immaculate_shard",
-                        "outputType": "material",
-                        "count": 1,
-                        "requirements": [
-                            { "type": "job_level", "job": "adventuring:grandmaster_summoner", "level": 10 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:refined_shard", "count": 5 }
-                        ]
-                    },
-                    {
-                        "id": "convert_immaculate_shard_to_transcendent",
-                        "material": "adventuring:transcendent_shard",
-                        "outputType": "material",
-                        "count": 1,
-                        "requirements": [
-                            { "type": "job_level", "job": "adventuring:legendary_summoner", "level": 10 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:immaculate_shard", "count": 5 }
-                        ]
-                    },
-                    {
-                        "id": "refined_fire_shard",
-                        "item": "melvorF:Fire_Shard",
-                        "outputType": "item",
-                        "count": 5,
-                        "requirements": [
-                            { "type": "skill_level", "level": 25 },
-                            { "type": "current_job_level", "job": "adventuring:master_summoner", "level": 1 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:refined_shard", "count": 1 }
-                        ]
-                    },
-                    {
-                        "id": "refined_water_shard",
-                        "item": "melvorF:Water_Shard",
-                        "outputType": "item",
-                        "count": 5,
-                        "requirements": [
-                            { "type": "skill_level", "level": 25 },
-                            { "type": "current_job_level", "job": "adventuring:master_summoner", "level": 10 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:refined_shard", "count": 1 }
-                        ]
-                    },
-                    {
-                        "id": "refined_air_shard",
-                        "item": "melvorF:Air_Shard",
-                        "outputType": "item",
-                        "count": 5,
-                        "requirements": [
-                            { "type": "skill_level", "level": 25 },
-                            { "type": "current_job_level", "job": "adventuring:master_summoner", "level": 20 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:refined_shard", "count": 1 }
-                        ]
-                    },
-                    {
-                        "id": "refined_earth_shard",
-                        "item": "melvorF:Earth_Shard",
-                        "outputType": "item",
-                        "count": 5,
-                        "requirements": [
-                            { "type": "skill_level", "level": 25 },
-                            { "type": "current_job_level", "job": "adventuring:master_summoner", "level": 30 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:refined_shard", "count": 1 }
-                        ]
-                    },
-                    {
-                        "id": "immaculate_summoning_shard",
-                        "item": "melvorF:Summoning_Shard_Red",
-                        "outputType": "item",
-                        "count": 10,
-                        "requirements": [
-                            { "type": "skill_level", "level": 50 },
-                            { "type": "current_job_level", "job": "adventuring:grandmaster_summoner", "level": 1 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:immaculate_shard", "count": 1 }
-                        ]
-                    },
-                    {
-                        "id": "transcendent_summoning_shard",
-                        "item": "melvorF:Summoning_Shard_Black",
-                        "outputType": "item",
-                        "count": 25,
-                        "requirements": [
-                            { "type": "skill_level", "level": 75 },
-                            { "type": "current_job_level", "job": "adventuring:legendary_summoner", "level": 1 }
-                        ],
-                        "materials": [
-                            { "id": "adventuring:transcendent_shard", "count": 1 }
-                        ]
-                    }
-                ],
-                "tiles": [
-                    {
-                        "id": "spirit_portal",
-                        "name": "Spirit Portal",
-                        "media": "melvor:assets/media/skills/summoning/summoning.svg",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:summoner", "level": 1 }
-                        ],
-                        "weight": 10,
-                        "floor_max": 1,
-                        "dungeon_max": 1,
-                        "effects": [
-                            { "type": "xp", "amount": 30, "job": "adventuring:summoner" },
-                            {
-                                "type": "loot",
-                                "pool": [
-                                    { "id": "adventuring:crude_shard", "qty": 1, "weight": 100 }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "summoning_circle",
-                        "name": "Summoning Circle",
-                        "media": "melvor:assets/media/skills/summoning/summoning.svg",
-                        "requirements": [
-                            { "type": "job_level", "job": "adventuring:master_summoner", "level": 1 }
-                        ],
-                        "weight": 8,
-                        "floor_max": 1,
-                        "dungeon_max": 2,
-                        "effects": [
-                            { "type": "xp", "amount": 100, "job": "adventuring:summoner" },
-                            { "type": "xp", "amount": 50, "job": "adventuring:master_summoner" },
-                            {
-                                "type": "loot",
-                                "pool": [
-                                    { "id": "adventuring:crude_shard", "qty": 3, "weight": 60 },
-                                    { "id": "adventuring:refined_shard", "qty": 2, "weight": 35 },
-                                    { "id": "adventuring:immaculate_shard", "qty": 1, "weight": 5 }
-                                ]
-                            }
-                        ]
-                    }
-                ]
+        "skillData": [
+            {
+                "skillID": "adventuring:Adventuring",
+                "data": {
+                    "stats": [
+                        {
+                            "id": "summoning",
+                            "name": "Summoning",
+                            "media": "melvor:assets/media/skills/summoning/summoning.svg"
+                        }
+                    ],
+                    "jobs": [
+                        {
+                            "id": "summoner",
+                            "name": "Summoner",
+                            "media": "melvor:assets/media/skills/summoning/summoning.svg",
+                            "requirements": [
+                                {
+                                    "type": "skill_level",
+                                    "level": 10
+                                }
+                            ],
+                            "isMilestoneReward": true,
+                            "isPassive": true,
+                            "scaling": [
+                                {
+                                    "id": "adventuring:summoning",
+                                    "value": 1
+                                }
+                            ]
+                        }
+                    ],
+                    "materials": [
+                        {
+                            "id": "crude_shard",
+                            "name": "Crude Shard",
+                            "media": "melvor:assets/media/skills/summoning/summoning.svg",
+                            "category": "adventuring:salvage"
+                        },
+                        {
+                            "id": "refined_shard",
+                            "name": "Refined Shard",
+                            "media": "melvor:assets/media/bank/summoning_shard_green.png",
+                            "tier": 2,
+                            "category": "adventuring:salvage",
+                            "requirements": [
+                                {
+                                    "type": "job_level",
+                                    "job": "adventuring:summoner",
+                                    "level": 25
+                                }
+                            ]
+                        },
+                        {
+                            "id": "immaculate_shard",
+                            "name": "Immaculate Shard",
+                            "media": "melvor:assets/media/bank/summoning_shard_blue.png",
+                            "tier": 3,
+                            "category": "adventuring:salvage",
+                            "requirements": [
+                                {
+                                    "type": "job_level",
+                                    "job": "adventuring:summoner",
+                                    "level": 50
+                                }
+                            ]
+                        },
+                        {
+                            "id": "transcendent_shard",
+                            "name": "Transcendent Shard",
+                            "media": "melvor:assets/media/bank/summoning_shard_gold.png",
+                            "tier": 4,
+                            "category": "adventuring:salvage",
+                            "requirements": [
+                                {
+                                    "type": "job_level",
+                                    "job": "adventuring:summoner",
+                                    "level": 75
+                                }
+                            ]
+                        },
+                        {
+                            "id": "spirit_fragment",
+                            "name": "Spirit Fragment",
+                            "media": "melvor:assets/media/skills/summoning/summoning.svg",
+                            "category": "adventuring:special"
+                        }
+                    ],
+                    "buildings": [
+                        {
+                            "id": "summoning_circle",
+                            "type": "workshop",
+                            "name": "Summoning Circle",
+                            "description": "Create tablets to summon familiars. Summoners bind creatures to aid in combat.",
+                            "media": "melvor:assets/media/skills/township/Wizards_Tower.png",
+                            "requirements": [],
+                            "idle": [
+                                "Drawing sigils",
+                                "Communing with spirits"
+                            ],
+                            "actions": [
+                                "adventuring:work"
+                            ],
+                            "products": [
+                                "adventuring:shard_green",
+                                "adventuring:shard_blue",
+                                "adventuring:shard_silver",
+                                "adventuring:shard_gold",
+                                "adventuring:shard_black",
+                                "adventuring:craft_spirit_fragment",
+                                "adventuring:convert_crude_to_refined_shard",
+                                "adventuring:convert_refined_to_immaculate_shard",
+                                "adventuring:convert_immaculate_to_transcendent_shard",
+                                "adventuring:convert_transcendent_to_immaculate_shard",
+                                "adventuring:convert_immaculate_to_refined_shard",
+                                "adventuring:convert_refined_to_crude_shard",
+                                "adventuring:craft_spirit_blessing",
+                                "adventuring:craft_spirit_strike",
+                                "adventuring:craft_chaos_spirits",
+                                "adventuring:craft_spirit_communion",
+                                "adventuring:craft_vampiric_spirit",
+                                "adventuring:craft_soul_drain",
+                                "adventuring:craft_summoned_blade",
+                                "adventuring:craft_spirit_tether"
+                            ]
+                        }
+                    ],
+                    "products": [
+                        {
+                            "id": "shard_green",
+                            "item": "melvorF:Summoning_Shard_Green",
+                            "outputType": "item",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 2,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_shard",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 6,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_shard",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 16,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_shard",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 40,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_shard",
+                                            "count": 1
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "shard_blue",
+                            "item": "melvorF:Summoning_Shard_Blue",
+                            "outputType": "item",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 2,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 1
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Summoning",
+                                            "level": 15
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_shard",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 6,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 25
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Summoning",
+                                            "level": 15
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_shard",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 16,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 50
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Summoning",
+                                            "level": 15
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_shard",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 40,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 75
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Summoning",
+                                            "level": 15
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_shard",
+                                            "count": 1
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "shard_silver",
+                            "item": "melvorF:Summoning_Shard_Silver",
+                            "outputType": "item",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 2,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 1
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Summoning",
+                                            "level": 35
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_shard",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 6,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 25
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Summoning",
+                                            "level": 35
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_shard",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 16,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 50
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Summoning",
+                                            "level": 35
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_shard",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 40,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 75
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Summoning",
+                                            "level": 35
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_shard",
+                                            "count": 1
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "shard_gold",
+                            "item": "melvorF:Summoning_Shard_Gold",
+                            "outputType": "item",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 2,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 1
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Summoning",
+                                            "level": 55
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_shard",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 6,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 25
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Summoning",
+                                            "level": 55
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_shard",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 16,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 50
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Summoning",
+                                            "level": 55
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_shard",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 40,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 75
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Summoning",
+                                            "level": 55
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_shard",
+                                            "count": 1
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "shard_black",
+                            "item": "melvorF:Summoning_Shard_Black",
+                            "outputType": "item",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 2,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 1
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Summoning",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_shard",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 6,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 25
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Summoning",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_shard",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 16,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 50
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Summoning",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_shard",
+                                            "count": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 40,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 75
+                                        },
+                                        {
+                                            "type": "melvor_skill_level",
+                                            "skill": "melvorD:Summoning",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_shard",
+                                            "count": 1
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "craft_spirit_fragment",
+                            "material": "adventuring:spirit_fragment",
+                            "outputType": "material",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 2,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 4,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 6,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 8,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "convert_crude_to_refined_shard",
+                            "outputType": "conversion",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "material": "adventuring:refined_shard",
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_shard",
+                                            "count": 5
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "convert_refined_to_immaculate_shard",
+                            "outputType": "conversion",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "material": "adventuring:immaculate_shard",
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_shard",
+                                            "count": 5
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "convert_immaculate_to_transcendent_shard",
+                            "outputType": "conversion",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "material": "adventuring:transcendent_shard",
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_shard",
+                                            "count": 5
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "convert_transcendent_to_immaculate_shard",
+                            "outputType": "conversion",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "material": "adventuring:immaculate_shard",
+                                    "count": 3,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_shard",
+                                            "count": 1
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "convert_immaculate_to_refined_shard",
+                            "outputType": "conversion",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "material": "adventuring:refined_shard",
+                                    "count": 3,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_shard",
+                                            "count": 1
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "convert_refined_to_crude_shard",
+                            "outputType": "conversion",
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "material": "adventuring:crude_shard",
+                                    "count": 3,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_shard",
+                                            "count": 1
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "craft_spirit_blessing",
+                            "consumable": "adventuring:spirit_blessing",
+                            "outputType": "consumable",
+                            "count": 1,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "craft_spirit_strike",
+                            "consumable": "adventuring:spirit_strike",
+                            "outputType": "consumable",
+                            "count": 1,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "craft_chaos_spirits",
+                            "consumable": "adventuring:chaos_spirits",
+                            "outputType": "consumable",
+                            "count": 1,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "craft_spirit_communion",
+                            "consumable": "adventuring:spirit_communion",
+                            "outputType": "consumable",
+                            "count": 1,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "craft_vampiric_spirit",
+                            "consumable": "adventuring:vampiric_spirit",
+                            "outputType": "consumable",
+                            "count": 1,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "craft_soul_drain",
+                            "consumable": "adventuring:soul_drain",
+                            "outputType": "consumable",
+                            "count": 1,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "craft_summoned_blade",
+                            "consumable": "adventuring:summoned_blade",
+                            "outputType": "consumable",
+                            "count": 1,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "craft_spirit_tether",
+                            "consumable": "adventuring:spirit_tether",
+                            "outputType": "consumable",
+                            "count": 1,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_shard",
+                                            "count": 5
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_shard",
+                                            "count": 5
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 50
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_shard",
+                                            "count": 5
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "count": 1,
+                                    "requirements": [
+                                        {
+                                            "type": "current_job_level",
+                                            "job": "adventuring:summoner",
+                                            "level": 75
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_shard",
+                                            "count": 5
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "tiles": [
+                        {
+                            "id": "spirit_circle",
+                            "name": "Spirit Circle",
+                            "media": "melvor:assets/media/skills/summoning/summoning.svg",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:summoner",
+                                    "level": 1
+                                }
+                            ],
+                            "weight": 10,
+                            "floor_max": 1,
+                            "dungeon_max": 1,
+                            "effects": [
+                                {
+                                    "type": "xp",
+                                    "amount": 30,
+                                    "job": "adventuring:summoner"
+                                },
+                                {
+                                    "type": "loot",
+                                    "pool": [
+                                        {
+                                            "id": "adventuring:crude_shard",
+                                            "qty": 1,
+                                            "weight": 100
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "summoning_ring",
+                            "name": "Summoning Ring",
+                            "media": "melvor:assets/media/skills/summoning/summoning.svg",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:summoner",
+                                    "level": 25
+                                }
+                            ],
+                            "weight": 8,
+                            "floor_max": 1,
+                            "dungeon_max": 2,
+                            "effects": [
+                                {
+                                    "type": "xp",
+                                    "amount": 75,
+                                    "job": "adventuring:summoner"
+                                },
+                                {
+                                    "type": "loot",
+                                    "pool": [
+                                        {
+                                            "id": "adventuring:crude_shard",
+                                            "qty": 2,
+                                            "weight": 60
+                                        },
+                                        {
+                                            "id": "adventuring:refined_shard",
+                                            "qty": 1,
+                                            "weight": 40
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "binding_altar",
+                            "name": "Binding Altar",
+                            "media": "melvor:assets/media/skills/summoning/summoning.svg",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:summoner",
+                                    "level": 50
+                                }
+                            ],
+                            "weight": 5,
+                            "floor_max": 1,
+                            "dungeon_max": 2,
+                            "effects": [
+                                {
+                                    "type": "xp",
+                                    "amount": 150,
+                                    "job": "adventuring:summoner"
+                                },
+                                {
+                                    "type": "loot",
+                                    "pool": [
+                                        {
+                                            "id": "adventuring:crude_shard",
+                                            "qty": 1,
+                                            "weight": 30
+                                        },
+                                        {
+                                            "id": "adventuring:refined_shard",
+                                            "qty": 1,
+                                            "weight": 45
+                                        },
+                                        {
+                                            "id": "adventuring:immaculate_shard",
+                                            "qty": 1,
+                                            "weight": 25
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "planar_rift",
+                            "name": "Planar Rift",
+                            "media": "melvor:assets/media/skills/summoning/summoning.svg",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:summoner",
+                                    "level": 75
+                                }
+                            ],
+                            "weight": 3,
+                            "floor_max": 1,
+                            "dungeon_max": 2,
+                            "effects": [
+                                {
+                                    "type": "xp",
+                                    "amount": 300,
+                                    "job": "adventuring:summoner"
+                                },
+                                {
+                                    "type": "loot",
+                                    "pool": [
+                                        {
+                                            "id": "adventuring:crude_shard",
+                                            "qty": 1,
+                                            "weight": 15
+                                        },
+                                        {
+                                            "id": "adventuring:refined_shard",
+                                            "qty": 1,
+                                            "weight": 30
+                                        },
+                                        {
+                                            "id": "adventuring:immaculate_shard",
+                                            "qty": 1,
+                                            "weight": 35
+                                        },
+                                        {
+                                            "id": "adventuring:transcendent_shard",
+                                            "qty": 1,
+                                            "weight": 20
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "consumableTypes": [
+                        {
+                            "id": "spirit_blessing",
+                            "name": "Spirit Blessing",
+                            "media": "melvor:assets/media/bank/soul_rune.png",
+                            "type": "ward",
+                            "sourceJob": "adventuring:summoner",
+                            "maxCharges": 3,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "nameSuffix": "I",
+                                    "media": "melvor:assets/media/bank/soul_rune.png",
+                                    "flavorText": "Critical strikes invoke spirit blessings.",
+                                    "effects": [
+                                        {
+                                            "type": "random_buffs",
+                                            "trigger": "on_crit",
+                                            "count": 1,
+                                            "stacks": 1,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "nameSuffix": "II",
+                                    "media": "melvor:assets/media/bank/soul_rune.png",
+                                    "flavorText": "Critical strikes invoke spirit blessings.",
+                                    "effects": [
+                                        {
+                                            "type": "random_buffs",
+                                            "trigger": "on_crit",
+                                            "count": 1,
+                                            "stacks": 2,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "nameSuffix": "III",
+                                    "media": "melvor:assets/media/bank/soul_rune.png",
+                                    "flavorText": "Critical strikes invoke spirit blessings.",
+                                    "effects": [
+                                        {
+                                            "type": "random_buffs",
+                                            "trigger": "on_crit",
+                                            "count": 2,
+                                            "stacks": 2,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "nameSuffix": "IV",
+                                    "media": "melvor:assets/media/bank/soul_rune.png",
+                                    "flavorText": "Critical strikes invoke spirit blessings.",
+                                    "effects": [
+                                        {
+                                            "type": "random_buffs",
+                                            "trigger": "on_crit",
+                                            "count": 2,
+                                            "stacks": 3,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "spirit_strike",
+                            "name": "Spirit Strike",
+                            "media": "melvor:assets/media/bank/summoning.svg",
+                            "type": "elixir",
+                            "sourceJob": "adventuring:summoner",
+                            "maxCharges": 3,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "nameSuffix": "I",
+                                    "media": "melvor:assets/media/bank/summoning.svg",
+                                    "flavorText": "Spirits strike your foe after you attack.",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "trigger": "after_damage_dealt",
+                                            "amount": 15,
+                                            "target": "enemy"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "nameSuffix": "II",
+                                    "media": "melvor:assets/media/bank/summoning.svg",
+                                    "flavorText": "Spirits strike your foe after you attack.",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "trigger": "after_damage_dealt",
+                                            "amount": 25,
+                                            "target": "enemy"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "nameSuffix": "III",
+                                    "media": "melvor:assets/media/bank/summoning.svg",
+                                    "flavorText": "Spirits strike your foe after you attack.",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "trigger": "after_damage_dealt",
+                                            "amount": 40,
+                                            "target": "enemy"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "nameSuffix": "IV",
+                                    "media": "melvor:assets/media/bank/summoning.svg",
+                                    "flavorText": "Spirits strike your foe after you attack.",
+                                    "effects": [
+                                        {
+                                            "type": "damage",
+                                            "trigger": "after_damage_dealt",
+                                            "amount": 60,
+                                            "target": "enemy"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "chaos_spirits",
+                            "name": "Chaos Spirits",
+                            "media": "melvor:assets/media/bank/chaos_rune.png",
+                            "type": "ward",
+                            "sourceJob": "adventuring:summoner",
+                            "maxCharges": 3,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "nameSuffix": "I",
+                                    "media": "melvor:assets/media/bank/chaos_rune.png",
+                                    "flavorText": "Chaotic spirits curse enemies on critical hits.",
+                                    "effects": [
+                                        {
+                                            "type": "random_debuffs",
+                                            "trigger": "on_crit",
+                                            "count": 1,
+                                            "stacks": 1,
+                                            "target": "enemy"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "nameSuffix": "II",
+                                    "media": "melvor:assets/media/bank/chaos_rune.png",
+                                    "flavorText": "Chaotic spirits curse enemies on critical hits.",
+                                    "effects": [
+                                        {
+                                            "type": "random_debuffs",
+                                            "trigger": "on_crit",
+                                            "count": 1,
+                                            "stacks": 2,
+                                            "target": "enemy"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "nameSuffix": "III",
+                                    "media": "melvor:assets/media/bank/chaos_rune.png",
+                                    "flavorText": "Chaotic spirits curse enemies on critical hits.",
+                                    "effects": [
+                                        {
+                                            "type": "random_debuffs",
+                                            "trigger": "on_crit",
+                                            "count": 2,
+                                            "stacks": 2,
+                                            "target": "enemy"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "nameSuffix": "IV",
+                                    "media": "melvor:assets/media/bank/chaos_rune.png",
+                                    "flavorText": "Chaotic spirits curse enemies on critical hits.",
+                                    "effects": [
+                                        {
+                                            "type": "random_debuffs",
+                                            "trigger": "on_crit",
+                                            "count": 2,
+                                            "stacks": 3,
+                                            "target": "enemy"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "spirit_communion",
+                            "name": "Spirit Communion",
+                            "media": "melvor:assets/media/bank/blood_rune.png",
+                            "type": "gem",
+                            "sourceJob": "adventuring:summoner",
+                            "maxCharges": 3,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "nameSuffix": "I",
+                                    "media": "melvor:assets/media/bank/blood_rune.png",
+                                    "flavorText": "Taking damage calls spirits to heal the party.",
+                                    "effects": [
+                                        {
+                                            "type": "heal_party_percent",
+                                            "trigger": "after_damage_received",
+                                            "amount": 2,
+                                            "target": "party"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "nameSuffix": "II",
+                                    "media": "melvor:assets/media/bank/blood_rune.png",
+                                    "flavorText": "Taking damage calls spirits to heal the party.",
+                                    "effects": [
+                                        {
+                                            "type": "heal_party_percent",
+                                            "trigger": "after_damage_received",
+                                            "amount": 4,
+                                            "target": "party"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "nameSuffix": "III",
+                                    "media": "melvor:assets/media/bank/blood_rune.png",
+                                    "flavorText": "Taking damage calls spirits to heal the party.",
+                                    "effects": [
+                                        {
+                                            "type": "heal_party_percent",
+                                            "trigger": "after_damage_received",
+                                            "amount": 6,
+                                            "target": "party"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "nameSuffix": "IV",
+                                    "media": "melvor:assets/media/bank/blood_rune.png",
+                                    "flavorText": "Taking damage calls spirits to heal the party.",
+                                    "effects": [
+                                        {
+                                            "type": "heal_party_percent",
+                                            "trigger": "after_damage_received",
+                                            "amount": 8,
+                                            "target": "party"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "vampiric_spirit",
+                            "name": "Vampiric Spirit",
+                            "media": "melvor:assets/media/bank/air_rune.png",
+                            "type": "ward",
+                            "sourceJob": "adventuring:summoner",
+                            "maxCharges": 3,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "nameSuffix": "I",
+                                    "media": "melvor:assets/media/bank/air_rune.png",
+                                    "flavorText": "Slaying enemies summons a vampiric spirit.",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "trigger": "on_kill",
+                                            "id": "vampirism",
+                                            "stacks": 1,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "nameSuffix": "II",
+                                    "media": "melvor:assets/media/bank/air_rune.png",
+                                    "flavorText": "Slaying enemies summons a vampiric spirit.",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "trigger": "on_kill",
+                                            "id": "vampirism",
+                                            "stacks": 2,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "nameSuffix": "III",
+                                    "media": "melvor:assets/media/bank/air_rune.png",
+                                    "flavorText": "Slaying enemies summons a vampiric spirit.",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "trigger": "on_kill",
+                                            "id": "vampirism",
+                                            "stacks": 3,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "nameSuffix": "IV",
+                                    "media": "melvor:assets/media/bank/air_rune.png",
+                                    "flavorText": "Slaying enemies summons a vampiric spirit.",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "trigger": "on_kill",
+                                            "id": "vampirism",
+                                            "stacks": 4,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "soul_drain",
+                            "name": "Soul Drain",
+                            "media": "melvor:assets/media/bank/death_rune.png",
+                            "type": "gem",
+                            "sourceJob": "adventuring:summoner",
+                            "maxCharges": 3,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "nameSuffix": "I",
+                                    "media": "melvor:assets/media/bank/death_rune.png",
+                                    "flavorText": "Spirits drain energy from fallen foes.",
+                                    "effects": [
+                                        {
+                                            "type": "energy",
+                                            "trigger": "after_damage_dealt",
+                                            "amount": 1,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "nameSuffix": "II",
+                                    "media": "melvor:assets/media/bank/death_rune.png",
+                                    "flavorText": "Spirits drain energy from fallen foes.",
+                                    "effects": [
+                                        {
+                                            "type": "energy",
+                                            "trigger": "after_damage_dealt",
+                                            "amount": 1,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "nameSuffix": "III",
+                                    "media": "melvor:assets/media/bank/death_rune.png",
+                                    "flavorText": "Spirits drain energy from fallen foes.",
+                                    "effects": [
+                                        {
+                                            "type": "energy",
+                                            "trigger": "after_damage_dealt",
+                                            "amount": 2,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "nameSuffix": "IV",
+                                    "media": "melvor:assets/media/bank/death_rune.png",
+                                    "flavorText": "Spirits drain energy from fallen foes.",
+                                    "effects": [
+                                        {
+                                            "type": "energy",
+                                            "trigger": "after_damage_dealt",
+                                            "amount": 2,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "summoned_blade",
+                            "name": "Summoned Blade",
+                            "media": "melvor:assets/media/bank/blood_rune.png",
+                            "type": "gem",
+                            "sourceJob": "adventuring:summoner",
+                            "maxCharges": 3,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "nameSuffix": "I",
+                                    "media": "melvor:assets/media/bank/blood_rune.png",
+                                    "flavorText": "Critical strikes empower your ethereal blade.",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "trigger": "on_crit",
+                                            "id": "adventuring:empower",
+                                            "stacks": 3,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "nameSuffix": "II",
+                                    "media": "melvor:assets/media/bank/blood_rune.png",
+                                    "flavorText": "Critical strikes empower your ethereal blade.",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "trigger": "on_crit",
+                                            "id": "adventuring:empower",
+                                            "stacks": 5,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "nameSuffix": "III",
+                                    "media": "melvor:assets/media/bank/blood_rune.png",
+                                    "flavorText": "Critical strikes empower your ethereal blade.",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "trigger": "on_crit",
+                                            "id": "adventuring:empower",
+                                            "stacks": 8,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "nameSuffix": "IV",
+                                    "media": "melvor:assets/media/bank/blood_rune.png",
+                                    "flavorText": "Critical strikes empower your ethereal blade.",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "trigger": "on_crit",
+                                            "id": "adventuring:empower",
+                                            "stacks": 12,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_shard",
+                                            "count": 3
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "spirit_tether",
+                            "name": "Spirit Tether",
+                            "media": "melvor:assets/media/bank/death_rune.png",
+                            "type": "ward",
+                            "sourceJob": "adventuring:summoner",
+                            "maxCharges": 1,
+                            "tiers": [
+                                {
+                                    "tier": 1,
+                                    "nameSuffix": "I",
+                                    "media": "melvor:assets/media/bank/death_rune.png",
+                                    "flavorText": "A spirit tether that prevents death.",
+                                    "effects": [
+                                        {
+                                            "type": "prevent_death",
+                                            "trigger": "before_death",
+                                            "healPercent": 15,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:crude_shard",
+                                            "count": 5
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 2,
+                                    "nameSuffix": "II",
+                                    "media": "melvor:assets/media/bank/death_rune.png",
+                                    "flavorText": "A spirit tether that prevents death.",
+                                    "effects": [
+                                        {
+                                            "type": "prevent_death",
+                                            "trigger": "before_death",
+                                            "healPercent": 22,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:refined_shard",
+                                            "count": 5
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 3,
+                                    "nameSuffix": "III",
+                                    "media": "melvor:assets/media/bank/death_rune.png",
+                                    "flavorText": "A spirit tether that prevents death.",
+                                    "effects": [
+                                        {
+                                            "type": "prevent_death",
+                                            "trigger": "before_death",
+                                            "healPercent": 30,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:immaculate_shard",
+                                            "count": 5
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tier": 4,
+                                    "nameSuffix": "IV",
+                                    "media": "melvor:assets/media/bank/death_rune.png",
+                                    "flavorText": "A spirit tether that prevents death.",
+                                    "effects": [
+                                        {
+                                            "type": "prevent_death",
+                                            "trigger": "before_death",
+                                            "healPercent": 40,
+                                            "target": "self"
+                                        }
+                                    ],
+                                    "materials": [
+                                        {
+                                            "id": "adventuring:transcendent_shard",
+                                            "count": 5
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
             }
-        }]
+        ]
     }
 }
-

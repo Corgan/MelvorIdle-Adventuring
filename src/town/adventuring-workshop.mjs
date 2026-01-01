@@ -126,48 +126,43 @@ export class AdventuringWorkshop extends AdventuringPage {
         }
     }
 
+    /**
+     * Store an item for later collection (shipping to bank)
+     * Only used for Melvor item outputs - materials/consumables/conversions are added directly
+     */
     store(output, count, outputType = 'item') {
+        // Only store items (Melvor materials) - everything else is added directly in product.create()
+        if (outputType !== 'item') {
+            return;
+        }
+        
         let existingCount = this.storedItems.get(output);
         if(existingCount === undefined)
             existingCount = 0;
         
         this.storedItems.set(output, existingCount + count);
-        // Track output type for collection routing
-        if(!this.storedOutputTypes) this.storedOutputTypes = new Map();
-        this.storedOutputTypes.set(output, outputType);
         this.renderQueue.storedItems = true;
     }
     
-    collect(output) {
+    /**
+     * Ship stored items to the player's bank
+     */
+    shipToBank(output) {
         let count = this.storedItems.get(output);
         if(count !== undefined) {
-            const outputType = this.storedOutputTypes?.get(output) || 'item';
-            let success = false;
-            
-            switch(outputType) {
-                case 'material':
-                    // Materials go to adventuring stash
-                    this.manager.stash.add(output, count);
-                    success = true;
-                    break;
-                case 'consumable':
-                    // Consumables go to adventuring stash (they're materials internally)
-                    this.manager.stash.add(output, count);
-                    success = true;
-                    break;
-                case 'item':
-                default:
-                    // Items go to the bank
-                    success = this.game.bank.addItem(output, count, false, true);
-                    break;
-            }
+            // Items go to the bank
+            const success = this.game.bank.addItem(output, count, false, true);
             
             if(success) {
                 this.storedItems.delete(output);
-                this.storedOutputTypes?.delete(output);
                 this.renderQueue.storedItems = true;
             }
         }
+    }
+    
+    // Keep collect as an alias for backwards compatibility
+    collect(output) {
+        this.shipToBank(output);
     }
 
     selectProduct(product) {
@@ -462,7 +457,7 @@ export class AdventuringWorkshop extends AdventuringPage {
             component.setTooltipContent(item.name);
     
             component.icon.src = item.media;
-            component.clickable.onclick = () => this.collect(item);
+            component.clickable.onclick = () => this.shipToBank(item);
     
             component.count.textContent = this.storedItems.get(item);
             componentCount++;
@@ -476,42 +471,12 @@ export class AdventuringWorkshop extends AdventuringPage {
     }
 
     encode(writer) {
-        // Encode stored items with their output types
-        const itemEntries = [];
-        const materialEntries = [];
-        const consumableEntries = [];
-        
-        this.storedItems.forEach((count, output) => {
-            const outputType = this.storedOutputTypes?.get(output) || 'item';
-            if(outputType === 'material') {
-                materialEntries.push({ output, count });
-            } else if(outputType === 'consumable') {
-                consumableEntries.push({ output, count });
-            } else {
-                itemEntries.push({ output, count });
-            }
+        // Only items are stored now (materials/consumables/conversions added directly)
+        writer.writeUint32(this.storedItems.size);
+        this.storedItems.forEach((count, item) => {
+            writer.writeNamespacedObject(item);
+            writer.writeUint32(count);
         });
-        
-        // Write items (from game.items)
-        writer.writeUint32(itemEntries.length);
-        for(const entry of itemEntries) {
-            writer.writeNamespacedObject(entry.output);
-            writer.writeUint32(entry.count);
-        }
-        
-        // Write materials
-        writer.writeUint32(materialEntries.length);
-        for(const entry of materialEntries) {
-            writer.writeNamespacedObject(entry.output);
-            writer.writeUint32(entry.count);
-        }
-        
-        // Write consumables
-        writer.writeUint32(consumableEntries.length);
-        for(const entry of consumableEntries) {
-            writer.writeNamespacedObject(entry.output);
-            writer.writeUint32(entry.count);
-        }
         
         writer.writeSet(this.workOrders, (order, writer) => {
             order.encode(writer);
@@ -519,8 +484,6 @@ export class AdventuringWorkshop extends AdventuringPage {
     }
 
     decode(reader, version) {
-        if(!this.storedOutputTypes) this.storedOutputTypes = new Map();
-        
         // Read items
         const itemCount = reader.getUint32();
         for(let i = 0; i < itemCount; i++) {
@@ -528,29 +491,6 @@ export class AdventuringWorkshop extends AdventuringPage {
             let value = reader.getUint32();
             if(typeof key !== "string") {
                 this.storedItems.set(key, value);
-                this.storedOutputTypes.set(key, 'item');
-            }
-        }
-        
-        // Read materials
-        const materialCount = reader.getUint32();
-        for(let i = 0; i < materialCount; i++) {
-            let key = reader.getNamespacedObject(this.manager.materials);
-            let value = reader.getUint32();
-            if(typeof key !== "string") {
-                this.storedItems.set(key, value);
-                this.storedOutputTypes.set(key, 'material');
-            }
-        }
-        
-        // Read consumables
-        const consumableCount = reader.getUint32();
-        for(let i = 0; i < consumableCount; i++) {
-            let key = reader.getNamespacedObject(this.manager.consumableTypes);
-            let value = reader.getUint32();
-            if(typeof key !== "string") {
-                this.storedItems.set(key, value);
-                this.storedOutputTypes.set(key, 'consumable');
             }
         }
         
