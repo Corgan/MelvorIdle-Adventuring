@@ -1008,10 +1008,6 @@ const effectDescriptionRegistry = new Map([
         effect.perStack ? `+${firstDefined(value, amount, 1)} Damage per stack` : `${helpers.sign(firstDefined(value, amount))}${firstDefined(value, amount)} Damage`],
     ['increase_damage_percent', (effect, value, stacks, amount, manager, helpers) => 
         effect.perStack ? `+${firstDefined(value, amount, 1)}% Damage per stack` : `${helpers.sign(firstDefined(value, amount))}${firstDefined(value, amount)}% Damage`],
-    ['reduce_stat_percent', (effect, value, stacks, amount, manager, helpers) => 
-        effect.perStack 
-            ? `-${firstDefined(value, amount, 1)}% ${helpers.stat(effect.id)} per stack` 
-            : `-${firstDefined(value, amount)}% ${helpers.stat(effect.id)}`],
     ['defense_buff', (effect, value, stacks, amount, manager, helpers) => 
         `${helpers.sign(firstDefined(value, amount))}${firstDefined(value, amount)} Defense`],
     ['speed_buff', (effect, value, stacks, amount, manager, helpers) => 
@@ -1159,9 +1155,6 @@ const effectDescriptionRegistry = new Map([
     ['ward', (effect, value, stacks) => `Block next ${firstDefined(stacks, 1)} attacks`],
     ['charm', (effect) => `Charm target for ${effect.duration || 1} turns`],
     
-    // Double cast
-    ['double_cast', (effect, value) => `${firstDefined(effect.chance, value)}% chance to cast twice`],
-    
     // Mastery unlocks
     ['unlock_auto_run', () => 'Unlock Auto-Run'],
     ['unlock_difficulty', (effect) => {
@@ -1270,8 +1263,6 @@ const effectDescriptionRegistry = new Map([
     }],
     ['all_resistance', (effect, value, stacks, amount, manager, helpers) => 
         `+${helpers.percent(value)}% All Resistance`],
-    ['reflect', (effect, value, stacks, amount, manager, helpers) => 
-        `Reflect ${helpers.percent(value)}% damage`],
     
     // XP/Loot bonuses
     ['xp_bonus', (effect, value) => `+${value}% XP`],
@@ -1399,8 +1390,7 @@ function formatTrigger(trigger) {
         'turn_end': 'At turn end',
         'round_start': 'At round start',
         'round_end': 'At round end',
-        'before_damage_dealt': 'Before dealing damage',
-        'after_damage_dealt': 'After dealing damage',
+
         'before_damage_received': 'Before receiving damage',
         'after_damage_received': 'After receiving damage',
         'on_hit': 'On hit',
@@ -1565,9 +1555,9 @@ function formatTriggerSuffix(trigger) {
         'turn_end': 'at the end of the turn',
         'round_start': 'each round',
         'round_end': 'at the end of the round',
-        'before_damage_dealt': 'before dealing damage',
+
         'before_damage_delivered': 'before dealing damage',
-        'after_damage_dealt': 'after dealing damage',
+
         'after_damage_delivered': 'after dealing damage',
         'before_damage_received': 'before taking damage',
         'after_damage_received': 'after taking damage',
@@ -1603,7 +1593,6 @@ function formatTriggerSuffix(trigger) {
         'on_damage_taken': 'when taking damage',
         'xp_gain': 'when gaining XP',
         'loot_roll': 'when rolling loot',
-        'stats': '',  // Internal trigger, don't show
         'targeting': '',  // Internal trigger, don't show
         'death': '',  // Internal, handled separately
         'before_debuff_received': 'before receiving a debuff',
@@ -2223,6 +2212,109 @@ function createDefaultEffectProcessor() {
         const increase = Math.ceil((ctx.extra.amount || 0) * (amount / 100));
         ctx.extra.amount = (ctx.extra.amount || 0) + increase;
         return ctx.extra;
+    });
+    
+    // Prevent lethal damage (unkillable buff) - damage cannot reduce HP below 1
+    processor.register('prevent_lethal', (effect, instance, ctx) => {
+        const currentHP = ctx.character.hitpoints;
+        const incomingDamage = ctx.extra.amount || 0;
+        
+        // If this damage would kill, reduce it to leave 1 HP
+        if(currentHP - incomingDamage <= 0 && currentHP > 0) {
+            ctx.extra.amount = currentHP - 1;
+            ctx.extra.preventedLethal = true;
+            ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} prevents lethal damage!`);
+        }
+        return ctx.extra;
+    });
+    
+    // Evade (phase buff) - completely avoid next attack
+    processor.register('evade', (effect, instance, ctx) => {
+        ctx.extra.amount = 0;
+        ctx.extra.evaded = true;
+        if(effect.consume !== false) {
+            instance.remove_stacks(1);
+        }
+        ctx.manager.log.add(`${ctx.character.name} evades the attack with ${instance.base.name}!`);
+        return ctx.extra;
+    });
+    
+    // Absorb damage (shield buff) - absorbs damage up to stack count
+    processor.register('absorb_damage', (effect, instance, ctx) => {
+        const amountPerStack = firstDefined(effect.amount, 1);
+        const totalAbsorb = amountPerStack * instance.stacks;
+        const damage = ctx.extra.amount || 0;
+        
+        const absorbed = Math.min(damage, totalAbsorb);
+        ctx.extra.amount = damage - absorbed;
+        
+        // Consume stacks based on damage absorbed
+        if(effect.consume !== false && absorbed > 0) {
+            const stacksToRemove = Math.ceil(absorbed / amountPerStack);
+            instance.remove_stacks(stacksToRemove);
+        }
+        
+        if(absorbed > 0) {
+            ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} absorbs ${absorbed} damage`);
+        }
+        return ctx.extra;
+    });
+    
+    // Heal party (martyrdom buff, difficulty floor_end)
+    processor.register('heal_party', (effect, instance, ctx) => {
+        const amount = getEffectAmount(effect, instance);
+        const healPercent = effect.healingPercent || effect.healPercent || 0;
+        
+        if(ctx.manager.party) {
+            ctx.manager.party.heroes.forEach(hero => {
+                if(!hero.dead) {
+                    // Use flat amount or percent of max HP
+                    let healAmount = amount;
+                    if(healPercent > 0) {
+                        healAmount = Math.ceil(hero.maxHitpoints * (healPercent / 100));
+                    }
+                    if(healAmount > 0) {
+                        hero.heal({ amount: healAmount }, ctx.character);
+                    }
+                }
+            });
+            const sourceName = instance.base ? instance.base.name : 'effect';
+            ctx.manager.log.add(`${sourceName} heals the party`);
+        }
+        return ctx.extra;
+    });
+    
+    // Dispel buffs from target
+    processor.register('dispel_buff', (effect, instance, ctx) => {
+        const count = effect.count || 1;
+        const target = effect.target === 'self' ? ctx.character : 
+                      (effect.target === 'attacker' ? ctx.extra.attacker : ctx.extra.target);
+        
+        if(target && !target.dead && target.auras) {
+            let removed = 0;
+            // Iterate through auras and remove buffs (non-debuffs)
+            for(const auraInstance of [...target.auras.auras.values()]) {
+                if(auraInstance.base && !auraInstance.base.isDebuff && removed < count) {
+                    auraInstance.stacks = 0;
+                    removed++;
+                }
+            }
+            if(removed > 0) {
+                target.auras.cleanAuras();
+                target.auras.renderQueue.auras = true;
+                if(target.effectCache) {
+                    target.invalidateEffects('auras');
+                }
+                ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} dispels ${removed} buff(s) from ${target.name}`);
+            }
+        }
+        return ctx.extra;
+    });
+    
+    // Dispel (alias for dispel_buff with default behavior)
+    processor.register('dispel', (effect, instance, ctx) => {
+        // Delegate to dispel_buff
+        return processor.process('dispel_buff', effect, instance, ctx);
     });
     
     // Note: increase_stat_percent and reduce_stat_percent are NOT registered here.

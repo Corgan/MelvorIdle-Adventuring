@@ -199,7 +199,6 @@ export class AdventuringEncounter extends AdventuringPage {
     _processDamageEffect(effect, builtEffect, target) {
         // Check for miss (Blind debuff)
         let missCheck = this.currentTurn.trigger('before_damage_delivered', { target, ...builtEffect });
-        missCheck = this.currentTurn.trigger('before_damage_dealt', { target, ...missCheck });
         if(missCheck.missed) {
             this.manager.log.add(`${this.currentTurn.name}'s attack misses ${target.name}!`);
             return null;
@@ -296,7 +295,6 @@ export class AdventuringEncounter extends AdventuringPage {
         
         // Trigger lifesteal with damage dealt
         this.currentTurn.trigger('after_damage_delivered', { target, damageDealt, ...builtEffect });
-        this.currentTurn.trigger('after_damage_dealt', { target, damageDealt, ...builtEffect });
         
         // Check if target died and trigger on_kill
         if(target.dead) {

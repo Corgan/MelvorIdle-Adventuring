@@ -69,25 +69,10 @@ export class AdventuringAuras {
             if(auraInstance.base === undefined || auraInstance.stacks <= 0) continue;
             
             auraInstance.base.effects.forEach(effectData => {
-                // Map aura triggers to standard triggers
-                let trigger = effectData.trigger;
-                if(trigger === 'stats') {
-                    trigger = 'passive';
-                }
-                
-                // Map aura effect types to standard types
-                let type = effectData.type;
+                const trigger = effectData.trigger;
+                const type = effectData.type;
                 // getAmount already handles perStack multiplication
-                let value = effectData.getAmount ? effectData.getAmount(auraInstance) : (effectData.amount || 0);
-                
-                // Handle reduce variants by negating the value
-                if(type === 'reduce_stat_percent') {
-                    type = 'increase_stat_percent';
-                    value = -value;
-                } else if(type === 'reduce_stat_flat') {
-                    type = 'increase_stat_flat';
-                    value = -value;
-                }
+                const value = effectData.getAmount ? effectData.getAmount(auraInstance) : (effectData.amount || 0);
                 
                 effects.push(createEffect(
                     {
