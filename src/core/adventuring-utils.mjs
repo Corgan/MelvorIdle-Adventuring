@@ -1038,8 +1038,6 @@ const effectDescriptionRegistry = new Map([
     // Revival
     ['revive', (effect, value, stacks, amount, manager, helpers) => 
         `Revive with ${firstDefined(amount, effect.hpPercent, 100)}% HP`],
-    ['revive_all', (effect, value, stacks, amount, manager, helpers) => 
-        `Revive with ${firstDefined(amount, effect.hpPercent, 100)}% HP`],
     
     // Tile effects
     ['teleport', () => 'Teleport to a random tile'],
@@ -1146,12 +1144,7 @@ const effectDescriptionRegistry = new Map([
         return cleanseCount === 1 ? 'Cleanse a debuff' : `Cleanse ${cleanseCount} debuffs`;
     }],
     
-    // Summon effects
-    ['summon', () => 'Summon a companion'],
-    ['summon_power_bonus', (effect, value) => `+${value}% summon power`],
-    ['summon_attack_speed', (effect, value) => `+${value}% summon attack speed`],
-    
-    // Ward/Charm
+    // Ward/Charm (item categories, not effect types)
     ['ward', (effect, value, stacks) => `Block next ${firstDefined(stacks, 1)} attacks`],
     ['charm', (effect) => `Charm target for ${effect.duration || 1} turns`],
     
@@ -1222,26 +1215,7 @@ const effectDescriptionRegistry = new Map([
         `-${firstDefined(amount, 0)}% healing received${effect.perStack ? ' per stack' : ''}`],
     ['heal_party', (effect, value, stacks, amount) => `Heal party for ${firstDefined(amount, 0)} HP`],
     
-    // Chaos effects
-    ['chaos_damage', (effect) => 
-        `Chaotic damage (${effect.bonusDamageChance || 0}% bonus, ${effect.healEnemyChance || 0}% heal enemy)`],
-    
-    // Percentage stat modifiers
-    ['ability_damage_percent', (effect, value, stacks, amount) => `+${firstDefined(amount, 0)}% ability damage`],
-    ['buff_damage', (effect, value, stacks, amount) => `+${firstDefined(amount, 0)} damage`],
-    
-    // Immunities
-    ['effect_immunity', (effect) => {
-        const effects = effect.effects || [effect.effect];
-        return `Immune to ${effects.join(', ')}`;
-    }],
-    ['immune_displacement', () => 'Immune to displacement'],
-    ['prevent_enemy_teleport', () => 'Enemies cannot teleport'],
-    
-    // Buff application
-    ['apply_effect', (effect, value) => 
-        `Apply ${effect.effect}${effect.chance ? ` (${effect.chance}% chance)` : ''}`],
-    
+
     // Stat/passive bonuses
     ['stat_bonus', (effect, value, stacks, amount, manager, helpers) => {
         const statBonusName = helpers.stat(effect.stat) !== 'Unknown' 
@@ -1257,12 +1231,6 @@ const effectDescriptionRegistry = new Map([
             || 'modifier';
         return `Apply ${passiveName}`;
     }],
-    ['resistance', (effect, value, stacks, amount, manager, helpers) => {
-        const element = effect.element?.charAt(0).toUpperCase() + effect.element?.slice(1) || 'Elemental';
-        return `+${helpers.percent(value)}% ${element} Resistance`;
-    }],
-    ['all_resistance', (effect, value, stacks, amount, manager, helpers) => 
-        `+${helpers.percent(value)}% All Resistance`],
     
     // XP/Loot bonuses
     ['xp_bonus', (effect, value) => `+${value}% XP`],
@@ -1274,15 +1242,6 @@ const effectDescriptionRegistry = new Map([
     // Energy bonuses
     ['energy_bonus', (effect, value) => `+${value}% Energy`],
     ['energy_regen_bonus', (effect, value) => `+${value}% Energy Regen`],
-    
-    // Damage bonuses
-    ['spell_damage_bonus', (effect, value, stacks, amount, manager, helpers) => 
-        `+${helpers.percent(value)}% Spell Damage`],
-    ['extra_target', (effect, value) => `Hit ${value} extra target(s)`],
-    ['damage_bonus_vs_debuff', (effect, value) => `+${value}% damage vs debuffed enemies`],
-    
-    // Duration modifiers
-    ['debuff_duration_reduction', (effect, value) => `${value}% shorter debuff duration`],
     
     // Enemy buffs
     ['enemy_buff', (effect, value, stacks, amount, manager, helpers) => 
