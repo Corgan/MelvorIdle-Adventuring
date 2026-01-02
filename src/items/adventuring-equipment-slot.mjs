@@ -17,6 +17,9 @@ class AdventuringEquipmentSlotRenderQueue {
         this.selected = true;
         this.clickable = true;
     }
+    updateAll() {
+        this.queueAll();
+    }
 }
 
 export class AdventuringEquipmentSlot {

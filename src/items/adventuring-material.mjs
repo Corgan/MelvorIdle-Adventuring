@@ -19,6 +19,10 @@ class AdventuringMaterialRenderQueue {
         this.count = true;
         this.newBadge = true;
     }
+
+    updateAll() {
+        this.queueAll();
+    }
 }
 
 export class AdventuringMaterial extends NamespacedObject {

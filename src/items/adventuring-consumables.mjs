@@ -18,6 +18,9 @@ class AdventuringConsumablesRenderQueue {
         this.details = true;
         this.list = true;
     }
+    updateAll() {
+        this.queueAll();
+    }
 }
 
 /**

@@ -63,21 +63,21 @@ export class AdventuringDifficulty extends NamespacedObject {
      * Check if this difficulty uses infinite wave generation
      */
     get isInfinite() {
-        return this.waveGeneration !== undefined && this.waveGeneration.type === 'infinite';
+        return this.waveGeneration && this.waveGeneration.type === 'infinite';
     }
 
     /**
      * Get floors per wave (default 1 for infinite modes)
      */
     get floorsPerWave() {
-        return this.waveGeneration !== undefined && this.waveGeneration.floorsPerWave !== undefined ? this.waveGeneration.floorsPerWave : 1;
+        return this.waveGeneration && this.waveGeneration.floorsPerWave !== undefined ? this.waveGeneration.floorsPerWave : 1;
     }
 
     /**
      * Get floor selection strategy
      */
     get floorSelection() {
-        return this.waveGeneration !== undefined && this.waveGeneration.floorSelection !== undefined ? this.waveGeneration.floorSelection : 'first';
+        return this.waveGeneration && this.waveGeneration.floorSelection !== undefined ? this.waveGeneration.floorSelection : 'first';
     }
 
     get name() {

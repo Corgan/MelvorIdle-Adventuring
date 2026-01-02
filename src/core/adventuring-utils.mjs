@@ -2459,6 +2459,13 @@ class AdventuringMasteryRenderQueue {
         this.clickable = true;
         this.mastery = true;
     }
+
+    /**
+     * Alias for queueAll - marks all properties for update
+     */
+    updateAll() {
+        this.queueAll();
+    }
 }
 
 /**

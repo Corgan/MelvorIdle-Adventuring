@@ -17,6 +17,9 @@ class AdventuringConsumableRenderQueue {
         this.tooltip = true;
         this.equipped = true;
     }
+    updateAll() {
+        this.queueAll();
+    }
 }
 
 /**

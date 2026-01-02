@@ -365,7 +365,7 @@ export class AdventuringDungeon extends AdventuringPage {
         if (this.area === undefined || this.area.floors === undefined || !this.area.floors.length) return undefined;
         
         const waveGen = this.waveGeneration;
-        if (waveGen !== undefined && waveGen.type === 'infinite') {
+        if (waveGen && waveGen.type === 'infinite') {
             const floors = this.area.floors;
             const selection = waveGen.floorSelection !== undefined ? waveGen.floorSelection : 'first';
             
@@ -552,7 +552,7 @@ export class AdventuringDungeon extends AdventuringPage {
         // For infinite modes, numFloors represents floors per wave
         // For standard modes, numFloors is the total floor count
         const difficulty = area.getDifficulty();
-        if (difficulty !== undefined && difficulty.waveGeneration !== undefined && difficulty.waveGeneration.type === 'infinite') {
+        if (difficulty && difficulty.waveGeneration && difficulty.waveGeneration.type === 'infinite') {
             this.numFloors = difficulty.waveGeneration.floorsPerWave !== undefined ? difficulty.waveGeneration.floorsPerWave : 1;
         } else {
             this.numFloors = this.area.floors !== undefined ? this.area.floors.length : 1;

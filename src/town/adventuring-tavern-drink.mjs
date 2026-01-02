@@ -14,6 +14,9 @@ class AdventuringTavernDrinkRenderQueue {
         this.charges = true;
         this.tooltip = true;
     }
+    updateAll() {
+        this.queueAll();
+    }
 }
 
 /**
