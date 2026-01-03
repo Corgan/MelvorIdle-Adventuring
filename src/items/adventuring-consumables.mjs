@@ -608,16 +608,6 @@ export class AdventuringConsumables extends AdventuringPage {
         this.component.detailName.textContent = consumable.getTierName(tier);
         this.component.detailDescription.textContent = consumable.getTierDescription(tier);
         
-        // Effects
-        this.component.detailEffects.innerHTML = '';
-        const effectText = consumable.getTierEffectText(tier);
-        if (effectText) {
-            const effectDiv = document.createElement('div');
-            effectDiv.className = 'text-success';
-            effectDiv.textContent = effectText;
-            this.component.detailEffects.appendChild(effectDiv);
-        }
-        
         // Charges for this tier
         this.component.detailCharges.textContent = `${this.getCharges(consumable, tier)}`;
         

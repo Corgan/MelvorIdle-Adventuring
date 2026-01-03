@@ -95,21 +95,13 @@ export class AdventuringModifiers {
     }
 
     /**
-     * Get effects from active tavern drink
+     * Get effects from active tavern drinks
      */
     getTavernEffects() {
-        const effects = [];
+        if (!this.manager.tavern) return [];
         
-        if (!this.manager.tavern) return effects;
-        
-        const activeDrink = this.manager.tavern.activeDrink;
-        if (!activeDrink || !activeDrink.effects) return effects;
-        
-        activeDrink.effects.forEach(effectData => {
-            effects.push(createEffect(effectData, activeDrink, activeDrink.name));
-        });
-        
-        return effects;
+        // The tavern's getEffects() returns all effects from equipped drinks
+        return this.manager.tavern.getEffects();
     }
 
     /**

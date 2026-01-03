@@ -106,7 +106,7 @@ export class AdventuringTown extends AdventuringPage {
             if(this.characterAction.get(character) !== undefined) {
                 let { action, building } = this.characterAction.get(character);
 
-                if(action !== undefined) {
+                if(action !== undefined && building !== undefined) {
                     card.icon = building.media;
                     card.renderQueue.icon = true;
 

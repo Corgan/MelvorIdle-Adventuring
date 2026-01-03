@@ -254,11 +254,11 @@ export class AdventuringOverview {
 
         // 3. Active tavern drinks - always visible
         const tavernDrinks = this.manager.tavern.getActiveDrinks();
-        tavernDrinks.forEach(({ drink, runsRemaining }) => {
+        tavernDrinks.forEach(({ drink, tier, runsRemaining }) => {
             effects.push({
-                name: drink.name,
-                media: drink.media,
-                tooltip: this.buildTavernDrinkTooltip(drink, runsRemaining)
+                name: drink.getTierName(tier),
+                media: drink.getTierMedia(tier),
+                tooltip: this.buildTavernDrinkTooltip(drink, tier, runsRemaining)
             });
         });
 
@@ -300,28 +300,10 @@ export class AdventuringOverview {
             lines.push(`<div class="text-info">${description}</div>`);
         }
         
-        // Show effects
-        const tierEffects = consumable.getTierEffects(tier);
-        if(tierEffects && tierEffects.length > 0) {
-            lines.push(`<hr class="my-1">`);
-            tierEffects.forEach(effect => {
-                const desc = describeEffect(effect, this.manager);
-                lines.push(`<div class="text-success">${desc}</div>`);
-            });
-        }
-        
-        // Show trigger type
-        if(tierEffects && tierEffects.length > 0) {
-            const triggerTypes = [...new Set(tierEffects.map(e => e.trigger))];
-            lines.push(`<hr class="my-1">`);
-            const triggerText = triggerTypes.includes('passive') ? 'Triggers automatically' : 'Activated when conditions met';
-            lines.push(`<div class="text-muted font-size-sm">${triggerText}</div>`);
-        }
-        
         // Show charges for this tier
         lines.push(`<hr class="my-1">`);
         const charges = this.manager.consumables.getCharges(consumable, tier);
-        lines.push(`<div class="text-muted">Charges: ${charges}/${consumable.maxCharges}</div>`);
+        lines.push(`<div class="text-muted">Charges: ${charges}</div>`);
         
         return lines.join('');
     }
@@ -329,15 +311,16 @@ export class AdventuringOverview {
     /**
      * Build tooltip HTML for a tavern drink
      */
-    buildTavernDrinkTooltip(drink, runsRemaining) {
+    buildTavernDrinkTooltip(drink, tier, runsRemaining) {
         const lines = [];
-        lines.push(`<div class="font-w700">${drink.name}</div>`);
+        lines.push(`<div class="font-w700">${drink.getTierName(tier)}</div>`);
         lines.push(`<div class="text-muted font-size-sm">Tavern Drink</div>`);
         
         // Show effects
-        if(drink.effects && drink.effects.length > 0) {
+        const effects = drink.getTierEffects(tier);
+        if(effects && effects.length > 0) {
             lines.push(`<hr class="my-1">`);
-            drink.effects.forEach(effect => {
+            effects.forEach(effect => {
                 const desc = describeEffect(effect, this.manager);
                 lines.push(`<div class="text-success">${desc}</div>`);
             });

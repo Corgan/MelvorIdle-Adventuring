@@ -440,30 +440,6 @@
 </template>
 
 <!-- Drink card - used in tavern -->
-<template id="adventuring-drink-card-template">
-    <div class="col-12 col-md-6 col-lg-4 p-2" id="col">
-        <div class="block block-rounded-double bg-combat-inner-dark p-3" id="card">
-            <div class="d-flex justify-content-between align-items-center mb-2" id="header">
-                <span class="badge" id="tierBadge"></span>
-                <small class="text-muted" id="duration"></small>
-            </div>
-            <div class="d-flex align-items-center mb-2" id="info">
-                <img class="skill-icon-sm mr-2" id="icon">
-                <div id="nameContainer">
-                    <strong class="text-white" id="name"></strong>
-                </div>
-            </div>
-            <div class="small text-success mb-2" id="effects"></div>
-            <div class="small text-muted font-italic mb-2 d-none" id="flavor"></div>
-            <div class="mb-2" id="costSection">
-                <h6 class="font-w700 text-combat-smoke text-center m-0 mb-1">Cost</h6>
-                <div class="row no-gutters justify-content-center" id="costItems"></div>
-            </div>
-            <button class="btn btn-sm btn-block" id="buyBtn"></button>
-        </div>
-    </div>
-</template>
-
 <!-- Stash category section - simplified without collapsible -->
 <template id="adventuring-stash-category-template">
     <div class="col-12 mb-3" id="section">
@@ -496,14 +472,6 @@
     <div class="badge badge-info m-1 p-2 d-flex align-items-center" id="badge">
         <img class="skill-icon-xxs mr-1" id="icon">
         <span id="text"></span>
-    </div>
-</template>
-
-<!-- Material cost item - displays material icon with have/need counts -->
-<template id="adventuring-material-cost-template">
-    <div class="d-flex align-items-center mr-3" id="container">
-        <img class="skill-icon-xxs mr-1" id="icon">
-        <span class="small" id="text"></span>
     </div>
 </template>
 
@@ -806,7 +774,7 @@
                                 <button id="tier-4" class="btn btn-sm btn-outline-info tier-btn">IV</button>
                             </div>
                         </div>
-                        <div class="col-12">
+                        <div class="col-12 d-none">
                             <div class="block-content p-3">
                                 <h5 class="font-w700 text-combat-smoke text-center m-0 mt-2">Effects</h5>
                                 <div class="block block-rounded-double bg-combat-inner-dark text-center p-3" id="detail-effects"></div>
@@ -1006,23 +974,98 @@
     </div>
 </template>
 
+<!-- Tavern drink icon element -->
+<template id="adventuring-tavern-drink-template">
+    <div id="clickable" class="pointer-enabled m-1" style="position: relative; width: fit-content;">
+        <div id="border" class="border-secondary border-2x border-rounded-equip combat-equip-img fishing-img m-0" style="position: relative; overflow: hidden; border-width: 2px!important; border-style: solid!important;">
+            <img id="icon" class="w-100 p-1" src="">
+            <span id="equipped-badge" class="badge badge-success d-none" style="position: absolute; top: 2px; right: 2px; font-size: 0.5rem; z-index: 10;">E</span>
+        </div>
+        <div id="charges-badge" class="font-size-sm text-white text-center d-none" style="position: absolute; bottom: -8px; width: 100%;"><small id="charges" class="badge-pill bg-info">0</small></div>
+    </div>
+</template>
+
 <template id="adventuring-tavern-template">
     <div id="page" class="row no-gutters d-none">
         <div class="col-12">
             <button id="back" class="btn btn-alt-info ml-3 mr-3 mb-3 mt-2 position-absolute" style="z-index: 10;">Back to Town</button>
             <h3 class="font-w700 text-combat-smoke text-center m-0 mt-2">Tavern</h3>
-            <p class="text-muted text-center mb-0 mt-1">Buy drinks for stat buffs that last multiple dungeon runs</p>
+            <p class="text-muted text-center mb-0 mt-1">Craft drinks for stat buffs that last multiple dungeon runs</p>
         </div>
-        <div class="col-12 p-3">
-            <div class="block block-rounded bg-combat-dark p-3 mb-3">
-                <h5 class="font-w600 text-success m-0 mb-2">Active Drinks</h5>
-                <div id="active-buffs" class="d-flex flex-wrap"></div>
+        <!-- Equipped Slots at Top -->
+        <div class="col-12">
+            <div class="block-content p-3">
+                <h5 class="text-warning text-center mb-2">Equipped Drinks (3 slots)</h5>
+                <div id="slots" class="d-flex justify-content-center mb-3">
+                    <div id="slot-0" class="border-secondary border-2x border-rounded-equip combat-equip-img fishing-img m-1 pointer-enabled" style="border-width: 2px!important; border-style: dashed!important;">
+                        <img class="w-100 p-1 invisible" src="">
+                    </div>
+                    <div id="slot-1" class="border-secondary border-2x border-rounded-equip combat-equip-img fishing-img m-1 pointer-enabled" style="border-width: 2px!important; border-style: dashed!important;">
+                        <img class="w-100 p-1 invisible" src="">
+                    </div>
+                    <div id="slot-2" class="border-secondary border-2x border-rounded-equip combat-equip-img fishing-img m-1 pointer-enabled" style="border-width: 2px!important; border-style: dashed!important;">
+                        <img class="w-100 p-1 invisible" src="">
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="col-12 p-3">
-            <div class="block block-rounded bg-combat-dark p-3">
-                <h5 class="font-w600 text-warning m-0 mb-2">Drink Menu</h5>
-                <div class="row no-gutters" id="drinks"></div>
+        <!-- Left Column: Drinks Grid -->
+        <div class="col-5 pt-3">
+            <div class="block-content pt-3">
+                <h5 class="font-w600 text-warning m-0 mb-2 text-center">Drink Menu</h5>
+                <div id="drinks" class="d-flex flex-wrap justify-content-center"></div>
+            </div>
+        </div>
+        <!-- Right Column: Details Panel -->
+        <div class="col-7 pt-3">
+            <div class="block-content pt-3">
+                <div class="block block-rounded-double bg-combat-inner-dark text-center" id="details-container">
+                    <div id="details" class="row no-gutters p-3 d-none">
+                        <div class="col-12 text-center">
+                            <img class="skill-icon-sm m-0 mt-2" id="detail-icon"></img>
+                        </div>
+                        <div class="col-12">
+                            <h5 id="detail-name" class="font-w700 text-combat-smoke text-center m-0 mt-2"></h5>
+                            <p id="detail-description" class="text-muted small mb-2"></p>
+                        </div>
+                        <!-- Tier Selection Buttons -->
+                        <div class="col-12 mb-2">
+                            <div id="tier-buttons" class="btn-group d-flex justify-content-center" role="group">
+                                <button id="tier-1" class="btn btn-sm btn-outline-info tier-btn active">I</button>
+                                <button id="tier-2" class="btn btn-sm btn-outline-info tier-btn">II</button>
+                                <button id="tier-3" class="btn btn-sm btn-outline-info tier-btn">III</button>
+                                <button id="tier-4" class="btn btn-sm btn-outline-info tier-btn">IV</button>
+                            </div>
+                        </div>
+                        <div class="col-6 d-none">
+                            <div class="block-content p-2">
+                                <h6 class="font-w600 text-combat-smoke text-center m-0">Effects</h6>
+                                <div class="block block-rounded-double bg-combat-inner-dark text-center p-2" id="detail-effects"></div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="block-content p-2">
+                                <h6 class="font-w600 text-combat-smoke text-center m-0">Materials</h6>
+                                <div class="block block-rounded-double bg-combat-inner-dark text-center p-2" id="detail-materials"></div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="block-content p-2">
+                                <div class="d-flex justify-content-center align-items-center">
+                                    <span class="text-muted mr-2">Charges:</span>
+                                    <span id="detail-charges" class="font-w600 text-info">0</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 text-center p-2">
+                            <button id="craft-button" class="btn btn-info mr-2">Craft</button>
+                            <button id="equip-button" class="btn btn-success">Equip</button>
+                        </div>
+                    </div>
+                    <div id="details-placeholder" class="p-5">
+                        <p class="text-muted">Select a drink to view details</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

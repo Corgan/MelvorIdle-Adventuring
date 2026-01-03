@@ -1,6 +1,6 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { createEffect, describeEffect } = await loadModule('src/core/adventuring-utils.mjs');
+const { createEffect, describeEffect, describeEffectFull } = await loadModule('src/core/adventuring-utils.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
 
 class AdventuringTavernDrinkRenderQueue {
@@ -8,11 +8,13 @@ class AdventuringTavernDrinkRenderQueue {
         this.icon = false;
         this.charges = false;
         this.tooltip = false;
+        this.equipped = false;
     }
     queueAll() {
         this.icon = true;
         this.charges = true;
         this.tooltip = true;
+        this.equipped = true;
     }
     updateAll() {
         this.queueAll();
@@ -20,8 +22,27 @@ class AdventuringTavernDrinkRenderQueue {
 }
 
 /**
- * A tavern drink that provides passive effects for a number of runs.
- * Separate from consumables - these are purchased with currency/materials.
+ * A tavern drink with 4 tiers that provides passive effects for a number of runs.
+ * Similar to consumables but purchased/crafted at the tavern.
+ * 
+ * Data format:
+ * {
+ *   "id": "ale",
+ *   "name": "Adventurer's Ale",
+ *   "media": "...",
+ *   "type": "drink",
+ *   "tiers": [
+ *     {
+ *       "tier": 1,
+ *       "nameSuffix": "I",
+ *       "media": "...",
+ *       "flavorText": "...",
+ *       "effects": [...],
+ *       "materials": [{ "id": "...", "count": N }]
+ *     },
+ *     ...
+ *   ]
+ * }
  */
 export class AdventuringTavernDrink extends NamespacedObject {
     constructor(namespace, data, manager, game) {
@@ -31,26 +52,43 @@ export class AdventuringTavernDrink extends NamespacedObject {
 
         this._name = data.name;
         this._media = data.media;
-        this.tier = data.tier || 1;
-        this.flavorText = data.flavorText;
         
-        // Raw effects from data - will be converted in postDataRegistration
-        this._rawEffects = data.effects || [];
-        this.effects = [];
-        
-        // Cost to purchase one run's worth
-        this._cost = data.cost || {};
-        this.cost = {
-            currency: 0,
-            slayerCoins: 0,
-            materials: new Map()
-        };
+        // Tier data - array of tier definitions
+        this._tiers = data.tiers || [];
+        this.tiers = new Map(); // Map<tierNumber, tierData>
 
+        this.component = createElement('adventuring-tavern-drink');
         this.renderQueue = new AdventuringTavernDrinkRenderQueue();
+        
+        this.component.clickable.onclick = () => this.onClick();
+    }
+
+    /**
+     * Handle click on the drink icon
+     */
+    onClick() {
+        this.manager.tavern.selectDrink(this);
+        this.manager.tavern.render();
     }
 
     get name() {
         return this._name;
+    }
+
+    /**
+     * Get description (flavor text from tier 1)
+     */
+    get description() {
+        return this.getTierFlavorText(1);
+    }
+
+    /**
+     * Get the name for a specific tier
+     */
+    getTierName(tier) {
+        const tierData = this.tiers.get(tier);
+        if (!tierData) return this._name;
+        return tierData.nameSuffix ? `${this._name} ${tierData.nameSuffix}` : this._name;
     }
 
     get media() {
@@ -58,157 +96,235 @@ export class AdventuringTavernDrink extends NamespacedObject {
     }
 
     /**
-     * Get the number of runs remaining for this drink
+     * Get media for a specific tier
      */
-    get charges() {
-        return this.manager.tavern.getCharges(this);
+    getTierMedia(tier) {
+        const tierData = this.tiers.get(tier);
+        if (tierData && tierData.media) {
+            return this.getMediaURL(tierData.media);
+        }
+        return this.media;
     }
 
     /**
-     * Check if this drink is currently active (has charges)
+     * Get effects for a specific tier
      */
-    get isActive() {
-        return this.charges > 0;
+    getTierEffects(tier) {
+        const tierData = this.tiers.get(tier);
+        return tierData ? tierData.effects : [];
     }
 
     /**
-     * Check if this drink is equipped (in one of the 3 slots)
+     * Get materials for a specific tier
+     */
+    getTierMaterials(tier) {
+        const tierData = this.tiers.get(tier);
+        return tierData ? tierData.materials : new Map();
+    }
+
+    /**
+     * Get flavor text for a specific tier
+     */
+    getTierFlavorText(tier) {
+        const tierData = this.tiers.get(tier);
+        return tierData ? tierData.flavorText : '';
+    }
+
+    /**
+     * Get charge count for a specific tier
+     */
+    getCharges(tier) {
+        return this.manager.tavern.getCharges(this, tier);
+    }
+
+    /**
+     * Get total charges across all tiers
+     */
+    get totalCharges() {
+        let total = 0;
+        for (let t = 1; t <= 4; t++) {
+            total += this.getCharges(t);
+        }
+        return total;
+    }
+
+    /**
+     * Get the currently equipped tier (0 if not equipped)
+     */
+    get equippedTier() {
+        return this.manager.tavern.getEquippedTier(this);
+    }
+
+    /**
+     * Check if any tier is equipped
      */
     get isEquipped() {
-        return this.manager.tavern.isEquipped(this);
+        return this.equippedTier > 0;
     }
 
     /**
-     * Get a human-readable cost string
+     * Check if this drink is active (equipped and has charges)
      */
-    get costText() {
+    get isActive() {
+        const tier = this.equippedTier;
+        return tier > 0 && this.getCharges(tier) > 0;
+    }
+
+    /**
+     * Get effect text for a specific tier
+     */
+    getTierEffectText(tier) {
+        const effects = this.getTierEffects(tier);
+        return effects.map(e => describeEffect(e, this.manager)).join(', ');
+    }
+
+    /**
+     * Get description for a specific tier
+     */
+    getTierDescription(tier) {
+        const effects = this.getTierEffects(tier);
+        const flavorText = this.getTierFlavorText(tier);
+        
+        const effectDescs = effects.map(e => describeEffectFull(e, this.manager));
+        const generated = effectDescs.join('. ');
+        
+        if (flavorText) {
+            return generated ? `${generated}.\n\n${flavorText}` : flavorText;
+        }
+        
+        return generated || 'No effect.';
+    }
+
+    /**
+     * Get material cost text for a specific tier
+     */
+    getTierCostText(tier) {
+        const materials = this.getTierMaterials(tier);
+        if (!materials || materials.size === 0) return 'Free';
+        
         const parts = [];
-        if(this.cost.currency > 0) {
-            parts.push(`${this.cost.currency} coins`);
-        }
-        if(this.cost.slayerCoins > 0) {
-            parts.push(`${this.cost.slayerCoins} slayer coins`);
-        }
-        this.cost.materials.forEach((qty, mat) => {
+        for (const [mat, qty] of materials) {
             parts.push(`${qty} ${mat.name}`);
-        });
-        return parts.join(', ') || 'Free';
+        }
+        return parts.join(', ');
     }
 
     /**
-     * Get effect description text
+     * Check if the player can afford to craft a specific tier
      */
-    get effectText() {
-        return this.effects.map(e => describeEffect(e, this.manager)).join(', ');
-    }
-
-    /**
-     * Get full description for tooltip
-     */
-    get description() {
-        const lines = [];
-        lines.push(this.effectText);
-        if(this.flavorText) {
-            lines.push(`<span class="text-muted font-italic">${this.flavorText}</span>`);
-        }
-        return lines.join('<br>');
-    }
-
-    /**
-     * Check if player can afford to purchase runs
-     */
-    canAfford(runs = 1) {
-        const stash = this.manager.stash;
+    canAffordTier(tier) {
+        const materials = this.getTierMaterials(tier);
+        if (!materials || materials.size === 0) return false;
         
-        if(this.cost.currency > 0) {
-            const currency = this.manager.cached.currency;
-            if(currency === undefined || stash.getCount(currency) < this.cost.currency * runs) {
-                return false;
-            }
+        for (const [mat, qty] of materials) {
+            if (this.manager.stash.getCount(mat) < qty) return false;
         }
-        
-        if(this.cost.slayerCoins > 0) {
-            const slayerCoins = this.manager.cached.slayerCoins;
-            if(slayerCoins === undefined || stash.getCount(slayerCoins) < this.cost.slayerCoins * runs) {
-                return false;
-            }
-        }
-        
-        for(const [mat, qty] of this.cost.materials) {
-            if(stash.getCount(mat) < qty * runs) {
-                return false;
-            }
-        }
-        
         return true;
     }
 
     /**
-     * Purchase runs of this drink
+     * Craft one charge of a specific tier
      */
-    purchase(runs = 1) {
-        if(!this.canAfford(runs)) {
-            this.manager.log.add(`Cannot afford ${this.name}`);
-            return false;
+    craftTier(tier) {
+        const materials = this.getTierMaterials(tier);
+        if (!materials || materials.size === 0) return false;
+        
+        // Check materials
+        for (const [mat, qty] of materials) {
+            if (this.manager.stash.getCount(mat) < qty) return false;
         }
 
-        const stash = this.manager.stash;
-
-        // Deduct currency
-        if(this.cost.currency > 0) {
-            const currency = this.manager.cached.currency;
-            stash.remove(currency, this.cost.currency * runs);
-        }
-        
-        // Deduct slayer coins
-        if(this.cost.slayerCoins > 0) {
-            const slayerCoins = this.manager.cached.slayerCoins;
-            stash.remove(slayerCoins, this.cost.slayerCoins * runs);
-        }
-        
         // Deduct materials
-        for(const [mat, qty] of this.cost.materials) {
-            stash.remove(mat, qty * runs);
+        for (const [mat, qty] of materials) {
+            this.manager.stash.remove(mat, qty);
         }
 
-        // Add charges
-        this.manager.tavern.addCharges(this, runs);
-        this.manager.log.add(`Bought ${runs} run${runs > 1 ? 's' : ''} of ${this.name}`);
+        // Add charge
+        this.manager.tavern.addCharges(this, tier, 1);
+        this.manager.log.add(`Crafted ${this.getTierName(tier)}`);
+        this.renderQueue.updateAll();
+        return true;
+    }
+
+    /**
+     * Use one charge of the equipped tier
+     */
+    useCharge() {
+        const tier = this.equippedTier;
+        if (tier <= 0) return false;
+        if (this.getCharges(tier) <= 0) return false;
         
+        this.manager.tavern.removeCharges(this, tier, 1);
+        this.renderQueue.updateAll();
         return true;
     }
 
     get tooltip() {
-        return TooltipBuilder.forTavernDrink(this).build();
+        return TooltipBuilder.forTavernDrink(this, this.totalCharges).build();
+    }
+
+    /**
+     * Render the drink's component
+     */
+    render() {
+        if (this.renderQueue.icon) {
+            this.component.icon.src = this.media;
+            this.renderQueue.icon = false;
+        }
+        
+        if (this.renderQueue.charges) {
+            this.component.setCharges(this.totalCharges);
+            this.renderQueue.charges = false;
+        }
+        
+        if (this.renderQueue.equipped) {
+            this.component.setEquipped(this.isEquipped);
+            this.renderQueue.equipped = false;
+        }
+        
+        if (this.renderQueue.tooltip) {
+            this.component.setTooltipContent(this.tooltip);
+            this.renderQueue.tooltip = false;
+        }
     }
 
     postDataRegistration() {
-        // Resolve cost references
-        if(this._cost.currency) {
-            this.cost.currency = this._cost.currency;
-        }
-        if(this._cost.slayerCoins) {
-            this.cost.slayerCoins = this._cost.slayerCoins;
-        }
-        if(this._cost.materials) {
-            this._cost.materials.forEach(({ id, qty }) => {
-                const material = this.manager.materials.getObjectByID(id);
-                if(material) {
-                    this.cost.materials.set(material, qty);
+        // Process tier data
+        for (const tierData of this._tiers) {
+            const tier = tierData.tier;
+            
+            // Convert effects to standardized format (all are passive)
+            const effects = (tierData.effects || []).map(effectData => {
+                return createEffect({ 
+                    ...effectData, 
+                    trigger: 'passive'
+                }, this, this.getTierName(tier));
+            });
+
+            // Resolve material references
+            const materials = new Map();
+            if (tierData.materials) {
+                for (const { id, count } of tierData.materials) {
+                    const material = this.manager.materials.getObjectByID(id);
+                    if (material) {
+                        materials.set(material, count);
+                    } else {
+                        console.warn(`TavernDrink ${this.id}: Material not found: ${id}`);
+                    }
                 }
+            }
+
+            this.tiers.set(tier, {
+                tier,
+                nameSuffix: tierData.nameSuffix || '',
+                media: tierData.media,
+                flavorText: tierData.flavorText || '',
+                effects,
+                materials
             });
         }
-        delete this._cost;
 
-        // Convert effects to standardized format
-        // All tavern drink effects are passive by definition
-        this.effects = this._rawEffects.map(effectData => {
-            return createEffect({ 
-                ...effectData, 
-                trigger: 'passive'  // Force passive trigger
-            }, this, this.name);
-        });
-        delete this._rawEffects;
+        delete this._tiers;
     }
 
     onLoad() {

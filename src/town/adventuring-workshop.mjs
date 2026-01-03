@@ -6,7 +6,6 @@ const { formatRequirements } = await loadModule('src/core/adventuring-utils.mjs'
 
 const { AdventuringWorkshopElement } = await loadModule('src/town/components/adventuring-workshop.mjs');
 const { AdventuringStoredItemElement } = await loadModule('src/items/components/adventuring-stored-item.mjs');
-const { AdventuringMaterialCostElement } = await loadModule('src/ui/components/adventuring-material-cost.mjs');
 const { AdventuringRequirementElement } = await loadModule('src/ui/components/adventuring-requirement.mjs');
 const { AdventuringWorkshopProductElement } = await loadModule('src/town/components/adventuring-workshop-product.mjs');
 
@@ -239,9 +238,18 @@ export class AdventuringWorkshop extends AdventuringPage {
             const have = this.manager.stash.getCount(material);
             const need = mat.count;
             
-            const costEl = new AdventuringMaterialCostElement();
-            costEl.setCost({ iconSrc: material.media, have, need });
-            this.component.costDisplay.appendChild(costEl);
+            const component = document.createElement('adventuring-material');
+            this.component.costDisplay.appendChild(component);
+            component.icon.src = material.media;
+            component.count.textContent = need;
+            // Border based on affordability
+            if (have >= need) {
+                component.border.classList.remove('border-danger');
+                component.border.classList.add('border-success');
+            } else {
+                component.border.classList.remove('border-success');
+                component.border.classList.add('border-danger');
+            }
         });
     }
 

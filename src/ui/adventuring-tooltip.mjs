@@ -630,7 +630,7 @@ export class TooltipBuilder {
     }
 
     /**
-     * Create a consumable tooltip showing name, type, description, and total charges across all tiers.
+     * Create a consumable tooltip showing name, type, description, effects, and total charges.
      * @param {Object} consumable - Tiered consumable object with name, media, type, etc.
      * @returns {TooltipBuilder} This builder for chaining
      */
@@ -645,27 +645,15 @@ export class TooltipBuilder {
             tooltip.hint(`Source: ${consumable.sourceJob.name}`);
         }
         
-        tooltip.separator();
-        
-        // Show total charges across all tiers
-        const totalCharges = consumable.totalCharges;
-        tooltip.warning(`Total Charges: ${totalCharges}`);
-        
-        // Show equipped tier if any
-        const equippedTier = consumable.equippedTier;
-        if (equippedTier > 0) {
-            tooltip.bonus(`Equipped: ${consumable.getTierName(equippedTier)}`);
+        // Show description
+        if (consumable.description) {
+            tooltip.separator().text(consumable.description, 'text-info');
         }
         
-        // Show tier summary
-        tooltip.separator().hint('Tiers:');
-        for (let tier = 1; tier <= 4; tier++) {
-            const tierData = consumable.tiers.get(tier);
-            if (tierData) {
-                const charges = consumable.getCharges(tier);
-                const mark = equippedTier === tier ? ' ✓' : '';
-                tooltip.text(`${consumable.getTierName(tier)}: ${charges}${mark}`, 'text-muted');
-            }
+        // Show total charges
+        const totalCharges = consumable.totalCharges;
+        if (totalCharges > 0) {
+            tooltip.separator().warning(`Charges: ${totalCharges}`);
         }
         
         return tooltip;
@@ -687,12 +675,17 @@ export class TooltipBuilder {
         
         const tooltip = TooltipBuilder.create()
             .header(tierName, tierMedia)
-            .subheader(typeLabel)
-            .hint(tierDesc)
-            .separator();
+            .subheader(typeLabel);
+        
+        // Show description
+        if (tierDesc) {
+            tooltip.hint(tierDesc);
+        }
         
         // Show charges
-        tooltip.warning(`Charges: ${charges}`);
+        if (charges > 0) {
+            tooltip.separator().warning(`Charges: ${charges}`);
+        }
         
         if(materials !== undefined && materials.size > 0) {
             tooltip.separator().hint('Craft Cost:');
@@ -709,20 +702,29 @@ export class TooltipBuilder {
     }
 
     /**
-     * Create a tavern drink tooltip showing name, description, and runs remaining.
+     * Create a tavern drink tooltip showing name, description, effects, and charges.
      * @param {Object} drink - TavernDrink object with name, media, description
-     * @param {number} runsRemaining - Number of runs remaining
+     * @param {number} [chargesOrRuns=0] - Total charges or runs remaining
      * @returns {TooltipBuilder} This builder for chaining
      */
-    static forTavernDrink(drink, runsRemaining) {
+    static forTavernDrink(drink, chargesOrRuns = 0) {
         const tooltip = TooltipBuilder.create()
             .header(drink.name, drink.media)
-            .subheader('Tavern Drink')
-            .hint(drink.description)
-            .separator();
+            .subheader('Tavern Drink');
         
-        if(runsRemaining > 0) {
-            tooltip.bonus(`Active: ${runsRemaining} runs remaining`);
+        if (drink.description) {
+            tooltip.hint(drink.description);
+        }
+        
+        // Show effects from tier 1 as representative
+        const effects = drink.getTierEffects ? drink.getTierEffects(1) : null;
+        if (effects && effects.length > 0) {
+            tooltip.separator();
+            tooltip.effects(effects);
+        }
+        
+        if (chargesOrRuns > 0) {
+            tooltip.separator().warning(`${chargesOrRuns} charge${chargesOrRuns !== 1 ? 's' : ''}`);
         }
         
         return tooltip;
