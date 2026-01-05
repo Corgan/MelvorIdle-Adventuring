@@ -27,6 +27,7 @@ export class AdventuringArmory extends AdventuringPage {
         this.itemsByCategory = new Map(); // Category -> Array of slots
         this.unlocked = new Map();
         this.viewed = new Map();  // Track if item has been viewed in UI
+        this.masterfulItems = new Map();  // Track Masterful rank items
         this.activeCategory = 'melee'; // Currently selected category
 
         this.component = createElement('adventuring-armory');
@@ -209,14 +210,11 @@ export class AdventuringArmory extends AdventuringPage {
 
     checkUnlocked() {
         this.upgradeLevels.forEach((level, baseItem) => {
-            if(!baseItem.materials || baseItem.materials.size === 0) {
-                // No materials required, unlock immediately
-                this.unlock(baseItem);
-                baseItem.renderQueue.updateAll();
-                return;
-            }
-            let unlock = [...baseItem.materials.keys()].map((material) => this.manager.stash.unlocked.get(material) === true).reduce((acc, val) => acc && val, true);
-            if(unlock) {
+            // Skip if already unlocked
+            if(this.unlocked.get(baseItem) === true) return;
+            
+            // Check if requirements are met (skill level, achievements, etc.)
+            if(baseItem.requirementsMet) {
                 this.unlock(baseItem);
                 baseItem.renderQueue.updateAll();
             }
@@ -225,8 +223,34 @@ export class AdventuringArmory extends AdventuringPage {
 
     unlock(item) {
         this.unlocked.set(item, true);
+        // When unlocked, item becomes usable (upgradeLevel 1)
+        if (this.upgradeLevels.get(item) < 1) {
+            this.upgradeLevels.set(item, 1);
+        }
         item.renderQueue.updateAll();
         this.renderQueue.details = true;
+    }
+
+    /**
+     * Pre-craft an item by unlocking it and setting upgrade level to 1.
+     * Used for starter gear that heroes begin with.
+     * @param {string} itemId - The full item ID (e.g. 'adventuring:bronze_sword1h')
+     * @returns {AdventuringItemBase|null} The pre-crafted item, or null if not found
+     */
+    preCraftItem(itemId) {
+        const item = this.manager.baseItems.getObjectByID(itemId);
+        if(!item) {
+            console.warn(`[Adventuring] Could not pre-craft item: ${itemId}`);
+            return null;
+        }
+        
+        // Unlock and set to level 1
+        this.unlocked.set(item, true);
+        this.upgradeLevels.set(item, 1);
+        this.viewed.set(item, true); // Don't show as NEW
+        item.renderQueue.updateAll();
+        
+        return item;
     }
 
     /**
@@ -287,6 +311,70 @@ export class AdventuringArmory extends AdventuringPage {
                 item.currentSlot.renderQueue.updateAll();
         }
         this.renderQueue.details = true;
+    }
+    
+    /**
+     * Check if an item can be upgraded to Masterful rank
+     * Requires: max upgrade level (10), level 99 mastery, and gauntlet tokens
+     */
+    canUpgradeToMasterful(item) {
+        if (this.masterfulItems.get(item)) return false; // Already masterful
+        if (this.upgradeLevels.get(item) < item.maxUpgrades) return false; // Not max upgrade
+        if (item.level < 99) return false; // Not max mastery level
+        
+        // Check gauntlet token requirements
+        const tokenCosts = this.getMasterfulTokenCost(item);
+        for (const [tokenId, cost] of Object.entries(tokenCosts)) {
+            const token = this.manager.materials.getObjectByID(tokenId);
+            if (!token) return false;
+            const available = this.manager.stash.materialCounts.get(token) || 0;
+            if (available < cost) return false;
+        }
+        
+        return true;
+    }
+    
+    /**
+     * Get the gauntlet token cost for masterful upgrade
+     */
+    getMasterfulTokenCost(item) {
+        // Tier scales with item tier
+        const tier = item.tier || 1;
+        const baseCost = Math.max(1, Math.floor(tier / 3));
+        
+        return {
+            'adventuring:gauntlet_token': baseCost,
+            'adventuring:gauntlet_token_ii': baseCost,
+            'adventuring:gauntlet_token_iii': baseCost
+        };
+    }
+    
+    /**
+     * Upgrade an item to Masterful rank
+     */
+    upgradeToMasterful(item) {
+        if (!this.canUpgradeToMasterful(item)) return false;
+        
+        // Deduct gauntlet tokens
+        const tokenCosts = this.getMasterfulTokenCost(item);
+        for (const [tokenId, cost] of Object.entries(tokenCosts)) {
+            const token = this.manager.materials.getObjectByID(tokenId);
+            if (token) {
+                this.manager.stash.remove(token, cost);
+            }
+        }
+        
+        // Mark as masterful
+        this.masterfulItems.set(item, true);
+        item.calculateStats();
+        item.renderQueue.updateAll();
+        
+        if (item.currentSlot !== undefined) {
+            item.currentSlot.renderQueue.updateAll();
+        }
+        
+        this.renderQueue.details = true;
+        return true;
     }
 
     updateSelectHighlight() {
@@ -397,6 +485,10 @@ export class AdventuringArmory extends AdventuringPage {
             writer.writeNamespacedObject(key);
             writer.writeBoolean(value);
         });
+        writer.writeComplexMap(this.masterfulItems, (key, value, writer) => {
+            writer.writeNamespacedObject(key);
+            writer.writeBoolean(value);
+        });
 
         return writer;
     }
@@ -419,6 +511,12 @@ export class AdventuringArmory extends AdventuringPage {
             let value = reader.getBoolean();
             if(typeof key !== "string" && key.id !== "adventuring:none")
                 this.viewed.set(key, value);
+        });
+        reader.getComplexMap((reader) => {
+            let key = reader.getNamespacedObject(this.manager.baseItems);
+            let value = reader.getBoolean();
+            if(typeof key !== "string" && key.id !== "adventuring:none")
+                this.masterfulItems.set(key, value);
         });
     }
 }

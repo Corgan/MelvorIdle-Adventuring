@@ -49,7 +49,9 @@ export class AdventuringEquipmentSet extends NamespacedObject {
         
         let count = 0;
         character.equipment.slots.forEach(slot => {
-            if(slot.equipped && this.items.includes(slot.equipped.base)) {
+            // slot.item is the AdventuringItemBase directly (or none item)
+            // Check if this item is in the set's items array
+            if(slot.item && this.items.includes(slot.item)) {
                 count++;
             }
         });

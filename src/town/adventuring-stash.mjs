@@ -210,6 +210,10 @@ export class AdventuringStash extends AdventuringPage {
         if(typeof material === "string")
             material = this.manager.materials.getObjectByID(material);
         let count = this.materialCounts.get(material);
+        // DEBUG: Check for NaN
+        if (typeof qty !== 'number' || isNaN(qty)) {
+            console.log(`[STASH DEBUG] Bad qty for ${material?.id}: qty=${qty}, count=${count}`);
+        }
         if(count !== undefined) {
             if(!material.unlocked)
                 this.unlock(material);

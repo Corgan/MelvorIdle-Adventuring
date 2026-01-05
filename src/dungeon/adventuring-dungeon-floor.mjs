@@ -307,10 +307,8 @@ export class AdventuringDungeonFloor {
     }
 
     complete() {
-        // Trigger floor_end effects before transitioning
-        this.manager.party.all.forEach(member => {
-            member.trigger('floor_end', {});
-        });
+        // Use centralized trigger system for floor_end
+        this.manager.triggerEffects('floor_end', {});
         
         this.manager.dungeon.progress++;
         this.manager.overview.renderQueue.status = true;

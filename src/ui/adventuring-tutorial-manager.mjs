@@ -887,6 +887,18 @@ export class AdventuringTutorialManager {
     }
 
     /**
+     * Reset all tutorial state (for skill reset)
+     */
+    resetState() {
+        this.skipAll = false;
+        this.completedTutorials.clear();
+        this.skippedTutorials.clear();
+        this.queue = [];
+        this.activeTutorial = null;
+        this.activeStepIndex = 0;
+    }
+
+    /**
      * Encode save data
      */
     encode(writer) {

@@ -71,6 +71,10 @@ export class AdventuringPages {
         reader.getComplexMap((reader) => {
             let key = reader.getString();
             let page = this.byId.get(key);
+            if (page === undefined) {
+                console.warn('[AdventuringPages] page not found for key:', key);
+                return;
+            }
             page.decode(reader, version);
         });
     }

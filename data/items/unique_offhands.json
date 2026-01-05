@@ -1,541 +1,1073 @@
 {
-    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
-    "namespace": "adventuring",
-    "data": {
-        "skillData": [{
-            "skillID": "adventuring:Adventuring",
-            "data": {
-                "baseItems": [
-                    {
-                        "id": "tower_shield",
-                        "name": "Tower Shield",
-                        "media": "melvor:assets/media/bank/armour_shield_dragon.png",
-                        "type": "adventuring:shield",
-                        "materials": [
-                            { "id": "adventuring:currency", "qty": 1500 },
-                            { "id": "adventuring:big_parts", "qty": 15 },
-                            { "id": "adventuring:knights_crest", "qty": 10 }
-                        ],
-                        "base": [
-                            { "id": "adventuring:hitpoints", "value": 30 },
-                            { "id": "adventuring:defence", "value": 40 },
-                            { "id": "adventuring:agility", "value": -10 }
-                        ],
-                        "scaling": [
-                            { "id": "adventuring:hitpoints", "value": 2.5 },
-                            { "id": "adventuring:defence", "value": 4.0 },
-                            { "id": "adventuring:agility", "value": -0.5 }
-                        ],
-                        "effects": [
-                            {
-                                "trigger": "encounter_start",
-                                "type": "buff",
-                                "id": "adventuring:block",
-                                "target": "self",
-                                "amount": 15,
-                                "scaling": 2,
-                                "stacks": 3
-                            }
-                        ]
-                    },
-                    {
-                        "id": "spiked_buckler",
-                        "name": "Spiked Buckler",
-                        "media": "melvor:assets/media/bank/armour_dragonhide_red_shield.png",
-                        "type": "adventuring:buckler",
-                        "materials": [
-                            { "id": "adventuring:currency", "qty": 1200 },
-                            { "id": "adventuring:big_parts", "qty": 10 },
-                            { "id": "adventuring:dragon_scale", "qty": 8 }
-                        ],
-                        "base": [
-                            { "id": "adventuring:hitpoints", "value": 15 },
-                            { "id": "adventuring:defence", "value": 12 },
-                            { "id": "adventuring:agility", "value": 8 }
-                        ],
-                        "scaling": [
-                            { "id": "adventuring:hitpoints", "value": 1.2 },
-                            { "id": "adventuring:defence", "value": 1.0 },
-                            { "id": "adventuring:agility", "value": 0.8 }
-                        ],
-                        "effects": [
-                            {
-                                "trigger": "after_damage_received",
-                                "type": "damage",
-                                "target": "attacker",
-                                "amount": 8,
-                                "scaling": 1.5
-                            }
-                        ]
-                    },
-                    {
-                        "id": "flame_ward",
-                        "name": "Flame Ward",
-                        "media": "melvor:assets/media/bank/armour_dragonhide_black_shield.png#shade=toxic",
-                        "type": "adventuring:shield",
-                        "materials": [
-                            { "id": "adventuring:currency", "qty": 2000 },
-                            { "id": "adventuring:big_parts", "qty": 12 },
-                            { "id": "adventuring:fire_essence", "qty": 15 }
-                        ],
-                        "base": [
-                            { "id": "adventuring:hitpoints", "value": 18 },
-                            { "id": "adventuring:defence", "value": 20 },
-                            { "id": "adventuring:magic", "value": 15 }
-                        ],
-                        "scaling": [
-                            { "id": "adventuring:hitpoints", "value": 1.5 },
-                            { "id": "adventuring:defence", "value": 1.8 },
-                            { "id": "adventuring:magic", "value": 1.2 }
-                        ],
-                        "effects": [
-                            {
-                                "trigger": "round_start",
-                                "type": "buff",
-                                "id": "adventuring:thorns",
-                                "target": "self",
-                                "amount": 5,
-                                "scaling": 0.8,
-                                "stacks": 2
-                            }
-                        ]
-                    },
-                    {
-                        "id": "frost_ward",
-                        "name": "Frost Ward",
-                        "media": "melvor:assets/media/bank/armour_shield_ice.png",
-                        "type": "adventuring:shield",
-                        "materials": [
-                            { "id": "adventuring:currency", "qty": 2000 },
-                            { "id": "adventuring:big_parts", "qty": 12 },
-                            { "id": "adventuring:water_essence", "qty": 15 }
-                        ],
-                        "base": [
-                            { "id": "adventuring:hitpoints", "value": 22 },
-                            { "id": "adventuring:defence", "value": 22 },
-                            { "id": "adventuring:agility", "value": 10 }
-                        ],
-                        "scaling": [
-                            { "id": "adventuring:hitpoints", "value": 1.8 },
-                            { "id": "adventuring:defence", "value": 1.8 },
-                            { "id": "adventuring:agility", "value": 0.8 }
-                        ],
-                        "effects": [
-                            {
-                                "trigger": "after_damage_received",
-                                "type": "debuff",
-                                "id": "adventuring:chill",
-                                "target": "attacker",
-                                "stacks": 3,
-                                "chance": 30
-                            }
-                        ]
-                    },
-                    {
-                        "id": "storm_ward",
-                        "name": "Storm Ward",
-                        "media": "melvor:assets/media/bank/armour_shield_bronze.png#shade=brown",
-                        "type": "adventuring:shield",
-                        "materials": [
-                            { "id": "adventuring:currency", "qty": 2000 },
-                            { "id": "adventuring:big_parts", "qty": 12 },
-                            { "id": "adventuring:air_essence", "qty": 15 }
-                        ],
-                        "base": [
-                            { "id": "adventuring:hitpoints", "value": 15 },
-                            { "id": "adventuring:defence", "value": 18 },
-                            { "id": "adventuring:agility", "value": 20 }
-                        ],
-                        "scaling": [
-                            { "id": "adventuring:hitpoints", "value": 1.2 },
-                            { "id": "adventuring:defence", "value": 1.5 },
-                            { "id": "adventuring:agility", "value": 1.8 }
-                        ],
-                        "effects": [
-                            {
-                                "trigger": "encounter_start",
-                                "type": "buff",
-                                "id": "adventuring:haste",
-                                "target": "self",
-                                "stacks": 2
-                            }
-                        ]
-                    },
-                    {
-                        "id": "earth_ward",
-                        "name": "Earth Ward",
-                        "media": "melvor:assets/media/bank/armour_shield_rune.png",
-                        "type": "adventuring:shield",
-                        "materials": [
-                            { "id": "adventuring:currency", "qty": 2000 },
-                            { "id": "adventuring:big_parts", "qty": 12 },
-                            { "id": "adventuring:earth_essence", "qty": 15 }
-                        ],
-                        "base": [
-                            { "id": "adventuring:hitpoints", "value": 28 },
-                            { "id": "adventuring:defence", "value": 28 },
-                            { "id": "adventuring:strength", "value": 8 }
-                        ],
-                        "scaling": [
-                            { "id": "adventuring:hitpoints", "value": 2.2 },
-                            { "id": "adventuring:defence", "value": 2.2 },
-                            { "id": "adventuring:strength", "value": 0.6 }
-                        ],
-                        "effects": [
-                            {
-                                "trigger": "encounter_start",
-                                "type": "buff",
-                                "id": "adventuring:fortify",
-                                "target": "self",
-                                "stacks": 1
-                            }
-                        ]
-                    },
-                    {
-                        "id": "parrying_dagger",
-                        "name": "Parrying Dagger",
-                        "media": "melvor:assets/media/bank/weapon_dagger_dragon.png",
-                        "type": "adventuring:dagger",
-                        "materials": [
-                            { "id": "adventuring:currency", "qty": 1500 },
-                            { "id": "adventuring:big_parts", "qty": 10 },
-                            { "id": "adventuring:bandits_coin", "qty": 20 }
-                        ],
-                        "base": [
-                            { "id": "adventuring:agility", "value": 25 },
-                            { "id": "adventuring:strength", "value": 12 }
-                        ],
-                        "scaling": [
-                            { "id": "adventuring:agility", "value": 2.2 },
-                            { "id": "adventuring:strength", "value": 1.0 }
-                        ],
-                        "effects": [
-                            {
-                                "trigger": "encounter_start",
-                                "type": "buff",
-                                "id": "adventuring:evasion",
-                                "target": "self",
-                                "stacks": 2
-                            }
-                        ]
-                    },
-                    {
-                        "id": "throwing_knives",
-                        "name": "Throwing Knives",
-                        "media": "melvor:assets/media/bank/weapon_dagger_rune.png",
-                        "type": "adventuring:dagger",
-                        "materials": [
-                            { "id": "adventuring:currency", "qty": 1400 },
-                            { "id": "adventuring:big_parts", "qty": 10 },
-                            { "id": "adventuring:spider_silk", "qty": 15 }
-                        ],
-                        "base": [
-                            { "id": "adventuring:agility", "value": 18 },
-                            { "id": "adventuring:ranged", "value": 20 }
-                        ],
-                        "scaling": [
-                            { "id": "adventuring:agility", "value": 1.5 },
-                            { "id": "adventuring:ranged", "value": 1.8 }
-                        ],
-                        "effects": [
-                            {
-                                "trigger": "round_start",
-                                "type": "damage",
-                                "target": "random", "party": "enemy",
-                                "amount": 5,
-                                "scaling": 1.2
-                            }
-                        ]
-                    },
-                    {
-                        "id": "crystal_orb",
-                        "name": "Crystal Orb",
-                        "media": "melvor:assets/media/bank/rune_air.png",
-                        "type": "adventuring:orb",
-                        "materials": [
-                            { "id": "adventuring:currency", "qty": 1800 },
-                            { "id": "adventuring:big_parts", "qty": 12 },
-                            { "id": "adventuring:arcane_dust", "qty": 25 }
-                        ],
-                        "base": [
-                            { "id": "adventuring:magic", "value": 30 },
-                            { "id": "adventuring:prayer", "value": 10 }
-                        ],
-                        "scaling": [
-                            { "id": "adventuring:magic", "value": 2.8 },
-                            { "id": "adventuring:prayer", "value": 0.8 }
-                        ],
-                        "effects": [
-                            {
-                                "trigger": "encounter_start",
-                                "type": "buff",
-                                "id": "adventuring:arcane_power",
-                                "target": "self",
-                                "stacks": 2
-                            }
-                        ]
-                    },
-                    {
-                        "id": "dark_orb",
-                        "name": "Dark Orb",
-                        "media": "melvor:assets/media/bank/rune_havoc.png#shade=red",
-                        "type": "adventuring:orb",
-                        "materials": [
-                            { "id": "adventuring:currency", "qty": 2200 },
-                            { "id": "adventuring:big_parts", "qty": 15 },
-                            { "id": "adventuring:vampire_fang", "qty": 12 }
-                        ],
-                        "base": [
-                            { "id": "adventuring:magic", "value": 25 },
-                            { "id": "adventuring:hitpoints", "value": 15 }
-                        ],
-                        "scaling": [
-                            { "id": "adventuring:magic", "value": 2.2 },
-                            { "id": "adventuring:hitpoints", "value": 1.2 }
-                        ],
-                        "effects": [
-                            {
-                                "trigger": "on_kill",
-                                "type": "heal",
-                                "target": "self",
-                                "amount": 10,
-                                "scaling": 1.5
-                            }
-                        ]
-                    },
-                    {
-                        "id": "tome_of_fire",
-                        "name": "Tome of Fire",
-                        "media": "melvor:assets/media/bank/book_of_eli.png",
-                        "type": "adventuring:spellbook",
-                        "materials": [
-                            { "id": "adventuring:currency", "qty": 2500 },
-                            { "id": "adventuring:big_parts", "qty": 15 },
-                            { "id": "adventuring:fire_essence", "qty": 20 }
-                        ],
-                        "base": [
-                            { "id": "adventuring:magic", "value": 28 },
-                            { "id": "adventuring:strength", "value": 12 }
-                        ],
-                        "scaling": [
-                            { "id": "adventuring:magic", "value": 2.5 },
-                            { "id": "adventuring:strength", "value": 1.0 }
-                        ],
-                        "effects": [
-                            {
-                                "trigger": "on_hit",
-                                "type": "debuff",
-                                "id": "adventuring:burn",
-                                "target": "hit_target",
-                                "stacks": 2,
-                                "chance": 25
-                            }
-                        ]
-                    },
-                    {
-                        "id": "tome_of_frost",
-                        "name": "Tome of Frost",
-                        "media": "melvor:assets/media/bank/wizards_scroll.png#shade=blue",
-                        "type": "adventuring:spellbook",
-                        "materials": [
-                            { "id": "adventuring:currency", "qty": 2500 },
-                            { "id": "adventuring:big_parts", "qty": 15 },
-                            { "id": "adventuring:water_essence", "qty": 20 }
-                        ],
-                        "base": [
-                            { "id": "adventuring:magic", "value": 25 },
-                            { "id": "adventuring:hitpoints", "value": 18 }
-                        ],
-                        "scaling": [
-                            { "id": "adventuring:magic", "value": 2.2 },
-                            { "id": "adventuring:hitpoints", "value": 1.5 }
-                        ],
-                        "effects": [
-                            {
-                                "trigger": "on_hit",
-                                "type": "debuff",
-                                "id": "adventuring:slow",
-                                "target": "hit_target",
-                                "stacks": 2,
-                                "chance": 25
-                            }
-                        ]
-                    },
-                    {
-                        "id": "tome_of_shadows",
-                        "name": "Tome of Shadows",
-                        "media": "melvor:assets/media/bank/book_of_occults.png",
-                        "type": "adventuring:spellbook",
-                        "materials": [
-                            { "id": "adventuring:currency", "qty": 3000 },
-                            { "id": "adventuring:big_parts", "qty": 18 },
-                            { "id": "adventuring:mist_shard", "qty": 10 }
-                        ],
-                        "base": [
-                            { "id": "adventuring:magic", "value": 32 },
-                            { "id": "adventuring:agility", "value": 15 }
-                        ],
-                        "scaling": [
-                            { "id": "adventuring:magic", "value": 2.8 },
-                            { "id": "adventuring:agility", "value": 1.2 }
-                        ],
-                        "effects": [
-                            {
-                                "trigger": "on_hit",
-                                "type": "debuff",
-                                "id": "adventuring:vulnerability",
-                                "target": "hit_target",
-                                "stacks": 2,
-                                "chance": 20
-                            }
-                        ]
-                    },
-                    {
-                        "id": "hunters_trophy",
-                        "name": "Hunter's Trophy",
-                        "media": "melvor:assets/media/bank/big_bones.png#shade=white",
-                        "type": "adventuring:trophy",
-                        "materials": [
-                            { "id": "adventuring:currency", "qty": 1000 },
-                            { "id": "adventuring:big_parts", "qty": 8 },
-                            { "id": "adventuring:bone_fragment", "qty": 30 }
-                        ],
-                        "base": [
-                            { "id": "adventuring:hitpoints", "value": 12 },
-                            { "id": "adventuring:strength", "value": 15 }
-                        ],
-                        "scaling": [
-                            { "id": "adventuring:hitpoints", "value": 1.0 },
-                            { "id": "adventuring:strength", "value": 1.3 }
-                        ],
-                        "effects": [
-                            {
-                                "trigger": "on_kill",
-                                "type": "buff",
-                                "id": "adventuring:might",
-                                "target": "self",
-                                "stacks": 1
-                            }
-                        ]
-                    },
-                    {
-                        "id": "slayers_trophy",
-                        "name": "Slayer's Trophy",
-                        "media": "melvor:assets/media/bank/skull_cape.png#shade=brown",
-                        "type": "adventuring:trophy",
-                        "materials": [
-                            { "id": "adventuring:currency", "qty": 2000 },
-                            { "id": "adventuring:big_parts", "qty": 12 },
-                            { "id": "adventuring:demon_horn", "qty": 10 }
-                        ],
-                        "base": [
-                            { "id": "adventuring:hitpoints", "value": 20 },
-                            { "id": "adventuring:strength", "value": 20 },
-                            { "id": "adventuring:agility", "value": 10 }
-                        ],
-                        "scaling": [
-                            { "id": "adventuring:hitpoints", "value": 1.6 },
-                            { "id": "adventuring:strength", "value": 1.8 },
-                            { "id": "adventuring:agility", "value": 0.8 }
-                        ],
-                        "effects": [
-                            {
-                                "trigger": "on_kill",
-                                "type": "buff",
-                                "id": "adventuring:bloodlust",
-                                "target": "self",
-                                "stacks": 1
-                            }
-                        ]
-                    },
-                    {
-                        "id": "holy_quiver",
-                        "name": "Holy Quiver",
-                        "media": "melvor:assets/media/bank/ammo_arrow_dragon.png",
-                        "type": "adventuring:quiver",
-                        "materials": [
-                            { "id": "adventuring:currency", "qty": 2200 },
-                            { "id": "adventuring:big_parts", "qty": 12 },
-                            { "id": "adventuring:holy_dust", "qty": 15 }
-                        ],
-                        "base": [
-                            { "id": "adventuring:ranged", "value": 28 },
-                            { "id": "adventuring:prayer", "value": 15 }
-                        ],
-                        "scaling": [
-                            { "id": "adventuring:ranged", "value": 2.5 },
-                            { "id": "adventuring:prayer", "value": 1.2 }
-                        ],
-                        "effects": [
-                            {
-                                "trigger": "on_hit",
-                                "type": "heal",
-                                "target": "self",
-                                "amount": 3,
-                                "scaling": 0.5,
-                                "chance": 20
-                            }
-                        ]
-                    },
-                    {
-                        "id": "poisoned_quiver",
-                        "name": "Poisoned Quiver",
-                        "media": "melvor:assets/media/bank/ammo_bolt_diamond.png#shade=green",
-                        "type": "adventuring:quiver",
-                        "materials": [
-                            { "id": "adventuring:currency", "qty": 1600 },
-                            { "id": "adventuring:big_parts", "qty": 10 },
-                            { "id": "adventuring:goo", "qty": 20 }
-                        ],
-                        "base": [
-                            { "id": "adventuring:ranged", "value": 25 },
-                            { "id": "adventuring:agility", "value": 12 }
-                        ],
-                        "scaling": [
-                            { "id": "adventuring:ranged", "value": 2.2 },
-                            { "id": "adventuring:agility", "value": 1.0 }
-                        ],
-                        "effects": [
-                            {
-                                "trigger": "on_hit",
-                                "type": "debuff",
-                                "id": "adventuring:poison",
-                                "target": "hit_target",
-                                "stacks": 2,
-                                "chance": 30
-                            }
-                        ]
-                    },
-                    {
-                        "id": "explosive_quiver",
-                        "name": "Explosive Quiver",
-                        "media": "melvor:assets/media/bank/ammo_arrow_rune.png",
-                        "type": "adventuring:quiver",
-                        "materials": [
-                            { "id": "adventuring:currency", "qty": 2800 },
-                            { "id": "adventuring:big_parts", "qty": 15 },
-                            { "id": "adventuring:fire_essence", "qty": 18 }
-                        ],
-                        "base": [
-                            { "id": "adventuring:ranged", "value": 35 },
-                            { "id": "adventuring:strength", "value": 10 }
-                        ],
-                        "scaling": [
-                            { "id": "adventuring:ranged", "value": 3.0 },
-                            { "id": "adventuring:strength", "value": 0.8 }
-                        ],
-                        "effects": [
-                            {
-                                "trigger": "on_kill",
-                                "type": "damage",
-                                "target": "all", "party": "enemy",
-                                "amount": 8,
-                                "scaling": 1.2
-                            }
-                        ]
-                    }
-                ]
-            }
-        }]
-    }
+    "$schema":  "https://www.melvoridle.com/assets/schema/gameData.json",
+    "namespace":  "adventuring",
+    "data":  {
+                 "skillData":  [
+                                   {
+                                       "skillID":  "adventuring:Adventuring",
+                                       "data":  {
+                                                    "baseItems":  [
+                                                                      {
+                                                                          "id":  "tower_shield",
+                                                                          "name":  "Tower Shield",
+                                                                          "media":  "melvor:assets/media/bank/armour_shield_dragon.png",
+                                                                          "type":  "adventuring:shield",
+                                                                          "materials":  [
+                                                                                            {
+                                                                                                "id":  "adventuring:currency",
+                                                                                                "qty":  1500
+                                                                                            },
+                                                                                            {
+                                                                                                "id":  "adventuring:big_parts",
+                                                                                                "qty":  15
+                                                                                            },
+                                                                                            {
+                                                                                                "id":  "adventuring:knights_crest",
+                                                                                                "qty":  10
+                                                                                            }
+                                                                                        ],
+                                                                          "base":  [
+                                                                                       {
+                                                                                           "id":  "adventuring:hitpoints",
+                                                                                           "value":  30
+                                                                                       },
+                                                                                       {
+                                                                                           "id":  "adventuring:defence",
+                                                                                           "value":  40
+                                                                                       },
+                                                                                       {
+                                                                                           "id":  "adventuring:agility",
+                                                                                           "value":  -10
+                                                                                       }
+                                                                                   ],
+                                                                          "scaling":  [
+                                                                                          {
+                                                                                              "id":  "adventuring:hitpoints",
+                                                                                              "value":  2.5
+                                                                                          },
+                                                                                          {
+                                                                                              "id":  "adventuring:defence",
+                                                                                              "value":  4.0
+                                                                                          },
+                                                                                          {
+                                                                                              "id":  "adventuring:agility",
+                                                                                              "value":  -0.5
+                                                                                          }
+                                                                                      ],
+                                                                          "effects":  [
+                                                                                          {
+                                                                                              "trigger":  "encounter_start",
+                                                                                              "type":  "buff",
+                                                                                              "id":  "adventuring:block",
+                                                                                              "target":  "self",
+                                                                                              "amount":  15,
+                                                                                              "scaling":  2,
+                                                                                              "stacks":  3
+                                                                                          }
+                                                                                      ],
+                                                                          "requirements":  [
+                                                                                               {
+                                                                                                   "hint":  "Boss drop required",
+                                                                                                   "type":  "always_false"
+                                                                                               }
+                                                                                           ]
+                                                                      },
+                                                                      {
+                                                                          "id":  "spiked_buckler",
+                                                                          "name":  "Spiked Buckler",
+                                                                          "media":  "melvor:assets/media/bank/armour_dragonhide_red_shield.png",
+                                                                          "type":  "adventuring:buckler",
+                                                                          "materials":  [
+                                                                                            {
+                                                                                                "id":  "adventuring:currency",
+                                                                                                "qty":  1200
+                                                                                            },
+                                                                                            {
+                                                                                                "id":  "adventuring:big_parts",
+                                                                                                "qty":  10
+                                                                                            },
+                                                                                            {
+                                                                                                "id":  "adventuring:dragon_scale",
+                                                                                                "qty":  8
+                                                                                            }
+                                                                                        ],
+                                                                          "base":  [
+                                                                                       {
+                                                                                           "id":  "adventuring:hitpoints",
+                                                                                           "value":  15
+                                                                                       },
+                                                                                       {
+                                                                                           "id":  "adventuring:defence",
+                                                                                           "value":  12
+                                                                                       },
+                                                                                       {
+                                                                                           "id":  "adventuring:agility",
+                                                                                           "value":  8
+                                                                                       }
+                                                                                   ],
+                                                                          "scaling":  [
+                                                                                          {
+                                                                                              "id":  "adventuring:hitpoints",
+                                                                                              "value":  1.2
+                                                                                          },
+                                                                                          {
+                                                                                              "id":  "adventuring:defence",
+                                                                                              "value":  1.0
+                                                                                          },
+                                                                                          {
+                                                                                              "id":  "adventuring:agility",
+                                                                                              "value":  0.8
+                                                                                          }
+                                                                                      ],
+                                                                          "effects":  [
+                                                                                          {
+                                                                                              "trigger":  "after_damage_received",
+                                                                                              "type":  "damage",
+                                                                                              "target":  "attacker",
+                                                                                              "amount":  8,
+                                                                                              "scaling":  1.5
+                                                                                          }
+                                                                                      ],
+                                                                          "requirements":  [
+                                                                                               {
+                                                                                                   "hint":  "Boss drop required",
+                                                                                                   "type":  "always_false"
+                                                                                               }
+                                                                                           ]
+                                                                      },
+                                                                      {
+                                                                          "id":  "flame_ward",
+                                                                          "name":  "Flame Ward",
+                                                                          "media":  "melvor:assets/media/bank/armour_dragonhide_black_shield.png#shade=toxic",
+                                                                          "type":  "adventuring:shield",
+                                                                          "materials":  [
+                                                                                            {
+                                                                                                "id":  "adventuring:currency",
+                                                                                                "qty":  2000
+                                                                                            },
+                                                                                            {
+                                                                                                "id":  "adventuring:big_parts",
+                                                                                                "qty":  12
+                                                                                            },
+                                                                                            {
+                                                                                                "id":  "adventuring:fire_essence",
+                                                                                                "qty":  15
+                                                                                            }
+                                                                                        ],
+                                                                          "base":  [
+                                                                                       {
+                                                                                           "id":  "adventuring:hitpoints",
+                                                                                           "value":  18
+                                                                                       },
+                                                                                       {
+                                                                                           "id":  "adventuring:defence",
+                                                                                           "value":  20
+                                                                                       },
+                                                                                       {
+                                                                                           "id":  "adventuring:magic",
+                                                                                           "value":  15
+                                                                                       }
+                                                                                   ],
+                                                                          "scaling":  [
+                                                                                          {
+                                                                                              "id":  "adventuring:hitpoints",
+                                                                                              "value":  1.5
+                                                                                          },
+                                                                                          {
+                                                                                              "id":  "adventuring:defence",
+                                                                                              "value":  1.8
+                                                                                          },
+                                                                                          {
+                                                                                              "id":  "adventuring:magic",
+                                                                                              "value":  1.2
+                                                                                          }
+                                                                                      ],
+                                                                          "effects":  [
+                                                                                          {
+                                                                                              "trigger":  "round_start",
+                                                                                              "type":  "buff",
+                                                                                              "id":  "adventuring:thorns",
+                                                                                              "target":  "self",
+                                                                                              "amount":  5,
+                                                                                              "scaling":  0.8,
+                                                                                              "stacks":  2
+                                                                                          }
+                                                                                      ],
+                                                                          "requirements":  [
+                                                                                               {
+                                                                                                   "hint":  "Boss drop required",
+                                                                                                   "type":  "always_false"
+                                                                                               }
+                                                                                           ]
+                                                                      },
+                                                                      {
+                                                                          "id":  "frost_ward",
+                                                                          "name":  "Frost Ward",
+                                                                          "media":  "melvor:assets/media/bank/armour_shield_ice.png",
+                                                                          "type":  "adventuring:shield",
+                                                                          "materials":  [
+                                                                                            {
+                                                                                                "id":  "adventuring:currency",
+                                                                                                "qty":  2000
+                                                                                            },
+                                                                                            {
+                                                                                                "id":  "adventuring:big_parts",
+                                                                                                "qty":  12
+                                                                                            },
+                                                                                            {
+                                                                                                "id":  "adventuring:water_essence",
+                                                                                                "qty":  15
+                                                                                            }
+                                                                                        ],
+                                                                          "base":  [
+                                                                                       {
+                                                                                           "id":  "adventuring:hitpoints",
+                                                                                           "value":  22
+                                                                                       },
+                                                                                       {
+                                                                                           "id":  "adventuring:defence",
+                                                                                           "value":  22
+                                                                                       },
+                                                                                       {
+                                                                                           "id":  "adventuring:agility",
+                                                                                           "value":  10
+                                                                                       }
+                                                                                   ],
+                                                                          "scaling":  [
+                                                                                          {
+                                                                                              "id":  "adventuring:hitpoints",
+                                                                                              "value":  1.8
+                                                                                          },
+                                                                                          {
+                                                                                              "id":  "adventuring:defence",
+                                                                                              "value":  1.8
+                                                                                          },
+                                                                                          {
+                                                                                              "id":  "adventuring:agility",
+                                                                                              "value":  0.8
+                                                                                          }
+                                                                                      ],
+                                                                          "effects":  [
+                                                                                          {
+                                                                                              "trigger":  "after_damage_received",
+                                                                                              "type":  "debuff",
+                                                                                              "id":  "adventuring:chill",
+                                                                                              "target":  "attacker",
+                                                                                              "stacks":  3,
+                                                                                              "chance":  30
+                                                                                          }
+                                                                                      ],
+                                                                          "requirements":  [
+                                                                                               {
+                                                                                                   "hint":  "Boss drop required",
+                                                                                                   "type":  "always_false"
+                                                                                               }
+                                                                                           ]
+                                                                      },
+                                                                      {
+                                                                          "id":  "storm_ward",
+                                                                          "name":  "Storm Ward",
+                                                                          "media":  "melvor:assets/media/bank/armour_shield_bronze.png#shade=brown",
+                                                                          "type":  "adventuring:shield",
+                                                                          "materials":  [
+                                                                                            {
+                                                                                                "id":  "adventuring:currency",
+                                                                                                "qty":  2000
+                                                                                            },
+                                                                                            {
+                                                                                                "id":  "adventuring:big_parts",
+                                                                                                "qty":  12
+                                                                                            },
+                                                                                            {
+                                                                                                "id":  "adventuring:air_essence",
+                                                                                                "qty":  15
+                                                                                            }
+                                                                                        ],
+                                                                          "base":  [
+                                                                                       {
+                                                                                           "id":  "adventuring:hitpoints",
+                                                                                           "value":  15
+                                                                                       },
+                                                                                       {
+                                                                                           "id":  "adventuring:defence",
+                                                                                           "value":  18
+                                                                                       },
+                                                                                       {
+                                                                                           "id":  "adventuring:agility",
+                                                                                           "value":  20
+                                                                                       }
+                                                                                   ],
+                                                                          "scaling":  [
+                                                                                          {
+                                                                                              "id":  "adventuring:hitpoints",
+                                                                                              "value":  1.2
+                                                                                          },
+                                                                                          {
+                                                                                              "id":  "adventuring:defence",
+                                                                                              "value":  1.5
+                                                                                          },
+                                                                                          {
+                                                                                              "id":  "adventuring:agility",
+                                                                                              "value":  1.8
+                                                                                          }
+                                                                                      ],
+                                                                          "effects":  [
+                                                                                          {
+                                                                                              "trigger":  "encounter_start",
+                                                                                              "type":  "buff",
+                                                                                              "id":  "adventuring:haste",
+                                                                                              "target":  "self",
+                                                                                              "stacks":  2
+                                                                                          }
+                                                                                      ],
+                                                                          "requirements":  [
+                                                                                               {
+                                                                                                   "hint":  "Boss drop required",
+                                                                                                   "type":  "always_false"
+                                                                                               }
+                                                                                           ]
+                                                                      },
+                                                                      {
+                                                                          "id":  "earth_ward",
+                                                                          "name":  "Earth Ward",
+                                                                          "media":  "melvor:assets/media/bank/armour_shield_rune.png",
+                                                                          "type":  "adventuring:shield",
+                                                                          "materials":  [
+                                                                                            {
+                                                                                                "id":  "adventuring:currency",
+                                                                                                "qty":  2000
+                                                                                            },
+                                                                                            {
+                                                                                                "id":  "adventuring:big_parts",
+                                                                                                "qty":  12
+                                                                                            },
+                                                                                            {
+                                                                                                "id":  "adventuring:earth_essence",
+                                                                                                "qty":  15
+                                                                                            }
+                                                                                        ],
+                                                                          "base":  [
+                                                                                       {
+                                                                                           "id":  "adventuring:hitpoints",
+                                                                                           "value":  28
+                                                                                       },
+                                                                                       {
+                                                                                           "id":  "adventuring:defence",
+                                                                                           "value":  28
+                                                                                       },
+                                                                                       {
+                                                                                           "id":  "adventuring:strength",
+                                                                                           "value":  8
+                                                                                       }
+                                                                                   ],
+                                                                          "scaling":  [
+                                                                                          {
+                                                                                              "id":  "adventuring:hitpoints",
+                                                                                              "value":  2.2
+                                                                                          },
+                                                                                          {
+                                                                                              "id":  "adventuring:defence",
+                                                                                              "value":  2.2
+                                                                                          },
+                                                                                          {
+                                                                                              "id":  "adventuring:strength",
+                                                                                              "value":  0.6
+                                                                                          }
+                                                                                      ],
+                                                                          "effects":  [
+                                                                                          {
+                                                                                              "trigger":  "encounter_start",
+                                                                                              "type":  "buff",
+                                                                                              "id":  "adventuring:fortify",
+                                                                                              "target":  "self",
+                                                                                              "stacks":  1
+                                                                                          }
+                                                                                      ],
+                                                                          "requirements":  [
+                                                                                               {
+                                                                                                   "hint":  "Boss drop required",
+                                                                                                   "type":  "always_false"
+                                                                                               }
+                                                                                           ]
+                                                                      },
+                                                                      {
+                                                                          "id":  "parrying_dagger",
+                                                                          "name":  "Parrying Dagger",
+                                                                          "media":  "melvor:assets/media/bank/weapon_dagger_dragon.png",
+                                                                          "type":  "adventuring:dagger",
+                                                                          "materials":  [
+                                                                                            {
+                                                                                                "id":  "adventuring:currency",
+                                                                                                "qty":  1500
+                                                                                            },
+                                                                                            {
+                                                                                                "id":  "adventuring:big_parts",
+                                                                                                "qty":  10
+                                                                                            },
+                                                                                            {
+                                                                                                "id":  "adventuring:bandits_coin",
+                                                                                                "qty":  20
+                                                                                            }
+                                                                                        ],
+                                                                          "base":  [
+                                                                                       {
+                                                                                           "id":  "adventuring:agility",
+                                                                                           "value":  25
+                                                                                       },
+                                                                                       {
+                                                                                           "id":  "adventuring:strength",
+                                                                                           "value":  12
+                                                                                       }
+                                                                                   ],
+                                                                          "scaling":  [
+                                                                                          {
+                                                                                              "id":  "adventuring:agility",
+                                                                                              "value":  2.2
+                                                                                          },
+                                                                                          {
+                                                                                              "id":  "adventuring:strength",
+                                                                                              "value":  1.0
+                                                                                          }
+                                                                                      ],
+                                                                          "effects":  [
+                                                                                          {
+                                                                                              "trigger":  "encounter_start",
+                                                                                              "type":  "buff",
+                                                                                              "id":  "adventuring:evasion",
+                                                                                              "target":  "self",
+                                                                                              "stacks":  2
+                                                                                          }
+                                                                                      ],
+                                                                          "requirements":  [
+                                                                                               {
+                                                                                                   "hint":  "Boss drop required",
+                                                                                                   "type":  "always_false"
+                                                                                               }
+                                                                                           ]
+                                                                      },
+                                                                      {
+                                                                          "id":  "throwing_knives",
+                                                                          "name":  "Throwing Knives",
+                                                                          "media":  "melvor:assets/media/bank/weapon_dagger_rune.png",
+                                                                          "type":  "adventuring:dagger",
+                                                                          "materials":  [
+                                                                                            {
+                                                                                                "id":  "adventuring:currency",
+                                                                                                "qty":  1400
+                                                                                            },
+                                                                                            {
+                                                                                                "id":  "adventuring:big_parts",
+                                                                                                "qty":  10
+                                                                                            },
+                                                                                            {
+                                                                                                "id":  "adventuring:spider_silk",
+                                                                                                "qty":  15
+                                                                                            }
+                                                                                        ],
+                                                                          "base":  [
+                                                                                       {
+                                                                                           "id":  "adventuring:agility",
+                                                                                           "value":  18
+                                                                                       },
+                                                                                       {
+                                                                                           "id":  "adventuring:ranged",
+                                                                                           "value":  20
+                                                                                       }
+                                                                                   ],
+                                                                          "scaling":  [
+                                                                                          {
+                                                                                              "id":  "adventuring:agility",
+                                                                                              "value":  1.5
+                                                                                          },
+                                                                                          {
+                                                                                              "id":  "adventuring:ranged",
+                                                                                              "value":  1.8
+                                                                                          }
+                                                                                      ],
+                                                                          "effects":  [
+                                                                                          {
+                                                                                              "trigger":  "round_start",
+                                                                                              "type":  "damage",
+                                                                                              "target":  "random",
+                                                                                              "party":  "enemy",
+                                                                                              "amount":  5,
+                                                                                              "scaling":  1.2
+                                                                                          }
+                                                                                      ],
+                                                                          "requirements":  [
+                                                                                               {
+                                                                                                   "hint":  "Boss drop required",
+                                                                                                   "type":  "always_false"
+                                                                                               }
+                                                                                           ]
+                                                                      },
+                                                                      {
+                                                                          "id":  "crystal_orb",
+                                                                          "name":  "Crystal Orb",
+                                                                          "media":  "melvor:assets/media/bank/rune_air.png",
+                                                                          "type":  "adventuring:orb",
+                                                                          "materials":  [
+                                                                                            {
+                                                                                                "id":  "adventuring:currency",
+                                                                                                "qty":  1800
+                                                                                            },
+                                                                                            {
+                                                                                                "id":  "adventuring:big_parts",
+                                                                                                "qty":  12
+                                                                                            },
+                                                                                            {
+                                                                                                "id":  "adventuring:arcane_dust",
+                                                                                                "qty":  25
+                                                                                            }
+                                                                                        ],
+                                                                          "base":  [
+                                                                                       {
+                                                                                           "id":  "adventuring:magic",
+                                                                                           "value":  30
+                                                                                       },
+                                                                                       {
+                                                                                           "id":  "adventuring:prayer",
+                                                                                           "value":  10
+                                                                                       }
+                                                                                   ],
+                                                                          "scaling":  [
+                                                                                          {
+                                                                                              "id":  "adventuring:magic",
+                                                                                              "value":  2.8
+                                                                                          },
+                                                                                          {
+                                                                                              "id":  "adventuring:prayer",
+                                                                                              "value":  0.8
+                                                                                          }
+                                                                                      ],
+                                                                          "effects":  [
+                                                                                          {
+                                                                                              "trigger":  "encounter_start",
+                                                                                              "type":  "buff",
+                                                                                              "id":  "adventuring:arcane_power",
+                                                                                              "target":  "self",
+                                                                                              "stacks":  2
+                                                                                          }
+                                                                                      ],
+                                                                          "requirements":  [
+                                                                                               {
+                                                                                                   "hint":  "Boss drop required",
+                                                                                                   "type":  "always_false"
+                                                                                               }
+                                                                                           ]
+                                                                      },
+                                                                      {
+                                                                          "id":  "dark_orb",
+                                                                          "name":  "Dark Orb",
+                                                                          "media":  "melvor:assets/media/bank/rune_havoc.png#shade=red",
+                                                                          "type":  "adventuring:orb",
+                                                                          "materials":  [
+                                                                                            {
+                                                                                                "id":  "adventuring:currency",
+                                                                                                "qty":  2200
+                                                                                            },
+                                                                                            {
+                                                                                                "id":  "adventuring:big_parts",
+                                                                                                "qty":  15
+                                                                                            },
+                                                                                            {
+                                                                                                "id":  "adventuring:vampire_fang",
+                                                                                                "qty":  12
+                                                                                            }
+                                                                                        ],
+                                                                          "base":  [
+                                                                                       {
+                                                                                           "id":  "adventuring:magic",
+                                                                                           "value":  25
+                                                                                       },
+                                                                                       {
+                                                                                           "id":  "adventuring:hitpoints",
+                                                                                           "value":  15
+                                                                                       }
+                                                                                   ],
+                                                                          "scaling":  [
+                                                                                          {
+                                                                                              "id":  "adventuring:magic",
+                                                                                              "value":  2.2
+                                                                                          },
+                                                                                          {
+                                                                                              "id":  "adventuring:hitpoints",
+                                                                                              "value":  1.2
+                                                                                          }
+                                                                                      ],
+                                                                          "effects":  [
+                                                                                          {
+                                                                                              "trigger":  "on_kill",
+                                                                                              "type":  "heal",
+                                                                                              "target":  "self",
+                                                                                              "amount":  10,
+                                                                                              "scaling":  1.5
+                                                                                          }
+                                                                                      ],
+                                                                          "requirements":  [
+                                                                                               {
+                                                                                                   "hint":  "Boss drop required",
+                                                                                                   "type":  "always_false"
+                                                                                               }
+                                                                                           ]
+                                                                      },
+                                                                      {
+                                                                          "id":  "tome_of_fire",
+                                                                          "name":  "Tome of Fire",
+                                                                          "media":  "melvor:assets/media/bank/book_of_eli.png",
+                                                                          "type":  "adventuring:spellbook",
+                                                                          "materials":  [
+                                                                                            {
+                                                                                                "id":  "adventuring:currency",
+                                                                                                "qty":  2500
+                                                                                            },
+                                                                                            {
+                                                                                                "id":  "adventuring:big_parts",
+                                                                                                "qty":  15
+                                                                                            },
+                                                                                            {
+                                                                                                "id":  "adventuring:fire_essence",
+                                                                                                "qty":  20
+                                                                                            }
+                                                                                        ],
+                                                                          "base":  [
+                                                                                       {
+                                                                                           "id":  "adventuring:magic",
+                                                                                           "value":  28
+                                                                                       },
+                                                                                       {
+                                                                                           "id":  "adventuring:strength",
+                                                                                           "value":  12
+                                                                                       }
+                                                                                   ],
+                                                                          "scaling":  [
+                                                                                          {
+                                                                                              "id":  "adventuring:magic",
+                                                                                              "value":  2.5
+                                                                                          },
+                                                                                          {
+                                                                                              "id":  "adventuring:strength",
+                                                                                              "value":  1.0
+                                                                                          }
+                                                                                      ],
+                                                                          "effects":  [
+                                                                                          {
+                                                                                              "trigger":  "on_hit",
+                                                                                              "type":  "debuff",
+                                                                                              "id":  "adventuring:burn",
+                                                                                              "target":  "hit_target",
+                                                                                              "stacks":  2,
+                                                                                              "chance":  25
+                                                                                          }
+                                                                                      ],
+                                                                          "requirements":  [
+                                                                                               {
+                                                                                                   "hint":  "Boss drop required",
+                                                                                                   "type":  "always_false"
+                                                                                               }
+                                                                                           ]
+                                                                      },
+                                                                      {
+                                                                          "id":  "tome_of_frost",
+                                                                          "name":  "Tome of Frost",
+                                                                          "media":  "melvor:assets/media/bank/wizards_scroll.png#shade=blue",
+                                                                          "type":  "adventuring:spellbook",
+                                                                          "materials":  [
+                                                                                            {
+                                                                                                "id":  "adventuring:currency",
+                                                                                                "qty":  2500
+                                                                                            },
+                                                                                            {
+                                                                                                "id":  "adventuring:big_parts",
+                                                                                                "qty":  15
+                                                                                            },
+                                                                                            {
+                                                                                                "id":  "adventuring:water_essence",
+                                                                                                "qty":  20
+                                                                                            }
+                                                                                        ],
+                                                                          "base":  [
+                                                                                       {
+                                                                                           "id":  "adventuring:magic",
+                                                                                           "value":  25
+                                                                                       },
+                                                                                       {
+                                                                                           "id":  "adventuring:hitpoints",
+                                                                                           "value":  18
+                                                                                       }
+                                                                                   ],
+                                                                          "scaling":  [
+                                                                                          {
+                                                                                              "id":  "adventuring:magic",
+                                                                                              "value":  2.2
+                                                                                          },
+                                                                                          {
+                                                                                              "id":  "adventuring:hitpoints",
+                                                                                              "value":  1.5
+                                                                                          }
+                                                                                      ],
+                                                                          "effects":  [
+                                                                                          {
+                                                                                              "trigger":  "on_hit",
+                                                                                              "type":  "debuff",
+                                                                                              "id":  "adventuring:slow",
+                                                                                              "target":  "hit_target",
+                                                                                              "stacks":  2,
+                                                                                              "chance":  25
+                                                                                          }
+                                                                                      ],
+                                                                          "requirements":  [
+                                                                                               {
+                                                                                                   "hint":  "Boss drop required",
+                                                                                                   "type":  "always_false"
+                                                                                               }
+                                                                                           ]
+                                                                      },
+                                                                      {
+                                                                          "id":  "tome_of_shadows",
+                                                                          "name":  "Tome of Shadows",
+                                                                          "media":  "melvor:assets/media/bank/book_of_occults.png",
+                                                                          "type":  "adventuring:spellbook",
+                                                                          "materials":  [
+                                                                                            {
+                                                                                                "id":  "adventuring:currency",
+                                                                                                "qty":  3000
+                                                                                            },
+                                                                                            {
+                                                                                                "id":  "adventuring:big_parts",
+                                                                                                "qty":  18
+                                                                                            },
+                                                                                            {
+                                                                                                "id":  "adventuring:mist_shard",
+                                                                                                "qty":  10
+                                                                                            }
+                                                                                        ],
+                                                                          "base":  [
+                                                                                       {
+                                                                                           "id":  "adventuring:magic",
+                                                                                           "value":  32
+                                                                                       },
+                                                                                       {
+                                                                                           "id":  "adventuring:agility",
+                                                                                           "value":  15
+                                                                                       }
+                                                                                   ],
+                                                                          "scaling":  [
+                                                                                          {
+                                                                                              "id":  "adventuring:magic",
+                                                                                              "value":  2.8
+                                                                                          },
+                                                                                          {
+                                                                                              "id":  "adventuring:agility",
+                                                                                              "value":  1.2
+                                                                                          }
+                                                                                      ],
+                                                                          "effects":  [
+                                                                                          {
+                                                                                              "trigger":  "on_hit",
+                                                                                              "type":  "debuff",
+                                                                                              "id":  "adventuring:vulnerability",
+                                                                                              "target":  "hit_target",
+                                                                                              "stacks":  2,
+                                                                                              "chance":  20
+                                                                                          }
+                                                                                      ],
+                                                                          "requirements":  [
+                                                                                               {
+                                                                                                   "hint":  "Boss drop required",
+                                                                                                   "type":  "always_false"
+                                                                                               }
+                                                                                           ]
+                                                                      },
+                                                                      {
+                                                                          "id":  "hunters_trophy",
+                                                                          "name":  "Hunter\u0027s Trophy",
+                                                                          "media":  "melvor:assets/media/bank/big_bones.png#shade=white",
+                                                                          "type":  "adventuring:trophy",
+                                                                          "materials":  [
+                                                                                            {
+                                                                                                "id":  "adventuring:currency",
+                                                                                                "qty":  1000
+                                                                                            },
+                                                                                            {
+                                                                                                "id":  "adventuring:big_parts",
+                                                                                                "qty":  8
+                                                                                            },
+                                                                                            {
+                                                                                                "id":  "adventuring:bone_fragment",
+                                                                                                "qty":  30
+                                                                                            }
+                                                                                        ],
+                                                                          "base":  [
+                                                                                       {
+                                                                                           "id":  "adventuring:hitpoints",
+                                                                                           "value":  12
+                                                                                       },
+                                                                                       {
+                                                                                           "id":  "adventuring:strength",
+                                                                                           "value":  15
+                                                                                       }
+                                                                                   ],
+                                                                          "scaling":  [
+                                                                                          {
+                                                                                              "id":  "adventuring:hitpoints",
+                                                                                              "value":  1.0
+                                                                                          },
+                                                                                          {
+                                                                                              "id":  "adventuring:strength",
+                                                                                              "value":  1.3
+                                                                                          }
+                                                                                      ],
+                                                                          "effects":  [
+                                                                                          {
+                                                                                              "trigger":  "on_kill",
+                                                                                              "type":  "buff",
+                                                                                              "id":  "adventuring:might",
+                                                                                              "target":  "self",
+                                                                                              "stacks":  1
+                                                                                          }
+                                                                                      ],
+                                                                          "requirements":  [
+                                                                                               {
+                                                                                                   "hint":  "Boss drop required",
+                                                                                                   "type":  "always_false"
+                                                                                               }
+                                                                                           ]
+                                                                      },
+                                                                      {
+                                                                          "id":  "slayers_trophy",
+                                                                          "name":  "Slayer\u0027s Trophy",
+                                                                          "media":  "melvor:assets/media/bank/skull_cape.png#shade=brown",
+                                                                          "type":  "adventuring:trophy",
+                                                                          "materials":  [
+                                                                                            {
+                                                                                                "id":  "adventuring:currency",
+                                                                                                "qty":  2000
+                                                                                            },
+                                                                                            {
+                                                                                                "id":  "adventuring:big_parts",
+                                                                                                "qty":  12
+                                                                                            },
+                                                                                            {
+                                                                                                "id":  "adventuring:demon_horn",
+                                                                                                "qty":  10
+                                                                                            }
+                                                                                        ],
+                                                                          "base":  [
+                                                                                       {
+                                                                                           "id":  "adventuring:hitpoints",
+                                                                                           "value":  20
+                                                                                       },
+                                                                                       {
+                                                                                           "id":  "adventuring:strength",
+                                                                                           "value":  20
+                                                                                       },
+                                                                                       {
+                                                                                           "id":  "adventuring:agility",
+                                                                                           "value":  10
+                                                                                       }
+                                                                                   ],
+                                                                          "scaling":  [
+                                                                                          {
+                                                                                              "id":  "adventuring:hitpoints",
+                                                                                              "value":  1.6
+                                                                                          },
+                                                                                          {
+                                                                                              "id":  "adventuring:strength",
+                                                                                              "value":  1.8
+                                                                                          },
+                                                                                          {
+                                                                                              "id":  "adventuring:agility",
+                                                                                              "value":  0.8
+                                                                                          }
+                                                                                      ],
+                                                                          "effects":  [
+                                                                                          {
+                                                                                              "trigger":  "on_kill",
+                                                                                              "type":  "buff",
+                                                                                              "id":  "adventuring:bloodlust",
+                                                                                              "target":  "self",
+                                                                                              "stacks":  1
+                                                                                          }
+                                                                                      ],
+                                                                          "requirements":  [
+                                                                                               {
+                                                                                                   "hint":  "Boss drop required",
+                                                                                                   "type":  "always_false"
+                                                                                               }
+                                                                                           ]
+                                                                      },
+                                                                      {
+                                                                          "id":  "holy_quiver",
+                                                                          "name":  "Holy Quiver",
+                                                                          "media":  "melvor:assets/media/bank/ammo_arrow_dragon.png",
+                                                                          "type":  "adventuring:quiver",
+                                                                          "materials":  [
+                                                                                            {
+                                                                                                "id":  "adventuring:currency",
+                                                                                                "qty":  2200
+                                                                                            },
+                                                                                            {
+                                                                                                "id":  "adventuring:big_parts",
+                                                                                                "qty":  12
+                                                                                            },
+                                                                                            {
+                                                                                                "id":  "adventuring:holy_dust",
+                                                                                                "qty":  15
+                                                                                            }
+                                                                                        ],
+                                                                          "base":  [
+                                                                                       {
+                                                                                           "id":  "adventuring:ranged",
+                                                                                           "value":  28
+                                                                                       },
+                                                                                       {
+                                                                                           "id":  "adventuring:prayer",
+                                                                                           "value":  15
+                                                                                       }
+                                                                                   ],
+                                                                          "scaling":  [
+                                                                                          {
+                                                                                              "id":  "adventuring:ranged",
+                                                                                              "value":  2.5
+                                                                                          },
+                                                                                          {
+                                                                                              "id":  "adventuring:prayer",
+                                                                                              "value":  1.2
+                                                                                          }
+                                                                                      ],
+                                                                          "effects":  [
+                                                                                          {
+                                                                                              "trigger":  "on_hit",
+                                                                                              "type":  "heal",
+                                                                                              "target":  "self",
+                                                                                              "amount":  3,
+                                                                                              "scaling":  0.5,
+                                                                                              "chance":  20
+                                                                                          }
+                                                                                      ],
+                                                                          "requirements":  [
+                                                                                               {
+                                                                                                   "hint":  "Boss drop required",
+                                                                                                   "type":  "always_false"
+                                                                                               }
+                                                                                           ]
+                                                                      },
+                                                                      {
+                                                                          "id":  "poisoned_quiver",
+                                                                          "name":  "Poisoned Quiver",
+                                                                          "media":  "melvor:assets/media/bank/ammo_bolt_diamond.png#shade=green",
+                                                                          "type":  "adventuring:quiver",
+                                                                          "materials":  [
+                                                                                            {
+                                                                                                "id":  "adventuring:currency",
+                                                                                                "qty":  1600
+                                                                                            },
+                                                                                            {
+                                                                                                "id":  "adventuring:big_parts",
+                                                                                                "qty":  10
+                                                                                            },
+                                                                                            {
+                                                                                                "id":  "adventuring:goo",
+                                                                                                "qty":  20
+                                                                                            }
+                                                                                        ],
+                                                                          "base":  [
+                                                                                       {
+                                                                                           "id":  "adventuring:ranged",
+                                                                                           "value":  25
+                                                                                       },
+                                                                                       {
+                                                                                           "id":  "adventuring:agility",
+                                                                                           "value":  12
+                                                                                       }
+                                                                                   ],
+                                                                          "scaling":  [
+                                                                                          {
+                                                                                              "id":  "adventuring:ranged",
+                                                                                              "value":  2.2
+                                                                                          },
+                                                                                          {
+                                                                                              "id":  "adventuring:agility",
+                                                                                              "value":  1.0
+                                                                                          }
+                                                                                      ],
+                                                                          "effects":  [
+                                                                                          {
+                                                                                              "trigger":  "on_hit",
+                                                                                              "type":  "debuff",
+                                                                                              "id":  "adventuring:poison",
+                                                                                              "target":  "hit_target",
+                                                                                              "stacks":  2,
+                                                                                              "chance":  30
+                                                                                          }
+                                                                                      ],
+                                                                          "requirements":  [
+                                                                                               {
+                                                                                                   "hint":  "Boss drop required",
+                                                                                                   "type":  "always_false"
+                                                                                               }
+                                                                                           ]
+                                                                      },
+                                                                      {
+                                                                          "id":  "explosive_quiver",
+                                                                          "name":  "Explosive Quiver",
+                                                                          "media":  "melvor:assets/media/bank/ammo_arrow_rune.png",
+                                                                          "type":  "adventuring:quiver",
+                                                                          "materials":  [
+                                                                                            {
+                                                                                                "id":  "adventuring:currency",
+                                                                                                "qty":  2800
+                                                                                            },
+                                                                                            {
+                                                                                                "id":  "adventuring:big_parts",
+                                                                                                "qty":  15
+                                                                                            },
+                                                                                            {
+                                                                                                "id":  "adventuring:fire_essence",
+                                                                                                "qty":  18
+                                                                                            }
+                                                                                        ],
+                                                                          "base":  [
+                                                                                       {
+                                                                                           "id":  "adventuring:ranged",
+                                                                                           "value":  35
+                                                                                       },
+                                                                                       {
+                                                                                           "id":  "adventuring:strength",
+                                                                                           "value":  10
+                                                                                       }
+                                                                                   ],
+                                                                          "scaling":  [
+                                                                                          {
+                                                                                              "id":  "adventuring:ranged",
+                                                                                              "value":  3.0
+                                                                                          },
+                                                                                          {
+                                                                                              "id":  "adventuring:strength",
+                                                                                              "value":  0.8
+                                                                                          }
+                                                                                      ],
+                                                                          "effects":  [
+                                                                                          {
+                                                                                              "trigger":  "on_kill",
+                                                                                              "type":  "damage",
+                                                                                              "target":  "all",
+                                                                                              "party":  "enemy",
+                                                                                              "amount":  8,
+                                                                                              "scaling":  1.2
+                                                                                          }
+                                                                                      ],
+                                                                          "requirements":  [
+                                                                                               {
+                                                                                                   "hint":  "Boss drop required",
+                                                                                                   "type":  "always_false"
+                                                                                               }
+                                                                                           ]
+                                                                      }
+                                                                  ]
+                                                }
+                                   }
+                               ]
+             }
 }

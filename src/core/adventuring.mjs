@@ -239,6 +239,226 @@ export class Adventuring extends SkillWithMastery {
         this.isActive = false;
     }
     
+    /**
+     * Full skill reset - resets all progression to initial state (like starting a new save).
+     * This is different from reset() which just resets combat/dungeon state.
+     */
+    resetSkill() {
+        // First, do the regular combat/dungeon reset
+        this.reset();
+        
+        // Stop any ongoing activities
+        if (this.townTimer.isActive)
+            this.townTimer.stop();
+        
+        // Reset skill XP and mastery
+        this._xp = 0;
+        this.masteryPoolXP = 0;
+        this.actionMastery.forEach((data, action) => {
+            data.xp = 0;
+        });
+        
+        // Clear learned abilities (Blue Mage)
+        this.learnedAbilities.clear();
+        
+        // Clear seen abilities
+        this.seenAbilities.clear();
+        
+        // Reset auto-repeat
+        this.autoRepeatArea = null;
+        
+        // Reset armory - clear all item unlocks and upgrades
+        this.armory.unlocked.clear();
+        this.armory.viewed.clear();
+        this.armory.upgradeLevels.forEach((level, item) => {
+            this.armory.upgradeLevels.set(item, 0);
+        });
+        this.armory.clearSelected();
+        
+        // Reset stash - clear all materials (stash.reset() clears materialCounts and unlocked)
+        this.stash.reset();
+        this.materials.allObjects.forEach(material => {
+            material.renderQueue.updateAll();
+        });
+        
+        // Reset tavern - clear active drinks
+        this.tavern.resetDrinks();
+        
+        // Reset consumables
+        this.consumables.resetCharges();
+        
+        // Reset slayer tasks
+        this.slayers.resetTasks();
+        
+        // Reset lemons
+        this.lemons.resetStats();
+        
+        // Reset achievements
+        this.achievementManager.resetAll();
+        
+        // Reset grimoire (learned monster abilities)
+        this.grimoire.resetAll();
+        
+        // Reset tutorial state
+        this.tutorialManager.resetState();
+        
+        // Reset bestiary
+        this.bestiary.reset();
+        
+        // Reset areas - mastery XP reset above handles autoRepeatUnlocked (computed from mastery)
+        this.areas.allObjects.forEach(area => {
+            area.renderQueue.updateAll();
+        });
+        
+        // Reset heroes
+        this.party.all.forEach(hero => {
+            // Clear name so onLoad detects as new player
+            hero.name = undefined;
+            
+            // Reset jobs to none
+            hero.setCombatJob(this.jobs.getObjectByID('adventuring:none'));
+            hero.setPassiveJob(this.jobs.getObjectByID('adventuring:none'));
+            
+            // Reset abilities to default
+            hero.setGenerator(this.generators.getObjectByID('adventuring:slap'));
+            hero.setSpender(this.spenders.getObjectByID('adventuring:backhand'));
+            
+            // Clear equipment
+            hero.equipment.slots.forEach(slot => {
+                slot.setEmpty();
+            });
+            
+            // Reset character state
+            hero.dead = false;
+            hero.energy = 0;
+            hero.auras.clear();
+            
+            // Reset stats
+            hero.stats.reset();
+            this.stats.allObjects.forEach(stat => {
+                if(stat.base !== undefined)
+                    hero.stats.set(stat, stat.base);
+            });
+            
+            // Reset hitpoints will be done after calculateStats
+        });
+        
+        // Recalculate stats for all heroes
+        this.party.all.forEach(hero => {
+            hero.calculateStats();
+            hero.hitpoints = hero.maxHitpoints;
+        });
+        
+        // Apply starter loadouts (job, gear, abilities)
+        this.party.all.forEach(hero => {
+            hero._applyStarterLoadout();
+        });
+        
+        // Trigger re-render
+        this.jobs.allObjects.forEach(job => job.renderQueue.updateAll());
+        this.areas.allObjects.forEach(area => area.renderQueue.updateAll());
+        this.baseItems.allObjects.forEach(item => item.renderQueue.updateAll());
+        this.monsters.allObjects.forEach(monster => monster.renderQueue.updateAll());
+        this.materials.allObjects.forEach(material => material.renderQueue.updateAll());
+        this.tavernDrinks.allObjects.forEach(drink => drink.renderQueue.updateAll());
+        this.consumableTypes.allObjects.forEach(consumable => consumable.renderQueue.updateAll());
+        this.party.all.forEach(hero => hero.renderQueue.updateAll());
+        
+        // Go back to town
+        this.town.go();
+        
+        this.log.add('Skill has been reset to initial state.');
+    }
+
+    // =========================================
+    // Centralized Effect Trigger System
+    // =========================================
+    
+    /**
+     * Centralized trigger system - fires effects from ALL sources for a given trigger
+     * Sources include:
+     * - Party member auras
+     * - Dungeon effectCache (difficulty effects, endless scaling, etc.)
+     * 
+     * @param {string} trigger - The trigger type (e.g., 'floor_end', 'floor_start', 'dungeon_start')
+     * @param {Object} context - Optional context data passed to effects
+     */
+    triggerEffects(trigger, context = {}) {
+        // 1. Trigger party member auras
+        if(this.party) {
+            this.party.all.forEach(member => {
+                member.trigger(trigger, context);
+            });
+        }
+        
+        // 2. Apply dungeon-level effects from effectCache
+        if(this.dungeon && this.dungeon.effectCache) {
+            const effects = this.dungeon.effectCache.getEffectsForTrigger(trigger);
+            for(const effect of effects) {
+                this.applyEffect(effect, trigger, context);
+            }
+        }
+    }
+    
+    /**
+     * Apply a single effect from the effect cache
+     * Handles all effect types in a centralized way
+     * 
+     * @param {Object} effect - The effect to apply
+     * @param {string} trigger - The trigger that caused this effect
+     * @param {Object} context - Optional context data
+     */
+    applyEffect(effect, trigger, context = {}) {
+        switch(effect.type) {
+            case 'heal_party': {
+                const healPercent = effect.healingPercent || effect.healPercent || 0;
+                const healAmount = effect.amount || 0;
+                
+                this.party.all.forEach(hero => {
+                    if(!hero.dead) {
+                        let heal = healAmount;
+                        if(healPercent > 0) {
+                            heal = Math.ceil(hero.maxHitpoints * (healPercent / 100));
+                        }
+                        if(heal > 0) {
+                            hero.heal({ amount: heal }, null);
+                        }
+                    }
+                });
+                
+                if(healPercent > 0) {
+                    this.log.add(`Party healed for ${healPercent}% at ${trigger}`);
+                } else if(healAmount > 0) {
+                    this.log.add(`Party healed for ${healAmount} HP at ${trigger}`);
+                }
+                break;
+            }
+            
+            case 'buff': {
+                // Apply buff to all party members
+                const aura = effect.aura;
+                if(aura) {
+                    this.party.all.forEach(hero => {
+                        if(!hero.dead) {
+                            hero.auras.add(aura, effect.stacks || 1, effect.sourceName);
+                        }
+                    });
+                }
+                break;
+            }
+            
+            case 'debuff':
+            case 'enemy_buff': {
+                // These are applied to enemies at spawn, handled by encounter system
+                // No action needed here - stored in cache for encounter to retrieve
+                break;
+            }
+            
+            default:
+                // Unknown effect type - can extend here for new types
+                break;
+        }
+    }
 
     onLoad() {
         super.onLoad();
@@ -259,6 +479,19 @@ export class Adventuring extends SkillWithMastery {
 
         this.overview.onLoad();
         this.party.onLoad();
+
+        // Handle pending reset from failed decode - AFTER all components are loaded
+        if(this._pendingReset) {
+            this._pendingReset = false;
+            try {
+                this.resetSkill();
+                this.log.add('Save data was corrupted. Skill has been reset.');
+            } catch(e) {
+                console.warn('Adventuring resetSkill failed after decode error:', e);
+                // Continue loading even if reset fails - the skill may be in a partial state
+                // but it's better than completely breaking the game
+            }
+        }
 
         this.town.checkActions();
         
@@ -308,6 +541,9 @@ export class Adventuring extends SkillWithMastery {
             monster.renderQueue.clickable = true;
             monster.renderQueue.mastery = true;
         });
+        
+        // Check for newly unlocked equipment based on skill level requirements
+        this.armory.checkUnlocked();
     }
 
     onMasteryLevelUp(action, oldLevel, newLevel) {
@@ -608,6 +844,9 @@ export class Adventuring extends SkillWithMastery {
     }
 
     render() {
+        // Skip rendering if a reset is pending (save data was corrupt)
+        if (this._pendingReset)
+            return;
         super.render();
         this.overview.render();
         this.log.render();
@@ -1122,10 +1361,14 @@ export class Adventuring extends SkillWithMastery {
             if(this.saveVersion >= 5) {
                 this.grimoire.decode(reader, version);
             }
-        } catch(e) { // Something's fucky, dump all progress and skip past the trash save data
-            console.log(e);
+        } catch(e) { 
+            // Save data is corrupt or incompatible - do a full reset instead of partial load
+            console.warn('Adventuring save decode failed, performing full reset:', e);
             reader.byteOffset = start;
             reader.getFixedLengthBuffer(skillDataSize);
+            
+            // Schedule reset after load completes (can't reset during decode)
+            this._pendingReset = true;
         }
 
         let end = reader.byteOffset;

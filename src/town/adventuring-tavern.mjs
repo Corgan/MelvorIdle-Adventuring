@@ -147,6 +147,17 @@ export class AdventuringTavern extends AdventuringPage {
         }
     }
 
+    /**
+     * Reset all tavern drink state (for skill reset)
+     */
+    resetDrinks() {
+        this.charges.clear();
+        this.equipped.clear();
+        this.selectedDrink = null;
+        this.selectedTier = 1;
+        this.renderQueue.queueAll();
+    }
+
     // =========================================
     // Equipment Management
     // =========================================
@@ -310,8 +321,16 @@ export class AdventuringTavern extends AdventuringPage {
         // Mount drink components once
         this.component.drinks.replaceChildren();
         for (const drink of this.manager.tavernDrinks.allObjects) {
-            drink.component.mount(this.component.drinks);
-            drink.component.setSelected(drink === this.selectedDrink);
+            // Check if component has mount method (may be undefined if custom element not registered)
+            if (typeof drink.component.mount === 'function') {
+                drink.component.mount(this.component.drinks);
+            } else {
+                // Fallback: manually append element
+                this.component.drinks.appendChild(drink.component);
+            }
+            if (typeof drink.component.setSelected === 'function') {
+                drink.component.setSelected(drink === this.selectedDrink);
+            }
             drink.renderQueue.queueAll();
             drink.render();
         }

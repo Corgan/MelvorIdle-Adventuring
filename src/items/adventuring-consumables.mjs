@@ -247,6 +247,17 @@ export class AdventuringConsumables extends AdventuringPage {
     }
 
     /**
+     * Reset all consumable charges and equipped state (for skill reset)
+     */
+    resetCharges() {
+        this.charges.clear();
+        this.equipped = [];
+        this.selectedConsumable = null;
+        this.selectedTier = 1;
+        this.renderQueue.updateAll();
+    }
+
+    /**
      * Remove charges from a consumable at a specific tier
      */
     removeCharges(consumable, tier, amount) {

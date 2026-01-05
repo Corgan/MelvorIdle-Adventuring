@@ -32,6 +32,7 @@ export class AdventuringWorkshop extends AdventuringPage {
         this.component = createElement('adventuring-workshop');
         this.component.nameText.textContent = data.name;
         
+        this.products = []; // Initialize to empty array, populated in postDataRegistration
         if(data.products !== undefined)
             this._products = data.products;
 

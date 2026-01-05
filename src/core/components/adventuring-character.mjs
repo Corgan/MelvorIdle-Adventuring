@@ -68,6 +68,22 @@ export class AdventuringCharacterElement extends HTMLElement {
         this.jobs.hide();
     }
 
+    /**
+     * Set callback for when name is clicked (enables clickable name styling)
+     */
+    setNameClickHandler(callback) {
+        this._onNameClick = callback;
+        if(callback) {
+            this.nameText.classList.add('pointer-enabled');
+            this.nameText.style.cursor = 'pointer';
+            this.nameText.onclick = () => callback();
+        } else {
+            this.nameText.classList.remove('pointer-enabled');
+            this.nameText.style.cursor = '';
+            this.nameText.onclick = null;
+        }
+    }
+
     setSkill(skill) {
         this.skill = skill;
         this.generator.setSkill(skill);

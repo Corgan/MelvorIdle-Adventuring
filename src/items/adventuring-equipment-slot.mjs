@@ -33,14 +33,26 @@ export class AdventuringEquipmentSlot {
         this.highlight = false;
         this.clickable = false;
         this.selected = false;
+        this.selectorPopup = undefined;
 
         this.renderQueue = new AdventuringEquipmentSlotRenderQueue();
 
         this.component = createElement('adventuring-equipment-slot');
 
-        this.component.clickable.onclick = () => {
-            this.slotClicked();
-        }
+        // Create click-triggered popup for item selection
+        this.selectorPopup = tippy(this.component.clickable, {
+            content: '',
+            allowHTML: true,
+            interactive: true,
+            trigger: 'click',
+            placement: 'bottom',
+            maxWidth: 320,
+            onShow: (instance) => {
+                // Don't show if equipment is locked or slot is occupied
+                if(this.equipment.locked || this.occupied) return false;
+                instance.setContent(this.buildItemSelectorContent());
+            }
+        });
     }
 
     onLoad() {
@@ -79,79 +91,148 @@ export class AdventuringEquipmentSlot {
         return true;
     }
 
-    slotClicked() {
-        if(!this.manager.armory.active)
-            return;
+    /**
+     * Build the item selector popup content.
+     * Shows all equippable items for this slot type.
+     */
+    buildItemSelectorContent() {
+        const container = document.createElement('div');
+        container.className = 'adventuring-item-selector';
         
-        if(this.manager.armory.selectedItem !== undefined) {
-            if(this.manager.armory.selectedItem === this) {
-                this.manager.armory.clearSelected();
-            } else {
-                let swapSlot = this.manager.armory.selectedItem.currentSlot;
-
-                let newItem = this.manager.armory.selectedItem;
-                let oldItem = this.item;
-
-                let newEquippedSlotItems = newItem.occupies.map(slot => this.equipment.slots.get(slot))
-                    .filter(slot => !slot.empty && !slot.occupied).map(slot => ({ slot: slot.slotType, item: slot.item }));
-
-                let oldEquippedSlotItems = [];
-                if(swapSlot !== undefined) {
-                    oldEquippedSlotItems = oldItem.occupies.map(slot => swapSlot.equipment.slots.get(slot))
-                        .filter(slot => !slot.empty && !slot.occupied).map(slot => ({ slot: slot.slotType, item: slot.item }));
-                }
-
-                if(this.canEquip(newItem)) {
-                    oldEquippedSlotItems.forEach(({ slot, item }) => {
-                        let equipmentSlot = swapSlot.equipment.slots.get(slot);
-                        equipmentSlot.setEmpty();
-                    });
-
-                    newEquippedSlotItems.forEach(({ slot, item }) => {
-                        let equipmentSlot = this.equipment.slots.get(slot);
-                        equipmentSlot.setEmpty();
-                    });
-                    this.setEmpty();
-                    if(swapSlot !== undefined)
-                        swapSlot.setEmpty();
-
-                    
-                    this.setEquipped(newItem);
-
-                    if(swapSlot !== undefined) {
-                        if(swapSlot.canEquip(oldItem))
-                            swapSlot.setEquipped(oldItem);
-                    }
-
-                    oldEquippedSlotItems.forEach(({ slot, item }) => {
-                        let equipmentSlot = swapSlot.equipment.slots.get(slot);
-
-                        if(equipmentSlot.canEquip(item))
-                            equipmentSlot.setEquipped(item);
-                    });
-
-                    newEquippedSlotItems.forEach(({ slot, item }) => {
-                        let equipmentSlot = this.equipment.slots.get(slot);
-
-                        if(equipmentSlot.canEquip(item))
-                            equipmentSlot.setEquipped(item);
-                    });
-
-                    this.manager.armory.clearSelected();
-                } else {
-                    if(!this.empty && !this.occupied) {
-                        this.manager.armory.clearSelected();
-                        this.manager.armory.selectItem(this.item);
-                    }
-                }
-            }
-        } else {
-            if(!this.empty && !this.occupied) {
-                this.manager.armory.selectItem(this.item);
-            }
+        // Header
+        const header = document.createElement('div');
+        header.className = 'text-center font-w600 text-warning border-bottom border-dark pb-1 mb-2';
+        header.textContent = this.slotType.name;
+        container.appendChild(header);
+        
+        // Get all items that can go in this slot
+        const equippableItems = this.getEquippableItems();
+        
+        if(equippableItems.length === 0) {
+            const empty = document.createElement('div');
+            empty.className = 'text-center text-muted font-size-sm p-2';
+            empty.textContent = 'No items available';
+            container.appendChild(empty);
+            return container;
         }
-
-        this.manager.party.all.forEach(member => member.calculateStats());
+        
+        // Item grid
+        const grid = document.createElement('div');
+        grid.className = 'd-flex flex-wrap justify-content-center gap-1';
+        
+        // Add "Unequip" option if slot is not empty
+        if(!this.empty) {
+            const unequipBtn = document.createElement('div');
+            unequipBtn.className = 'adventuring-item-selector-item p-1 pointer-enabled text-center';
+            unequipBtn.style.cssText = 'width: 48px; height: 48px; border: 1px solid #444; border-radius: 4px; display: flex; align-items: center; justify-content: center;';
+            unequipBtn.innerHTML = '<i class="fa fa-times text-danger"></i>';
+            unequipBtn.title = 'Unequip';
+            unequipBtn.onclick = () => {
+                this.setEmpty();
+                this.equipment.character.calculateStats();
+                if(this.selectorPopup) this.selectorPopup.hide();
+            };
+            grid.appendChild(unequipBtn);
+        }
+        
+        // Add each equippable item
+        equippableItems.forEach(item => {
+            const itemBtn = document.createElement('div');
+            itemBtn.className = 'adventuring-item-selector-item p-1 pointer-enabled';
+            itemBtn.style.cssText = 'width: 48px; height: 48px; border: 1px solid #444; border-radius: 4px; position: relative;';
+            
+            // Highlight currently equipped item
+            if(this.item === item) {
+                itemBtn.style.borderColor = '#28a745';
+                itemBtn.style.borderWidth = '2px';
+            }
+            
+            const img = document.createElement('img');
+            img.src = item.media;
+            img.className = 'w-100 h-100';
+            img.style.objectFit = 'contain';
+            itemBtn.appendChild(img);
+            
+            // Show upgrade level
+            if(item.upgradeLevel > 0) {
+                const level = document.createElement('small');
+                level.className = 'position-absolute text-warning font-w700';
+                level.style.cssText = 'bottom: 0; right: 2px; font-size: 10px; text-shadow: 1px 1px 1px black;';
+                level.textContent = item.level;
+                itemBtn.appendChild(level);
+            }
+            
+            itemBtn.title = `${item.name} (Lv ${item.level})`;
+            itemBtn.onclick = () => {
+                this.equipItem(item);
+                if(this.selectorPopup) this.selectorPopup.hide();
+            };
+            
+            grid.appendChild(itemBtn);
+        });
+        
+        container.appendChild(grid);
+        return container;
+    }
+    
+    /**
+     * Get all items that can be equipped in this slot.
+     */
+    getEquippableItems() {
+        const character = this.equipment.character;
+        const combatJob = character.combatJob;
+        const passiveJob = character.passiveJob;
+        
+        return this.manager.baseItems.filter(item => {
+            // Skip the "none" item
+            if(item.id === 'adventuring:none') return false;
+            
+            // Must be unlocked and crafted
+            if(!item.unlocked || item.upgradeLevel === 0) return false;
+            
+            // Must fit this slot type
+            if(!item.slots.includes(this.slotType)) return false;
+            
+            // Must be usable by one of the hero's jobs
+            if(!item.jobs.includes(combatJob) && !item.jobs.includes(passiveJob)) return false;
+            
+            // Check paired slot compatibility (e.g., shields with 1h weapons)
+            if(item.pairs.length > 0 && this.slotType.pair !== undefined) {
+                let pairedSlot = this.slotType.pair;
+                let equipmentSlotType = this.manager.itemSlots.getObjectByID(pairedSlot);
+                let equipmentSlot = this.equipment.slots.get(equipmentSlotType);
+                
+                if(!equipmentSlot.empty && !equipmentSlot.occupied && !item.pairs.includes(equipmentSlot.item.type))
+                    return false;
+            }
+            
+            return true;
+        });
+    }
+    
+    /**
+     * Equip an item to this slot, handling occupancy and displaced items.
+     */
+    equipItem(item) {
+        // Handle items being displaced by this equip
+        const displacedItems = item.occupies.map(slot => this.equipment.slots.get(slot))
+            .filter(slot => !slot.empty && !slot.occupied)
+            .map(slot => ({ slot: slot.slotType, item: slot.item }));
+        
+        // Clear occupied slots
+        displacedItems.forEach(({ slot }) => {
+            let equipmentSlot = this.equipment.slots.get(slot);
+            equipmentSlot.setEmpty();
+        });
+        
+        // Clear current slot
+        this.setEmpty();
+        
+        // Equip the new item
+        this.setEquipped(item);
+        
+        // Recalculate stats
+        this.equipment.character.calculateStats();
     }
 
     setOccupied(slot) {

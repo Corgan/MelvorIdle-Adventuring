@@ -756,6 +756,17 @@ export class AdventuringSlayers extends AdventuringPage {
         return colors[tier - 1] || 'secondary';
     }
 
+    /**
+     * Reset all slayer task state (for skill reset)
+     */
+    resetTasks() {
+        this.totalTasksCompleted = 0;
+        this.activeTasks = [];
+        this.availableTasks = [];
+        this.fillAvailableTasks();
+        this.renderQueue.queueAll();
+    }
+
     encode(writer) {
         // Encode total completed count
         writer.writeUint32(this.totalTasksCompleted);

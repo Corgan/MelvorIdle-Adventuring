@@ -234,6 +234,17 @@ export class AdventuringLemons extends AdventuringPage {
         this.renderQueue.stats = false;
     }
 
+    /**
+     * Reset all lemon stats (for skill reset)
+     */
+    resetStats() {
+        this.lemonadesConsumed = 0;
+        this.lemonsSquashed = 0;
+        this.timesVisited = 0;
+        this.secretsFound = new Set();
+        this.renderQueue.queueAll();
+    }
+
     encode(writer) {
         writer.writeUint32(this.lemonadesConsumed);
         writer.writeUint32(this.lemonsSquashed);

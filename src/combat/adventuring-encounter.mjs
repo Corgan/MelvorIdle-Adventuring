@@ -347,7 +347,7 @@ export class AdventuringEncounter extends AdventuringPage {
         
         let currentHit = this.currentAction.hits[this.currentHit];
 
-        let effectParty = currentHit.party;
+        let effectParty = currentHit.party ?? "enemy"; // Default to enemy if not specified
         let targetType = currentHit.target;
 
         let targetParty;

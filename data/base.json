@@ -33,37 +33,37 @@
                             "id": "defence",
                             "name": "Defence",
                             "media": "melvor:assets/media/skills/defence/defence.svg",
-                            "base": 0
+                            "base": 10
                         },
                         {
                             "id": "agility",
                             "name": "Agility",
                             "media": "melvor:assets/media/skills/agility/agility.svg",
-                            "base": 0
+                            "base": 15
                         },
                         {
                             "id": "strength",
                             "name": "Strength",
                             "media": "melvor:assets/media/skills/strength/strength.svg",
-                            "base": 0
+                            "base": 25
                         },
                         {
                             "id": "ranged",
                             "name": "Ranged",
                             "media": "melvor:assets/media/skills/ranged/ranged.svg",
-                            "base": 0
+                            "base": 25
                         },
                         {
                             "id": "magic",
                             "name": "Magic",
                             "media": "melvor:assets/media/skills/magic/magic.svg",
-                            "base": 0
+                            "base": 25
                         },
                         {
                             "id": "prayer",
                             "name": "Prayer",
                             "media": "melvor:assets/media/skills/prayer/prayer.svg",
-                            "base": 0
+                            "base": 25
                         }
                     ],
                     "overview": {
@@ -1843,6 +1843,60 @@
                                     "type": "remove"
                                 }
                             ],
+                            "combineMode": "stack"
+                        },
+                        {
+                            "id": "decay",
+                            "name": "Decaying",
+                            "media": "melvor:assets/media/status/wither.png",
+                            "effects": [
+                                {
+                                    "trigger": "turn_end",
+                                    "type": "damage",
+                                    "target": "self",
+                                    "amount": 10,
+                                    "perStack": true
+                                },
+                                {
+                                    "trigger": "turn_end",
+                                    "type": "remove_stacks",
+                                    "count": 1
+                                },
+                                {
+                                    "trigger": "encounter_end",
+                                    "type": "remove"
+                                },
+                                {
+                                    "trigger": "death",
+                                    "type": "remove"
+                                }
+                            ],
+                            "stackable": true,
+                            "combineMode": "stack"
+                        },
+                        {
+                            "id": "doom",
+                            "name": "Doomed",
+                            "media": "melvor:assets/media/misc/mark_of_death.png",
+                            "effects": [
+                                {
+                                    "trigger": "turn_end",
+                                    "type": "damage",
+                                    "target": "self",
+                                    "count": 0.33,
+                                    "amount": 15,
+                                    "perStack": true
+                                },
+                                {
+                                    "trigger": "encounter_end",
+                                    "type": "remove"
+                                },
+                                {
+                                    "trigger": "death",
+                                    "type": "remove"
+                                }
+                            ],
+                            "stackable": true,
                             "combineMode": "stack"
                         },
                         {

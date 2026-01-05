@@ -140,11 +140,23 @@ export class AdventuringAuras {
     }
 
     add(aura, { stacks = 1 }, source) {
-        if(typeof aura === "string")
+        // Handle undefined or null early
+        if(!aura) {
+            console.warn('[Auras.add] Invalid aura: undefined or null', new Error().stack);
+            return;
+        }
+        
+        const originalAuraId = aura;
+        if(typeof aura === "string") {
+            // Add namespace if missing
+            if(!aura.includes(':')) {
+                aura = `adventuring:${aura}`;
+            }
             aura = this.manager.auras.getObjectByID(aura);
+        }
         
         if(!aura || typeof aura === 'string') {
-            console.warn('[Auras.add] Invalid aura:', aura);
+            console.warn(`[Auras.add] Aura not found: ${originalAuraId}`, new Error().stack);
             return;
         }
 

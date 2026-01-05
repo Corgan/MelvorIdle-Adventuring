@@ -705,6 +705,22 @@ export class AchievementManager {
     }
 
     /**
+     * Reset all achievement state (for skill reset)
+     */
+    resetAll() {
+        // Reset stats by creating a fresh AchievementStats object
+        this.stats = new AchievementStats();
+        
+        // Clear completed achievements
+        this.completedAchievements.clear();
+        
+        // Clear bonuses
+        this.rebuildBonuses();
+        
+        this.renderQueue.completed = true;
+    }
+
+    /**
      * Encode for save
      */
     encode(writer) {

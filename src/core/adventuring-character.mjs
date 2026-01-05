@@ -164,10 +164,14 @@ class AdventuringCharacter {
             this.heal(builtEffect, character);
         if(effect.type === "revive")
             this.revive(builtEffect, character);
-        if(effect.type === "buff")
-            this.buff(effect.id, builtEffect, character);
-        if(effect.type === "debuff")
-            this.debuff(effect.id, builtEffect, character);
+        if(effect.type === "buff") {
+            const auraId = effect.buff || effect.id;
+            if(auraId) this.buff(auraId, builtEffect, character);
+        }
+        if(effect.type === "debuff") {
+            const auraId = effect.debuff || effect.buff || effect.id;
+            if(auraId) this.debuff(auraId, builtEffect, character);
+        }
     }
 
     /**
@@ -294,6 +298,18 @@ class AdventuringCharacter {
                 stats.totalDamage = (stats.totalDamage || 0) + amount;
             }
         }
+        
+        // Equipment gains mastery XP from damage dealt (attacker's equipment)
+        if(character && character.isHero && !this.isHero && amount > 0) {
+            // Calculate XP based on damage dealt
+            const equipmentXP = Math.max(1, Math.floor(amount / 5));
+            
+            character.equipment?.slots?.forEach((equipmentSlot, slotType) => {
+                if(!equipmentSlot.empty && !equipmentSlot.occupied && equipmentSlot.item) {
+                    equipmentSlot.item.addXP(equipmentXP);
+                }
+            });
+        }
 
         if(!loadingOfflineProgress) {
             this.component.splash.add({
@@ -348,6 +364,18 @@ class AdventuringCharacter {
             if(stats) {
                 stats.totalHealing = (stats.totalHealing || 0) + actualHeal;
             }
+        }
+        
+        // Equipment gains mastery XP from healing done (healer's equipment)
+        if(character && character.isHero && actualHeal > 0) {
+            // Calculate XP based on healing done (same rate as damage)
+            const equipmentXP = Math.max(1, Math.floor(actualHeal / 5));
+            
+            character.equipment?.slots?.forEach((equipmentSlot, slotType) => {
+                if(!equipmentSlot.empty && !equipmentSlot.occupied && equipmentSlot.item) {
+                    equipmentSlot.item.addXP(equipmentXP);
+                }
+            });
         }
 
         if(!loadingOfflineProgress) {

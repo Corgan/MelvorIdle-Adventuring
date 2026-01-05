@@ -84,6 +84,13 @@ export class AdventuringGrimoire {
         return generators.length + spenders.length;
     }
     
+    /**
+     * Reset all grimoire state (for skill reset)
+     */
+    resetAll() {
+        this.learnedAbilities.clear();
+    }
+    
     encode(writer) {
         writer.writeUint32(this.learnedAbilities.size);
         for(const abilityId of this.learnedAbilities) {

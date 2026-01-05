@@ -110,13 +110,16 @@ export class AdventuringEnemy extends AdventuringCharacter {
         const spawnEffects = this.manager.dungeon.effectCache.getEnemySpawnEffects();
         
         for(const effect of spawnEffects) {
+            const auraId = effect.aura || effect.id || effect.buff || effect.debuff;
+            if(!auraId) continue; // Skip effects without valid aura ID
+            
             if(effect.type === 'debuff') {
-                this.debuff(effect.aura, { 
+                this.debuff(auraId, { 
                     stacks: effect.stacks, 
                     amount: effect.amount 
                 }, null);
             } else if(effect.type === 'enemy_buff') {
-                this.buff(effect.aura, { 
+                this.buff(auraId, { 
                     stacks: effect.stacks, 
                     amount: effect.amount 
                 }, null);
@@ -204,7 +207,7 @@ export class AdventuringEnemy extends AdventuringCharacter {
         
         // Apply phase aura/buff
         if(phase.aura) {
-            this.auras.add(phase.aura);
+            this.auras.add(phase.aura, { stacks: 1 }, this);
         }
         
         this.renderQueue.name = true;
@@ -266,23 +269,27 @@ export class AdventuringEnemy extends AdventuringCharacter {
             // Add skill XP with area as action for modifier query
             this.manager.addXP(bonusXP, area || this.base);
 
+            // Job mastery XP from kills
             this.manager.party.all.filter(member => !member.dead).forEach(member => {
                 if(member.combatJob.isMilestoneReward)
                     member.combatJob.addXP(bonusXP);
-
-                member.equipment.slots.forEach((equipmentSlot, slotType) => {
-                    if(!equipmentSlot.empty && !equipmentSlot.occupied) {
-                        equipmentSlot.item.addXP(bonusXP);
-                    }
-                });
+                
+                // Note: Equipment XP is now granted from damage dealt, not kills
+                // See adventuring-character.mjs damage() method
             });
 
-            this.manager.dungeon.area.addXP(this.xp); // Mastery XP not boosted
+            // Note: Area XP is now granted on dungeon clear, not per kill
+            // See adventuring-dungeon.mjs onClear() method
 
-            this.base.addXP(this.xp); // Monster mastery XP not boosted
+            this.base.addXP(this.xp); // Monster mastery XP from kills
 
             // Get loot with Monster Mastery bonuses
             let { id, qty } = this.base.lootGenerator.getEntry();
+            
+            // DEBUG: Check loot generator output
+            if (typeof qty !== 'number' || isNaN(qty)) {
+                console.log(`[LOOT DEBUG] Bad loot from generator: id=${id}, qty=${qty}, monster=${this.base?.id}`);
+            }
             
             // Apply drop rate bonus from monster mastery (chance for extra drop roll)
             const dropRateBonus = this.manager.modifiers.getMonsterDropRateBonus(this.base);

@@ -32,7 +32,7 @@ export class AdventuringItemBase extends AdventuringMasteryAction {
         }
 
         this._type = data.type;
-        this.maxUpgrades = 12;
+        this.maxUpgrades = 10;
         this.selected = false;
         this.highlight = false;
         
@@ -132,6 +132,7 @@ export class AdventuringItemBase extends AdventuringMasteryAction {
     calculateStats() {
         this.stats.reset();
 
+        // Base stats calculation
         this.base.forEach((value, stat) => this.stats.set(stat, value));
         this.scaling.forEach((value, stat) => this.stats.set(stat, this.stats.get(stat) + Math.floor(this.level * value)));
 
@@ -143,6 +144,42 @@ export class AdventuringItemBase extends AdventuringMasteryAction {
                 this.stats.set(stat, value + bonus);
             });
         }
+        
+        // Masterful rank: Apply normalization to bring all items to same power level
+        if (this.isMasterful) {
+            this.applyMasterfulScaling();
+        }
+    }
+    
+    /**
+     * Apply Masterful rank scaling - normalizes all Masterful items to same power level
+     * This brings lower-tier items up to high-tier power when both are Masterful
+     */
+    applyMasterfulScaling() {
+        // Target power level for Masterful items (based on highest tier items at level 99)
+        const masterfulMultiplier = this.getMasterfulMultiplier();
+        
+        if (masterfulMultiplier > 1) {
+            this.stats.forEach((value, stat) => {
+                const boostedValue = Math.floor(value * masterfulMultiplier);
+                this.stats.set(stat, boostedValue);
+            });
+        }
+    }
+    
+    /**
+     * Get the multiplier needed to bring this item to Masterful power level
+     * Higher tier items get lower multipliers, lower tier items get higher multipliers
+     */
+    getMasterfulMultiplier() {
+        const tier = this.tier || 1;
+        const maxTier = 10; // Assumed max tier
+        
+        // Inverse relationship: lower tier gets bigger boost
+        // Tier 10 items get 1.0x, tier 1 items get 1.9x
+        const multiplier = 1 + (maxTier - tier) * 0.1;
+        
+        return multiplier;
     }
 
     get tooltip() {
@@ -199,7 +236,18 @@ export class AdventuringItemBase extends AdventuringMasteryAction {
     }
 
     get levelCap() {
+        // 10 upgrade levels: 1→10, 2→20, ..., 9→90, 10→99
+        if (this.upgradeLevel >= this.maxUpgrades) {
+            return 99;
+        }
         return this.upgradeLevel * 10;
+    }
+    
+    /**
+     * Check if this item has been upgraded to Masterful rank
+     */
+    get isMasterful() {
+        return this.manager.armory.masterfulItems?.has(this) || false;
     }
 
     get upgradeLevel() {
@@ -219,6 +267,12 @@ export class AdventuringItemBase extends AdventuringMasteryAction {
             return false;
         if(this.materials === undefined)
             return false;
+        
+        // Must reach current level cap before upgrading
+        // This ensures players USE equipment to level it before upgrading
+        if(this.level < this.levelCap)
+            return false;
+        
         for(let material of this.materials.keys()) {
             if(this.getCost(material) > this.manager.stash.materialCounts.get(material))
                 return false;
@@ -317,7 +371,10 @@ export class AdventuringItemBase extends AdventuringMasteryAction {
         
         // Apply upgrade cost modifier from mastery
         const costReduction = this.manager.modifiers.getUpgradeCostReduction(this);
-        const baseCost = Math.pow(5, this.upgradeLevel) * amount;
+        
+        // Quadratic scaling: (upgradeLevel + 1)² * amount
+        // Level 0→1: 1x, 1→2: 4x, 2→3: 9x, 3→4: 16x, ..., 9→10: 100x
+        const baseCost = Math.pow(this.upgradeLevel + 1, 2) * amount;
         return Math.max(1, Math.floor(baseCost * (1 + costReduction)));
     }
 

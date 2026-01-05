@@ -2,6 +2,7 @@ const { loadModule } = mod.getContext(import.meta);
 
 const { createEffect, describeEffect, describeEffectFull } = await loadModule('src/core/adventuring-utils.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
+const { AdventuringTavernDrinkElement } = await loadModule('src/town/components/adventuring-tavern-drink.mjs');
 
 class AdventuringTavernDrinkRenderQueue {
     constructor() {
@@ -60,7 +61,12 @@ export class AdventuringTavernDrink extends NamespacedObject {
         this.component = createElement('adventuring-tavern-drink');
         this.renderQueue = new AdventuringTavernDrinkRenderQueue();
         
-        this.component.clickable.onclick = () => this.onClick();
+        // Use setOnClick if available (browser), otherwise try direct access (may be undefined in test env)
+        if (typeof this.component.setOnClick === 'function') {
+            this.component.setOnClick(() => this.onClick());
+        } else if (this.component.clickable) {
+            this.component.clickable.onclick = () => this.onClick();
+        }
     }
 
     /**

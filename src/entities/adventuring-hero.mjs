@@ -7,6 +7,54 @@ const { AdventuringCard } = await loadModule('src/progression/adventuring-card.m
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
 const { AdventuringPassiveBadgeElement } = await loadModule('src/entities/components/adventuring-passive-badge.mjs');
 
+/**
+ * Starter loadouts for new players.
+ * Each hero position (front/center/back) gets a job, abilities, and gear set.
+ */
+const STARTER_LOADOUTS = {
+    front: {
+        job: 'adventuring:fighter',
+        generator: 'adventuring:slash',
+        spender: 'adventuring:whirlwind',
+        gear: {
+            weapon: 'adventuring:bronze_sword1h',
+            offhand: 'adventuring:bronze_shield',
+            head: 'adventuring:might_helm',
+            body: 'adventuring:might_platebody',
+            legs: 'adventuring:might_platelegs',
+            hands: 'adventuring:might_gauntlets',
+            feet: 'adventuring:might_sabatons'
+        }
+    },
+    center: {
+        job: 'adventuring:cleric',
+        generator: 'adventuring:holy_fire',
+        spender: 'adventuring:divine_heal',
+        gear: {
+            weapon: 'adventuring:healing_staff',
+            head: 'adventuring:devotion_hat',
+            body: 'adventuring:devotion_robes',
+            legs: 'adventuring:devotion_bottoms',
+            hands: 'adventuring:devotion_mitts',
+            feet: 'adventuring:devotion_slippers'
+        }
+    },
+    back: {
+        job: 'adventuring:ranger',
+        generator: 'adventuring:shoot',
+        spender: 'adventuring:snipe',
+        gear: {
+            weapon: 'adventuring:normal_shortbow',
+            offhand: 'adventuring:basic_quiver',
+            head: 'adventuring:precision_cowl',
+            body: 'adventuring:precision_vest',
+            legs: 'adventuring:precision_chaps',
+            hands: 'adventuring:precision_vambraces',
+            feet: 'adventuring:precision_boots'
+        }
+    }
+};
+
 class AdventuringHeroRenderQueue extends AdventuringCharacterRenderQueue {
     constructor() {
         super(...arguments);
@@ -63,6 +111,12 @@ export class AdventuringHero extends AdventuringCharacter {
     onLoad() {
         super.onLoad();
 
+        // Set up name click handler for renaming via component callback
+        this.component.setNameClickHandler(() => this.promptRename());
+
+        // Check if this is a new player (no name = first time)
+        const isNewPlayer = this.name === undefined || this.name === "";
+
         if(this.combatJob === undefined) // Default to None
             this.setCombatJob(this.manager.jobs.getObjectByID('adventuring:none'));
         if(this.passiveJob === undefined) // Default to None
@@ -79,9 +133,13 @@ export class AdventuringHero extends AdventuringCharacter {
 
         this.calculateStats();
             
-        if(this.name === undefined || this.name === "") { // Oh No
+        if(isNewPlayer) {
+            // Assign name
             this.name = this.getRandomName(this.manager.party.all.map(member => member.name));
             this.renderQueue.name = true;
+
+            // Apply starter loadout based on party position
+            this._applyStarterLoadout();
 
             this.hitpoints = this.maxHitpoints;
             this.renderQueue.hitpoints = true;
@@ -89,6 +147,67 @@ export class AdventuringHero extends AdventuringCharacter {
 
         this.card.icon = this.media;
         this.renderQueue.icon = true;
+    }
+
+    /**
+     * Determine this hero's position in the party (front/center/back)
+     * @returns {string} 'front', 'center', or 'back'
+     */
+    _getPartyPosition() {
+        if(this === this.manager.party.front) return 'front';
+        if(this === this.manager.party.center) return 'center';
+        if(this === this.manager.party.back) return 'back';
+        return 'front'; // fallback
+    }
+
+    /**
+     * Apply starter job, abilities, and gear for new players based on party position.
+     */
+    _applyStarterLoadout() {
+        const position = this._getPartyPosition();
+        const loadout = STARTER_LOADOUTS[position];
+        if(!loadout) return;
+
+        // Set combat job
+        const job = this.manager.jobs.getObjectByID(loadout.job);
+        if(job) {
+            this.setCombatJob(job);
+        }
+
+        // Set generator
+        if(loadout.generator) {
+            const generator = this.manager.generators.getObjectByID(loadout.generator);
+            if(generator) {
+                this.setGenerator(generator);
+            }
+        }
+
+        // Set spender
+        if(loadout.spender) {
+            const spender = this.manager.spenders.getObjectByID(loadout.spender);
+            if(spender) {
+                this.setSpender(spender);
+            }
+        }
+
+        // Pre-craft and equip starter gear
+        for(const [slotName, itemId] of Object.entries(loadout.gear)) {
+            // Pre-craft the item (unlock + upgrade to level 1)
+            const item = this.manager.armory.preCraftItem(itemId);
+            if(!item) continue;
+
+            // Find the equipment slot
+            const slotType = this.manager.itemSlots.getObjectByID(`adventuring:${slotName}`);
+            if(!slotType) continue;
+
+            const slot = this.equipment.slots.get(slotType);
+            if(slot && slot.canEquip(item)) {
+                slot.setEquipped(item);
+            }
+        }
+
+        // Recalculate stats after equipping
+        this.calculateStats();
     }
 
     calculateStats() {
@@ -210,6 +329,34 @@ export class AdventuringHero extends AdventuringCharacter {
     setName(name) {
         this.name = name;
         this.renderQueue.name = true;
+    }
+
+    /**
+     * Prompt user to rename this hero using SweetAlert2 modal
+     */
+    promptRename() {
+        SwalLocale.fire({
+            title: 'Rename Hero',
+            input: 'text',
+            inputValue: this.name || '',
+            inputPlaceholder: 'Enter a new name',
+            showCancelButton: true,
+            confirmButtonText: 'Rename',
+            cancelButtonText: 'Cancel',
+            inputValidator: (value) => {
+                if (!value || value.trim() === '') {
+                    return 'Please enter a name';
+                }
+                if (value.length > 20) {
+                    return 'Name must be 20 characters or less';
+                }
+            }
+        }).then((result) => {
+            if (result.isConfirmed && result.value) {
+                this.setName(result.value.trim());
+                this.manager.log.add(`Hero renamed to ${this.name}`);
+            }
+        });
     }
 
     /**

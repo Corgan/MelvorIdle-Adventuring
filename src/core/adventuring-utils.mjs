@@ -178,6 +178,12 @@ class AdventuringWeightedTable {
             return dropRoll < itemWeight;
         });
         const drop = this.table[lootIndex];
+        
+        // Calculate qty from minQty/maxQty if needed
+        if (drop && drop.qty === undefined && drop.minQty !== undefined && drop.maxQty !== undefined) {
+            drop.qty = drop.minQty + Math.floor(Math.random() * (drop.maxQty - drop.minQty + 1));
+        }
+        
         return drop;
     }
 }
@@ -548,6 +554,18 @@ class RequirementsChecker {
                 const achievement = this.manager.achievements.getObjectByID(req.id);
                 return achievement ? achievement.isComplete : false;
             }
+            
+            case 'area_cleared': {
+                // Check if an area has been cleared at least once by checking if it has any XP
+                const area = this.manager.areas.getObjectByID(req.area);
+                if (!area) return false;
+                const xp = this.manager.actionMastery?.get(area)?.xp || 0;
+                return xp > 0;
+            }
+            
+            case 'always_false':
+                // Placeholder for items that require special unlock methods (drops, etc.)
+                return false;
 
             default:
                 console.warn(`Unknown requirement type: ${req.type}`);
@@ -735,6 +753,17 @@ function formatRequirement(req, manager, context = {}) {
             text = `${operand.replace(/_/g, ' ')} ${opSymbol} ${target}`;
             break;
         }
+        
+        case 'area_cleared': {
+            const area = manager.areas.getObjectByID(req.area);
+            const areaName = area !== undefined ? area.name : req.area;
+            text = `Clear ${areaName}`;
+            break;
+        }
+        
+        case 'always_false':
+            text = req.hint || 'Special unlock required';
+            break;
         
         default:
             text = `${req.type}: ${req.level || req.value || '?'}`;
@@ -1907,13 +1936,19 @@ function createDefaultEffectProcessor() {
         const stacks = instance.stacks || effect.stacks || 1;
         const builtEffect = { stacks };
         const target = effect.target || 'self';
+        const auraId = effect.buff || effect.id;
+        
+        if(!auraId) {
+            console.warn('[buff processor] Missing aura id in effect:', effect);
+            return ctx.extra;
+        }
         
         if(target === 'self' || target === undefined) {
-            ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} applies ${effect.id}`);
-            ctx.character.auras.add(effect.id, builtEffect, ctx.character);
+            ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} applies ${auraId}`);
+            ctx.character.auras.add(auraId, builtEffect, ctx.character);
         } else if(target === 'attacker' && ctx.extra.attacker) {
-            ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} applies ${effect.id} to ${ctx.extra.attacker.name}`);
-            ctx.extra.attacker.auras.add(effect.id, builtEffect, ctx.character);
+            ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} applies ${auraId} to ${ctx.extra.attacker.name}`);
+            ctx.extra.attacker.auras.add(auraId, builtEffect, ctx.character);
         }
         return ctx.extra;
     });
@@ -1923,6 +1958,12 @@ function createDefaultEffectProcessor() {
         const stacks = instance.stacks || effect.stacks || 1;
         const builtEffect = { stacks };
         const target = effect.target || 'target';
+        const auraId = effect.debuff || effect.buff || effect.id;
+        
+        if(!auraId) {
+            console.warn('[debuff processor] Missing aura id in effect:', effect);
+            return ctx.extra;
+        }
         
         let targetChar = null;
         if(target === 'self') {
@@ -1934,8 +1975,8 @@ function createDefaultEffectProcessor() {
         }
         
         if(targetChar && !targetChar.dead) {
-            ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} applies ${effect.id} to ${targetChar.name}`);
-            targetChar.auras.add(effect.id, builtEffect, ctx.character);
+            ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} applies ${auraId} to ${targetChar.name}`);
+            targetChar.auras.add(auraId, builtEffect, ctx.character);
         }
         return ctx.extra;
     });

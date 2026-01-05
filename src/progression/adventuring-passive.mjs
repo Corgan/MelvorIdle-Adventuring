@@ -80,11 +80,15 @@ export class AdventuringPassive extends NamespacedObject {
                     return;
                     
                 if(effect.type === "buff") {
-                    target.buff(effect.id, builtEffect, character);
-                    this.manager.log.add(`${character.name}'s ${this.name} applies ${getAuraName(this.manager, effect.id)} to ${target.name}`);
+                    const auraId = effect.buff || effect.id;
+                    if(!auraId) return;
+                    target.buff(auraId, builtEffect, character);
+                    this.manager.log.add(`${character.name}'s ${this.name} applies ${getAuraName(this.manager, auraId)} to ${target.name}`);
                 } else if(effect.type === "debuff") {
-                    target.debuff(effect.id, builtEffect, character);
-                    this.manager.log.add(`${character.name}'s ${this.name} applies ${getAuraName(this.manager, effect.id)} to ${target.name}`);
+                    const auraId = effect.debuff || effect.buff || effect.id;
+                    if(!auraId) return;
+                    target.debuff(auraId, builtEffect, character);
+                    this.manager.log.add(`${character.name}'s ${this.name} applies ${getAuraName(this.manager, auraId)} to ${target.name}`);
                 } else if(effect.type === "heal") {
                     target.heal(builtEffect, character);
                     this.manager.log.add(`${character.name}'s ${this.name} heals ${target.name} for ${builtEffect.amount}`);

@@ -24,6 +24,22 @@ export class AdventuringTavernDrinkElement extends AdventuringTooltipElement {
     connectedCallback() {
         this.appendChild(this._content);
         super.connectedCallback();
+        // Set onclick handler if one was queued
+        if (this._pendingOnClick) {
+            this.clickable.onclick = this._pendingOnClick;
+            this._pendingOnClick = null;
+        }
+    }
+
+    /**
+     * Set click handler - queues if not yet connected
+     */
+    setOnClick(handler) {
+        if (this.isConnected && this.clickable) {
+            this.clickable.onclick = handler;
+        } else {
+            this._pendingOnClick = handler;
+        }
     }
 
     disconnectedCallback() {
