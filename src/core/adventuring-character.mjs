@@ -301,10 +301,23 @@ class AdventuringCharacter {
         
         // Equipment gains mastery XP from damage dealt (attacker's equipment)
         if(character && character.isHero && !this.isHero && amount > 0) {
-            // Calculate XP based on damage dealt
-            const equipmentXP = Math.max(1, Math.floor(amount / 5));
+            // Calculate XP based on damage dealt (scaled down to reasonable rate)
+            const equipmentXP = Math.max(1, Math.floor(amount / 10));
             
             character.equipment?.slots?.forEach((equipmentSlot, slotType) => {
+                if(!equipmentSlot.empty && !equipmentSlot.occupied && equipmentSlot.item) {
+                    equipmentSlot.item.addXP(equipmentXP);
+                }
+            });
+        }
+        
+        // Equipment gains mastery XP from damage taken (defender's equipment, heroes only)
+        // This allows tanks to level their gear through surviving hits
+        if(this.isHero && !character?.isHero && amount > 0 && !this.dead) {
+            // Calculate XP based on damage taken (same rate as damage dealt)
+            const equipmentXP = Math.max(1, Math.floor(amount / 10));
+            
+            this.equipment?.slots?.forEach((equipmentSlot, slotType) => {
                 if(!equipmentSlot.empty && !equipmentSlot.occupied && equipmentSlot.item) {
                     equipmentSlot.item.addXP(equipmentXP);
                 }
@@ -367,11 +380,25 @@ class AdventuringCharacter {
         }
         
         // Equipment gains mastery XP from healing done (healer's equipment)
+        // Healing is less frequent and smaller amounts than damage, so use higher rate
         if(character && character.isHero && actualHeal > 0) {
-            // Calculate XP based on healing done (same rate as damage)
+            // Calculate XP based on healing done (2x rate of damage since heals are less frequent)
             const equipmentXP = Math.max(1, Math.floor(actualHeal / 5));
             
             character.equipment?.slots?.forEach((equipmentSlot, slotType) => {
+                if(!equipmentSlot.empty && !equipmentSlot.occupied && equipmentSlot.item) {
+                    equipmentSlot.item.addXP(equipmentXP);
+                }
+            });
+        }
+        
+        // Equipment gains mastery XP from being healed (target's equipment)
+        // This helps support roles level their gear
+        if(this.isHero && character && character.isHero && actualHeal > 0) {
+            // Calculate XP based on healing received (same rate as damage taken)
+            const equipmentXP = Math.max(1, Math.floor(actualHeal / 10));
+            
+            this.equipment?.slots?.forEach((equipmentSlot, slotType) => {
                 if(!equipmentSlot.empty && !equipmentSlot.occupied && equipmentSlot.item) {
                     equipmentSlot.item.addXP(equipmentXP);
                 }

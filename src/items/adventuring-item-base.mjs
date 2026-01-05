@@ -372,9 +372,9 @@ export class AdventuringItemBase extends AdventuringMasteryAction {
         // Apply upgrade cost modifier from mastery
         const costReduction = this.manager.modifiers.getUpgradeCostReduction(this);
         
-        // Quadratic scaling: (upgradeLevel + 1)² * amount
-        // Level 0→1: 1x, 1→2: 4x, 2→3: 9x, 3→4: 16x, ..., 9→10: 100x
-        const baseCost = Math.pow(this.upgradeLevel + 1, 2) * amount;
+        // Linear scaling: (upgradeLevel + 1) * amount
+        // Level 0→1: 1x, 1→2: 2x, 2→3: 3x, 3→4: 4x, ..., 9→10: 10x
+        const baseCost = (this.upgradeLevel + 1) * amount;
         return Math.max(1, Math.floor(baseCost * (1 + costReduction)));
     }
 

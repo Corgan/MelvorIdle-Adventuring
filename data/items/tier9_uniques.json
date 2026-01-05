@@ -2,253 +2,471 @@
     "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
     "namespace": "adventuring",
     "data": {
-        "skillData": [{
-            "skillID": "adventuring:Adventuring",
-            "data": {
-                "baseItems": [
-                    {
-                        "id": "eternal_blade",
-                        "name": "Eternal Blade",
-                        "media": "melvor:assets/media/bank/weapon_sword_ancient.png",
-                        "type": "adventuring:sword2h",
-                        "materials": [
-                            { "id": "adventuring:currency", "qty": 15000 },
-                            { "id": "adventuring:champions_crown", "qty": 3 },
-                            { "id": "adventuring:eternal_essence", "qty": 30 },
-                            { "id": "adventuring:glory_medal", "qty": 40 }
-                        ],
-                        "base": [
-                            { "id": "adventuring:hitpoints", "value": 40 },
-                            { "id": "adventuring:strength", "value": 78 },
-                            { "id": "adventuring:agility", "value": 32 }
-                        ],
-                        "scaling": [
-                            { "id": "adventuring:hitpoints", "value": 3.5 },
-                            { "id": "adventuring:strength", "value": 6.5 },
-                            { "id": "adventuring:agility", "value": 2.8 }
-                        ],
-                        "effects": [
-                            {
-                                "trigger": "on_kill",
-                                "type": "buff",
-                                "id": "adventuring:might",
-                                "target": "self",
-                                "stacks": 8
-                            },
-                            {
-                                "trigger": "on_kill",
-                                "type": "heal",
-                                "target": "self",
-                                "amount": 30,
-                                "scaling": 3.0
-                            },
-                            {
-                                "trigger": "on_hit",
-                                "type": "damage",
-                                "target": "target",
-                                "amount": 15,
-                                "scaling": 1.5,
-                                "chance": 30
-                            }
-                        ]
-                    },
-                    {
-                        "id": "gladiators_aegis",
-                        "name": "Gladiator's Aegis",
-                        "media": "melvor:assets/media/bank/armour_shield_dragon.png",
-                        "type": "adventuring:shield",
-                        "materials": [
-                            { "id": "adventuring:currency", "qty": 12000 },
-                            { "id": "adventuring:champions_crown", "qty": 2 },
-                            { "id": "adventuring:champions_blood", "qty": 50 },
-                            { "id": "adventuring:arena_token", "qty": 80 }
-                        ],
-                        "base": [
-                            { "id": "adventuring:hitpoints", "value": 45 },
-                            { "id": "adventuring:defence", "value": 65 },
-                            { "id": "adventuring:strength", "value": 18 }
-                        ],
-                        "scaling": [
-                            { "id": "adventuring:hitpoints", "value": 4.0 },
-                            { "id": "adventuring:defence", "value": 5.5 },
-                            { "id": "adventuring:strength", "value": 1.4 }
-                        ],
-                        "effects": [
-                            {
-                                "trigger": "after_damage_received",
-                                "type": "buff",
-                                "id": "adventuring:barrier",
-                                "target": "self",
-                                "stacks": 3,
-                                "chance": 40
-                            },
-                            {
-                                "trigger": "encounter_start",
-                                "type": "buff",
-                                "id": "adventuring:block",
-                                "target": "self",
-                                "stacks": 15
-                            }
-                        ]
-                    },
-                    {
-                        "id": "crown_of_glory",
-                        "name": "Crown of Glory",
-                        "media": "melvor:assets/media/bank/fez_amulet.png",
-                        "type": "adventuring:helm",
-                        "materials": [
-                            { "id": "adventuring:currency", "qty": 14000 },
-                            { "id": "adventuring:champions_crown", "qty": 3 },
-                            { "id": "adventuring:glory_medal", "qty": 50 },
-                            { "id": "adventuring:eternal_essence", "qty": 25 }
-                        ],
-                        "base": [
-                            { "id": "adventuring:hitpoints", "value": 35 },
-                            { "id": "adventuring:strength", "value": 45 },
-                            { "id": "adventuring:defence", "value": 38 }
-                        ],
-                        "scaling": [
-                            { "id": "adventuring:hitpoints", "value": 3.0 },
-                            { "id": "adventuring:strength", "value": 3.8 },
-                            { "id": "adventuring:defence", "value": 3.2 }
-                        ],
-                        "effects": [
-                            {
-                                "trigger": "encounter_start",
-                                "type": "buff",
-                                "id": "adventuring:might",
-                                "target": "all", "party": "ally",
-                                "stacks": 5
-                            },
-                            {
-                                "trigger": "on_kill",
-                                "type": "buff",
-                                "id": "adventuring:haste",
-                                "target": "self",
-                                "stacks": 3
-                            }
-                        ]
-                    },
-                    {
-                        "id": "bloodsoaked_gauntlets",
-                        "name": "Bloodsoaked Gauntlets",
-                        "media": "melvor:assets/media/bank/armour_gloves_dragon.png",
-                        "type": "adventuring:vambraces",
-                        "materials": [
-                            { "id": "adventuring:currency", "qty": 10000 },
-                            { "id": "adventuring:champions_crown", "qty": 1 },
-                            { "id": "adventuring:champions_blood", "qty": 60 },
-                            { "id": "adventuring:beast_fang", "qty": 30 }
-                        ],
-                        "base": [
-                            { "id": "adventuring:hitpoints", "value": 25 },
-                            { "id": "adventuring:strength", "value": 42 },
-                            { "id": "adventuring:agility", "value": 22 }
-                        ],
-                        "scaling": [
-                            { "id": "adventuring:hitpoints", "value": 2.0 },
-                            { "id": "adventuring:strength", "value": 3.5 },
-                            { "id": "adventuring:agility", "value": 1.8 }
-                        ],
-                        "effects": [
-                            {
-                                "trigger": "on_hit",
-                                "type": "heal",
-                                "target": "self",
-                                "amount": 5,
-                                "scaling": 0.5,
-                                "chance": 40
-                            },
-                            {
-                                "trigger": "on_hit",
-                                "type": "buff",
-                                "id": "adventuring:bloodlust",
-                                "target": "self",
-                                "stacks": 2,
-                                "chance": 25
-                            }
-                        ]
-                    },
-                    {
-                        "id": "arena_champions_ring",
-                        "name": "Arena Champion's Ring",
-                        "media": "melvor:assets/media/bank/ring_of_power.png",
-                        "type": "adventuring:ring",
-                        "materials": [
-                            { "id": "adventuring:currency", "qty": 11000 },
-                            { "id": "adventuring:champions_crown", "qty": 2 },
-                            { "id": "adventuring:arena_token", "qty": 100 },
-                            { "id": "adventuring:glory_medal", "qty": 35 }
-                        ],
-                        "base": [
-                            { "id": "adventuring:hitpoints", "value": 22 },
-                            { "id": "adventuring:strength", "value": 35 },
-                            { "id": "adventuring:agility", "value": 28 }
-                        ],
-                        "scaling": [
-                            { "id": "adventuring:hitpoints", "value": 1.8 },
-                            { "id": "adventuring:strength", "value": 3.0 },
-                            { "id": "adventuring:agility", "value": 2.4 }
-                        ],
-                        "effects": [
-                            {
-                                "trigger": "on_generator",
-                                "type": "buff",
-                                "id": "adventuring:might",
-                                "target": "self",
-                                "stacks": 1,
-                                "chance": 35
-                            },
-                            {
-                                "trigger": "on_spender",
-                                "type": "damage",
-                                "target": "target",
-                                "amount": 25,
-                                "scaling": 2.5
-                            }
-                        ]
-                    },
-                    {
-                        "id": "eternal_amulet",
-                        "name": "Eternal Amulet",
-                        "media": "melvor:assets/media/bank/amulet_of_glory.png",
-                        "type": "adventuring:amulet",
-                        "materials": [
-                            { "id": "adventuring:currency", "qty": 12000 },
-                            { "id": "adventuring:champions_crown", "qty": 2 },
-                            { "id": "adventuring:eternal_essence", "qty": 35 },
-                            { "id": "adventuring:champions_blood", "qty": 40 }
-                        ],
-                        "base": [
-                            { "id": "adventuring:hitpoints", "value": 28 },
-                            { "id": "adventuring:strength", "value": 32 },
-                            { "id": "adventuring:defence", "value": 32 }
-                        ],
-                        "scaling": [
-                            { "id": "adventuring:hitpoints", "value": 2.4 },
-                            { "id": "adventuring:strength", "value": 2.8 },
-                            { "id": "adventuring:defence", "value": 2.8 }
-                        ],
-                        "effects": [
-                            {
-                                "trigger": "round_start",
-                                "type": "heal",
-                                "target": "self",
-                                "amount": 12,
-                                "scaling": 1.2
-                            },
-                            {
-                                "trigger": "low_health",
-                                "type": "buff",
-                                "id": "adventuring:barrier",
-                                "target": "self",
-                                "stacks": 15
-                            }
-                        ]
-                    }
-                ]
+        "skillData": [
+            {
+                "skillID": "adventuring:Adventuring",
+                "data": {
+                    "baseItems": [
+                        {
+                            "id": "eternal_blade",
+                            "name": "Eternal Blade",
+                            "media": "melvor:assets/media/bank/weapon_sword_ancient.png",
+                            "type": "adventuring:sword2h",
+                            "materials": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 15000
+                                },
+                                {
+                                    "id": "adventuring:champions_crown",
+                                    "qty": 3
+                                },
+                                {
+                                    "id": "adventuring:eternal_essence",
+                                    "qty": 30
+                                },
+                                {
+                                    "id": "adventuring:glory_medal",
+                                    "qty": 40
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 40
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 78
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 32
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 3.5
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 6.5
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 2.8
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "on_kill",
+                                    "type": "buff",
+                                    "id": "adventuring:might",
+                                    "target": "self",
+                                    "stacks": 8
+                                },
+                                {
+                                    "trigger": "on_kill",
+                                    "type": "heal",
+                                    "target": "self",
+                                    "amount": 30,
+                                    "scaling": 3
+                                },
+                                {
+                                    "trigger": "on_hit",
+                                    "type": "damage",
+                                    "target": "target",
+                                    "amount": 15,
+                                    "scaling": 1.5,
+                                    "chance": 30
+                                }
+                            ],
+                            "requirements": [
+                                {
+                                    "type": "area_cleared",
+                                    "area": "adventuring:eternal_colosseum"
+                                }
+                            ]
+                        },
+                        {
+                            "id": "gladiators_aegis",
+                            "name": "Gladiator's Aegis",
+                            "media": "melvor:assets/media/bank/armour_shield_dragon.png",
+                            "type": "adventuring:shield",
+                            "materials": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 12000
+                                },
+                                {
+                                    "id": "adventuring:champions_crown",
+                                    "qty": 2
+                                },
+                                {
+                                    "id": "adventuring:champions_blood",
+                                    "qty": 50
+                                },
+                                {
+                                    "id": "adventuring:arena_token",
+                                    "qty": 80
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 45
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 65
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 18
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 4
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 5.5
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 1.4
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "after_damage_received",
+                                    "type": "buff",
+                                    "id": "adventuring:barrier",
+                                    "target": "self",
+                                    "stacks": 3,
+                                    "chance": 40
+                                },
+                                {
+                                    "trigger": "encounter_start",
+                                    "type": "buff",
+                                    "id": "adventuring:block",
+                                    "target": "self",
+                                    "stacks": 15
+                                }
+                            ],
+                            "requirements": [
+                                {
+                                    "type": "area_cleared",
+                                    "area": "adventuring:eternal_colosseum"
+                                }
+                            ]
+                        },
+                        {
+                            "id": "crown_of_glory",
+                            "name": "Crown of Glory",
+                            "media": "melvor:assets/media/bank/fez_amulet.png",
+                            "type": "adventuring:helm",
+                            "materials": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 14000
+                                },
+                                {
+                                    "id": "adventuring:champions_crown",
+                                    "qty": 3
+                                },
+                                {
+                                    "id": "adventuring:glory_medal",
+                                    "qty": 50
+                                },
+                                {
+                                    "id": "adventuring:eternal_essence",
+                                    "qty": 25
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 35
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 45
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 38
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 3
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 3.8
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 3.2
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "encounter_start",
+                                    "type": "buff",
+                                    "id": "adventuring:might",
+                                    "target": "all",
+                                    "party": "ally",
+                                    "stacks": 5
+                                },
+                                {
+                                    "trigger": "on_kill",
+                                    "type": "buff",
+                                    "id": "adventuring:haste",
+                                    "target": "self",
+                                    "stacks": 3
+                                }
+                            ],
+                            "requirements": [
+                                {
+                                    "type": "area_cleared",
+                                    "area": "adventuring:eternal_colosseum"
+                                }
+                            ]
+                        },
+                        {
+                            "id": "bloodsoaked_gauntlets",
+                            "name": "Bloodsoaked Gauntlets",
+                            "media": "melvor:assets/media/bank/armour_gloves_dragon.png",
+                            "type": "adventuring:vambraces",
+                            "materials": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 10000
+                                },
+                                {
+                                    "id": "adventuring:champions_crown",
+                                    "qty": 1
+                                },
+                                {
+                                    "id": "adventuring:champions_blood",
+                                    "qty": 60
+                                },
+                                {
+                                    "id": "adventuring:beast_fang",
+                                    "qty": 30
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 25
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 42
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 22
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 2
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 3.5
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 1.8
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "on_hit",
+                                    "type": "heal",
+                                    "target": "self",
+                                    "amount": 5,
+                                    "scaling": 0.5,
+                                    "chance": 40
+                                },
+                                {
+                                    "trigger": "on_hit",
+                                    "type": "buff",
+                                    "id": "adventuring:bloodlust",
+                                    "target": "self",
+                                    "stacks": 2,
+                                    "chance": 25
+                                }
+                            ],
+                            "requirements": [
+                                {
+                                    "type": "area_cleared",
+                                    "area": "adventuring:eternal_colosseum"
+                                }
+                            ]
+                        },
+                        {
+                            "id": "arena_champions_ring",
+                            "name": "Arena Champion's Ring",
+                            "media": "melvor:assets/media/bank/ring_of_power.png",
+                            "type": "adventuring:ring",
+                            "materials": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 11000
+                                },
+                                {
+                                    "id": "adventuring:champions_crown",
+                                    "qty": 2
+                                },
+                                {
+                                    "id": "adventuring:arena_token",
+                                    "qty": 100
+                                },
+                                {
+                                    "id": "adventuring:glory_medal",
+                                    "qty": 35
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 22
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 35
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 28
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 1.8
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 3
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "value": 2.4
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "on_generator",
+                                    "type": "buff",
+                                    "id": "adventuring:might",
+                                    "target": "self",
+                                    "stacks": 1,
+                                    "chance": 35
+                                },
+                                {
+                                    "trigger": "on_spender",
+                                    "type": "damage",
+                                    "target": "target",
+                                    "amount": 25,
+                                    "scaling": 2.5
+                                }
+                            ],
+                            "requirements": [
+                                {
+                                    "type": "area_cleared",
+                                    "area": "adventuring:eternal_colosseum"
+                                }
+                            ]
+                        },
+                        {
+                            "id": "eternal_amulet",
+                            "name": "Eternal Amulet",
+                            "media": "melvor:assets/media/bank/amulet_of_glory.png",
+                            "type": "adventuring:amulet",
+                            "materials": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 12000
+                                },
+                                {
+                                    "id": "adventuring:champions_crown",
+                                    "qty": 2
+                                },
+                                {
+                                    "id": "adventuring:eternal_essence",
+                                    "qty": 35
+                                },
+                                {
+                                    "id": "adventuring:champions_blood",
+                                    "qty": 40
+                                }
+                            ],
+                            "base": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 28
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 32
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 32
+                                }
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "value": 2.4
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "value": 2.8
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "value": 2.8
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "round_start",
+                                    "type": "heal",
+                                    "target": "self",
+                                    "amount": 12,
+                                    "scaling": 1.2
+                                },
+                                {
+                                    "trigger": "low_health",
+                                    "type": "buff",
+                                    "id": "adventuring:barrier",
+                                    "target": "self",
+                                    "stacks": 15
+                                }
+                            ],
+                            "requirements": [
+                                {
+                                    "type": "area_cleared",
+                                    "area": "adventuring:eternal_colosseum"
+                                }
+                            ]
+                        }
+                    ]
+                }
             }
-        }]
+        ]
     }
 }
-
