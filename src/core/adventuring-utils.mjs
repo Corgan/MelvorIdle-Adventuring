@@ -1445,9 +1445,17 @@ const effectDescriptionRegistry = new Map([
     ['energy', (effect, value, stacks, amount, manager, helpers) => 
         `${helpers.sign(firstDefined(value, amount))}${firstDefined(value, amount)} Energy`],
     
-    // Dungeon modifiers (additive percentages)
-    ['xp_percent', (effect, value, stacks, amount, manager, helpers) => 
-        `${helpers.sign(value)}${value}% XP`],
+    // XP modifiers - category specifies which XP type (monsters, jobs, areas, equipment)
+    ['xp_percent', (effect, value, stacks, amount, manager, helpers) => {
+        if (effect.category) {
+            const catId = effect.category;
+            // Strip namespace prefix for display
+            const catName = catId.includes(':') ? catId.split(':').pop() : catId;
+            const label = catName.charAt(0).toUpperCase() + catName.slice(1);
+            return `${helpers.sign(value)}${value}% ${label} XP`;
+        }
+        return `${helpers.sign(value)}${value}% XP`;
+    }],
     ['loot_percent', (effect, value, stacks, amount, manager, helpers) => 
         `${helpers.sign(value)}${value}% Loot`],
     ['stats_percent', (effect, value, stacks, amount, manager, helpers) => {
@@ -1483,11 +1491,9 @@ const effectDescriptionRegistry = new Map([
     ['crit_damage', (effect, value, stacks, amount, manager, helpers) => 
         `+${helpers.percent(value)}% critical damage`],
     
-    // Cost/Dodge
+    // Cost reduction
     ['cost_reduction', (effect, value, stacks, amount, manager, helpers) => 
         `-${helpers.percent(value)}% ability cost`],
-    ['dodge_chance', (effect, value, stacks, amount, manager, helpers) => 
-        `${helpers.percent(value)}% dodge chance`],
     
     // Healing modifiers
     ['healing_bonus', (effect, value, stacks, amount, manager, helpers) => 
@@ -1537,15 +1543,15 @@ const effectDescriptionRegistry = new Map([
     ['drop_rate_percent', (effect, value) => `+${value}% Drop Rate`],
     ['drop_quantity_percent', (effect, value) => `+${value}% Drop Quantity`],
     ['explore_speed_percent', (effect, value) => `+${value}% Explore Speed`],
-    ['trap_spawn_rate_percent', (effect, value) => `${value > 0 ? '+' : ''}${value}% Trap Spawn Rate`],
-    ['fountain_spawn_rate_percent', (effect, value) => `+${value}% Fountain Spawn Rate`],
-    ['treasure_spawn_rate_percent', (effect, value) => `+${value}% Treasure Spawn Rate`],
-    ['shrine_spawn_rate_percent', (effect, value) => `+${value}% Shrine Spawn Rate`],
+    ['spawn_rate_percent', (effect, value) => {
+        const spawnType = effect.spawnType || 'unknown';
+        const label = spawnType.charAt(0).toUpperCase() + spawnType.slice(1);
+        return `${value > 0 ? '+' : ''}${value}% ${label} Spawn Rate`;
+    }],
     ['ability_learn_chance_percent', (effect, value) => `+${value}% Ability Learn Chance`],
     ['equipment_xp_percent', (effect, value) => `+${value}% Equipment XP`],
     ['upgrade_cost_percent', (effect, value) => `${value > 0 ? '+' : ''}${value}% Upgrade Cost`],
     ['equipment_stats_percent', (effect, value) => `+${value}% Equipment Stats`],
-    ['mastery_xp_percent', (effect, value) => `+${value}% Mastery XP`],
     
     // Aura internal effects
     ['remove', () => ''],
@@ -1583,16 +1589,6 @@ const effectDescriptionRegistry = new Map([
         `${firstDefined(amount, 0)}% damage reduction${effect.perStack ? ' per stack' : ''}`],
     ['reduce_heal_percent', (effect, value, stacks, amount) => 
         `-${firstDefined(amount, 0)}% healing received${effect.perStack ? ' per stack' : ''}`],
-    
-    // Modifier effect
-    ['modifier', (effect, value, stacks, amount, manager, helpers) => {
-        const passiveId = typeof effect.passive === 'string' ? effect.passive : effect.passive?.id;
-        const passiveName = manager?.passives?.getObjectByID(passiveId)?.name 
-            || effect.passive?.name 
-            || passiveId?.split(':').pop() 
-            || 'modifier';
-        return `Apply ${passiveName}`;
-    }],
     
     // Double cast
     ['double_cast', (effect, value, stacks, amount, manager, helpers) => {
@@ -2604,6 +2600,32 @@ function createDefaultEffectProcessor() {
         return ctx.extra;
     });
     
+    // Immune to specific aura - prevents application of specified debuff
+    processor.register('immune', (effect, instance, ctx) => {
+        // Check if incoming aura matches the immunity
+        if (effect.id && ctx.extra.auraId === effect.id) {
+            ctx.extra.prevented = true;
+            ctx.manager.log.add(`${ctx.character.name} is immune to ${effect.id}!`);
+        } else if (!effect.id) {
+            // General debuff immunity
+            ctx.extra.prevented = true;
+            ctx.manager.log.add(`${ctx.character.name} is immune to debuffs!`);
+        }
+        return ctx.extra;
+    });
+    
+    // Revive - resurrect dead character with percentage HP
+    processor.register('revive', (effect, instance, ctx) => {
+        const amount = getEffectAmount(effect, instance) || 100;
+        const target = effect.target === 'self' ? ctx.character : ctx.extra.target;
+        
+        if (target && target.dead) {
+            target.revive({ amount }, ctx.character);
+            ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} revives ${target.name} with ${amount}% HP!`);
+        }
+        return ctx.extra;
+    });
+    
     // Lifesteal
     processor.register('lifesteal', (effect, instance, ctx) => {
         const amount = getEffectAmount(effect, instance);
@@ -2651,52 +2673,15 @@ function createDefaultEffectProcessor() {
         return ctx.extra;
     });
     
-    // Random buffs
-    processor.register('random_buffs', (effect, instance, ctx) => {
-        const buffPool = [
-            'adventuring:might', 'adventuring:fortify', 'adventuring:haste',
-            'adventuring:regeneration', 'adventuring:barrier', 'adventuring:focus',
-            'adventuring:arcane_power', 'adventuring:stealth'
-        ];
-        const count = effect.count || 1;
-        const stacks = instance.stacks || effect.stacks || 1;
-        for(let i = 0; i < count; i++) {
-            const buffId = buffPool[Math.floor(Math.random() * buffPool.length)];
-            ctx.character.auras.add(buffId, { stacks }, ctx.character);
-        }
-        ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} grants ${count} random buffs`);
-        return ctx.extra;
-    });
-    
-    // Random debuffs
-    processor.register('random_debuffs', (effect, instance, ctx) => {
-        const debuffPool = [
-            'adventuring:weaken', 'adventuring:slow', 'adventuring:blind',
-            'adventuring:poison', 'adventuring:burn', 'adventuring:decay',
-            'adventuring:vulnerability', 'adventuring:chill'
-        ];
-        const count = effect.count || 1;
-        const stacks = instance.stacks || effect.stacks || 1;
-        const target = effect.target === 'attacker' ? ctx.extra.attacker : ctx.extra.target;
-        if(target && !target.dead) {
-            for(let i = 0; i < count; i++) {
-                const debuffId = debuffPool[Math.floor(Math.random() * debuffPool.length)];
-                target.auras.add(debuffId, { stacks }, ctx.character);
-            }
-            ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} applies ${count} random debuffs to ${target.name}`);
-        }
-        return ctx.extra;
-    });
-    
     // XP and loot bonuses
-    processor.register('increase_xp_percent', (effect, instance, ctx) => {
+    processor.register('xp_percent', (effect, instance, ctx) => {
         const amount = getEffectAmount(effect, instance);
         const increase = Math.ceil((ctx.extra.amount || 0) * (amount / 100));
         ctx.extra.amount = (ctx.extra.amount || 0) + increase;
         return ctx.extra;
     });
     
-    processor.register('increase_loot_percent', (effect, instance, ctx) => {
+    processor.register('loot_percent', (effect, instance, ctx) => {
         const amount = getEffectAmount(effect, instance);
         const increase = Math.ceil((ctx.extra.amount || 0) * (amount / 100));
         ctx.extra.amount = (ctx.extra.amount || 0) + increase;
