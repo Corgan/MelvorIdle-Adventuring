@@ -156,12 +156,20 @@ class PassiveEffectProcessor {
         }
         amount = missCheck.amount ?? amount;
         
-        // Pre-damage trigger: dodge check (e.g., Evasion buff)
+        // Pre-damage trigger: dodge check (e.g., Evasion buff, conditional dodge)
         const dodgeCheck = target.trigger('before_damage_received', { attacker, amount, ...context });
         if (dodgeCheck.dodged) {
+            target.trigger('dodge', { attacker, ...context });
             return { negated: 'dodge', amount: 0 };
         }
         amount = dodgeCheck.amount ?? amount;
+        
+        // Passive dodge check (sum of passive dodge bonuses)
+        const dodgeChance = target.getPassiveBonus('dodge');
+        if (dodgeChance > 0 && Math.random() * 100 < dodgeChance) {
+            target.trigger('dodge', { attacker, ...context });
+            return { negated: 'dodge', amount: 0 };
+        }
         
         // Apply attacker's damage bonus
         amount = this._applyPercentBonus(amount, attacker, 'damage_bonus');
@@ -1562,7 +1570,12 @@ const effectDescriptionRegistry = new Map([
         return 'Skip turn';
     }],
     ['dodge', (effect, value, stacks, amount) => {
+        // Passive dodge with amount (percent chance)
+        const dodgeAmount = firstDefined(amount, effect.amount);
+        if (dodgeAmount !== undefined) return `+${dodgeAmount}% dodge chance`;
+        // Conditional dodge
         if (effect.condition?.type === 'chance') return `${effect.condition.value}% chance to dodge`;
+        if (effect.condition?.type === 'hp_below') return `Dodge attacks when HP below ${effect.condition.threshold}%`;
         return 'Dodge attack';
     }],
     ['miss', (effect, value, stacks, amount) => {
