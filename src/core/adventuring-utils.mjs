@@ -112,128 +112,22 @@ class StatCalculator {
 }
 
 // ============================================================================
-// Passive Effect System
+// Passive Effect Processor
 // ============================================================================
 
-/**
- * Passive effect definitions with metadata for validation and UI.
- * Each effect defines how bonuses are applied in combat.
- */
-const PassiveEffects = {
-    // === Damage Modifiers (from attacker) ===
-    DAMAGE_BONUS: {
-        id: 'damage_bonus',
-        name: 'Damage Bonus',
-        description: 'Increases damage dealt by X%',
-        appliesTo: 'attacker'
-    },
-    CRIT_CHANCE: {
-        id: 'crit_chance',
-        name: 'Critical Chance',
-        description: 'X% chance to deal critical damage',
-        appliesTo: 'attacker'
-    },
-    CRIT_DAMAGE: {
-        id: 'crit_damage',
-        name: 'Critical Damage',
-        description: 'Critical hits deal X% bonus damage (base 50%)',
-        appliesTo: 'attacker',
-        baseValue: 50
-    },
-    EXECUTE: {
-        id: 'execute',
-        name: 'Execute Threshold',
-        description: 'Instantly kill targets below X% HP',
-        appliesTo: 'attacker'
-    },
-    
-    // === Defense Modifiers (from defender) ===
-    DAMAGE_REDUCTION: {
-        id: 'damage_reduction',
-        name: 'Damage Reduction',
-        description: 'Reduces damage taken by X%',
-        appliesTo: 'defender'
-    },
-    REFLECT_DAMAGE: {
-        id: 'reflect_damage',
-        name: 'Reflect Damage',
-        description: 'Reflects X% of damage taken back to attacker',
-        appliesTo: 'defender'
-    },
-    
-    // === Healing Modifiers ===
-    HEALING_BONUS: {
-        id: 'healing_bonus',
-        name: 'Healing Power',
-        description: 'Increases healing done by X%',
-        appliesTo: 'caster'
-    },
-    HEALING_RECEIVED: {
-        id: 'healing_received',
-        name: 'Healing Received',
-        description: 'Increases healing received by X%',
-        appliesTo: 'target'
-    },
-    
-    // === Resource Modifiers ===
-    ENERGY_GAIN_BONUS: {
-        id: 'energy_gain_bonus',
-        name: 'Energy Gain',
-        description: 'Increases energy gained by X%',
-        appliesTo: 'self'
-    },
-    COST_REDUCTION: {
-        id: 'cost_reduction',
-        name: 'Cost Reduction',
-        description: 'Reduces ability costs by X (flat)',
-        appliesTo: 'self'
-    },
-    SPELL_ECHO: {
-        id: 'spell_echo',
-        name: 'Spell Echo',
-        description: 'X% chance to cast spender abilities twice',
-        appliesTo: 'caster'
-    },
-    
-    // === Stat Modifiers ===
-    ALL_STAT_BONUS: {
-        id: 'all_stat_bonus',
-        name: 'All Stats',
-        description: 'Increases all stats by X%',
-        appliesTo: 'self'
-    }
-};
-
-// Create ID lookup set for validation
-const PASSIVE_EFFECT_IDS = new Set(Object.values(PassiveEffects).map(m => m.id));
-
-/**
- * Check if a passive effect ID is valid
- * @param {string} id - Effect ID to validate
- * @returns {boolean} True if valid
- */
-function isValidPassiveEffect(id) {
-    return PASSIVE_EFFECT_IDS.has(id);
-}
-
-/**
- * Get passive effect info by ID
- * @param {string} id - Effect ID
- * @returns {object|undefined} Effect definition or undefined
- */
-function getPassiveEffectInfo(id) {
-    return Object.values(PassiveEffects).find(m => m.id === id);
-}
+// Base crit damage multiplier (50% = 1.5x damage)
+const BASE_CRIT_MULTIPLIER = 1.5;
 
 /**
  * PassiveEffectProcessor - Handles passive effect application pipeline.
  * 
  * Centralizes damage, healing, and resource modifier calculations.
+ * Uses character.getPassiveBonus(effectType) to query summed passive bonuses.
  * 
  * Usage:
  *   const processor = new PassiveEffectProcessor(encounter);
  *   const result = processor.processDamage(attacker, target, baseAmount);
- *   if (result === null) { // Attack missed or dodged }
+ *   if (result.negated) { // Attack missed or dodged }
  *   const healResult = processor.processHealing(caster, target, baseAmount);
  */
 class PassiveEffectProcessor {
@@ -250,7 +144,7 @@ class PassiveEffectProcessor {
      * @param {object} target - Target character
      * @param {number} baseAmount - Base damage amount
      * @param {object} [context={}] - Additional context for triggers
-     * @returns {object|null} { amount, isCrit } or null if attack was negated
+     * @returns {object} { amount, isCrit, negated }
      */
     processDamage(attacker, target, baseAmount, context = {}) {
         let amount = baseAmount;
@@ -270,10 +164,10 @@ class PassiveEffectProcessor {
         amount = dodgeCheck.amount ?? amount;
         
         // Apply attacker's damage bonus
-        amount = this._applyPercentBonus(amount, attacker, PassiveEffects.DAMAGE_BONUS);
+        amount = this._applyPercentBonus(amount, attacker, 'damage_bonus');
         
         // Apply target's damage reduction
-        amount = this._applyPercentReduction(amount, target, PassiveEffects.DAMAGE_REDUCTION);
+        amount = this._applyPercentReduction(amount, target, 'damage_reduction');
         
         // Process critical hit
         const critResult = this._processCritical(amount, attacker);
@@ -299,10 +193,10 @@ class PassiveEffectProcessor {
         let amount = baseAmount;
         
         // Apply caster's healing bonus
-        amount = this._applyPercentBonus(amount, caster, PassiveEffects.HEALING_BONUS);
+        amount = this._applyPercentBonus(amount, caster, 'healing_bonus');
         
         // Apply target's healing received bonus
-        amount = this._applyPercentBonus(amount, target, PassiveEffects.HEALING_RECEIVED);
+        amount = this._applyPercentBonus(amount, target, 'healing_received');
         
         // Healing triggers
         const deliverResult = caster.trigger('before_heal_delivered', { target, amount, ...context });
@@ -322,7 +216,7 @@ class PassiveEffectProcessor {
      * @returns {number} Modified energy amount
      */
     processEnergyGain(character, baseEnergy) {
-        const bonus = character.getPassiveBonus(PassiveEffects.ENERGY_GAIN_BONUS.id);
+        const bonus = character.getPassiveBonus('energy_gain_bonus');
         return baseEnergy + Math.floor(baseEnergy * (bonus / 100));
     }
     
@@ -334,7 +228,7 @@ class PassiveEffectProcessor {
      * @returns {number} Modified cost (minimum 0)
      */
     processCostReduction(character, baseCost) {
-        const reduction = character.getPassiveBonus(PassiveEffects.COST_REDUCTION.id);
+        const reduction = character.getPassiveBonus('cost_reduction');
         return Math.max(0, baseCost - reduction);
     }
     
@@ -345,7 +239,7 @@ class PassiveEffectProcessor {
      * @returns {boolean} True if spell should echo
      */
     checkSpellEcho(character) {
-        const echoChance = character.getPassiveBonus(PassiveEffects.SPELL_ECHO.id);
+        const echoChance = character.getPassiveBonus('spell_echo');
         return echoChance > 0 && Math.random() * 100 < echoChance;
     }
     
@@ -359,7 +253,7 @@ class PassiveEffectProcessor {
     checkExecute(attacker, target) {
         if (target.dead) return false;
         
-        const threshold = attacker.getPassiveBonus(PassiveEffects.EXECUTE.id);
+        const threshold = attacker.getPassiveBonus('execute');
         if (threshold > 0 && target.hitpointsPercent < threshold) {
             return true;
         }
@@ -377,7 +271,7 @@ class PassiveEffectProcessor {
     calculateReflect(attacker, target, damageDealt) {
         if (damageDealt <= 0) return 0;
         
-        const reflectPercent = target.getPassiveBonus(PassiveEffects.REFLECT_DAMAGE.id);
+        const reflectPercent = target.getPassiveBonus('reflect_damage');
         if (reflectPercent > 0) {
             return Math.ceil(damageDealt * (reflectPercent / 100));
         }
@@ -387,28 +281,27 @@ class PassiveEffectProcessor {
     // === Private Helpers ===
     
     _processCritical(amount, attacker) {
-        const critChance = attacker.getPassiveBonus(PassiveEffects.CRIT_CHANCE.id);
+        const critChance = attacker.getPassiveBonus('crit_chance');
         
         if (critChance > 0 && Math.random() * 100 < critChance) {
-            const critDamage = attacker.getPassiveBonus(PassiveEffects.CRIT_DAMAGE.id);
-            const baseMultiplier = 1 + (PassiveEffects.CRIT_DAMAGE.baseValue / 100); // 1.5
-            const multiplier = baseMultiplier + (critDamage / 100);
+            const critDamage = attacker.getPassiveBonus('crit_damage');
+            const multiplier = BASE_CRIT_MULTIPLIER + (critDamage / 100);
             return { amount: Math.ceil(amount * multiplier), isCrit: true };
         }
         
         return { amount, isCrit: false };
     }
     
-    _applyPercentBonus(amount, character, modifier) {
-        const bonus = character.getPassiveBonus(modifier.id);
+    _applyPercentBonus(amount, character, effectType) {
+        const bonus = character.getPassiveBonus(effectType);
         if (bonus > 0) {
             return Math.ceil(amount * (1 + bonus / 100));
         }
         return amount;
     }
     
-    _applyPercentReduction(amount, character, modifier) {
-        const reduction = character.getPassiveBonus(modifier.id);
+    _applyPercentReduction(amount, character, effectType) {
+        const reduction = character.getPassiveBonus(effectType);
         if (reduction > 0) {
             return Math.ceil(amount * (1 - reduction / 100));
         }
@@ -3173,10 +3066,7 @@ export {
     getLockedMedia,
     // Stat calculation
     StatCalculator,
-    // Passive effects
-    PassiveEffects,
-    PassiveEffectProcessor,
-    isValidPassiveEffect,
-    getPassiveEffectInfo
+    // Passive effect processor
+    PassiveEffectProcessor
 }
 

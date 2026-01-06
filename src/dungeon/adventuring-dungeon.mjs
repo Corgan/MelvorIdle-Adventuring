@@ -67,19 +67,19 @@ class DungeonEffectCache {
             
             this.cachedEffects.push(createEffect({
                 trigger: 'passive',
-                type: 'enemy_stat_multiplier',
+                type: 'stat_multiplier',
                 value: statMult
             }, this.dungeon, `Endless Wave ${this.dungeon.endlessWave + 1}`));
             
             this.cachedEffects.push(createEffect({
                 trigger: 'passive',
-                type: 'xp_multiplier',
+                type: 'xp_modifier_percent',
                 value: rewardMult
             }, this.dungeon, `Endless Wave ${this.dungeon.endlessWave + 1}`));
             
             this.cachedEffects.push(createEffect({
                 trigger: 'passive',
-                type: 'loot_multiplier',
+                type: 'loot_modifier_percent',
                 value: rewardMult
             }, this.dungeon, `Endless Wave ${this.dungeon.endlessWave + 1}`));
         }
@@ -106,11 +106,11 @@ class DungeonEffectCache {
         this.lootMultiplier = 1.0;
         
         for(const effect of this.cachedEffects) {
-            if(effect.type === 'enemy_stat_multiplier') {
+            if(effect.type === 'stat_multiplier') {
                 this.enemyStatMultiplier *= effect.amount;
-            } else if(effect.type === 'xp_multiplier') {
+            } else if(effect.type === 'xp_modifier_percent') {
                 this.xpMultiplier *= effect.amount;
-            } else if(effect.type === 'loot_multiplier') {
+            } else if(effect.type === 'loot_modifier_percent') {
                 this.lootMultiplier *= effect.amount;
             }
         }

@@ -1,6 +1,6 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { sortByAgility, resolveTargets, PassiveEffectProcessor, PassiveEffects } = await loadModule('src/core/adventuring-utils.mjs');
+const { sortByAgility, resolveTargets, PassiveEffectProcessor } = await loadModule('src/core/adventuring-utils.mjs');
 const { AdventuringPage } = await loadModule('src/ui/adventuring-page.mjs');
 
 const { AdventuringGenerator } = await loadModule('src/dungeon/adventuring-generator.mjs');

@@ -3,7 +3,7 @@ const { loadModule } = mod.getContext(import.meta);
 const { AdventuringCard } = await loadModule('src/progression/adventuring-card.mjs');
 const { AdventuringStats } = await loadModule('src/core/adventuring-stats.mjs');
 const { AdventuringAuras } = await loadModule('src/combat/adventuring-auras.mjs');
-const { createEffect, EffectCache, defaultEffectProcessor, SimpleEffectInstance, evaluateCondition, buildEffectContext, StatCalculator, PassiveEffects } = await loadModule('src/core/adventuring-utils.mjs');
+const { createEffect, EffectCache, defaultEffectProcessor, SimpleEffectInstance, evaluateCondition, buildEffectContext, StatCalculator } = await loadModule('src/core/adventuring-utils.mjs');
 
 const { AdventuringCharacterElement } = await loadModule('src/core/components/adventuring-character.mjs');
 
@@ -473,7 +473,7 @@ class AdventuringCharacter {
         return StatCalculator.calculate(
             this.stats.get(stat),
             this.getStatBonus(stat.id),
-            this.getPassiveBonus(PassiveEffects.ALL_STAT_BONUS.id)
+            this.getPassiveBonus('all_stat_bonus')
         );
     }
 
