@@ -110,7 +110,7 @@ export class AdventuringEnemy extends AdventuringCharacter {
         const spawnEffects = this.manager.dungeon.getEffectsForTrigger('enemy_spawn');
         
         for(const effect of spawnEffects) {
-            const auraId = effect.aura || effect.id || effect.buff || effect.debuff;
+            const auraId = effect.id;
             if(!auraId) continue; // Skip effects without valid aura ID
             
             if(effect.type === 'debuff') {
@@ -119,13 +119,7 @@ export class AdventuringEnemy extends AdventuringCharacter {
                     amount: effect.amount 
                 }, null);
             } else if(effect.type === 'buff' && effect.party === 'enemy') {
-                // New format: buff with party: 'enemy'
-                this.buff(auraId, { 
-                    stacks: effect.stacks, 
-                    amount: effect.amount 
-                }, null);
-            } else if(effect.type === 'enemy_buff') {
-                // Legacy format
+                // buff with party: 'enemy' applies to enemies
                 this.buff(auraId, { 
                     stacks: effect.stacks, 
                     amount: effect.amount 
@@ -205,9 +199,9 @@ export class AdventuringEnemy extends AdventuringCharacter {
             });
         }
         
-        // Heal on phase transition
-        if(phase.healPercent) {
-            const healAmount = Math.floor(this.maxHitpoints * (phase.healPercent / 100));
+        // Heal on phase transition (amount is whole number percent, e.g., 10 = 10%)
+        if(phase.amount) {
+            const healAmount = Math.floor(this.maxHitpoints * (phase.amount / 100));
             this.heal({ amount: healAmount });
             this.manager.log.add(`${this.base.name} heals for ${healAmount}!`);
         }

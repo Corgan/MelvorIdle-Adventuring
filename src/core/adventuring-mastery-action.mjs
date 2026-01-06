@@ -73,6 +73,15 @@ export class AdventuringMasteryAction extends MasteryAction {
     }
     
     /**
+     * Check if an unlock of the given type is active.
+     * @param {string} unlockType - Unlock type to check for (e.g., 'auto_run', 'mastered_variant')
+     * @returns {boolean}
+     */
+    hasUnlock(unlockType) {
+        return this.masteryEffects.some(e => e.type === 'unlock' && e.unlockType === unlockType);
+    }
+    
+    /**
      * Get the total value of all mastery effects of a given type.
      * @param {string} effectType - Effect type to sum
      * @returns {number}

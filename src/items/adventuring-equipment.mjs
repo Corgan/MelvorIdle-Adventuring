@@ -52,7 +52,7 @@ export class AdventuringEquipment {
                         effects.push(createEffect(
                             {
                                 trigger: 'passive',
-                                type: 'increase_stat_flat',
+                                type: 'stat_flat',
                                 stat: stat.id,
                                 value: value
                             },

@@ -431,13 +431,13 @@ export class AdventuringHero extends AdventuringCharacter {
             if (target.dead) continue;
             
             if (effect.type === "buff") {
-                const auraId = effect.buff || effect.id;
+                const auraId = effect.id;
                 if (!auraId) continue;
                 target.buff(auraId, builtEffect, this);
                 this.manager.log.add(`${this.name}'s ${passive.name} applies ${getAuraName(this.manager, auraId)} to ${target.name}`);
                 anyApplied = true;
             } else if (effect.type === "debuff") {
-                const auraId = effect.debuff || effect.buff || effect.id;
+                const auraId = effect.id;
                 if (!auraId) continue;
                 target.debuff(auraId, builtEffect, this);
                 this.manager.log.add(`${this.name}'s ${passive.name} applies ${getAuraName(this.manager, auraId)} to ${target.name}`);

@@ -231,7 +231,7 @@ export class AdventuringArea extends AdventuringMasteryAction {
      * Check if auto-repeat is unlocked for this dungeon
      */
     get autoRepeatUnlocked() {
-        return this.hasMasteryEffect('unlock_auto_run');
+        return this.hasUnlock('auto_run');
     }
 
     /**
@@ -246,7 +246,7 @@ export class AdventuringArea extends AdventuringMasteryAction {
      * Check if mastery aura is unlocked for this dungeon
      */
     get masteryAuraUnlocked() {
-        return this.hasMasteryEffect('unlock_mastery_aura');
+        return this.hasUnlock('mastery_aura');
     }
 
     /**

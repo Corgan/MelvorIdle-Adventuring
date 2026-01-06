@@ -241,7 +241,7 @@ export class AdventuringItemBase extends AdventuringMasteryAction {
     get name() {
         const baseName = this._name;
         // Add "Mastered" prefix at level 99 equipment mastery
-        if (this.unlocked && this.hasMasteryEffect('unlock_mastered_variant')) {
+        if (this.unlocked && this.hasUnlock('mastered_variant')) {
             return `Mastered ${baseName}`;
         }
         return baseName;

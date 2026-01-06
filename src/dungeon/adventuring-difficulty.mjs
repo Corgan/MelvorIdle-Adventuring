@@ -131,8 +131,7 @@ export class AdventuringDifficulty extends NamespacedObject {
      */
     get enemyStatsPercent() {
         const effect = this.effects.find(e => 
-            (e.type === 'stats_percent' && e.party === 'enemy') ||
-            e.type === 'enemy_stats_percent' // Legacy support
+            e.type === 'stats_percent' && e.party === 'enemy'
         );
         return effect && effect.amount ? effect.amount.base : 0;
     }
@@ -185,16 +184,16 @@ export class AdventuringDifficulty extends NamespacedObject {
 
     /**
      * Check if this difficulty is unlocked for a given area
-     * Normal difficulty is always unlocked, others require unlock_difficulty mastery effect
+     * Normal difficulty is always unlocked, others require unlock mastery effect with unlockType: 'difficulty'
      * @param {AdventuringArea} area - The area to check unlock status for
      */
     isUnlocked(area) {
         // Normal difficulty (unlockLevel 0) is always available
         if (this.unlockLevel === 0) return true;
         
-        // Check if area has the unlock_difficulty effect for this difficulty
+        // Check if area has the unlock effect for this difficulty
         return area.masteryEffects.some(e => 
-            e.type === 'unlock_difficulty' && e.difficultyID === this.id
+            e.type === 'unlock' && e.unlockType === 'difficulty' && e.difficultyID === this.id
         );
     }
 
@@ -232,13 +231,7 @@ export class AdventuringDifficulty extends NamespacedObject {
                     amount: effect.getAmount() 
                 }, null);
             } else if(effect.type === 'buff' && effect.party === 'enemy') {
-                // New format: buff with party: 'enemy'
-                enemy.buff(effect.id, { 
-                    stacks: effect.getStacks(), 
-                    amount: effect.getAmount() 
-                }, null);
-            } else if(effect.type === 'enemy_buff') {
-                // Legacy format
+                // buff with party: 'enemy' applies to enemies
                 enemy.buff(effect.id, { 
                     stacks: effect.getStacks(), 
                     amount: effect.getAmount() 
@@ -303,7 +296,7 @@ export class AdventuringDifficulty extends NamespacedObject {
             lines.push('<div class="text-warning">Enemy Effects:</div>');
             enemySpawnEffects.forEach(effect => {
                 const auraName = getAuraName(this.manager, effect.id);
-                const isBuffType = effect.type === 'buff' || effect.type === 'enemy_buff';
+                const isBuffType = effect.type === 'buff';
                 const typeLabel = isBuffType ? '' : '(debuff) ';
                 lines.push(`<div class="text-muted">• ${typeLabel}${auraName} x${effect.getStacks()}</div>`);
             });

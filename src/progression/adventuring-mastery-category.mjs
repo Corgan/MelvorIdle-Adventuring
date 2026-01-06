@@ -34,7 +34,7 @@ export class AdventuringMasteryCategory extends NamespacedObject {
     /**
      * Get all effects that are active at the given mastery level.
      * For non-scaling effects with the same type, only the highest level milestone applies.
-     * Exception: unlock effects (unlock_difficulty, etc.) accumulate since each unlocks something different.
+     * Exception: unlock effects accumulate since each unlocks something different.
      * For scaling effects, the value is multiplied by the current level.
      * @param {number} level - Current mastery level
      * @returns {Array} Array of effect objects
@@ -43,7 +43,7 @@ export class AdventuringMasteryCategory extends NamespacedObject {
         // Map to track highest-level effect for each type (non-scaling only)
         const effectsByType = new Map();
         const scalingEffects = [];
-        const accumulatedEffects = []; // Effects that accumulate (unlock_difficulty, etc.)
+        const accumulatedEffects = []; // Effects that accumulate (unlock types, etc.)
         
         for (const milestone of this.milestones) {
             if (level >= milestone.level) {
@@ -55,7 +55,7 @@ export class AdventuringMasteryCategory extends NamespacedObject {
                                 ...effect,
                                 amount: effect.amount * level
                             });
-                        } else if (effect.type === 'unlock_difficulty') {
+                        } else if (effect.type === 'unlock') {
                             // Unlock effects accumulate - each unlocks something different
                             accumulatedEffects.push(effect);
                         } else {

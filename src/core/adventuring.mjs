@@ -415,13 +415,14 @@ export class Adventuring extends SkillWithMastery {
      */
     applyEffect(effect, trigger, context = {}) {
         switch(effect.type) {
-            case 'heal_percent':
-            case 'heal_party': {
+            case 'heal_percent': {
                 // Use 'amount' for percent of max HP for heal_percent/heal_party
                 const healPercent = effect.amount || 0;
                 const healAmount = effect.amount?.base ?? effect.amount ?? 0;
                 
-                // Determine targets based on party property (default to hero for heal_percent)
+                // Determine targets based on party property
+                // 'enemy' targets enemies, 'hero'/'ally' targets the hero party
+                // In non-combat context (like floor_end), 'ally' defaults to hero party
                 const targetParty = effect.party === 'enemy' ? null : this.party.all;
                 if(!targetParty) break; // heal_percent with party: 'enemy' not applicable here
                 
@@ -447,12 +448,12 @@ export class Adventuring extends SkillWithMastery {
             
             case 'buff': {
                 // Apply buff based on party property
-                const aura = effect.aura;
-                if(aura && effect.party !== 'enemy') {
+                const auraId = effect.id;
+                if(auraId && effect.party !== 'enemy') {
                     // Party buffs applied to heroes
                     this.party.all.forEach(hero => {
                         if(!hero.dead) {
-                            hero.auras.add(aura, effect.stacks || 1, effect.sourceName);
+                            hero.auras.add(auraId, effect.stacks || 1, effect.sourceName);
                         }
                     });
                 }
@@ -460,8 +461,7 @@ export class Adventuring extends SkillWithMastery {
                 break;
             }
             
-            case 'debuff':
-            case 'enemy_buff': {
+            case 'debuff': {
                 // These are applied to enemies at spawn, handled by encounter system
                 // No action needed here - stored in cache for encounter to retrieve
                 break;

@@ -501,7 +501,7 @@ class AdventuringWeightedTable {
  * 
  * @typedef {Object} StandardEffect
  * @property {string} trigger - When the effect activates: 'passive', 'turn_start', 'before_damage_delivered', etc.
- * @property {string} type - What the effect does: 'increase_stat_flat', 'increase_stat_percent', 'damage', 'heal', 'buff', 'debuff', etc.
+ * @property {string} type - What the effect does: 'stat_flat', 'stat_percent', 'damage', 'heal', 'buff', 'debuff', etc.
  * @property {string} [stat] - For stat effects, the stat ID (e.g., 'adventuring:strength')
  * @property {number} [value] - The effect value/amount
  * @property {object} source - Reference to the source object (consumable, aura instance, equipment, etc.)
@@ -585,7 +585,7 @@ function filterEffectsByType(effects, type) {
  */
 function getStatEffects(effects, statId) {
     return effects.filter(e => 
-        (e.type === 'increase_stat_flat' || e.type === 'increase_stat_percent') && 
+        (e.type === 'stat_flat' || e.type === 'stat_percent') && 
         e.stat === statId
     );
 }
@@ -779,9 +779,9 @@ class EffectCache {
         
         passiveEffects.forEach(e => {
             if(e.stat === statId) {
-                if(e.type === 'increase_stat_flat') {
+                if(e.type === 'stat_flat') {
                     flat += e.value || 0;
-                } else if(e.type === 'increase_stat_percent') {
+                } else if(e.type === 'stat_percent') {
                     percent += e.value || 0;
                 }
             }
@@ -954,20 +954,16 @@ class RequirementsChecker {
     
     /**
      * Check comparison requirements (e.g., HP thresholds, material counts)
-     * Supports both formats:
-     *   - New: { property, operator: '<'|'>'|'==', value }
-     *   - Legacy: { operand, operator: 'lt'|'gt'|'eq', amount, material? }
+     * Format: { property, operator: '<'|'>'|'=='|'<='|'>=', value }
      */
     _checkComparison(req, character) {
         let value;
         
-        // Handle legacy 'operand' format
-        const operand = req.property || req.operand;
-        const target = req.value !== undefined ? req.value : req.amount;
+        const property = req.property;
+        const target = req.value;
         
-        switch(operand) {
+        switch(property) {
             case 'hitpoints_percent':
-            case 'hitpoint_pct':
                 if(!character) return false;
                 value = character.hitpointsPercent;
                 break;
@@ -990,21 +986,17 @@ class RequirementsChecker {
                 return false;
         }
         
-        // Handle both operator formats
         const op = req.operator;
         switch(op) {
             case '<':
-            case 'lt':
                 return value < target;
             case '<=':
                 return value <= target;
             case '>':
-            case 'gt':
                 return value > target;
             case '>=':
                 return value >= target;
             case '==':
-            case 'eq':
                 return value === target;
             default:
                 return false;
@@ -1398,14 +1390,14 @@ function firstDefined(...values) {
  */
 const effectDescriptionRegistry = new Map([
     // Stat modifiers
-    ['increase_stat_flat', (effect, value, stacks, amount, manager, helpers) => 
+    ['stat_flat', (effect, value, stacks, amount, manager, helpers) => 
         effect.perStack 
-            ? `+${firstDefined(value, amount, 1)} ${helpers.stat(effect.stat || effect.id)} per stack` 
-            : `${helpers.sign(value)}${value} ${helpers.stat(effect.stat || effect.id)}`],
-    ['increase_stat_percent', (effect, value, stacks, amount, manager, helpers) => 
+            ? `+${firstDefined(value, amount, 1)} ${helpers.stat(effect.stat)} per stack` 
+            : `${helpers.sign(value)}${value} ${helpers.stat(effect.stat)}`],
+    ['stat_percent', (effect, value, stacks, amount, manager, helpers) => 
         effect.perStack 
-            ? `+${firstDefined(value, amount, 1)}% ${helpers.stat(effect.stat || effect.id)} per stack` 
-            : `${helpers.sign(value)}${value}% ${helpers.stat(effect.stat || effect.id)}`],
+            ? `+${firstDefined(value, amount, 1)}% ${helpers.stat(effect.stat)} per stack` 
+            : `${helpers.sign(value)}${value}% ${helpers.stat(effect.stat)}`],
     
     // Damage/Healing
     ['damage_flat', (effect, value, stacks, amount, manager, helpers) => 
@@ -1425,10 +1417,6 @@ const effectDescriptionRegistry = new Map([
         effect.perStack ? `${helpers.sign(firstDefined(value, amount, 1))}${firstDefined(value, amount, 1)} Damage per stack` : `${helpers.sign(firstDefined(value, amount))}${firstDefined(value, amount)} Damage`],
     ['increase_damage_percent', (effect, value, stacks, amount, manager, helpers) => 
         effect.perStack ? `+${firstDefined(value, amount, 1)}% Damage per stack` : `${helpers.sign(firstDefined(value, amount))}${firstDefined(value, amount)}% Damage`],
-    ['defense_buff', (effect, value, stacks, amount, manager, helpers) => 
-        `${helpers.sign(firstDefined(value, amount))}${firstDefined(value, amount)} Defense`],
-    ['speed_buff', (effect, value, stacks, amount, manager, helpers) => 
-        `${helpers.sign(firstDefined(value, amount))}${firstDefined(value, amount)} Speed`],
     
     // Buffs/Debuffs - use 'id' property for aura reference
     ['buff', (effect, value, stacks, amount, manager, helpers) => 
@@ -1441,8 +1429,6 @@ const effectDescriptionRegistry = new Map([
     // Energy
     ['energy', (effect, value, stacks, amount, manager, helpers) => 
         `${helpers.sign(firstDefined(value, amount))}${firstDefined(value, amount)} Energy`],
-    ['energy_gain_bonus', (effect, value, stacks, amount, manager, helpers) => 
-        `+${value}% energy from generators`],
     
     // Dungeon modifiers (additive percentages)
     ['xp_percent', (effect, value, stacks, amount, manager, helpers) => 
@@ -1453,13 +1439,10 @@ const effectDescriptionRegistry = new Map([
         const partyLabel = effect.party === 'enemy' ? 'Enemy' : 'Party';
         return `${partyLabel} Stats: ${helpers.sign(value)}${value}%`;
     }],
-    // Legacy alias - prefer stats_percent with party property
-    ['enemy_stats_percent', (effect, value, stacks, amount, manager, helpers) => 
-        `Enemy Stats: ${helpers.sign(value)}${value}%`],
     
-    // Revival
-    ['revive', (effect, value, stacks, amount, manager, helpers) => 
-        `Revive with ${firstDefined(amount, effect.hpPercent, 100)}% HP`],
+    // Revival - amount is whole number percent (e.g., 50 = 50% HP)
+    ['revive', (effect, value, stacks, amount) => 
+        `Revive with ${amount || 100}% HP`],
     
     // Tile effects
     ['teleport', () => 'Teleport to a random tile'],
@@ -1537,25 +1520,21 @@ const effectDescriptionRegistry = new Map([
         return dispelCount === 'all' ? 'Remove all buffs from target' : `Remove ${dispelCount} buff${dispelCount !== 1 ? 's' : ''} from target`;
     }],
     
-    // Enemy stat debuff
-    ['enemy_stat_debuff', (effect, value, stacks, amount, manager, helpers) => {
-        const debuffVal = Math.abs(helpers.percent(firstDefined(value, amount, 0)));
-        return `Reduce enemy ${helpers.stat(effect.stat || effect.id)} by ${debuffVal}%`;
+    // Mastery unlocks - consolidated unlock type with unlockType property
+    ['unlock', (effect) => {
+        const unlockType = effect.unlockType || 'unknown';
+        switch (unlockType) {
+            case 'auto_run': return 'Unlock Auto-Run';
+            case 'difficulty': {
+                const diffId = effect.difficultyID?.split(':').pop() || 'Unknown';
+                return `Unlock ${diffId.charAt(0).toUpperCase() + diffId.slice(1)} Mode`;
+            }
+            case 'mastery_aura': return 'Unlock Mastery Aura';
+            case 'multi_job_assignment': return 'Unlock Multi-Job Assignment';
+            case 'mastered_variant': return 'Unlock Mastered Variant';
+            default: return `Unlock ${unlockType.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}`;
+        }
     }],
-    
-    // Ward/Charm (item categories, not effect types)
-    ['ward', (effect, value, stacks) => `Block next ${firstDefined(stacks, 1)} attacks`],
-    ['charm', (effect) => `Charm target for ${effect.duration || 1} turns`],
-    
-    // Mastery unlocks
-    ['unlock_auto_run', () => 'Unlock Auto-Run'],
-    ['unlock_difficulty', (effect) => {
-        const diffId = effect.difficultyID?.split(':').pop() || 'Unknown';
-        return `Unlock ${diffId.charAt(0).toUpperCase() + diffId.slice(1)} Mode`;
-    }],
-    ['unlock_mastery_aura', () => 'Unlock Mastery Aura'],
-    ['unlock_multi_job_assignment', () => 'Unlock Multi-Job Assignment'],
-    ['unlock_mastered_variant', () => 'Unlock Mastered Variant'],
     
     // Mastery stat bonuses
     ['job_stats_percent', (effect, value) => `+${value}% Job Stats`],
@@ -1570,25 +1549,7 @@ const effectDescriptionRegistry = new Map([
     ['equipment_xp_percent', (effect, value) => `+${value}% Equipment XP`],
     ['upgrade_cost_percent', (effect, value) => `${value > 0 ? '+' : ''}${value}% Upgrade Cost`],
     ['equipment_stats_percent', (effect, value) => `+${value}% Equipment Stats`],
-    
-    // Generic percentage bonuses
-    ['xp_percent', (effect, value) => `+${value}% XP`],
-    ['loot_percent', (effect, value) => `+${value}% Loot`],
-    ['enemy_stats_percent', (effect, value) => `Enemy Stats: +${value}%`],
-    
-    // Consumable effects
-    ['heal_on_low_hp', (effect, value, stacks, amount) => 
-        `Heal ${firstDefined(amount, effect.healAmount, '?')} HP when below ${firstDefined(effect.threshold, '?')}% HP`],
-    ['proc_debuff', (effect, value, stacks, amount, manager, helpers) => {
-        const debuffName = manager?.auras?.getObjectByID(effect.id)?.name || effect.id?.split(':').pop() || 'Unknown';
-        return `${firstDefined(effect.chance, '?')}% chance to apply ${firstDefined(stacks, 1)} ${debuffName}`;
-    }],
-    ['heal_on_floor_start', (effect, value, stacks, amount) => 
-        `Heal ${firstDefined(amount, effect.healAmount, '?')} HP at floor start`],
-    ['heal_after_combat', (effect, value, stacks, amount) => 
-        `Heal ${firstDefined(amount, effect.healAmount, '?')} HP after combat`],
-    ['lifesteal', (effect) => 
-        `Heal ${firstDefined(effect.heal_percent, effect.healPercent, 0)}% of damage dealt`],
+    ['mastery_xp_percent', (effect, value) => `+${value}% Mastery XP`],
     
     // Aura internal effects
     ['remove', () => ''],
@@ -1606,33 +1567,18 @@ const effectDescriptionRegistry = new Map([
     ['prevent_ability', () => 'Cannot use spenders'],
     ['prevent_debuff', () => 'Immune to next debuff'],
     ['prevent_lethal', () => 'Cannot be killed'],
-    ['prevent_death', (effect) => 
-        `Prevent death${effect.healPercent ? `, heal ${Math.round(effect.healPercent * 100)}% HP` : ''}`],
+    ['prevent_death', (effect, value, stacks, amount) => {
+        if(amount > 0) {
+            return `Prevent death, heal ${amount}% HP`;
+        }
+        return 'Prevent death';
+    }],
     ['reduce_damage_percent', (effect, value, stacks, amount) => 
         `${firstDefined(amount, 0)}% damage reduction${effect.perStack ? ' per stack' : ''}`],
     ['reduce_heal_percent', (effect, value, stacks, amount) => 
         `-${firstDefined(amount, 0)}% healing received${effect.perStack ? ' per stack' : ''}`],
-    // heal_percent: percent of max HP healing with target/party properties
-    ['heal_percent', (effect, value, stacks, amount, manager, helpers) => {
-        const targetLabel = effect.party === 'enemy' ? 'enemies' : 'party';
-        return `Heal ${targetLabel} for ${firstDefined(amount, value, 0)}% max HP`;
-    }],
-    // Legacy alias - prefer heal_percent with target/party properties
-    ['heal_party', (effect, value, stacks, amount) => {
-        if(value !== undefined && value !== 0) {
-            return `Heal party for ${value}% max HP`;
-        }
-        return `Heal party for ${firstDefined(amount, 0)} HP`;
-    }],
     
-
-    // Stat/passive bonuses
-    ['stat_bonus', (effect, value, stacks, amount, manager, helpers) => {
-        const statBonusName = helpers.stat(effect.stat) !== 'Unknown' 
-            ? helpers.stat(effect.stat) 
-            : (effect.stat?.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) || 'Stat');
-        return `+${value}% ${statBonusName}`;
-    }],
+    // Modifier effect
     ['modifier', (effect, value, stacks, amount, manager, helpers) => {
         const passiveId = typeof effect.passive === 'string' ? effect.passive : effect.passive?.id;
         const passiveName = manager?.passives?.getObjectByID(passiveId)?.name 
@@ -1641,24 +1587,6 @@ const effectDescriptionRegistry = new Map([
             || 'modifier';
         return `Apply ${passiveName}`;
     }],
-    
-    // Loot bonuses
-    ['loot_quality_bonus', (effect, value) => `+${value}% Loot Quality`],
-    ['rare_drop_bonus', (effect, value) => `+${value}% Rare Drop Chance`],
-    ['material_drop_bonus', (effect, value) => `+${value}% Material Drops`],
-    
-    // Energy bonuses
-    ['energy_bonus', (effect, value) => `+${value}% Energy`],
-    ['energy_regen_bonus', (effect, value) => `+${value}% Energy Regen`],
-    
-    // Buffs with party targeting
-    ['buff', (effect, value, stacks, amount, manager, helpers) => {
-        const targetLabel = effect.party === 'enemy' ? 'Enemies' : 'Party';
-        return `${targetLabel} gain ${firstDefined(stacks, 1)} ${helpers.aura(effect.id)}`;
-    }],
-    // Legacy alias - prefer buff with party: 'enemy'
-    ['enemy_buff', (effect, value, stacks, amount, manager, helpers) => 
-        `Enemies gain ${firstDefined(stacks, 1)} ${helpers.aura(effect.id)}`],
 ]);
 
 /**
@@ -1788,7 +1716,16 @@ function formatTrigger(trigger) {
         'debuff_applied': 'When debuffed',
         'spell_cast': 'When casting a spell',
         'spell_hit': 'When a spell hits',
-        'fatal_hit': 'On fatal hit'
+        'fatal_hit': 'On fatal hit',
+        'before_death': 'Before death',
+        'before_ability_cast': 'Before using an ability',
+        'before_heal_delivered': 'Before healing',
+        'after_heal_received': 'After being healed',
+        'after_heal_delivered': 'After healing',
+        'before_hit_delivered': 'Before hitting',
+        'before_hit_received': 'Before being hit',
+        'after_hit_delivered': 'After hitting',
+        'after_hit_received': 'After being hit'
     };
     return triggerNames[trigger] || trigger.replace(/_/g, ' ');
 }
@@ -1842,7 +1779,8 @@ function formatTarget(target, party) {
             if(baseName === 'dead') return 'dead enemy';
             return `${baseName} enemy`;
         }
-        if(effectiveParty === 'ally') {
+        // 'hero' = always hero party, 'ally' = same party as caster (both display as "ally")
+        if(effectiveParty === 'hero' || effectiveParty === 'ally') {
             if(baseName === 'all') return 'all allies';
             if(baseName === 'front') return 'front ally';
             if(baseName === 'back') return 'back ally';
@@ -1980,13 +1918,20 @@ function formatTriggerSuffix(trigger) {
         'spell_hit': 'when a spell hits',
         'fatal_hit': 'on fatal hit',
         'attack': 'on attack',
-        'xp_gain': 'when gaining XP',
-        'loot_roll': 'when rolling loot',
         'targeting': '',  // Internal trigger, don't show
         'before_debuff_received': 'before receiving a debuff',
         'before_heal_received': 'before receiving a heal',
         'before_spender_cast': 'before using a spender',
-        'after_ability_cast': 'after using an ability'
+        'after_ability_cast': 'after using an ability',
+        'before_death': 'before death',
+        'before_ability_cast': 'before using an ability',
+        'before_heal_delivered': 'before healing',
+        'after_heal_received': 'after being healed',
+        'after_heal_delivered': 'after healing',
+        'before_hit_delivered': 'before hitting',
+        'before_hit_received': 'before being hit',
+        'after_hit_delivered': 'after hitting',
+        'after_hit_received': 'after being hit'
     };
     
     const suffix = suffixes[trigger];
@@ -2392,10 +2337,12 @@ function createDefaultEffectProcessor() {
         if(percentValue <= 0) return ctx.extra;
         
         // Determine targets based on target/party properties
-        const party = effect.party || 'hero';
+        // 'ally' means same party as caster, which for heroes is the hero party
+        const party = effect.party || 'ally';
         const target = effect.target || 'all';
         
-        if(party === 'hero' && ctx.manager.party) {
+        // For hero characters, 'ally' and 'hero' both target the hero party
+        if((party === 'hero' || party === 'ally') && ctx.manager.party) {
             if(target === 'all') {
                 ctx.manager.party.heroes.forEach(hero => {
                     if(!hero.dead) {
@@ -2410,32 +2357,6 @@ function createDefaultEffectProcessor() {
             ctx.manager.log.add(`${ctx.character?.name || 'Effect'} heals for ${percentValue}%`);
         }
         // Enemy healing not typically used, but could be extended here
-        return ctx.extra;
-    });
-    
-    // Heal entire party - legacy format, prefer heal_percent with target/party
-    processor.register('heal_party', (effect, instance, ctx) => {
-        if(ctx.manager.party) {
-            // Check for percent-based healing (amount property with heal_party type)
-            const percentValue = effect.amount ?? instance.amount;
-            if(percentValue !== undefined && percentValue !== 0) {
-                ctx.manager.party.heroes.forEach(hero => {
-                    if(!hero.dead) {
-                        const healAmount = Math.ceil(hero.maxHitpoints * (percentValue / 100));
-                        hero.heal({ amount: healAmount }, ctx.character);
-                    }
-                });
-            } else {
-                // Flat HP healing (amount property)
-                const amount = getEffectAmount(effect, instance);
-                ctx.manager.party.heroes.forEach(hero => {
-                    if(!hero.dead) {
-                        hero.heal({ amount }, ctx.character);
-                    }
-                });
-            }
-            ctx.manager.log.add(`${ctx.character?.name || 'Effect'}'s ${instance?.base?.name || 'heal'} heals the party`);
-        }
         return ctx.extra;
     });
     
@@ -2795,7 +2716,7 @@ function createDefaultEffectProcessor() {
         return ctx.extra;
     });
     
-    // Note: increase_stat_percent and reduce_stat_percent are NOT registered here.
+    // Note: stat_percent and reduce_stat_percent are NOT registered here.
     // They use trigger: "stats" and are handled in stat calculation (adventuring-auras.mjs),
     // never through the character.trigger() method.
     

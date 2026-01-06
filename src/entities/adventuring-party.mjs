@@ -170,15 +170,12 @@ class AdventuringParty {
      * Note: This only applies to hero party. Uses new target/party format.
      */
     applyPartyEffect(effect, source, sourceName, sourceType) {
-        // Use new format target, with backwards compatibility for old 'all_allies' format
         const target = effect.target || 'all';
         const amount = effect.amount || 0;
         
         // Resolve targets within this party
         let targets = [];
         switch (target) {
-            case 'all_allies': // Legacy
-            case 'party': // Legacy
             case 'all':
                 targets = this.alive;
                 break;
@@ -217,14 +214,14 @@ class AdventuringParty {
                     this.manager.log.add(`${sourceName} heals ${member.name} for ${healAmount}`);
                     break;
                 case 'buff':
-                    const buffId = effect.id || effect.buff;
+                    const buffId = effect.id;
                     if (buffId) {
                         member.buff(buffId, builtEffect, null);
                         this.manager.log.add(`${sourceName} applies buff to ${member.name}`);
                     }
                     break;
                 case 'debuff':
-                    const debuffId = effect.id || effect.debuff;
+                    const debuffId = effect.id;
                     if (debuffId) {
                         member.debuff(debuffId, builtEffect, null);
                         this.manager.log.add(`${sourceName} applies debuff to ${member.name}`);

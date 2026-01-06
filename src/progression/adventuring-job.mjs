@@ -91,7 +91,7 @@ export class AdventuringJob extends AdventuringMasteryAction {
     }
 
     get allowMultiple() {
-        return this.alwaysMultiple || this.hasMasteryEffect('unlock_multi_job_assignment');
+        return this.alwaysMultiple || this.hasUnlock('multi_job_assignment');
     }
 
     onLoad() {
