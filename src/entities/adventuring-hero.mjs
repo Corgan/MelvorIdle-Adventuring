@@ -6,6 +6,7 @@ const { AdventuringStats } = await loadModule('src/core/adventuring-stats.mjs');
 const { AdventuringCard } = await loadModule('src/progression/adventuring-card.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
 const { AdventuringPassiveBadgeElement } = await loadModule('src/entities/components/adventuring-passive-badge.mjs');
+const { evaluateCondition, getAuraName } = await loadModule('src/core/adventuring-utils.mjs');
 
 /**
  * Starter loadouts for new players.
@@ -282,48 +283,184 @@ export class AdventuringHero extends AdventuringCharacter {
         this.renderQueue.spender = true;
     }
 
-    // Override trigger to also check equipment effects
-    trigger(type, extra={}) {
-        // First call parent trigger for auras
-        extra = super.trigger(type, extra);
+    /**
+     * Override to add hero-specific effect sources: equipment, consumables, passives.
+     * @override
+     */
+    getAllPendingEffectsForTrigger(type, context) {
+        // Get base sources (currently empty in parent, but could have party-level sources)
+        const pending = super.getAllPendingEffectsForTrigger(type, context);
         
-        // Then check equipment for item effects
-        if(this.equipment) {
-            let itemEffects = this.equipment.trigger(type, extra);
-            itemEffects.forEach(({ item, effect, amount, chance }) => {
-                // Roll for chance-based effects
-                if(Math.random() * 100 > chance) return;
-                
-                // Use the shared effect processor
-                extra = this.processTriggeredEffect(effect, amount, extra, item.name);
-            });
+        // Add equipment effects (character-scoped only, party-scoped handled by Party.trigger)
+        if (this.equipment) {
+            const equipmentEffects = this.equipment.getEffectsForTrigger(type, context);
+            for (const { item, effect } of equipmentEffects) {
+                if (effect.scope === 'party') continue; // Skip party-scoped
+                pending.push({
+                    effect,
+                    source: item,
+                    sourceName: item.name,
+                    sourceType: 'equipment'
+                });
+            }
         }
         
-        // Check consumables for triggered effects (consumables apply to party)
-        if(this.manager.consumables) {
-            // Build context for condition evaluation
-            const context = {
-                character: this,
-                target: extra.target || null,
-                party: this.manager.party?.members || [],
-                manager: this.manager
-            };
+        // Add consumable effects (character-scoped only, party-scoped handled by Party.trigger)
+        if (this.manager.consumables) {
+            const consumableEffects = this.manager.consumables.getEffectsForTrigger(type, context);
+            for (const { consumable, effect } of consumableEffects) {
+                if (effect.scope === 'party') continue; // Skip party-scoped
+                pending.push({
+                    effect,
+                    source: consumable,
+                    sourceName: consumable.name,
+                    sourceType: 'consumable'
+                });
+            }
+        }
+        
+        // Add job passive effects (combat job) - use job's own method
+        if (this.combatJob && this.combatJob.getPassivesForTrigger) {
+            const passiveEffects = this.combatJob.getPassivesForTrigger(this, type);
+            for (const { passive, effect } of passiveEffects) {
+                pending.push({
+                    effect,
+                    source: passive,
+                    sourceName: `${this.combatJob.name} (${passive.name})`,
+                    sourceType: 'jobPassive'
+                });
+            }
+        }
+        
+        // Add passive job effects
+        if (this.passiveJob && this.passiveJob !== this.combatJob && this.passiveJob.getPassivesForTrigger) {
+            const passiveEffects = this.passiveJob.getPassivesForTrigger(this, type);
+            for (const { passive, effect } of passiveEffects) {
+                pending.push({
+                    effect,
+                    source: passive,
+                    sourceName: `${this.passiveJob.name} (${passive.name})`,
+                    sourceType: 'jobPassive'
+                });
+            }
+        }
+        
+        // Add tavern drink effects (character-scoped only, party-scoped handled by Party.trigger)
+        if (this.manager.tavern) {
+            const drinkEffects = this.manager.tavern.getEffectsForTrigger(type, context);
+            for (const { drink, effect } of drinkEffects) {
+                if (effect.scope === 'party') continue; // Skip party-scoped
+                pending.push({
+                    effect,
+                    source: drink,
+                    sourceName: drink.name,
+                    sourceType: 'tavernDrink'
+                });
+            }
+        }
+        
+        return pending;
+    }
+    
+    /**
+     * Override to handle special processing for different source types.
+     * - Consumables: consume a charge after triggering
+     * - Job Passives: use passive's target resolution
+     * @override
+     */
+    processPendingEffect(pending, context) {
+        const { effect, source, sourceName, sourceType } = pending;
+        
+        // For job passives, use the passive's built-in apply logic (with target resolution)
+        if (sourceType === 'jobPassive') {
+            return this.processJobPassiveEffect(pending, context);
+        }
+        
+        // For other sources, use the standard processing
+        const applied = super.processPendingEffect(pending, context);
+        
+        // If this was a consumable effect that applied, consume a charge
+        if (applied && sourceType === 'consumable') {
+            this.manager.consumables.removeCharges(source, 1);
+            this.manager.log.add(`${sourceName} consumed a charge.`);
+        }
+        
+        return applied;
+    }
+    
+    /**
+     * Process a job passive effect with condition/limit checking.
+     * Uses the passive's target resolution but adds unified condition/limit evaluation.
+     * @param {object} pending - Pending effect with passive and effect
+     * @param {object} context - Effect context
+     * @returns {boolean} Whether the effect was applied
+     */
+    processJobPassiveEffect(pending, context) {
+        const { effect, source: passive, sourceName } = pending;
+        
+        // Check condition if present (evaluateCondition imported at module level)
+        if (effect.condition) {
+            if (!evaluateCondition(effect.condition, context)) {
+                return false;
+            }
+        }
+        
+        // Check limit if present
+        if (!this.canEffectTrigger(effect, passive)) {
+            return false;
+        }
+        
+        // Roll for chance if present
+        const chance = effect.chance || 100;
+        if (Math.random() * 100 > chance) {
+            return false;
+        }
+        
+        // Use the passive's built-in apply logic for this single effect
+        // Get encounter from context (passed in from encounter triggers)
+        const encounter = context.encounter;
+        
+        let builtEffect = {
+            amount: effect.getAmount ? effect.getAmount(this) : (effect.amount || 0),
+            stacks: effect.getStacks ? effect.getStacks(this) : (effect.stacks || 1)
+        };
+        
+        // Resolve targets using passive's target resolution
+        const targets = passive.resolveTargets(effect, this, encounter);
+        
+        let anyApplied = false;
+        for (const target of targets) {
+            if (target.dead) continue;
             
-            let consumableEffects = this.manager.consumables.trigger(type, context);
-            consumableEffects.forEach(({ consumable, effect, amount, chance }) => {
-                // Roll for chance-based effects
-                if(Math.random() * 100 > chance) return;
-                
-                // Use the shared effect processor
-                extra = this.processTriggeredEffect(effect, amount, extra, consumable.name);
-                
-                // All consumables consume a charge when triggered
-                this.manager.consumables.removeCharges(consumable, 1);
-                this.manager.log.add(`${consumable.name} consumed a charge.`);
-            });
+            if (effect.type === "buff") {
+                const auraId = effect.buff || effect.id;
+                if (!auraId) continue;
+                target.buff(auraId, builtEffect, this);
+                this.manager.log.add(`${this.name}'s ${passive.name} applies ${getAuraName(this.manager, auraId)} to ${target.name}`);
+                anyApplied = true;
+            } else if (effect.type === "debuff") {
+                const auraId = effect.debuff || effect.buff || effect.id;
+                if (!auraId) continue;
+                target.debuff(auraId, builtEffect, this);
+                this.manager.log.add(`${this.name}'s ${passive.name} applies ${getAuraName(this.manager, auraId)} to ${target.name}`);
+                anyApplied = true;
+            } else if (effect.type === "heal" || effect.type === "heal_flat") {
+                target.heal(builtEffect, this);
+                this.manager.log.add(`${this.name}'s ${passive.name} heals ${target.name} for ${builtEffect.amount}`);
+                anyApplied = true;
+            } else if (effect.type === "damage" || effect.type === "damage_flat") {
+                target.damage(builtEffect, this);
+                this.manager.log.add(`${this.name}'s ${passive.name} deals ${builtEffect.amount} damage to ${target.name}`);
+                anyApplied = true;
+            }
         }
         
-        return extra;
+        // Record trigger if any effect applied
+        if (anyApplied) {
+            this.recordEffectTrigger(effect, passive);
+        }
+        
+        return anyApplied;
     }
 
     setName(name) {

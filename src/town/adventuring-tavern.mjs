@@ -266,6 +266,33 @@ export class AdventuringTavern extends AdventuringPage {
         
         return effects;
     }
+    
+    /**
+     * Get all effects from equipped drinks that match a trigger type.
+     * Does NOT evaluate conditions or limits - those are handled by the central dispatcher.
+     * @param {string} triggerType - The trigger type to match
+     * @param {object} context - Context for evaluation (not used here, passed for interface consistency)
+     * @returns {Array<{drink: object, effect: object}>}
+     */
+    getEffectsForTrigger(triggerType, context = {}) {
+        const results = [];
+        
+        for (const [drink, tier] of this.equipped.entries()) {
+            if (this.getCharges(drink, tier) <= 0) continue;
+            
+            const tierEffects = drink.getTierEffects(tier);
+            for (const effect of tierEffects) {
+                if (effect.trigger !== triggerType) continue;
+                
+                results.push({
+                    drink: drink,
+                    effect: effect
+                });
+            }
+        }
+        
+        return results;
+    }
 
     /**
      * Invalidate effect cache for all heroes.

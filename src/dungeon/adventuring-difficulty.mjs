@@ -173,27 +173,6 @@ export class AdventuringDifficulty extends NamespacedObject {
         return 1 + (this.lootPercent / 100);
     }
 
-    /**
-     * Get tooltip-ready effects for display
-     * Effects are already in percentage format, just filter and return
-     * @returns {Array} Array of {type, value} effect objects
-     */
-    getTooltipEffects() {
-        const effects = [];
-        
-        if(this.enemyStatsPercent !== 0) {
-            effects.push({ type: 'enemy_stats_percent', value: this.enemyStatsPercent });
-        }
-        if(this.xpPercent !== 0) {
-            effects.push({ type: 'xp_percent', value: this.xpPercent });
-        }
-        if(this.lootPercent !== 0) {
-            effects.push({ type: 'loot_percent', value: this.lootPercent });
-        }
-        
-        return effects;
-    }
-
     postDataRegistration() {
         this.effects.forEach(effect => effect.postDataRegistration());
     }

@@ -30,6 +30,12 @@ export class AdventuringItemBase extends AdventuringMasteryAction {
             this._materials = data.materials;
             this.materials = new Map();
         }
+        
+        // Tiered upgrade materials (higher upgrade levels require later-game materials)
+        if(data.upgradeMaterials !== undefined) {
+            this._upgradeMaterials = data.upgradeMaterials;
+        }
+        this.upgradeMaterials = new Map(); // Map<threshold, Material[]>
 
         this._type = data.type;
         this.maxUpgrades = 10;
@@ -116,6 +122,23 @@ export class AdventuringItemBase extends AdventuringMasteryAction {
                     this.materials.set(material, qty);
             });
             delete this._materials;
+        }
+        
+        // Parse tiered upgrade materials
+        if(this._upgradeMaterials !== undefined) {
+            for (const [threshold, matIds] of Object.entries(this._upgradeMaterials)) {
+                const materials = [];
+                for (const matId of matIds) {
+                    const material = this.manager.materials.getObjectByID(matId);
+                    if (material !== undefined) {
+                        materials.push(material);
+                    }
+                }
+                if (materials.length > 0) {
+                    this.upgradeMaterials.set(parseInt(threshold), materials);
+                }
+            }
+            delete this._upgradeMaterials;
         }
 
         if(this._type !== undefined) {
@@ -210,9 +233,22 @@ export class AdventuringItemBase extends AdventuringMasteryAction {
                     const color = owned >= cost ? 'text-success' : 'text-danger';
                     costItems.push(tooltip.iconValue(material.media, `<span class="${color}">${cost}</span> <small class="text-muted">(${owned})</small>`));
                 });
+                
+                // Add tiered upgrade materials (if any apply to next upgrade level)
+                const tieredMats = this.getUpgradeTierMaterials();
+                for (const material of tieredMats) {
+                    const cost = this.getUpgradeTierCost(material);
+                    const owned = this.manager.stash.materialCounts.get(material) || 0;
+                    const color = owned >= cost ? 'text-success' : 'text-danger';
+                    costItems.push(tooltip.iconValue(material.media, `<span class="${color}">${cost}</span> <small class="text-muted">(${owned})</small>`));
+                }
+                
                 tooltip.hint(`${upgradeOrUnlock} Cost:`);
                 tooltip.statRow(...costItems);
             }
+        } else {
+            // Item is locked - show unlock requirements
+            tooltip.unlockRequirements(this.requirements, this.manager);
         }
         
         return tooltip.build();
@@ -273,11 +309,51 @@ export class AdventuringItemBase extends AdventuringMasteryAction {
         if(this.level < this.levelCap)
             return false;
         
+        // Check base materials
         for(let material of this.materials.keys()) {
             if(this.getCost(material) > this.manager.stash.materialCounts.get(material))
                 return false;
         }
+        
+        // Check tiered upgrade materials (higher upgrade levels need later-game materials)
+        const tieredMats = this.getUpgradeTierMaterials();
+        for (const material of tieredMats) {
+            const cost = this.getUpgradeTierCost(material);
+            if (cost > (this.manager.stash.materialCounts.get(material) || 0))
+                return false;
+        }
+        
         return true;
+    }
+    
+    /**
+     * Get materials required for the current upgrade tier
+     * Materials are REPLACED at each tier (not cumulative)
+     * +1 to +3: uses threshold 1 materials
+     * +4 to +6: uses threshold 4 materials
+     * +7 to +10: uses threshold 7 materials
+     */
+    getUpgradeTierMaterials() {
+        const nextLevel = this.upgradeLevel + 1;
+        
+        // Find the highest threshold that applies to our next upgrade level
+        let activeThreshold = 1;
+        for (const threshold of this.upgradeMaterials.keys()) {
+            if (nextLevel >= threshold && threshold > activeThreshold) {
+                activeThreshold = threshold;
+            }
+        }
+        
+        // Return only the materials for that threshold
+        return this.upgradeMaterials.get(activeThreshold) || [];
+    }
+    
+    /**
+     * Get cost for a tiered upgrade material (flat cost, doesn't scale with level)
+     */
+    getUpgradeTierCost(material) {
+        // Tiered materials have a flat cost of 1-3 based on tier
+        return Math.ceil((this.upgradeLevel + 1) / 3);
     }
 
     get equipped() {
@@ -402,19 +478,12 @@ export class AdventuringItemBase extends AdventuringMasteryAction {
         if(!this.unlocked)
             return;
 
-        if(this.manager.armory.selectedItem !== undefined) {
-            if(this.manager.armory.selectedItem === this) {
-                if(this.manager.armory.selectedItem.currentSlot !== undefined)
-                    this.manager.armory.selectedItem.currentSlot.setEmpty();
-                this.manager.armory.clearSelected();
-            } else {
-                this.manager.armory.selectItem(this);
-            }
+        // Just select/deselect items - no equipping from armory
+        if(this.manager.armory.selectedItem === this) {
+            this.manager.armory.clearSelected();
         } else {
             this.manager.armory.selectItem(this);
         }
-
-        this.manager.party.all.forEach(member => member.calculateStats());
     }
 
     setSelected(selected) {

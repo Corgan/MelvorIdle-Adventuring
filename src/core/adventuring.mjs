@@ -384,14 +384,19 @@ export class Adventuring extends SkillWithMastery {
      * @param {Object} context - Optional context data passed to effects
      */
     triggerEffects(trigger, context = {}) {
-        // 1. Trigger party member auras
+        // 1. Party-scoped effects (scope: 'party') - fire once for party
+        if(this.party) {
+            this.party.trigger(trigger, context);
+        }
+        
+        // 2. Character-scoped effects - fire for each party member
         if(this.party) {
             this.party.all.forEach(member => {
                 member.trigger(trigger, context);
             });
         }
         
-        // 2. Apply dungeon-level effects from effectCache
+        // 3. Apply dungeon-level effects from effectCache
         if(this.dungeon && this.dungeon.effectCache) {
             const effects = this.dungeon.effectCache.getEffectsForTrigger(trigger);
             for(const effect of effects) {
@@ -411,8 +416,9 @@ export class Adventuring extends SkillWithMastery {
     applyEffect(effect, trigger, context = {}) {
         switch(effect.type) {
             case 'heal_party': {
-                const healPercent = effect.healingPercent || effect.healPercent || 0;
-                const healAmount = effect.amount || 0;
+                // Use 'amount' for percent of max HP for heal_party
+                const healPercent = effect.amount || 0;
+                const healAmount = effect.amount?.base ?? effect.amount ?? 0;
                 
                 this.party.all.forEach(hero => {
                     if(!hero.dead) {

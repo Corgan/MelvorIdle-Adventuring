@@ -70,7 +70,7 @@ export class AdventuringEquipment {
                     if(trigger !== null && effect.trigger !== trigger) return;
                     
                     // Calculate effect amount based on item level scaling
-                    let amount = effect.amount || effect.value || 0;
+                    let amount = effect.amount || 0;
                     if(effect.scaling && item.level > 0) {
                         amount += Math.floor(item.level * effect.scaling);
                     }
@@ -104,7 +104,7 @@ export class AdventuringEquipment {
                             trigger: effect.trigger || 'passive',
                             type: effect.type,
                             stat: effect.stat,
-                            value: effect.value,
+                            amount: effect.amount,
                             id: effect.id,
                             stacks: effect.stacks,
                             chance: effect.chance,
@@ -120,33 +120,53 @@ export class AdventuringEquipment {
         
         return effects;
     }
-
-    // Trigger item effects for equipped items
-    trigger(triggerType, extra={}) {
-        let results = [];
+    
+    /**
+     * Get all effects from equipment that match a trigger type.
+     * Does NOT evaluate conditions or limits - those are handled by the central dispatcher.
+     * @param {string} triggerType - The trigger type to match
+     * @param {object} context - Context for evaluation (not used here, passed for interface consistency)
+     * @returns {Array<{item: object, effect: object}>}
+     */
+    getEffectsForTrigger(triggerType, context = {}) {
+        const results = [];
+        
+        // Individual equipment item effects
         this.slots.forEach((equipmentSlot, slotType) => {
-            if(!equipmentSlot.canEquip(equipmentSlot.item)) return;
+            if (!equipmentSlot.canEquip(equipmentSlot.item)) return;
             
             const item = equipmentSlot.item;
-            if(!item.effects || item.effects.length === 0) return;
+            if (!item.effects || item.effects.length === 0) return;
             
             item.effects.forEach(effect => {
-                if(effect.trigger !== triggerType) return;
-                
-                // Calculate effect amount based on item level scaling
-                let amount = effect.amount || 0;
-                if(effect.scaling && item.level > 0) {
-                    amount += Math.floor(item.level * effect.scaling);
-                }
+                if (effect.trigger !== triggerType) return;
                 
                 results.push({
                     item: item,
-                    effect: effect,
-                    amount: amount,
-                    chance: effect.chance || 100
+                    effect: effect
                 });
             });
         });
+        
+        // Equipment set bonus effects
+        if (this.character && this.manager && this.manager.equipmentSets) {
+            this.manager.equipmentSets.forEach(set => {
+                const setEffects = set.getActiveEffects(this.character);
+                setEffects.forEach(effect => {
+                    if (effect.trigger !== triggerType) return;
+                    
+                    results.push({
+                        item: { 
+                            name: effect.sourceName,
+                            level: 0,
+                            isSetBonus: true
+                        },
+                        effect: effect
+                    });
+                });
+            });
+        }
+        
         return results;
     }
 

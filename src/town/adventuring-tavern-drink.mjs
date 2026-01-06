@@ -309,6 +309,14 @@ export class AdventuringTavernDrink extends NamespacedObject {
 
             // Resolve material references
             const materials = new Map();
+            
+            // Add currency cost based on tier (50/100/200/400 coins)
+            const currency = this.manager.materials.getObjectByID('adventuring:currency');
+            if (currency) {
+                const tierCosts = [50, 100, 200, 400];
+                materials.set(currency, tierCosts[tier - 1] || 50);
+            }
+            
             if (tierData.materials) {
                 for (const { id, count } of tierData.materials) {
                     const material = this.manager.materials.getObjectByID(id);

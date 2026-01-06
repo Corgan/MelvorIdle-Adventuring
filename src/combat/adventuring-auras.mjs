@@ -1,7 +1,7 @@
 const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringAuraInstance } = await loadModule('src/combat/adventuring-aura-instance.mjs');
-const { createEffect } = await loadModule('src/core/adventuring-utils.mjs');
+const { createEffect, evaluateCondition, buildEffectContext } = await loadModule('src/core/adventuring-utils.mjs');
 
 const { AdventuringAurasElement } = await loadModule('src/combat/components/adventuring-auras.mjs');
 
@@ -35,15 +35,53 @@ export class AdventuringAuras {
         this.renderQueue.auras = true;
     }
 
-    trigger(type) {
-        let resolvedEffects = this.effectByType.get(type);
+    /**
+     * Get all aura effects for a trigger type in standard format.
+     * This integrates auras into the unified trigger/effect system.
+     * @param {string} type - Trigger type
+     * @param {object} context - Effect context from buildEffectContext
+     * @returns {Array<{effect, source, sourceName, sourceType}>}
+     */
+    getEffectsForTrigger(type, context = {}) {
+        const results = [];
+        const resolved = this.effectByType.get(type) || [];
         
         // Increment age of all auras at round_end
         if (type === 'round_end') {
             this.incrementAges();
         }
         
-        return resolvedEffects !== undefined ? resolvedEffects : [];
+        for (const { effect, instance } of resolved) {
+            if (instance.base === undefined || instance.stacks <= 0) continue;
+            
+            // Pre-resolve amount from instance (handles perStack, etc.)
+            const amount = effect.getAmount ? effect.getAmount(instance) : (effect.amount || 0);
+            const stacks = instance.stacks;
+            
+            results.push({
+                effect: {
+                    ...effect,
+                    amount,
+                    stacks,
+                    // Copy standard effect properties
+                    type: effect.type,
+                    trigger: effect.trigger,
+                    target: effect.target,
+                    party: effect.party,
+                    condition: effect.condition,
+                    chance: effect.chance,
+                    limit: effect.limit,
+                    times: effect.times,
+                    id: effect.id,
+                    consume: effect.consume
+                },
+                source: instance,  // Keep instance reference for self-modifying effects
+                sourceName: instance.base.name,
+                sourceType: 'aura'
+            });
+        }
+        
+        return results;
     }
     
     /**

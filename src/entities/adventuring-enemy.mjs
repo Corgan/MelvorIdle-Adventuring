@@ -256,6 +256,38 @@ export class AdventuringEnemy extends AdventuringCharacter {
             this.checkEnrage();
         }
     }
+    
+    /**
+     * Get all effect sources for a trigger type (overrides base to add monster passives)
+     * @param {string} type - Trigger type
+     * @param {object} context - Effect context
+     * @returns {Array<{effect, source, sourceName, sourceType}>}
+     */
+    getAllPendingEffectsForTrigger(type, context) {
+        // Get base effects (auras)
+        const pending = super.getAllPendingEffectsForTrigger(type, context);
+        
+        // Add monster passives
+        if (this.base && this.base.passives) {
+            for (const passiveId of this.base.passives) {
+                const passive = this.manager.passives.getObjectByID(passiveId);
+                if (!passive || !passive.effects) continue;
+                
+                for (const effect of passive.effects) {
+                    if (effect.trigger === type) {
+                        pending.push({
+                            effect,
+                            source: passive,
+                            sourceName: `${this.base.name} (${passive.name})`,
+                            sourceType: 'monsterPassive'
+                        });
+                    }
+                }
+            }
+        }
+        
+        return pending;
+    }
 
     onDeath() {
         super.onDeath();
@@ -283,44 +315,69 @@ export class AdventuringEnemy extends AdventuringCharacter {
 
             this.base.addXP(this.xp); // Monster mastery XP from kills
 
-            // Get loot with Monster Mastery bonuses
-            let { id, qty } = this.base.lootGenerator.getEntry();
+            // New loot system: Currency always drops, salvage always drops with range, monster material occasionally drops
+            const lootTable = this.base.lootGenerator.table;
             
-            // DEBUG: Check loot generator output
-            if (typeof qty !== 'number' || isNaN(qty)) {
-                console.log(`[LOOT DEBUG] Bad loot from generator: id=${id}, qty=${qty}, monster=${this.base?.id}`);
+            // Helper function to apply loot bonuses and add to stash
+            const processLoot = (id, qty) => {
+                // Apply drop quantity bonus from monster mastery
+                const dropQtyBonus = this.manager.modifiers.getMonsterDropQtyBonus(this.base);
+                if(dropQtyBonus > 0) {
+                    qty = Math.ceil(qty * (1 + dropQtyBonus));
+                }
+
+                // Apply global material drop rate bonus from mastery pool
+                const materialDropBonus = this.manager.modifiers.getMaterialDropRateBonus();
+                if(materialDropBonus > 0) {
+                    qty = Math.ceil(qty * (1 + materialDropBonus));
+                }
+
+                // Apply loot multiplier from dungeon effect cache (difficulty + endless combined)
+                const lootMultiplier = this.manager.dungeon.effectCache.getLootMultiplier();
+                if(lootMultiplier > 1) {
+                    qty = Math.ceil(qty * lootMultiplier);
+                }
+                
+                this.manager.stash.add(id, qty);
+            };
+            
+            // 1. Currency always drops
+            const currencyEntry = lootTable.find(entry => entry.id === 'adventuring:currency');
+            if(currencyEntry) {
+                // Add slight variance: 80% to 120% of base qty
+                const variance = 0.8 + (Math.random() * 0.4);
+                const currencyQty = Math.max(1, Math.round(currencyEntry.qty * variance));
+                processLoot(currencyEntry.id, currencyQty);
             }
             
-            // Apply drop rate bonus from monster mastery (chance for extra drop roll)
-            const dropRateBonus = this.manager.modifiers.getMonsterDropRateBonus(this.base);
-            if(dropRateBonus > 0 && Math.random() < dropRateBonus) {
-                let bonus = this.base.lootGenerator.getEntry();
-                if(bonus.id === id) {
-                    qty += bonus.qty;
-                } else {
-                    this.manager.stash.add(bonus.id, bonus.qty);
+            // 2. Salvage always drops with quantity range (1 to base qty)
+            const salvageEntry = lootTable.find(entry => entry.id === 'adventuring:parts');
+            if(salvageEntry) {
+                // Random quantity from 1 to base qty
+                const salvageQty = 1 + Math.floor(Math.random() * salvageEntry.qty);
+                processLoot(salvageEntry.id, salvageQty);
+            }
+            
+            // 3. Monster-specific materials have a chance to drop (based on their weight relative to total)
+            const monsterMaterials = lootTable.filter(entry => 
+                entry.id !== 'adventuring:currency' && entry.id !== 'adventuring:parts'
+            );
+            for(const material of monsterMaterials) {
+                // Drop chance based on weight: weight / totalWeight gives original probability
+                // We use weight / 100 as the drop chance (currency typically has weight 100)
+                const dropChance = material.weight / 100;
+                if(Math.random() < dropChance) {
+                    processLoot(material.id, material.qty);
                 }
             }
             
-            // Apply drop quantity bonus from monster mastery
-            const dropQtyBonus = this.manager.modifiers.getMonsterDropQtyBonus(this.base);
-            if(dropQtyBonus > 0) {
-                qty = Math.ceil(qty * (1 + dropQtyBonus));
+            // Apply drop rate bonus from monster mastery (chance for extra monster material drop)
+            const dropRateBonus = this.manager.modifiers.getMonsterDropRateBonus(this.base);
+            if(dropRateBonus > 0 && monsterMaterials.length > 0 && Math.random() < dropRateBonus) {
+                // Pick a random monster material for bonus drop
+                const bonusMaterial = monsterMaterials[Math.floor(Math.random() * monsterMaterials.length)];
+                processLoot(bonusMaterial.id, bonusMaterial.qty);
             }
-
-            // Apply global material drop rate bonus from mastery pool
-            const materialDropBonus = this.manager.modifiers.getMaterialDropRateBonus();
-            if(materialDropBonus > 0) {
-                qty = Math.ceil(qty * (1 + materialDropBonus));
-            }
-
-            // Apply loot multiplier from dungeon effect cache (difficulty + endless combined)
-            const lootMultiplier = this.manager.dungeon.effectCache.getLootMultiplier();
-            if(lootMultiplier > 1) {
-                qty = Math.ceil(qty * lootMultiplier);
-            }
-            
-            this.manager.stash.add(id, qty);
         }
     }
     

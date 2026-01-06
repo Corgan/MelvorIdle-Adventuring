@@ -14,6 +14,7 @@ export class AdventuringEquipmentSlotElement extends AdventuringTooltipElement {
         this.upgrade = getElementFromFragment(this._content, 'upgrade', 'small');
         
         this._tooltipTarget = this.clickable;
+        this._tooltipOptions = { placement: 'right' };
     }
 
     connectedCallback() {

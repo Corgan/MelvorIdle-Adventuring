@@ -229,6 +229,28 @@ function createEffect(effectData, source, sourceName) {
 }
 
 /**
+ * Build a standard context object for condition evaluation.
+ * This ensures all effect sources use consistent context format.
+ * 
+ * @param {object} character - The character triggering effects
+ * @param {object} extra - Additional context from the trigger
+ * @returns {object} Standardized context for evaluateCondition()
+ */
+function buildEffectContext(character, extra = {}) {
+    return {
+        character,
+        target: extra.target || null,
+        attacker: extra.attacker || null,
+        party: character.manager?.party?.members || character.manager?.party?.all || [],
+        manager: character.manager,
+        hpPercentBefore: extra.hpPercentBefore,
+        damageDealt: extra.damageDealt,
+        damageReceived: extra.damageReceived,
+        ...extra
+    };
+}
+
+/**
  * Filter effects by trigger type
  * @param {StandardEffect[]} effects - Array of effects
  * @param {string} trigger - Trigger to filter by
@@ -886,6 +908,23 @@ function evaluateCondition(condition, context) {
             return context.party.every(member => !member.dead);
         }
         
+        // Threshold crossing conditions - check if value just crossed a boundary
+        case 'hp_crossed_below': {
+            if(!character) return false;
+            const hpPercent = (character.hitpoints / character.maxHitpoints) * 100;
+            const hpBefore = context.hpPercentBefore ?? 100;
+            const threshold = condition.threshold || 30;
+            return hpBefore >= threshold && hpPercent < threshold;
+        }
+        
+        case 'hp_crossed_above': {
+            if(!character) return false;
+            const hpPercent = (character.hitpoints / character.maxHitpoints) * 100;
+            const hpBefore = context.hpPercentBefore ?? 0;
+            const threshold = condition.threshold || 50;
+            return hpBefore < threshold && hpPercent >= threshold;
+        }
+        
         default:
             console.warn(`Unknown condition type: ${condition.type}`);
             return true;
@@ -938,8 +977,36 @@ function describeCondition(condition, manager) {
             return `if any ally is injured`;
         case 'all_allies_alive':
             return `if all allies are alive`;
+        case 'hp_crossed_below':
+            return `when dropping below ${condition.threshold}% HP`;
+        case 'hp_crossed_above':
+            return `when rising above ${condition.threshold}% HP`;
         default:
             return condition.type;
+    }
+}
+
+/**
+ * Generate a human-readable description for an effect limit.
+ * 
+ * @param {string} limitType - 'combat', 'round', or 'turn'
+ * @param {number} times - Maximum trigger count
+ * @returns {string} Human-readable limit description
+ */
+function describeLimitSuffix(limitType, times) {
+    if (!limitType) return '';
+    
+    const timesText = times === 1 ? 'once' : `${times} times`;
+    
+    switch(limitType) {
+        case 'combat':
+            return `(${timesText} per combat)`;
+        case 'round':
+            return `(${timesText} per round)`;
+        case 'turn':
+            return `(${timesText} per turn)`;
+        default:
+            return `(${timesText} per ${limitType})`;
     }
 }
 
@@ -977,11 +1044,13 @@ function parseDescription(template, replacements) {
  */
 function getAuraName(manager, auraId) {
     if (!auraId) return 'Unknown';
+    // Prettify the ID as fallback (e.g., 'arcane_power' -> 'Arcane Power')
+    const prettified = auraId.split(':').pop()?.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) || 'Unknown';
     if (manager === undefined || manager.auras === undefined) {
-        return auraId.split(':').pop() || 'Unknown';
+        return prettified;
     }
     const aura = manager.auras.getObjectByID(auraId);
-    return aura !== undefined ? aura.name : (auraId.split(':').pop() || 'Unknown');
+    return aura !== undefined ? aura.name : prettified;
 }
 
 /**
@@ -1001,7 +1070,7 @@ function firstDefined(...values) {
  * Effect description registry - maps effect types to description generator functions.
  * Each function receives: (effect, value, stacks, amount, manager, helpers)
  * - effect: The full effect object
- * - value: Resolved value (effect.value ?? amount)
+ * - value: Resolved amount value (same as amount - kept for registry function signature)
  * - stacks: Resolved stacks count
  * - amount: Resolved amount
  * - manager: AdventuringManager for lookups
@@ -1019,9 +1088,9 @@ const effectDescriptionRegistry = new Map([
             : `${helpers.sign(value)}${value}% ${helpers.stat(effect.stat || effect.id)}`],
     
     // Damage/Healing
-    ['damage', (effect, value, stacks, amount, manager, helpers) => 
+    ['damage_flat', (effect, value, stacks, amount, manager, helpers) => 
         effect.perStack ? `Deal ${firstDefined(value, amount, 1)} damage per stack` : `Deal ${firstDefined(value, amount, '?')} damage`],
-    ['heal', (effect, value, stacks, amount, manager, helpers) => 
+    ['heal_flat', (effect, value, stacks, amount, manager, helpers) => 
         effect.perStack ? `Heal ${firstDefined(value, amount, effect.count, 1)} HP per stack` : `Heal ${firstDefined(value, amount, effect.count, '?')} HP`],
     ['heal_percent', (effect, value, stacks, amount, manager, helpers) => 
         `Restore ${helpers.percent(firstDefined(value, amount))}% HP`],
@@ -1031,10 +1100,9 @@ const effectDescriptionRegistry = new Map([
             : `Heal for ${helpers.percent(firstDefined(value, amount, 0))}% of damage dealt`],
     
     // Damage modifiers
-    ['damage_buff', (effect, value, stacks, amount, manager, helpers) => 
-        effect.perStack ? `+${firstDefined(value, amount, 1)} Damage per stack` : `${helpers.sign(firstDefined(value, amount))}${firstDefined(value, amount)} Damage`],
-    ['increase_damage', (effect, value, stacks, amount, manager, helpers) => 
-        effect.perStack ? `+${firstDefined(value, amount, 1)} Damage per stack` : `${helpers.sign(firstDefined(value, amount))}${firstDefined(value, amount)} Damage`],
+    // flat_damage: flat damage bonus (can be negative)
+    ['flat_damage', (effect, value, stacks, amount, manager, helpers) => 
+        effect.perStack ? `${helpers.sign(firstDefined(value, amount, 1))}${firstDefined(value, amount, 1)} Damage per stack` : `${helpers.sign(firstDefined(value, amount))}${firstDefined(value, amount)} Damage`],
     ['increase_damage_percent', (effect, value, stacks, amount, manager, helpers) => 
         effect.perStack ? `+${firstDefined(value, amount, 1)}% Damage per stack` : `${helpers.sign(firstDefined(value, amount))}${firstDefined(value, amount)}% Damage`],
     ['defense_buff', (effect, value, stacks, amount, manager, helpers) => 
@@ -1042,11 +1110,11 @@ const effectDescriptionRegistry = new Map([
     ['speed_buff', (effect, value, stacks, amount, manager, helpers) => 
         `${helpers.sign(firstDefined(value, amount))}${firstDefined(value, amount)} Speed`],
     
-    // Buffs/Debuffs
+    // Buffs/Debuffs - use 'id' property for aura reference
     ['buff', (effect, value, stacks, amount, manager, helpers) => 
-        `Apply ${firstDefined(stacks, 1)} ${helpers.aura(effect.id || effect.aura || effect.buff)}`],
+        `Apply ${firstDefined(stacks, 1)} ${helpers.aura(effect.id)}`],
     ['debuff', (effect, value, stacks, amount, manager, helpers) => 
-        `Apply ${firstDefined(stacks, 1)} ${helpers.aura(effect.id || effect.aura || effect.debuff)}`],
+        `Apply ${firstDefined(stacks, 1)} ${helpers.aura(effect.id)}`],
     ['cleanse', (effect, value, stacks, amount, manager, helpers) => 
         effect.id ? `Remove ${helpers.aura(effect.id)}` : 'Cleanse debuffs'],
     
@@ -1081,10 +1149,9 @@ const effectDescriptionRegistry = new Map([
     ['damage_reduction', (effect, value, stacks, amount, manager, helpers) => 
         `${helpers.percent(value)}% damage reduction`],
     
-    // Immunity
+    // Immunity - use 'id' property for aura reference
     ['immunity', (effect, value, stacks, amount, manager, helpers) => {
-        const immuneTo = effect.debuff || effect.id;
-        return immuneTo ? `Immune to ${helpers.aura(immuneTo)}` : 'Immune to debuffs';
+        return effect.id ? `Immune to ${helpers.aura(effect.id)}` : 'Immune to debuffs';
     }],
     
     // Crit
@@ -1123,10 +1190,6 @@ const effectDescriptionRegistry = new Map([
     ['all_stat_bonus', (effect, value, stacks, amount, manager, helpers) => 
         `+${value}% all stats`],
     
-    // Party healing
-    ['heal_party_percent', (effect, value, stacks, amount, manager, helpers) => 
-        `Heal party for ${value}% max HP`],
-    
     // Random buffs/debuffs
     ['random_buffs', (effect, value, stacks, amount, manager, helpers) => {
         const count = firstDefined(effect.count, 1);
@@ -1143,34 +1206,16 @@ const effectDescriptionRegistry = new Map([
             : `Apply ${count} random debuffs (${stackCount} stack${stackCount !== 1 ? 's' : ''} each)`;
     }],
     
-    // Dispel effects
-    ['dispel', (effect, value, stacks, amount, manager, helpers) => {
-        const dispelCount = effect.count || 1;
-        return dispelCount === 'all' ? 'Remove all buffs from target' : `Remove ${dispelCount} buff${dispelCount !== 1 ? 's' : ''} from target`;
-    }],
+    // Dispel/cleanse effects
     ['dispel_buff', (effect, value, stacks, amount, manager, helpers) => {
         const dispelCount = effect.count || 1;
         return dispelCount === 'all' ? 'Remove all buffs from target' : `Remove ${dispelCount} buff${dispelCount !== 1 ? 's' : ''} from target`;
-    }],
-    ['dispel_debuff', (effect, value, stacks, amount, manager, helpers) => {
-        const debuffCount = effect.count || 1;
-        return debuffCount === 'all' ? 'Cleanse all debuffs' : `Cleanse ${debuffCount} debuff${debuffCount !== 1 ? 's' : ''}`;
     }],
     
     // Enemy stat debuff
     ['enemy_stat_debuff', (effect, value, stacks, amount, manager, helpers) => {
         const debuffVal = Math.abs(helpers.percent(firstDefined(value, amount, 0)));
         return `Reduce enemy ${helpers.stat(effect.stat || effect.id)} by ${debuffVal}%`;
-    }],
-    
-    // Cleanse variants
-    ['cleanse_debuff', (effect, value, stacks, amount, manager, helpers) => {
-        const cleanseCount = effect.count || 1;
-        return cleanseCount === 1 ? 'Cleanse a debuff' : `Cleanse ${cleanseCount} debuffs`;
-    }],
-    ['cleanse_random_debuff', (effect, value, stacks, amount, manager, helpers) => {
-        const cleanseCount = effect.count || 1;
-        return cleanseCount === 1 ? 'Cleanse a debuff' : `Cleanse ${cleanseCount} debuffs`;
     }],
     
     // Ward/Charm (item categories, not effect types)
@@ -1210,14 +1255,14 @@ const effectDescriptionRegistry = new Map([
     ['heal_on_low_hp', (effect, value, stacks, amount) => 
         `Heal ${firstDefined(amount, effect.healAmount, '?')} HP when below ${firstDefined(effect.threshold, '?')}% HP`],
     ['proc_debuff', (effect, value, stacks, amount, manager, helpers) => {
-        const debuffName = manager?.auras?.getObjectByID(effect.debuff)?.name || effect.debuff?.split(':').pop() || 'Unknown';
+        const debuffName = manager?.auras?.getObjectByID(effect.id)?.name || effect.id?.split(':').pop() || 'Unknown';
         return `${firstDefined(effect.chance, '?')}% chance to apply ${firstDefined(stacks, 1)} ${debuffName}`;
     }],
     ['heal_on_floor_start', (effect, value, stacks, amount) => 
         `Heal ${firstDefined(amount, effect.healAmount, '?')} HP at floor start`],
     ['heal_after_combat', (effect, value, stacks, amount) => 
         `Heal ${firstDefined(amount, effect.healAmount, '?')} HP after combat`],
-    ['on_damage', (effect) => 
+    ['lifesteal', (effect) => 
         `Heal ${firstDefined(effect.heal_percent, effect.healPercent, 0)}% of damage dealt`],
     
     // Aura internal effects
@@ -1242,7 +1287,13 @@ const effectDescriptionRegistry = new Map([
         `${firstDefined(amount, 0)}% damage reduction${effect.perStack ? ' per stack' : ''}`],
     ['reduce_heal_percent', (effect, value, stacks, amount) => 
         `-${firstDefined(amount, 0)}% healing received${effect.perStack ? ' per stack' : ''}`],
-    ['heal_party', (effect, value, stacks, amount) => `Heal party for ${firstDefined(amount, 0)} HP`],
+    // heal_party: use 'value' for percent of max HP, 'amount' for flat HP
+    ['heal_party', (effect, value, stacks, amount) => {
+        if(value !== undefined && value !== 0) {
+            return `Heal party for ${value}% max HP`;
+        }
+        return `Heal party for ${firstDefined(amount, 0)} HP`;
+    }],
     
 
     // Stat/passive bonuses
@@ -1261,9 +1312,7 @@ const effectDescriptionRegistry = new Map([
         return `Apply ${passiveName}`;
     }],
     
-    // XP/Loot bonuses
-    ['xp_bonus', (effect, value) => `+${value}% XP`],
-    ['loot_bonus', (effect, value) => `+${value}% Loot`],
+    // Loot bonuses
     ['loot_quality_bonus', (effect, value) => `+${value}% Loot Quality`],
     ['rare_drop_bonus', (effect, value) => `+${value}% Rare Drop Chance`],
     ['material_drop_bonus', (effect, value) => `+${value}% Material Drops`],
@@ -1321,7 +1370,7 @@ function describeEffect(effect, manager, displayMode = false) {
     // Convenience getters for common fields
     const amount = getVal('amount');
     const stacks = getVal('stacks');
-    const value = firstDefined(effect.value, amount); // value takes precedence if present
+    const value = amount; // 'amount' is the canonical property
     
     const statName = (statId) => {
         const stat = manager?.stats?.getObjectByID(statId);
@@ -1338,7 +1387,7 @@ function describeEffect(effect, manager, displayMode = false) {
     const getStatDisplay = (statId) => statName(statId) || prettifyStatId(statId);
     const auraName = (auraId) => {
         const aura = manager?.auras?.getObjectByID(auraId);
-        return aura?.name || auraId?.split(':').pop() || 'Unknown';
+        return aura?.name || prettifyStatId(auraId);
     };
     
     // Build helpers object for registry functions
@@ -1357,8 +1406,8 @@ function describeEffect(effect, manager, displayMode = false) {
     }
     
     // Fallback for unknown effect types
-    if (effect.value !== undefined) {
-        return `${effect.type}: ${value}`;
+    if (amount !== undefined) {
+        return `${effect.type}: ${amount}`;
     }
     return effect.type || 'Unknown effect';
 }
@@ -1366,7 +1415,7 @@ function describeEffect(effect, manager, displayMode = false) {
 /**
  * Format a trigger type into a human-readable string.
  * 
- * @param {string} trigger - Trigger type (e.g., 'round_start', 'on_kill')
+ * @param {string} trigger - Trigger type (e.g., 'round_start', 'kill')
  * @returns {string} Human-readable trigger description
  */
 function formatTrigger(trigger) {
@@ -1381,11 +1430,11 @@ function formatTrigger(trigger) {
 
         'before_damage_received': 'Before receiving damage',
         'after_damage_received': 'After receiving damage',
-        'on_hit': 'On hit',
-        'on_miss': 'On miss',
-        'on_crit': 'On critical hit',
-        'on_kill': 'On kill',
-        'on_death': 'On death',
+        'hit': 'On hit',
+        'miss': 'On miss',
+        'crit': 'On critical hit',
+        'kill': 'On kill',
+        'death': 'On death',
         'encounter_start': 'At encounter start',
         'encounter_end': 'At encounter end',
         'floor_start': 'At floor start',
@@ -1393,9 +1442,18 @@ function formatTrigger(trigger) {
         'dungeon_start': 'At dungeon start',
         'dungeon_end': 'At dungeon end',
         'enemy_spawn': 'When enemy spawns',
-        'ability_used': 'When ability is used',
+        'ability': 'When ability is used',
         'party_wipe': 'When party wipes',
-        'on_damage': 'When damaged'
+        'damaged': 'When damaged',
+        'ally_death': 'When an ally dies',
+        'heal': 'When healing',
+        'generator': 'When using a generator',
+        'spender': 'When using a spender',
+        'dodge': 'When dodging',
+        'debuff_applied': 'When debuffed',
+        'spell_cast': 'When casting a spell',
+        'spell_hit': 'When a spell hits',
+        'fatal_hit': 'On fatal hit'
     };
     return triggerNames[trigger] || trigger.replace(/_/g, ' ');
 }
@@ -1489,7 +1547,7 @@ function describeEffectFull(effect, manager, options = {}) {
     const party = effect.party || options.party;
     
     // For self-targeting damage, explicitly say "to self"
-    if (target === 'self' && effect.type === 'damage') {
+    if (target === 'self' && (effect.type === 'damage' || effect.type === 'damage_flat')) {
         desc = `${desc} to self`;
     } else if(target && target !== 'self') {
         const targetName = formatTarget(target, party);
@@ -1513,6 +1571,20 @@ function describeEffectFull(effect, manager, options = {}) {
         }
     }
     
+    // Add limit description if present
+    if(effect.limit) {
+        const times = effect.times || 1;
+        const limitDesc = describeLimitSuffix(effect.limit, times);
+        if(limitDesc) {
+            desc = `${desc} ${limitDesc}`;
+        }
+    }
+    
+    // Add scope description if party-scoped
+    if(effect.scope === 'party') {
+        desc = `[Party] ${desc}`;
+    }
+    
     // Add trigger as a natural suffix (not a prefix)
     // Skip if the description already contains condition text like "when below X%" to avoid "when below 50% HP when damaged"
     const trigger = effect.trigger || options.trigger;
@@ -1530,7 +1602,7 @@ function describeEffectFull(effect, manager, options = {}) {
 
 /**
  * Format a trigger as a suffix phrase for natural reading.
- * E.g., "on_kill" -> "on kill", "round_start" -> "each round"
+ * E.g., "kill" -> "on kill", "round_start" -> "each round"
  * 
  * @param {string} trigger - Trigger type
  * @returns {string} Natural suffix phrase
@@ -1545,15 +1617,14 @@ function formatTriggerSuffix(trigger) {
         'round_end': 'at the end of the round',
 
         'before_damage_delivered': 'before dealing damage',
-
         'after_damage_delivered': 'after dealing damage',
         'before_damage_received': 'before taking damage',
         'after_damage_received': 'after taking damage',
-        'on_hit': 'on hit',
-        'on_miss': 'on miss',
-        'on_crit': 'on critical hit',
-        'on_kill': 'on kill',
-        'on_death': 'on death',
+        'hit': 'on hit',
+        'miss': 'on miss',
+        'crit': 'on critical hit',
+        'kill': 'on kill',
+        'death': 'on death',
         'encounter_start': 'at the start of combat',
         'encounter_end': 'at the end of combat',
         'floor_start': 'at the start of a floor',
@@ -1561,28 +1632,22 @@ function formatTriggerSuffix(trigger) {
         'dungeon_start': 'at the start of a dungeon',
         'dungeon_end': 'at the end of the dungeon',
         'enemy_spawn': 'when an enemy spawns',
-        'ability_used': 'when using an ability',
+        'ability': 'when using an ability',
         'party_wipe': 'when the party wipes',
-        'on_damage': 'when damaged',
-        'low_health': 'when low on health',
-        'on_low_health': 'when low on health',
-        'on_ally_death': 'when an ally dies',
+        'damaged': 'when damaged',
         'ally_death': 'when an ally dies',
-        'on_heal': 'when healing',
-        'on_generator': 'when using a generator',
-        'on_spender': 'when using a spender',
-        'on_dodge': 'when dodging',
-        'on_debuff_applied': 'when debuffed',
-        'on_spell_cast': 'when casting a spell',
-        'on_spell_hit': 'when a spell hits',
-        'on_fatal_hit': 'on fatal hit',
-        'on_attack': 'on attack',
-        'on_ability': 'when using an ability',
-        'on_damage_taken': 'when taking damage',
+        'heal': 'when healing',
+        'generator': 'when using a generator',
+        'spender': 'when using a spender',
+        'dodge': 'when dodging',
+        'debuff_applied': 'when debuffed',
+        'spell_cast': 'when casting a spell',
+        'spell_hit': 'when a spell hits',
+        'fatal_hit': 'on fatal hit',
+        'attack': 'on attack',
         'xp_gain': 'when gaining XP',
         'loot_roll': 'when rolling loot',
         'targeting': '',  // Internal trigger, don't show
-        'death': '',  // Internal, handled separately
         'before_debuff_received': 'before receiving a debuff',
         'before_heal_received': 'before receiving a heal',
         'before_spender_cast': 'before using a spender',
@@ -1856,6 +1921,23 @@ class EffectProcessor {
      */
     processAll(resolvedEffects, context) {
         resolvedEffects.forEach(resolved => {
+            const { effect, instance } = resolved;
+            
+            // Check condition if present on the effect
+            if (effect.condition) {
+                // Build context for condition evaluation
+                const evalContext = buildEffectContext(context.character, context.extra);
+                if (!evaluateCondition(effect.condition, evalContext)) {
+                    return; // Skip this effect
+                }
+            }
+            
+            // Check chance if present
+            const chance = effect.chance || 100;
+            if (Math.random() * 100 > chance) {
+                return; // Skip this effect
+            }
+            
             context.extra = this.process(resolved, context);
         });
         return context.extra;
@@ -1904,8 +1986,8 @@ function createDefaultEffectProcessor() {
         }
         return ctx.extra;
     };
-    processor.register('damage', damageOrHeal);
-    processor.register('heal', damageOrHeal);
+    processor.register('damage_flat', damageOrHeal);
+    processor.register('heal_flat', damageOrHeal);
     
     // Heal percent of max HP
     processor.register('heal_percent', (effect, instance, ctx) => {
@@ -1916,27 +1998,38 @@ function createDefaultEffectProcessor() {
         return ctx.extra;
     });
     
-    // Heal entire party for percent of max HP
-    processor.register('heal_party_percent', (effect, instance, ctx) => {
-        const amount = getEffectAmount(effect, instance);
+    // Heal entire party - uses 'value' for percent of max HP, 'amount' for flat HP
+    processor.register('heal_party', (effect, instance, ctx) => {
         if(ctx.manager.party) {
-            ctx.manager.party.heroes.forEach(hero => {
-                if(!hero.dead) {
-                    const healAmount = Math.ceil(hero.maxHitpoints * (amount / 100));
-                    hero.heal({ amount: healAmount }, ctx.character);
-                }
-            });
-            ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} heals the party`);
+            // Check for percent-based healing (amount property with heal_party type)
+            const percentValue = effect.amount ?? instance.amount;
+            if(percentValue !== undefined && percentValue !== 0) {
+                ctx.manager.party.heroes.forEach(hero => {
+                    if(!hero.dead) {
+                        const healAmount = Math.ceil(hero.maxHitpoints * (percentValue / 100));
+                        hero.heal({ amount: healAmount }, ctx.character);
+                    }
+                });
+            } else {
+                // Flat HP healing (amount property)
+                const amount = getEffectAmount(effect, instance);
+                ctx.manager.party.heroes.forEach(hero => {
+                    if(!hero.dead) {
+                        hero.heal({ amount }, ctx.character);
+                    }
+                });
+            }
+            ctx.manager.log.add(`${ctx.character?.name || 'Effect'}'s ${instance?.base?.name || 'heal'} heals the party`);
         }
         return ctx.extra;
     });
     
-    // Apply buff aura
+    // Apply buff aura - uses 'id' property for aura reference
     processor.register('buff', (effect, instance, ctx) => {
         const stacks = instance.stacks || effect.stacks || 1;
         const builtEffect = { stacks };
         const target = effect.target || 'self';
-        const auraId = effect.buff || effect.id;
+        const auraId = effect.id;
         
         if(!auraId) {
             console.warn('[buff processor] Missing aura id in effect:', effect);
@@ -1953,12 +2046,12 @@ function createDefaultEffectProcessor() {
         return ctx.extra;
     });
     
-    // Apply debuff aura
+    // Apply debuff aura - uses 'id' property for aura reference
     processor.register('debuff', (effect, instance, ctx) => {
         const stacks = instance.stacks || effect.stacks || 1;
         const builtEffect = { stacks };
         const target = effect.target || 'target';
-        const auraId = effect.debuff || effect.buff || effect.id;
+        const auraId = effect.id;
         
         if(!auraId) {
             console.warn('[debuff processor] Missing aura id in effect:', effect);
@@ -2013,7 +2106,7 @@ function createDefaultEffectProcessor() {
     });
     
     // Damage modifiers
-    processor.register('increase_damage', (effect, instance, ctx) => {
+    processor.register('flat_damage', (effect, instance, ctx) => {
         const amount = getEffectAmount(effect, instance);
         ctx.extra.amount = (ctx.extra.amount || 0) + amount;
         return ctx.extra;
@@ -2260,30 +2353,6 @@ function createDefaultEffectProcessor() {
         return ctx.extra;
     });
     
-    // Heal party (martyrdom buff, difficulty floor_end)
-    processor.register('heal_party', (effect, instance, ctx) => {
-        const amount = getEffectAmount(effect, instance);
-        const healPercent = effect.healingPercent || effect.healPercent || 0;
-        
-        if(ctx.manager.party) {
-            ctx.manager.party.heroes.forEach(hero => {
-                if(!hero.dead) {
-                    // Use flat amount or percent of max HP
-                    let healAmount = amount;
-                    if(healPercent > 0) {
-                        healAmount = Math.ceil(hero.maxHitpoints * (healPercent / 100));
-                    }
-                    if(healAmount > 0) {
-                        hero.heal({ amount: healAmount }, ctx.character);
-                    }
-                }
-            });
-            const sourceName = instance.base ? instance.base.name : 'effect';
-            ctx.manager.log.add(`${sourceName} heals the party`);
-        }
-        return ctx.extra;
-    });
-    
     // Dispel buffs from target
     processor.register('dispel_buff', (effect, instance, ctx) => {
         const count = effect.count || 1;
@@ -2309,12 +2378,6 @@ function createDefaultEffectProcessor() {
             }
         }
         return ctx.extra;
-    });
-    
-    // Dispel (alias for dispel_buff with default behavior)
-    processor.register('dispel', (effect, instance, ctx) => {
-        // Delegate to dispel_buff
-        return processor.process('dispel_buff', effect, instance, ctx);
     });
     
     // Note: increase_stat_percent and reduce_stat_percent are NOT registered here.
@@ -2404,35 +2467,74 @@ function buildDescription(config) {
             const hit = hits[i];
             if (hit.effects === undefined || hit.effects.length === 0) continue;
             
+            // Get effect descriptions WITHOUT target info first
             const hitEffectDescs = [];
             for (let j = 0; j < hit.effects.length; j++) {
                 const effect = hit.effects[j];
                 const effectObj = {
                     type: effect.type,
                     trigger: effect.trigger !== undefined ? effect.trigger : 'on_use',
-                    value: effect.getAmount !== undefined 
+                    amount: effect.getAmount !== undefined 
                         ? effect.getAmount(stats, displayMode) 
                         : (effect.amount !== undefined && effect.amount.base !== undefined 
                             ? effect.amount.base 
-                            : (effect.amount !== undefined ? effect.amount : (effect.value !== undefined ? effect.value : 0))),
+                            : (effect.amount !== undefined ? effect.amount : 0)),
                     stacks: effect.getStacks !== undefined 
                         ? effect.getStacks(stats, displayMode) 
                         : (effect.stacks !== undefined && effect.stacks.base !== undefined 
                             ? effect.stacks.base 
                             : (effect.stacks !== undefined ? effect.stacks : 0)),
                     id: effect.id,
-                    target: hit.target,
-                    party: hit.party,
+                    // Don't include target here - we'll add it at the end
                     condition: effect.condition,
                     chance: effect.chance
                 };
-                hitEffectDescs.push(describeEffectFull(effectObj, manager, { displayMode, includeTrigger: false }));
+                let effectDesc = describeEffectFull(effectObj, manager, { displayMode, includeTrigger: false });
+                // Lowercase the first letter for joining with "and" (except first effect)
+                if (j > 0 && effectDesc.length > 0) {
+                    effectDesc = effectDesc.charAt(0).toLowerCase() + effectDesc.slice(1);
+                }
+                hitEffectDescs.push(effectDesc);
             }
+            
             if (hitEffectDescs.length > 0) {
-                hitDescs.push(hitEffectDescs.join(' and '));
+                let hitDesc = hitEffectDescs.join(' and ');
+                // Add target suffix once at the end for the whole hit
+                const target = hit.target;
+                const party = hit.party;
+                if (target && target !== 'self') {
+                    const targetName = formatTarget(target, party);
+                    if (targetName && !hitDesc.toLowerCase().includes(targetName.toLowerCase())) {
+                        hitDesc = `${hitDesc} to ${targetName}`;
+                    }
+                } else if (target === 'self') {
+                    hitDesc = `${hitDesc} to self`;
+                }
+                hitDescs.push(hitDesc);
             }
         }
-        desc = hitDescs.join('. ');
+        
+        // Format multi-hit descriptions naturally
+        if (hitDescs.length === 1) {
+            desc = hitDescs[0];
+        } else if (hitDescs.length === 2) {
+            // Check if both hits are identical
+            if (hitDescs[0] === hitDescs[1]) {
+                desc = `${hitDescs[0]} (hits twice)`;
+            } else {
+                desc = `First: ${hitDescs[0]}. Then: ${hitDescs[1]}`;
+            }
+        } else if (hitDescs.length > 2) {
+            // Check if all hits are identical
+            const allSame = hitDescs.every(h => h === hitDescs[0]);
+            if (allSame) {
+                desc = `${hitDescs[0]} (hits ${hitDescs.length} times)`;
+            } else {
+                const ordinals = ['First', 'Second', 'Third', 'Fourth', 'Fifth'];
+                desc = hitDescs.map((h, i) => `${ordinals[i] || `Hit ${i+1}`}: ${h}`).join('. ');
+            }
+        }
+        
         if (desc !== '') {
             desc = desc + '.';
         }
@@ -2445,11 +2547,11 @@ function buildDescription(config) {
             const effectObj = {
                 type: effect.type,
                 trigger: effect.trigger !== undefined ? effect.trigger : 'passive',
-                value: effect.getAmount !== undefined 
+                amount: effect.getAmount !== undefined 
                     ? effect.getAmount(stats, displayMode) 
                     : (effect.amount !== undefined && effect.amount.base !== undefined 
                         ? effect.amount.base 
-                        : (effect.amount !== undefined ? effect.amount : (effect.value !== undefined ? effect.value : 0))),
+                        : (effect.amount !== undefined ? effect.amount : 0)),
                 stacks: effect.getStacks !== undefined 
                     ? effect.getStacks(stats, displayMode) 
                     : (effect.stacks !== undefined && effect.stacks.base !== undefined 
@@ -2592,6 +2694,7 @@ export {
     // Condition system
     evaluateCondition,
     describeCondition,
+    buildEffectContext,
     // RenderQueue base classes
     AdventuringMasteryRenderQueue,
     AdventuringBadgeRenderQueue,

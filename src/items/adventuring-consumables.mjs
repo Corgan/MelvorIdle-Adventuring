@@ -395,34 +395,34 @@ export class AdventuringConsumables extends AdventuringPage {
         
         return effects;
     }
-
+    
     /**
-     * Trigger consumable effects for a specific trigger type.
-     * @param {string} triggerType - The trigger type (e.g., 'on_hit', 'after_damage_dealt')
-     * @param {Object} context - Context object with character, target, party, manager
-     * @returns {Array<{consumable, tier, effect, amount, chance}>}
+     * Get all effects from equipped consumables that match a trigger type.
+     * Does NOT evaluate conditions or limits - those are handled by the central dispatcher.
+     * @param {string} triggerType - The trigger type to match
+     * @param {object} context - Context for evaluation (not used here, passed for interface consistency)
+     * @returns {Array<{consumable: object, effect: object}>}
      */
-    trigger(triggerType, context = {}) {
+    getEffectsForTrigger(triggerType, context = {}) {
         const results = [];
+        
+        // Trigger aliases for backwards compatibility
+        const triggerAliases = {
+            'after_damage_received': ['damaged'],
+            'after_damage_dealt': ['hit']
+        };
+        const matchingTriggers = [triggerType, ...(triggerAliases[triggerType] || [])];
         
         for (const { consumable, tier } of this.equipped) {
             if (this.getCharges(consumable, tier) <= 0) continue;
             
             const tierEffects = consumable.getTierEffects(tier);
             for (const effect of tierEffects) {
-                if (effect.trigger !== triggerType) continue;
-                
-                // Check condition if present
-                if (effect.condition) {
-                    if (!evaluateCondition(effect.condition, context)) continue;
-                }
+                if (!matchingTriggers.includes(effect.trigger)) continue;
                 
                 results.push({
                     consumable: consumable,
-                    tier: tier,
-                    effect: effect,
-                    amount: effect.amount || 0,
-                    chance: effect.chance || 100
+                    effect: effect
                 });
             }
         }
@@ -459,112 +459,9 @@ export class AdventuringConsumables extends AdventuringPage {
         this.usedThisRun.clear();
     }
 
-    onFloorStart() {
-        for (const { consumable, tier } of this.equipped) {
-            const tierEffects = consumable.getTierEffects(tier);
-            for (const effect of tierEffects) {
-                if (effect.trigger === 'floor_start') {
-                    if (effect.only_if_injured) {
-                        const anyoneInjured = this.manager.party.all.some(m => !m.dead && m.hitpoints < m.stats.maxHitpoints);
-                        if (!anyoneInjured) continue;
-                    }
-                    this.applyEffect(consumable, tier, effect);
-                }
-            }
-        }
-    }
-
-    onEncounterStart() {
-        for (const { consumable, tier } of this.equipped) {
-            const tierEffects = consumable.getTierEffects(tier);
-            for (const effect of tierEffects) {
-                if (effect.trigger === 'encounter_start') {
-                    this.applyEffect(consumable, tier, effect);
-                }
-            }
-        }
-    }
-
-    onCharacterDamaged(member) {
-        if (member.dead) return false;
-        
-        const hpPercent = member.hitpoints / member.stats.maxHitpoints;
-        
-        for (const { consumable, tier } of this.equipped) {
-            const tierEffects = consumable.getTierEffects(tier);
-            for (const effect of tierEffects) {
-                if (effect.trigger === 'on_damage' && effect.type === 'heal_on_low_hp') {
-                    if (hpPercent < effect.threshold / 100) {
-                        member.heal({ amount: effect.healAmount });
-                        this.manager.log.add(`${consumable.getTierName(tier)} healed ${member.name} for ${effect.healAmount} HP!`);
-                        consumable.useCharge();
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    onPartyWipe() {
-        const allDead = this.manager.party.all.every(member => member.dead);
-        if (!allDead) return false;
-        
-        for (const { consumable, tier } of this.equipped) {
-            const tierEffects = consumable.getTierEffects(tier);
-            for (const effect of tierEffects) {
-                if (effect.trigger === 'party_wipe' && effect.type === 'revive_all') {
-                    if (effect.once_per_run && this.usedThisRun.has(consumable.id)) {
-                        continue;
-                    }
-                    
-                    const amount = effect.amount;
-                    this.manager.party.all.forEach(member => {
-                        if (member.dead) {
-                            member.revive({ amount });
-                        }
-                    });
-
-                    this.usedThisRun.add(consumable.id);
-                    this.manager.log.add(`${consumable.getTierName(tier)} revived the party!`);
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    applyEffect(consumable, tier, effect) {
-        const tierName = consumable.getTierName(tier);
-        
-        switch (effect.type) {
-            case 'heal_percent':
-                this.manager.party.all.forEach(member => {
-                    if (!member.dead) {
-                        const healAmount = Math.floor(member.stats.maxHitpoints * effect.amount / 100);
-                        member.heal({ amount: healAmount });
-                    }
-                });
-                break;
-            case 'buff_damage':
-                this.manager.party.alive.forEach(member => {
-                    member.buff('adventuring:consumable_damage', { amount: effect.amount }, member);
-                });
-                this.manager.log.add(`${tierName} grants +${effect.amount}% damage to the party!`);
-                break;
-            case 'buff_defense':
-                this.manager.party.alive.forEach(member => {
-                    member.buff('adventuring:fortify', { amount: effect.amount }, member);
-                });
-                this.manager.log.add(`${tierName} grants +${effect.amount}% damage reduction to the party!`);
-                break;
-            case 'buff_speed':
-                this.manager.party.alive.forEach(member => {
-                    member.buff('adventuring:haste', { amount: effect.amount }, member);
-                });
-                this.manager.log.add(`${tierName} grants +${effect.amount}% speed to the party!`);
-                break;
-        }
+    // =========================================
+    // Rendering
+    // =========================================
     }
 
     // =========================================

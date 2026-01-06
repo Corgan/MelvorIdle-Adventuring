@@ -49,11 +49,11 @@ export class AdventuringMasteryCategory extends NamespacedObject {
             if (level >= milestone.level) {
                 if (milestone.effects) {
                     for (const effect of milestone.effects) {
-                        if (milestone.scaling && effect.value !== undefined) {
-                            // Scaling effects: multiply value by level, add directly
+                        if (milestone.scaling && effect.amount !== undefined) {
+                            // Scaling effects: multiply amount by level, add directly
                             scalingEffects.push({
                                 ...effect,
-                                value: effect.value * level
+                                amount: effect.amount * level
                             });
                         } else if (effect.type === 'unlock_difficulty') {
                             // Unlock effects accumulate - each unlocks something different

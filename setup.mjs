@@ -211,7 +211,7 @@ export async function setup({ gameData, patch, loadTemplates, loadModule, loadSt
     await load('data/areas/demons_domain.json');
     await load('data/areas/elemental_plane.json');
     await load('data/areas/eternal_colosseum.json');
-    await load('data/areas/goblin_fortress.json');
+    await load('data/areas/golbin_fortress.json');
     await load('data/areas/haunted_catacombs.json');
     await load('data/areas/holy_grounds.json');
     await load('data/areas/knights_fortress.json');

@@ -113,6 +113,34 @@ export class AdventuringJob extends AdventuringMasteryAction {
             this.stats.set(stat, Math.floor(baseValue * (1 + statBonus)));
         });
     }
+    
+    /**
+     * Get passive effects from this job that match a trigger type.
+     * @param {AdventuringCharacter} character - The character to check requirements against
+     * @param {string} triggerType - Trigger type to match (e.g., 'turn_start', 'after_damage_dealt')
+     * @returns {Array<{passive: object, effect: object}>}
+     */
+    getPassivesForTrigger(character, triggerType) {
+        const results = [];
+        
+        // Use the cached passives lookup from manager
+        const passives = this.manager.getPassivesForJob(this);
+        
+        for (const passive of passives) {
+            // Check if passive can be equipped by this character
+            if (!passive.canEquip(character)) continue;
+            
+            // Check each effect for matching trigger
+            if (!passive.effects) continue;
+            for (const effect of passive.effects) {
+                if (effect.trigger === triggerType) {
+                    results.push({ passive, effect });
+                }
+            }
+        }
+        
+        return results;
+    }
 
     postDataRegistration() {
         this._reqChecker = new RequirementsChecker(this.manager, this.requirements);

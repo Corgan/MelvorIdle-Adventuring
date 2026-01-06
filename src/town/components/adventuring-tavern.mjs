@@ -161,7 +161,7 @@ export class AdventuringTavernElement extends AdventuringSubpageElement {
         // Icon and name
         this.detailIcon.src = drink.getTierMedia(tier);
         this.detailName.textContent = drink.getTierName(tier);
-        this.detailDescription.textContent = drink.getTierFlavorText(tier);
+        this.detailDescription.textContent = drink.getTierDescription(tier);
         
         // Tier buttons
         for (let i = 0; i < 4; i++) {
@@ -186,7 +186,7 @@ export class AdventuringTavernElement extends AdventuringSubpageElement {
         this.detailMaterials.replaceChildren();
         if (materials.size > 0) {
             const container = document.createElement('div');
-            container.className = 'd-flex flex-wrap align-items-center';
+            container.className = 'd-flex flex-wrap align-items-center justify-content-center';
             for (const [mat, qty] of materials) {
                 const owned = mat.count || 0;
                 const component = document.createElement('adventuring-material');
@@ -201,6 +201,12 @@ export class AdventuringTavernElement extends AdventuringSubpageElement {
                     component.border.classList.remove('border-success');
                     component.border.classList.add('border-danger');
                 }
+                // Set tooltip content using the component's built-in tooltip
+                const tooltipContent = TooltipBuilder.create()
+                    .header(mat.name, mat.media)
+                    .text(`Owned: ${owned}`, owned >= qty ? 'text-success' : 'text-danger')
+                    .build();
+                component.setTooltipContent(tooltipContent);
             }
             this.detailMaterials.appendChild(container);
         } else {

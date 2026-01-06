@@ -1,6 +1,6 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { formatRequirement, describeEffect } = await loadModule('src/core/adventuring-utils.mjs');
+const { formatRequirement, describeEffect, describeEffectFull } = await loadModule('src/core/adventuring-utils.mjs');
 
 /**
  * Tooltip builder utility - creates styled tooltips matching Melvor's style
@@ -113,9 +113,17 @@ export class TooltipBuilder {
     }
 
     /**
+     * Add an italic flavor text line (like tooltips in MMOs)
+     */
+    flavor(text) {
+        this.sections.push(`<div><small class="text-muted font-italic">${text}</small></div>`);
+        return this;
+    }
+
+    /**
      * Add a source hint with optional icon
      * Used to show where an item/monster/etc comes from
-     * @param {string} text - The source description (e.g., "Drops from: Goblin")
+     * @param {string} text - The source description (e.g., "Drops from: Golbin")
      * @param {string} [iconSrc] - Optional icon URL
      */
     source(text, iconSrc = null) {
@@ -168,7 +176,7 @@ export class TooltipBuilder {
     /**
      * Add a list of effects as bonus/penalty lines using describeEffect
      * @param {Array} effects - Array of effect objects {type, value, ...}
-     * @param {Object} [manager] - Optional manager for describeEffect
+     * @param {Object} [manager] - Optional manager for describeEffectFull
      * @param {boolean} [addSeparator=true] - Whether to add separator before effects
      */
     effects(effects, manager = null, addSeparator = true) {
@@ -176,7 +184,7 @@ export class TooltipBuilder {
         
         if(addSeparator) this.separator();
         effects.forEach(e => {
-            const description = describeEffect(e, manager);
+            const description = describeEffectFull(e, manager);
             // Negative values or penalty types get penalty styling
             const isPenalty = e.value < 0 || (e.type !== undefined && (e.type.includes('enemy_') || e.type.includes('_cost')));
             if(isPenalty) {
@@ -190,7 +198,7 @@ export class TooltipBuilder {
 
     /**
      * Add difficulty mode header and effects
-     * @param {Object} difficulty - Difficulty object with name, color, getTooltipEffects(), isEndless
+     * @param {Object} difficulty - Difficulty object with name, color, effects[], isEndless
      * @param {Object} [manager] - Optional manager for describeEffect
      */
     difficultyInfo(difficulty, manager = null) {
@@ -199,10 +207,12 @@ export class TooltipBuilder {
         this.separator();
         this.subheader(`${difficulty.name} Mode`, difficulty.color);
         
-        // Use the difficulty's tooltip effects method
-        const effects = difficulty.getTooltipEffects !== undefined ? difficulty.getTooltipEffects() : [];
+        // Use the difficulty's effects array directly
+        const effects = difficulty.effects || [];
         effects.forEach(e => {
-            const description = describeEffect(e, manager);
+            const description = describeEffectFull(e, manager);
+            // Skip empty descriptions (like 'remove' effects)
+            if(!description) return;
             const isPenalty = (e.type !== undefined && e.type.includes('enemy_')) || e.value < 0;
             if(isPenalty) {
                 this.penalty(description);
@@ -267,8 +277,9 @@ export class TooltipBuilder {
      * Calculates the correct level-relative XP values
      * @param {Object} manager - The adventuring manager
      * @param {Object} action - The mastery action
+     * @param {number} [levelCap] - Optional level cap to display as "Level X / Y"
      */
-    masteryProgressFor(manager, action) {
+    masteryProgressFor(manager, action, levelCap = null) {
         const totalXP = manager.getMasteryXP(action);
         const level = manager.getMasteryLevel(action);
         const currentLevelXP = exp.levelToXP(level);
@@ -276,6 +287,13 @@ export class TooltipBuilder {
         const xpInLevel = Math.floor(totalXP - currentLevelXP);
         const xpToNextLevel = nextLevelXP - currentLevelXP;
         const percent = level >= 99 ? 100 : Math.min(100, (xpInLevel / xpToNextLevel) * 100);
+        
+        if (levelCap !== null) {
+            // Show level with cap: "Level 1 / 10"
+            const levelText = `Level ${level} / ${levelCap}`;
+            this.sections.push(`<div class="text-center"><small class="text-info">${levelText}</small></div>`);
+        }
+        
         return this.masteryProgress(xpInLevel, xpToNextLevel, level, percent);
     }
 
@@ -475,12 +493,12 @@ export class TooltipBuilder {
      * @param {Object} manager - The adventuring manager
      * @returns {TooltipBuilder} This builder for chaining
      */
-    static forEquipment(item, manager) {
+    static forEquipment(item, manager, character = null) {
         const tooltip = TooltipBuilder.create()
             .header(item.name, item.media);
 
         if(item.unlocked) {
-            // Upgrade stars
+            // Upgrade stars - centered
             const empty = `<i class="far fa-star text-muted"></i>`;
             const solid = `<i class="fa fa-star text-warning"></i>`;
             const half = `<i class="fa fa-star-half-alt text-warning"></i>`;
@@ -490,18 +508,16 @@ export class TooltipBuilder {
             const emptyStarCount = ((item.maxUpgrades/2) - (starCount + halfStarCount));
             const stars = [...new Array(starCount).fill(solid), ...new Array(halfStarCount).fill(half), ...new Array(emptyStarCount).fill(empty)];
 
-            tooltip.text(stars.join(''), 'text-center');
+            tooltip.sections.push(`<div class="text-center">${stars.join('')}</div>`);
             
-            // Level info
+            // Level info - always show as Level X/Y
             if(item.upgradeLevel > 0) {
                 if(item.level < item.levelCap) {
                     tooltip.masteryProgressFor(manager, item);
-                    tooltip.hint(`Max Level: ${item.levelCap}`);
-                } else {
-                    tooltip.subheader(`Level ${item.level} / ${item.levelCap}`, 'text-warning');
                 }
+                tooltip.subheader(`Level ${item.level}/${item.levelCap}`, item.level >= item.levelCap ? 'text-warning' : '');
             } else {
-                tooltip.hint(`Max Level: ${item.levelCap} (unlock to level up)`);
+                tooltip.hint(`Level 1/${item.levelCap} (unlock to level up)`);
             }
 
             // Stats
@@ -514,8 +530,28 @@ export class TooltipBuilder {
             if(item.set) {
                 tooltip.separator();
                 tooltip.subheader(item.set.name, 'text-info');
+                // If character provided, use that character's count
+                // Otherwise find the character with the most pieces equipped (armory view)
+                let equippedCount = 0;
+                if(character) {
+                    equippedCount = item.set.countEquippedPieces(character);
+                } else if(manager.party && manager.party.all) {
+                    for(const member of manager.party.all) {
+                        const count = item.set.countEquippedPieces(member);
+                        if(count > equippedCount) {
+                            equippedCount = count;
+                        }
+                    }
+                }
                 item.set.bonuses.forEach(bonus => {
-                    tooltip.text(`<span class="text-muted">(${bonus.pieces}pc)</span> ${bonus.description}`, 'small');
+                    const isActive = equippedCount >= bonus.pieces;
+                    const cssClass = isActive ? 'text-success' : 'text-muted';
+                    // Generate description from effects if not provided
+                    let desc = bonus.description;
+                    if(!desc && bonus.effects) {
+                        desc = bonus.effects.map(e => describeEffect(e, manager)).join(', ');
+                    }
+                    tooltip.text(`<span class="${cssClass}">(${bonus.pieces})</span> <span class="${cssClass}">${desc || 'Set Bonus'}</span>`, 'small');
                 });
             }
             
@@ -635,25 +671,30 @@ export class TooltipBuilder {
      * @returns {TooltipBuilder} This builder for chaining
      */
     static forConsumable(consumable) {
-        const typeLabel = consumable.type ? (consumable.type.charAt(0).toUpperCase() + consumable.type.slice(1)) : 'Consumable';
         const tooltip = TooltipBuilder.create()
-            .header(consumable.name, consumable.media)
-            .subheader(typeLabel);
-        
-        // Show source job if defined
-        if (consumable.sourceJob) {
-            tooltip.hint(`Source: ${consumable.sourceJob.name}`);
-        }
+            .header(consumable.name, consumable.media);
         
         // Show description
         if (consumable.description) {
-            tooltip.separator().text(consumable.description, 'text-info');
+            tooltip.hint(consumable.description);
+        }
+        
+        // Show effects from tier 1 as representative
+        const effects = consumable.getTierEffects ? consumable.getTierEffects(1) : null;
+        if (effects && effects.length > 0) {
+            tooltip.effects(effects, consumable.manager);
+        }
+        
+        // Show flavor text if available
+        const flavorText = consumable.getTierFlavorText ? consumable.getTierFlavorText(1) : null;
+        if (flavorText) {
+            tooltip.separator().flavor(flavorText);
         }
         
         // Show total charges
         const totalCharges = consumable.totalCharges;
         if (totalCharges > 0) {
-            tooltip.separator().warning(`Charges: ${totalCharges}`);
+            tooltip.separator().warning(`${totalCharges} charge${totalCharges !== 1 ? 's' : ''}`);
         }
         
         return tooltip;
@@ -666,25 +707,34 @@ export class TooltipBuilder {
      * @returns {TooltipBuilder} This builder for chaining
      */
     static forConsumableTier(consumable, tier) {
-        const typeLabel = consumable.type ? (consumable.type.charAt(0).toUpperCase() + consumable.type.slice(1)) : 'Consumable';
         const tierName = consumable.getTierName(tier);
         const tierMedia = consumable.getTierMedia(tier);
-        const tierDesc = consumable.getTierDescription(tier);
         const charges = consumable.getCharges(tier);
         const materials = consumable.getTierMaterials(tier);
         
         const tooltip = TooltipBuilder.create()
-            .header(tierName, tierMedia)
-            .subheader(typeLabel);
+            .header(tierName, tierMedia);
         
-        // Show description
-        if (tierDesc) {
-            tooltip.hint(tierDesc);
+        // Show description if available
+        if (consumable.description) {
+            tooltip.hint(consumable.description);
+        }
+        
+        // Show effects for this tier
+        const effects = consumable.getTierEffects ? consumable.getTierEffects(tier) : null;
+        if (effects && effects.length > 0) {
+            tooltip.effects(effects, consumable.manager);
+        }
+        
+        // Show flavor text if available
+        const flavorText = consumable.getTierFlavorText ? consumable.getTierFlavorText(tier) : null;
+        if (flavorText) {
+            tooltip.separator().flavor(flavorText);
         }
         
         // Show charges
         if (charges > 0) {
-            tooltip.separator().warning(`Charges: ${charges}`);
+            tooltip.separator().warning(`${charges} charge${charges !== 1 ? 's' : ''}`);
         }
         
         if(materials !== undefined && materials.size > 0) {
@@ -709,8 +759,7 @@ export class TooltipBuilder {
      */
     static forTavernDrink(drink, chargesOrRuns = 0) {
         const tooltip = TooltipBuilder.create()
-            .header(drink.name, drink.media)
-            .subheader('Tavern Drink');
+            .header(drink.name, drink.media);
         
         if (drink.description) {
             tooltip.hint(drink.description);
@@ -719,8 +768,7 @@ export class TooltipBuilder {
         // Show effects from tier 1 as representative
         const effects = drink.getTierEffects ? drink.getTierEffects(1) : null;
         if (effects && effects.length > 0) {
-            tooltip.separator();
-            tooltip.effects(effects);
+            tooltip.effects(effects, drink.manager);
         }
         
         if (chargesOrRuns > 0) {

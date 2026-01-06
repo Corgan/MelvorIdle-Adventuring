@@ -115,9 +115,9 @@ export class AdventuringDungeonCell {
                 const desc = describeEffect(effect, this.manager);
                 // Color based on effect type
                 let colorClass = 'text-info';
-                if(effect.type === 'damage' || effect.type === 'damage_percent' || effect.type === 'debuff') {
+                if(effect.type === 'damage' || effect.type === 'damage_flat' || effect.type === 'damage_percent' || effect.type === 'debuff') {
                     colorClass = 'text-danger';
-                } else if(effect.type === 'heal' || effect.type === 'heal_percent' || effect.type === 'energy') {
+                } else if(effect.type === 'heal' || effect.type === 'heal_flat' || effect.type === 'heal_percent' || effect.type === 'energy') {
                     colorClass = 'text-success';
                 } else if(effect.type === 'loot') {
                     colorClass = 'text-warning';

@@ -107,11 +107,11 @@ class DungeonEffectCache {
         
         for(const effect of this.cachedEffects) {
             if(effect.type === 'enemy_stat_multiplier') {
-                this.enemyStatMultiplier *= effect.value;
+                this.enemyStatMultiplier *= effect.amount;
             } else if(effect.type === 'xp_multiplier') {
-                this.xpMultiplier *= effect.value;
+                this.xpMultiplier *= effect.amount;
             } else if(effect.type === 'loot_multiplier') {
-                this.lootMultiplier *= effect.value;
+                this.lootMultiplier *= effect.amount;
             }
         }
     }
@@ -237,30 +237,6 @@ class DungeonEffectCache {
         this.ensureValid();
         return this.effectsByTrigger.get(trigger) || [];
     }
-    
-    /**
-     * Get precompiled enemy spawn effects (ready to apply)
-     * @deprecated Use getEffectsForTrigger('enemy_spawn') instead
-     */
-    getEnemySpawnEffects() {
-        return this.getEffectsForTrigger('enemy_spawn');
-    }
-    
-    /**
-     * Get precompiled party start effects (ready to apply)
-     * @deprecated Use getEffectsForTrigger('dungeon_start') instead
-     */
-    getPartyStartEffects() {
-        return this.getEffectsForTrigger('dungeon_start');
-    }
-    
-    /**
-     * Get precompiled floor end effects (ready to apply)
-     * @deprecated Use getEffectsForTrigger('floor_end') instead
-     */
-    getFloorEndEffects() {
-        return this.getEffectsForTrigger('floor_end');
-    }
 }
 
 export class AdventuringDungeon extends AdventuringPage {
@@ -292,22 +268,6 @@ export class AdventuringDungeon extends AdventuringPage {
         
         // Effect cache for dungeon-level effects (difficulty, endless, party effects targeting enemies)
         this.effectCache = new DungeonEffectCache(this);
-    }
-
-    /**
-     * @deprecated Use manager.triggerEffects() instead - moved to Adventuring class
-     * Kept for backwards compatibility
-     */
-    triggerEffects(trigger, context = {}) {
-        return this.manager.triggerEffects(trigger, context);
-    }
-    
-    /**
-     * @deprecated Use manager.applyEffect() instead - moved to Adventuring class
-     * Kept for backwards compatibility
-     */
-    applyEffect(effect, context = {}) {
-        return this.manager.applyEffect(effect, effect.trigger || 'unknown', context);
     }
 
     get active() {
@@ -642,10 +602,8 @@ export class AdventuringDungeon extends AdventuringPage {
         this.floor.generate(this.area.height, this.area.width);
 
         // Use centralized trigger system for floor_start
+        // This handles both party-scoped and character-scoped effects
         this.manager.triggerEffects('floor_start', {});
-
-        // Apply consumable effects at floor start
-        this.manager.consumables.onFloorStart();
 
         this.updateFloorCards();
     }
@@ -680,15 +638,6 @@ export class AdventuringDungeon extends AdventuringPage {
         this.manager.tutorialManager.checkTriggers('event', { event: 'dungeonStart' });
     }
     
-    /**
-     * Apply difficulty effects at dungeon start
-     * @deprecated Use triggerEffects('dungeon_start') instead - kept for backwards compatibility
-     */
-    applyDifficultyEffects() {
-        // Now handled by centralized triggerEffects() method
-        // This method is kept for backwards compatibility but does nothing
-    }
-
     /**
      * Apply mastery auras from all dungeons that have reached level 99
      * These provide passive bonuses for the entire dungeon run

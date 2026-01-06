@@ -93,37 +93,34 @@ export class AdventuringEncounter extends AdventuringPage {
             });
         }
 
-        // Apply consumable effects at encounter start
-        this.manager.consumables.onEncounterStart();
-
-        // Apply job passives at encounter start
-        this.manager.party.all.forEach(member => {
-            this.applyJobPassives(member, 'encounter_start');
-        });
-
-        // Apply monster passives at encounter start
-        this.party.all.forEach(enemy => {
-            this.applyMonsterPassives(enemy, 'encounter_start');
-        });
-
+        // Reset effect limits for combat start (characters and party)
         this.all.forEach(member => {
-            let resolvedEffects = member.trigger('encounter_start');
+            member.resetEffectLimits('combat');
+            member.resetEffectLimits('round');
+            member.resetEffectLimits('turn');
         });
+        this.manager.party.resetEffectLimits('combat');
+        this.manager.party.resetEffectLimits('round');
+        this.manager.party.resetEffectLimits('turn');
 
-        // Also trigger round_start for the first round
-        this.manager.party.all.forEach(member => {
-            this.applyJobPassives(member, 'round_start');
+        // Job passives are now handled by hero's getAllPendingEffectsForTrigger()
+        // Monster passives are now handled by enemy's getAllPendingEffectsForTrigger()
+        // via the central trigger dispatcher
+
+        // Party-scoped effects fire first via party.trigger()
+        this.manager.party.trigger('encounter_start', { encounter: this });
+        
+        // Then character-scoped effects (includes monster passives for enemies)
+        this.all.forEach(member => {
+            let resolvedEffects = member.trigger('encounter_start', { encounter: this });
         });
 
         // Trigger tutorial for first combat
         this.manager.tutorialManager.checkTriggers('event', { event: 'combatStart' });
 
-        this.party.all.forEach(enemy => {
-            this.applyMonsterPassives(enemy, 'round_start');
-        });
-
+        // Also trigger round_start for the first round
         this.all.forEach(member => {
-            let resolvedEffects = member.trigger('round_start');
+            let resolvedEffects = member.trigger('round_start', { encounter: this });
         });
 
         this.nextTurn();
@@ -156,31 +153,40 @@ export class AdventuringEncounter extends AdventuringPage {
 
     nextRound() {
         this.all.forEach(member => {
-            let resolvedEffects = member.trigger('round_end');
+            let resolvedEffects = member.trigger('round_end', { encounter: this });
         });
 
         this.currentRoundOrder = this.nextRoundOrder;
         this.nextRoundOrder = [];
         this.roundCounter++;
         this.manager.overview.renderQueue.status = true;
-
-        // Apply job passives at round start
-        this.manager.party.all.forEach(member => {
-            this.applyJobPassives(member, 'round_start');
-        });
-
-        // Apply monster passives at round start
-        this.party.all.forEach(enemy => {
-            this.applyMonsterPassives(enemy, 'round_start');
-        });
-
+        
+        // Reset round-based effect limits (characters and party)
         this.all.forEach(member => {
-            let resolvedEffects = member.trigger('round_start');
+            member.resetEffectLimits('round');
+            member.resetEffectLimits('turn');
+        });
+        this.manager.party.resetEffectLimits('round');
+        this.manager.party.resetEffectLimits('turn');
+
+        // Job and monster passives are now handled by getAllPendingEffectsForTrigger()
+
+        // Party-scoped effects fire first via party.trigger()
+        this.manager.party.trigger('round_start', { encounter: this });
+        
+        // Then character-scoped effects (includes monster passives for enemies)
+        this.all.forEach(member => {
+            let resolvedEffects = member.trigger('round_start', { encounter: this });
         });
     }
 
     nextTurn() {
         this.currentTurn = this.currentRoundOrder.shift();
+        
+        // Reset turn-based effect limits for the active character
+        if (this.currentTurn) {
+            this.currentTurn.resetEffectLimits('turn');
+        }
         
         this.turnTimer.start(this.turnInterval);
         
@@ -268,14 +274,21 @@ export class AdventuringEncounter extends AdventuringPage {
      * @param {number} damageDealt - Amount of damage dealt
      * @param {Object} builtEffect - The built effect
      * @param {boolean} isCrit - Whether this was a critical hit
+     * @param {number} hpPercentBefore - Target's HP% before damage was applied
      */
-    _afterDamageDealt(target, damageDealt, builtEffect, isCrit) {
-        // Trigger on_crit if this was a critical hit
+    _afterDamageDealt(target, damageDealt, builtEffect, isCrit, hpPercentBefore = 100) {
+        // Trigger crit if this was a critical hit
         if(isCrit) {
-            this.currentTurn.trigger('on_crit', { target, damageDealt });
+            this.currentTurn.trigger('crit', { target, damageDealt, encounter: this });
         }
         
-        target.trigger('after_damage_received', { attacker: this.currentTurn, damageReceived: damageDealt, ...builtEffect });
+        target.trigger('after_damage_received', { 
+            attacker: this.currentTurn, 
+            damageReceived: damageDealt, 
+            hpPercentBefore,
+            encounter: this,
+            ...builtEffect 
+        });
         
         // Check execute threshold
         const executeThreshold = this.currentTurn.getPassiveBonus('execute');
@@ -294,11 +307,11 @@ export class AdventuringEncounter extends AdventuringPage {
         }
         
         // Trigger lifesteal with damage dealt
-        this.currentTurn.trigger('after_damage_delivered', { target, damageDealt, ...builtEffect });
+        this.currentTurn.trigger('after_damage_delivered', { target, damageDealt, encounter: this, ...builtEffect });
         
-        // Check if target died and trigger on_kill
+        // Check if target died and trigger kill
         if(target.dead) {
-            this.currentTurn.trigger('on_kill', { target, damageDealt });
+            this.currentTurn.trigger('kill', { target, damageDealt, encounter: this });
         }
     }
 
@@ -314,15 +327,9 @@ export class AdventuringEncounter extends AdventuringPage {
         this.hitRepeat = 0;
         this.hitHistory = [];
         
-        // Apply job passives at turn start (if current turn is a hero)
-        if(this.manager.party.all.includes(this.currentTurn)) {
-            this.applyJobPassives(this.currentTurn, 'turn_start');
-        } else {
-            // Apply monster passives at turn start
-            this.applyMonsterPassives(this.currentTurn, 'turn_start');
-        }
+        // Job and monster passives are now handled by getAllPendingEffectsForTrigger()
         
-        let resolvedEffects = this.currentTurn.trigger('turn_start', { skip: false });
+        let resolvedEffects = this.currentTurn.trigger('turn_start', { skip: false, encounter: this });
 
         if(this.currentTurn.dead || resolvedEffects.skip === true) {
             this.endTurn();
@@ -413,27 +420,30 @@ export class AdventuringEncounter extends AdventuringPage {
 
                         let isCrit = false;
                         
-                        if(effect.type === "damage") {
+                        if(effect.type === "damage" || effect.type === "damage_flat") {
                             builtEffect = this._processDamageEffect(effect, builtEffect, target);
                             if(!builtEffect) return; // Skipped (miss/dodge)
                             isCrit = builtEffect.isCrit;
-                        } else if(effect.type === "heal") {
+                        } else if(effect.type === "heal" || effect.type === "heal_flat") {
                             builtEffect = this._processHealEffect(effect, builtEffect, target);
                         }
 
                         // Track damage for lifesteal
-                        let damageDealt = effect.type === "damage" ? builtEffect.amount : 0;
+                        let damageDealt = (effect.type === "damage" || effect.type === "damage_flat") ? builtEffect.amount : 0;
 
-                        if(effect.type === "damage" || effect.type === "heal") {
+                        if(effect.type === "damage" || effect.type === "damage_flat" || effect.type === "heal" || effect.type === "heal_flat") {
                             const critText = isCrit ? ' (CRIT!)' : '';
                             this.manager.log.add(`${this.currentTurn.name} ${effect.type}s ${target.name} with ${this.currentAction.name} for ${builtEffect.amount}${critText}`);
                         }
                         
+                        // Capture HP percent before applying damage (for hp_crossed_below conditions)
+                        const hpPercentBefore = target.hitpointsPercent;
+                        
                         target.applyEffect(effect, builtEffect, this.currentTurn);
                         
-                        if(effect.type === "damage") {
-                            this._afterDamageDealt(target, damageDealt, builtEffect, isCrit);
-                        } else if(effect.type === "heal") {
+                        if(effect.type === "damage" || effect.type === "damage_flat") {
+                            this._afterDamageDealt(target, damageDealt, builtEffect, isCrit, hpPercentBefore);
+                        } else if(effect.type === "heal" || effect.type === "heal_flat") {
                             target.trigger('after_heal_received', { attacker: this.currentTurn, ...builtEffect });
                             this.currentTurn.trigger('after_heal_delivered', { target, ...builtEffect });
                         }
@@ -629,38 +639,6 @@ export class AdventuringEncounter extends AdventuringPage {
             this.manager.overview.cards.renderQueue.cards.add(card)
         });
         this.manager.overview.cards.renderQueue.update = true;
-    }
-
-    // Apply passives from character's combatJob and passiveJob
-    applyJobPassives(character, triggerType) {
-        // Get passives from combatJob (use cached lookup)
-        if(character.combatJob !== undefined) {
-            this.manager.getPassivesForJob(character.combatJob).forEach(passive => {
-                if(passive.canEquip(character)) {
-                    passive.apply(character, triggerType, this);
-                }
-            });
-        }
-        // Get passives from passiveJob (if it's a combat job with passives)
-        if(character.passiveJob !== undefined && character.passiveJob !== character.combatJob) {
-            this.manager.getPassivesForJob(character.passiveJob).forEach(passive => {
-                if(passive.canEquip(character)) {
-                    passive.apply(character, triggerType, this);
-                }
-            });
-        }
-    }
-
-    // Apply passives from monster's passive list
-    applyMonsterPassives(enemy, triggerType) {
-        if(!enemy.base || !enemy.base.passives) return;
-        
-        enemy.base.passives.forEach(passiveId => {
-            const passive = this.manager.passives.getObjectByID(passiveId);
-            if(passive) {
-                passive.apply(enemy, triggerType, this);
-            }
-        });
     }
 
     // Blue Mage (Slayer) ability learning

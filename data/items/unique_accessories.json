@@ -25,26 +25,26 @@
                                                                           "base":  [
                                                                                        {
                                                                                            "id":  "adventuring:hitpoints",
-                                                                                           "value":  12
+                                                                                           "amount":  12
                                                                                        },
                                                                                        {
                                                                                            "id":  "adventuring:strength",
-                                                                                           "value":  8
+                                                                                           "amount":  8
                                                                                        }
                                                                                    ],
                                                                           "scaling":  [
                                                                                           {
                                                                                               "id":  "adventuring:hitpoints",
-                                                                                              "value":  1.2
+                                                                                              "amount":  1.2
                                                                                           },
                                                                                           {
                                                                                               "id":  "adventuring:strength",
-                                                                                              "value":  0.8
+                                                                                              "amount":  0.8
                                                                                           }
                                                                                       ],
                                                                           "effects":  [
                                                                                           {
-                                                                                              "trigger":  "on_hit",
+                                                                                              "trigger": "hit",
                                                                                               "type":  "lifesteal",
                                                                                               "target":  "self",
                                                                                               "amount":  5,
@@ -76,31 +76,33 @@
                                                                           "base":  [
                                                                                        {
                                                                                            "id":  "adventuring:hitpoints",
-                                                                                           "value":  8
+                                                                                           "amount":  8
                                                                                        },
                                                                                        {
                                                                                            "id":  "adventuring:strength",
-                                                                                           "value":  15
+                                                                                           "amount":  15
                                                                                        }
                                                                                    ],
                                                                           "scaling":  [
                                                                                           {
                                                                                               "id":  "adventuring:hitpoints",
-                                                                                              "value":  0.8
+                                                                                              "amount":  0.8
                                                                                           },
                                                                                           {
                                                                                               "id":  "adventuring:strength",
-                                                                                              "value":  1.5
+                                                                                              "amount":  1.5
                                                                                           }
                                                                                       ],
                                                                           "effects":  [
                                                                                           {
-                                                                                              "trigger":  "on_low_health",
+                                                                                              "trigger": "after_damage_received",
+                                                                                              "condition": { "type": "hp_crossed_below", "threshold": 30 },
+                                                                                              "limit": "combat",
+                                                                                              "times": 1,
                                                                                               "type":  "buff",
                                                                                               "id":  "adventuring:berserk",
                                                                                               "target":  "self",
                                                                                               "amount":  25,
-                                                                                              "threshold":  30,
                                                                                               "stacks":  1
                                                                                           }
                                                                                       ],
@@ -129,26 +131,26 @@
                                                                           "base":  [
                                                                                        {
                                                                                            "id":  "adventuring:hitpoints",
-                                                                                           "value":  20
+                                                                                           "amount":  20
                                                                                        },
                                                                                        {
                                                                                            "id":  "adventuring:defence",
-                                                                                           "value":  12
+                                                                                           "amount":  12
                                                                                        }
                                                                                    ],
                                                                           "scaling":  [
                                                                                           {
                                                                                               "id":  "adventuring:hitpoints",
-                                                                                              "value":  2.0
+                                                                                              "amount":  2.0
                                                                                           },
                                                                                           {
                                                                                               "id":  "adventuring:defence",
-                                                                                              "value":  1.2
+                                                                                              "amount":  1.2
                                                                                           }
                                                                                       ],
                                                                           "effects":  [
                                                                                           {
-                                                                                              "trigger":  "on_ally_death",
+                                                                                              "trigger": "ally_death",
                                                                                               "type":  "buff",
                                                                                               "id":  "adventuring:barrier",
                                                                                               "target":  "self",
@@ -186,26 +188,26 @@
                                                                           "base":  [
                                                                                        {
                                                                                            "id":  "adventuring:hitpoints",
-                                                                                           "value":  25
+                                                                                           "amount":  25
                                                                                        },
                                                                                        {
                                                                                            "id":  "adventuring:prayer",
-                                                                                           "value":  10
+                                                                                           "amount":  10
                                                                                        }
                                                                                    ],
                                                                           "scaling":  [
                                                                                           {
                                                                                               "id":  "adventuring:hitpoints",
-                                                                                              "value":  2.5
+                                                                                              "amount":  2.5
                                                                                           },
                                                                                           {
                                                                                               "id":  "adventuring:prayer",
-                                                                                              "value":  1.0
+                                                                                              "amount":  1.0
                                                                                           }
                                                                                       ],
                                                                           "effects":  [
                                                                                           {
-                                                                                              "trigger":  "on_ally_death",
+                                                                                              "trigger": "ally_death",
                                                                                               "type":  "revive",
                                                                                               "target":  "dead",
                                                                                               "party":  "ally",
@@ -239,26 +241,26 @@
                                                                           "base":  [
                                                                                        {
                                                                                            "id":  "adventuring:hitpoints",
-                                                                                           "value":  10
+                                                                                           "amount":  10
                                                                                        },
                                                                                        {
                                                                                            "id":  "adventuring:magic",
-                                                                                           "value":  12
+                                                                                           "amount":  12
                                                                                        }
                                                                                    ],
                                                                           "scaling":  [
                                                                                           {
                                                                                               "id":  "adventuring:hitpoints",
-                                                                                              "value":  1.0
+                                                                                              "amount":  1.0
                                                                                           },
                                                                                           {
                                                                                               "id":  "adventuring:magic",
-                                                                                              "value":  1.2
+                                                                                              "amount":  1.2
                                                                                           }
                                                                                       ],
                                                                           "effects":  [
                                                                                           {
-                                                                                              "trigger":  "on_hit",
+                                                                                              "trigger": "hit",
                                                                                               "type":  "debuff",
                                                                                               "id":  "adventuring:poison",
                                                                                               "target":  "target",
@@ -293,34 +295,34 @@
                                                                           "base":  [
                                                                                        {
                                                                                            "id":  "adventuring:hitpoints",
-                                                                                           "value":  10
+                                                                                           "amount":  10
                                                                                        },
                                                                                        {
                                                                                            "id":  "adventuring:magic",
-                                                                                           "value":  10
+                                                                                           "amount":  10
                                                                                        },
                                                                                        {
                                                                                            "id":  "adventuring:agility",
-                                                                                           "value":  5
+                                                                                           "amount":  5
                                                                                        }
                                                                                    ],
                                                                           "scaling":  [
                                                                                           {
                                                                                               "id":  "adventuring:hitpoints",
-                                                                                              "value":  1.0
+                                                                                              "amount":  1.0
                                                                                           },
                                                                                           {
                                                                                               "id":  "adventuring:magic",
-                                                                                              "value":  1.0
+                                                                                              "amount":  1.0
                                                                                           },
                                                                                           {
                                                                                               "id":  "adventuring:agility",
-                                                                                              "value":  0.5
+                                                                                              "amount":  0.5
                                                                                           }
                                                                                       ],
                                                                           "effects":  [
                                                                                           {
-                                                                                              "trigger":  "on_hit",
+                                                                                              "trigger": "hit",
                                                                                               "type":  "debuff",
                                                                                               "id":  "adventuring:slow",
                                                                                               "target":  "target",
@@ -354,35 +356,35 @@
                                                                           "base":  [
                                                                                        {
                                                                                            "id":  "adventuring:hitpoints",
-                                                                                           "value":  8
+                                                                                           "amount":  8
                                                                                        },
                                                                                        {
                                                                                            "id":  "adventuring:magic",
-                                                                                           "value":  15
+                                                                                           "amount":  15
                                                                                        },
                                                                                        {
                                                                                            "id":  "adventuring:agility",
-                                                                                           "value":  8
+                                                                                           "amount":  8
                                                                                        }
                                                                                    ],
                                                                           "scaling":  [
                                                                                           {
                                                                                               "id":  "adventuring:hitpoints",
-                                                                                              "value":  0.8
+                                                                                              "amount":  0.8
                                                                                           },
                                                                                           {
                                                                                               "id":  "adventuring:magic",
-                                                                                              "value":  1.5
+                                                                                              "amount":  1.5
                                                                                           },
                                                                                           {
                                                                                               "id":  "adventuring:agility",
-                                                                                              "value":  0.8
+                                                                                              "amount":  0.8
                                                                                           }
                                                                                       ],
                                                                           "effects":  [
                                                                                           {
                                                                                               "trigger":  "round_start",
-                                                                                              "type":  "damage",
+                                                                                              "type": "damage_flat",
                                                                                               "target":  "random",
                                                                                               "party":  "enemy",
                                                                                               "amount":  10,
@@ -415,27 +417,27 @@
                                                                           "base":  [
                                                                                        {
                                                                                            "id":  "adventuring:hitpoints",
-                                                                                           "value":  25
+                                                                                           "amount":  25
                                                                                        },
                                                                                        {
                                                                                            "id":  "adventuring:prayer",
-                                                                                           "value":  8
+                                                                                           "amount":  8
                                                                                        }
                                                                                    ],
                                                                           "scaling":  [
                                                                                           {
                                                                                               "id":  "adventuring:hitpoints",
-                                                                                              "value":  2.5
+                                                                                              "amount":  2.5
                                                                                           },
                                                                                           {
                                                                                               "id":  "adventuring:prayer",
-                                                                                              "value":  0.8
+                                                                                              "amount":  0.8
                                                                                           }
                                                                                       ],
                                                                           "effects":  [
                                                                                           {
                                                                                               "trigger":  "round_start",
-                                                                                              "type":  "heal",
+                                                                                              "type": "heal_flat",
                                                                                               "target":  "self",
                                                                                               "amount":  3,
                                                                                               "scaling":  0.3,
@@ -467,35 +469,35 @@
                                                                           "base":  [
                                                                                        {
                                                                                            "id":  "adventuring:hitpoints",
-                                                                                           "value":  12
+                                                                                           "amount":  12
                                                                                        },
                                                                                        {
                                                                                            "id":  "adventuring:strength",
-                                                                                           "value":  18
+                                                                                           "amount":  18
                                                                                        },
                                                                                        {
                                                                                            "id":  "adventuring:agility",
-                                                                                           "value":  8
+                                                                                           "amount":  8
                                                                                        }
                                                                                    ],
                                                                           "scaling":  [
                                                                                           {
                                                                                               "id":  "adventuring:hitpoints",
-                                                                                              "value":  1.2
+                                                                                              "amount":  1.2
                                                                                           },
                                                                                           {
                                                                                               "id":  "adventuring:strength",
-                                                                                              "value":  1.8
+                                                                                              "amount":  1.8
                                                                                           },
                                                                                           {
                                                                                               "id":  "adventuring:agility",
-                                                                                              "value":  0.8
+                                                                                              "amount":  0.8
                                                                                           }
                                                                                       ],
                                                                           "effects":  [
                                                                                           {
-                                                                                              "trigger":  "on_hit",
-                                                                                              "type":  "damage",
+                                                                                              "trigger": "hit",
+                                                                                              "type": "damage_flat",
                                                                                               "target":  "target",
                                                                                               "amount":  15,
                                                                                               "scaling":  1.5,
@@ -532,21 +534,21 @@
                                                                           "base":  [
                                                                                        {
                                                                                            "id":  "adventuring:hitpoints",
-                                                                                           "value":  40
+                                                                                           "amount":  40
                                                                                        },
                                                                                        {
                                                                                            "id":  "adventuring:defence",
-                                                                                           "value":  15
+                                                                                           "amount":  15
                                                                                        }
                                                                                    ],
                                                                           "scaling":  [
                                                                                           {
                                                                                               "id":  "adventuring:hitpoints",
-                                                                                              "value":  4.0
+                                                                                              "amount":  4.0
                                                                                           },
                                                                                           {
                                                                                               "id":  "adventuring:defence",
-                                                                                              "value":  1.5
+                                                                                              "amount":  1.5
                                                                                           }
                                                                                       ],
                                                                           "effects":  [
@@ -582,21 +584,21 @@
                                                                           "base":  [
                                                                                        {
                                                                                            "id":  "adventuring:hitpoints",
-                                                                                           "value":  15
+                                                                                           "amount":  15
                                                                                        },
                                                                                        {
                                                                                            "id":  "adventuring:strength",
-                                                                                           "value":  18
+                                                                                           "amount":  18
                                                                                        }
                                                                                    ],
                                                                           "scaling":  [
                                                                                           {
                                                                                               "id":  "adventuring:hitpoints",
-                                                                                              "value":  1.5
+                                                                                              "amount":  1.5
                                                                                           },
                                                                                           {
                                                                                               "id":  "adventuring:strength",
-                                                                                              "value":  1.8
+                                                                                              "amount":  1.8
                                                                                           }
                                                                                       ],
                                                                           "effects":  [
@@ -635,27 +637,27 @@
                                                                           "base":  [
                                                                                        {
                                                                                            "id":  "adventuring:hitpoints",
-                                                                                           "value":  18
+                                                                                           "amount":  18
                                                                                        },
                                                                                        {
                                                                                            "id":  "adventuring:defence",
-                                                                                           "value":  18
+                                                                                           "amount":  18
                                                                                        }
                                                                                    ],
                                                                           "scaling":  [
                                                                                           {
                                                                                               "id":  "adventuring:hitpoints",
-                                                                                              "value":  1.8
+                                                                                              "amount":  1.8
                                                                                           },
                                                                                           {
                                                                                               "id":  "adventuring:defence",
-                                                                                              "value":  1.8
+                                                                                              "amount":  1.8
                                                                                           }
                                                                                       ],
                                                                           "effects":  [
                                                                                           {
                                                                                               "trigger":  "after_damage_received",
-                                                                                              "type":  "damage",
+                                                                                              "type": "damage_flat",
                                                                                               "target":  "attacker",
                                                                                               "amount":  10,
                                                                                               "percentDamage":  true
@@ -686,27 +688,27 @@
                                                                           "base":  [
                                                                                        {
                                                                                            "id":  "adventuring:hitpoints",
-                                                                                           "value":  20
+                                                                                           "amount":  20
                                                                                        },
                                                                                        {
                                                                                            "id":  "adventuring:strength",
-                                                                                           "value":  10
+                                                                                           "amount":  10
                                                                                        }
                                                                                    ],
                                                                           "scaling":  [
                                                                                           {
                                                                                               "id":  "adventuring:hitpoints",
-                                                                                              "value":  2.0
+                                                                                              "amount":  2.0
                                                                                           },
                                                                                           {
                                                                                               "id":  "adventuring:strength",
-                                                                                              "value":  1.0
+                                                                                              "amount":  1.0
                                                                                           }
                                                                                       ],
                                                                           "effects":  [
                                                                                           {
-                                                                                              "trigger":  "on_kill",
-                                                                                              "type":  "heal",
+                                                                                              "trigger": "kill",
+                                                                                              "type": "heal_flat",
                                                                                               "target":  "self",
                                                                                               "amount":  10,
                                                                                               "percentMax":  true
@@ -737,21 +739,21 @@
                                                                           "base":  [
                                                                                        {
                                                                                            "id":  "adventuring:hitpoints",
-                                                                                           "value":  12
+                                                                                           "amount":  12
                                                                                        },
                                                                                        {
                                                                                            "id":  "adventuring:agility",
-                                                                                           "value":  20
+                                                                                           "amount":  20
                                                                                        }
                                                                                    ],
                                                                           "scaling":  [
                                                                                           {
                                                                                               "id":  "adventuring:hitpoints",
-                                                                                              "value":  1.2
+                                                                                              "amount":  1.2
                                                                                           },
                                                                                           {
                                                                                               "id":  "adventuring:agility",
-                                                                                              "value":  2.0
+                                                                                              "amount":  2.0
                                                                                           }
                                                                                       ],
                                                                           "effects":  [
@@ -787,29 +789,29 @@
                                                                           "base":  [
                                                                                        {
                                                                                            "id":  "adventuring:hitpoints",
-                                                                                           "value":  22
+                                                                                           "amount":  22
                                                                                        },
                                                                                        {
                                                                                            "id":  "adventuring:defence",
-                                                                                           "value":  15
+                                                                                           "amount":  15
                                                                                        },
                                                                                        {
                                                                                            "id":  "adventuring:prayer",
-                                                                                           "value":  10
+                                                                                           "amount":  10
                                                                                        }
                                                                                    ],
                                                                           "scaling":  [
                                                                                           {
                                                                                               "id":  "adventuring:hitpoints",
-                                                                                              "value":  2.2
+                                                                                              "amount":  2.2
                                                                                           },
                                                                                           {
                                                                                               "id":  "adventuring:defence",
-                                                                                              "value":  1.5
+                                                                                              "amount":  1.5
                                                                                           },
                                                                                           {
                                                                                               "id":  "adventuring:prayer",
-                                                                                              "value":  1.0
+                                                                                              "amount":  1.0
                                                                                           }
                                                                                       ],
                                                                           "effects":  [
@@ -849,21 +851,21 @@
                                                                           "base":  [
                                                                                        {
                                                                                            "id":  "adventuring:hitpoints",
-                                                                                           "value":  18
+                                                                                           "amount":  18
                                                                                        },
                                                                                        {
                                                                                            "id":  "adventuring:prayer",
-                                                                                           "value":  15
+                                                                                           "amount":  15
                                                                                        }
                                                                                    ],
                                                                           "scaling":  [
                                                                                           {
                                                                                               "id":  "adventuring:hitpoints",
-                                                                                              "value":  1.8
+                                                                                              "amount":  1.8
                                                                                           },
                                                                                           {
                                                                                               "id":  "adventuring:prayer",
-                                                                                              "value":  1.5
+                                                                                              "amount":  1.5
                                                                                           }
                                                                                       ],
                                                                           "effects":  [
@@ -903,26 +905,26 @@
                                                                           "base":  [
                                                                                        {
                                                                                            "id":  "adventuring:hitpoints",
-                                                                                           "value":  15
+                                                                                           "amount":  15
                                                                                        },
                                                                                        {
                                                                                            "id":  "adventuring:strength",
-                                                                                           "value":  20
+                                                                                           "amount":  20
                                                                                        }
                                                                                    ],
                                                                           "scaling":  [
                                                                                           {
                                                                                               "id":  "adventuring:hitpoints",
-                                                                                              "value":  1.5
+                                                                                              "amount":  1.5
                                                                                           },
                                                                                           {
                                                                                               "id":  "adventuring:strength",
-                                                                                              "value":  2.0
+                                                                                              "amount":  2.0
                                                                                           }
                                                                                       ],
                                                                           "effects":  [
                                                                                           {
-                                                                                              "trigger":  "on_ally_death",
+                                                                                              "trigger": "ally_death",
                                                                                               "type":  "buff",
                                                                                               "id":  "adventuring:berserk",
                                                                                               "target":  "self",
@@ -956,36 +958,36 @@
                                                                           "base":  [
                                                                                        {
                                                                                            "id":  "adventuring:hitpoints",
-                                                                                           "value":  15
+                                                                                           "amount":  15
                                                                                        },
                                                                                        {
                                                                                            "id":  "adventuring:strength",
-                                                                                           "value":  12
+                                                                                           "amount":  12
                                                                                        },
                                                                                        {
                                                                                            "id":  "adventuring:magic",
-                                                                                           "value":  12
+                                                                                           "amount":  12
                                                                                        }
                                                                                    ],
                                                                           "scaling":  [
                                                                                           {
                                                                                               "id":  "adventuring:hitpoints",
-                                                                                              "value":  1.5
+                                                                                              "amount":  1.5
                                                                                           },
                                                                                           {
                                                                                               "id":  "adventuring:strength",
-                                                                                              "value":  1.2
+                                                                                              "amount":  1.2
                                                                                           },
                                                                                           {
                                                                                               "id":  "adventuring:magic",
-                                                                                              "value":  1.2
+                                                                                              "amount":  1.2
                                                                                           }
                                                                                       ],
                                                                           "effects":  [
                                                                                           {
                                                                                               "trigger":  "passive",
                                                                                               "type":  "damage_bonus",
-                                                                                              "value":  10
+                                                                                              "amount":  10
                                                                                           }
                                                                                       ],
                                                                           "requirements":  [
@@ -1013,21 +1015,21 @@
                                                                           "base":  [
                                                                                        {
                                                                                            "id":  "adventuring:hitpoints",
-                                                                                           "value":  15
+                                                                                           "amount":  15
                                                                                        },
                                                                                        {
                                                                                            "id":  "adventuring:agility",
-                                                                                           "value":  18
+                                                                                           "amount":  18
                                                                                        }
                                                                                    ],
                                                                           "scaling":  [
                                                                                           {
                                                                                               "id":  "adventuring:hitpoints",
-                                                                                              "value":  1.5
+                                                                                              "amount":  1.5
                                                                                           },
                                                                                           {
                                                                                               "id":  "adventuring:agility",
-                                                                                              "value":  1.8
+                                                                                              "amount":  1.8
                                                                                           }
                                                                                       ],
                                                                           "effects":  [
@@ -1065,27 +1067,27 @@
                                                                           "base":  [
                                                                                        {
                                                                                            "id":  "adventuring:hitpoints",
-                                                                                           "value":  18
+                                                                                           "amount":  18
                                                                                        },
                                                                                        {
                                                                                            "id":  "adventuring:defence",
-                                                                                           "value":  15
+                                                                                           "amount":  15
                                                                                        }
                                                                                    ],
                                                                           "scaling":  [
                                                                                           {
                                                                                               "id":  "adventuring:hitpoints",
-                                                                                              "value":  1.8
+                                                                                              "amount":  1.8
                                                                                           },
                                                                                           {
                                                                                               "id":  "adventuring:defence",
-                                                                                              "value":  1.5
+                                                                                              "amount":  1.5
                                                                                           }
                                                                                       ],
                                                                           "effects":  [
                                                                                           {
                                                                                               "trigger":  "after_damage_received",
-                                                                                              "type":  "damage",
+                                                                                              "type": "damage_flat",
                                                                                               "target":  "attacker",
                                                                                               "amount":  8,
                                                                                               "scaling":  0.8
@@ -1120,26 +1122,26 @@
                                                                           "base":  [
                                                                                        {
                                                                                            "id":  "adventuring:hitpoints",
-                                                                                           "value":  30
+                                                                                           "amount":  30
                                                                                        },
                                                                                        {
                                                                                            "id":  "adventuring:prayer",
-                                                                                           "value":  15
+                                                                                           "amount":  15
                                                                                        }
                                                                                    ],
                                                                           "scaling":  [
                                                                                           {
                                                                                               "id":  "adventuring:hitpoints",
-                                                                                              "value":  3.0
+                                                                                              "amount":  3.0
                                                                                           },
                                                                                           {
                                                                                               "id":  "adventuring:prayer",
-                                                                                              "value":  1.5
+                                                                                              "amount":  1.5
                                                                                           }
                                                                                       ],
                                                                           "effects":  [
                                                                                           {
-                                                                                              "trigger":  "on_death",
+                                                                                              "trigger":  "death",
                                                                                               "type":  "revive",
                                                                                               "target":  "self",
                                                                                               "amount":  50,
@@ -1172,29 +1174,29 @@
                                                                           "base":  [
                                                                                        {
                                                                                            "id":  "adventuring:hitpoints",
-                                                                                           "value":  20
+                                                                                           "amount":  20
                                                                                        },
                                                                                        {
                                                                                            "id":  "adventuring:strength",
-                                                                                           "value":  12
+                                                                                           "amount":  12
                                                                                        },
                                                                                        {
                                                                                            "id":  "adventuring:prayer",
-                                                                                           "value":  10
+                                                                                           "amount":  10
                                                                                        }
                                                                                    ],
                                                                           "scaling":  [
                                                                                           {
                                                                                               "id":  "adventuring:hitpoints",
-                                                                                              "value":  2.0
+                                                                                              "amount":  2.0
                                                                                           },
                                                                                           {
                                                                                               "id":  "adventuring:strength",
-                                                                                              "value":  1.2
+                                                                                              "amount":  1.2
                                                                                           },
                                                                                           {
                                                                                               "id":  "adventuring:prayer",
-                                                                                              "value":  1.0
+                                                                                              "amount":  1.0
                                                                                           }
                                                                                       ],
                                                                           "effects":  [
@@ -1233,21 +1235,21 @@
                                                                           "base":  [
                                                                                        {
                                                                                            "id":  "adventuring:hitpoints",
-                                                                                           "value":  20
+                                                                                           "amount":  20
                                                                                        },
                                                                                        {
                                                                                            "id":  "adventuring:strength",
-                                                                                           "value":  12
+                                                                                           "amount":  12
                                                                                        }
                                                                                    ],
                                                                           "scaling":  [
                                                                                           {
                                                                                               "id":  "adventuring:hitpoints",
-                                                                                              "value":  2.0
+                                                                                              "amount":  2.0
                                                                                           },
                                                                                           {
                                                                                               "id":  "adventuring:strength",
-                                                                                              "value":  1.2
+                                                                                              "amount":  1.2
                                                                                           }
                                                                                       ],
                                                                           "effects":  [
@@ -1282,30 +1284,32 @@
                                                                           "base":  [
                                                                                        {
                                                                                            "id":  "adventuring:hitpoints",
-                                                                                           "value":  25
+                                                                                           "amount":  25
                                                                                        },
                                                                                        {
                                                                                            "id":  "adventuring:defence",
-                                                                                           "value":  18
+                                                                                           "amount":  18
                                                                                        }
                                                                                    ],
                                                                           "scaling":  [
                                                                                           {
                                                                                               "id":  "adventuring:hitpoints",
-                                                                                              "value":  2.5
+                                                                                              "amount":  2.5
                                                                                           },
                                                                                           {
                                                                                               "id":  "adventuring:defence",
-                                                                                              "value":  1.8
+                                                                                              "amount":  1.8
                                                                                           }
                                                                                       ],
                                                                           "effects":  [
                                                                                           {
-                                                                                              "trigger":  "on_low_health",
+                                                                                              "trigger": "after_damage_received",
+                                                                                              "condition": { "type": "hp_crossed_below", "threshold": 35 },
+                                                                                              "limit": "combat",
+                                                                                              "times": 1,
                                                                                               "type":  "buff",
                                                                                               "id":  "adventuring:fortify",
                                                                                               "target":  "self",
-                                                                                              "threshold":  35,
                                                                                               "amount":  25,
                                                                                               "stacks":  1
                                                                                           }
@@ -1335,21 +1339,21 @@
                                                                           "base":  [
                                                                                        {
                                                                                            "id":  "adventuring:hitpoints",
-                                                                                           "value":  15
+                                                                                           "amount":  15
                                                                                        },
                                                                                        {
                                                                                            "id":  "adventuring:agility",
-                                                                                           "value":  22
+                                                                                           "amount":  22
                                                                                        }
                                                                                    ],
                                                                           "scaling":  [
                                                                                           {
                                                                                               "id":  "adventuring:hitpoints",
-                                                                                              "value":  1.5
+                                                                                              "amount":  1.5
                                                                                           },
                                                                                           {
                                                                                               "id":  "adventuring:agility",
-                                                                                              "value":  2.2
+                                                                                              "amount":  2.2
                                                                                           }
                                                                                       ],
                                                                           "effects":  [
@@ -1384,26 +1388,26 @@
                                                                           "base":  [
                                                                                        {
                                                                                            "id":  "adventuring:hitpoints",
-                                                                                           "value":  18
+                                                                                           "amount":  18
                                                                                        },
                                                                                        {
                                                                                            "id":  "adventuring:strength",
-                                                                                           "value":  18
+                                                                                           "amount":  18
                                                                                        }
                                                                                    ],
                                                                           "scaling":  [
                                                                                           {
                                                                                               "id":  "adventuring:hitpoints",
-                                                                                              "value":  1.8
+                                                                                              "amount":  1.8
                                                                                           },
                                                                                           {
                                                                                               "id":  "adventuring:strength",
-                                                                                              "value":  1.8
+                                                                                              "amount":  1.8
                                                                                           }
                                                                                       ],
                                                                           "effects":  [
                                                                                           {
-                                                                                              "trigger":  "on_kill",
+                                                                                              "trigger": "kill",
                                                                                               "type":  "buff",
                                                                                               "id":  "adventuring:bloodlust",
                                                                                               "target":  "self",
@@ -1437,21 +1441,21 @@
                                                                           "base":  [
                                                                                        {
                                                                                            "id":  "adventuring:hitpoints",
-                                                                                           "value":  20
+                                                                                           "amount":  20
                                                                                        },
                                                                                        {
                                                                                            "id":  "adventuring:prayer",
-                                                                                           "value":  18
+                                                                                           "amount":  18
                                                                                        }
                                                                                    ],
                                                                           "scaling":  [
                                                                                           {
                                                                                               "id":  "adventuring:hitpoints",
-                                                                                              "value":  2.0
+                                                                                              "amount":  2.0
                                                                                           },
                                                                                           {
                                                                                               "id":  "adventuring:prayer",
-                                                                                              "value":  1.8
+                                                                                              "amount":  1.8
                                                                                           }
                                                                                       ],
                                                                           "effects":  [
@@ -1469,8 +1473,8 @@
                                                                                            ]
                                                                       },
                                                                       {
-                                                                          "id":  "goblin_kings_crown",
-                                                                          "name":  "Goblin King\u0027s Crown",
+                                                                          "id": "golbin_kings_crown",
+                                                                          "name": "Golbin King\u0027s Crown",
                                                                           "media":  "melvor:assets/media/bank/crown_of_rhaelyx.png#shade=gold",
                                                                           "type":  "adventuring:helm",
                                                                           "materials":  [
@@ -1486,29 +1490,29 @@
                                                                           "base":  [
                                                                                        {
                                                                                            "id":  "adventuring:strength",
-                                                                                           "value":  10
+                                                                                           "amount":  10
                                                                                        },
                                                                                        {
                                                                                            "id":  "adventuring:agility",
-                                                                                           "value":  8
+                                                                                           "amount":  8
                                                                                        },
                                                                                        {
                                                                                            "id":  "adventuring:hitpoints",
-                                                                                           "value":  12
+                                                                                           "amount":  12
                                                                                        }
                                                                                    ],
                                                                           "scaling":  [
                                                                                           {
                                                                                               "id":  "adventuring:strength",
-                                                                                              "value":  1.0
+                                                                                              "amount":  1.0
                                                                                           },
                                                                                           {
                                                                                               "id":  "adventuring:agility",
-                                                                                              "value":  0.8
+                                                                                              "amount":  0.8
                                                                                           },
                                                                                           {
                                                                                               "id":  "adventuring:hitpoints",
-                                                                                              "value":  1.2
+                                                                                              "amount":  1.2
                                                                                           }
                                                                                       ],
                                                                           "effects":  [
@@ -1516,14 +1520,14 @@
                                                                                               "trigger":  "encounter_start",
                                                                                               "type":  "buff",
                                                                                               "target":  "self",
-                                                                                              "buff":  "adventuring:might",
+                                                                                              "id": "adventuring:might",
                                                                                               "stacks":  3
                                                                                           },
                                                                                           {
                                                                                               "trigger":  "encounter_start",
                                                                                               "type":  "buff",
                                                                                               "target":  "self",
-                                                                                              "buff":  "adventuring:haste",
+                                                                                              "id": "adventuring:haste",
                                                                                               "stacks":  2
                                                                                           }
                                                                                       ],
@@ -1552,38 +1556,38 @@
                                                                           "base":  [
                                                                                        {
                                                                                            "id":  "adventuring:strength",
-                                                                                           "value":  8
+                                                                                           "amount":  8
                                                                                        },
                                                                                        {
                                                                                            "id":  "adventuring:magic",
-                                                                                           "value":  8
+                                                                                           "amount":  8
                                                                                        },
                                                                                        {
                                                                                            "id":  "adventuring:hitpoints",
-                                                                                           "value":  15
+                                                                                           "amount":  15
                                                                                        }
                                                                                    ],
                                                                           "scaling":  [
                                                                                           {
                                                                                               "id":  "adventuring:strength",
-                                                                                              "value":  0.8
+                                                                                              "amount":  0.8
                                                                                           },
                                                                                           {
                                                                                               "id":  "adventuring:magic",
-                                                                                              "value":  0.8
+                                                                                              "amount":  0.8
                                                                                           },
                                                                                           {
                                                                                               "id":  "adventuring:hitpoints",
-                                                                                              "value":  1.5
+                                                                                              "amount":  1.5
                                                                                           }
                                                                                       ],
                                                                           "effects":  [
                                                                                           {
-                                                                                              "trigger":  "on_kill",
+                                                                                              "trigger": "kill",
                                                                                               "type":  "debuff",
                                                                                               "target":  "all",
                                                                                               "party":  "enemy",
-                                                                                              "debuff":  "adventuring:curse",
+                                                                                              "id": "adventuring:curse",
                                                                                               "stacks":  2
                                                                                           }
                                                                                       ],
@@ -1624,21 +1628,21 @@
                                                                           "base":  [
                                                                                        {
                                                                                            "id":  "adventuring:magic",
-                                                                                           "value":  25
+                                                                                           "amount":  25
                                                                                        },
                                                                                        {
                                                                                            "id":  "adventuring:hitpoints",
-                                                                                           "value":  30
+                                                                                           "amount":  30
                                                                                        }
                                                                                    ],
                                                                           "scaling":  [
                                                                                           {
                                                                                               "id":  "adventuring:magic",
-                                                                                              "value":  2.5
+                                                                                              "amount":  2.5
                                                                                           },
                                                                                           {
                                                                                               "id":  "adventuring:hitpoints",
-                                                                                              "value":  3.0
+                                                                                              "amount":  3.0
                                                                                           }
                                                                                       ],
                                                                           "effects":  [
@@ -1646,34 +1650,34 @@
                                                                                               "trigger":  "passive",
                                                                                               "type":  "damage_bonus",
                                                                                               "element":  "fire",
-                                                                                              "value":  0.25
+                                                                                              "amount":  0.25
                                                                                           },
                                                                                           {
                                                                                               "trigger":  "passive",
                                                                                               "type":  "damage_bonus",
                                                                                               "element":  "ice",
-                                                                                              "value":  0.25
+                                                                                              "amount":  0.25
                                                                                           },
                                                                                           {
                                                                                               "trigger":  "passive",
                                                                                               "type":  "damage_bonus",
                                                                                               "element":  "lightning",
-                                                                                              "value":  0.25
+                                                                                              "amount":  0.25
                                                                                           },
                                                                                           {
                                                                                               "trigger":  "passive",
                                                                                               "type":  "immunity",
-                                                                                              "debuff":  "adventuring:burn"
+                                                                                              "id": "adventuring:burn"
                                                                                           },
                                                                                           {
                                                                                               "trigger":  "passive",
                                                                                               "type":  "immunity",
-                                                                                              "debuff":  "adventuring:chill"
+                                                                                              "id": "adventuring:chill"
                                                                                           },
                                                                                           {
                                                                                               "trigger":  "passive",
                                                                                               "type":  "immunity",
-                                                                                              "debuff":  "adventuring:shock"
+                                                                                              "id": "adventuring:shock"
                                                                                           }
                                                                                       ],
                                                                           "requirements":  [

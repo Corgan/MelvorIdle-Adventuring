@@ -302,9 +302,18 @@ export class AdventuringArmory extends AdventuringPage {
 
     upgrade(item) {
         if(item.upgradeable) {
+            // Deduct base materials
             for(let material of item.materials.keys()) {
                 this.manager.stash.remove(material, item.getCost(material));
             }
+            
+            // Deduct tiered upgrade materials (higher upgrade levels need later-game materials)
+            const tieredMats = item.getUpgradeTierMaterials();
+            for (const material of tieredMats) {
+                const cost = item.getUpgradeTierCost(material);
+                this.manager.stash.remove(material, cost);
+            }
+            
             this.upgradeLevels.set(item, this.upgradeLevels.get(item) + 1);
             item.renderQueue.updateAll();
             if(item.currentSlot !== undefined)
