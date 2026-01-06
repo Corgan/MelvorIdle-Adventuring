@@ -2,242 +2,12 @@ const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringPage } = await loadModule('src/ui/adventuring-page.mjs');
 
-const { AdventuringWeightedTable, createEffect } = await loadModule('src/core/adventuring-utils.mjs');
+const { AdventuringWeightedTable, createEffect, EffectCache } = await loadModule('src/core/adventuring-utils.mjs');
 
 const { AdventuringCard } = await loadModule('src/progression/adventuring-card.mjs');
 const { AdventuringDungeonFloor } = await loadModule('src/dungeon/adventuring-dungeon-floor.mjs');
 
 const { AdventuringDungeonElement } = await loadModule('src/dungeon/components/adventuring-dungeon.mjs');
-
-/**
- * DungeonEffectCache - Caches and precompiles dungeon-level effects
- * 
- * Sources:
- * - Difficulty effects (stat/xp/loot multipliers, enemy buffs/debuffs, party buffs)
- * - Endless mode scaling
- * - Party effects that target enemies (future)
- * 
- * Precompiled values for fast runtime access:
- * - enemyStatMultiplier
- * - xpMultiplier  
- * - lootMultiplier
- * - enemySpawnEffects (debuffs/buffs to apply to enemies)
- * - partyStartEffects (buffs to apply to party at dungeon start)
- */
-class DungeonEffectCache {
-    constructor(dungeon) {
-        this.dungeon = dungeon;
-        this.dirty = true;
-        
-        // Raw effect arrays
-        this.cachedEffects = [];
-        
-        // Precompiled multipliers (computed once per cache rebuild)
-        this.enemyStatMultiplier = 1.0;
-        this.xpMultiplier = 1.0;
-        this.lootMultiplier = 1.0;
-        
-        // Precompiled effect lists by trigger type (Map for centralized access)
-        this.effectsByTrigger = new Map();
-    }
-    
-    /**
-     * Mark cache as dirty - will rebuild on next access
-     */
-    invalidate() {
-        this.dirty = true;
-    }
-    
-    /**
-     * Rebuild the cache from all sources
-     */
-    rebuild() {
-        this.cachedEffects = [];
-        
-        // 1. Gather difficulty effects
-        const difficulty = this.dungeon.area !== undefined ? this.dungeon.area.getDifficulty() : undefined;
-        if(difficulty) {
-            this.cachedEffects.push(...difficulty.getEffects());
-        }
-        
-        // 2. Gather endless mode effects
-        if(this.dungeon.isEndless && this.dungeon.endlessWave > 0) {
-            const statMult = this.dungeon.getEndlessStatMultiplier();
-            const rewardMult = this.dungeon.getEndlessRewardMultiplier();
-            
-            this.cachedEffects.push(createEffect({
-                trigger: 'passive',
-                type: 'stat_multiplier',
-                value: statMult
-            }, this.dungeon, `Endless Wave ${this.dungeon.endlessWave + 1}`));
-            
-            this.cachedEffects.push(createEffect({
-                trigger: 'passive',
-                type: 'xp_modifier_percent',
-                value: rewardMult
-            }, this.dungeon, `Endless Wave ${this.dungeon.endlessWave + 1}`));
-            
-            this.cachedEffects.push(createEffect({
-                trigger: 'passive',
-                type: 'loot_modifier_percent',
-                value: rewardMult
-            }, this.dungeon, `Endless Wave ${this.dungeon.endlessWave + 1}`));
-        }
-        
-        // 3. Gather party effects that target enemies
-        // e.g., equipment with "enemies take 5% more damage"
-        this.gatherPartyEnemyEffects();
-        
-        // Precompile multipliers (multiply all sources together)
-        this.precompileMultipliers();
-        
-        // Precompile effect lists by trigger
-        this.precompileEffectLists();
-        
-        this.dirty = false;
-    }
-    
-    /**
-     * Precompile multipliers from effects
-     */
-    precompileMultipliers() {
-        this.enemyStatMultiplier = 1.0;
-        this.xpMultiplier = 1.0;
-        this.lootMultiplier = 1.0;
-        
-        for(const effect of this.cachedEffects) {
-            if(effect.type === 'stat_multiplier') {
-                this.enemyStatMultiplier *= effect.amount;
-            } else if(effect.type === 'xp_modifier_percent') {
-                this.xpMultiplier *= effect.amount;
-            } else if(effect.type === 'loot_modifier_percent') {
-                this.lootMultiplier *= effect.amount;
-            }
-        }
-    }
-    
-    /**
-     * Precompile effect lists by trigger for fast application
-     * All effects are stored in a Map keyed by trigger type
-     */
-    precompileEffectLists() {
-        this.effectsByTrigger = new Map();
-        
-        for(const effect of this.cachedEffects) {
-            const trigger = effect.trigger;
-            if(!trigger || trigger === 'passive') continue; // Skip passive effects (handled by multipliers)
-            
-            if(!this.effectsByTrigger.has(trigger)) {
-                this.effectsByTrigger.set(trigger, []);
-            }
-            this.effectsByTrigger.get(trigger).push(effect);
-        }
-    }
-    
-    /**
-     * Gather effects from party members that target enemies.
-     * These include equipment and consumable effects with target: all_enemies, etc.
-     */
-    gatherPartyEnemyEffects() {
-        const manager = this.dungeon.manager;
-        if(manager === undefined || manager.party === undefined) return;
-        
-        // Collect effects from all party members
-        for(const hero of manager.party.all) {
-            const allEffects = hero.getAllEffects();
-            
-            for(const effect of allEffects) {
-                // Check if this effect targets enemies
-                const target = effect.target;
-                if(!target) continue;
-                
-                const isEnemyTarget = target === 'all_enemies' || 
-                                      target === 'random_enemy' ||
-                                      target === 'front_enemy' ||
-                                      target === 'back_enemy' ||
-                                      target === 'lowest_enemy';
-                
-                if(!isEnemyTarget) continue;
-                
-                // Add to cached effects for later application
-                this.cachedEffects.push(effect);
-            }
-        }
-        
-        // Also gather from consumables
-        if(manager.consumables) {
-            const consumableEffects = manager.consumables.getEffects();
-            for(const effect of consumableEffects) {
-                const target = effect.target;
-                if(!target) continue;
-                
-                const isEnemyTarget = target === 'all_enemies' || 
-                                      target === 'random_enemy' ||
-                                      target === 'front_enemy' ||
-                                      target === 'back_enemy' ||
-                                      target === 'lowest_enemy';
-                
-                if(!isEnemyTarget) continue;
-                
-                this.cachedEffects.push(effect);
-            }
-        }
-    }
-    
-    /**
-     * Ensure cache is valid before access
-     */
-    ensureValid() {
-        if(this.dirty) {
-            this.rebuild();
-        }
-    }
-    
-    /**
-     * Get all cached effects, optionally filtered by trigger
-     */
-    getEffects(trigger) {
-        this.ensureValid();
-        if(trigger) {
-            return this.cachedEffects.filter(e => e.trigger === trigger);
-        }
-        return this.cachedEffects;
-    }
-    
-    /**
-     * Get precompiled enemy stat multiplier
-     */
-    getEnemyStatMultiplier() {
-        this.ensureValid();
-        return this.enemyStatMultiplier;
-    }
-    
-    /**
-     * Get precompiled XP multiplier
-     */
-    getXPMultiplier() {
-        this.ensureValid();
-        return this.xpMultiplier;
-    }
-    
-    /**
-     * Get precompiled loot multiplier
-     */
-    getLootMultiplier() {
-        this.ensureValid();
-        return this.lootMultiplier;
-    }
-    
-    /**
-     * Get precompiled effects for a specific trigger type
-     * @param {string} trigger - The trigger type (e.g., 'floor_end', 'enemy_spawn', 'dungeon_start')
-     * @returns {Array} Array of effects for that trigger, or empty array if none
-     */
-    getEffectsForTrigger(trigger) {
-        this.ensureValid();
-        return this.effectsByTrigger.get(trigger) || [];
-    }
-}
 
 export class AdventuringDungeon extends AdventuringPage {
     constructor(manager, game) {
@@ -267,7 +37,94 @@ export class AdventuringDungeon extends AdventuringPage {
         this.endlessWave = 0;
         
         // Effect cache for dungeon-level effects (difficulty, endless, party effects targeting enemies)
-        this.effectCache = new DungeonEffectCache(this);
+        this.effectCache = new EffectCache();
+        this._setupEffectSources();
+    }
+    
+    /**
+     * Set up effect sources for the dungeon effect cache
+     */
+    _setupEffectSources() {
+        // Difficulty effects (stat/xp/loot bonuses, floor_end heals, enemy_spawn buffs)
+        this.effectCache.registerSource('difficulty', () => {
+            if(this.area === undefined) return [];
+            const difficulty = this.area.getDifficulty();
+            return difficulty ? difficulty.getEffects() : [];
+        });
+        
+        // Endless mode wave scaling (additive percentages)
+        this.effectCache.registerSource('endless', () => {
+            if(!this.isEndless || this.endlessWave === 0) return [];
+            
+            const scaling = this.waveScaling;
+            if(!scaling) return [];
+            
+            const statPercent = (scaling.statPercentPerWave ?? 5) * this.endlessWave;
+            const rewardPercent = (scaling.rewardPercentPerWave ?? 2) * this.endlessWave;
+            const source = `Endless Wave ${this.endlessWave + 1}`;
+            
+            return [
+                createEffect({ trigger: 'passive', type: 'enemy_stats_percent', value: statPercent }, this, source),
+                createEffect({ trigger: 'passive', type: 'xp_percent', value: rewardPercent }, this, source),
+                createEffect({ trigger: 'passive', type: 'loot_percent', value: rewardPercent }, this, source)
+            ];
+        });
+        
+        // Party effects that target enemies (future: equipment with "enemies take 5% more damage")
+        this.effectCache.registerSource('party_enemy_effects', () => {
+            return this._gatherPartyEnemyEffects();
+        });
+    }
+    
+    /**
+     * Gather effects from party members that target enemies
+     */
+    _gatherPartyEnemyEffects() {
+        const effects = [];
+        if(this.manager === undefined || this.manager.party === undefined) return effects;
+        
+        const isEnemyTarget = (target) => 
+            target === 'all_enemies' || target === 'random_enemy' ||
+            target === 'front_enemy' || target === 'back_enemy' || target === 'lowest_enemy';
+        
+        // Collect from all party members
+        for(const hero of this.manager.party.all) {
+            const allEffects = hero.getAllEffects();
+            for(const effect of allEffects) {
+                if(effect.target && isEnemyTarget(effect.target)) {
+                    effects.push(effect);
+                }
+            }
+        }
+        
+        // Collect from consumables
+        if(this.manager.consumables) {
+            for(const effect of this.manager.consumables.getEffects()) {
+                if(effect.target && isEnemyTarget(effect.target)) {
+                    effects.push(effect);
+                }
+            }
+        }
+        
+        return effects;
+    }
+    
+    /**
+     * Get bonus value for a passive effect type (additive stacking)
+     * @param {string} effectType - Effect type (e.g., 'enemy_stats_percent', 'xp_percent')
+     * @returns {number} Total bonus percentage
+     */
+    getBonus(effectType) {
+        return this.effectCache.getBonus(effectType);
+    }
+    
+    /**
+     * Get effects for a specific trigger
+     * @param {string} trigger - Trigger type (e.g., 'floor_end', 'enemy_spawn')
+     * @returns {Array} Effects for that trigger
+     */
+    getEffectsForTrigger(trigger) {
+        return this.effectCache.getEffects(trigger);
     }
 
     get active() {
@@ -312,28 +169,6 @@ export class AdventuringDungeon extends AdventuringPage {
         const difficulty = this.area.getDifficulty();
         if (difficulty === undefined) return null;
         return difficulty.waveScaling !== undefined ? difficulty.waveScaling : null;
-    }
-
-    /**
-     * Get stat multiplier for wave-scaling difficulties based on current wave
-     * Uses waveScaling.statPercentPerWave (whole percent, e.g., 5 = +5% per wave)
-     */
-    getEndlessStatMultiplier() {
-        const scaling = this.waveScaling;
-        if(!scaling) return 1.0;
-        const perWave = (scaling.statPercentPerWave !== undefined ? scaling.statPercentPerWave : 5) / 100;
-        return 1.0 + (this.endlessWave * perWave);
-    }
-
-    /**
-     * Get XP/loot multiplier for wave-scaling difficulties based on current wave
-     * Uses waveScaling.rewardPercentPerWave (whole percent, e.g., 2 = +2% per wave)
-     */
-    getEndlessRewardMultiplier() {
-        const scaling = this.waveScaling;
-        if(!scaling) return 1.0;
-        const perWave = (scaling.rewardPercentPerWave !== undefined ? scaling.rewardPercentPerWave : 2) / 100;
-        return 1.0 + (this.endlessWave * perWave);
     }
 
     /**
@@ -541,7 +376,7 @@ export class AdventuringDungeon extends AdventuringPage {
             this.groupGenerator.loadTable(this.currentFloor.monsters);
         
         // Invalidate effect cache when area changes (new difficulty)
-        this.effectCache.invalidate();
+        this.effectCache.invalidateAll();
     }
 
     updateFloorCards() {
@@ -552,8 +387,8 @@ export class AdventuringDungeon extends AdventuringPage {
             if(this.floorCards[0] === undefined)
                 this.floorCards[0] = new AdventuringCard(this.manager, this.game);
             
-            const statMult = Math.round(this.getEndlessStatMultiplier() * 100);
-            this.floorCards[0].name = `Wave ${this.endlessWave + 1} (${statMult}%)`;
+            const statBonus = 100 + this.getBonus('enemy_stats_percent');
+            this.floorCards[0].name = `Wave ${this.endlessWave + 1} (${statBonus}%)`;
             this.floorCards[0].renderQueue.name = true;
             this.floorCards[0].icon = cdnMedia('assets/media/main/hardcore.svg');
             this.floorCards[0].renderQueue.icon = true;
@@ -613,7 +448,7 @@ export class AdventuringDungeon extends AdventuringPage {
         this.endlessWave = 0;
         
         // Invalidate and rebuild effect cache for the new run
-        this.effectCache.invalidate();
+        this.effectCache.invalidateAll();
         
         this.tileCount.clear();
         this.manager.tiles.allObjects.forEach(tile => {
@@ -664,7 +499,7 @@ export class AdventuringDungeon extends AdventuringPage {
         this.endlessWave = 0;
         
         // Invalidate effect cache on reset
-        this.effectCache.invalidate();
+        this.effectCache.invalidateAll();
         
         this.manager.overview.renderQueue.turnProgressBar = true;
         this.manager.overview.renderQueue.status = true;
@@ -732,7 +567,7 @@ export class AdventuringDungeon extends AdventuringPage {
                 this.manager.log.add(`Endless Wave ${this.endlessWave + 1} starting...`);
                 
                 // Invalidate effect cache for new wave scaling
-                this.effectCache.invalidate();
+                this.effectCache.invalidateAll();
                 
                 // Update best streak if this is a new record
                 this.area.updateBestEndlessStreak(this.endlessWave);

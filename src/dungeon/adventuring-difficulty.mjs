@@ -5,9 +5,10 @@ const { getAuraName, UNKNOWN_MEDIA, describeEffectsInline } = await loadModule('
 
 /**
  * Effect types for difficulties:
- * - stat_multiplier: Multiplies enemy stats by amount (1.5 = 150%)
- * - xp_modifier_percent: Multiplies XP gained by amount
- * - loot_modifier_percent: Multiplies loot quantity by amount
+ * - enemy_stats_percent: +X% to enemy stats (additive)
+ * - xp_percent: +X% to XP gained (additive)
+ * - loot_percent: +X% to loot quantity (additive)
+ * - heal_party: Heal party for X% at floor_end
  * - buff: Apply a buff aura to party at dungeon start
  * - debuff: Apply a debuff to enemies at spawn
  * - enemy_buff: Apply a buff to enemies at spawn

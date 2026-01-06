@@ -65,19 +65,19 @@ export class AdventuringEnemy extends AdventuringCharacter {
         this.enrageBuff = monster.enrageBuff || null;
         this.phaseTransitioned = false;
 
-        // Get stat multiplier from dungeon effect cache (precompiled from difficulty + endless)
-        const statMultiplier = this.manager.dungeon.effectCache.getEnemyStatMultiplier();
+        // Get stat bonus from dungeon effect cache (additive percentages from difficulty + endless)
+        const statBonus = this.manager.dungeon.getBonus('enemy_stats_percent');
 
         monster.stats.forEach(({ id, value }) => {
-            // Scale stats by cached multiplier
-            const scaledValue = Math.floor(value * statMultiplier);
+            // Scale stats by bonus percentage
+            const scaledValue = Math.floor(value * (1 + statBonus / 100));
             this.stats.set(id, scaledValue);
         })
         this.stats.renderQueue.stats = true;
 
-        // Get XP multiplier from dungeon effect cache (precompiled)
-        const xpMultiplier = this.manager.dungeon.effectCache.getXPMultiplier();
-        this.xp = Math.floor(monster.xp * xpMultiplier);
+        // Get XP bonus from dungeon effect cache (additive percentage)
+        const xpBonus = this.manager.dungeon.getBonus('xp_percent');
+        this.xp = Math.floor(monster.xp * (1 + xpBonus / 100));
         
         this.setGenerator(this.manager.generators.getObjectByID(monster.generator));
 
@@ -107,7 +107,7 @@ export class AdventuringEnemy extends AdventuringCharacter {
      * Apply effects to this enemy at spawn (from dungeon effect cache)
      */
     applySpawnEffects() {
-        const spawnEffects = this.manager.dungeon.effectCache.getEnemySpawnEffects();
+        const spawnEffects = this.manager.dungeon.getEffectsForTrigger('enemy_spawn');
         
         for(const effect of spawnEffects) {
             const auraId = effect.aura || effect.id || effect.buff || effect.debuff;
@@ -332,10 +332,10 @@ export class AdventuringEnemy extends AdventuringCharacter {
                     qty = Math.ceil(qty * (1 + materialDropBonus));
                 }
 
-                // Apply loot multiplier from dungeon effect cache (difficulty + endless combined)
-                const lootMultiplier = this.manager.dungeon.effectCache.getLootMultiplier();
-                if(lootMultiplier > 1) {
-                    qty = Math.ceil(qty * lootMultiplier);
+                // Apply loot bonus from dungeon effect cache (additive percentage from difficulty + endless)
+                const lootBonus = this.manager.dungeon.getBonus('loot_percent');
+                if(lootBonus > 0) {
+                    qty = Math.ceil(qty * (1 + lootBonus / 100));
                 }
                 
                 this.manager.stash.add(id, qty);

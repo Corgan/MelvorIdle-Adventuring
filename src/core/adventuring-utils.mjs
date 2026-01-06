@@ -1431,13 +1431,13 @@ const effectDescriptionRegistry = new Map([
     ['energy_gain_bonus', (effect, value, stacks, amount, manager, helpers) => 
         `+${value}% energy from generators`],
     
-    // Multipliers
-    ['xp_modifier_percent', (effect, value, stacks, amount, manager, helpers) => 
-        `${helpers.sign((value - 1) * 100)}${Math.round((value - 1) * 100)}% XP`],
-    ['loot_modifier_percent', (effect, value, stacks, amount, manager, helpers) => 
-        `${helpers.sign((value - 1) * 100)}${Math.round((value - 1) * 100)}% Loot`],
-    ['stat_multiplier', (effect, value, stacks, amount, manager, helpers) => 
-        `Enemy Stats: ${helpers.sign((value - 1) * 100)}${Math.round((value - 1) * 100)}%`],
+    // Dungeon modifiers (additive percentages)
+    ['xp_percent', (effect, value, stacks, amount, manager, helpers) => 
+        `${helpers.sign(value)}${value}% XP`],
+    ['loot_percent', (effect, value, stacks, amount, manager, helpers) => 
+        `${helpers.sign(value)}${value}% Loot`],
+    ['enemy_stats_percent', (effect, value, stacks, amount, manager, helpers) => 
+        `Enemy Stats: ${helpers.sign(value)}${value}%`],
     
     // Revival
     ['revive', (effect, value, stacks, amount, manager, helpers) => 
