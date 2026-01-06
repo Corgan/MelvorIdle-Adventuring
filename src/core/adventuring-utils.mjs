@@ -1412,17 +1412,32 @@ const effectDescriptionRegistry = new Map([
             : `Heal for ${helpers.percent(firstDefined(value, amount, 0))}% of damage dealt`],
     
     // Damage modifiers
-    // flat_damage: flat damage bonus (can be negative)
-    ['flat_damage', (effect, value, stacks, amount, manager, helpers) => 
+    ['damage_modifier_flat', (effect, value, stacks, amount, manager, helpers) => 
         effect.perStack ? `${helpers.sign(firstDefined(value, amount, 1))}${firstDefined(value, amount, 1)} Damage per stack` : `${helpers.sign(firstDefined(value, amount))}${firstDefined(value, amount)} Damage`],
-    ['increase_damage_percent', (effect, value, stacks, amount, manager, helpers) => 
+    ['damage_modifier_percent', (effect, value, stacks, amount, manager, helpers) => 
         effect.perStack ? `+${firstDefined(value, amount, 1)}% Damage per stack` : `${helpers.sign(firstDefined(value, amount))}${firstDefined(value, amount)}% Damage`],
     
-    // Buffs/Debuffs - use 'id' property for aura reference
-    ['buff', (effect, value, stacks, amount, manager, helpers) => 
-        `Apply ${firstDefined(stacks, 1)} ${helpers.aura(effect.id)}`],
-    ['debuff', (effect, value, stacks, amount, manager, helpers) => 
-        `Apply ${firstDefined(stacks, 1)} ${helpers.aura(effect.id)}`],
+    // Buffs/Debuffs - use 'id' property for aura reference, or random: true
+    ['buff', (effect, value, stacks, amount, manager, helpers) => {
+        if (effect.random) {
+            const count = firstDefined(effect.count, 1);
+            const stackCount = firstDefined(stacks, 1);
+            return count === 1 
+                ? `Apply a random buff (${stackCount} stack${stackCount !== 1 ? 's' : ''})` 
+                : `Apply ${count} random buffs (${stackCount} stack${stackCount !== 1 ? 's' : ''} each)`;
+        }
+        return `Apply ${firstDefined(stacks, 1)} ${helpers.aura(effect.id)}`;
+    }],
+    ['debuff', (effect, value, stacks, amount, manager, helpers) => {
+        if (effect.random) {
+            const count = firstDefined(effect.count, 1);
+            const stackCount = firstDefined(stacks, 1);
+            return count === 1 
+                ? `Apply a random debuff (${stackCount} stack${stackCount !== 1 ? 's' : ''})` 
+                : `Apply ${count} random debuffs (${stackCount} stack${stackCount !== 1 ? 's' : ''} each)`;
+        }
+        return `Apply ${firstDefined(stacks, 1)} ${helpers.aura(effect.id)}`;
+    }],
     ['cleanse', (effect, value, stacks, amount, manager, helpers) => 
         effect.id ? `Remove ${helpers.aura(effect.id)}` : 'Cleanse debuffs'],
     
@@ -1458,7 +1473,7 @@ const effectDescriptionRegistry = new Map([
         `${helpers.percent(value)}% damage reduction`],
     
     // Immunity - use 'id' property for aura reference
-    ['immunity', (effect, value, stacks, amount, manager, helpers) => {
+    ['immune', (effect, value, stacks, amount, manager, helpers) => {
         return effect.id ? `Immune to ${helpers.aura(effect.id)}` : 'Immune to debuffs';
     }],
     
@@ -1481,41 +1496,22 @@ const effectDescriptionRegistry = new Map([
         `+${helpers.percent(value)}% healing received`],
     
     // Reflect
-    ['reflect_damage', (effect, value, stacks, amount, manager, helpers) => 
+    ['reflect', (effect, value, stacks, amount, manager, helpers) => 
         effect.perStack 
             ? `Reflect ${helpers.percent(firstDefined(amount, value))}% damage per stack` 
             : `Reflect ${helpers.percent(firstDefined(value, amount))}% damage taken`],
-    
-    // Spell echo
-    ['spell_echo', (effect, value, stacks, amount, manager, helpers) => 
-        `${firstDefined(effect.chance, value)}% chance to cast spells twice`],
     
     // Execute
     ['execute', (effect, value, stacks, amount, manager, helpers) => 
         `Execute enemies below ${helpers.percent(firstDefined(effect.threshold, value, 20))}% HP`],
     
-    // All stat bonus
-    ['all_stat_bonus', (effect, value, stacks, amount, manager, helpers) => 
+    // All stat percent bonus
+    ['all_stat_percent', (effect, value, stacks, amount, manager, helpers) => 
         `+${value}% all stats`],
     
-    // Random buffs/debuffs
-    ['random_buffs', (effect, value, stacks, amount, manager, helpers) => {
-        const count = firstDefined(effect.count, 1);
-        const stackCount = firstDefined(stacks, 1);
-        return count === 1 
-            ? `Apply a random buff (${stackCount} stack${stackCount !== 1 ? 's' : ''})` 
-            : `Apply ${count} random buffs (${stackCount} stack${stackCount !== 1 ? 's' : ''} each)`;
-    }],
-    ['random_debuffs', (effect, value, stacks, amount, manager, helpers) => {
-        const count = firstDefined(effect.count, 1);
-        const stackCount = firstDefined(stacks, 1);
-        return count === 1 
-            ? `Apply a random debuff (${stackCount} stack${stackCount !== 1 ? 's' : ''})` 
-            : `Apply ${count} random debuffs (${stackCount} stack${stackCount !== 1 ? 's' : ''} each)`;
-    }],
-    
-    // Dispel/cleanse effects
-    ['dispel_buff', (effect, value, stacks, amount, manager, helpers) => {
+    // Dispel effects - removes buffs from enemies
+    ['dispel', (effect, value, stacks, amount, manager, helpers) => {
+        if (effect.id) return `Remove ${helpers.aura(effect.id)} from target`;
         const dispelCount = effect.count || 1;
         return dispelCount === 'all' ? 'Remove all buffs from target' : `Remove ${dispelCount} buff${dispelCount !== 1 ? 's' : ''} from target`;
     }],
@@ -1554,15 +1550,25 @@ const effectDescriptionRegistry = new Map([
     // Aura internal effects
     ['remove', () => ''],
     ['remove_stacks', (effect, value, stacks, amount) => `Remove ${firstDefined(effect.count, amount, 1)} stack(s)`],
-    ['reduce_amount', (effect, value, stacks, amount) => `Reduce damage by ${firstDefined(amount, 1)} per stack`],
-    ['absorb_damage', (effect, value, stacks, amount) => `Absorb ${firstDefined(amount, 1)} damage per stack`],
-    ['skip', () => 'Skip turn'],
-    ['chance_skip', (effect, value, stacks, amount) => `${firstDefined(amount, 0)}% chance to skip turn`],
+    ['absorb', (effect, value, stacks, amount) => `Absorb ${firstDefined(amount, 1)} damage per stack`],
+    ['skip', (effect, value, stacks, amount) => {
+        if (effect.condition?.type === 'chance') return `${effect.condition.value}% chance to skip turn`;
+        return 'Skip turn';
+    }],
+    ['dodge', (effect, value, stacks, amount) => {
+        if (effect.condition?.type === 'chance') return `${effect.condition.value}% chance to dodge`;
+        return 'Dodge attack';
+    }],
+    ['miss', (effect, value, stacks, amount) => {
+        if (effect.condition?.type === 'chance') return `${effect.condition.value}% chance to miss`;
+        return 'Attack misses';
+    }],
+    ['confuse', (effect, value, stacks, amount) => {
+        if (effect.condition?.type === 'chance') return `${effect.condition.value}% chance to hit ally instead`;
+        return 'Hit ally instead';
+    }],
     ['untargetable', () => 'Cannot be targeted'],
     ['evade', () => 'Evade next attack'],
-    ['chance_dodge', (effect, value, stacks, amount) => `${firstDefined(amount, 0)}% chance to dodge`],
-    ['chance_miss', (effect, value, stacks, amount) => `${firstDefined(amount, 0)}% chance to miss`],
-    ['chance_hit_ally', (effect, value, stacks, amount) => `${firstDefined(amount, 0)}% chance to hit ally instead`],
     ['force_target', () => 'Force enemies to target this character'],
     ['prevent_ability', () => 'Cannot use spenders'],
     ['prevent_debuff', () => 'Immune to next debuff'],
@@ -1586,6 +1592,12 @@ const effectDescriptionRegistry = new Map([
             || passiveId?.split(':').pop() 
             || 'modifier';
         return `Apply ${passiveName}`;
+    }],
+    
+    // Double cast
+    ['double_cast', (effect, value, stacks, amount, manager, helpers) => {
+        if (effect.condition?.type === 'chance') return `${effect.condition.value}% chance to cast spells twice`;
+        return `${firstDefined(effect.chance, amount, value)}% chance to cast spells twice`;
     }],
 ]);
 
@@ -2360,52 +2372,95 @@ function createDefaultEffectProcessor() {
         return ctx.extra;
     });
     
-    // Apply buff aura - uses 'id' property for aura reference
+    // Buff pools for random buff application
+    const BUFF_POOL = [
+        'adventuring:might', 'adventuring:fortify', 'adventuring:haste',
+        'adventuring:regeneration', 'adventuring:barrier', 'adventuring:focus',
+        'adventuring:arcane_power', 'adventuring:stealth'
+    ];
+    
+    // Debuff pools for random debuff application
+    const DEBUFF_POOL = [
+        'adventuring:weaken', 'adventuring:slow', 'adventuring:blind',
+        'adventuring:poison', 'adventuring:burn', 'adventuring:decay',
+        'adventuring:vulnerability', 'adventuring:chill'
+    ];
+    
+    // Apply buff aura - uses 'id' property for aura reference, or random: true with optional pool
     processor.register('buff', (effect, instance, ctx) => {
         const stacks = instance.stacks || effect.stacks || 1;
         const builtEffect = { stacks };
         const target = effect.target || 'self';
-        const auraId = effect.id;
+        const count = effect.count || 1;
         
-        if(!auraId) {
-            console.warn('[buff processor] Missing aura id in effect:', effect);
-            return ctx.extra;
+        // Determine which auras to apply
+        let auraIds = [];
+        if (effect.random) {
+            // Use custom pool if provided, otherwise use default buff pool
+            const pool = effect.pool || BUFF_POOL;
+            for (let i = 0; i < count; i++) {
+                auraIds.push(pool[Math.floor(Math.random() * pool.length)]);
+            }
+        } else {
+            if (!effect.id) {
+                console.warn('[buff processor] Missing aura id in effect:', effect);
+                return ctx.extra;
+            }
+            auraIds.push(effect.id);
         }
         
-        if(target === 'self' || target === undefined) {
-            ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} applies ${auraId}`);
-            ctx.character.auras.add(auraId, builtEffect, ctx.character);
-        } else if(target === 'attacker' && ctx.extra.attacker) {
-            ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} applies ${auraId} to ${ctx.extra.attacker.name}`);
-            ctx.extra.attacker.auras.add(auraId, builtEffect, ctx.character);
+        // Apply each aura
+        for (const auraId of auraIds) {
+            if (target === 'self' || target === undefined) {
+                ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} applies ${auraId}`);
+                ctx.character.auras.add(auraId, { ...builtEffect }, ctx.character);
+            } else if (target === 'attacker' && ctx.extra.attacker) {
+                ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} applies ${auraId} to ${ctx.extra.attacker.name}`);
+                ctx.extra.attacker.auras.add(auraId, { ...builtEffect }, ctx.character);
+            }
         }
         return ctx.extra;
     });
     
-    // Apply debuff aura - uses 'id' property for aura reference
+    // Apply debuff aura - uses 'id' property for aura reference, or random: true with optional pool
     processor.register('debuff', (effect, instance, ctx) => {
         const stacks = instance.stacks || effect.stacks || 1;
         const builtEffect = { stacks };
         const target = effect.target || 'target';
-        const auraId = effect.id;
+        const count = effect.count || 1;
         
-        if(!auraId) {
-            console.warn('[debuff processor] Missing aura id in effect:', effect);
-            return ctx.extra;
+        // Determine which auras to apply
+        let auraIds = [];
+        if (effect.random) {
+            // Use custom pool if provided, otherwise use default debuff pool
+            const pool = effect.pool || DEBUFF_POOL;
+            for (let i = 0; i < count; i++) {
+                auraIds.push(pool[Math.floor(Math.random() * pool.length)]);
+            }
+        } else {
+            if (!effect.id) {
+                console.warn('[debuff processor] Missing aura id in effect:', effect);
+                return ctx.extra;
+            }
+            auraIds.push(effect.id);
         }
         
+        // Resolve target character
         let targetChar = null;
-        if(target === 'self') {
+        if (target === 'self') {
             targetChar = ctx.character;
-        } else if(target === 'attacker' && ctx.extra.attacker) {
+        } else if (target === 'attacker' && ctx.extra.attacker) {
             targetChar = ctx.extra.attacker;
-        } else if(target === 'target' && ctx.extra.target) {
+        } else if (target === 'target' && ctx.extra.target) {
             targetChar = ctx.extra.target;
         }
         
-        if(targetChar && !targetChar.dead) {
-            ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} applies ${auraId} to ${targetChar.name}`);
-            targetChar.auras.add(auraId, builtEffect, ctx.character);
+        // Apply each aura
+        if (targetChar && !targetChar.dead) {
+            for (const auraId of auraIds) {
+                ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} applies ${auraId} to ${targetChar.name}`);
+                targetChar.auras.add(auraId, { ...builtEffect }, ctx.character);
+            }
         }
         return ctx.extra;
     });
@@ -2442,13 +2497,13 @@ function createDefaultEffectProcessor() {
     });
     
     // Damage modifiers
-    processor.register('flat_damage', (effect, instance, ctx) => {
+    processor.register('damage_modifier_flat', (effect, instance, ctx) => {
         const amount = getEffectAmount(effect, instance);
         ctx.extra.amount = (ctx.extra.amount || 0) + amount;
         return ctx.extra;
     });
     
-    processor.register('increase_damage_percent', (effect, instance, ctx) => {
+    processor.register('damage_modifier_percent', (effect, instance, ctx) => {
         const amount = getEffectAmount(effect, instance);
         const increase = Math.ceil((ctx.extra.amount || 0) * (amount / 100));
         ctx.extra.amount = (ctx.extra.amount || 0) + increase;
@@ -2469,19 +2524,26 @@ function createDefaultEffectProcessor() {
         return ctx.extra;
     });
     
-    // Chance-based effects
-    processor.register('chance_skip', (effect, instance, ctx) => {
-        const amount = getEffectAmount(effect, instance);
-        if(Math.random() * 100 < amount) {
+    // Condition-based effects - check condition before applying
+    const checkCondition = (effect, instance) => {
+        if (!effect.condition) return true;
+        if (effect.condition.type === 'chance') {
+            const chance = effect.condition.value || 0;
+            return Math.random() * 100 < chance;
+        }
+        return true;
+    };
+    
+    processor.register('skip', (effect, instance, ctx) => {
+        if (checkCondition(effect, instance)) {
             ctx.extra.skip = true;
             ctx.manager.log.add(`${ctx.character.name} is overcome with ${instance.base.name}!`);
         }
         return ctx.extra;
     });
     
-    processor.register('chance_dodge', (effect, instance, ctx) => {
-        const amount = getEffectAmount(effect, instance);
-        if(Math.random() * 100 < amount) {
+    processor.register('dodge', (effect, instance, ctx) => {
+        if (checkCondition(effect, instance)) {
             ctx.extra.amount = 0;
             ctx.extra.dodged = true;
             ctx.manager.log.add(`${ctx.character.name} dodges the attack!`);
@@ -2489,9 +2551,8 @@ function createDefaultEffectProcessor() {
         return ctx.extra;
     });
     
-    processor.register('chance_miss', (effect, instance, ctx) => {
-        const amount = getEffectAmount(effect, instance);
-        if(Math.random() * 100 < amount) {
+    processor.register('miss', (effect, instance, ctx) => {
+        if (checkCondition(effect, instance)) {
             ctx.extra.amount = 0;
             ctx.extra.missed = true;
             ctx.manager.log.add(`${ctx.character.name} misses due to ${instance.base.name}!`);
@@ -2499,9 +2560,8 @@ function createDefaultEffectProcessor() {
         return ctx.extra;
     });
     
-    processor.register('chance_hit_ally', (effect, instance, ctx) => {
-        const amount = getEffectAmount(effect, instance);
-        if(Math.random() * 100 < amount) {
+    processor.register('confuse', (effect, instance, ctx) => {
+        if (checkCondition(effect, instance)) {
             ctx.extra.hitAlly = true;
             ctx.manager.log.add(`${ctx.character.name} is confused and attacks an ally!`);
         }
@@ -2556,7 +2616,7 @@ function createDefaultEffectProcessor() {
     });
     
     // Reflect damage
-    processor.register('reflect_damage', (effect, instance, ctx) => {
+    processor.register('reflect', (effect, instance, ctx) => {
         const amount = getEffectAmount(effect, instance);
         if(ctx.extra.damageReceived && ctx.extra.attacker) {
             const reflectAmount = Math.ceil(ctx.extra.damageReceived * (amount / 100));
@@ -2669,7 +2729,7 @@ function createDefaultEffectProcessor() {
     });
     
     // Absorb damage (shield buff) - absorbs damage up to stack count
-    processor.register('absorb_damage', (effect, instance, ctx) => {
+    processor.register('absorb', (effect, instance, ctx) => {
         const amountPerStack = firstDefined(effect.amount, 1);
         const totalAbsorb = amountPerStack * instance.stacks;
         const damage = ctx.extra.amount || 0;
@@ -2690,7 +2750,7 @@ function createDefaultEffectProcessor() {
     });
     
     // Dispel buffs from target
-    processor.register('dispel_buff', (effect, instance, ctx) => {
+    processor.register('dispel', (effect, instance, ctx) => {
         const count = effect.count || 1;
         const target = effect.target === 'self' ? ctx.character : 
                       (effect.target === 'attacker' ? ctx.extra.attacker : ctx.extra.target);
@@ -2712,6 +2772,20 @@ function createDefaultEffectProcessor() {
                 }
                 ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} dispels ${removed} buff(s) from ${target.name}`);
             }
+        }
+        return ctx.extra;
+    });
+    
+    // Double cast - chance to cast abilities twice
+    processor.register('double_cast', (effect, instance, ctx) => {
+        let chance;
+        if (effect.condition?.type === 'chance') {
+            chance = effect.condition.value;
+        } else {
+            chance = effect.chance || getEffectAmount(effect, instance);
+        }
+        if(Math.random() * 100 < chance) {
+            ctx.extra.doubleCast = true;
         }
         return ctx.extra;
     });
