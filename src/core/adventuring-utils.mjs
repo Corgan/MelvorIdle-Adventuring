@@ -6,6 +6,420 @@ const { loadModule } = mod.getContext(import.meta);
  * Shared helper functions to reduce duplicate code across the mod.
  */
 
+// ============================================================================
+// Stat Calculation
+// ============================================================================
+
+/**
+ * StatCalculator - Unified stat calculation pipeline
+ * 
+ * Consolidates the pattern: base → add sources → apply flat → apply percent → apply global
+ * 
+ * Usage:
+ *   // Calculate effective stat with bonuses
+ *   const final = StatCalculator.calculate(baseValue, { flat: 10, percent: 25 }, allStatBonus);
+ *   
+ *   // Aggregate stats from multiple sources
+ *   StatCalculator.aggregate(targetStats, job1.stats, job2.stats, equipment.stats);
+ *   
+ *   // Calculate equipment stats with level scaling
+ *   const stats = StatCalculator.calculateWithScaling(base, scaling, level, bonusPercent);
+ */
+class StatCalculator {
+    /**
+     * Calculate final stat value with all modifiers.
+     * Applies: base + flat, then percent, then global percent.
+     * 
+     * @param {number} baseValue - The base stat value
+     * @param {object} bonuses - { flat: number, percent: number } bonuses
+     * @param {number} [globalPercent=0] - Global multiplier (e.g., all_stat_bonus)
+     * @returns {number} Final calculated value (floored)
+     */
+    static calculate(baseValue, bonuses = { flat: 0, percent: 0 }, globalPercent = 0) {
+        const flat = bonuses.flat || 0;
+        const percent = bonuses.percent || 0;
+        
+        const withFlat = baseValue + flat;
+        const withPercent = withFlat * (1 + percent / 100);
+        const withGlobal = withPercent * (1 + globalPercent / 100);
+        
+        return Math.floor(withGlobal);
+    }
+    
+    /**
+     * Aggregate stats from multiple sources into a target map.
+     * Adds all source values to existing target values.
+     * 
+     * @param {Map} target - Target stats map to aggregate into
+     * @param {...(Map|undefined)} sources - Stats maps to aggregate (undefined sources are skipped)
+     */
+    static aggregate(target, ...sources) {
+        for (const source of sources) {
+            if (!source) continue;
+            
+            if (typeof source.forEach === 'function') {
+                source.forEach((value, stat) => {
+                    target.set(stat, (target.get(stat) || 0) + value);
+                });
+            }
+        }
+    }
+    
+    /**
+     * Calculate stats with base values, level scaling, and optional percent bonus.
+     * Used for equipment stat calculation.
+     * 
+     * @param {Map} target - Target stats map to write to
+     * @param {Map} base - Base stats map
+     * @param {Map} scaling - Per-level scaling map
+     * @param {number} level - Current level for scaling
+     * @param {number} [bonusPercent=0] - Flat percent bonus to apply (e.g., mastery bonus)
+     */
+    static calculateWithScaling(target, base, scaling, level, bonusPercent = 0) {
+        target.reset();
+        
+        // Apply base stats
+        base.forEach((value, stat) => target.set(stat, value));
+        
+        // Apply level scaling
+        scaling.forEach((value, stat) => {
+            target.set(stat, (target.get(stat) || 0) + Math.floor(level * value));
+        });
+        
+        // Apply percent bonus if any
+        if (bonusPercent > 0) {
+            target.forEach((value, stat) => {
+                const bonus = Math.floor(value * bonusPercent / 100);
+                target.set(stat, value + bonus);
+            });
+        }
+    }
+    
+    /**
+     * Apply a multiplier to all stats in a map.
+     * Used for masterful scaling, difficulty modifiers, etc.
+     * 
+     * @param {Map} target - Stats map to modify
+     * @param {number} multiplier - Multiplier to apply
+     */
+    static applyMultiplier(target, multiplier) {
+        if (multiplier === 1) return;
+        
+        target.forEach((value, stat) => {
+            target.set(stat, Math.floor(value * multiplier));
+        });
+    }
+}
+
+// ============================================================================
+// Passive Effect System
+// ============================================================================
+
+/**
+ * Passive effect definitions with metadata for validation and UI.
+ * Each effect defines how bonuses are applied in combat.
+ */
+const PassiveEffects = {
+    // === Damage Modifiers (from attacker) ===
+    DAMAGE_BONUS: {
+        id: 'damage_bonus',
+        name: 'Damage Bonus',
+        description: 'Increases damage dealt by X%',
+        appliesTo: 'attacker'
+    },
+    CRIT_CHANCE: {
+        id: 'crit_chance',
+        name: 'Critical Chance',
+        description: 'X% chance to deal critical damage',
+        appliesTo: 'attacker'
+    },
+    CRIT_DAMAGE: {
+        id: 'crit_damage',
+        name: 'Critical Damage',
+        description: 'Critical hits deal X% bonus damage (base 50%)',
+        appliesTo: 'attacker',
+        baseValue: 50
+    },
+    EXECUTE: {
+        id: 'execute',
+        name: 'Execute Threshold',
+        description: 'Instantly kill targets below X% HP',
+        appliesTo: 'attacker'
+    },
+    
+    // === Defense Modifiers (from defender) ===
+    DAMAGE_REDUCTION: {
+        id: 'damage_reduction',
+        name: 'Damage Reduction',
+        description: 'Reduces damage taken by X%',
+        appliesTo: 'defender'
+    },
+    REFLECT_DAMAGE: {
+        id: 'reflect_damage',
+        name: 'Reflect Damage',
+        description: 'Reflects X% of damage taken back to attacker',
+        appliesTo: 'defender'
+    },
+    
+    // === Healing Modifiers ===
+    HEALING_BONUS: {
+        id: 'healing_bonus',
+        name: 'Healing Power',
+        description: 'Increases healing done by X%',
+        appliesTo: 'caster'
+    },
+    HEALING_RECEIVED: {
+        id: 'healing_received',
+        name: 'Healing Received',
+        description: 'Increases healing received by X%',
+        appliesTo: 'target'
+    },
+    
+    // === Resource Modifiers ===
+    ENERGY_GAIN_BONUS: {
+        id: 'energy_gain_bonus',
+        name: 'Energy Gain',
+        description: 'Increases energy gained by X%',
+        appliesTo: 'self'
+    },
+    COST_REDUCTION: {
+        id: 'cost_reduction',
+        name: 'Cost Reduction',
+        description: 'Reduces ability costs by X (flat)',
+        appliesTo: 'self'
+    },
+    SPELL_ECHO: {
+        id: 'spell_echo',
+        name: 'Spell Echo',
+        description: 'X% chance to cast spender abilities twice',
+        appliesTo: 'caster'
+    },
+    
+    // === Stat Modifiers ===
+    ALL_STAT_BONUS: {
+        id: 'all_stat_bonus',
+        name: 'All Stats',
+        description: 'Increases all stats by X%',
+        appliesTo: 'self'
+    }
+};
+
+// Create ID lookup set for validation
+const PASSIVE_EFFECT_IDS = new Set(Object.values(PassiveEffects).map(m => m.id));
+
+/**
+ * Check if a passive effect ID is valid
+ * @param {string} id - Effect ID to validate
+ * @returns {boolean} True if valid
+ */
+function isValidPassiveEffect(id) {
+    return PASSIVE_EFFECT_IDS.has(id);
+}
+
+/**
+ * Get passive effect info by ID
+ * @param {string} id - Effect ID
+ * @returns {object|undefined} Effect definition or undefined
+ */
+function getPassiveEffectInfo(id) {
+    return Object.values(PassiveEffects).find(m => m.id === id);
+}
+
+/**
+ * PassiveEffectProcessor - Handles passive effect application pipeline.
+ * 
+ * Centralizes damage, healing, and resource modifier calculations.
+ * 
+ * Usage:
+ *   const processor = new PassiveEffectProcessor(encounter);
+ *   const result = processor.processDamage(attacker, target, baseAmount);
+ *   if (result === null) { // Attack missed or dodged }
+ *   const healResult = processor.processHealing(caster, target, baseAmount);
+ */
+class PassiveEffectProcessor {
+    constructor(encounter) {
+        this.encounter = encounter;
+        this.manager = encounter.manager;
+    }
+    
+    /**
+     * Apply damage modifier pipeline.
+     * Handles miss/dodge checks, damage bonus, reduction, and crits.
+     * 
+     * @param {object} attacker - Attacking character
+     * @param {object} target - Target character
+     * @param {number} baseAmount - Base damage amount
+     * @param {object} [context={}] - Additional context for triggers
+     * @returns {object|null} { amount, isCrit } or null if attack was negated
+     */
+    processDamage(attacker, target, baseAmount, context = {}) {
+        let amount = baseAmount;
+        
+        // Pre-damage trigger: miss check (e.g., Blind debuff)
+        const missCheck = attacker.trigger('before_damage_delivered', { target, amount, ...context });
+        if (missCheck.missed) {
+            return { negated: 'miss', amount: 0 };
+        }
+        amount = missCheck.amount ?? amount;
+        
+        // Pre-damage trigger: dodge check (e.g., Evasion buff)
+        const dodgeCheck = target.trigger('before_damage_received', { attacker, amount, ...context });
+        if (dodgeCheck.dodged) {
+            return { negated: 'dodge', amount: 0 };
+        }
+        amount = dodgeCheck.amount ?? amount;
+        
+        // Apply attacker's damage bonus
+        amount = this._applyPercentBonus(amount, attacker, PassiveEffects.DAMAGE_BONUS);
+        
+        // Apply target's damage reduction
+        amount = this._applyPercentReduction(amount, target, PassiveEffects.DAMAGE_REDUCTION);
+        
+        // Process critical hit
+        const critResult = this._processCritical(amount, attacker);
+        
+        return {
+            amount: critResult.amount,
+            isCrit: critResult.isCrit,
+            negated: false
+        };
+    }
+    
+    /**
+     * Apply healing modifier pipeline.
+     * Handles healing bonus from caster and healing received by target.
+     * 
+     * @param {object} caster - Character doing the healing
+     * @param {object} target - Character receiving healing
+     * @param {number} baseAmount - Base heal amount
+     * @param {object} [context={}] - Additional context for triggers
+     * @returns {object} { amount } with modified healing
+     */
+    processHealing(caster, target, baseAmount, context = {}) {
+        let amount = baseAmount;
+        
+        // Apply caster's healing bonus
+        amount = this._applyPercentBonus(amount, caster, PassiveEffects.HEALING_BONUS);
+        
+        // Apply target's healing received bonus
+        amount = this._applyPercentBonus(amount, target, PassiveEffects.HEALING_RECEIVED);
+        
+        // Healing triggers
+        const deliverResult = caster.trigger('before_heal_delivered', { target, amount, ...context });
+        amount = deliverResult.amount ?? amount;
+        
+        const receiveResult = target.trigger('before_heal_received', { caster, amount, ...context });
+        amount = receiveResult.amount ?? amount;
+        
+        return { amount };
+    }
+    
+    /**
+     * Apply energy gain modifiers.
+     * 
+     * @param {object} character - Character gaining energy
+     * @param {number} baseEnergy - Base energy amount
+     * @returns {number} Modified energy amount
+     */
+    processEnergyGain(character, baseEnergy) {
+        const bonus = character.getPassiveBonus(PassiveEffects.ENERGY_GAIN_BONUS.id);
+        return baseEnergy + Math.floor(baseEnergy * (bonus / 100));
+    }
+    
+    /**
+     * Apply ability cost reduction.
+     * 
+     * @param {object} character - Character using ability
+     * @param {number} baseCost - Base ability cost
+     * @returns {number} Modified cost (minimum 0)
+     */
+    processCostReduction(character, baseCost) {
+        const reduction = character.getPassiveBonus(PassiveEffects.COST_REDUCTION.id);
+        return Math.max(0, baseCost - reduction);
+    }
+    
+    /**
+     * Check for spell echo (spender repeat).
+     * 
+     * @param {object} character - Character casting
+     * @returns {boolean} True if spell should echo
+     */
+    checkSpellEcho(character) {
+        const echoChance = character.getPassiveBonus(PassiveEffects.SPELL_ECHO.id);
+        return echoChance > 0 && Math.random() * 100 < echoChance;
+    }
+    
+    /**
+     * Check and apply execute threshold.
+     * 
+     * @param {object} attacker - Attacking character
+     * @param {object} target - Target character
+     * @returns {boolean} True if target was executed
+     */
+    checkExecute(attacker, target) {
+        if (target.dead) return false;
+        
+        const threshold = attacker.getPassiveBonus(PassiveEffects.EXECUTE.id);
+        if (threshold > 0 && target.hitpointsPercent < threshold) {
+            return true;
+        }
+        return false;
+    }
+    
+    /**
+     * Calculate and apply reflect damage.
+     * 
+     * @param {object} attacker - Character that dealt damage
+     * @param {object} target - Character that has reflect
+     * @param {number} damageDealt - Amount of damage dealt to target
+     * @returns {number} Amount of damage reflected (0 if none)
+     */
+    calculateReflect(attacker, target, damageDealt) {
+        if (damageDealt <= 0) return 0;
+        
+        const reflectPercent = target.getPassiveBonus(PassiveEffects.REFLECT_DAMAGE.id);
+        if (reflectPercent > 0) {
+            return Math.ceil(damageDealt * (reflectPercent / 100));
+        }
+        return 0;
+    }
+    
+    // === Private Helpers ===
+    
+    _processCritical(amount, attacker) {
+        const critChance = attacker.getPassiveBonus(PassiveEffects.CRIT_CHANCE.id);
+        
+        if (critChance > 0 && Math.random() * 100 < critChance) {
+            const critDamage = attacker.getPassiveBonus(PassiveEffects.CRIT_DAMAGE.id);
+            const baseMultiplier = 1 + (PassiveEffects.CRIT_DAMAGE.baseValue / 100); // 1.5
+            const multiplier = baseMultiplier + (critDamage / 100);
+            return { amount: Math.ceil(amount * multiplier), isCrit: true };
+        }
+        
+        return { amount, isCrit: false };
+    }
+    
+    _applyPercentBonus(amount, character, modifier) {
+        const bonus = character.getPassiveBonus(modifier.id);
+        if (bonus > 0) {
+            return Math.ceil(amount * (1 + bonus / 100));
+        }
+        return amount;
+    }
+    
+    _applyPercentReduction(amount, character, modifier) {
+        const reduction = character.getPassiveBonus(modifier.id);
+        if (reduction > 0) {
+            return Math.ceil(amount * (1 - reduction / 100));
+        }
+        return amount;
+    }
+}
+
+// ============================================================================
+// Basic Utilities
+// ============================================================================
+
 /**
  * Get a random element from an array
  * @param {Array} array - Array to select from
@@ -1125,11 +1539,11 @@ const effectDescriptionRegistry = new Map([
         `+${value}% energy from generators`],
     
     // Multipliers
-    ['xp_multiplier', (effect, value, stacks, amount, manager, helpers) => 
+    ['xp_modifier_percent', (effect, value, stacks, amount, manager, helpers) => 
         `${helpers.sign((value - 1) * 100)}${Math.round((value - 1) * 100)}% XP`],
-    ['loot_multiplier', (effect, value, stacks, amount, manager, helpers) => 
+    ['loot_modifier_percent', (effect, value, stacks, amount, manager, helpers) => 
         `${helpers.sign((value - 1) * 100)}${Math.round((value - 1) * 100)}% Loot`],
-    ['enemy_stat_multiplier', (effect, value, stacks, amount, manager, helpers) => 
+    ['stat_multiplier', (effect, value, stacks, amount, manager, helpers) => 
         `Enemy Stats: ${helpers.sign((value - 1) * 100)}${Math.round((value - 1) * 100)}%`],
     
     // Revival
@@ -1766,6 +2180,59 @@ function describeEffects(effects, manager, options = {}) {
     }
     
     return combined;
+}
+
+/**
+ * Generate comma-separated effect descriptions for inline display.
+ * Uses short-form descriptions without triggers.
+ * 
+ * @param {Array} effects - Array of effects to describe
+ * @param {object} manager - AdventuringManager for resolving names
+ * @param {object} [options] - Options for description generation
+ * @param {string} [options.separator=', '] - Separator between descriptions
+ * @returns {string} Comma-separated effect descriptions
+ */
+function describeEffectsInline(effects, manager, options = {}) {
+    if (!effects || effects.length === 0) return '';
+    const { separator = ', ' } = options;
+    return effects.map(e => describeEffect(e, manager)).join(separator);
+}
+
+/**
+ * Get an array of effect descriptions for itemized display.
+ * Each description includes trigger prefix for non-passive effects.
+ * Used for tooltip effect lists where each effect is on its own line.
+ * 
+ * @param {Array} effects - Array of effects to describe
+ * @param {object} manager - AdventuringManager for resolving names
+ * @param {object} [options] - Options for description generation
+ * @param {boolean} [options.includeChance=true] - Include chance prefix if < 100%
+ * @returns {Array<string>} Array of formatted effect descriptions
+ */
+function getEffectDescriptionsList(effects, manager, options = {}) {
+    if (!effects || effects.length === 0) return [];
+    const { includeChance = true } = options;
+    
+    return effects.map(effect => {
+        // Use description if explicitly provided
+        if (effect.description) return effect.description;
+        
+        // Build description from effect data
+        const trigger = formatTrigger(effect.trigger);
+        let desc = describeEffect(effect, manager);
+        
+        // Add chance if applicable (chance is whole percent, 100 = always)
+        if (includeChance && effect.chance !== undefined && effect.chance < 100) {
+            desc = `${effect.chance}% chance: ${desc}`;
+        }
+        
+        // Combine trigger and description for non-passive effects
+        if (trigger && effect.trigger !== 'passive') {
+            return `${trigger}: ${desc}`;
+        }
+        
+        return desc;
+    });
 }
 
 /**
@@ -2679,6 +3146,8 @@ export {
     describeEffect,
     describeEffectFull,
     describeEffects,
+    describeEffectsInline,
+    getEffectDescriptionsList,
     formatTrigger,
     formatTriggerSuffix,
     formatTarget,
@@ -2701,6 +3170,13 @@ export {
     AdventuringEquipmentRenderQueue,
     // Media helpers
     UNKNOWN_MEDIA,
-    getLockedMedia
+    getLockedMedia,
+    // Stat calculation
+    StatCalculator,
+    // Passive effects
+    PassiveEffects,
+    PassiveEffectProcessor,
+    isValidPassiveEffect,
+    getPassiveEffectInfo
 }
 

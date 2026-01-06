@@ -1,6 +1,6 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { formatRequirement, describeEffect, describeEffectFull } = await loadModule('src/core/adventuring-utils.mjs');
+const { formatRequirement, describeEffectsInline, describeEffectFull } = await loadModule('src/core/adventuring-utils.mjs');
 
 /**
  * Tooltip builder utility - creates styled tooltips matching Melvor's style
@@ -549,7 +549,7 @@ export class TooltipBuilder {
                     // Generate description from effects if not provided
                     let desc = bonus.description;
                     if(!desc && bonus.effects) {
-                        desc = bonus.effects.map(e => describeEffect(e, manager)).join(', ');
+                        desc = describeEffectsInline(bonus.effects, manager);
                     }
                     tooltip.text(`<span class="${cssClass}">(${bonus.pieces})</span> <span class="${cssClass}">${desc || 'Set Bonus'}</span>`, 'small');
                 });
@@ -632,7 +632,7 @@ export class TooltipBuilder {
             if(nextMilestone) {
                 let description = nextMilestone.description;
                 if (!description && nextMilestone.effects !== undefined) {
-                    description = nextMilestone.effects.map(e => describeEffect(e, manager)).join(', ');
+                    description = describeEffectsInline(nextMilestone.effects, manager);
                 }
                 if (!description) description = 'Unknown';
                 tooltip.separator().nextUnlock(nextMilestone.level, description);
@@ -879,7 +879,7 @@ export class TooltipBuilder {
             // Generate description from effects if not explicitly provided
             let description = nextMilestone.description;
             if (!description && nextMilestone.effects !== undefined) {
-                description = nextMilestone.effects.map(e => describeEffect(e, manager)).join(', ');
+                description = describeEffectsInline(nextMilestone.effects, manager);
             }
             if (!description) description = 'Unknown';
             this.nextUnlock(nextMilestone.level, description);

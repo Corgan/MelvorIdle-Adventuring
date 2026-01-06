@@ -1,7 +1,7 @@
 const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringScalableEffect } = await loadModule('src/combat/adventuring-scalable-effect.mjs');
-const { getAuraName, UNKNOWN_MEDIA } = await loadModule('src/core/adventuring-utils.mjs');
+const { getAuraName, UNKNOWN_MEDIA, describeEffectsInline } = await loadModule('src/core/adventuring-utils.mjs');
 
 /**
  * Effect types for difficulties:
@@ -85,7 +85,10 @@ export class AdventuringDifficulty extends NamespacedObject {
     }
 
     get description() {
-        return this._description;
+        // Custom description takes priority
+        if (this._description) return this._description;
+        // Build from effects
+        return describeEffectsInline(this.effects, this.manager) || 'No modifiers';
     }
 
     get media() {

@@ -1,6 +1,6 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { sortByAgility, resolveTargets } = await loadModule('src/core/adventuring-utils.mjs');
+const { sortByAgility, resolveTargets, PassiveEffectProcessor, PassiveEffects } = await loadModule('src/core/adventuring-utils.mjs');
 const { AdventuringPage } = await loadModule('src/ui/adventuring-page.mjs');
 
 const { AdventuringGenerator } = await loadModule('src/dungeon/adventuring-generator.mjs');
@@ -42,6 +42,9 @@ export class AdventuringEncounter extends AdventuringPage {
         this.hitTimer = new Timer('Hit', () => this.processHit());
         this.hitInterval = 150;
         this.endTurnInterval = 100;
+        
+        // Passive effect processor for unified damage/heal calculations
+        this.passiveEffects = new PassiveEffectProcessor(this);
     }
 
     get all() {
@@ -197,79 +200,60 @@ export class AdventuringEncounter extends AdventuringPage {
 
     /**
      * Process damage effect modifiers (miss, dodge, bonus, reduction, crit)
+     * Uses CombatModifierProcessor for unified modifier pipeline.
      * @param {Object} effect - The effect being applied
      * @param {Object} builtEffect - The built effect with calculated amounts
      * @param {Object} target - The target character
      * @returns {Object|null} Modified builtEffect with isCrit flag, or null if skipped
      */
     _processDamageEffect(effect, builtEffect, target) {
-        // Check for miss (Blind debuff)
-        let missCheck = this.currentTurn.trigger('before_damage_delivered', { target, ...builtEffect });
-        if(missCheck.missed) {
+        const result = this.passiveEffects.processDamage(
+            this.currentTurn, 
+            target, 
+            builtEffect.amount,
+            builtEffect
+        );
+        
+        if (result.negated === 'miss') {
             this.manager.log.add(`${this.currentTurn.name}'s attack misses ${target.name}!`);
             return null;
         }
-        builtEffect = missCheck;
-        
-        // Check for dodge (Evasion buff)
-        let dodgeCheck = target.trigger('before_damage_received', { attacker: this.currentTurn, ...builtEffect });
-        if(dodgeCheck.dodged) {
+        if (result.negated === 'dodge') {
             return null;
         }
-        builtEffect = dodgeCheck;
         
-        // Apply damage bonus from passive effects
-        const damageBonus = this.currentTurn.getPassiveBonus('damage_bonus');
-        if(damageBonus > 0) {
-            builtEffect.amount = Math.ceil(builtEffect.amount * (1 + damageBonus / 100));
-        }
-        
-        // Apply damage reduction from target's passive effects
-        const damageReduction = target.getPassiveBonus('damage_reduction');
-        if(damageReduction > 0) {
-            builtEffect.amount = Math.ceil(builtEffect.amount * (1 - damageReduction / 100));
-        }
-        
-        // Critical hit check
-        builtEffect.isCrit = false;
-        const critChance = this.currentTurn.getPassiveBonus('crit_chance');
-        if(critChance > 0 && Math.random() * 100 < critChance) {
-            builtEffect.isCrit = true;
-            const critDamageBonus = this.currentTurn.getPassiveBonus('crit_damage');
-            const critMultiplier = 1.5 + (critDamageBonus / 100);
-            builtEffect.amount = Math.ceil(builtEffect.amount * critMultiplier);
-        }
-        
-        return builtEffect;
+        return {
+            ...builtEffect,
+            amount: result.amount,
+            isCrit: result.isCrit
+        };
     }
 
     /**
      * Process healing effect modifiers
+     * Uses PassiveEffectProcessor for unified modifier pipeline.
      * @param {Object} effect - The effect being applied
      * @param {Object} builtEffect - The built effect with calculated amounts
      * @param {Object} target - The target character
      * @returns {Object} Modified builtEffect
      */
     _processHealEffect(effect, builtEffect, target) {
-        // Apply healing bonus from caster
-        const healingBonus = this.currentTurn.getPassiveBonus('healing_bonus');
-        if(healingBonus > 0) {
-            builtEffect.amount = Math.ceil(builtEffect.amount * (1 + healingBonus / 100));
-        }
+        const result = this.passiveEffects.processHealing(
+            this.currentTurn,
+            target,
+            builtEffect.amount,
+            builtEffect
+        );
         
-        // Apply healing received bonus to target
-        const healingReceived = target.getPassiveBonus('healing_received');
-        if(healingReceived > 0) {
-            builtEffect.amount = Math.ceil(builtEffect.amount * (1 + healingReceived / 100));
-        }
-        
-        builtEffect = this.currentTurn.trigger('before_heal_delivered', { target, ...builtEffect });
-        builtEffect = target.trigger('before_heal_received', { attacker: this.currentTurn, ...builtEffect });
-        return builtEffect;
+        return {
+            ...builtEffect,
+            amount: result.amount
+        };
     }
 
     /**
      * Handle post-damage effects (execute, reflect, lifesteal, on_kill)
+     * Uses PassiveEffectProcessor for execute and reflect calculations.
      * @param {Object} target - The target that was damaged
      * @param {number} damageDealt - Amount of damage dealt
      * @param {Object} builtEffect - The built effect
@@ -291,17 +275,15 @@ export class AdventuringEncounter extends AdventuringPage {
         });
         
         // Check execute threshold
-        const executeThreshold = this.currentTurn.getPassiveBonus('execute');
-        if(executeThreshold > 0 && !target.dead && target.hitpointsPercent < executeThreshold) {
+        if(this.passiveEffects.checkExecute(this.currentTurn, target)) {
             this.manager.log.add(`${this.currentTurn.name} executes ${target.name}!`);
             target.hitpoints = 0;
             target.damage({ amount: 0 }, this.currentTurn);
         }
         
         // Check reflect damage
-        const reflectDamage = target.getPassiveBonus('reflect_damage');
-        if(reflectDamage > 0 && damageDealt > 0) {
-            const reflectAmount = Math.ceil(damageDealt * (reflectDamage / 100));
+        const reflectAmount = this.passiveEffects.calculateReflect(this.currentTurn, target, damageDealt);
+        if(reflectAmount > 0) {
             this.currentTurn.damage({ amount: reflectAmount }, target);
             this.manager.log.add(`${target.name} reflects ${reflectAmount} damage to ${this.currentTurn.name}!`);
         }
@@ -460,9 +442,8 @@ export class AdventuringEncounter extends AdventuringPage {
 
         if(currentHit.energy !== undefined) {
             // Apply energy gain bonus modifier
-            const energyBonus = this.currentTurn.getPassiveBonus('energy_gain_bonus');
-            const bonusEnergy = Math.floor(currentHit.energy * (energyBonus / 100));
-            this.currentTurn.addEnergy(currentHit.energy + bonusEnergy);
+            const totalEnergy = this.passiveEffects.processEnergyGain(this.currentTurn, currentHit.energy);
+            this.currentTurn.addEnergy(totalEnergy);
         }
 
         if(currentHit.repeat === undefined || ++this.hitRepeat >= currentHit.repeat)
@@ -490,8 +471,7 @@ export class AdventuringEncounter extends AdventuringPage {
         let shouldEcho = false;
         
         if(isSpender && !this.isEchoAction) {
-            const spellEchoChance = this.currentTurn.getPassiveBonus('spell_echo');
-            if(spellEchoChance > 0 && Math.random() * 100 < spellEchoChance) {
+            if(this.passiveEffects.checkSpellEcho(this.currentTurn)) {
                 shouldEcho = true;
                 this.manager.log.add(`${this.currentTurn.name}'s spell echoes!`);
             }
@@ -499,8 +479,7 @@ export class AdventuringEncounter extends AdventuringPage {
         
         // Apply cost reduction for spenders
         if(this.currentAction.cost !== undefined && this.currentAction.cost > 0) {
-            const costReduction = this.currentTurn.getPassiveBonus('cost_reduction');
-            const effectiveCost = Math.max(0, this.currentAction.cost - costReduction);
+            const effectiveCost = this.passiveEffects.processCostReduction(this.currentTurn, this.currentAction.cost);
             if(effectiveCost <= this.currentTurn.energy) {
                 this.currentTurn.removeEnergy(effectiveCost);
             }
@@ -508,9 +487,8 @@ export class AdventuringEncounter extends AdventuringPage {
 
         if(this.currentAction.energy !== undefined) {
             // Apply energy gain bonus modifier
-            const energyBonus = this.currentTurn.getPassiveBonus('energy_gain_bonus');
-            const bonusEnergy = Math.floor(this.currentAction.energy * (energyBonus / 100));
-            this.currentTurn.addEnergy(this.currentAction.energy + bonusEnergy);
+            const totalEnergy = this.passiveEffects.processEnergyGain(this.currentTurn, this.currentAction.energy);
+            this.currentTurn.addEnergy(totalEnergy);
         }
 
         // If spell echo triggered, repeat the action

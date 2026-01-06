@@ -2,7 +2,7 @@ const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringConsumableElement } = await loadModule('src/items/components/adventuring-consumable.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
-const { createEffect, describeEffect, describeEffectFull } = await loadModule('src/core/adventuring-utils.mjs');
+const { createEffect, describeEffectsInline, buildDescription } = await loadModule('src/core/adventuring-utils.mjs');
 
 class AdventuringConsumableRenderQueue {
     constructor() {
@@ -173,7 +173,7 @@ export class AdventuringConsumable extends NamespacedObject {
      */
     getTierEffectText(tier) {
         const effects = this.getTierEffects(tier);
-        return effects.map(e => describeEffect(e, this.manager)).join(', ');
+        return describeEffectsInline(effects, this.manager);
     }
 
     /**
@@ -189,14 +189,12 @@ export class AdventuringConsumable extends NamespacedObject {
                 : this.customDescription;
         }
         
-        const effectDescs = effects.map(e => describeEffectFull(e, this.manager));
-        const generated = effectDescs.join('. ');
-        
-        if (flavorText) {
-            return generated ? `${generated}.\n\n${flavorText}` : flavorText;
-        }
-        
-        return generated || 'No effect.';
+        return buildDescription({
+            effects,
+            manager: this.manager,
+            flavorText,
+            includeTrigger: true
+        }) || 'No effect.';
     }
 
     /**

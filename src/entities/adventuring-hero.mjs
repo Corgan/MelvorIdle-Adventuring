@@ -6,7 +6,7 @@ const { AdventuringStats } = await loadModule('src/core/adventuring-stats.mjs');
 const { AdventuringCard } = await loadModule('src/progression/adventuring-card.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
 const { AdventuringPassiveBadgeElement } = await loadModule('src/entities/components/adventuring-passive-badge.mjs');
-const { evaluateCondition, getAuraName } = await loadModule('src/core/adventuring-utils.mjs');
+const { evaluateCondition, getAuraName, StatCalculator } = await loadModule('src/core/adventuring-utils.mjs');
 
 /**
  * Starter loadouts for new players.
@@ -219,25 +219,23 @@ export class AdventuringHero extends AdventuringCharacter {
 
         this.stats.reset();
 
+        // Set base stats
         this.manager.stats.forEach(stat => {
             if(stat.base !== undefined)
                 this.stats.set(stat, stat.base);
         });
 
-        if(this.combatJob !== undefined) {
-            this.combatJob.calculateStats();
-            this.combatJob.stats.forEach((value, stat) => this.stats.set(stat, this.stats.get(stat) + value));
-        }
-
-        if(this.passiveJob !== undefined) {
-            this.passiveJob.calculateStats();
-            this.passiveJob.stats.forEach((value, stat) => this.stats.set(stat, this.stats.get(stat) + value));
-        }
+        // Calculate job and equipment stats
+        if(this.combatJob !== undefined) this.combatJob.calculateStats();
+        if(this.passiveJob !== undefined) this.passiveJob.calculateStats();
+        if(this.equipment !== undefined) this.equipment.calculateStats();
         
-        if(this.equipment !== undefined) {
-            this.equipment.calculateStats();
-            this.equipment.stats.forEach((value, stat) => this.stats.set(stat, this.stats.get(stat) + value));
-        }
+        // Aggregate all stat sources
+        StatCalculator.aggregate(this.stats,
+            this.combatJob?.stats,
+            this.passiveJob?.stats,
+            this.equipment?.stats
+        );
 
         // Tavern drink bonuses are now applied in getEffectiveStat()
         

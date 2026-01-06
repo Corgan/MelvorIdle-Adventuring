@@ -3,7 +3,7 @@ const { loadModule } = mod.getContext(import.meta);
 const { AdventuringCard } = await loadModule('src/progression/adventuring-card.mjs');
 const { AdventuringStats } = await loadModule('src/core/adventuring-stats.mjs');
 const { AdventuringAuras } = await loadModule('src/combat/adventuring-auras.mjs');
-const { createEffect, EffectCache, defaultEffectProcessor, SimpleEffectInstance, evaluateCondition, buildEffectContext } = await loadModule('src/core/adventuring-utils.mjs');
+const { createEffect, EffectCache, defaultEffectProcessor, SimpleEffectInstance, evaluateCondition, buildEffectContext, StatCalculator, PassiveEffects } = await loadModule('src/core/adventuring-utils.mjs');
 
 const { AdventuringCharacterElement } = await loadModule('src/core/components/adventuring-character.mjs');
 
@@ -464,26 +464,17 @@ class AdventuringCharacter {
     /**
      * Get effective stat value with all modifiers applied.
      * Queries all effect sources for passive stat effects.
-     * Applies flat bonuses first, then percent bonuses, then all_stat_bonus.
+     * Uses StatCalculator: base + flat → percent → all_stat_bonus.
      */
     getEffectiveStat(stat) {
         if(typeof stat === "string")
             stat = this.manager.stats.getObjectByID(stat);
         
-        let baseValue = this.stats.get(stat);
-        
-        // Use cached stat bonus calculation
-        const bonus = this.getStatBonus(stat.id);
-        
-        // Get all_stat_bonus (applies to all stats)
-        const allStatBonus = this.getPassiveBonus('all_stat_bonus');
-        
-        // Apply flat bonuses to base, then percent modifier, then all_stat_bonus
-        const withFlat = baseValue + bonus.flat;
-        const withPercent = withFlat * (1 + bonus.percent / 100);
-        const withAllBonus = withPercent * (1 + allStatBonus / 100);
-        
-        return Math.floor(withAllBonus);
+        return StatCalculator.calculate(
+            this.stats.get(stat),
+            this.getStatBonus(stat.id),
+            this.getPassiveBonus(PassiveEffects.ALL_STAT_BONUS.id)
+        );
     }
 
     damage({ amount }, character) {

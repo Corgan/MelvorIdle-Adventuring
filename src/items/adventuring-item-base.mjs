@@ -3,7 +3,7 @@ const { loadModule } = mod.getContext(import.meta);
 const { AdventuringMasteryAction } = await loadModule('src/core/adventuring-mastery-action.mjs');
 const { AdventuringItemBaseElement } = await loadModule('src/items/components/adventuring-item-base.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
-const { RequirementsChecker, formatRequirements, describeEffect, describeEffectFull, formatTrigger, AdventuringEquipmentRenderQueue, buildDescription, getLockedMedia } = await loadModule('src/core/adventuring-utils.mjs');
+const { RequirementsChecker, formatRequirements, getEffectDescriptionsList, AdventuringEquipmentRenderQueue, buildDescription, getLockedMedia, StatCalculator } = await loadModule('src/core/adventuring-utils.mjs');
 
 const { AdventuringStats } = await loadModule('src/core/adventuring-stats.mjs');
 
@@ -153,20 +153,9 @@ export class AdventuringItemBase extends AdventuringMasteryAction {
     }
 
     calculateStats() {
-        this.stats.reset();
-
-        // Base stats calculation
-        this.base.forEach((value, stat) => this.stats.set(stat, value));
-        this.scaling.forEach((value, stat) => this.stats.set(stat, this.stats.get(stat) + Math.floor(this.level * value)));
-
-        // Apply equipment_stats_percent mastery bonus (level 99)
+        // Calculate base stats with level scaling and mastery bonus
         const statBonus = this.getMasteryEffectValue('equipment_stats_percent');
-        if (statBonus > 0) {
-            this.stats.forEach((value, stat) => {
-                const bonus = Math.floor(value * statBonus / 100);
-                this.stats.set(stat, value + bonus);
-            });
-        }
+        StatCalculator.calculateWithScaling(this.stats, this.base, this.scaling, this.level, statBonus);
         
         // Masterful rank: Apply normalization to bring all items to same power level
         if (this.isMasterful) {
@@ -179,14 +168,9 @@ export class AdventuringItemBase extends AdventuringMasteryAction {
      * This brings lower-tier items up to high-tier power when both are Masterful
      */
     applyMasterfulScaling() {
-        // Target power level for Masterful items (based on highest tier items at level 99)
-        const masterfulMultiplier = this.getMasterfulMultiplier();
-        
-        if (masterfulMultiplier > 1) {
-            this.stats.forEach((value, stat) => {
-                const boostedValue = Math.floor(value * masterfulMultiplier);
-                this.stats.set(stat, boostedValue);
-            });
+        const multiplier = this.getMasterfulMultiplier();
+        if (multiplier > 1) {
+            StatCalculator.applyMultiplier(this.stats, multiplier);
         }
     }
     
@@ -417,28 +401,7 @@ export class AdventuringItemBase extends AdventuringMasteryAction {
      * @returns {Array<string>} Array of effect description strings
      */
     getEffectDescriptions() {
-        if(!this.effects || this.effects.length === 0) return [];
-        
-        return this.effects.map(effect => {
-            // Use description if explicitly provided
-            if(effect.description) return effect.description;
-            
-            // Build description from effect data
-            let trigger = formatTrigger(effect.trigger);
-            let desc = describeEffect(effect, this.manager);
-            
-            // Add chance if applicable (chance is whole percent, 100 = always)
-            if(effect.chance !== undefined && effect.chance < 100) {
-                desc = `${effect.chance}% chance: ${desc}`;
-            }
-            
-            // Combine trigger and description for non-passive effects
-            if(trigger && effect.trigger !== 'passive') {
-                return `${trigger}: ${desc}`;
-            }
-            
-            return desc;
-        });
+        return getEffectDescriptionsList(this.effects, this.manager);
     }
 
     getCost(material) {
