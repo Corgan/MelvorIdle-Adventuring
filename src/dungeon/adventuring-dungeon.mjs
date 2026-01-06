@@ -64,7 +64,7 @@ export class AdventuringDungeon extends AdventuringPage {
             const source = `Endless Wave ${this.endlessWave + 1}`;
             
             return [
-                createEffect({ trigger: 'passive', type: 'enemy_stats_percent', value: statPercent }, this, source),
+                createEffect({ trigger: 'passive', type: 'stats_percent', target: 'all', party: 'enemy', value: statPercent }, this, source),
                 createEffect({ trigger: 'passive', type: 'xp_percent', value: rewardPercent }, this, source),
                 createEffect({ trigger: 'passive', type: 'loot_percent', value: rewardPercent }, this, source)
             ];
@@ -83,15 +83,11 @@ export class AdventuringDungeon extends AdventuringPage {
         const effects = [];
         if(this.manager === undefined || this.manager.party === undefined) return effects;
         
-        const isEnemyTarget = (target) => 
-            target === 'all_enemies' || target === 'random_enemy' ||
-            target === 'front_enemy' || target === 'back_enemy' || target === 'lowest_enemy';
-        
         // Collect from all party members
         for(const hero of this.manager.party.all) {
             const allEffects = hero.getAllEffects();
             for(const effect of allEffects) {
-                if(effect.target && isEnemyTarget(effect.target)) {
+                if(effect.party === 'enemy') {
                     effects.push(effect);
                 }
             }
@@ -100,7 +96,7 @@ export class AdventuringDungeon extends AdventuringPage {
         // Collect from consumables
         if(this.manager.consumables) {
             for(const effect of this.manager.consumables.getEffects()) {
-                if(effect.target && isEnemyTarget(effect.target)) {
+                if(effect.party === 'enemy') {
                     effects.push(effect);
                 }
             }
@@ -111,11 +107,12 @@ export class AdventuringDungeon extends AdventuringPage {
     
     /**
      * Get bonus value for a passive effect type (additive stacking)
-     * @param {string} effectType - Effect type (e.g., 'enemy_stats_percent', 'xp_percent')
+     * @param {string} effectType - Effect type (e.g., 'stats_percent', 'xp_percent')
+     * @param {Object} [filter={}] - Optional filter for effect properties (e.g., { target: 'all', party: 'enemy' })
      * @returns {number} Total bonus percentage
      */
-    getBonus(effectType) {
-        return this.effectCache.getBonus(effectType);
+    getBonus(effectType, filter = {}) {
+        return this.effectCache.getBonus(effectType, filter);
     }
     
     /**
@@ -387,7 +384,7 @@ export class AdventuringDungeon extends AdventuringPage {
             if(this.floorCards[0] === undefined)
                 this.floorCards[0] = new AdventuringCard(this.manager, this.game);
             
-            const statBonus = 100 + this.getBonus('enemy_stats_percent');
+            const statBonus = 100 + this.getBonus('stats_percent', { target: 'all', party: 'enemy' });
             this.floorCards[0].name = `Wave ${this.endlessWave + 1} (${statBonus}%)`;
             this.floorCards[0].renderQueue.name = true;
             this.floorCards[0].icon = cdnMedia('assets/media/main/hardcore.svg');

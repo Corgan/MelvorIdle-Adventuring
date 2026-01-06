@@ -5,13 +5,12 @@ const { getAuraName, UNKNOWN_MEDIA, describeEffectsInline } = await loadModule('
 
 /**
  * Effect types for difficulties:
- * - enemy_stats_percent: +X% to enemy stats (additive)
+ * - stats_percent: +X% to stats (with target/party: e.g., party: 'enemy' for enemy stats)
  * - xp_percent: +X% to XP gained (additive)
  * - loot_percent: +X% to loot quantity (additive)
- * - heal_party: Heal party for X% at floor_end
- * - buff: Apply a buff aura to party at dungeon start
- * - debuff: Apply a debuff to enemies at spawn
- * - enemy_buff: Apply a buff to enemies at spawn
+ * - heal_percent: Heal for X% (with target/party: e.g., target: 'all', party: 'hero')
+ * - buff: Apply a buff aura (with target/party for targeting)
+ * - debuff: Apply a debuff (with target/party for targeting)
  */
 class DifficultyEffect extends AdventuringScalableEffect {
     constructor(manager, game, difficulty, data) {
@@ -131,7 +130,10 @@ export class AdventuringDifficulty extends NamespacedObject {
      * Returns whole percent value (50 = +50%)
      */
     get enemyStatsPercent() {
-        const effect = this.effects.find(e => e.type === 'enemy_stats_percent');
+        const effect = this.effects.find(e => 
+            (e.type === 'stats_percent' && e.party === 'enemy') ||
+            e.type === 'enemy_stats_percent' // Legacy support
+        );
         return effect && effect.amount ? effect.amount.base : 0;
     }
 
@@ -229,7 +231,14 @@ export class AdventuringDifficulty extends NamespacedObject {
                     stacks: effect.getStacks(), 
                     amount: effect.getAmount() 
                 }, null);
+            } else if(effect.type === 'buff' && effect.party === 'enemy') {
+                // New format: buff with party: 'enemy'
+                enemy.buff(effect.id, { 
+                    stacks: effect.getStacks(), 
+                    amount: effect.getAmount() 
+                }, null);
             } else if(effect.type === 'enemy_buff') {
+                // Legacy format
                 enemy.buff(effect.id, { 
                     stacks: effect.getStacks(), 
                     amount: effect.getAmount() 
@@ -294,7 +303,8 @@ export class AdventuringDifficulty extends NamespacedObject {
             lines.push('<div class="text-warning">Enemy Effects:</div>');
             enemySpawnEffects.forEach(effect => {
                 const auraName = getAuraName(this.manager, effect.id);
-                const typeLabel = effect.type === 'enemy_buff' ? '' : '(debuff) ';
+                const isBuffType = effect.type === 'buff' || effect.type === 'enemy_buff';
+                const typeLabel = isBuffType ? '' : '(debuff) ';
                 lines.push(`<div class="text-muted">• ${typeLabel}${auraName} x${effect.getStacks()}</div>`);
             });
         }

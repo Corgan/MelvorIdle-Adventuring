@@ -66,7 +66,7 @@ export class AdventuringEnemy extends AdventuringCharacter {
         this.phaseTransitioned = false;
 
         // Get stat bonus from dungeon effect cache (additive percentages from difficulty + endless)
-        const statBonus = this.manager.dungeon.getBonus('enemy_stats_percent');
+        const statBonus = this.manager.dungeon.getBonus('stats_percent', { target: 'all', party: 'enemy' });
 
         monster.stats.forEach(({ id, value }) => {
             // Scale stats by bonus percentage
@@ -118,7 +118,14 @@ export class AdventuringEnemy extends AdventuringCharacter {
                     stacks: effect.stacks, 
                     amount: effect.amount 
                 }, null);
+            } else if(effect.type === 'buff' && effect.party === 'enemy') {
+                // New format: buff with party: 'enemy'
+                this.buff(auraId, { 
+                    stacks: effect.stacks, 
+                    amount: effect.amount 
+                }, null);
             } else if(effect.type === 'enemy_buff') {
+                // Legacy format
                 this.buff(auraId, { 
                     stacks: effect.stacks, 
                     amount: effect.amount 

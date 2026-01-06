@@ -167,16 +167,18 @@ class AdventuringParty {
     /**
      * Apply a party-scoped effect.
      * Handles target resolution for party-wide effects.
+     * Note: This only applies to hero party. Uses new target/party format.
      */
     applyPartyEffect(effect, source, sourceName, sourceType) {
-        const target = effect.target || 'all_allies';
+        // Use new format target, with backwards compatibility for old 'all_allies' format
+        const target = effect.target || 'all';
         const amount = effect.amount || 0;
         
-        // Resolve targets
+        // Resolve targets within this party
         let targets = [];
         switch (target) {
-            case 'all_allies':
-            case 'party':
+            case 'all_allies': // Legacy
+            case 'party': // Legacy
             case 'all':
                 targets = this.alive;
                 break;

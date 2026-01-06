@@ -726,22 +726,35 @@ class EffectCache {
     
     /**
      * Get computed bonus for a specific effect type.
-     * Sums all passive effects of the given type.
-     * @param {string} effectType - Effect type to sum (e.g., 'increase_xp_percent')
+     * Sums all passive effects of the given type, optionally filtered by properties.
+     * @param {string} effectType - Effect type to sum (e.g., 'stats_percent')
+     * @param {object} [filter={}] - Optional property filters (e.g., { target: 'all', party: 'enemy' })
      * @returns {number} Total bonus value
      */
-    getBonus(effectType) {
+    getBonus(effectType, filter = {}) {
         this.rebuild();
         
-        const cacheKey = `bonus:${effectType}`;
+        // Build cache key from type + filter
+        const filterKey = Object.keys(filter).length > 0 
+            ? ':' + Object.entries(filter).sort().map(([k,v]) => `${k}=${v}`).join(',')
+            : '';
+        const cacheKey = `bonus:${effectType}${filterKey}`;
+        
         if(this.bonusCache.has(cacheKey)) {
             return this.bonusCache.get(cacheKey);
         }
         
         const passiveEffects = this.getEffects('passive');
         const total = passiveEffects
-            .filter(e => e.type === effectType)
-            .reduce((sum, e) => sum + (e.value || 0), 0);
+            .filter(e => {
+                if(e.type !== effectType) return false;
+                // Check all filter properties match
+                for(const [key, value] of Object.entries(filter)) {
+                    if(e[key] !== value) return false;
+                }
+                return true;
+            })
+            .reduce((sum, e) => sum + (e.value ?? e.amount ?? 0), 0);
         
         this.bonusCache.set(cacheKey, total);
         return total;
@@ -1436,6 +1449,11 @@ const effectDescriptionRegistry = new Map([
         `${helpers.sign(value)}${value}% XP`],
     ['loot_percent', (effect, value, stacks, amount, manager, helpers) => 
         `${helpers.sign(value)}${value}% Loot`],
+    ['stats_percent', (effect, value, stacks, amount, manager, helpers) => {
+        const partyLabel = effect.party === 'enemy' ? 'Enemy' : 'Party';
+        return `${partyLabel} Stats: ${helpers.sign(value)}${value}%`;
+    }],
+    // Legacy alias - prefer stats_percent with party property
     ['enemy_stats_percent', (effect, value, stacks, amount, manager, helpers) => 
         `Enemy Stats: ${helpers.sign(value)}${value}%`],
     
@@ -1594,7 +1612,12 @@ const effectDescriptionRegistry = new Map([
         `${firstDefined(amount, 0)}% damage reduction${effect.perStack ? ' per stack' : ''}`],
     ['reduce_heal_percent', (effect, value, stacks, amount) => 
         `-${firstDefined(amount, 0)}% healing received${effect.perStack ? ' per stack' : ''}`],
-    // heal_party: use 'value' for percent of max HP, 'amount' for flat HP
+    // heal_percent: percent of max HP healing with target/party properties
+    ['heal_percent', (effect, value, stacks, amount, manager, helpers) => {
+        const targetLabel = effect.party === 'enemy' ? 'enemies' : 'party';
+        return `Heal ${targetLabel} for ${firstDefined(amount, value, 0)}% max HP`;
+    }],
+    // Legacy alias - prefer heal_percent with target/party properties
     ['heal_party', (effect, value, stacks, amount) => {
         if(value !== undefined && value !== 0) {
             return `Heal party for ${value}% max HP`;
@@ -1628,7 +1651,12 @@ const effectDescriptionRegistry = new Map([
     ['energy_bonus', (effect, value) => `+${value}% Energy`],
     ['energy_regen_bonus', (effect, value) => `+${value}% Energy Regen`],
     
-    // Enemy buffs
+    // Buffs with party targeting
+    ['buff', (effect, value, stacks, amount, manager, helpers) => {
+        const targetLabel = effect.party === 'enemy' ? 'Enemies' : 'Party';
+        return `${targetLabel} gain ${firstDefined(stacks, 1)} ${helpers.aura(effect.id)}`;
+    }],
+    // Legacy alias - prefer buff with party: 'enemy'
     ['enemy_buff', (effect, value, stacks, amount, manager, helpers) => 
         `Enemies gain ${firstDefined(stacks, 1)} ${helpers.aura(effect.id)}`],
 ]);
@@ -2358,7 +2386,34 @@ function createDefaultEffectProcessor() {
         return ctx.extra;
     });
     
-    // Heal entire party - uses 'value' for percent of max HP, 'amount' for flat HP
+    // Heal with target/party properties - standardized format
+    processor.register('heal_percent', (effect, instance, ctx) => {
+        const percentValue = effect.amount ?? instance.amount ?? 0;
+        if(percentValue <= 0) return ctx.extra;
+        
+        // Determine targets based on target/party properties
+        const party = effect.party || 'hero';
+        const target = effect.target || 'all';
+        
+        if(party === 'hero' && ctx.manager.party) {
+            if(target === 'all') {
+                ctx.manager.party.heroes.forEach(hero => {
+                    if(!hero.dead) {
+                        const healAmount = Math.ceil(hero.maxHitpoints * (percentValue / 100));
+                        hero.heal({ amount: healAmount }, ctx.character);
+                    }
+                });
+            } else if(target === 'self') {
+                const healAmount = Math.ceil(ctx.character.maxHitpoints * (percentValue / 100));
+                ctx.character.heal({ amount: healAmount }, ctx.character);
+            }
+            ctx.manager.log.add(`${ctx.character?.name || 'Effect'} heals for ${percentValue}%`);
+        }
+        // Enemy healing not typically used, but could be extended here
+        return ctx.extra;
+    });
+    
+    // Heal entire party - legacy format, prefer heal_percent with target/party
     processor.register('heal_party', (effect, instance, ctx) => {
         if(ctx.manager.party) {
             // Check for percent-based healing (amount property with heal_party type)

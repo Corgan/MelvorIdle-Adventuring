@@ -415,12 +415,17 @@ export class Adventuring extends SkillWithMastery {
      */
     applyEffect(effect, trigger, context = {}) {
         switch(effect.type) {
+            case 'heal_percent':
             case 'heal_party': {
-                // Use 'amount' for percent of max HP for heal_party
+                // Use 'amount' for percent of max HP for heal_percent/heal_party
                 const healPercent = effect.amount || 0;
                 const healAmount = effect.amount?.base ?? effect.amount ?? 0;
                 
-                this.party.all.forEach(hero => {
+                // Determine targets based on party property (default to hero for heal_percent)
+                const targetParty = effect.party === 'enemy' ? null : this.party.all;
+                if(!targetParty) break; // heal_percent with party: 'enemy' not applicable here
+                
+                targetParty.forEach(hero => {
                     if(!hero.dead) {
                         let heal = healAmount;
                         if(healPercent > 0) {
@@ -441,15 +446,17 @@ export class Adventuring extends SkillWithMastery {
             }
             
             case 'buff': {
-                // Apply buff to all party members
+                // Apply buff based on party property
                 const aura = effect.aura;
-                if(aura) {
+                if(aura && effect.party !== 'enemy') {
+                    // Party buffs applied to heroes
                     this.party.all.forEach(hero => {
                         if(!hero.dead) {
                             hero.auras.add(aura, effect.stacks || 1, effect.sourceName);
                         }
                     });
                 }
+                // Enemy buffs handled by encounter system at spawn
                 break;
             }
             
