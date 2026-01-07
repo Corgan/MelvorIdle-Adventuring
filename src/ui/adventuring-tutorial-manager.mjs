@@ -423,29 +423,17 @@ export class AdventuringTutorialManager {
             return;
         }
 
-        // Resolve target element (even for informational steps, so tooltip can point at target)
+        // Resolve target element for visual highlighting (optional)
         var targetElement = step.target ? this.resolveTarget(step.target) : null;
         
-        if(!step.informational && !targetElement) {
-            // Target not found - check if we're on the wrong page
+        // If target specified but not found, check if we're on wrong page
+        if(step.target && !targetElement) {
             if(!this.isOnCorrectPageForTarget(step.target)) {
-                // Wrong page - wait for page change event, don't poll
+                // Wrong page - wait for page change event
                 this.component.hide();
                 return;
             }
-            // Right page but element not rendered yet - schedule a limited retry
-            this.scheduleRetry();
-            return;
-        }
-
-        // For informational steps with target, also check if target is available
-        if(step.informational && step.target && !targetElement) {
-            if(!this.isOnCorrectPageForTarget(step.target)) {
-                this.component.hide();
-                // Resume timers while waiting for page change - we're not showing a tooltip
-                this.resumeTimers();
-                return;
-            }
+            // Right page but element not rendered yet - schedule retry
             this.scheduleRetry();
             return;
         }
@@ -453,18 +441,8 @@ export class AdventuringTutorialManager {
         // Clear any pending retry
         this.clearRetry();
 
-        // For informational steps, pause game timers
-        if(step.informational) {
-            this.pauseTimers();
-        }
-
-        // Show the tooltip
-        this.component.show(targetElement, step.message, step.position, step.informational);
-
-        // Set up click listener on target (only for non-informational steps)
-        if(!step.informational && targetElement) {
-            this.setupClickListener(targetElement);
-        }
+        // Show the tooltip (target is optional - used for highlighting only)
+        this.component.show(targetElement, step.message, step.position);
     }
 
     /**
@@ -751,64 +729,17 @@ export class AdventuringTutorialManager {
     }
 
     /**
-     * Set up click listener to advance on interaction
-     */
-    setupClickListener(element) {
-        // Remove any existing listener
-        if(this._currentClickHandler && this._currentTargetElement) {
-            this._currentTargetElement.removeEventListener('click', this._currentClickHandler, true);
-        }
-
-        this._currentTargetElement = element;
-        this._currentClickHandler = (e) => {
-            // Small delay to let the actual click action complete first
-            setTimeout(() => this.advanceStep(), 50);
-        };
-
-        // Use capture phase to catch clicks on children of display:contents elements
-        element.addEventListener('click', this._currentClickHandler, { once: true, capture: true });
-    }
-
-    /**
      * Advance to the next step
      */
     advanceStep() {
-        // Clean up
         this.clearRetry();
-        if(this._currentClickHandler && this._currentTargetElement) {
-            this._currentTargetElement.removeEventListener('click', this._currentClickHandler, true);
-            this._currentClickHandler = null;
-            this._currentTargetElement = null;
-        }
-
         this.activeStepIndex++;
 
         if(this.activeStepIndex >= this.activeTutorial.steps.length) {
-            // Resume timers before completing
-            this.resumeTimers();
             this.completeTutorial();
         } else {
-            // Check if next step is informational - only resume timers if it's not
-            var nextStep = this.activeTutorial.steps[this.activeStepIndex];
-            if(!nextStep || !nextStep.informational) {
-                this.resumeTimers();
-            }
             this.showCurrentStep();
         }
-    }
-
-    /**
-     * Pause dungeon and combat timers for informational steps
-     */
-    pauseTimers() {
-        this.manager.timersPaused = true;
-    }
-
-    /**
-     * Resume timers that were paused by an informational step
-     */
-    resumeTimers() {
-        this.manager.timersPaused = false;
     }
 
     /**
@@ -845,16 +776,6 @@ export class AdventuringTutorialManager {
     skipTutorial() {
         if(!this.activeTutorial) return;
 
-        // Resume timers if they were paused
-        this.resumeTimers();
-
-        // Clean up click listener
-        if(this._currentClickHandler && this._currentTargetElement) {
-            this._currentTargetElement.removeEventListener('click', this._currentClickHandler, true);
-            this._currentClickHandler = null;
-            this._currentTargetElement = null;
-        }
-
         this.skippedTutorials.add(this.activeTutorial);
         this.activeTutorial = null;
         this.activeStepIndex = 0;
@@ -868,9 +789,6 @@ export class AdventuringTutorialManager {
     setSkipAll(skip) {
         this.skipAll = skip;
         if(skip) {
-            // Resume timers if they were paused
-            this.resumeTimers();
-            
             this.queue = [];
             this.activeTutorial = null;
             this.activeStepIndex = 0;

@@ -387,6 +387,7 @@ export class AdventuringAchievement extends NamespacedObject {
      * Format rewards for display
      */
     getRewardsText() {
+        const { getEffectDescriptionsList } = loadModule('src/core/adventuring-utils.mjs');
         const parts = [];
         for(const reward of this.rewards) {
             switch(reward.type) {
@@ -397,9 +398,11 @@ export class AdventuringAchievement extends NamespacedObject {
                     const mat = this.manager.materials.getObjectByID(reward.id);
                     if(mat) parts.push(`${reward.qty}x ${mat.name}`);
                     break;
-                case 'permanent_stat':
-                    const stat = this.manager.stats.getObjectByID(reward.stat);
-                    if(stat) parts.push(`+${reward.value} ${stat.name} (permanent)`);
+                case 'effect':
+                    const descs = getEffectDescriptionsList(reward.effects, this.manager);
+                    for(const desc of descs) {
+                        parts.push(`${desc} (permanent)`);
+                    }
                     break;
                 case 'ability':
                     const ability = this.manager.getAbilityByID(reward.id);
@@ -461,16 +464,15 @@ export class AchievementManager {
         
         for(const achievement of this.completedAchievements) {
             for(const reward of achievement.rewards) {
-                if(reward.type === 'permanent_stat') {
-                    // Convert permanent stat bonus to StandardEffect format
-                    effects.push({
-                        id: `achievement:${achievement.localID}:${reward.stat}`,
-                        trigger: 'passive',
-                        effectType: 'stat_bonus',
-                        stat: reward.stat,
-                        value: reward.value,
-                        source: achievement
-                    });
+                if(reward.type === 'effect') {
+                    // Add all effects from the effect reward
+                    for(const effect of reward.effects) {
+                        effects.push({
+                            ...effect,
+                            id: `achievement:${achievement.localID}:${effect.type}:${effect.stat || ''}`,
+                            source: achievement
+                        });
+                    }
                 }
             }
         }
@@ -494,8 +496,12 @@ export class AchievementManager {
         let total = 0;
         for(const achievement of this.completedAchievements) {
             for(const reward of achievement.rewards) {
-                if(reward.type === 'permanent_stat' && reward.stat === statId) {
-                    total += reward.value;
+                if(reward.type === 'effect') {
+                    for(const effect of reward.effects) {
+                        if(effect.type === 'stat_flat' && effect.stat === statId) {
+                            total += effect.amount;
+                        }
+                    }
                 }
             }
         }
@@ -647,7 +653,7 @@ export class AchievementManager {
         // Mark as complete (stores the actual object)
         this.completedAchievements.add(achievement);
         
-        // Grant rewards (except permanent_stat and ability, which are derived)
+        // Grant rewards (except effect and ability, which are derived)
         for(const reward of achievement.rewards) {
             this.grantReward(reward);
         }
@@ -683,7 +689,7 @@ export class AchievementManager {
                 }
                 break;
                 
-            // permanent_stat and ability are now derived from completedAchievements
+            // effect and ability are now derived from completedAchievements
             // No need to store them separately
         }
     }

@@ -5,7 +5,7 @@ const { getAuraName, UNKNOWN_MEDIA, describeEffectsInline } = await loadModule('
 
 /**
  * Effect types for difficulties:
- * - stats_percent: +X% to stats (with target/party: e.g., party: 'enemy' for enemy stats)
+ * - all_stat_percent: +X% to stats (with target/party: e.g., party: 'enemy' for enemy stats)
  * - xp_percent: +X% to XP gained (additive)
  * - loot_percent: +X% to loot quantity (additive)
  * - heal_percent: Heal for X% (with target/party: e.g., target: 'all', party: 'hero')
@@ -131,7 +131,7 @@ export class AdventuringDifficulty extends NamespacedObject {
      */
     get enemyStatsPercent() {
         const effect = this.effects.find(e => 
-            e.type === 'stats_percent' && e.party === 'enemy'
+            e.type === 'all_stat_percent' && e.party === 'enemy'
         );
         return effect && effect.amount ? effect.amount.base : 0;
     }

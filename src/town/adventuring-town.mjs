@@ -88,8 +88,9 @@ export class AdventuringTown extends AdventuringPage {
         if(actions.length === 0) {
             let building = [...this.buildings][Math.floor(Math.random()*this.buildings.size)];
             let idle = this.manager.townActions.getObjectByID('adventuring:idle');
+            const currentAction = this.characterAction.get(character);
 
-            if(this.characterAction.get(character) !== idle || Math.random() > 0.85) {
+            if(!currentAction || currentAction.action !== idle || Math.random() > 0.85) {
                 return { building: building, action: idle };
             }
         }

@@ -52,6 +52,10 @@ export class AdventuringTownAction extends NamespacedObject {
                 let amount = Math.floor(effect.amount / 100 * character.maxHitpoints);
                 character.heal({ amount });
             }
+            if(effect.type === "heal_flat") {
+                let amount = effect.amount;
+                character.heal({ amount });
+            }
             if(effect.type === "work") {
                 building.page.doWork(character);
             }

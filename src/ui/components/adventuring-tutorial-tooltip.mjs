@@ -10,7 +10,7 @@ export class AdventuringTutorialTooltipElement extends HTMLElement {
         this.tooltip = getElementFromFragment(this._content, 'tooltip', 'div');
         this.arrow = getElementFromFragment(this._content, 'arrow', 'div');
         this.message = getElementFromFragment(this._content, 'message', 'div');
-        this.okayBtn = getElementFromFragment(this._content, 'okay-btn', 'button');
+        this.nextBtn = getElementFromFragment(this._content, 'next-btn', 'button');
         this.skipBtn = getElementFromFragment(this._content, 'skip-btn', 'a');
         this.skipAllBtn = getElementFromFragment(this._content, 'skip-all-btn', 'a');
 
@@ -30,8 +30,8 @@ export class AdventuringTutorialTooltipElement extends HTMLElement {
             e.stopPropagation();
         }, true);
 
-        // Okay button handler (for informational steps)
-        this.okayBtn.onclick = (e) => {
+        // Next button handler - always advances to next step
+        this.nextBtn.onclick = (e) => {
             e.preventDefault();
             e.stopPropagation();
             if(this.manager) this.manager.advanceStep();
@@ -87,26 +87,17 @@ export class AdventuringTutorialTooltipElement extends HTMLElement {
 
     /**
      * Show the tutorial tooltip pointing at a target element
-     * @param {HTMLElement} targetElement - Element to highlight (null for informational-only)
+     * @param {HTMLElement} targetElement - Element to highlight (null for centered tooltip)
      * @param {string} messageText - Message to display
      * @param {string} preferredPosition - 'top', 'bottom', 'left', 'right'
-     * @param {boolean} isInformational - If true, show Okay button and block all clicks
      */
-    show(targetElement, messageText, preferredPosition = 'bottom', isInformational = false) {
+    show(targetElement, messageText, preferredPosition = 'bottom') {
         this._currentTarget = targetElement;
         this._preferredPosition = preferredPosition;
         this._visible = true;
-        this._isInformational = isInformational;
 
         // Set message
         this.message.textContent = messageText;
-
-        // Show/hide Okay button based on step type
-        if(isInformational) {
-            this.okayBtn.classList.remove('d-none');
-        } else {
-            this.okayBtn.classList.add('d-none');
-        }
 
         // Show overlay
         this.overlay.classList.remove('d-none');
@@ -126,10 +117,7 @@ export class AdventuringTutorialTooltipElement extends HTMLElement {
     hide() {
         this._visible = false;
         this._currentTarget = null;
-        this._isInformational = false;
         this.overlay.classList.add('d-none');
-        this.okayBtn.classList.add('d-none');
-        this.clickBlocker.classList.add('d-none');
         this.highlight.style.display = '';
         this.overlay.style.clipPath = '';
         if(this._renderWaitTimeout) {
@@ -198,7 +186,7 @@ export class AdventuringTutorialTooltipElement extends HTMLElement {
     }
 
     /**
-     * Position the highlight box and update overlay clip-path to create clickable hole
+     * Position the highlight box and update overlay clip-path to create visual hole
      */
     positionHighlight(targetRect) {
         const padding = 4;
@@ -213,30 +201,24 @@ export class AdventuringTutorialTooltipElement extends HTMLElement {
         this.highlight.style.width = `${width}px`;
         this.highlight.style.height = `${height}px`;
         
-        // Update overlay clip-path to create a hole (both informational and interactive)
-        // polygon draws the outer rectangle, then an inner rectangle (the hole)
+        // Update overlay clip-path to create a visual hole
         const right = left + width;
         const bottom = top + height;
         const vw = window.innerWidth;
         const vh = window.innerHeight;
         
         // Create clip-path with hole using polygon
-        // Outer box (full screen), then inner box (hole) drawn in reverse
         this.overlay.style.clipPath = `polygon(
             0 0, ${vw}px 0, ${vw}px ${vh}px, 0 ${vh}px, 0 0,
             ${left}px ${top}px, ${left}px ${bottom}px, ${right}px ${bottom}px, ${right}px ${top}px, ${left}px ${top}px
         )`;
         
-        // For informational steps, show click blocker over the hole to block clicks but allow hover
-        if(this._isInformational) {
-            this.clickBlocker.classList.remove('d-none');
-            this.clickBlocker.style.left = `${left}px`;
-            this.clickBlocker.style.top = `${top}px`;
-            this.clickBlocker.style.width = `${width}px`;
-            this.clickBlocker.style.height = `${height}px`;
-        } else {
-            this.clickBlocker.classList.add('d-none');
-        }
+        // Always show click blocker over the hole to block clicks
+        this.clickBlocker.classList.remove('d-none');
+        this.clickBlocker.style.left = `${left}px`;
+        this.clickBlocker.style.top = `${top}px`;
+        this.clickBlocker.style.width = `${width}px`;
+        this.clickBlocker.style.height = `${height}px`;
     }
 
     /**

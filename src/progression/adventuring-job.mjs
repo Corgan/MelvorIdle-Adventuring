@@ -146,8 +146,8 @@ export class AdventuringJob extends AdventuringMasteryAction {
         this._reqChecker = new RequirementsChecker(this.manager, this.requirements);
         
         if(this._scaling !== undefined) {
-            this._scaling.forEach(({ id, value }) => {
-                this.scaling.set(id, value);
+            this._scaling.forEach(({ id, amount }) => {
+                this.scaling.set(id, amount);
             });
             delete this._scaling;
         }

@@ -306,11 +306,12 @@ export class AdventuringHero extends AdventuringCharacter {
         // Add consumable effects (character-scoped only, party-scoped handled by Party.trigger)
         if (this.manager.consumables) {
             const consumableEffects = this.manager.consumables.getEffectsForTrigger(type, context);
-            for (const { consumable, effect } of consumableEffects) {
+            for (const { consumable, tier, effect } of consumableEffects) {
                 if (effect.scope === 'party') continue; // Skip party-scoped
                 pending.push({
                     effect,
                     source: consumable,
+                    sourceTier: tier,
                     sourceName: consumable.name,
                     sourceType: 'consumable'
                 });
@@ -364,22 +365,31 @@ export class AdventuringHero extends AdventuringCharacter {
      * Override to handle special processing for different source types.
      * - Consumables: consume a charge after triggering
      * - Job Passives: use passive's target resolution
+     * - consume_charge effects: explicitly consume charges
      * @override
      */
     processPendingEffect(pending, context) {
-        const { effect, source, sourceName, sourceType } = pending;
+        const { effect, source, sourceTier, sourceName, sourceType } = pending;
         
         // For job passives, use the passive's built-in apply logic (with target resolution)
         if (sourceType === 'jobPassive') {
             return this.processJobPassiveEffect(pending, context);
         }
         
+        // Handle consume_charge effect type (for consumables with passive effects)
+        if (effect.type === 'consume_charge' && sourceType === 'consumable') {
+            const count = effect.count || 1;
+            this.manager.consumables.removeCharges(source, sourceTier, count);
+            this.manager.log.add(`${sourceName} consumed ${count} charge(s).`);
+            return true;
+        }
+        
         // For other sources, use the standard processing
         const applied = super.processPendingEffect(pending, context);
         
-        // If this was a consumable effect that applied, consume a charge
-        if (applied && sourceType === 'consumable') {
-            this.manager.consumables.removeCharges(source, 1);
+        // If this was a consumable effect that applied (not passive), consume a charge
+        if (applied && sourceType === 'consumable' && effect.trigger !== 'passive') {
+            this.manager.consumables.removeCharges(source, sourceTier, 1);
             this.manager.log.add(`${sourceName} consumed a charge.`);
         }
         

@@ -223,7 +223,7 @@ export async function setup({ gameData, patch, loadTemplates, loadModule, loadSt
     await load('data/areas/void_citadel.json');
 
     // Gauntlet areas
-    await load('data/gauntlet.json');
+    await load('data/areas/gauntlet.json');
 
     // Tavern drinks (passive run-length effects)
     await load('data/tavern-drinks.json');

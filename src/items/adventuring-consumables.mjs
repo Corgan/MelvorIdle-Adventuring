@@ -406,22 +406,16 @@ export class AdventuringConsumables extends AdventuringPage {
     getEffectsForTrigger(triggerType, context = {}) {
         const results = [];
         
-        // Trigger aliases for backwards compatibility
-        const triggerAliases = {
-            'after_damage_received': ['damaged'],
-            'after_damage_dealt': ['hit']
-        };
-        const matchingTriggers = [triggerType, ...(triggerAliases[triggerType] || [])];
-        
         for (const { consumable, tier } of this.equipped) {
             if (this.getCharges(consumable, tier) <= 0) continue;
             
             const tierEffects = consumable.getTierEffects(tier);
             for (const effect of tierEffects) {
-                if (!matchingTriggers.includes(effect.trigger)) continue;
+                if (effect.trigger !== triggerType) continue;
                 
                 results.push({
                     consumable: consumable,
+                    tier: tier,
                     effect: effect
                 });
             }
@@ -457,11 +451,6 @@ export class AdventuringConsumables extends AdventuringPage {
         
         this.manager.tavern.consumeCharges();
         this.usedThisRun.clear();
-    }
-
-    // =========================================
-    // Rendering
-    // =========================================
     }
 
     // =========================================

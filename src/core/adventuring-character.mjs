@@ -272,340 +272,21 @@ class AdventuringCharacter {
     
     /**
      * Process an aura effect with instance context.
-     * Handles context-modifying effects (reduce_amount, etc.) and self-modifying effects.
+     * Delegates to the centralized EffectProcessor for consistent handling.
      * @param {object} effect - The effect with pre-resolved amount
      * @param {object} instance - The aura instance (for self-modifying effects)
      * @param {string} sourceName - Name for logging
      * @param {object} context - Context object (mutated for middleware effects)
      */
     processAuraEffect(effect, instance, sourceName, context) {
-        const amount = effect.amount || 0;
-        const stacks = effect.stacks || instance.stacks || 1;
+        // Use the unified processor
+        const processorContext = {
+            character: this,
+            manager: this.manager,
+            extra: context
+        };
         
-        // Context-modifying effects (middleware pattern)
-        switch (effect.type) {
-            case 'skip':
-                context.skip = true;
-                return;
-                
-            case 'reduce_amount': {
-                const reduce = Math.min(context.amount || 0, amount * stacks);
-                context.amount = (context.amount || 0) - reduce;
-                if (effect.consume !== false && instance.remove_stacks) {
-                    instance.remove_stacks(reduce);
-                }
-                return;
-            }
-            
-            case 'reduce_damage_percent': {
-                const reduction = Math.ceil((context.amount || 0) * (amount / 100));
-                context.amount = Math.max(0, (context.amount || 0) - reduction);
-                return;
-            }
-            
-            case 'absorb_damage': {
-                const amountPerStack = amount || 1;
-                const totalAbsorb = amountPerStack * stacks;
-                const damage = context.amount || 0;
-                const absorbed = Math.min(damage, totalAbsorb);
-                context.amount = damage - absorbed;
-                if (effect.consume !== false && absorbed > 0 && instance.remove_stacks) {
-                    const stacksToRemove = Math.ceil(absorbed / amountPerStack);
-                    instance.remove_stacks(stacksToRemove);
-                }
-                if (absorbed > 0) {
-                    this.manager.log.add(`${this.name}'s ${sourceName} absorbs ${absorbed} damage`);
-                }
-                return;
-            }
-            
-            case 'chance_skip':
-                if (Math.random() * 100 < amount) {
-                    context.skip = true;
-                    this.manager.log.add(`${this.name} is overcome with ${sourceName}!`);
-                }
-                return;
-                
-            case 'chance_dodge':
-                if (Math.random() * 100 < amount) {
-                    context.amount = 0;
-                    context.dodged = true;
-                    this.manager.log.add(`${this.name} dodges the attack!`);
-                }
-                return;
-                
-            case 'chance_miss':
-                if (Math.random() * 100 < amount) {
-                    context.amount = 0;
-                    context.missed = true;
-                    this.manager.log.add(`${this.name} misses due to ${sourceName}!`);
-                }
-                return;
-                
-            case 'evade':
-                context.amount = 0;
-                context.evaded = true;
-                if (effect.consume !== false && instance.remove_stacks) {
-                    instance.remove_stacks(1);
-                }
-                this.manager.log.add(`${this.name} evades the attack with ${sourceName}!`);
-                return;
-                
-            case 'untargetable':
-                context.untargetable = true;
-                return;
-                
-            case 'prevent_debuff':
-                context.prevented = true;
-                this.manager.log.add(`${this.name}'s ${sourceName} prevents the debuff!`);
-                return;
-                
-            case 'prevent_ability':
-                context.prevented = true;
-                return;
-                
-            case 'prevent_death':
-                if (effect.oncePerEncounter && instance._preventDeathUsed) {
-                    return;
-                }
-                context.prevented = true;
-                // Pass through heal amount for death prevention healing (whole number percent)
-                context.preventDeathHealAmount = effect.amount || 0;
-                if (effect.oncePerEncounter) {
-                    instance._preventDeathUsed = true;
-                }
-                this.manager.log.add(`${this.name}'s ${sourceName} prevents death!`);
-                return;
-                
-            case 'prevent_lethal': {
-                const currentHP = this.hitpoints;
-                const incomingDamage = context.amount || 0;
-                if (currentHP - incomingDamage <= 0 && currentHP > 0) {
-                    context.amount = currentHP - 1;
-                    context.preventedLethal = true;
-                    this.manager.log.add(`${this.name}'s ${sourceName} prevents lethal damage!`);
-                }
-                return;
-            }
-            
-            case 'force_target':
-                if (instance.source) {
-                    context.forcedTarget = instance.source;
-                }
-                return;
-                
-            case 'flat_damage':
-                context.amount = (context.amount || 0) + amount;
-                return;
-                
-            case 'increase_damage_percent': {
-                const increase = Math.ceil((context.amount || 0) * (amount / 100));
-                context.amount = (context.amount || 0) + increase;
-                return;
-            }
-        }
-        
-        // Self-modifying effects (cleanup)
-        switch (effect.type) {
-            case 'remove_stacks': {
-                let count = effect.count || 1;
-                if (count < 1) {
-                    count = Math.ceil(stacks * count);
-                }
-                if (instance.remove_stacks) instance.remove_stacks(count);
-                return;
-            }
-            
-            case 'remove':
-                if (effect.age !== undefined) {
-                    if (instance.age >= effect.age && instance.remove) {
-                        instance.remove();
-                    }
-                } else if (instance.remove) {
-                    instance.remove();
-                }
-                return;
-        }
-        
-        // Apply effects (damage, heal, buff, debuff, etc.)
-        const builtEffect = { amount, stacks };
-        
-        switch (effect.type) {
-            case 'damage_flat':
-            case 'damage': {
-                const target = effect.target || 'self';
-                let targetChar = this.resolveEffectTarget(target, context);
-                if (targetChar && !targetChar.dead) {
-                    targetChar.damage(builtEffect, this);
-                    this.manager.log.add(`${this.name}'s ${sourceName} deals ${amount} damage to ${targetChar.name}`);
-                }
-                return;
-            }
-            
-            case 'heal_flat':
-            case 'heal': {
-                const target = effect.target || 'self';
-                let targetChar = this.resolveEffectTarget(target, context);
-                if (targetChar && !targetChar.dead) {
-                    targetChar.heal(builtEffect, this);
-                    this.manager.log.add(`${this.name}'s ${sourceName} heals ${targetChar.name} for ${amount}`);
-                }
-                return;
-            }
-            
-            case 'heal_percent': {
-                const healAmount = Math.ceil(this.maxHitpoints * (amount / 100));
-                this.heal({ amount: healAmount }, this);
-                this.manager.log.add(`${this.name} heals for ${healAmount} from ${sourceName}`);
-                return;
-            }
-            
-            case 'buff': {
-                const auraId = effect.id;
-                if (!auraId) return;
-                const target = effect.target || 'self';
-                let targetChar = this.resolveEffectTarget(target, context);
-                if (targetChar && !targetChar.dead) {
-                    targetChar.buff(auraId, { stacks }, this);
-                    this.manager.log.add(`${this.name}'s ${sourceName} applies buff to ${targetChar.name}`);
-                }
-                return;
-            }
-            
-            case 'debuff': {
-                const auraId = effect.id;
-                if (!auraId) return;
-                const target = effect.target || 'target';
-                let targetChar = this.resolveEffectTarget(target, context);
-                if (targetChar && !targetChar.dead) {
-                    targetChar.debuff(auraId, { stacks }, this);
-                    this.manager.log.add(`${this.name}'s ${sourceName} applies debuff to ${targetChar.name}`);
-                }
-                return;
-            }
-            
-            case 'energy':
-                this.energy = Math.min(this.maxEnergy, this.energy + amount);
-                this.renderQueue.energy = true;
-                return;
-                
-            case 'lifesteal': {
-                const healAmount = Math.ceil((context.damageDealt || 0) * (amount / 100));
-                if (healAmount > 0) {
-                    this.heal({ amount: healAmount }, this);
-                    this.manager.log.add(`${this.name} heals for ${healAmount} from ${sourceName}`);
-                }
-                return;
-            }
-            
-            case 'reflect_damage': {
-                if (context.damageReceived && context.attacker) {
-                    const reflectAmount = Math.ceil(context.damageReceived * (amount / 100));
-                    context.attacker.damage({ amount: reflectAmount }, this);
-                    this.manager.log.add(`${this.name}'s ${sourceName} reflects ${reflectAmount} damage`);
-                }
-                return;
-            }
-            
-            case 'cleanse': {
-                const count = amount || effect.count || 999;
-                const target = effect.target === 'self' || !effect.target ? this : 
-                              (effect.target === 'attacker' ? context.attacker : context.target);
-                if (target && !target.dead && target.auras) {
-                    let removed = 0;
-                    for (const auraInstance of [...target.auras.auras.values()]) {
-                        if (auraInstance.base && auraInstance.base.isDebuff && removed < count) {
-                            auraInstance.stacks = 0;
-                            removed++;
-                        }
-                    }
-                    if (removed > 0) {
-                        target.auras.cleanAuras();
-                        target.auras.renderQueue.auras = true;
-                        if (target.effectCache) target.invalidateEffects('auras');
-                        this.manager.log.add(`${this.name}'s ${sourceName} cleanses ${removed} debuff(s) from ${target.name}`);
-                    }
-                }
-                return;
-            }
-            
-            case 'random_buffs': {
-                const buffPool = [
-                    'adventuring:might', 'adventuring:fortify', 'adventuring:haste',
-                    'adventuring:regeneration', 'adventuring:barrier', 'adventuring:focus',
-                    'adventuring:arcane_power', 'adventuring:stealth'
-                ];
-                const count = effect.count || 1;
-                for (let i = 0; i < count; i++) {
-                    const buffId = buffPool[Math.floor(Math.random() * buffPool.length)];
-                    this.auras.add(buffId, { stacks }, this);
-                }
-                this.manager.log.add(`${this.name}'s ${sourceName} grants ${count} random buffs`);
-                return;
-            }
-            
-            case 'random_debuffs': {
-                const debuffPool = [
-                    'adventuring:weaken', 'adventuring:slow', 'adventuring:blind',
-                    'adventuring:poison', 'adventuring:burn', 'adventuring:decay',
-                    'adventuring:vulnerability', 'adventuring:chill'
-                ];
-                const count = effect.count || 1;
-                const target = effect.target === 'attacker' ? context.attacker : context.target;
-                if (target && !target.dead) {
-                    for (let i = 0; i < count; i++) {
-                        const debuffId = debuffPool[Math.floor(Math.random() * debuffPool.length)];
-                        target.auras.add(debuffId, { stacks }, this);
-                    }
-                    this.manager.log.add(`${this.name}'s ${sourceName} applies ${count} random debuffs to ${target.name}`);
-                }
-                return;
-            }
-            
-            case 'dispel_buff': {
-                const count = effect.count || 1;
-                const target = effect.target === 'self' ? this : 
-                              (effect.target === 'attacker' ? context.attacker : context.target);
-                if (target && !target.dead && target.auras) {
-                    let removed = 0;
-                    for (const auraInstance of [...target.auras.auras.values()]) {
-                        if (auraInstance.base && !auraInstance.base.isDebuff && removed < count) {
-                            auraInstance.stacks = 0;
-                            removed++;
-                        }
-                    }
-                    if (removed > 0) {
-                        target.auras.cleanAuras();
-                        target.auras.renderQueue.auras = true;
-                        if (target.effectCache) target.invalidateEffects('auras');
-                        this.manager.log.add(`${this.name}'s ${sourceName} dispels ${removed} buff(s) from ${target.name}`);
-                    }
-                }
-                return;
-            }
-        }
-        
-        // Stat-related effects are passive and don't need runtime processing
-    }
-    
-    /**
-     * Resolve a target string to a character.
-     * @param {string} target - Target type
-     * @param {object} context - Context with attacker, target references
-     * @returns {object|null} Target character or null
-     */
-    resolveEffectTarget(target, context) {
-        switch (target) {
-            case 'self':
-            case undefined:
-                return this;
-            case 'attacker':
-                return context.attacker || null;
-            case 'target':
-                return context.target || null;
-            default:
-                return this;
-        }
+        defaultEffectProcessor.process({ effect, instance }, processorContext);
     }
 
     get action() {
@@ -736,6 +417,18 @@ class AdventuringCharacter {
     }
     
     /**
+     * Get a passive bonus value with condition evaluation.
+     * Use for effects that may have runtime conditions (e.g., hp_below).
+     * @param {string} effectType - Effect type to sum
+     * @param {object} [additionalContext={}] - Additional context for condition evaluation
+     * @returns {number} Total bonus value
+     */
+    getConditionalBonus(effectType, additionalContext = {}) {
+        const context = { character: this, manager: this.manager, ...additionalContext };
+        return this.effectCache.getConditionalBonus(effectType, context);
+    }
+    
+    /**
      * Get computed stat bonuses from all passive effects.
      * @param {string} statId - Stat ID to query
      * @returns {{ flat: number, percent: number }} Flat and percent bonuses
@@ -843,6 +536,16 @@ class AdventuringCharacter {
                 this.onDeath();
 
                 let resolvedEffects = this.trigger('death');
+                
+                // Trigger ally_death on all living party members
+                if(this.manager && this.manager.party) {
+                    const party = this.isHero ? this.manager.party.all : (this.manager.encounter?.party?.all || []);
+                    party.forEach(member => {
+                        if(member !== this && !member.dead) {
+                            member.trigger('ally_death', { deadAlly: this });
+                        }
+                    });
+                }
             }
         } else {
             // Damage triggers are now handled via the unified trigger system

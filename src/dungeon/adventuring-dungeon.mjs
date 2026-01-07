@@ -64,7 +64,7 @@ export class AdventuringDungeon extends AdventuringPage {
             const source = `Endless Wave ${this.endlessWave + 1}`;
             
             return [
-                createEffect({ trigger: 'passive', type: 'stats_percent', target: 'all', party: 'enemy', value: statPercent }, this, source),
+                createEffect({ trigger: 'passive', type: 'all_stat_percent', target: 'all', party: 'enemy', value: statPercent }, this, source),
                 createEffect({ trigger: 'passive', type: 'xp_percent', value: rewardPercent }, this, source),
                 createEffect({ trigger: 'passive', type: 'loot_percent', value: rewardPercent }, this, source)
             ];
@@ -280,9 +280,13 @@ export class AdventuringDungeon extends AdventuringPage {
     processTileEffect(effect, sourceName) {
         switch(effect.type) {
             case "damage":
+            case "damage_flat":
+            case "damage_percent":
                 this.processTileDamage(effect, sourceName);
                 break;
             case "heal":
+            case "heal_flat":
+            case "heal_percent":
                 this.processTileHeal(effect, sourceName);
                 break;
             case "loot":
@@ -384,7 +388,7 @@ export class AdventuringDungeon extends AdventuringPage {
             if(this.floorCards[0] === undefined)
                 this.floorCards[0] = new AdventuringCard(this.manager, this.game);
             
-            const statBonus = 100 + this.getBonus('stats_percent', { target: 'all', party: 'enemy' });
+            const statBonus = 100 + this.getBonus('all_stat_percent', { target: 'all', party: 'enemy' });
             this.floorCards[0].name = `Wave ${this.endlessWave + 1} (${statBonus}%)`;
             this.floorCards[0].renderQueue.name = true;
             this.floorCards[0].icon = cdnMedia('assets/media/main/hardcore.svg');
@@ -574,6 +578,9 @@ export class AdventuringDungeon extends AdventuringPage {
                 this.next();
                 return;
             }
+            
+            // Trigger dungeon_end effects
+            this.manager.triggerEffects('dungeon_end', {});
             
             // Check if we should auto-repeat or go back to town
             if(this.canAutoRepeat) {

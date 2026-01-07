@@ -164,8 +164,8 @@ class PassiveEffectProcessor {
         }
         amount = dodgeCheck.amount ?? amount;
         
-        // Passive dodge check (sum of passive dodge bonuses)
-        const dodgeChance = target.getPassiveBonus('dodge');
+        // Passive dodge check (sum of passive dodge bonuses, including conditional)
+        const dodgeChance = target.getConditionalBonus('dodge', { target: attacker });
         if (dodgeChance > 0 && Math.random() * 100 < dodgeChance) {
             target.trigger('dodge', { attacker, ...context });
             return { negated: 'dodge', amount: 0 };
@@ -547,17 +547,19 @@ function createEffect(effectData, source, sourceName) {
  * Build a standard context object for condition evaluation.
  * This ensures all effect sources use consistent context format.
  * 
- * @param {object} character - The character triggering effects
+ * @param {object} character - The character triggering effects (can be null for party-level triggers)
  * @param {object} extra - Additional context from the trigger
  * @returns {object} Standardized context for evaluateCondition()
  */
 function buildEffectContext(character, extra = {}) {
+    // Support null character for party-level triggers - use manager from extra if provided
+    const manager = character?.manager || extra.manager || null;
     return {
         character,
         target: extra.target || null,
         attacker: extra.attacker || null,
-        party: character.manager?.party?.members || character.manager?.party?.all || [],
-        manager: character.manager,
+        party: manager?.party?.members || manager?.party?.all || [],
+        manager,
         hpPercentBefore: extra.hpPercentBefore,
         damageDealt: extra.damageDealt,
         damageReceived: extra.damageReceived,
@@ -808,6 +810,30 @@ class EffectCache {
         this.cachedByTrigger.clear();
         this.bonusCache.clear();
         this.globalDirty = true;
+    }
+    
+    /**
+     * Get computed bonus for a specific effect type with condition evaluation.
+     * Unlike getBonus(), this evaluates conditions and is not cached.
+     * Use this for effects that may have runtime conditions (e.g., hp_below).
+     * @param {string} effectType - Effect type to sum
+     * @param {object} context - Context for condition evaluation (character, target, manager)
+     * @returns {number} Total bonus value (including only effects whose conditions pass)
+     */
+    getConditionalBonus(effectType, context) {
+        this.rebuild();
+        
+        const passiveEffects = this.getEffects('passive');
+        return passiveEffects
+            .filter(e => {
+                if (e.type !== effectType) return false;
+                // If effect has condition, evaluate it
+                if (e.condition) {
+                    return evaluateCondition(e.condition, context);
+                }
+                return true;
+            })
+            .reduce((sum, e) => sum + (e.value ?? e.amount ?? 0), 0);
     }
 }
 
@@ -1466,10 +1492,6 @@ const effectDescriptionRegistry = new Map([
     }],
     ['loot_percent', (effect, value, stacks, amount, manager, helpers) => 
         `${helpers.sign(value)}${value}% Loot`],
-    ['stats_percent', (effect, value, stacks, amount, manager, helpers) => {
-        const partyLabel = effect.party === 'enemy' ? 'Enemy' : 'Party';
-        return `${partyLabel} Stats: ${helpers.sign(value)}${value}%`;
-    }],
     
     // Revival - amount is whole number percent (e.g., 50 = 50% HP)
     ['revive', (effect, value, stacks, amount) => 
@@ -1519,9 +1541,12 @@ const effectDescriptionRegistry = new Map([
     ['execute', (effect, value, stacks, amount, manager, helpers) => 
         `Execute enemies below ${helpers.percent(firstDefined(effect.threshold, value, 20))}% HP`],
     
-    // All stat percent bonus
-    ['all_stat_percent', (effect, value, stacks, amount, manager, helpers) => 
-        `+${value}% all stats`],
+    // All stat percent bonus (with optional party scoping)
+    ['all_stat_percent', (effect, value, stacks, amount, manager, helpers) => {
+        if (effect.party === 'enemy') return `Enemy Stats: ${helpers.sign(value)}${value}%`;
+        if (effect.party === 'hero') return `Party Stats: ${helpers.sign(value)}${value}%`;
+        return `+${value}% all stats`;
+    }],
     
     // Dispel effects - removes buffs from enemies
     ['dispel', (effect, value, stacks, amount, manager, helpers) => {
@@ -1564,6 +1589,7 @@ const effectDescriptionRegistry = new Map([
     // Aura internal effects
     ['remove', () => ''],
     ['remove_stacks', (effect, value, stacks, amount) => `Remove ${firstDefined(effect.count, amount, 1)} stack(s)`],
+    ['consume_charge', (effect) => `Consume ${firstDefined(effect.count, 1)} charge(s)`],
     ['absorb', (effect, value, stacks, amount) => `Absorb ${firstDefined(amount, 1)} damage per stack`],
     ['skip', (effect, value, stacks, amount) => {
         if (effect.condition?.type === 'chance') return `${effect.condition.value}% chance to skip turn`;
@@ -1714,7 +1740,8 @@ function formatTrigger(trigger) {
 
         'before_damage_received': 'Before receiving damage',
         'after_damage_received': 'After receiving damage',
-        'hit': 'On hit',
+        'before_damage_delivered': 'Before dealing damage',
+        'after_damage_dealt': 'After dealing damage',
         'miss': 'On miss',
         'crit': 'On critical hit',
         'kill': 'On kill',
@@ -1728,7 +1755,6 @@ function formatTrigger(trigger) {
         'enemy_spawn': 'When enemy spawns',
         'ability': 'When ability is used',
         'party_wipe': 'When party wipes',
-        'damaged': 'When damaged',
         'ally_death': 'When an ally dies',
         'heal': 'When healing',
         'generator': 'When using a generator',
@@ -1914,7 +1940,8 @@ function formatTriggerSuffix(trigger) {
         'after_damage_delivered': 'after dealing damage',
         'before_damage_received': 'before taking damage',
         'after_damage_received': 'after taking damage',
-        'hit': 'on hit',
+        'before_damage_delivered': 'before dealing damage',
+        'after_damage_dealt': 'after dealing damage',
         'miss': 'on miss',
         'crit': 'on critical hit',
         'kill': 'on kill',
@@ -1928,7 +1955,6 @@ function formatTriggerSuffix(trigger) {
         'enemy_spawn': 'when an enemy spawns',
         'ability': 'when using an ability',
         'party_wipe': 'when the party wipes',
-        'damaged': 'when damaged',
         'ally_death': 'when an ally dies',
         'heal': 'when healing',
         'generator': 'when using a generator',
@@ -2343,16 +2369,7 @@ function createDefaultEffectProcessor() {
     processor.register('damage_flat', damageOrHeal);
     processor.register('heal_flat', damageOrHeal);
     
-    // Heal percent of max HP
-    processor.register('heal_percent', (effect, instance, ctx) => {
-        const amount = getEffectAmount(effect, instance);
-        const healAmount = Math.ceil(ctx.character.maxHitpoints * (amount / 100));
-        ctx.character.heal({ amount: healAmount }, ctx.character);
-        ctx.manager.log.add(`${ctx.character.name} heals for ${healAmount} from ${instance.base.name}`);
-        return ctx.extra;
-    });
-    
-    // Heal with target/party properties - standardized format
+    // Heal percent of max HP - supports target/party properties
     processor.register('heal_percent', (effect, instance, ctx) => {
         const percentValue = effect.amount ?? instance.amount ?? 0;
         if(percentValue <= 0) return ctx.extra;
@@ -2365,7 +2382,7 @@ function createDefaultEffectProcessor() {
         // For hero characters, 'ally' and 'hero' both target the hero party
         if((party === 'hero' || party === 'ally') && ctx.manager.party) {
             if(target === 'all') {
-                ctx.manager.party.heroes.forEach(hero => {
+                ctx.manager.party.all.forEach(hero => {
                     if(!hero.dead) {
                         const healAmount = Math.ceil(hero.maxHitpoints * (percentValue / 100));
                         hero.heal({ amount: healAmount }, ctx.character);
@@ -2595,13 +2612,9 @@ function createDefaultEffectProcessor() {
     });
     
     processor.register('prevent_death', (effect, instance, ctx) => {
-        if(effect.oncePerEncounter && instance._preventDeathUsed) {
-            return ctx.extra;
-        }
         ctx.extra.prevented = true;
-        if(effect.oncePerEncounter) {
-            instance._preventDeathUsed = true;
-        }
+        // Pass through heal amount for death prevention healing (whole number percent)
+        ctx.extra.preventDeathHealAmount = getEffectAmount(effect, instance) || 0;
         ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} prevents death!`);
         return ctx.extra;
     });
@@ -2682,6 +2695,29 @@ function createDefaultEffectProcessor() {
                 }
                 ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} cleanses ${removed} debuff(s) from ${target.name}`);
             }
+        }
+        return ctx.extra;
+    });
+    
+    // Deal damage as percentage of target's max HP
+    processor.register('damage_percent', (effect, instance, ctx) => {
+        const percent = getEffectAmount(effect, instance);
+        
+        // Resolve target
+        let target;
+        const targetType = effect.target || 'target';
+        if (targetType === 'self') {
+            target = ctx.character;
+        } else if (targetType === 'attacker' && ctx.extra.attacker) {
+            target = ctx.extra.attacker;
+        } else if (ctx.extra.target) {
+            target = ctx.extra.target;
+        }
+        
+        if (target && !target.dead) {
+            const amount = Math.floor(target.maxHitpoints * (percent / 100));
+            target.damage({ amount }, ctx.character);
+            ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} deals ${amount} damage (${percent}% HP)`);
         }
         return ctx.extra;
     });

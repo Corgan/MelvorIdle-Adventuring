@@ -177,6 +177,31 @@ export class AdventuringAuras {
         }
     }
 
+    /**
+     * Capture stats from a source character for snapshot-based scaling.
+     * @param {object} source - The source character
+     * @returns {Map<string, number>|null} Map of stat values, or null if no stats
+     */
+    _captureSnapshot(source) {
+        if (!source || !source.stats) return null;
+        
+        const snapshot = new Map();
+        source.stats.forEach((value, key) => {
+            snapshot.set(key, value);
+        });
+        return snapshot;
+    }
+    
+    /**
+     * Check if an aura has any effects that use snapshot scaling.
+     * @param {object} aura - The aura definition
+     * @returns {boolean} True if any effect uses scaleFrom: 'snapshot'
+     */
+    _needsSnapshot(aura) {
+        if (!aura || !aura.effects) return false;
+        return aura.effects.some(effect => effect.scaleFrom === 'snapshot');
+    }
+
     add(aura, { stacks = 1 }, source) {
         // Handle undefined or null early
         if(!aura) {
@@ -206,12 +231,19 @@ export class AdventuringAuras {
             existing = this.get(aura, source); // Find instance from same source
         }
         // combineMode === 'separate' always creates new instance
+        
+        // Capture snapshot if needed
+        const needsSnap = this._needsSnapshot(aura);
+        let snapshot = null;
+        if (needsSnap) {
+            snapshot = this._captureSnapshot(source);
+        }
 
         if(existing === undefined) {
             // Create a new instance
             let instance = new AdventuringAuraInstance(this.manager, this.game, this, source);
             this.auras.add(instance);
-            instance.setAura(aura, stacks);
+            instance.setAura(aura, stacks, snapshot);
             
             // Add to aurasByBase cache
             this._addToCache(aura, instance, source);
@@ -220,9 +252,17 @@ export class AdventuringAuras {
             let newStacks = existing.stacks;
             if(aura.combineMode === 'stack' || aura.combineMode === 'bySource') { // Both modes add stacks
                 newStacks = existing.stacks + stacks;
+                // For stack mode with snapshot, update snapshot to latest caster's stats
+                if (needsSnap && snapshot) {
+                    existing.snapshotStats = snapshot;
+                }
             } else if(aura.combineMode === 'refresh') {
                 newStacks = stacks;
                 existing.age = 0; // Reset age on refresh
+                // For refresh mode, replace snapshot with new caster's stats
+                if (needsSnap && snapshot) {
+                    existing.snapshotStats = snapshot;
+                }
             }
             
             // Enforce maxStacks if defined

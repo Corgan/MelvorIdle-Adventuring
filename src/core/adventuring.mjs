@@ -398,7 +398,7 @@ export class Adventuring extends SkillWithMastery {
         
         // 3. Apply dungeon-level effects from effectCache
         if(this.dungeon && this.dungeon.effectCache) {
-            const effects = this.dungeon.effectCache.getEffectsForTrigger(trigger);
+            const effects = this.dungeon.getEffectsForTrigger(trigger);
             for(const effect of effects) {
                 this.applyEffect(effect, trigger, context);
             }

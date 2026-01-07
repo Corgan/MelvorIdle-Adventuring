@@ -102,15 +102,15 @@ export class AdventuringItemBase extends AdventuringMasteryAction {
 
     postDataRegistration() {
         if(this._base !== undefined) {
-            this._base.forEach(({ id, value }) => {
-                this.base.set(id, value);
+            this._base.forEach(({ id, amount }) => {
+                this.base.set(id, amount);
             });
             delete this._base;
         }
 
         if(this._scaling !== undefined) {
-            this._scaling.forEach(({ id, value }) => {
-                this.scaling.set(id, value);
+            this._scaling.forEach(({ id, amount }) => {
+                this.scaling.set(id, amount);
             });
             delete this._scaling;
         }

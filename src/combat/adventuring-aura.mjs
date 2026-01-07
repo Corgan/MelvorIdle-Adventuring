@@ -1,6 +1,7 @@
 const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringStats } = await loadModule('src/core/adventuring-stats.mjs');
+const { AdventuringScalableEffect } = await loadModule('src/combat/adventuring-scalable-effect.mjs');
 const { parseDescription, buildEffectReplacements, describeEffectFull } = await loadModule('src/core/adventuring-utils.mjs');
 
 const { AdventuringAuraElement } = await loadModule('src/combat/components/adventuring-aura.mjs');
@@ -20,54 +21,122 @@ class AdventuringAuraRenderQueue {
     }
 }
 
-class AdventuringAuraEffect {
+/**
+ * Aura effect that extends ScalableEffect for stat-based scaling.
+ * 
+ * Supports all ScalableEffect features plus:
+ * - consume: remove stacks when triggered
+ * - perStack: multiply amount by stack count
+ * - scaleFrom: 'source' | 'target' | 'snapshot'
+ * - age: for remove effects that trigger after N rounds
+ * - modifier: legacy multiplier support
+ * - count: stack count multiplier
+ */
+class AdventuringAuraEffect extends AdventuringScalableEffect {
     constructor(manager, game, aura, data) {
-        this.manager = manager;
-        this.game = game;
+        // Normalize amount to ScalableEffect format if it's a plain number
+        const normalizedData = { ...data };
+        if (data.amount !== undefined && typeof data.amount === 'number') {
+            normalizedData.amount = { base: data.amount };
+        }
+        if (data.stacks !== undefined && typeof data.stacks === 'number') {
+            normalizedData.stacks = { base: data.stacks };
+        }
+        
+        super(manager, game, normalizedData);
+        
         this.aura = aura;
-        this.type = data.type;
-        this.trigger = data.trigger;
         this.consume = data.consume === true; // Remove stacks when triggered
-        this.perStack = data.perStack === true; // Amount multiplied by stack count
-        this.amount = data.amount; // Effect's base amount
         this.age = data.age; // For remove effects: trigger this many times before removal
         
         if(data.modifier !== undefined)
            this.modifier = data.modifier;
-
-        if(data.target !== undefined)
-            this.target = data.target;
-        if(data.id !== undefined) 
-            this.id = data.id;
         if(data.count !== undefined) 
             this.count = data.count;
+        if(data.condition !== undefined)
+            this.condition = data.condition;
+        if(data.chance !== undefined)
+            this.chance = data.chance;
     }
 
     postDataRegistration() {
-        
+        super.postDataRegistration();
     }
 
-    getAmount(instance) {
-        // Amount is defined on the effect itself
-        let amount = this.amount !== undefined ? this.amount : 1;
-
-        let stacks = this.getStacks(instance);
-
-        if(this.perStack)
-            amount = Math.ceil(amount * stacks);
-
-        if(this.modifier) {
-            amount = Math.ceil(amount * this.modifier);
+    /**
+     * Resolve which stats source to use based on scaleFrom setting.
+     * @param {object} instance - The aura instance
+     * @returns {object|Map|null} Stats source for scaling calculation
+     */
+    _resolveStatsSource(instance) {
+        if (!instance) return null;
+        
+        const scaleFrom = this.scaleFrom || 'source';
+        
+        switch (scaleFrom) {
+            case 'source':
+                // Use caster's current stats
+                return instance.source;
+            case 'target':
+                // Use aura holder's current stats
+                return instance.auras?.character;
+            case 'snapshot':
+                // Use stats captured at application time
+                return instance.snapshotStats;
+            default:
+                return instance.source;
         }
+    }
 
+    /**
+     * Get the amount value for this aura effect.
+     * Handles perStack, modifier, and stat scaling.
+     * 
+     * @param {object} instance - The aura instance (has stacks, source, snapshotStats)
+     * @param {string} displayMode - Display mode for formatting
+     * @returns {number|string} Calculated amount
+     */
+    getAmount(instance, displayMode) {
+        // Resolve stats source for scaling
+        const statsSource = this._resolveStatsSource(instance);
+        
+        // Get base amount using ScalableEffect's calculation
+        let amount = super.getAmount(statsSource, displayMode);
+        
+        // For raw number mode (no displayMode), apply modifiers
+        if (!displayMode) {
+            // Apply perStack multiplier
+            if (this.perStack && instance) {
+                const stackCount = this.getStacks(instance);
+                amount = Math.ceil(amount * stackCount);
+            }
+            
+            // Apply legacy modifier
+            if (this.modifier) {
+                amount = Math.ceil(amount * this.modifier);
+            }
+        }
+        
         return amount;
     }
 
-    getStacks(instance) {
-        let stacks = instance.stacks;
+    /**
+     * Get the stacks value for this aura effect.
+     * Uses instance stacks, optionally modified by count.
+     * 
+     * @param {object} instance - The aura instance
+     * @param {string} displayMode - Display mode for formatting
+     * @returns {number} Stack count
+     */
+    getStacks(instance, displayMode) {
+        if (!instance) return 0;
+        
+        let stacks = instance.stacks || 0;
 
-        if(this.count)
+        // Apply count modifier if present
+        if (this.count) {
             stacks = Math.ceil(stacks * this.count);
+        }
 
         return stacks;
     }

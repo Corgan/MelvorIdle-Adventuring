@@ -27,11 +27,44 @@ export class AdventuringAuraInstance {
         this.auras = auras;
         this.source = source;
         this.stacks = 0;
+        
+        /**
+         * Captured stats from source at application time.
+         * Used when any effect has scaleFrom: 'snapshot'.
+         * @type {Map<string, number>|null}
+         */
+        this.snapshotStats = null;
 
         this.component = createElement('adventuring-aura-instance');
         this.component.auraInstance = this;
 
         this.renderQueue = new AdventuringAuraInstanceRenderQueue();
+    }
+    
+    /**
+     * Capture stats from a character for snapshot-based scaling.
+     * @param {object} character - The character whose stats to capture
+     */
+    captureSnapshot(character) {
+        if (!character || !character.stats) {
+            this.snapshotStats = null;
+            return;
+        }
+        
+        // Copy all current stat values into a Map
+        this.snapshotStats = new Map();
+        character.stats.forEach((value, key) => {
+            this.snapshotStats.set(key, value);
+        });
+    }
+    
+    /**
+     * Check if this aura has any effects that use snapshot scaling.
+     * @returns {boolean} True if any effect uses scaleFrom: 'snapshot'
+     */
+    needsSnapshot() {
+        if (!this.base || !this.base.effects) return false;
+        return this.base.effects.some(effect => effect.scaleFrom === 'snapshot');
     }
 
     get tooltip() {
@@ -104,9 +137,14 @@ export class AdventuringAuraInstance {
         return Array.from(triggers);
     }
 
-    setAura(aura, stacks=1) {
+    setAura(aura, stacks=1, snapshot=null) {
         this.base = aura;
         this.stacks = stacks;
+        
+        // Store snapshot if provided
+        if (snapshot) {
+            this.snapshotStats = snapshot;
+        }
         
         // Enforce maxStacks if defined
         if(aura.maxStacks !== undefined) {
@@ -226,6 +264,18 @@ export class AdventuringAuraInstance {
         writer.writeUint32(this.stacks);
         writer.writeUint8(this.manager.encounter.all.indexOf(this.source));
         writer.writeUint16(this.age || 0);
+        
+        // Encode snapshot stats
+        const hasSnapshot = this.snapshotStats !== null && this.snapshotStats.size > 0;
+        writer.writeBoolean(hasSnapshot);
+        if (hasSnapshot) {
+            writer.writeUint16(this.snapshotStats.size);
+            this.snapshotStats.forEach((value, key) => {
+                writer.writeString(key);
+                writer.writeFloat64(value);
+            });
+        }
+        
         return writer;
     }
 
@@ -239,5 +289,22 @@ export class AdventuringAuraInstance {
         let sourceIdx = reader.getUint8();
         this.source = this.manager.encounter.all[sourceIdx];
         this.age = reader.getUint16();
+        
+        // Decode snapshot stats (if present - version check)
+        try {
+            const hasSnapshot = reader.getBoolean();
+            if (hasSnapshot) {
+                this.snapshotStats = new Map();
+                const count = reader.getUint16();
+                for (let i = 0; i < count; i++) {
+                    const key = reader.getString();
+                    const value = reader.getFloat64();
+                    this.snapshotStats.set(key, value);
+                }
+            }
+        } catch (e) {
+            // Old save format without snapshot - that's fine
+            this.snapshotStats = null;
+        }
     }
 }

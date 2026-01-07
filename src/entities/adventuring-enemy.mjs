@@ -66,11 +66,11 @@ export class AdventuringEnemy extends AdventuringCharacter {
         this.phaseTransitioned = false;
 
         // Get stat bonus from dungeon effect cache (additive percentages from difficulty + endless)
-        const statBonus = this.manager.dungeon.getBonus('stats_percent', { target: 'all', party: 'enemy' });
+        const statBonus = this.manager.dungeon.getBonus('all_stat_percent', { target: 'all', party: 'enemy' });
 
-        monster.stats.forEach(({ id, value }) => {
+        monster.stats.forEach(({ id, amount }) => {
             // Scale stats by bonus percentage
-            const scaledValue = Math.floor(value * (1 + statBonus / 100));
+            const scaledValue = Math.floor(amount * (1 + statBonus / 100));
             this.stats.set(id, scaledValue);
         })
         this.stats.renderQueue.stats = true;

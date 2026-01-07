@@ -4,13 +4,19 @@ const { AdventuringStats } = await loadModule('src/core/adventuring-stats.mjs');
 
 /**
  * Base class for effects that have amount/stacks with stat-based scaling.
- * Used by AbilityHitEffect and PassiveEffect.
+ * Used by AbilityHitEffect, PassiveEffect, and AuraEffect.
+ * 
+ * Supports:
+ * - Base amount + stat-based scaling
+ * - perStack multiplier (amount * instance stacks)
+ * - scaleFrom: 'source' | 'target' | 'snapshot' for auras
  */
 export class AdventuringScalableEffect {
     constructor(manager, game, data) {
         this.manager = manager;
         this.game = game;
         this.type = data.type;
+        this.trigger = data.trigger;
 
         if(data.id !== undefined)
             this.id = data.id;
@@ -20,6 +26,15 @@ export class AdventuringScalableEffect {
 
         if(data.party !== undefined)
             this.party = data.party;
+        
+        // perStack: multiply amount by instance stacks (for auras)
+        if(data.perStack !== undefined)
+            this.perStack = data.perStack === true;
+        
+        // scaleFrom: which stats to use for scaling (for auras)
+        // 'source' = caster's stats (default), 'target' = aura holder's stats, 'snapshot' = stats at application
+        if(data.scaleFrom !== undefined)
+            this.scaleFrom = data.scaleFrom;
 
         if(data.amount !== undefined) {
             this.amount = { base: data.amount.base !== undefined ? data.amount.base : data.amount };
@@ -40,14 +55,14 @@ export class AdventuringScalableEffect {
 
     postDataRegistration() {
         if(this.amount !== undefined && this.amount._scaling !== undefined) {
-            this.amount._scaling.forEach(({ id, value }) => {
-                this.amount.scaling.set(id, value);
+            this.amount._scaling.forEach(({ id, amount }) => {
+                this.amount.scaling.set(id, amount);
             });
             delete this.amount._scaling;
         }
         if(this.stacks !== undefined && this.stacks._scaling !== undefined) {
-            this.stacks._scaling.forEach(({ id, value }) => {
-                this.stacks.scaling.set(id, value);
+            this.stacks._scaling.forEach(({ id, amount }) => {
+                this.stacks.scaling.set(id, amount);
             });
             delete this.stacks._scaling;
         }

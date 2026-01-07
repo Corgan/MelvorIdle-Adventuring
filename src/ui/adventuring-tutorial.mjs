@@ -4,7 +4,6 @@ export class AdventuringTutorialStep {
         this.target = data.target;
         this.message = data.message;
         this.position = data.position || 'bottom';
-        this.informational = data.informational || false;
     }
 }
 

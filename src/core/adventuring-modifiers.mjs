@@ -212,31 +212,57 @@ export class AdventuringModifiers {
     }
 
     /**
+     * Get spawn rate modifier for a specific spawn type.
+     * Uses the consolidated spawn_rate_percent effect type with spawnType filter.
+     * @param {string} spawnType - The spawn type: 'trap', 'fountain', 'treasure', 'shrine'
+     * @param {object} [context] - Optional context with action for mastery effects
+     * @returns {number} Spawn rate modifier (percentage points, negative = fewer spawns)
+     */
+    getSpawnRateMod(spawnType, context = {}) {
+        let total = 0;
+        
+        // Get effects from the global cache
+        const passiveEffects = this.effectCache.getEffects('passive');
+        for (const effect of passiveEffects) {
+            if (effect.type === 'spawn_rate_percent' && effect.spawnType === spawnType) {
+                total += effect.value ?? effect.amount ?? 0;
+            }
+        }
+        
+        // Add mastery effects if an action is provided
+        if (context.action && typeof context.action.getMasteryEffectValue === 'function') {
+            total += context.action.getMasteryEffectValue('spawn_rate_percent', { spawnType });
+        }
+        
+        return total;
+    }
+
+    /**
      * Get trap spawn rate modifier (percentage points, negative = fewer traps)
      */
-    getTrapSpawnRateMod() {
-        return this.getBonus('trap_spawn_rate_percent');
+    getTrapSpawnRateMod(context = {}) {
+        return this.getSpawnRateMod('trap', context);
     }
 
     /**
      * Get fountain spawn rate modifier (percentage points)
      */
-    getFountainSpawnRateMod() {
-        return this.getBonus('fountain_spawn_rate_percent');
+    getFountainSpawnRateMod(context = {}) {
+        return this.getSpawnRateMod('fountain', context);
     }
 
     /**
      * Get treasure spawn rate modifier (percentage points)
      */
-    getTreasureSpawnRateMod() {
-        return this.getBonus('treasure_spawn_rate_percent');
+    getTreasureSpawnRateMod(context = {}) {
+        return this.getSpawnRateMod('treasure', context);
     }
 
     /**
      * Get shrine spawn rate modifier (percentage points)
      */
-    getShrineSpawnRateMod() {
-        return this.getBonus('shrine_spawn_rate_percent');
+    getShrineSpawnRateMod(context = {}) {
+        return this.getSpawnRateMod('shrine', context);
     }
 
     // ========================================================================

@@ -490,6 +490,13 @@ export class AdventuringEncounter extends AdventuringPage {
             const totalEnergy = this.passiveEffects.processEnergyGain(this.currentTurn, this.currentAction.energy);
             this.currentTurn.addEnergy(totalEnergy);
         }
+        
+        // Trigger generator/spender based on ability type
+        if(isSpender) {
+            this.currentTurn.trigger('spender', { ability: this.currentAction, encounter: this });
+        } else {
+            this.currentTurn.trigger('generator', { ability: this.currentAction, encounter: this });
+        }
 
         // If spell echo triggered, repeat the action
         if(shouldEcho) {
@@ -548,9 +555,9 @@ export class AdventuringEncounter extends AdventuringPage {
 
         // Track monster kills for Slayer tasks and Monster Mastery
         this.party.all.forEach(enemy => {
-            if(enemy.dead && enemy.monster) {
-                this.manager.slayers.onMonsterKilled(enemy.monster);
-                this.manager.bestiary.registerKill(enemy.monster);
+            if(enemy.dead && enemy.base) {
+                this.manager.slayers.onMonsterKilled(enemy.base);
+                this.manager.bestiary.registerKill(enemy.base);
             }
         });
 
