@@ -525,6 +525,9 @@ export class Adventuring extends SkillWithMastery {
         // Check tutorial triggers for skill level
         this.tutorialManager.checkTriggers('skillLevel', { level: newLevel });
 
+        // Check achievements for job unlock requirements (which depend on skill level)
+        this.achievementManager.checkAchievements();
+
         this.jobs.forEach(job => {
             job.renderQueue.name = true;
             job.renderQueue.tooltip = true;
@@ -601,6 +604,9 @@ export class Adventuring extends SkillWithMastery {
             monster.renderQueue.clickable = true;
             monster.renderQueue.mastery = true;
         });
+
+        // Check achievements for job/mastery level requirements
+        this.achievementManager.checkAchievements();
     }
 
     selectArea(area) {

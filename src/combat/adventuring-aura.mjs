@@ -192,14 +192,27 @@ export class AdventuringAura extends NamespacedObject {
             return desc;
         }
         
+        // Filter out standard cleanup effects - the minimal { trigger, type: 'remove' } patterns
+        // that are defined on every aura for encounter_end and death
+        const isStandardCleanup = (e) => {
+            if (e.type !== 'remove') return false;
+            if (e.trigger !== 'encounter_end' && e.trigger !== 'death') return false;
+            // Standard cleanup only has trigger and type, no other properties
+            const keys = Object.keys(e).filter(k => k !== 'trigger' && k !== 'type');
+            return keys.length === 0;
+        };
+        
+        const mainEffects = this.effects.filter(e => !isStandardCleanup(e));
+        
         // Auto-generate from effects
-        const effectDescs = this.effects.map(effect => {
+        const effectDescs = mainEffects.map(effect => {
             const effectObj = {
                 type: effect.type,
                 trigger: effect.trigger || 'passive',
-                value: effect.getAmount ? effect.getAmount(instance) : (this.amount || 0),
+                amount: effect.getAmount ? effect.getAmount(instance) : (this.amount || 0),
                 stacks: effect.getStacks ? effect.getStacks(instance) : (instance !== undefined ? (instance.stacks || 0) : (this.stacks || 0)),
                 id: effect.id,
+                stat: effect.stat,
                 target: effect.target,
                 condition: effect.condition
             };

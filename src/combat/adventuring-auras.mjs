@@ -132,6 +132,21 @@ export class AdventuringAuras {
         let auras = this.auras.values();
         for(let aura of auras) {
             if(aura.stacks === 0) {
+                // Fire 'removed' trigger before the aura is cleaned up
+                if (this.character && aura.base && aura.base.effects) {
+                    const removedEffects = aura.base.effects.filter(e => e.trigger === 'removed');
+                    if (removedEffects.length > 0) {
+                        const ctx = {
+                            character: this.character,
+                            manager: this.character.manager,
+                            extra: { source: aura.source, aura: aura.base }
+                        };
+                        for (const effect of removedEffects) {
+                            this.character.processEffect(effect, aura, ctx);
+                        }
+                    }
+                }
+                
                 // stacks is already 0, so disconnectedCallback will destroy the tooltip
                 this._removeFromCache(aura.base, aura.source);
                 this.auras.delete(aura);

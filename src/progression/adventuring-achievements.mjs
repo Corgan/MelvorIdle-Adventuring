@@ -37,6 +37,7 @@ export class AchievementStats {
         this.totalDamage = 0;
         this.totalHealing = 0;
         this.slayerTasksCompleted = 0;
+        this.totalEndlessWaves = 0;
     }
 
     /**
@@ -56,6 +57,7 @@ export class AchievementStats {
         writer.writeFloat64(this.totalDamage);
         writer.writeFloat64(this.totalHealing);
         writer.writeUint32(this.slayerTasksCompleted);
+        writer.writeUint32(this.totalEndlessWaves);
         
         // Write kills by tag
         const tagEntries = Object.entries(this.killsByTag);
@@ -91,6 +93,7 @@ export class AchievementStats {
         this.totalDamage = reader.getFloat64();
         this.totalHealing = reader.getFloat64();
         this.slayerTasksCompleted = reader.getUint32();
+        this.totalEndlessWaves = reader.getUint32();
         
         // Read kills by tag
         this.killsByTag = {};
@@ -232,9 +235,65 @@ export class AdventuringAchievement extends NamespacedObject {
                 return this._getAllPassiveJobsAtLevel(req.level) ? 1 : 0;
             case 'specific_job_level':
                 return this._getSpecificJobLevel(req.job);
+            // Area cleared - check if masteryXP > 0 (any XP means at least 1 clear)
+            case 'area_cleared':
+                const area = this.manager.areas.getObjectByID(req.area);
+                if (!area) return 0;
+                return this.manager.getMasteryXP(area) > 0 ? 1 : 0;
+            // Total endless waves completed across all dungeons
+            case 'total_endless_waves':
+                return stats.totalEndlessWaves;
+            // Equipment set bonus - check if any hero has X pieces equipped
+            case 'set_bonus_active':
+                return this._getMaxSetBonusPieces() >= req.pieces ? 1 : 0;
+            // Monster mastery - highest mastery on any single monster
+            case 'monster_mastery':
+                return this._getHighestMonsterMastery();
+            // Total monster mastery - sum of all monster mastery levels
+            case 'total_monster_mastery':
+                return this._getTotalMonsterMastery();
             default:
                 return 0;
         }
+    }
+
+    /**
+     * Helper: Get max equipped set pieces across all heroes
+     */
+    _getMaxSetBonusPieces() {
+        let maxPieces = 0;
+        if (!this.manager.equipmentSets) return 0;
+        
+        for (const hero of this.manager.party.all) {
+            for (const set of this.manager.equipmentSets.allObjects) {
+                const pieces = set.countEquippedPieces(hero);
+                if (pieces > maxPieces) maxPieces = pieces;
+            }
+        }
+        return maxPieces;
+    }
+
+    /**
+     * Helper: Get highest mastery level on any single monster
+     */
+    _getHighestMonsterMastery() {
+        let highest = 0;
+        for (const monster of this.manager.monsters.allObjects) {
+            const mastery = this.manager.getMasteryLevel(monster) || 0;
+            if (mastery > highest) highest = mastery;
+        }
+        return highest;
+    }
+
+    /**
+     * Helper: Get sum of all monster mastery levels
+     */
+    _getTotalMonsterMastery() {
+        let total = 0;
+        for (const monster of this.manager.monsters.allObjects) {
+            total += this.manager.getMasteryLevel(monster) || 0;
+        }
+        return total;
     }
 
     /**
@@ -244,8 +303,8 @@ export class AdventuringAchievement extends NamespacedObject {
         const req = this.requirement;
         // Some requirements use 'level' instead of 'target'
         if(req.level !== undefined) return req.level;
-        // Boolean checks (job_unlocked, all_passive_jobs_level, etc.) use target: 1
-        if(req.type === 'job_unlocked' || req.type === 'all_jobs_tier' || req.type === 'all_passive_jobs_level') {
+        // Boolean checks use target: 1
+        if(req.type === 'job_unlocked' || req.type === 'all_jobs_tier' || req.type === 'all_passive_jobs_level' || req.type === 'area_cleared' || req.type === 'set_bonus_active') {
             return 1;
         }
         return req.target || 1;
@@ -565,8 +624,13 @@ export class AchievementManager {
             this.stats.mythicClears++;
         }
         
-        if(isEndless && endlessWave > this.stats.bestEndlessWave) {
-            this.stats.bestEndlessWave = endlessWave;
+        if(isEndless) {
+            // Track best wave reached
+            if(endlessWave > this.stats.bestEndlessWave) {
+                this.stats.bestEndlessWave = endlessWave;
+            }
+            // Track total waves completed
+            this.stats.totalEndlessWaves += endlessWave;
         }
         
         this.checkAchievements();

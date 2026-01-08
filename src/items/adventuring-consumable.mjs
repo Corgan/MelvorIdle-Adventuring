@@ -185,7 +185,7 @@ export class AdventuringConsumable extends NamespacedObject {
         
         if (this.customDescription) {
             return flavorText 
-                ? `${this.customDescription}\n\n${flavorText}`
+                ? `${this.customDescription}<br><br><em>${flavorText}</em>`
                 : this.customDescription;
         }
         

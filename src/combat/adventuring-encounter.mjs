@@ -532,8 +532,11 @@ export class AdventuringEncounter extends AdventuringPage {
         }
         
         if(this.manager.party.all.every(hero => hero.dead)) {
-            // Try to revive with Phoenix Feather or similar consumable
-            if(this.manager.consumables.onPartyWipe()) {
+            // Fire party_wipe trigger - consumables/equipment with revive effects can respond
+            this.manager.party.trigger('party_wipe', { encounter: this });
+            
+            // Check if any hero was revived by the trigger
+            if(this.manager.party.all.some(hero => !hero.dead)) {
                 // Party was revived, continue combat
                 this.nextTurn();
                 return;
@@ -680,6 +683,8 @@ export class AdventuringEncounter extends AdventuringPage {
         // Also add to old learnedAbilities Set for backward compatibility
         if(learned) {
             this.manager.learnedAbilities.add(learned.id);
+            // Check achievements for learned ability count requirements
+            this.manager.achievementManager.checkAchievements();
         }
     }
 

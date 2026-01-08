@@ -503,7 +503,7 @@ export class AdventuringConsumables extends AdventuringPage {
         // Basic info for selected tier
         this.component.detailIcon.src = consumable.getTierMedia(tier);
         this.component.detailName.textContent = consumable.getTierName(tier);
-        this.component.detailDescription.textContent = consumable.getTierDescription(tier);
+        this.component.detailDescription.innerHTML = consumable.getTierDescription(tier);
         
         // Charges for this tier
         this.component.detailCharges.textContent = `${this.getCharges(consumable, tier)}`;

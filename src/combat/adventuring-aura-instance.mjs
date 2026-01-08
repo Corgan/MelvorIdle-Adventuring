@@ -128,9 +128,18 @@ export class AdventuringAuraInstance {
      */
     getUniqueTriggers() {
         if(!this.base || !this.base.effects) return [];
+        
+        // Standard cleanup only has trigger and type: 'remove', no other properties
+        const isStandardCleanup = (e) => {
+            if (e.type !== 'remove') return false;
+            if (e.trigger !== 'encounter_end' && e.trigger !== 'death') return false;
+            const keys = Object.keys(e).filter(k => k !== 'trigger' && k !== 'type');
+            return keys.length === 0;
+        };
+        
         const triggers = new Set();
         this.base.effects.forEach(effect => {
-            if(effect.trigger && effect.type !== 'remove' && effect.type !== 'remove_stacks') {
+            if(effect.trigger && !isStandardCleanup(effect)) {
                 triggers.add(effect.trigger);
             }
         });
@@ -202,7 +211,24 @@ export class AdventuringAuraInstance {
     }
 
     remove_stacks(count) {
+        const previousStacks = this.stacks;
         this.stacks = Math.max(this.stacks - count, 0);
+        
+        // Fire stacks_depleted trigger if stacks just reached 0
+        if (previousStacks > 0 && this.stacks === 0 && this.auras.character) {
+            // Process stacks_depleted effects from this aura before it's cleaned up
+            const depletedEffects = this.base.effects.filter(e => e.trigger === 'stacks_depleted');
+            if (depletedEffects.length > 0) {
+                const ctx = {
+                    character: this.auras.character,
+                    manager: this.auras.character.manager,
+                    extra: { source: this.source, aura: this.base }
+                };
+                for (const effect of depletedEffects) {
+                    this.auras.character.processEffect(effect, this, ctx);
+                }
+            }
+        }
 
         this.auras.buildEffects();
         this.renderQueue.icon = true;

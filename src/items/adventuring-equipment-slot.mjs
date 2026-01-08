@@ -143,6 +143,9 @@ export class AdventuringEquipmentSlot {
             unequipBtn.onclick = () => {
                 this.setEmpty();
                 this.equipment.character.calculateStats();
+                if(this.manager.achievementManager) {
+                    this.manager.achievementManager.checkAchievements();
+                }
                 if(this.selectorPopup) this.selectorPopup.hide();
             };
             createTooltip(unequipBtn, '<div class="p-1">Unequip</div>');
@@ -274,6 +277,11 @@ export class AdventuringEquipmentSlot {
         
         // Recalculate stats
         this.equipment.character.calculateStats();
+        
+        // Check achievements (for set_bonus_active)
+        if(this.manager.achievementManager) {
+            this.manager.achievementManager.checkAchievements();
+        }
     }
 
     setOccupied(slot) {

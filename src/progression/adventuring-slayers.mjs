@@ -343,6 +343,9 @@ export class AdventuringSlayers extends AdventuringPage {
         if(!this.renderQueue.achievements && !this.renderQueue.all)
             return;
 
+        // Auto-complete any achievements that are met before rendering
+        this.manager.achievementManager.checkAchievements();
+
         this.renderAchievementSummary();
         this.renderAchievementCategoryFilter();
         this.renderAchievementList();
@@ -413,7 +416,7 @@ export class AdventuringSlayers extends AdventuringPage {
 
         // All button
         const allBtn = document.createElement('button');
-        allBtn.className = `btn btn-outline-info ${this.selectedCategory === 'all' ? 'active' : ''}`;
+        allBtn.className = `btn btn-sm btn-outline-info ${this.selectedCategory === 'all' ? 'active' : ''}`;
         allBtn.textContent = 'All';
         allBtn.onclick = () => {
             this.selectedCategory = 'all';
@@ -425,7 +428,7 @@ export class AdventuringSlayers extends AdventuringPage {
         // Category buttons
         for(const category of this.manager.achievementCategories.allObjects) {
             const btn = document.createElement('button');
-            btn.className = `btn btn-outline-info ${this.selectedCategory === category.id ? 'active' : ''}`;
+            btn.className = `btn btn-sm btn-outline-info ${this.selectedCategory === category.id ? 'active' : ''}`;
             btn.textContent = category.name;
             btn.onclick = () => {
                 this.selectedCategory = category.id;
@@ -535,11 +538,7 @@ export class AdventuringSlayers extends AdventuringPage {
             rewards.appendChild(rewardEl);
         }
 
-        // Claim button
-        if(isMet && !isComplete) {
-            claimBtn.classList.remove('d-none');
-            claimBtn.onclick = () => this.claimAchievement(achievement);
-        }
+        // Claim button no longer needed - achievements auto-complete
 
         const col = document.createElement('div');
         col.className = 'col-12 col-md-6 col-lg-4 p-2';

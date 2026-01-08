@@ -161,7 +161,7 @@ export class AdventuringTavernElement extends AdventuringSubpageElement {
         // Icon and name
         this.detailIcon.src = drink.getTierMedia(tier);
         this.detailName.textContent = drink.getTierName(tier);
-        this.detailDescription.textContent = drink.getTierDescription(tier);
+        this.detailDescription.innerHTML = drink.getTierDescription(tier);
         
         // Tier buttons
         for (let i = 0; i < 4; i++) {

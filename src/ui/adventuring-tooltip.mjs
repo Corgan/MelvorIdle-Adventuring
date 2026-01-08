@@ -674,11 +674,6 @@ export class TooltipBuilder {
         const tooltip = TooltipBuilder.create()
             .header(consumable.name, consumable.media);
         
-        // Show description
-        if (consumable.description) {
-            tooltip.hint(consumable.description);
-        }
-        
         // Show effects from tier 1 as representative
         const effects = consumable.getTierEffects ? consumable.getTierEffects(1) : null;
         if (effects && effects.length > 0) {
@@ -715,11 +710,6 @@ export class TooltipBuilder {
         const tooltip = TooltipBuilder.create()
             .header(tierName, tierMedia);
         
-        // Show description if available
-        if (consumable.description) {
-            tooltip.hint(consumable.description);
-        }
-        
         // Show effects for this tier
         const effects = consumable.getTierEffects ? consumable.getTierEffects(tier) : null;
         if (effects && effects.length > 0) {
@@ -752,7 +742,7 @@ export class TooltipBuilder {
     }
 
     /**
-     * Create a tavern drink tooltip showing name, description, effects, and charges.
+     * Create a tavern drink tooltip showing name, effects, flavor text, and charges.
      * @param {Object} drink - TavernDrink object with name, media, description
      * @param {number} [chargesOrRuns=0] - Total charges or runs remaining
      * @returns {TooltipBuilder} This builder for chaining
@@ -761,14 +751,16 @@ export class TooltipBuilder {
         const tooltip = TooltipBuilder.create()
             .header(drink.name, drink.media);
         
-        if (drink.description) {
-            tooltip.hint(drink.description);
-        }
-        
         // Show effects from tier 1 as representative
         const effects = drink.getTierEffects ? drink.getTierEffects(1) : null;
         if (effects && effects.length > 0) {
             tooltip.effects(effects, drink.manager);
+        }
+        
+        // Show flavor text if available
+        const flavorText = drink.getTierFlavorText ? drink.getTierFlavorText(1) : null;
+        if (flavorText) {
+            tooltip.separator().flavor(flavorText);
         }
         
         if (chargesOrRuns > 0) {

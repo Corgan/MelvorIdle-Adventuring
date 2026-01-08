@@ -1314,7 +1314,7 @@ function describeCondition(condition, manager) {
         case 'enemy_hp_above':
             return `vs enemies above ${condition.threshold}% HP`;
         case 'chance':
-            return `${condition.value}% chance`;
+            return `(${condition.value}% chance)`;
         case 'is_injured':
             return `when injured`;
         case 'is_full_hp':
@@ -1346,7 +1346,8 @@ function describeLimitSuffix(limitType, times) {
     
     switch(limitType) {
         case 'combat':
-            return `(${timesText} per combat)`;
+        case 'encounter':
+            return `(${timesText} per encounter)`;
         case 'round':
             return `(${timesText} per round)`;
         case 'turn':
@@ -1424,14 +1425,20 @@ function firstDefined(...values) {
  */
 const effectDescriptionRegistry = new Map([
     // Stat modifiers
-    ['stat_flat', (effect, value, stacks, amount, manager, helpers) => 
-        effect.perStack 
-            ? `+${firstDefined(value, amount, 1)} ${helpers.stat(effect.stat)} per stack` 
-            : `${helpers.sign(value)}${value} ${helpers.stat(effect.stat)}`],
-    ['stat_percent', (effect, value, stacks, amount, manager, helpers) => 
-        effect.perStack 
-            ? `+${firstDefined(value, amount, 1)}% ${helpers.stat(effect.stat)} per stack` 
-            : `${helpers.sign(value)}${value}% ${helpers.stat(effect.stat)}`],
+    ['stat_flat', (effect, value, stacks, amount, manager, helpers) => {
+        const v = firstDefined(value, amount, 1);
+        const absV = Math.abs(v);
+        return effect.perStack 
+            ? `${helpers.sign(v)}${absV} ${helpers.stat(effect.stat)} per stack` 
+            : `${helpers.sign(v)}${absV} ${helpers.stat(effect.stat)}`;
+    }],
+    ['stat_percent', (effect, value, stacks, amount, manager, helpers) => {
+        const v = firstDefined(value, amount, 1);
+        const absV = Math.abs(v);
+        return effect.perStack 
+            ? `${helpers.sign(v)}${absV}% ${helpers.stat(effect.stat)} per stack` 
+            : `${helpers.sign(v)}${absV}% ${helpers.stat(effect.stat)}`;
+    }],
     
     // Damage/Healing
     ['damage_flat', (effect, value, stacks, amount, manager, helpers) => 
@@ -1446,10 +1453,16 @@ const effectDescriptionRegistry = new Map([
             : `Heal for ${helpers.percent(firstDefined(value, amount, 0))}% of damage dealt`],
     
     // Damage modifiers
-    ['damage_modifier_flat', (effect, value, stacks, amount, manager, helpers) => 
-        effect.perStack ? `${helpers.sign(firstDefined(value, amount, 1))}${firstDefined(value, amount, 1)} Damage per stack` : `${helpers.sign(firstDefined(value, amount))}${firstDefined(value, amount)} Damage`],
-    ['damage_modifier_percent', (effect, value, stacks, amount, manager, helpers) => 
-        effect.perStack ? `+${firstDefined(value, amount, 1)}% Damage per stack` : `${helpers.sign(firstDefined(value, amount))}${firstDefined(value, amount)}% Damage`],
+    ['damage_modifier_flat', (effect, value, stacks, amount, manager, helpers) => {
+        const v = firstDefined(value, amount, 1);
+        const absV = Math.abs(v);
+        return effect.perStack ? `${helpers.sign(v)}${absV} Damage per stack` : `${helpers.sign(v)}${absV} Damage`;
+    }],
+    ['damage_modifier_percent', (effect, value, stacks, amount, manager, helpers) => {
+        const v = firstDefined(value, amount, 1);
+        const absV = Math.abs(v);
+        return effect.perStack ? `${helpers.sign(v)}${absV}% Damage per stack` : `${helpers.sign(v)}${absV}% Damage`;
+    }],
     
     // Buffs/Debuffs - use 'id' property for aura reference, or random: true
     ['buff', (effect, value, stacks, amount, manager, helpers) => {
@@ -1476,26 +1489,37 @@ const effectDescriptionRegistry = new Map([
         effect.id ? `Remove ${helpers.aura(effect.id)}` : 'Cleanse debuffs'],
     
     // Energy
-    ['energy', (effect, value, stacks, amount, manager, helpers) => 
-        `${helpers.sign(firstDefined(value, amount))}${firstDefined(value, amount)} Energy`],
+    ['energy', (effect, value, stacks, amount, manager, helpers) => {
+        const v = firstDefined(value, amount, 0);
+        const absV = Math.abs(v);
+        return `${helpers.sign(v)}${absV} Energy`;
+    }],
     
     // XP modifiers - category specifies which XP type (monsters, jobs, areas, equipment)
     ['xp_percent', (effect, value, stacks, amount, manager, helpers) => {
+        const v = firstDefined(value, amount, 0);
+        const absV = Math.abs(v);
         if (effect.category) {
             const catId = effect.category;
             // Strip namespace prefix for display
             const catName = catId.includes(':') ? catId.split(':').pop() : catId;
             const label = catName.charAt(0).toUpperCase() + catName.slice(1);
-            return `${helpers.sign(value)}${value}% ${label} XP`;
+            return `${helpers.sign(v)}${absV}% ${label} XP`;
         }
-        return `${helpers.sign(value)}${value}% XP`;
+        return `${helpers.sign(v)}${absV}% XP`;
     }],
-    ['loot_percent', (effect, value, stacks, amount, manager, helpers) => 
-        `${helpers.sign(value)}${value}% Loot`],
+    ['loot_percent', (effect, value, stacks, amount, manager, helpers) => {
+        const v = firstDefined(value, amount, 0);
+        const absV = Math.abs(v);
+        return `${helpers.sign(v)}${absV}% Loot`;
+    }],
     
     // Revival - amount is whole number percent (e.g., 50 = 50% HP)
     ['revive', (effect, value, stacks, amount) => 
         `Revive with ${amount || 100}% HP`],
+    
+    // Town work action - hero works in their town job building
+    ['work', () => 'Work in town job building'],
     
     // Tile effects
     ['teleport', () => 'Teleport to a random tile'],
@@ -1538,13 +1562,17 @@ const effectDescriptionRegistry = new Map([
             : `Reflect ${helpers.percent(firstDefined(value, amount))}% damage taken`],
     
     // Execute
-    ['execute', (effect, value, stacks, amount, manager, helpers) => 
-        `Execute enemies below ${helpers.percent(firstDefined(effect.threshold, value, 20))}% HP`],
+    ['execute', (effect, value, stacks, amount, manager, helpers) => {
+        let threshold = firstDefined(effect.threshold, value, 0.2);
+        // Convert decimal (0.25) to percentage (25), but leave whole numbers as-is
+        if (threshold > 0 && threshold < 1) threshold = Math.round(threshold * 100);
+        return `Execute enemies below ${threshold}% HP`;
+    }],
     
     // All stat percent bonus (with optional party scoping)
     ['all_stat_percent', (effect, value, stacks, amount, manager, helpers) => {
-        if (effect.party === 'enemy') return `Enemy Stats: ${helpers.sign(value)}${value}%`;
-        if (effect.party === 'hero') return `Party Stats: ${helpers.sign(value)}${value}%`;
+        if (effect.party === 'enemy') return `+${value}% enemy stats`;
+        if (effect.party === 'hero') return `+${value}% party stats`;
         return `+${value}% all stats`;
     }],
     
@@ -1620,9 +1648,9 @@ const effectDescriptionRegistry = new Map([
     ['prevent_lethal', () => 'Cannot be killed'],
     ['prevent_death', (effect, value, stacks, amount) => {
         if(amount > 0) {
-            return `Prevent death, heal ${amount}% HP`;
+            return `Survive lethal damage and heal ${amount}% HP`;
         }
-        return 'Prevent death';
+        return 'Survive lethal damage once';
     }],
     ['reduce_damage_percent', (effect, value, stacks, amount) => 
         `${firstDefined(amount, 0)}% damage reduction${effect.perStack ? ' per stack' : ''}`],
@@ -1651,7 +1679,7 @@ function describeEffect(effect, manager, displayMode = false) {
     // If effect has explicit description, use it
     if(effect.description) return effect.description;
     
-    const sign = (val) => val >= 0 ? '+' : '';
+    const sign = (val) => val >= 0 ? '+' : '-';
     // Convert decimal to percentage if needed (0.25 -> 25, but 25 stays 25)
     const toPercent = (val) => {
         if (val === undefined || val === null) return 0;
@@ -1696,7 +1724,12 @@ function describeEffect(effect, manager, displayMode = false) {
     // Get stat name with fallback to prettified ID
     const getStatDisplay = (statId) => statName(statId) || prettifyStatId(statId);
     const auraName = (auraId) => {
-        const aura = manager?.auras?.getObjectByID(auraId);
+        // Try direct lookup first
+        let aura = manager?.auras?.getObjectByID(auraId);
+        // If not found and no namespace, try with adventuring: prefix
+        if (!aura && auraId && !auraId.includes(':')) {
+            aura = manager?.auras?.getObjectByID(`adventuring:${auraId}`);
+        }
         return aura?.name || prettifyStatId(auraId);
     };
     
@@ -1746,6 +1779,8 @@ function formatTrigger(trigger) {
         'crit': 'On critical hit',
         'kill': 'On kill',
         'death': 'On death',
+        'stacks_depleted': 'When stacks reach 0',
+        'removed': 'When removed',
         'encounter_start': 'At encounter start',
         'encounter_end': 'At encounter end',
         'floor_start': 'At floor start',
@@ -1826,8 +1861,8 @@ function formatTarget(target, party) {
             if(baseName === 'dead') return 'dead enemy';
             return `${baseName} enemy`;
         }
-        // 'hero' = always hero party, 'ally' = same party as caster (both display as "ally")
-        if(effectiveParty === 'hero' || effectiveParty === 'ally') {
+        // 'hero' = always hero party, 'ally' or 'player' = same party as caster (all display as "ally")
+        if(effectiveParty === 'hero' || effectiveParty === 'ally' || effectiveParty === 'player') {
             if(baseName === 'all') return 'all allies';
             if(baseName === 'front') return 'front ally';
             if(baseName === 'back') return 'back ally';
@@ -1841,6 +1876,81 @@ function formatTarget(target, party) {
     
     // Fallback: replace underscores with spaces
     return target.replace(/_/g, ' ');
+}
+
+/**
+ * Join effect descriptions with proper grammar (commas and Oxford comma).
+ * Groups effects by action word and removes repeated action words within groups.
+ * 
+ * @param {string[]} descriptions - Array of effect descriptions
+ * @returns {string} Joined description with proper punctuation
+ */
+function joinEffectDescriptions(descriptions) {
+    if (descriptions.length === 0) return '';
+    if (descriptions.length === 1) return descriptions[0];
+    
+    // Helper to lowercase first letter, preserving acronyms
+    const lowercaseFirst = (str) => {
+        if (!str) return str;
+        const firstWord = str.split(/[\s,]/)[0];
+        if (firstWord.length >= 2 && firstWord === firstWord.toUpperCase()) {
+            return str;  // Keep as-is for acronyms like "XP", "HP", etc.
+        }
+        return str.charAt(0).toLowerCase() + str.slice(1);
+    };
+    
+    // Action words we can deduplicate
+    const actionWords = ['Apply', 'Deal', 'Heal', 'Remove', 'Grant'];
+    
+    // Group consecutive descriptions by action word
+    const groups = [];
+    let currentGroup = null;
+    
+    for (const desc of descriptions) {
+        const firstWord = desc.split(' ')[0];
+        const isActionWord = actionWords.includes(firstWord);
+        
+        if (isActionWord && currentGroup && currentGroup.action === firstWord) {
+            // Same action word - add to current group
+            currentGroup.items.push(desc);
+        } else {
+            // Different action or not an action word - start new group
+            currentGroup = {
+                action: isActionWord ? firstWord : null,
+                items: [desc]
+            };
+            groups.push(currentGroup);
+        }
+    }
+    
+    // Process each group - deduplicate action words within groups
+    const processedParts = [];
+    for (const group of groups) {
+        if (group.action && group.items.length > 1) {
+            // Multiple items with same action - strip action from subsequent
+            const first = group.items[0];
+            const rest = group.items.slice(1).map(d => d.substring(group.action.length + 1));
+            processedParts.push(first);
+            processedParts.push(...rest);
+        } else {
+            // Single item or no action word - keep as-is
+            processedParts.push(...group.items);
+        }
+    }
+    
+    // Join all parts with proper grammar
+    if (processedParts.length === 1) {
+        return processedParts[0];
+    } else if (processedParts.length === 2) {
+        return `${processedParts[0]} and ${lowercaseFirst(processedParts[1])}`;
+    }
+    
+    // Oxford comma for 3+
+    const parts = processedParts.map((d, idx) => 
+        idx > 0 ? lowercaseFirst(d) : d
+    );
+    const lastPart = parts.pop();
+    return `${parts.join(', ')}, and ${lastPart}`;
 }
 
 /**
@@ -1884,7 +1994,9 @@ function describeEffectFull(effect, manager, options = {}) {
     }
     
     // Add condition suffix if present
-    if(effect.condition) {
+    // Skip if the effect type already handled the condition in its description
+    const typesWithBuiltInCondition = ['skip', 'miss', 'confuse', 'dodge'];
+    if(effect.condition && !typesWithBuiltInCondition.includes(effect.type)) {
         const conditionDesc = describeCondition(effect.condition, manager);
         if(conditionDesc) {
             desc = `${desc} ${conditionDesc}`;
@@ -1946,6 +2058,8 @@ function formatTriggerSuffix(trigger) {
         'crit': 'on critical hit',
         'kill': 'on kill',
         'death': 'on death',
+        'stacks_depleted': 'when stacks reach 0',
+        'removed': 'when removed',
         'encounter_start': 'at the start of combat',
         'encounter_end': 'at the end of combat',
         'floor_start': 'at the start of a floor',
@@ -2008,13 +2122,15 @@ function describeEffects(effects, manager, options = {}) {
     let mainEffects = effects;
     
     if (isAura) {
-        mainEffects = effects.filter(e => {
-            // Filter out removal/cleanup effects for auras
-            if (e.type === 'remove' || e.type === 'remove_stacks') {
-                return false;  // Always hide remove/remove_stacks for auras
-            }
-            return true;
-        });
+        // Standard cleanup only has trigger and type: 'remove', no other properties
+        const isStandardCleanup = (e) => {
+            if (e.type !== 'remove') return false;
+            if (e.trigger !== 'encounter_end' && e.trigger !== 'death') return false;
+            const keys = Object.keys(e).filter(k => k !== 'trigger' && k !== 'type');
+            return keys.length === 0;
+        };
+        
+        mainEffects = effects.filter(e => !isStandardCleanup(e));
     }
     
     // Helper to get effective target/trigger for an effect
@@ -2033,7 +2149,16 @@ function describeEffects(effects, manager, options = {}) {
     const allSameTrigger = mainEffects.every(e => getTrigger(e) === firstTrigger);
     
     // Helper to lowercase the first letter (for combining with "and")
-    const lowercaseFirst = (str) => str.charAt(0).toLowerCase() + str.slice(1);
+    // Preserves acronyms by checking if first word is all uppercase
+    const lowercaseFirst = (str) => {
+        if (!str) return str;
+        // Check if first word is an acronym (all uppercase, 2+ chars)
+        const firstWord = str.split(/[\s,]/)[0];
+        if (firstWord.length >= 2 && firstWord === firstWord.toUpperCase()) {
+            return str;  // Keep as-is for acronyms like "XP", "HP", etc.
+        }
+        return str.charAt(0).toLowerCase() + str.slice(1);
+    };
     
     let combined;
     
@@ -2049,17 +2174,8 @@ function describeEffects(effects, manager, options = {}) {
             })
         );
         
-        // Combine effect descriptions
-        if (descriptions.length === 1) {
-            combined = descriptions[0];
-        } else if (descriptions.length === 2) {
-            combined = `${descriptions[0]} and ${lowercaseFirst(descriptions[1])}`;
-        } else {
-            const first = descriptions.shift();
-            const last = descriptions.pop();
-            const middle = descriptions.map(d => lowercaseFirst(d)).join(', ');
-            combined = `${first}, ${middle}, and ${lowercaseFirst(last)}`;
-        }
+        // Combine effect descriptions using joinEffectDescriptions for action word deduplication
+        combined = joinEffectDescriptions(descriptions);
         
         // Add shared target at the end
         if (firstTarget && firstTarget !== 'self') {
@@ -2077,17 +2193,52 @@ function describeEffects(effects, manager, options = {}) {
             }
         }
     } else {
-        // Different targets/triggers - describe each fully
-        const descriptions = mainEffects.map(e => describeEffectFull(e, manager, options));
+        // Different triggers - group effects by trigger, then combine
+        const triggerGroups = new Map();
         
-        if (descriptions.length === 1) {
-            combined = descriptions[0];
-        } else if (descriptions.length === 2) {
-            combined = `${descriptions[0]} and ${lowercaseFirst(descriptions[1])}`;
+        for (const e of mainEffects) {
+            const trigger = getTrigger(e) || 'passive';
+            if (!triggerGroups.has(trigger)) {
+                triggerGroups.set(trigger, []);
+            }
+            triggerGroups.get(trigger).push(e);
+        }
+        
+        // Describe each trigger group
+        const groupDescriptions = [];
+        
+        for (const [trigger, groupEffects] of triggerGroups) {
+            // Describe effects in this group without triggers
+            const descriptions = groupEffects.map(e => 
+                describeEffectFull(e, manager, { 
+                    ...options, 
+                    includeTrigger: false
+                })
+            );
+            
+            // Combine effect descriptions using joinEffectDescriptions for action word deduplication
+            let groupCombined = joinEffectDescriptions(descriptions);
+            
+            // Add shared trigger suffix for this group
+            if (trigger && trigger !== 'passive' && trigger !== 'on_use') {
+                const triggerSuffix = formatTriggerSuffix(trigger);
+                if (triggerSuffix && !groupCombined.toLowerCase().includes('when below') && !groupCombined.toLowerCase().includes('when above')) {
+                    groupCombined = `${groupCombined} ${triggerSuffix}`;
+                }
+            }
+            
+            groupDescriptions.push(groupCombined);
+        }
+        
+        // Join all trigger groups (don't use joinEffectDescriptions here - groups have different actions)
+        if (groupDescriptions.length === 1) {
+            combined = groupDescriptions[0];
+        } else if (groupDescriptions.length === 2) {
+            combined = `${groupDescriptions[0]} and ${lowercaseFirst(groupDescriptions[1])}`;
         } else {
-            const first = descriptions.shift();
-            const last = descriptions.pop();
-            const middle = descriptions.map(d => lowercaseFirst(d)).join(', ');
+            const first = groupDescriptions.shift();
+            const last = groupDescriptions.pop();
+            const middle = groupDescriptions.map(d => lowercaseFirst(d)).join(', ');
             combined = `${first}, ${middle}, and ${lowercaseFirst(last)}`;
         }
     }
@@ -2907,12 +3058,25 @@ function buildDescription(config) {
     // Hits mode - for abilities with multiple hits
     else if (hits !== undefined && hits.length > 0) {
         const hitDescs = [];
+        
+        // Helper: determine if effect type normally targets self (heals/buffs) vs target (damage/debuffs)
+        // When hit targets allies, all effects go together. When targeting enemies, heals/buffs split off to self.
+        const isSelfTargetingEffect = (effectType, hitParty) => {
+            // If the hit targets allies, all effects go to that ally
+            if (hitParty === 'ally') return false;
+            // Otherwise, heals/buffs/energy/shield go to self
+            const selfTypes = ['heal_flat', 'heal_percent', 'buff', 'energy', 'shield'];
+            return selfTypes.includes(effectType);
+        };
+        
         for (let i = 0; i < hits.length; i++) {
             const hit = hits[i];
             if (hit.effects === undefined || hit.effects.length === 0) continue;
             
-            // Get effect descriptions WITHOUT target info first
-            const hitEffectDescs = [];
+            // Group effects by their implicit target
+            const selfEffects = [];
+            const targetEffects = [];
+            
             for (let j = 0; j < hit.effects.length; j++) {
                 const effect = hit.effects[j];
                 const effectObj = {
@@ -2929,32 +3093,57 @@ function buildDescription(config) {
                             ? effect.stacks.base 
                             : (effect.stacks !== undefined ? effect.stacks : 0)),
                     id: effect.id,
-                    // Don't include target here - we'll add it at the end
                     condition: effect.condition,
-                    chance: effect.chance
+                    chance: effect.chance,
+                    random: effect.random,
+                    count: effect.count,
+                    threshold: effect.threshold
                 };
                 let effectDesc = describeEffectFull(effectObj, manager, { displayMode, includeTrigger: false });
-                // Lowercase the first letter for joining with "and" (except first effect)
-                if (j > 0 && effectDesc.length > 0) {
-                    effectDesc = effectDesc.charAt(0).toLowerCase() + effectDesc.slice(1);
+                
+                // Categorize by implicit target
+                if (isSelfTargetingEffect(effect.type, hit.party)) {
+                    selfEffects.push(effectDesc);
+                } else {
+                    targetEffects.push(effectDesc);
                 }
-                hitEffectDescs.push(effectDesc);
             }
             
-            if (hitEffectDescs.length > 0) {
-                let hitDesc = hitEffectDescs.join(' and ');
-                // Add target suffix once at the end for the whole hit
-                const target = hit.target;
-                const party = hit.party;
-                if (target && target !== 'self') {
-                    const targetName = formatTarget(target, party);
-                    if (targetName && !hitDesc.toLowerCase().includes(targetName.toLowerCase())) {
-                        hitDesc = `${hitDesc} to ${targetName}`;
+            // Build descriptions with appropriate targets
+            const target = hit.target;
+            const party = hit.party;
+            const hitParts = [];
+            
+            // Target effects (damage, debuffs) go to hit target
+            if (targetEffects.length > 0) {
+                let targetDesc = joinEffectDescriptions(targetEffects);
+                if (target === 'self') {
+                    // Self-targeting damage/debuffs - explicitly say "to self"
+                    // Check if description contains damage (which is unusual for self)
+                    if (targetDesc.toLowerCase().includes('deal')) {
+                        targetDesc = `${targetDesc} to self`;
                     }
-                } else if (target === 'self') {
-                    hitDesc = `${hitDesc} to self`;
+                } else if (target) {
+                    const targetName = formatTarget(target, party);
+                    if (targetName && !targetDesc.toLowerCase().includes(targetName.toLowerCase())) {
+                        targetDesc = `${targetDesc} to ${targetName}`;
+                    }
                 }
-                hitDescs.push(hitDesc);
+                hitParts.push(targetDesc);
+            }
+            
+            // Self effects (heals, buffs) go to self - no target suffix needed
+            if (selfEffects.length > 0) {
+                let selfDesc = joinEffectDescriptions(selfEffects);
+                // Lowercase first letter if this follows target effects
+                if (hitParts.length > 0) {
+                    selfDesc = selfDesc.charAt(0).toLowerCase() + selfDesc.slice(1);
+                }
+                hitParts.push(selfDesc);
+            }
+            
+            if (hitParts.length > 0) {
+                hitDescs.push(hitParts.join(' and '));
             }
         }
         
@@ -2966,7 +3155,9 @@ function buildDescription(config) {
             if (hitDescs[0] === hitDescs[1]) {
                 desc = `${hitDescs[0]} (hits twice)`;
             } else {
-                desc = `First: ${hitDescs[0]}. Then: ${hitDescs[1]}`;
+                // Natural sentence: "Deal X, then heal Y"
+                const second = hitDescs[1].charAt(0).toLowerCase() + hitDescs[1].slice(1);
+                desc = `${hitDescs[0]}, then ${second}`;
             }
         } else if (hitDescs.length > 2) {
             // Check if all hits are identical
@@ -2974,8 +3165,12 @@ function buildDescription(config) {
             if (allSame) {
                 desc = `${hitDescs[0]} (hits ${hitDescs.length} times)`;
             } else {
-                const ordinals = ['First', 'Second', 'Third', 'Fourth', 'Fifth'];
-                desc = hitDescs.map((h, i) => `${ordinals[i] || `Hit ${i+1}`}: ${h}`).join('. ');
+                // Natural flow: "Deal X, then deal Y, then heal Z"
+                const parts = hitDescs.map((h, i) => {
+                    if (i === 0) return h;
+                    return h.charAt(0).toLowerCase() + h.slice(1);
+                });
+                desc = parts.join(', then ');
             }
         }
         
@@ -3002,10 +3197,14 @@ function buildDescription(config) {
                         ? effect.stacks.base 
                         : (effect.stacks !== undefined ? effect.stacks : 0)),
                 id: effect.id,
+                stat: effect.stat,
                 target: effect.target,
                 party: effect.party,
                 condition: effect.condition,
-                chance: effect.chance
+                chance: effect.chance,
+                random: effect.random,
+                count: effect.count,
+                threshold: effect.threshold
             };
             effectDescs.push(describeEffectFull(effectObj, manager, { displayMode, includeTrigger }));
         }
@@ -3015,9 +3214,9 @@ function buildDescription(config) {
         }
     }
     
-    // Append flavor text if present
+    // Append flavor text if present (in italics, with line break for HTML)
     if (flavorText !== undefined && flavorText !== null && flavorText !== '') {
-        desc = desc !== '' ? `${desc}\n\n${flavorText}` : flavorText;
+        desc = desc !== '' ? `${desc}<br><br><em>${flavorText}</em>` : `<em>${flavorText}</em>`;
     }
     
     return desc !== '' ? desc : '';
