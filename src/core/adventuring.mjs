@@ -77,9 +77,6 @@ export class Adventuring extends SkillWithMastery {
         this.isActive = false;
         this.timersPaused = false; // Used by tutorial system to pause exploration/combat
 
-        // Event system for loose coupling between components
-        this._eventHandlers = new Map();
-
         // Blue Mage (Slayer) learned abilities
         this.learnedAbilities = new Set();
         
@@ -214,90 +211,7 @@ export class Adventuring extends SkillWithMastery {
         }
     }
 
-    // =========================================
-    // Event System
-    // =========================================
-
-    /**
-     * Subscribe to an event
-     * @param {string} event - Event name (e.g., 'consumable:equipped', 'dungeon:started')
-     * @param {Function} handler - Callback function
-     * @returns {Function} Unsubscribe function
-     */
-    on(event, handler) {
-        if(!this._eventHandlers.has(event)) {
-            this._eventHandlers.set(event, []);
-        }
-        this._eventHandlers.get(event).push(handler);
-        
-        // Return unsubscribe function
-        return () => this.off(event, handler);
-    }
-
-    /**
-     * Unsubscribe from an event
-     * @param {string} event - Event name
-     * @param {Function} handler - Handler to remove
-     */
-    off(event, handler) {
-        const handlers = this._eventHandlers.get(event);
-        if(handlers) {
-            const idx = handlers.indexOf(handler);
-            if(idx > -1) handlers.splice(idx, 1);
-        }
-    }
-
-    /**
-     * Emit an event to all subscribers
-     * @param {string} event - Event name
-     * @param {*} [data] - Optional data to pass to handlers
-     */
-    emit(event, data) {
-        const handlers = this._eventHandlers.get(event);
-        if(handlers) {
-            handlers.forEach(fn => {
-                try {
-                    fn(data);
-                } catch(e) {
-                    console.error(`Error in event handler for '${event}':`, e);
-                }
-            });
-        }
-    }
-
-    /**
-     * Subscribe to an event for one-time handling
-     * @param {string} event - Event name
-     * @param {Function} handler - Callback function
-     * @returns {Function} Unsubscribe function
-     */
-    once(event, handler) {
-        const wrappedHandler = (data) => {
-            this.off(event, wrappedHandler);
-            handler(data);
-        };
-        return this.on(event, wrappedHandler);
-    }
-
-    /**
-     * Clear all event handlers (called on reset)
-     */
-    clearAllEvents() {
-        this._eventHandlers.clear();
-    }
-
-    /**
-     * Get list of registered events (for debugging)
-     * @returns {string[]}
-     */
-    getRegisteredEvents() {
-        return Array.from(this._eventHandlers.keys());
-    }
-
     reset() {
-        // Clear event handlers
-        this.clearAllEvents();
-
         // Reset party members to initial state
         this.party.forEach(member => {
             member.hitpoints = member.maxHitpoints;
@@ -618,8 +532,9 @@ export class Adventuring extends SkillWithMastery {
             member.renderQueue.jobs = true;
         });
 
-        // Emit skill level up event
-        this.emit('skill:level-up', { oldLevel, newLevel, level: newLevel });
+        // Check achievements and trigger tutorials for skill level up
+        this.achievementManager.checkAchievements();
+        this.tutorialManager.checkTriggers('skill', { level: newLevel });
 
         this.jobs.forEach(job => {
             job.renderQueue.name = true;
@@ -912,7 +827,7 @@ export class Adventuring extends SkillWithMastery {
         super.addMasteryXP(action, xp);
         const newLevel = this.getMasteryLevel(action);
 
-        // Emit mastery level up event
+        // Check for mastery level up triggers
         if(newLevel > oldLevel) {
             let category = 'other';
             const firstJob = this.jobs.registeredObjects.values().next().value;
@@ -923,7 +838,7 @@ export class Adventuring extends SkillWithMastery {
             } else if(this.baseItems.allObjects.includes(action)) {
                 category = 'equipment';
             }
-            this.emit('mastery:level-up', { action, category, oldLevel, newLevel, level: newLevel });
+            this.tutorialManager.checkTriggers('mastery', { category, level: newLevel });
         }
     }
 

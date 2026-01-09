@@ -14,12 +14,6 @@ class AdventuringParty {
         
         // Effect trigger limit tracking (shared implementation)
         this.effectLimitTracker = new EffectLimitTracker();
-        
-        // Subscribe to events that require effect invalidation
-        this.manager.on('consumable:equipped', () => this.invalidateAllEffects('consumables'));
-        this.manager.on('consumable:unequipped', () => this.invalidateAllEffects('consumables'));
-        this.manager.on('consumable:charges-changed', () => this.invalidateAllEffects('consumables'));
-        this.manager.on('tavern:drink-changed', () => this.invalidateAllEffects('tavern'));
     }
     
     /**

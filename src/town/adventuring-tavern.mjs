@@ -46,9 +46,6 @@ export class AdventuringTavern extends AdventuringPage {
         this.selectedTier = 1;
 
         this.component.back.onclick = () => this.back();
-        
-        // Subscribe to dungeon lifecycle events
-        this.manager.on('dungeon:ended', () => this.consumeCharges());
     }
 
     back() {
@@ -108,7 +105,7 @@ export class AdventuringTavern extends AdventuringPage {
         drink.renderQueue.updateAll();
         this.renderQueue.equipped = true;
         this.renderQueue.details = true;
-        this.manager.emit('tavern:drink-changed', { drink, tier, action: 'charges-added' });
+        this.manager.party.invalidateAllEffects('tavern');
     }
 
     /**
@@ -125,7 +122,7 @@ export class AdventuringTavern extends AdventuringPage {
         drink.renderQueue.updateAll();
         this.renderQueue.equipped = true;
         this.renderQueue.details = true;
-        this.manager.emit('tavern:drink-changed', { drink, tier, action: 'charges-removed' });
+        this.manager.party.invalidateAllEffects('tavern');
 
         // If charges depleted and this tier is equipped, unequip
         const equippedTier = this.getEquippedTier(drink);
@@ -191,7 +188,7 @@ export class AdventuringTavern extends AdventuringPage {
         drink.renderQueue.updateAll();
         this.renderQueue.equipped = true;
         this.renderQueue.details = true;
-        this.manager.emit('tavern:drink-changed', { drink, tier, action: 'equipped' });
+        this.manager.party.invalidateAllEffects('tavern');
         this.manager.log.add(`Equipped ${drink.getTierName(tier)}`);
         
         return true;
@@ -208,8 +205,9 @@ export class AdventuringTavern extends AdventuringPage {
         drink.renderQueue.updateAll();
         this.renderQueue.equipped = true;
         this.renderQueue.details = true;
-        this.manager.emit('tavern:drink-changed', { drink, tier, action: 'unequipped' });
+        this.manager.party.invalidateAllEffects('tavern');
         this.manager.log.add(`Unequipped ${drink.getTierName(tier)}`);
+        this.manager.overview.renderQueue.buffs = true;
         
         return true;
     }

@@ -53,15 +53,6 @@ export class AdventuringSlayers extends AdventuringPage {
         this.component.back.onclick = () => this.back();
         this.component.refreshButton.onclick = () => this.tryRefreshTasks();
         
-        // Subscribe to combat events
-        this.manager.on('combat:monster-killed', ({ monster }) => this.onMonsterKilled(monster));
-        
-        // Subscribe to stash events
-        this.manager.on('stash:material-added', ({ material, qty }) => this.onMaterialCollected(material, qty));
-        
-        // Subscribe to dungeon events
-        this.manager.on('dungeon:cleared', ({ area }) => this.onDungeonCleared(area));
-        
         // Tab switching
         this.component.tabTasks.onclick = () => this.switchTab('tasks');
         this.component.tabAchievements.onclick = () => this.switchTab('achievements');
@@ -250,8 +241,8 @@ export class AdventuringSlayers extends AdventuringPage {
             this.activeTasks.splice(index, 1);
             this.totalTasksCompleted++;
 
-            // Emit event for cross-cutting concerns
-            this.manager.emit('slayer:task-completed', { task, rewards: task.rewards });
+            // Direct achievement tracking (formerly event)
+            this.manager.achievementManager.recordSlayerTask();
             
             // Build reward message
             const rewardStrings = task.rewards.map(r => {

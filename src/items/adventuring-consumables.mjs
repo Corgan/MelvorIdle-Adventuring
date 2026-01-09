@@ -62,10 +62,6 @@ export class AdventuringConsumables extends AdventuringPage {
             const tier = i + 1;
             this.component.tierButtonElements[i].onclick = () => this.selectTier(tier);
         }
-        
-        // Subscribe to dungeon lifecycle events
-        this.manager.on('dungeon:started', () => this.onDungeonStart());
-        this.manager.on('dungeon:ended', () => this.onDungeonEnd());
     }
 
     back() {
@@ -234,14 +230,14 @@ export class AdventuringConsumables extends AdventuringPage {
         
         consumable.renderQueue.updateAll();
         
-        // Emit event if this consumable is equipped at this tier (effects may have changed)
+        // Invalidate effects if this consumable is equipped at this tier
         const equipped = this.getEquippedEntry(consumable);
         if (equipped && equipped.tier === tier) {
-            this.manager.emit('consumable:charges-changed', { consumable, tier, amount });
+            this.manager.party.invalidateAllEffects('consumables');
         }
         
         this.renderQueue.slots = true;
-        this.manager.emit('consumable:charges-added', { consumable, tier, amount });
+        this.manager.overview.renderQueue.buffs = true;
     }
 
     /**
@@ -273,8 +269,8 @@ export class AdventuringConsumables extends AdventuringPage {
         if (newCharges <= 0 && equipped && equipped.tier === tier) {
             this.unequip(consumable);
         } else if (equipped && equipped.tier === tier) {
-            // Emit event for effect recalculation
-            this.manager.emit('consumable:charges-changed', { consumable, tier, amount: -amount });
+            // Invalidate effects for recalculation
+            this.manager.party.invalidateAllEffects('consumables');
         }
         
         this.renderQueue.slots = true;
@@ -338,8 +334,9 @@ export class AdventuringConsumables extends AdventuringPage {
         this.renderQueue.slots = true;
         this.manager.log.add(`Equipped ${consumable.getTierName(tier)}`);
         
-        // Emit event for cross-cutting concerns
-        this.manager.emit('consumable:equipped', { consumable, tier });
+        // Direct calls for cross-cutting concerns
+        this.manager.party.invalidateAllEffects('consumables');
+        this.manager.overview.renderQueue.buffs = true;
         
         return true;
     }
@@ -356,8 +353,9 @@ export class AdventuringConsumables extends AdventuringPage {
         consumable.renderQueue.equipped = true;
         this.renderQueue.slots = true;
         
-        // Emit event for cross-cutting concerns
-        this.manager.emit('consumable:unequipped', { consumable, tier: entry.tier });
+        // Direct calls for cross-cutting concerns
+        this.manager.party.invalidateAllEffects('consumables');
+        this.manager.overview.renderQueue.buffs = true;
         
         return true;
     }

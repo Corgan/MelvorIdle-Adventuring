@@ -311,7 +311,7 @@ export class AdventuringDungeonFloor {
         this.manager.triggerEffects('floor_end', {});
         
         this.manager.dungeon.progress++;
-        this.manager.emit('floor:completed', { progress: this.manager.dungeon.progress });
+        this.manager.overview.renderQueue.status = true;
 
         if(this.manager.dungeon.progress >= this.manager.dungeon.numFloors) {
             this.manager.dungeon.complete();

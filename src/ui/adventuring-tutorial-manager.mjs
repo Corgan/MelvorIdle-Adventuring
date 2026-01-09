@@ -24,28 +24,6 @@ export class AdventuringTutorialManager {
         // UI Component
         this.component = createElement('adventuring-tutorial-tooltip');
         this.component.manager = this;
-        
-        // Subscribe to events for tutorial triggers
-        this.manager.on('stash:material-added', ({ isCurrency }) => {
-            this.checkTriggers(isCurrency ? 'currency' : 'material');
-        });
-        this.manager.on('bestiary:monster-seen', ({ isFirstEver }) => {
-            if (isFirstEver) {
-                this.checkTriggers('event', { event: 'firstMonsterSeen' });
-            }
-        });
-        this.manager.on('dungeon:started', () => {
-            this.checkTriggers('event', { event: 'dungeonStart' });
-        });
-        this.manager.on('combat:started', () => {
-            this.checkTriggers('event', { event: 'combatStart' });
-        });
-        this.manager.on('skill:level-up', ({ level }) => {
-            this.checkTriggers('skillLevel', { level });
-        });
-        this.manager.on('mastery:level-up', ({ category, level }) => {
-            this.checkTriggers('mastery', { category, level });
-        });
     }
 
     /**

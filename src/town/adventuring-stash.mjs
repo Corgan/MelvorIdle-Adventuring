@@ -219,12 +219,15 @@ export class AdventuringStash extends AdventuringPage {
             material.renderQueue.count = true;
             this.manager.log.add(`Found ${qty} ${material.name}`);
             
-            // Emit event for cross-cutting concerns
-            this.manager.emit('stash:material-added', { 
-                material, 
-                qty, 
-                isCurrency: material.isCurrency 
-            });
+            // Direct calls for cross-cutting concerns (formerly events)
+            if(material.isCurrency) {
+                this.manager.achievementManager.recordCurrency(qty);
+                this.manager.tutorialManager.checkTriggers('currency');
+            } else {
+                this.manager.achievementManager.recordMaterials(qty);
+                this.manager.tutorialManager.checkTriggers('material');
+                this.manager.slayers.onMaterialCollected(material, qty);
+            }
         }
     }
 

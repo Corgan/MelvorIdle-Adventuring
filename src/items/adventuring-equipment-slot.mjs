@@ -157,12 +157,7 @@ export class AdventuringEquipmentSlot {
                     this.setEmpty();
                     if (this.equipment.character.invalidateStats) this.equipment.character.invalidateStats();
                     this.equipment.character.calculateStats();
-                    this.manager.emit('equipment:changed', { 
-                        hero: this.equipment.character, 
-                        slot: this.slotType, 
-                        item: null,
-                        previousItem 
-                    });
+                    this.manager.achievementManager.checkAchievements();
                     if(this.selectorPopup) this.selectorPopup.hide();
                 }
             });
@@ -302,13 +297,8 @@ export class AdventuringEquipmentSlot {
         if (this.equipment.character.invalidateStats) this.equipment.character.invalidateStats();
         this.equipment.character.calculateStats();
         
-        // Emit equipment changed event
-        this.manager.emit('equipment:changed', { 
-            hero: this.equipment.character, 
-            slot: this.slotType, 
-            item: item,
-            displaced: displacedItems 
-        });
+        // Direct achievement check
+        this.manager.achievementManager.checkAchievements();
     }
 
     setOccupied(slot) {

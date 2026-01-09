@@ -234,7 +234,7 @@ export class AdventuringDungeon extends AdventuringPage {
         }
         this.floor.step();
         this.exploreTimer.start(this.getEffectiveExploreInterval());
-        this.manager.emit('dungeon:explored', {});
+        this.manager.overview.renderQueue.turnProgressBar = true;
     }
 
     triggerTile(tile) {
@@ -465,8 +465,11 @@ export class AdventuringDungeon extends AdventuringPage {
         // Use centralized trigger system for dungeon_start
         this.manager.triggerEffects('dungeon_start', {});
         
-        // Emit dungeon started event
-        this.manager.emit('dungeon:started', { area: this.area, isEndless: this.isEndless });
+        // Direct calls for cross-cutting concerns
+        this.manager.overview.renderQueue.status = true;
+        this.manager.overview.renderQueue.buffs = true;
+        this.manager.consumables.onDungeonStart();
+        this.manager.tutorialManager.checkTriggers('event', { event: 'dungeonStart' });
 
         this.next();
         this.manager.start();
@@ -500,8 +503,10 @@ export class AdventuringDungeon extends AdventuringPage {
         // Invalidate effect cache on reset
         this.effectCache.invalidateAll();
         
-        // Emit dungeon reset event for UI updates
-        this.manager.emit('dungeon:reset', {});
+        // Direct UI updates
+        this.manager.overview.renderQueue.turnProgressBar = true;
+        this.manager.overview.renderQueue.status = true;
+        this.manager.overview.renderQueue.buttons = true;
 
         this.groupGenerator.reset();
         this.floor.reset();
@@ -518,8 +523,10 @@ export class AdventuringDungeon extends AdventuringPage {
         if(this.area !== undefined)
             this.manager.log.add(`Abandoned ${this.area.name} on floor ${this.progress+1}`);
 
-        // Emit dungeon ended event (abandoned)
-        this.manager.emit('dungeon:ended', { area: this.area, abandoned: true, completed: false });
+        // Direct calls for cross-cutting concerns
+        this.manager.overview.renderQueue.buffs = true;
+        this.manager.consumables.onDungeonEnd();
+        this.manager.tavern.consumeCharges();
 
         this.reset();
         this.manager.stop();
@@ -539,17 +546,15 @@ export class AdventuringDungeon extends AdventuringPage {
             this.area.addXP(areaXP);
         }
 
-        // Emit dungeon cleared event for cross-cutting concerns
+        // Direct calls for cross-cutting concerns
         const difficulty = this.difficulty ? this.difficulty.id.replace('adventuring:', '') : 'normal';
-        this.manager.emit('dungeon:cleared', { 
-            area: this.area, 
-            difficulty,
-            isEndless: this.isEndless, 
-            endlessWave: this.endlessWave 
-        });
+        this.manager.achievementManager.recordDungeonClear(this.area, difficulty, this.isEndless, this.endlessWave);
+        this.manager.slayers.onDungeonCleared(this.area);
 
-        // Consume charges from equipped consumables
-        this.manager.emit('dungeon:ended', { area: this.area, abandoned: false, completed: true });
+        // Consume charges from equipped consumables and tavern drinks
+        this.manager.overview.renderQueue.buffs = true;
+        this.manager.consumables.onDungeonEnd();
+        this.manager.tavern.consumeCharges();
 
         if(!this.manager.party.all.every(hero => hero.dead)) {
             // Handle endless mode - continue to next wave

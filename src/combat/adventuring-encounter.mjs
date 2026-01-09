@@ -118,8 +118,8 @@ export class AdventuringEncounter extends AdventuringPage {
             let resolvedEffects = member.trigger('encounter_start', { encounter: this });
         });
 
-        // Emit combat started event
-        this.manager.emit('combat:started', { encounter: this });
+        // Notify tutorial manager of combat start
+        this.manager.tutorialManager.checkTriggers('event', { event: 'combatStart' });
 
         // Also trigger round_start for the first round
         this.all.forEach(member => {
@@ -145,7 +145,7 @@ export class AdventuringEncounter extends AdventuringPage {
         this.isFighting = false;
         this.turnTimer.stop();
         this.hitTimer.stop();
-        this.manager.emit('encounter:timer-changed', {});
+        this.manager.overview.renderQueue.turnProgressBar = true;
         this.updateTurnCards();
     }
 
@@ -162,7 +162,7 @@ export class AdventuringEncounter extends AdventuringPage {
         this.currentRoundOrder = this.nextRoundOrder;
         this.nextRoundOrder = [];
         this.roundCounter++;
-        this.manager.emit('encounter:status-changed', { round: this.roundCounter });
+        this.manager.overview.renderQueue.status = true;
         
         // Reset round-based effect limits (characters and party)
         this.all.forEach(member => {
@@ -193,8 +193,8 @@ export class AdventuringEncounter extends AdventuringPage {
         
         this.turnTimer.start(this.turnInterval);
         
-        this.manager.emit('encounter:timer-changed', {});
-        this.manager.emit('encounter:status-changed', { turn: this.currentTurn });
+        this.manager.overview.renderQueue.turnProgressBar = true;
+        this.manager.overview.renderQueue.status = true;
         this.updateTurnCards();
     }
 
@@ -321,7 +321,7 @@ export class AdventuringEncounter extends AdventuringPage {
         let currentHit = this.currentAction.hits[this.currentHit]; 
         if(currentHit !== undefined) {
             this.hitTimer.start(currentHit.delay !== undefined ? currentHit.delay : this.hitInterval);
-            this.manager.emit('encounter:timer-changed', {});
+            this.manager.overview.renderQueue.turnProgressBar = true;
             this.updateTurnCards();
         } else {
             this.processHit();
@@ -462,7 +462,7 @@ export class AdventuringEncounter extends AdventuringPage {
         } else {
             this.hitTimer.start(endTurnDelay);
         }
-        this.manager.emit('encounter:timer-changed', {});
+        this.manager.overview.renderQueue.turnProgressBar = true;
     }
 
     endTurn() {
@@ -556,20 +556,21 @@ export class AdventuringEncounter extends AdventuringPage {
             let resolvedEffects = member.trigger('encounter_end');
         });
 
-        // Emit monster kill events for cross-cutting concerns
+        // Record monster kills for cross-cutting concerns
         this.party.all.forEach(enemy => {
             if(enemy.dead && enemy.base) {
-                this.manager.emit('combat:monster-killed', { monster: enemy.base, enemy });
+                this.manager.bestiary.registerKill(enemy.base);
+                this.manager.slayers.onMonsterKilled(enemy.base);
             }
         });
 
-        // Emit combat ended event with stats
+        // Record combat stats for achievements
         const heroes = this.manager.party.all;
         const aliveHeroes = heroes.filter(h => !h.dead);
         const flawless = heroes.every(h => !h.dead && h.hitpoints >= h.maxHitpoints);
         const lastStand = aliveHeroes.length === 1;
         
-        this.manager.emit('combat:ended', {
+        this.manager.achievementManager.recordCombatEnd({
             flawless,
             rounds: this.round,
             lastStand,
@@ -590,7 +591,7 @@ export class AdventuringEncounter extends AdventuringPage {
             floor.complete();
         }
         this.manager.dungeon.updateFloorCards();
-        this.manager.emit('encounter:status-changed', { ended: true });
+        this.manager.overview.renderQueue.status = true;
     }
 
     updateTurnCards() {

@@ -36,8 +36,8 @@ export class AdventuringGrimoire {
         // Learn it
         this.learnedAbilities.add(ability.id);
         
-        // Emit event for cross-cutting concerns
-        this.manager.emit('grimoire:ability-learned', { hero, enemy, ability });
+        // Direct achievement check (formerly event)
+        this.manager.achievementManager.checkAchievements();
         
         // Notify
         this.manager.log.add(`${hero.name} learned ${ability.name}!`);

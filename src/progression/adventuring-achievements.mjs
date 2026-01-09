@@ -500,26 +500,6 @@ export class AchievementManager {
         
         // Effect cache for permanent bonuses from achievements
         this.bonusEffects = null; // Will be initialized when EffectCache is available
-        
-        // Subscribe to events for stat tracking
-        this.manager.on('stash:material-added', ({ qty, isCurrency }) => {
-            if (isCurrency) {
-                this.recordCurrency(qty);
-            } else {
-                this.recordMaterials(qty);
-            }
-        });
-        this.manager.on('bestiary:monster-seen', () => this.recordUniqueMonster());
-        this.manager.on('equipment:changed', () => this.checkAchievements());
-        this.manager.on('dungeon:cleared', ({ area, difficulty, isEndless, endlessWave }) => {
-            this.recordDungeonClear(area, difficulty, isEndless, endlessWave);
-        });
-        this.manager.on('slayer:task-completed', () => this.recordSlayerTask());
-        this.manager.on('combat:ended', ({ flawless, rounds, lastStand }) => {
-            this.recordCombatEnd(flawless, rounds, lastStand, 0, 0);
-        });
-        this.manager.on('skill:level-up', () => this.checkAchievements());
-        this.manager.on('grimoire:ability-learned', () => this.checkAchievements());
     }
 
     /**
