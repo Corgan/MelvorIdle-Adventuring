@@ -43,8 +43,7 @@ export class AdventuringPages {
             }
         }
 
-        this.manager.overview.renderQueue.status = true;
-        this.manager.overview.renderQueue.buttons = true;
+        this.manager.emit('page:changed', { page: page, id: page?.id });
     }
 
     register(id, page) {

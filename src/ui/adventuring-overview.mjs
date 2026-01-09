@@ -3,8 +3,9 @@ const { loadModule, getResourceUrl } = mod.getContext(import.meta);
 const { AdventuringCards } = await loadModule('src/progression/adventuring-cards.mjs');
 const { describeEffect } = await loadModule('src/core/adventuring-utils.mjs');
 
-const { AdventuringOverviewElement } = await loadModule('src/ui/components/adventuring-overview.mjs');
-const { AdventuringOverviewButtonElement } = await loadModule('src/ui/components/adventuring-overview-button.mjs');
+// Side-effect imports to register custom elements
+await loadModule('src/ui/components/adventuring-overview.mjs');
+await loadModule('src/ui/components/adventuring-overview-button.mjs');
 const { AdventuringEffectIconElement } = await loadModule('src/ui/components/adventuring-effect-icon.mjs');
 
 class AdventuringOverviewButton {
@@ -98,6 +99,58 @@ export class AdventuringOverview {
         this.cards = new AdventuringCards(this.manager, this.game);
         
         this.cards.component.mount(this.component.cards);
+        
+        // Subscribe to events
+        this.manager.on('consumable:equipped', () => {
+            this.renderQueue.buffs = true;
+        });
+        this.manager.on('consumable:unequipped', () => {
+            this.renderQueue.buffs = true;
+        });
+        this.manager.on('consumable:charges-added', () => {
+            this.renderQueue.buffs = true;
+        });
+        
+        // Subscribe to dungeon events
+        this.manager.on('dungeon:started', () => {
+            this.renderQueue.status = true;
+            this.renderQueue.buffs = true;
+        });
+        this.manager.on('dungeon:ended', () => {
+            this.renderQueue.buffs = true;
+        });
+        this.manager.on('dungeon:reset', () => {
+            this.renderQueue.turnProgressBar = true;
+            this.renderQueue.status = true;
+            this.renderQueue.buttons = true;
+        });
+        this.manager.on('dungeon:explored', () => {
+            this.renderQueue.turnProgressBar = true;
+        });
+        
+        // Subscribe to encounter events
+        this.manager.on('encounter:timer-changed', () => {
+            this.renderQueue.turnProgressBar = true;
+        });
+        this.manager.on('encounter:status-changed', () => {
+            this.renderQueue.status = true;
+        });
+        
+        // Subscribe to floor events
+        this.manager.on('floor:completed', () => {
+            this.renderQueue.status = true;
+        });
+        
+        // Subscribe to page events
+        this.manager.on('page:changed', () => {
+            this.renderQueue.status = true;
+            this.renderQueue.buttons = true;
+        });
+        
+        // Subscribe to tavern events
+        this.manager.on('tavern:drink-changed', () => {
+            this.renderQueue.buffs = true;
+        });
     }
 
     /**

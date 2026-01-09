@@ -23,7 +23,13 @@ export class AdventuringMessageLog {
         this.messages = [];
     }
 
-    add(body) {
+    /**
+     * Add a message to the log
+     * @param {string} body - Message text
+     * @param {string} type - Message type for styling (info, rare, epic, legendary)
+     * @param {string} media - Optional icon URL
+     */
+    add(body, type = 'info', media = null) {
         let message;
         if(this.messages.length >= 50) {
             message = this.messages.shift();
@@ -31,6 +37,8 @@ export class AdventuringMessageLog {
             message = new AdventuringMessage(this.manager, this.game, this);
         }
         message.body = body;
+        message.type = type;
+        message.media = media;
         message.ts = Date.now();
         this.messages.push(message);
         this.renderQueue.messages = true;

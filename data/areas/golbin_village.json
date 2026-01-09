@@ -2,435 +2,721 @@
     "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
     "namespace": "adventuring",
     "data": {
-        "skillData": [{
-            "skillID": "adventuring:Adventuring",
-            "data": {
-                "passives": [
-                    {
-                        "id": "golbin_war_cry",
-                        "name": "Golbin War Cry",
-                        "effects": [
-                            {
-                                "trigger": "encounter_start",
-                                "type": "buff",
-                                "id": "adventuring:might",
-                                "target": "all", "party": "ally",
-                                "stacks": { "base": 2, "scaling": [] }
-                            }
-                        ]
-                    }
-                ],
-                "areas": [
-                    {
-                        "id": "golbin_village",
-                        "name": "Golbin Village",
-                        "media": "melvor:assets/media/monsters/goblin.png",
-                        "requirements": [
-                            { "type": "skill_level", "level": 10 }
-                        ],
-                        "height": 6,
-                        "width": 5,
-                        "floors": [
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:golbin", "weight": 100 }
-                                ],
-                                "exit": ["adventuring:golbin", "adventuring:golbin", "adventuring:golbin"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:golbin", "weight": 60 },
-                                    { "id": "adventuring:ranged_golbin", "weight": 25 },
-                                    { "id": "adventuring:magic_golbin", "weight": 15 }
-                                ],
-                                "exit": ["adventuring:golbin", "adventuring:ranged_golbin", "adventuring:magic_golbin"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:golbin", "weight": 40 },
-                                    { "id": "adventuring:ranged_golbin", "weight": 30 },
-                                    { "id": "adventuring:magic_golbin", "weight": 20 },
-                                    { "id": "adventuring:golbin_shaman", "weight": 10 }
-                                ],
-                                "exit": ["adventuring:ranged_golbin", "adventuring:magic_golbin", "adventuring:golbin_shaman"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:ranged_golbin", "weight": 30 },
-                                    { "id": "adventuring:magic_golbin", "weight": 30 },
-                                    { "id": "adventuring:golbin_shaman", "weight": 40 }
-                                ],
-                                "exit": ["adventuring:magic_golbin", "adventuring:golbin_shaman", "adventuring:golbin_shaman"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:golbin_shaman", "weight": 100 }
-                                ],
-                                "exit": ["adventuring:golbin_shaman", "adventuring:golbin_shaman", "adventuring:golbin_chief"]
-                            }
-                        ]
-                    }
-                ],
-                "monsters": [
-                    {
-                        "id": "golbin",
-                        "name": "Golbin",
-                        "media": "melvor:assets/media/monsters/goblin.png",
-                        "tags": ["golbin", "humanoid"],
-                        "xp": 15,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "amount": 12 },
-                            { "id": "adventuring:defence", "amount": 6 },
-                            { "id": "adventuring:agility", "amount": 10 },
-                            { "id": "adventuring:strength", "amount": 12 },
-                            { "id": "adventuring:ranged", "amount": 5 },
-                            { "id": "adventuring:magic", "amount": 5 },
-                            { "id": "adventuring:prayer", "amount": 5 }
-                        ],
-                        "generator": "adventuring:club_swing",
-                        "spender": "adventuring:frenzied_attack",
-                        "passives": [],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 4, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 1, "weight": 15 },
-                            { "id": "adventuring:golbin_ear", "qty": 1, "weight": 20 }
-                        ]
-                    },
-                    {
-                        "id": "ranged_golbin",
-                        "name": "Ranged Golbin",
-                        "media": "melvor:assets/media/monsters/goblin.png",
-                        "tags": ["golbin", "humanoid"],
-                        "xp": 18,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "amount": 10 },
-                            { "id": "adventuring:defence", "amount": 4 },
-                            { "id": "adventuring:agility", "amount": 12 },
-                            { "id": "adventuring:strength", "amount": 6 },
-                            { "id": "adventuring:ranged", "amount": 15 },
-                            { "id": "adventuring:magic", "amount": 5 },
-                            { "id": "adventuring:prayer", "amount": 5 }
-                        ],
-                        "generator": "adventuring:slingshot",
-                        "spender": "adventuring:arrow_volley",
-                        "passives": [],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 5, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 2, "weight": 15 },
-                            { "id": "adventuring:golbin_ear", "qty": 1, "weight": 22 }
-                        ]
-                    },
-                    {
-                        "id": "golbin_chief",
-                        "name": "Golbin Chief",
-                        "media": "melvor:assets/media/skills/thieving/golbin_chief.png",
-                        "tags": ["golbin", "humanoid"],
-                        "xp": 50,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "amount": 35 },
-                            { "id": "adventuring:defence", "amount": 18 },
-                            { "id": "adventuring:agility", "amount": 15 },
-                            { "id": "adventuring:strength", "amount": 25 },
-                            { "id": "adventuring:ranged", "amount": 15 },
-                            { "id": "adventuring:magic", "amount": 10 },
-                            { "id": "adventuring:prayer", "amount": 10 }
-                        ],
-                        "generator": "adventuring:club_swing",
-                        "spender": "adventuring:chiefs_warcry",
-                        "passives": [],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 15, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 5, "weight": 35 },
-                            { "id": "adventuring:big_parts", "qty": 1, "weight": 20 },
-                            { "id": "adventuring:golbin_ear", "qty": 2, "weight": 40 }
-                        ]
-                    },
-                    {
-                        "id": "magic_golbin",
-                        "name": "Magic Golbin",
-                        "media": "melvor:assets/media/monsters/goblin.png",
-                        "tags": ["golbin", "humanoid", "mage"],
-                        "xp": 20,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "amount": 10 },
-                            { "id": "adventuring:defence", "amount": 5 },
-                            { "id": "adventuring:agility", "amount": 11 },
-                            { "id": "adventuring:strength", "amount": 5 },
-                            { "id": "adventuring:ranged", "amount": 5 },
-                            { "id": "adventuring:magic", "amount": 14 },
-                            { "id": "adventuring:prayer", "amount": 8 }
-                        ],
-                        "generator": "adventuring:golbin_spark",
-                        "spender": "adventuring:golbin_fireball",
-                        "passives": [],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 5, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 2, "weight": 15 },
-                            { "id": "adventuring:golbin_ear", "qty": 1, "weight": 25 }
-                        ]
-                    },
-                    {
-                        "id": "golbin_shaman",
-                        "name": "Golbin Shaman",
-                        "media": "melvor:assets/media/monsters/goblin.png",
-                        "tags": ["golbin", "humanoid", "mage"],
-                        "xp": 25,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "amount": 14 },
-                            { "id": "adventuring:defence", "amount": 8 },
-                            { "id": "adventuring:agility", "amount": 12 },
-                            { "id": "adventuring:strength", "amount": 6 },
-                            { "id": "adventuring:ranged", "amount": 6 },
-                            { "id": "adventuring:magic", "amount": 16 },
-                            { "id": "adventuring:prayer", "amount": 12 }
-                        ],
-                        "generator": "adventuring:golbin_spark",
-                        "spender": "adventuring:tribal_curse",
-                        "passives": [],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 6, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 2, "weight": 18 },
-                            { "id": "adventuring:golbin_ear", "qty": 1, "weight": 28 }
-                        ]
-                    }
-                ],
-                "generators": [
-                    {
-                        "id": "club_swing",
-                        "name": "Club Swing",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "energy": 40,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 5,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "amount": 1 }
-                                            ]
-                                        }
+        "skillData": [
+            {
+                "skillID": "adventuring:Adventuring",
+                "data": {
+                    "passives": [
+                        {
+                            "id": "golbin_war_cry",
+                            "name": "Golbin War Cry",
+                            "effects": [
+                                {
+                                    "trigger": "encounter_start",
+                                    "type": "buff",
+                                    "id": "adventuring:might",
+                                    "target": "all",
+                                    "party": "ally",
+                                    "stacks": {
+                                        "base": 2,
+                                        "scaling": []
                                     }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "slingshot",
-                        "name": "Slingshot",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "energy": 35,
-                        "hits": [
-                            {
-                                "target": "back",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 4,
-                                            "scaling": [
-                                                { "id": "adventuring:ranged", "amount": 0.8 }
-                                            ]
+                                }
+                            ]
+                        }
+                    ],
+                    "areas": [
+                        {
+                            "id": "golbin_village",
+                            "name": "Golbin Village",
+                            "media": "melvor:assets/media/monsters/goblin.png",
+                            "requirements": [
+                                {
+                                    "type": "skill_level",
+                                    "level": 10
+                                }
+                            ],
+                            "height": 6,
+                            "width": 5,
+                            "floors": [
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:golbin",
+                                            "weight": 100
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "golbin_spark",
-                        "name": "Golbin Spark",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "energy": 40,
-                        "hits": [
-                            {
-                                "target": "random",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 5,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "amount": 0.9 }
-                                            ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:golbin",
+                                        "adventuring:golbin",
+                                        "adventuring:golbin"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:golbin",
+                                            "weight": 60
+                                        },
+                                        {
+                                            "id": "adventuring:ranged_golbin",
+                                            "weight": 25
+                                        },
+                                        {
+                                            "id": "adventuring:magic_golbin",
+                                            "weight": 15
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ],
-                "spenders": [
-                    {
-                        "id": "frenzied_attack",
-                        "name": "Frenzied Attack",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 80,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 8,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "amount": 0.8 }
-                                            ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:golbin",
+                                        "adventuring:ranged_golbin",
+                                        "adventuring:magic_golbin"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:golbin",
+                                            "weight": 40
+                                        },
+                                        {
+                                            "id": "adventuring:ranged_golbin",
+                                            "weight": 30
+                                        },
+                                        {
+                                            "id": "adventuring:magic_golbin",
+                                            "weight": 20
+                                        },
+                                        {
+                                            "id": "adventuring:golbin_shaman",
+                                            "weight": 10
                                         }
-                                    }
-                                ]
-                            },
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 8,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "amount": 0.8 }
-                                            ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:ranged_golbin",
+                                        "adventuring:magic_golbin",
+                                        "adventuring:golbin_shaman"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:ranged_golbin",
+                                            "weight": 30
+                                        },
+                                        {
+                                            "id": "adventuring:magic_golbin",
+                                            "weight": 30
+                                        },
+                                        {
+                                            "id": "adventuring:golbin_shaman",
+                                            "weight": 40
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "arrow_volley",
-                        "name": "Arrow Volley",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 85,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 10,
-                                            "scaling": [
-                                                { "id": "adventuring:ranged", "amount": 1 }
-                                            ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:magic_golbin",
+                                        "adventuring:golbin_shaman",
+                                        "adventuring:golbin_shaman"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:golbin_shaman",
+                                            "weight": 100
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "chiefs_warcry",
-                        "name": "Chief's Warcry",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 100,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 12,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "amount": 1.2 }
-                                            ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:golbin_shaman",
+                                        "adventuring:golbin_shaman",
+                                        "adventuring:golbin_chief"
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "monsters": [
+                        {
+                            "id": "golbin",
+                            "name": "Golbin",
+                            "media": "melvor:assets/media/monsters/goblin.png",
+                            "tags": [
+                                "golbin",
+                                "humanoid"
+                            ],
+                            "xp": 15,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "amount": 12
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "amount": 6
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "amount": 10
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "amount": 12
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "amount": 5
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "amount": 5
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "amount": 5
+                                }
+                            ],
+                            "generator": "adventuring:club_swing",
+                            "spender": "adventuring:frenzied_attack",
+                            "passives": [],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 4,
+                                    "type": "currency"
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 1,
+                                    "type": "salvage"
+                                },
+                                {
+                                    "id": "adventuring:golbin_ear",
+                                    "qty": 1,
+                                    "type": "materials",
+                                    "chance": 0.2
+                                }
+                            ]
+                        },
+                        {
+                            "id": "ranged_golbin",
+                            "name": "Ranged Golbin",
+                            "media": "melvor:assets/media/monsters/goblin.png",
+                            "tags": [
+                                "golbin",
+                                "humanoid"
+                            ],
+                            "xp": 18,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "amount": 10
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "amount": 4
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "amount": 12
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "amount": 6
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "amount": 15
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "amount": 5
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "amount": 5
+                                }
+                            ],
+                            "generator": "adventuring:slingshot",
+                            "spender": "adventuring:arrow_volley",
+                            "passives": [],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 5,
+                                    "type": "currency"
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 2,
+                                    "type": "salvage"
+                                },
+                                {
+                                    "id": "adventuring:golbin_ear",
+                                    "qty": 1,
+                                    "type": "materials",
+                                    "chance": 0.22
+                                }
+                            ]
+                        },
+                        {
+                            "id": "golbin_chief",
+                            "name": "Golbin Chief",
+                            "media": "melvor:assets/media/skills/thieving/golbin_chief.png",
+                            "tags": [
+                                "golbin",
+                                "humanoid"
+                            ],
+                            "xp": 50,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "amount": 35
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "amount": 18
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "amount": 15
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "amount": 25
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "amount": 15
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "amount": 10
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "amount": 10
+                                }
+                            ],
+                            "generator": "adventuring:club_swing",
+                            "spender": "adventuring:chiefs_warcry",
+                            "passives": [],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 15,
+                                    "type": "currency"
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 5,
+                                    "type": "salvage"
+                                },
+                                {
+                                    "id": "adventuring:big_parts",
+                                    "qty": 1,
+                                    "type": "salvage"
+                                },
+                                {
+                                    "id": "adventuring:golbin_ear",
+                                    "qty": 2,
+                                    "type": "materials",
+                                    "chance": 0.4
+                                }
+                            ]
+                        },
+                        {
+                            "id": "magic_golbin",
+                            "name": "Magic Golbin",
+                            "media": "melvor:assets/media/monsters/goblin.png",
+                            "tags": [
+                                "golbin",
+                                "humanoid",
+                                "mage"
+                            ],
+                            "xp": 20,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "amount": 10
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "amount": 5
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "amount": 11
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "amount": 5
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "amount": 5
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "amount": 14
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "amount": 8
+                                }
+                            ],
+                            "generator": "adventuring:golbin_spark",
+                            "spender": "adventuring:golbin_fireball",
+                            "passives": [],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 5,
+                                    "type": "currency"
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 2,
+                                    "type": "salvage"
+                                },
+                                {
+                                    "id": "adventuring:golbin_ear",
+                                    "qty": 1,
+                                    "type": "materials",
+                                    "chance": 0.25
+                                }
+                            ]
+                        },
+                        {
+                            "id": "golbin_shaman",
+                            "name": "Golbin Shaman",
+                            "media": "melvor:assets/media/monsters/goblin.png",
+                            "tags": [
+                                "golbin",
+                                "humanoid",
+                                "mage"
+                            ],
+                            "xp": 25,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "amount": 14
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "amount": 8
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "amount": 12
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "amount": 6
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "amount": 6
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "amount": 16
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "amount": 12
+                                }
+                            ],
+                            "generator": "adventuring:golbin_spark",
+                            "spender": "adventuring:tribal_curse",
+                            "passives": [],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 6,
+                                    "type": "currency"
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 2,
+                                    "type": "salvage"
+                                },
+                                {
+                                    "id": "adventuring:golbin_ear",
+                                    "qty": 1,
+                                    "type": "materials",
+                                    "chance": 0.28
+                                }
+                            ]
+                        }
+                    ],
+                    "generators": [
+                        {
+                            "id": "club_swing",
+                            "name": "Club Swing",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "energy": 40,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 5,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "amount": 1
+                                                    }
+                                                ]
+                                            }
                                         }
-                                    }
-                                ]
-                            },
-                            {
-                                "target": "self",
-                                "party": "ally",
-                                "effects": [
-                                    {
-                                        "type": "heal_flat",
-                                        "amount": {
-                                            "base": 10,
-                                            "scaling": [
-                                                { "id": "adventuring:prayer", "amount": 1 }
-                                            ]
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "slingshot",
+                            "name": "Slingshot",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "energy": 35,
+                            "hits": [
+                                {
+                                    "target": "back",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 4,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:ranged",
+                                                        "amount": 0.8
+                                                    }
+                                                ]
+                                            }
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "golbin_fireball",
-                        "name": "Golbin Fireball",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 80,
-                        "hits": [
-                            {
-                                "target": "random",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 10,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "amount": 1.1 }
-                                            ]
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "golbin_spark",
+                            "name": "Golbin Spark",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "energy": 40,
+                            "hits": [
+                                {
+                                    "target": "random",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 5,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "amount": 0.9
+                                                    }
+                                                ]
+                                            }
                                         }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:burn",
-                                        "stacks": 2
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "tribal_curse",
-                        "name": "Tribal Curse",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 85,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 8,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "amount": 1 }
-                                            ]
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "spenders": [
+                        {
+                            "id": "frenzied_attack",
+                            "name": "Frenzied Attack",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 80,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 8,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "amount": 0.8
+                                                    }
+                                                ]
+                                            }
                                         }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:weaken",
-                                        "stacks": 2
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ]
+                                    ]
+                                },
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 8,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "amount": 0.8
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "arrow_volley",
+                            "name": "Arrow Volley",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 85,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 10,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:ranged",
+                                                        "amount": 1
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "chiefs_warcry",
+                            "name": "Chief's Warcry",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 100,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 12,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "amount": 1.2
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                },
+                                {
+                                    "target": "self",
+                                    "party": "ally",
+                                    "effects": [
+                                        {
+                                            "type": "heal_flat",
+                                            "amount": {
+                                                "base": 10,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:prayer",
+                                                        "amount": 1
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "golbin_fireball",
+                            "name": "Golbin Fireball",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 80,
+                            "hits": [
+                                {
+                                    "target": "random",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 10,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "amount": 1.1
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:burn",
+                                            "stacks": 2
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "tribal_curse",
+                            "name": "Tribal Curse",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 85,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 8,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "amount": 1
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:weaken",
+                                            "stacks": 2
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
             }
-        }]
+        ]
     }
 }

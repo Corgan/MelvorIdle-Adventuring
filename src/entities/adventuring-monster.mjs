@@ -69,6 +69,13 @@ export class AdventuringMonster extends AdventuringMasteryAction {
         addMasteryXPWithBonus(this.manager, this, xp);
     }
 
+    viewDetails() {
+        if(!this.unlocked) return;
+        this.manager.monsterdetails.setMonster(this);
+        this.manager.monsterdetails.render();
+        this.manager.monsterdetails.go();
+    }
+
     render() {
         this.renderName();
         this.renderTooltip();
@@ -120,6 +127,9 @@ export class AdventuringMonster extends AdventuringMasteryAction {
             return;
 
         this.component.clickable.classList.toggle('pointer-enabled', this.unlocked);
+        
+        // Add click handler to view details
+        this.component.clickable.onclick = () => this.viewDetails();
 
         this.renderQueue.clickable = false;
     }

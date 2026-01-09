@@ -16,10 +16,36 @@ export class AdventuringTutorialManager {
         this.queue = [];                       // Array<AdventuringTutorial>
         this.activeTutorial = null;            // Currently displaying
         this.activeStepIndex = 0;
+        
+        // Element cache for target resolution (key: target string, value: element)
+        // Cached elements are validated before use (must still be in DOM)
+        this._elementCache = new Map();
 
         // UI Component
         this.component = createElement('adventuring-tutorial-tooltip');
         this.component.manager = this;
+        
+        // Subscribe to events for tutorial triggers
+        this.manager.on('stash:material-added', ({ isCurrency }) => {
+            this.checkTriggers(isCurrency ? 'currency' : 'material');
+        });
+        this.manager.on('bestiary:monster-seen', ({ isFirstEver }) => {
+            if (isFirstEver) {
+                this.checkTriggers('event', { event: 'firstMonsterSeen' });
+            }
+        });
+        this.manager.on('dungeon:started', () => {
+            this.checkTriggers('event', { event: 'dungeonStart' });
+        });
+        this.manager.on('combat:started', () => {
+            this.checkTriggers('event', { event: 'combatStart' });
+        });
+        this.manager.on('skill:level-up', ({ level }) => {
+            this.checkTriggers('skillLevel', { level });
+        });
+        this.manager.on('mastery:level-up', ({ category, level }) => {
+            this.checkTriggers('mastery', { category, level });
+        });
     }
 
     /**
@@ -253,6 +279,9 @@ export class AdventuringTutorialManager {
      * Called when game state changes (town/dungeon) to check waiting tutorials
      */
     onStateChange() {
+        // Clear element cache since DOM has changed
+        this.clearElementCache();
+        
         // If we have an active tutorial waiting to display, try again
         if(this.activeTutorial && !this.component._visible) {
             this.showCurrentStep();
@@ -263,6 +292,9 @@ export class AdventuringTutorialManager {
      * Called when the overview page changes (e.g., town -> crossroads)
      */
     onOverviewPageChange() {
+        // Clear element cache since DOM has changed
+        this.clearElementCache();
+        
         // If we have an active tutorial waiting to display, try again
         if(this.activeTutorial && !this.component._visible) {
             this.showCurrentStep();
@@ -289,6 +321,7 @@ export class AdventuringTutorialManager {
         // Hide tooltip when leaving the page
         this.component.hide();
         this.clearRetry();
+        this.clearElementCache();
     }
 
     /**
@@ -521,13 +554,80 @@ export class AdventuringTutorialManager {
     }
 
     /**
+     * Check if a cached element is still valid (in the DOM)
+     * @param {HTMLElement} element
+     * @returns {boolean}
+     */
+    _isCachedElementValid(element) {
+        if (!element) return false;
+        return document.body.contains(element);
+    }
+    
+    /**
+     * Get an element from cache if valid, or null
+     * @param {string} target
+     * @returns {HTMLElement|null}
+     */
+    _getCachedElement(target) {
+        if (!this._elementCache.has(target)) return null;
+        
+        var cached = this._elementCache.get(target);
+        if (this._isCachedElementValid(cached)) {
+            return cached;
+        }
+        
+        // Invalid cache entry, remove it
+        this._elementCache.delete(target);
+        return null;
+    }
+    
+    /**
+     * Cache an element for a target
+     * @param {string} target
+     * @param {HTMLElement} element
+     */
+    _cacheElement(target, element) {
+        if (element) {
+            this._elementCache.set(target, element);
+        }
+    }
+    
+    /**
+     * Clear the element cache (call on page changes)
+     */
+    clearElementCache() {
+        this._elementCache.clear();
+    }
+
+    /**
      * Resolve a target string to a DOM element
      * @param {string} target - Target identifier (e.g., "page:trainer", "hero:0", "#css-selector")
      * @returns {HTMLElement|null}
      */
     resolveTarget(target) {
         if(!target) return null;
-
+        
+        // Check cache first
+        var cached = this._getCachedElement(target);
+        if (cached) return cached;
+        
+        var result = this._resolveTargetUncached(target);
+        
+        // Cache the result for stable targets
+        // Don't cache 'any' targets as they may change
+        if (result && target.indexOf(':any') === -1) {
+            this._cacheElement(target, result);
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Internal: resolve target without caching
+     * @param {string} target
+     * @returns {HTMLElement|null}
+     */
+    _resolveTargetUncached(target) {
         // Direct CSS selector
         if(target.startsWith('#') || target.startsWith('.')) {
             return document.querySelector(target);

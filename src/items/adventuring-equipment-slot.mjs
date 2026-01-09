@@ -3,6 +3,8 @@ const { loadModule } = mod.getContext(import.meta);
 const { AdventuringEquipmentSlotElement } = await loadModule('src/items/components/adventuring-equipment-slot.mjs');
 const { createTooltip } = await loadModule('src/core/adventuring-tooltip-element.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
+const { AdventuringIconButtonElement } = await loadModule('src/ui/components/adventuring-icon-button.mjs');
+const { AdventuringEmptyStateElement } = await loadModule('src/ui/components/adventuring-empty-state.mjs');
 
 class AdventuringEquipmentSlotRenderQueue {
     constructor() {
@@ -42,9 +44,7 @@ export class AdventuringEquipmentSlot {
         this.component = createElement('adventuring-equipment-slot');
 
         // Create click-triggered popup for item selection
-        this.selectorPopup = tippy(this.component.clickable, {
-            content: '',
-            allowHTML: true,
+        this.selectorPopup = createTooltip(this.component.clickable, '', {
             interactive: true,
             trigger: 'click',
             placement: 'bottom',
@@ -55,6 +55,16 @@ export class AdventuringEquipmentSlot {
                 instance.setContent(this.buildItemSelectorContent());
             }
         });
+    }
+
+    /**
+     * Cleanup resources (call when equipment slot is destroyed)
+     */
+    destroy() {
+        if(this.selectorPopup) {
+            this.selectorPopup.destroy();
+            this.selectorPopup = undefined;
+        }
     }
 
     onLoad() {
@@ -76,6 +86,20 @@ export class AdventuringEquipmentSlot {
             return false;
         if(!item.jobs.includes(this.equipment.character.combatJob) && !item.jobs.includes(this.equipment.character.passiveJob))
             return false;
+        
+        // === ARTIFACT RESTRICTION ===
+        // Only ONE artifact can be equipped per character
+        if(item.isArtifact) {
+            // Check if another artifact is already equipped (excluding this slot)
+            for(const [slotType, slot] of this.equipment.slots) {
+                if(slot === this) continue; // Skip current slot
+                if(slot.occupied) continue; // Skip occupied slots
+                if(slot.item && slot.item.isArtifact && slot.item !== item) {
+                    return false; // Another artifact is already equipped
+                }
+            }
+        }
+        
         if(item.pairs.length > 0) {
             if(this.slotType.pair !== undefined) {
                 let pairedSlot = this.slotType.pair;
@@ -112,9 +136,8 @@ export class AdventuringEquipmentSlot {
         const equippableItems = this.getEquippableItems();
         
         if(equippableItems.length === 0) {
-            const empty = document.createElement('div');
-            empty.className = 'text-center text-muted font-size-sm p-2';
-            empty.textContent = 'No items available';
+            const empty = new AdventuringEmptyStateElement();
+            empty.setMessage('No items available', 'p-2 font-size-sm');
             container.appendChild(empty);
             return container;
         }
@@ -125,87 +148,66 @@ export class AdventuringEquipmentSlot {
         
         // Add "Unequip" option if slot is not empty
         if(!this.empty) {
-            const unequipBtn = document.createElement('div');
-            unequipBtn.className = 'pointer-enabled m-1';
-            unequipBtn.style.cssText = 'position: relative; width: fit-content;';
-            
-            const border = document.createElement('div');
-            border.className = 'border-danger border-2x border-rounded-equip combat-equip-img fishing-img m-0';
-            border.style.cssText = 'position: relative; overflow: hidden; border-width: 2px!important; border-style: solid!important;';
-            
-            const innerDiv = document.createElement('div');
-            innerDiv.className = 'w-100 p-1 d-flex align-items-center justify-content-center';
-            innerDiv.style.cssText = 'height: 100%;';
-            innerDiv.innerHTML = '<i class="fa fa-times text-danger"></i>';
-            
-            border.appendChild(innerDiv);
-            unequipBtn.appendChild(border);
-            unequipBtn.onclick = () => {
-                this.setEmpty();
-                this.equipment.character.calculateStats();
-                if(this.manager.achievementManager) {
-                    this.manager.achievementManager.checkAchievements();
+            const unequipBtn = new AdventuringIconButtonElement();
+            unequipBtn.setIcon({
+                borderClass: 'border-danger',
+                tooltipContent: '<div class="p-1">Unequip</div>',
+                onClick: () => {
+                    const previousItem = this.item;
+                    this.setEmpty();
+                    if (this.equipment.character.invalidateStats) this.equipment.character.invalidateStats();
+                    this.equipment.character.calculateStats();
+                    this.manager.emit('equipment:changed', { 
+                        hero: this.equipment.character, 
+                        slot: this.slotType, 
+                        item: null,
+                        previousItem 
+                    });
+                    if(this.selectorPopup) this.selectorPopup.hide();
                 }
-                if(this.selectorPopup) this.selectorPopup.hide();
-            };
-            createTooltip(unequipBtn, '<div class="p-1">Unequip</div>');
+            });
+            unequipBtn.setCustomContent('<i class="fa fa-times text-danger"></i>');
             grid.appendChild(unequipBtn);
         }
         
         // Add each equippable item
         equippableItems.forEach(item => {
-            const container = document.createElement('div');
-            container.className = 'pointer-enabled m-1';
-            container.style.cssText = 'position: relative; width: fit-content;';
-            
-            const border = document.createElement('div');
             const isEquipped = this.item === item;
             const otherCharacterSlot = item.currentSlot && item.currentSlot.equipment.character !== character ? item.currentSlot : null;
+            
             let borderClass = 'border-secondary';
             if(isEquipped) {
                 borderClass = 'border-success';
             } else if(otherCharacterSlot) {
                 borderClass = 'border-warning';
             }
-            border.className = `border-2x border-rounded-equip combat-equip-img fishing-img m-0 ${borderClass}`;
-            border.style.cssText = 'position: relative; overflow: hidden; border-width: 2px!important; border-style: solid!important;';
             
-            const img = document.createElement('img');
-            img.src = item.media;
-            img.className = 'w-100 p-1';
-            border.appendChild(img);
-            container.appendChild(border);
-            
-            // Show upgrade level badge
-            if(item.upgradeLevel > 0) {
-                const levelBadge = document.createElement('div');
-                levelBadge.className = 'font-size-sm text-white text-center';
-                levelBadge.style.cssText = 'position: absolute; bottom: -8px; width: 100%;';
-                levelBadge.innerHTML = `<small class="badge-pill bg-secondary">${item.level}</small>`;
-                container.appendChild(levelBadge);
-            }
-            
-            container.onclick = () => {
-                this.equipItem(item);
-                if(this.selectorPopup) this.selectorPopup.hide();
-            };
+            const iconBtn = new AdventuringIconButtonElement();
+            iconBtn.setIcon({
+                icon: item.media,
+                borderClass,
+                bottomBadgeText: item.upgradeLevel > 0 ? item.level : undefined,
+                bottomBadgeClass: 'bg-secondary',
+                tooltipContent: TooltipBuilder.forEquipment(item, this.manager, character).build(),
+                onClick: () => {
+                    this.equipItem(item);
+                    if(this.selectorPopup) this.selectorPopup.hide();
+                }
+            });
             
             // Add hover effect to highlight slot on other character if equipped there
             if(otherCharacterSlot) {
-                container.onmouseenter = () => {
+                iconBtn.container.onmouseenter = () => {
                     otherCharacterSlot.component.border.classList.add('border-warning');
                     otherCharacterSlot.component.border.classList.remove('border-secondary');
                 };
-                container.onmouseleave = () => {
+                iconBtn.container.onmouseleave = () => {
                     otherCharacterSlot.component.border.classList.remove('border-warning');
                     otherCharacterSlot.component.border.classList.add('border-secondary');
                 };
             }
             
-            // Add tooltip with item stats (character-specific for set bonuses)
-            createTooltip(container, TooltipBuilder.forEquipment(item, this.manager, character).build());
-            
-            grid.appendChild(container);
+            grid.appendChild(iconBtn);
         });
         
         container.appendChild(grid);
@@ -220,6 +222,19 @@ export class AdventuringEquipmentSlot {
         const combatJob = character.combatJob;
         const passiveJob = character.passiveJob;
         
+        // Check if an artifact is already equipped in another slot
+        let hasEquippedArtifact = false;
+        let equippedArtifact = null;
+        for(const [slotType, slot] of this.equipment.slots) {
+            if(slot === this) continue;
+            if(slot.occupied) continue;
+            if(slot.item && slot.item.isArtifact) {
+                hasEquippedArtifact = true;
+                equippedArtifact = slot.item;
+                break;
+            }
+        }
+        
         return this.manager.baseItems.filter(item => {
             // Skip the "none" item
             if(item.id === 'adventuring:none') return false;
@@ -232,6 +247,13 @@ export class AdventuringEquipmentSlot {
             
             // Must be usable by one of the hero's jobs
             if(!item.jobs.includes(combatJob) && !item.jobs.includes(passiveJob)) return false;
+            
+            // === ARTIFACT RESTRICTION ===
+            // If this is an artifact and another artifact is equipped, block it
+            // (unless it's the same artifact equipped in this slot)
+            if(item.isArtifact && hasEquippedArtifact && item !== equippedArtifact) {
+                return false;
+            }
             
             // Check paired slot compatibility (e.g., shields with 1h weapons)
             if(item.pairs.length > 0 && this.slotType.pair !== undefined) {
@@ -255,6 +277,7 @@ export class AdventuringEquipmentSlot {
         const existingSlot = item.currentSlot;
         if(existingSlot && existingSlot.equipment.character !== this.equipment.character) {
             existingSlot.setEmpty();
+            if (existingSlot.equipment.character.invalidateStats) existingSlot.equipment.character.invalidateStats();
             existingSlot.equipment.character.calculateStats();
         }
         
@@ -276,12 +299,16 @@ export class AdventuringEquipmentSlot {
         this.setEquipped(item);
         
         // Recalculate stats
+        if (this.equipment.character.invalidateStats) this.equipment.character.invalidateStats();
         this.equipment.character.calculateStats();
         
-        // Check achievements (for set_bonus_active)
-        if(this.manager.achievementManager) {
-            this.manager.achievementManager.checkAchievements();
-        }
+        // Emit equipment changed event
+        this.manager.emit('equipment:changed', { 
+            hero: this.equipment.character, 
+            slot: this.slotType, 
+            item: item,
+            displaced: displacedItems 
+        });
     }
 
     setOccupied(slot) {

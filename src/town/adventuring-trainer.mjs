@@ -59,7 +59,7 @@ export class AdventuringTrainer extends AdventuringPage {
         if(job.isPassive) return 'passive';
         
         // Use the job's tier property (0-4+)
-        const tier = job.tier ?? 0;
+        const tier = (job.tier !== undefined) ? job.tier : 0;
         if(tier <= 4) {
             return `combat-tier${tier}`;
         }

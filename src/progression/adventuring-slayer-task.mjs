@@ -68,7 +68,7 @@ export class AdventuringSlayerTaskType extends NamespacedObject {
         this.targetType = data.targetType; // 'monster', 'material', 'area', 'monster_tag'
         
         // For monster_tag target type, specifies which tag to filter by
-        this.targetTag = data.targetTag ?? null;
+        this.targetTag = (data.targetTag !== undefined) ? data.targetTag : null;
         
         // Tier-indexed arrays (index 0 = tier 1)
         this.baseRequirements = data.baseRequirements;
@@ -318,7 +318,10 @@ export class AdventuringSlayerTask {
             const hasItem = reader.getBoolean();
             if(hasItem) {
                 // Use game.items as fallback registry for reading item bytes
-                const itemRegistry = (typeof rewardType !== 'string' && rewardType?.getRegistry?.()) || this.game.items;
+                let itemRegistry = this.game.items;
+                if (typeof rewardType !== 'string' && rewardType && typeof rewardType.getRegistry === 'function') {
+                    itemRegistry = rewardType.getRegistry();
+                }
                 const decoded = reader.getNamespacedObject(itemRegistry);
                 if(typeof decoded !== 'string' && decoded !== undefined) {
                     item = decoded;

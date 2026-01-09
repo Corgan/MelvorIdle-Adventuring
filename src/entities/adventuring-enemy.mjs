@@ -1,7 +1,7 @@
 const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringCharacter, AdventuringCharacterRenderQueue } = await loadModule('src/core/adventuring-character.mjs');
-const { UNKNOWN_MEDIA } = await loadModule('src/core/adventuring-utils.mjs');
+const { UNKNOWN_MEDIA, RequirementsChecker } = await loadModule('src/core/adventuring-utils.mjs');
 
 class AdventuringEnemyRenderQueue extends AdventuringCharacterRenderQueue {
     constructor() {
@@ -316,7 +316,7 @@ export class AdventuringEnemy extends AdventuringCharacter {
 
             this.base.addXP(this.xp); // Monster mastery XP from kills
 
-            // New loot system: Currency always drops, salvage always drops with range, monster material occasionally drops
+            // Type-based loot system: each entry has a type that determines processing
             const lootTable = this.base.lootGenerator.table;
             
             // Helper function to apply loot bonuses and add to stash
@@ -342,44 +342,152 @@ export class AdventuringEnemy extends AdventuringCharacter {
                 this.manager.stash.add(id, qty);
             };
             
-            // 1. Currency always drops
-            const currencyEntry = lootTable.find(entry => entry.id === 'adventuring:currency');
-            if(currencyEntry) {
-                // Add slight variance: 80% to 120% of base qty
-                const variance = 0.8 + (Math.random() * 0.4);
-                const currencyQty = Math.max(1, Math.round(currencyEntry.qty * variance));
-                processLoot(currencyEntry.id, currencyQty);
-            }
+            // Helper to get quantity from entry (supports qty or minQty/maxQty)
+            const getQty = (entry) => {
+                if(entry.qty !== undefined) return entry.qty;
+                if(entry.minQty !== undefined && entry.maxQty !== undefined) {
+                    return entry.minQty + Math.floor(Math.random() * (entry.maxQty - entry.minQty + 1));
+                }
+                return 1;
+            };
             
-            // 2. Salvage always drops with quantity range (1 to base qty)
-            const salvageEntry = lootTable.find(entry => entry.id === 'adventuring:parts');
-            if(salvageEntry) {
-                // Random quantity from 1 to base qty
-                const salvageQty = 1 + Math.floor(Math.random() * salvageEntry.qty);
-                processLoot(salvageEntry.id, salvageQty);
-            }
+            // Helper to check if entry conditions are met
+            const checkConditions = (entry) => {
+                if(!entry.conditions || entry.conditions.length === 0) return true;
+                const checker = new RequirementsChecker(this.manager, entry.conditions);
+                return checker.check({});
+            };
             
-            // 3. Monster-specific materials have a chance to drop (based on their weight relative to total)
-            const monsterMaterials = lootTable.filter(entry => 
-                entry.id !== 'adventuring:currency' && entry.id !== 'adventuring:parts'
-            );
-            for(const material of monsterMaterials) {
-                // Drop chance based on weight: weight / totalWeight gives original probability
-                // We use weight / 100 as the drop chance (currency typically has weight 100)
-                const dropChance = material.weight / 100;
-                if(Math.random() < dropChance) {
-                    processLoot(material.id, material.qty);
+            // Helper to expand loot table references into entries
+            const expandLootEntries = (entries) => {
+                const expanded = [];
+                for(const entry of entries) {
+                    if(entry.type === 'table') {
+                        // Reference to a named loot table
+                        const table = this.manager.lootTables.getObjectByID(entry.table);
+                        if(table) {
+                            expanded.push(...table.getEntries());
+                        } else {
+                            console.warn(`[Adventuring] Unknown loot table: ${entry.table}`);
+                        }
+                    } else {
+                        expanded.push(entry);
+                    }
+                }
+                return expanded;
+            };
+            
+            // Expand any loot table references
+            const expandedLoot = expandLootEntries(lootTable);
+
+            // Process each loot entry by type
+            for(const entry of expandedLoot) {
+                // Check conditions first
+                if(!checkConditions(entry)) continue;
+                
+                const lootType = (entry.type !== undefined) ? entry.type : this.inferLootType(entry);
+                
+                switch(lootType) {
+                    case 'currency': {
+                        // Currency always drops with variance (80-120%)
+                        const baseQty = getQty(entry);
+                        const variance = 0.8 + (Math.random() * 0.4);
+                        const qty = Math.max(1, Math.round(baseQty * variance));
+                        processLoot(entry.id, qty);
+                        break;
+                    }
+                    
+                    case 'salvage': {
+                        // Salvage always drops with random quantity (1 to qty)
+                        const baseQty = getQty(entry);
+                        const qty = 1 + Math.floor(Math.random() * baseQty);
+                        processLoot(entry.id, qty);
+                        break;
+                    }
+                    
+                    case 'materials': {
+                        // Materials drop based on chance (0.0-1.0)
+                        const dropChance = (entry.chance !== undefined) ? entry.chance : (entry.weight / 100);
+                        if(Math.random() < dropChance) {
+                            processLoot(entry.id, getQty(entry));
+                        }
+                        break;
+                    }
+                    
+                    case 'equipment_pool': {
+                        // Equipment pool drops from a configured pool
+                        const pool = this.manager.equipmentPools.getObjectByID(entry.pool);
+                        if(!pool) {
+                            console.warn(`[Adventuring] Unknown equipment pool: ${entry.pool}`);
+                            break;
+                        }
+                        
+                        // Check if pool has any available (un-dropped) items
+                        if(!pool.hasAvailable()) break;
+                        
+                        // Roll for drop chance
+                        const dropChance = (entry.chance !== undefined) ? entry.chance : 0.1;
+                        if(Math.random() < dropChance) {
+                            const item = pool.roll();
+                            if(item) {
+                                // Pass rarity from entry or item for notification styling
+                                const rarity = entry.rarity || item.rarity || null;
+                                this.manager.armory.markDropped(item, true, rarity);
+                            }
+                        }
+                        break;
+                    }
+                    
+                    case 'equipment': {
+                        // Specific equipment - one-time drop
+                        const item = this.manager.baseItems.getObjectByID(entry.id);
+                        if(!item) {
+                            console.warn(`[Adventuring] Unknown equipment: ${entry.id}`);
+                            break;
+                        }
+                        
+                        // Check if already dropped
+                        if(this.manager.armory.hasDropped(item)) break;
+                        
+                        // Roll for drop chance
+                        const dropChance = (entry.chance !== undefined) ? entry.chance : 0.01;
+                        if(Math.random() < dropChance) {
+                            // Pass rarity from entry or item for notification styling
+                            const rarity = entry.rarity || item.rarity || null;
+                            this.manager.armory.markDropped(item, true, rarity);
+                        }
+                        break;
+                    }
                 }
             }
             
-            // Apply drop rate bonus from monster mastery (chance for extra monster material drop)
+            // Apply drop rate bonus from monster mastery (chance for extra material drop)
             const dropRateBonus = this.manager.modifiers.getMonsterDropRateBonus(this.base);
-            if(dropRateBonus > 0 && monsterMaterials.length > 0 && Math.random() < dropRateBonus) {
-                // Pick a random monster material for bonus drop
-                const bonusMaterial = monsterMaterials[Math.floor(Math.random() * monsterMaterials.length)];
-                processLoot(bonusMaterial.id, bonusMaterial.qty);
+            const materialEntries = lootTable.filter(e => ((e.type !== undefined) ? e.type : this.inferLootType(e)) === 'materials');
+            if(dropRateBonus > 0 && materialEntries.length > 0 && Math.random() < dropRateBonus) {
+                const bonusMaterial = materialEntries[Math.floor(Math.random() * materialEntries.length)];
+                processLoot(bonusMaterial.id, getQty(bonusMaterial));
             }
         }
+    }
+    
+    /**
+     * Infer loot type from entry for backwards compatibility with old format.
+     * New format entries should have explicit "type" field.
+     * @param {Object} entry - Loot table entry
+     * @returns {string} - Loot type: 'currency', 'salvage', 'materials', 'equipment_pool', or 'equipment'
+     */
+    inferLootType(entry) {
+        // Explicit type takes precedence
+        if(entry.type) return entry.type;
+        
+        // Infer from ID patterns (for backwards compatibility)
+        if(entry.id === 'adventuring:currency') return 'currency';
+        if(entry.id === 'adventuring:parts' || entry.id === 'adventuring:big_parts') return 'salvage';
+        if(entry.pool) return 'equipment_pool';
+        
+        // Default to materials
+        return 'materials';
     }
     
     render() {

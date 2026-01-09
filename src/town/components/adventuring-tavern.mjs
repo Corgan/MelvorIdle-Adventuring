@@ -3,6 +3,7 @@ const { loadModule } = mod.getContext(import.meta);
 const { AdventuringSubpageElement } = await loadModule('src/ui/components/adventuring-page.mjs');
 const { createTooltip } = await loadModule('src/core/adventuring-tooltip-element.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
+const { AdventuringIconButtonElement } = await loadModule('src/ui/components/adventuring-icon-button.mjs');
 
 export class AdventuringTavernElement extends AdventuringSubpageElement {
     constructor() {
@@ -69,47 +70,22 @@ export class AdventuringTavernElement extends AdventuringSubpageElement {
      * Create a drink icon element
      */
     createDrinkIcon(drink, isSelected, onClick, manager) {
-        const container = document.createElement('div');
-        container.className = 'pointer-enabled m-1';
-        container.style.position = 'relative';
-        container.style.width = 'fit-content';
-        
-        const border = document.createElement('div');
-        border.className = `border-2x border-rounded-equip combat-equip-img fishing-img m-0 ${isSelected ? 'border-info' : 'border-secondary'}`;
-        border.style.cssText = 'position: relative; overflow: hidden; border-width: 2px!important; border-style: solid!important;';
-        
-        const img = document.createElement('img');
-        img.className = 'w-100 p-1';
-        img.src = drink.media;
-        
-        border.appendChild(img);
-        container.appendChild(border);
-        
-        // Show total charges badge
         const totalCharges = drink.totalCharges;
-        if (totalCharges > 0) {
-            const badge = document.createElement('div');
-            badge.className = 'font-size-sm text-white text-center';
-            badge.style.cssText = 'position: absolute; bottom: -8px; width: 100%;';
-            badge.innerHTML = `<small class="badge-pill bg-info">${totalCharges}</small>`;
-            container.appendChild(badge);
-        }
+        const tooltipContent = TooltipBuilder.forTavernDrink(drink, totalCharges).build();
         
-        // Show equipped indicator
-        if (drink.isEquipped) {
-            const equipped = document.createElement('span');
-            equipped.className = 'badge badge-success';
-            equipped.style.cssText = 'position: absolute; top: 2px; right: 2px; font-size: 0.5rem; z-index: 10;';
-            equipped.textContent = 'E';
-            border.appendChild(equipped);
-        }
+        const iconBtn = new AdventuringIconButtonElement();
+        iconBtn.setIcon({
+            icon: drink.media,
+            borderClass: isSelected ? 'border-info' : 'border-secondary',
+            cornerBadgeText: drink.isEquipped ? 'E' : undefined,
+            cornerBadgeClass: 'badge-success',
+            bottomBadgeText: totalCharges > 0 ? totalCharges : undefined,
+            bottomBadgeClass: 'bg-info',
+            tooltipContent,
+            onClick
+        });
         
-        // Add tooltip with effects and description
-        const tooltipContent = TooltipBuilder.forTavernDrink(drink, drink.totalCharges).build();
-        createTooltip(container, tooltipContent, { hideOnClick: true });
-        
-        container.onclick = onClick;
-        return container;
+        return iconBtn;
     }
 
     /**
@@ -122,33 +98,32 @@ export class AdventuringTavernElement extends AdventuringSubpageElement {
             
             slot.replaceChildren();
             
-            const img = document.createElement('img');
-            img.className = 'w-100 p-1';
-            
             if (active) {
-                img.src = active.drink.getTierMedia(active.tier);
+                const iconBtn = new AdventuringIconButtonElement();
+                iconBtn.setIcon({
+                    icon: active.drink.getTierMedia(active.tier),
+                    borderClass: 'border-success',
+                    bottomBadgeText: active.runsRemaining,
+                    bottomBadgeClass: 'bg-success',
+                    tooltipContent: `${active.drink.getTierName(active.tier)} (${active.runsRemaining} runs) - Click to unequip`,
+                    onClick: () => onUnequip(active.drink)
+                });
+                // Remove the outer container margin since slot already has margin
+                iconBtn.container.classList.remove('m-1');
+                slot.appendChild(iconBtn);
                 slot.classList.remove('border-secondary');
                 slot.classList.add('border-success');
                 slot.style.borderStyle = 'solid!important';
-                slot.onclick = () => onUnequip(active.drink);
-                slot.title = `${active.drink.getTierName(active.tier)} (${active.runsRemaining} runs) - Click to unequip`;
-                
-                // Add charges badge
-                const badge = document.createElement('div');
-                badge.className = 'font-size-sm text-white text-center';
-                badge.style.cssText = 'position: absolute; bottom: -8px; width: 100%;';
-                badge.innerHTML = `<small class="badge-pill bg-success">${active.runsRemaining}</small>`;
-                slot.appendChild(badge);
             } else {
-                img.classList.add('invisible');
+                const img = document.createElement('img');
+                img.className = 'w-100 p-1 invisible';
+                slot.appendChild(img);
                 slot.classList.remove('border-success');
                 slot.classList.add('border-secondary');
                 slot.style.borderStyle = 'dashed!important';
                 slot.onclick = null;
                 slot.title = 'Empty slot';
             }
-            
-            slot.insertBefore(img, slot.firstChild);
         }
     }
 

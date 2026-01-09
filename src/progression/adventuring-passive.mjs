@@ -53,7 +53,7 @@ export class AdventuringPassive extends NamespacedObject {
             manager: this.manager,
             template: this._descriptionTemplate,
             flavorText: this.flavorText,
-            stats: character?.stats,
+            stats: character ? character.stats : undefined,
             displayMode: 'total',
             includeTrigger: true,
             buildReplacements: buildEffectReplacements

@@ -2,205 +2,385 @@
     "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
     "namespace": "adventuring",
     "data": {
-        "skillData": [{
-            "skillID": "adventuring:Adventuring",
-            "data": {
-                "areas": [
-                    {
-                        "id": "chicken_coop",
-                        "name": "Chicken Coop",
-                        "media": "melvor:assets/media/monsters/mumma_chicken.svg",
-                        "requirements": [
-                            { "type": "skill_level", "level": 1 }
-                        ],
-                        "height": 6,
-                        "width": 5,
-                        "floors": [
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:chick", "weight": 100 }
-                                ],
-                                "exit": ["adventuring:chick", "adventuring:chick", "adventuring:chick"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:chick", "weight": 75 },
-                                    { "id": "adventuring:chicken", "weight": 25 }
-                                ],
-                                "exit": ["adventuring:chick", "adventuring:chick", "adventuring:chicken"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:chick", "weight": 50 },
-                                    { "id": "adventuring:chicken", "weight": 50 }
-                                ],
-                                "exit": ["adventuring:chick", "adventuring:chicken", "adventuring:chicken"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:chick", "weight": 25 },
-                                    { "id": "adventuring:chicken", "weight": 75 }
-                                ],
-                                "exit": ["adventuring:chicken", "adventuring:chicken", "adventuring:chicken"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:chicken", "weight": 100 }
-                                ],
-                                "exit": ["adventuring:chick", "adventuring:chicken", "adventuring:mumma_chicken"]
-                            }
-                        ]
-                    }
-                ],
-                "monsters": [
-                    {
-                        "id": "chick",
-                        "name": "Chick",
-                        "media": "melvor:assets/media/monsters/chick.png",
-                        "tags": ["beast", "bird"],
-                        "xp": 10,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "amount": 5 },
-                            { "id": "adventuring:defence", "amount": 1 },
-                            { "id": "adventuring:agility", "amount": 1 },
-                            { "id": "adventuring:strength", "amount": 1 },
-                            { "id": "adventuring:ranged", "amount": 1 },
-                            { "id": "adventuring:magic", "amount": 1 },
-                            { "id": "adventuring:prayer", "amount": 1 }
-                        ],
-                        "generator": "adventuring:cluck",
-                        "spender": "adventuring:none",
-                        "passives": [],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 2, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 1, "weight": 10 },
-                            { "id": "adventuring:feather", "qty": 1, "weight": 25 }
-                        ]
-                    },
-                    {
-                        "id": "chicken",
-                        "name": "Chicken",
-                        "media": "melvor:assets/media/monsters/chicken.png",
-                        "tags": ["beast", "bird"],
-                        "xp": 15,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "amount": 15 },
-                            { "id": "adventuring:defence", "amount": 15 },
-                            { "id": "adventuring:agility", "amount": 10 },
-                            { "id": "adventuring:strength", "amount": 10 },
-                            { "id": "adventuring:ranged", "amount": 10 },
-                            { "id": "adventuring:magic", "amount": 10 },
-                            { "id": "adventuring:prayer", "amount": 10 }
-                        ],
-                        "generator": "adventuring:cluck",
-                        "spender": "adventuring:crow",
-                        "passives": [],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 5, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 2, "weight": 10 },
-                            { "id": "adventuring:feather", "qty": 2, "weight": 35 }
-                        ]
-                    },
-                    {
-                        "id": "mumma_chicken",
-                        "name": "Mumma Chicken",
-                        "media": "melvor:assets/media/monsters/mumma_chicken.png",
-                        "tags": ["beast", "bird"],
-                        "xp": 30,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "amount": 25 },
-                            { "id": "adventuring:defence", "amount": 20 },
-                            { "id": "adventuring:agility", "amount": 20 },
-                            { "id": "adventuring:strength", "amount": 20 },
-                            { "id": "adventuring:ranged", "amount": 20 },
-                            { "id": "adventuring:magic", "amount": 20 },
-                            { "id": "adventuring:prayer", "amount": 20 }
-                        ],
-                        "generator": "adventuring:cluck",
-                        "spender": "adventuring:crow",
-                        "passives": [],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 2, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 5, "weight": 30 },
-                            { "id": "adventuring:big_parts", "qty": 1, "weight": 10 },
-                            { "id": "adventuring:feather", "qty": 3, "weight": 50 }
-                        ]
-                    }
-                ],
-                "generators": [
-                    {
-                        "id": "cluck",
-                        "name": "Cluck",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "energy": 35,
-                        "hits": [
-                            {
-                                "target": "random",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 5,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "amount": 1 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ],
-                "spenders": [
-                    {
-                        "id": "crow",
-                        "name": "Crow",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 70,
-                        "hits": [
-                            {
-                                "target": "random",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 15,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "amount": 1.5 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ],
-                        "masteryAuraId": "adventuring:mastery_aura_chicken_coop",
-                        "masteryAura": {
-                            "id": "mastery_aura_chicken_coop",
-                            "name": "Chicken Coop Mastery",
+        "skillData": [
+            {
+                "skillID": "adventuring:Adventuring",
+                "data": {
+                    "areas": [
+                        {
+                            "id": "chicken_coop",
+                            "name": "Chicken Coop",
                             "media": "melvor:assets/media/monsters/mumma_chicken.svg",
-                            "combine": true,
-                            "stack": false,
-                            "amount": 3,
-                            "stacks": 99,
-                            "effects": [
+                            "requirements": [
                                 {
-                                    "trigger": "turn_start",
-                                    "type": "heal_flat",
-                                    "target": "self"
+                                    "type": "skill_level",
+                                    "level": 1
+                                }
+                            ],
+                            "height": 6,
+                            "width": 5,
+                            "floors": [
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:chick",
+                                            "weight": 100
+                                        }
+                                    ],
+                                    "exit": [
+                                        "adventuring:chick",
+                                        "adventuring:chick",
+                                        "adventuring:chick"
+                                    ]
                                 },
                                 {
-                                    "trigger": "dungeon_end",
-                                    "type": "remove"
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:chick",
+                                            "weight": 75
+                                        },
+                                        {
+                                            "id": "adventuring:chicken",
+                                            "weight": 25
+                                        }
+                                    ],
+                                    "exit": [
+                                        "adventuring:chick",
+                                        "adventuring:chick",
+                                        "adventuring:chicken"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:chick",
+                                            "weight": 50
+                                        },
+                                        {
+                                            "id": "adventuring:chicken",
+                                            "weight": 50
+                                        }
+                                    ],
+                                    "exit": [
+                                        "adventuring:chick",
+                                        "adventuring:chicken",
+                                        "adventuring:chicken"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:chick",
+                                            "weight": 25
+                                        },
+                                        {
+                                            "id": "adventuring:chicken",
+                                            "weight": 75
+                                        }
+                                    ],
+                                    "exit": [
+                                        "adventuring:chicken",
+                                        "adventuring:chicken",
+                                        "adventuring:chicken"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:chicken",
+                                            "weight": 100
+                                        }
+                                    ],
+                                    "exit": [
+                                        "adventuring:chick",
+                                        "adventuring:chicken",
+                                        "adventuring:mumma_chicken"
+                                    ]
                                 }
                             ]
                         }
-                    }
-                ]
+                    ],
+                    "monsters": [
+                        {
+                            "id": "chick",
+                            "name": "Chick",
+                            "media": "melvor:assets/media/monsters/chick.png",
+                            "tags": [
+                                "beast",
+                                "bird"
+                            ],
+                            "xp": 10,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "amount": 5
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "amount": 1
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "amount": 1
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "amount": 1
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "amount": 1
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "amount": 1
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "amount": 1
+                                }
+                            ],
+                            "generator": "adventuring:cluck",
+                            "spender": "adventuring:none",
+                            "passives": [],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 2,
+                                    "type": "currency"
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 1,
+                                    "type": "salvage"
+                                },
+                                {
+                                    "id": "adventuring:feather",
+                                    "qty": 1,
+                                    "type": "materials",
+                                    "chance": 0.25
+                                }
+                            ]
+                        },
+                        {
+                            "id": "chicken",
+                            "name": "Chicken",
+                            "media": "melvor:assets/media/monsters/chicken.png",
+                            "tags": [
+                                "beast",
+                                "bird"
+                            ],
+                            "xp": 15,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "amount": 15
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "amount": 15
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "amount": 10
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "amount": 10
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "amount": 10
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "amount": 10
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "amount": 10
+                                }
+                            ],
+                            "generator": "adventuring:cluck",
+                            "spender": "adventuring:crow",
+                            "passives": [],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 5,
+                                    "type": "currency"
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 2,
+                                    "type": "salvage"
+                                },
+                                {
+                                    "id": "adventuring:feather",
+                                    "qty": 2,
+                                    "type": "materials",
+                                    "chance": 0.35
+                                },
+                                {
+                                    "type": "equipment_pool",
+                                    "pool": "adventuring:tier1_starter",
+                                    "chance": 0.05
+                                }
+                            ]
+                        },
+                        {
+                            "id": "mumma_chicken",
+                            "name": "Mumma Chicken",
+                            "media": "melvor:assets/media/monsters/mumma_chicken.png",
+                            "tags": [
+                                "beast",
+                                "bird"
+                            ],
+                            "xp": 30,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "amount": 25
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "amount": 20
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "amount": 20
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "amount": 20
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "amount": 20
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "amount": 20
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "amount": 20
+                                }
+                            ],
+                            "generator": "adventuring:cluck",
+                            "spender": "adventuring:crow",
+                            "passives": [],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 2,
+                                    "type": "currency"
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 5,
+                                    "type": "salvage"
+                                },
+                                {
+                                    "id": "adventuring:big_parts",
+                                    "qty": 1,
+                                    "type": "salvage"
+                                },
+                                {
+                                    "id": "adventuring:feather",
+                                    "qty": 3,
+                                    "type": "materials",
+                                    "chance": 0.5
+                                },
+                                {
+                                    "type": "equipment_pool",
+                                    "pool": "adventuring:tier1_starter",
+                                    "chance": 0.2
+                                }
+                            ]
+                        }
+                    ],
+                    "generators": [
+                        {
+                            "id": "cluck",
+                            "name": "Cluck",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "energy": 35,
+                            "hits": [
+                                {
+                                    "target": "random",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 5,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "amount": 1
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "spenders": [
+                        {
+                            "id": "crow",
+                            "name": "Crow",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 70,
+                            "hits": [
+                                {
+                                    "target": "random",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 15,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "amount": 1.5
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ],
+                            "masteryAuraId": "adventuring:mastery_aura_chicken_coop",
+                            "masteryAura": {
+                                "id": "mastery_aura_chicken_coop",
+                                "name": "Chicken Coop Mastery",
+                                "media": "melvor:assets/media/monsters/mumma_chicken.svg",
+                                "combine": true,
+                                "stack": false,
+                                "amount": 3,
+                                "stacks": 99,
+                                "effects": [
+                                    {
+                                        "trigger": "turn_start",
+                                        "type": "heal_flat",
+                                        "target": "self"
+                                    },
+                                    {
+                                        "trigger": "dungeon_end",
+                                        "type": "remove"
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
             }
-        }]
+        ]
     }
 }

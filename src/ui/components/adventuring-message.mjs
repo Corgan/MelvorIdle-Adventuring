@@ -6,6 +6,7 @@ export class AdventuringMessageElement extends HTMLElement {
 
         this.body = getElementFromFragment(this._content, 'body', 'small');
         this.ts = getElementFromFragment(this._content, 'ts', 'small');
+        this.icon = getElementFromFragment(this._content, 'icon', 'img');
     }
 
     mount(parent) {

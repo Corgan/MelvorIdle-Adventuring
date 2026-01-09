@@ -18,16 +18,55 @@ export class AdventuringEquipment {
         this.stats = new AdventuringStats(this.manager, this.game);
     }
     
+    /**
+     * Get an array of all equipped items (excludes empty/none slots)
+     * @returns {AdventuringItemBase[]}
+     */
+    get equippedItems() {
+        const items = [];
+        this.slots.forEach((slot) => {
+            if (slot.item && slot.item !== this.manager.cached.noneItem && slot.canEquip(slot.item)) {
+                items.push(slot.item);
+            }
+        });
+        return items;
+    }
+    
+    /**
+     * Iterate over all equipped items with their slots
+     * @param {Function} callback - (item, slot, slotType) => void
+     */
+    forEachEquipped(callback) {
+        this.slots.forEach((slot, slotType) => {
+            if (slot.item && slot.item !== this.manager.cached.noneItem && slot.canEquip(slot.item)) {
+                callback(slot.item, slot, slotType);
+            }
+        });
+    }
+    
+    /**
+     * Check if a specific item is equipped
+     * @param {AdventuringItemBase} item
+     * @returns {boolean}
+     */
+    hasItemEquipped(item) {
+        let found = false;
+        this.slots.forEach((slot) => {
+            if (slot.item === item) {
+                found = true;
+            }
+        });
+        return found;
+    }
+    
     calculateStats() {
         this.stats.reset();
-        this.slots.forEach((equipmentSlot, slotType) => {
-            equipmentSlot.item.calculateStats();
-            if(equipmentSlot.canEquip(equipmentSlot.item)) {
-                equipmentSlot.stats.forEach((value, stat) => {
-                    let old = this.stats.get(stat);
-                    this.stats.set(stat, old + value);
-                });
-            }
+        this.forEachEquipped((item, slot) => {
+            item.calculateStats();
+            slot.stats.forEach((value, stat) => {
+                let old = this.stats.get(stat);
+                this.stats.set(stat, old + value);
+            });
         });
     }
 
@@ -40,11 +79,7 @@ export class AdventuringEquipment {
     getEffects(trigger = null) {
         const effects = [];
         
-        this.slots.forEach((equipmentSlot, slotType) => {
-            if(!equipmentSlot.canEquip(equipmentSlot.item)) return;
-            
-            const item = equipmentSlot.item;
-            
+        this.forEachEquipped((item, slot) => {
             // Add passive stat bonuses from equipment stats
             if(trigger === null || trigger === 'passive') {
                 item.stats.forEach((value, stat) => {
@@ -132,10 +167,7 @@ export class AdventuringEquipment {
         const results = [];
         
         // Individual equipment item effects
-        this.slots.forEach((equipmentSlot, slotType) => {
-            if (!equipmentSlot.canEquip(equipmentSlot.item)) return;
-            
-            const item = equipmentSlot.item;
+        this.forEachEquipped((item, slot) => {
             if (!item.effects || item.effects.length === 0) return;
             
             item.effects.forEach(effect => {

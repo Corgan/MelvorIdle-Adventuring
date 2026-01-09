@@ -79,7 +79,7 @@ class AdventuringAuraEffect extends AdventuringScalableEffect {
                 return instance.source;
             case 'target':
                 // Use aura holder's current stats
-                return instance.auras?.character;
+                return instance.auras && instance.auras.character ? instance.auras.character : undefined;
             case 'snapshot':
                 // Use stats captured at application time
                 return instance.snapshotStats;

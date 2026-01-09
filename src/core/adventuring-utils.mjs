@@ -112,6 +112,116 @@ class StatCalculator {
 }
 
 // ============================================================================
+// Effect Limit Tracker
+// ============================================================================
+
+/**
+ * EffectLimitTracker - Tracks effect trigger counts for limit enforcement.
+ * 
+ * Handles effects with limit: 'combat', 'round', or 'turn' properties.
+ * Consolidates duplicated code from AdventuringCharacter and AdventuringParty.
+ * 
+ * Usage:
+ *   const tracker = new EffectLimitTracker();
+ *   if (tracker.canTrigger(effect, source)) {
+ *       // Process effect
+ *       tracker.record(effect, source);
+ *   }
+ *   tracker.reset('turn');  // Reset turn-limited effects
+ */
+class EffectLimitTracker {
+    constructor() {
+        /** @type {{ combat: Map<string, number>, round: Map<string, number>, turn: Map<string, number> }} */
+        this.counts = {
+            combat: new Map(),
+            round: new Map(),
+            turn: new Map()
+        };
+    }
+    
+    /**
+     * Generate a unique key for an effect to track its trigger count.
+     * @param {object} effect - The effect object
+     * @param {object} source - The source (item, consumable, etc.)
+     * @returns {string} Unique key for this effect
+     */
+    getKey(effect, source) {
+        let sourceId = 'unknown';
+        if (source && source.id) {
+            sourceId = source.id;
+        } else if (source && source.localID) {
+            sourceId = source.localID;
+        }
+        const effectStr = JSON.stringify({
+            type: effect.type,
+            trigger: effect.trigger,
+            id: effect.id,
+            stat: effect.stat,
+            amount: effect.amount
+        });
+        return `${sourceId}:${effectStr}`;
+    }
+    
+    /**
+     * Check if an effect can trigger based on its limit settings.
+     * @param {object} effect - The effect with optional limit/times properties
+     * @param {object} source - The source object for key generation
+     * @returns {boolean} Whether the effect can trigger
+     */
+    canTrigger(effect, source) {
+        if (!effect.limit) return true;
+        
+        const key = this.getKey(effect, source);
+        const times = effect.times || 1;
+        const countMap = this.counts[effect.limit];
+        
+        if (!countMap) {
+            console.warn(`EffectLimitTracker: Unknown limit type: ${effect.limit}`);
+            return true;
+        }
+        
+        const currentCount = countMap.get(key) || 0;
+        return currentCount < times;
+    }
+    
+    /**
+     * Record that an effect has triggered (increment its count).
+     * @param {object} effect - The effect that triggered
+     * @param {object} source - The source object for key generation
+     */
+    record(effect, source) {
+        if (!effect.limit) return;
+        
+        const key = this.getKey(effect, source);
+        const countMap = this.counts[effect.limit];
+        
+        if (!countMap) return;
+        
+        const currentCount = countMap.get(key) || 0;
+        countMap.set(key, currentCount + 1);
+    }
+    
+    /**
+     * Reset trigger counts for a specific limit period.
+     * @param {string} limitType - 'combat', 'round', or 'turn'
+     */
+    reset(limitType) {
+        if (this.counts[limitType]) {
+            this.counts[limitType].clear();
+        }
+    }
+    
+    /**
+     * Reset all limit periods.
+     */
+    resetAll() {
+        this.counts.combat.clear();
+        this.counts.round.clear();
+        this.counts.turn.clear();
+    }
+}
+
+// ============================================================================
 // Passive Effect Processor
 // ============================================================================
 
@@ -147,6 +257,11 @@ class PassiveEffectProcessor {
      * @returns {object} { amount, isCrit, negated }
      */
     processDamage(attacker, target, baseAmount, context = {}) {
+        // Early exit if target is already dead or no damage
+        if (target.dead || baseAmount <= 0) {
+            return { amount: 0, isCrit: false, negated: target.dead ? 'dead' : 'zero' };
+        }
+        
         let amount = baseAmount;
         
         // Pre-damage trigger: miss check (e.g., Blind debuff)
@@ -154,7 +269,7 @@ class PassiveEffectProcessor {
         if (missCheck.missed) {
             return { negated: 'miss', amount: 0 };
         }
-        amount = missCheck.amount ?? amount;
+        amount = (missCheck.amount !== undefined && missCheck.amount !== null) ? missCheck.amount : amount;
         
         // Pre-damage trigger: dodge check (e.g., Evasion buff, conditional dodge)
         const dodgeCheck = target.trigger('before_damage_received', { attacker, amount, ...context });
@@ -162,7 +277,7 @@ class PassiveEffectProcessor {
             target.trigger('dodge', { attacker, ...context });
             return { negated: 'dodge', amount: 0 };
         }
-        amount = dodgeCheck.amount ?? amount;
+        amount = (dodgeCheck.amount !== undefined && dodgeCheck.amount !== null) ? dodgeCheck.amount : amount;
         
         // Passive dodge check (sum of passive dodge bonuses, including conditional)
         const dodgeChance = target.getConditionalBonus('dodge', { target: attacker });
@@ -208,10 +323,10 @@ class PassiveEffectProcessor {
         
         // Healing triggers
         const deliverResult = caster.trigger('before_heal_delivered', { target, amount, ...context });
-        amount = deliverResult.amount ?? amount;
+        amount = (deliverResult.amount !== undefined && deliverResult.amount !== null) ? deliverResult.amount : amount;
         
         const receiveResult = target.trigger('before_heal_received', { caster, amount, ...context });
-        amount = receiveResult.amount ?? amount;
+        amount = (receiveResult.amount !== undefined && receiveResult.amount !== null) ? receiveResult.amount : amount;
         
         return { amount };
     }
@@ -547,24 +662,85 @@ function createEffect(effectData, source, sourceName) {
  * Build a standard context object for condition evaluation.
  * This ensures all effect sources use consistent context format.
  * 
+/**
+ * Pool of reusable context objects to reduce garbage collection.
+ * Contexts are acquired via getPooledContext() and released via releaseContext().
+ */
+const contextPool = [];
+const MAX_POOL_SIZE = 16;
+
+/**
+ * Get a context object from the pool or create a new one.
+ * @returns {object} A context object ready for use
+ */
+function getPooledContext() {
+    return contextPool.pop() || {};
+}
+
+/**
+ * Release a context object back to the pool.
+ * Clears all properties to prevent memory leaks.
+ * @param {object} ctx - Context to release
+ */
+function releaseContext(ctx) {
+    if (!ctx || contextPool.length >= MAX_POOL_SIZE) return;
+    
+    // Clear all properties
+    for (const key in ctx) {
+        if (Object.prototype.hasOwnProperty.call(ctx, key)) {
+            ctx[key] = undefined;
+        }
+    }
+    contextPool.push(ctx);
+}
+
+/**
+ * Build a standardized context object for condition evaluation and effect processing.
+ * Uses object pooling for reduced memory allocation in hot paths.
+ * 
  * @param {object} character - The character triggering effects (can be null for party-level triggers)
  * @param {object} extra - Additional context from the trigger
+ * @param {object} [pooledCtx] - Optional pre-allocated context to reuse
  * @returns {object} Standardized context for evaluateCondition()
  */
-function buildEffectContext(character, extra = {}) {
+function buildEffectContext(character, extra = {}, pooledCtx = null) {
     // Support null character for party-level triggers - use manager from extra if provided
-    const manager = character?.manager || extra.manager || null;
-    return {
-        character,
-        target: extra.target || null,
-        attacker: extra.attacker || null,
-        party: manager?.party?.members || manager?.party?.all || [],
-        manager,
-        hpPercentBefore: extra.hpPercentBefore,
-        damageDealt: extra.damageDealt,
-        damageReceived: extra.damageReceived,
-        ...extra
-    };
+    let manager = null;
+    if (character && character.manager) {
+        manager = character.manager;
+    } else if (extra.manager) {
+        manager = extra.manager;
+    }
+    
+    let partyMembers = [];
+    if (manager && manager.party) {
+        if (manager.party.members) {
+            partyMembers = manager.party.members;
+        } else if (manager.party.all) {
+            partyMembers = manager.party.all;
+        }
+    }
+    
+    // Reuse provided context or create new
+    const ctx = pooledCtx || {};
+    
+    ctx.character = character;
+    ctx.target = extra.target || null;
+    ctx.attacker = extra.attacker || null;
+    ctx.party = partyMembers;
+    ctx.manager = manager;
+    ctx.hpPercentBefore = extra.hpPercentBefore;
+    ctx.damageDealt = extra.damageDealt;
+    ctx.damageReceived = extra.damageReceived;
+    
+    // Copy any additional properties from extra
+    for (const key in extra) {
+        if (Object.prototype.hasOwnProperty.call(extra, key) && ctx[key] === undefined) {
+            ctx[key] = extra[key];
+        }
+    }
+    
+    return ctx;
 }
 
 /**
@@ -764,7 +940,10 @@ class EffectCache {
                 }
                 return true;
             })
-            .reduce((sum, e) => sum + (e.value ?? e.amount ?? 0), 0);
+            .reduce((sum, e) => {
+                const val = (e.value !== undefined) ? e.value : ((e.amount !== undefined) ? e.amount : 0);
+                return sum + val;
+            }, 0);
         
         this.bonusCache.set(cacheKey, total);
         return total;
@@ -833,7 +1012,10 @@ class EffectCache {
                 }
                 return true;
             })
-            .reduce((sum, e) => sum + (e.value ?? e.amount ?? 0), 0);
+            .reduce((sum, e) => {
+                const val = (e.value !== undefined) ? e.value : ((e.amount !== undefined) ? e.amount : 0);
+                return sum + val;
+            }, 0);
     }
 }
 
@@ -935,9 +1117,19 @@ class RequirementsChecker {
                 // Check if an area has been cleared at least once by checking if it has any XP
                 const area = this.manager.areas.getObjectByID(req.area);
                 if (!area) return false;
-                const xp = this.manager.actionMastery?.get(area)?.xp || 0;
+                let xp = 0;
+                if (this.manager.actionMastery) {
+                    const masteryEntry = this.manager.actionMastery.get(area);
+                    if (masteryEntry && masteryEntry.xp) {
+                        xp = masteryEntry.xp;
+                    }
+                }
                 return xp > 0;
             }
+            
+            case 'dropped':
+                // Check if the item has been dropped/unlocked via loot system
+                return context.item && context.item.dropped === true;
             
             case 'always_false':
                 // Placeholder for items that require special unlock methods (drops, etc.)
@@ -1258,7 +1450,7 @@ function evaluateCondition(condition, context) {
         case 'hp_crossed_below': {
             if(!character) return false;
             const hpPercent = (character.hitpoints / character.maxHitpoints) * 100;
-            const hpBefore = context.hpPercentBefore ?? 100;
+            const hpBefore = (context.hpPercentBefore !== undefined) ? context.hpPercentBefore : 100;
             const threshold = condition.threshold || 30;
             return hpBefore >= threshold && hpPercent < threshold;
         }
@@ -1266,7 +1458,7 @@ function evaluateCondition(condition, context) {
         case 'hp_crossed_above': {
             if(!character) return false;
             const hpPercent = (character.hitpoints / character.maxHitpoints) * 100;
-            const hpBefore = context.hpPercentBefore ?? 0;
+            const hpBefore = (context.hpPercentBefore !== undefined) ? context.hpPercentBefore : 0;
             const threshold = condition.threshold || 50;
             return hpBefore < threshold && hpPercent >= threshold;
         }
@@ -1392,7 +1584,8 @@ function parseDescription(template, replacements) {
 function getAuraName(manager, auraId) {
     if (!auraId) return 'Unknown';
     // Prettify the ID as fallback (e.g., 'arcane_power' -> 'Arcane Power')
-    const prettified = auraId.split(':').pop()?.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) || 'Unknown';
+    const idPart = auraId.split(':').pop();
+    const prettified = idPart ? idPart.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) : 'Unknown';
     if (manager === undefined || manager.auras === undefined) {
         return prettified;
     }
@@ -1589,7 +1782,8 @@ const effectDescriptionRegistry = new Map([
         switch (unlockType) {
             case 'auto_run': return 'Unlock Auto-Run';
             case 'difficulty': {
-                const diffId = effect.difficultyID?.split(':').pop() || 'Unknown';
+                const diffParts = effect.difficultyID ? effect.difficultyID.split(':') : [];
+                const diffId = diffParts.length > 0 ? diffParts[diffParts.length - 1] : 'Unknown';
                 return `Unlock ${diffId.charAt(0).toUpperCase() + diffId.slice(1)} Mode`;
             }
             case 'mastery_aura': return 'Unlock Mastery Aura';
@@ -1620,7 +1814,7 @@ const effectDescriptionRegistry = new Map([
     ['consume_charge', (effect) => `Consume ${firstDefined(effect.count, 1)} charge(s)`],
     ['absorb', (effect, value, stacks, amount) => `Absorb ${firstDefined(amount, 1)} damage per stack`],
     ['skip', (effect, value, stacks, amount) => {
-        if (effect.condition?.type === 'chance') return `${effect.condition.value}% chance to skip turn`;
+        if (effect.condition && effect.condition.type === 'chance') return `${effect.condition.value}% chance to skip turn`;
         return 'Skip turn';
     }],
     ['dodge', (effect, value, stacks, amount) => {
@@ -1628,16 +1822,16 @@ const effectDescriptionRegistry = new Map([
         const dodgeAmount = firstDefined(amount, effect.amount);
         if (dodgeAmount !== undefined) return `+${dodgeAmount}% dodge chance`;
         // Conditional dodge
-        if (effect.condition?.type === 'chance') return `${effect.condition.value}% chance to dodge`;
-        if (effect.condition?.type === 'hp_below') return `Dodge attacks when HP below ${effect.condition.threshold}%`;
+        if (effect.condition && effect.condition.type === 'chance') return `${effect.condition.value}% chance to dodge`;
+        if (effect.condition && effect.condition.type === 'hp_below') return `Dodge attacks when HP below ${effect.condition.threshold}%`;
         return 'Dodge attack';
     }],
     ['miss', (effect, value, stacks, amount) => {
-        if (effect.condition?.type === 'chance') return `${effect.condition.value}% chance to miss`;
+        if (effect.condition && effect.condition.type === 'chance') return `${effect.condition.value}% chance to miss`;
         return 'Attack misses';
     }],
     ['confuse', (effect, value, stacks, amount) => {
-        if (effect.condition?.type === 'chance') return `${effect.condition.value}% chance to hit ally instead`;
+        if (effect.condition && effect.condition.type === 'chance') return `${effect.condition.value}% chance to hit ally instead`;
         return 'Hit ally instead';
     }],
     ['untargetable', () => 'Cannot be targeted'],
@@ -1659,7 +1853,7 @@ const effectDescriptionRegistry = new Map([
     
     // Double cast
     ['double_cast', (effect, value, stacks, amount, manager, helpers) => {
-        if (effect.condition?.type === 'chance') return `${effect.condition.value}% chance to cast spells twice`;
+        if (effect.condition && effect.condition.type === 'chance') return `${effect.condition.value}% chance to cast spells twice`;
         return `${firstDefined(effect.chance, amount, value)}% chance to cast spells twice`;
     }],
 ]);
@@ -1711,26 +1905,31 @@ function describeEffect(effect, manager, displayMode = false) {
     const value = amount; // 'amount' is the canonical property
     
     const statName = (statId) => {
-        const stat = manager?.stats?.getObjectByID(statId);
-        // Return the actual name if found, otherwise return the raw ID for prettifying later
-        return stat?.name || null;
+        if (!manager || !manager.stats) return null;
+        const stat = manager.stats.getObjectByID(statId);
+        // Return the actual name if found, otherwise return null for prettifying later
+        return (stat && stat.name) ? stat.name : null;
     };
     // Prettify a stat ID (e.g., 'xp_bonus' -> 'XP Bonus', 'all' -> 'All Stats')
     const prettifyStatId = (statId) => {
         // Handle special cases
         if (statId === 'all') return 'All Stats';
-        return statId?.split(':').pop()?.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) || 'Unknown';
+        if (!statId) return 'Unknown';
+        const parts = statId.split(':');
+        const lastPart = parts.length > 0 ? parts[parts.length - 1] : '';
+        return lastPart ? lastPart.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) : 'Unknown';
     };
     // Get stat name with fallback to prettified ID
     const getStatDisplay = (statId) => statName(statId) || prettifyStatId(statId);
     const auraName = (auraId) => {
+        if (!manager || !manager.auras) return prettifyStatId(auraId);
         // Try direct lookup first
-        let aura = manager?.auras?.getObjectByID(auraId);
+        let aura = manager.auras.getObjectByID(auraId);
         // If not found and no namespace, try with adventuring: prefix
         if (!aura && auraId && !auraId.includes(':')) {
-            aura = manager?.auras?.getObjectByID(`adventuring:${auraId}`);
+            aura = manager.auras.getObjectByID(`adventuring:${auraId}`);
         }
-        return aura?.name || prettifyStatId(auraId);
+        return (aura && aura.name) ? aura.name : prettifyStatId(auraId);
     };
     
     // Build helpers object for registry functions
@@ -2522,7 +2721,7 @@ function createDefaultEffectProcessor() {
     
     // Heal percent of max HP - supports target/party properties
     processor.register('heal_percent', (effect, instance, ctx) => {
-        const percentValue = effect.amount ?? instance.amount ?? 0;
+        const percentValue = (effect.amount !== undefined) ? effect.amount : ((instance.amount !== undefined) ? instance.amount : 0);
         if(percentValue <= 0) return ctx.extra;
         
         // Determine targets based on target/party properties
@@ -2543,7 +2742,8 @@ function createDefaultEffectProcessor() {
                 const healAmount = Math.ceil(ctx.character.maxHitpoints * (percentValue / 100));
                 ctx.character.heal({ amount: healAmount }, ctx.character);
             }
-            ctx.manager.log.add(`${ctx.character?.name || 'Effect'} heals for ${percentValue}%`);
+            const characterName = (ctx.character && ctx.character.name) ? ctx.character.name : 'Effect';
+            ctx.manager.log.add(`${characterName} heals for ${percentValue}%`);
         }
         // Enemy healing not typically used, but could be extended here
         return ctx.extra;
@@ -2964,7 +3164,7 @@ function createDefaultEffectProcessor() {
     // Double cast - chance to cast abilities twice
     processor.register('double_cast', (effect, instance, ctx) => {
         let chance;
-        if (effect.condition?.type === 'chance') {
+        if (effect.condition && effect.condition.type === 'chance') {
             chance = effect.condition.value;
         } else {
             chance = effect.chance || getEffectAmount(effect, instance);
@@ -3299,6 +3499,51 @@ class AdventuringEquipmentRenderQueue extends AdventuringBadgeRenderQueue {
     }
 }
 
+// ============================================================================
+// Registry Lookup Helpers
+// ============================================================================
+
+/**
+ * Safely look up an object from a registry with optional warning.
+ * Standardizes the pattern of checking for undefined results.
+ * 
+ * @param {object} registry - The registry to search (must have getObjectByID method)
+ * @param {string} id - The ID to look up
+ * @param {string} [context] - Context for warning message (e.g., 'area', 'item')
+ * @param {boolean} [warn=false] - Whether to log a warning if not found
+ * @returns {object|undefined} The found object or undefined
+ */
+function getFromRegistry(registry, id, context = 'object', warn = false) {
+    if (!registry || !id) return undefined;
+    
+    const obj = registry.getObjectByID(id);
+    if (!obj && warn) {
+        console.warn(`[Adventuring] Unknown ${context}: ${id}`);
+    }
+    return obj;
+}
+
+/**
+ * Look up an object from a registry, throwing an error if not found.
+ * Use for required lookups where missing data indicates a bug.
+ * 
+ * @param {object} registry - The registry to search
+ * @param {string} id - The ID to look up
+ * @param {string} context - Context for error message
+ * @returns {object} The found object (throws if not found)
+ */
+function requireFromRegistry(registry, id, context = 'object') {
+    if (!registry) {
+        throw new Error(`[Adventuring] Registry is undefined when looking up ${context}: ${id}`);
+    }
+    
+    const obj = registry.getObjectByID(id);
+    if (!obj) {
+        throw new Error(`[Adventuring] Required ${context} not found: ${id}`);
+    }
+    return obj;
+}
+
 export { 
     AdventuringWeightedTable,
     randomElement,
@@ -3340,6 +3585,8 @@ export {
     evaluateCondition,
     describeCondition,
     buildEffectContext,
+    getPooledContext,
+    releaseContext,
     // RenderQueue base classes
     AdventuringMasteryRenderQueue,
     AdventuringBadgeRenderQueue,
@@ -3350,6 +3597,11 @@ export {
     // Stat calculation
     StatCalculator,
     // Passive effect processor
-    PassiveEffectProcessor
+    PassiveEffectProcessor,
+    // Effect limit tracking
+    EffectLimitTracker,
+    // Registry helpers
+    getFromRegistry,
+    requireFromRegistry
 }
 

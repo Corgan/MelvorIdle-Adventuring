@@ -5,7 +5,8 @@ const { AdventuringStats } = await loadModule('src/core/adventuring-stats.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
 const { AdventuringAbilityRowElement } = await loadModule('src/progression/components/adventuring-ability-row.mjs');
 
-const { AdventuringJobDetailsElement } = await loadModule('src/progression/components/adventuring-job-details.mjs');
+// Side-effect import to register custom element
+await loadModule('src/progression/components/adventuring-job-details.mjs');
 
 class AdventuringJobDetailsRenderQueue {
     constructor() {

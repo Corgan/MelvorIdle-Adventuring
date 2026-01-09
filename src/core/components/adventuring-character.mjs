@@ -1,10 +1,10 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { AdventuringAbilitiesElement } = await loadModule('src/combat/components/adventuring-abilities.mjs');
-const { AdventuringAbilitySmallElement } = await loadModule('src/combat/components/adventuring-ability-small.mjs');
-
-const { AdventuringJobsElement } = await loadModule('src/progression/components/adventuring-jobs.mjs');
-const { AdventuringJobSmallElement } = await loadModule('src/progression/components/adventuring-job-small.mjs');
+// Side-effect imports to register custom elements
+await loadModule('src/combat/components/adventuring-abilities.mjs');
+await loadModule('src/combat/components/adventuring-ability-small.mjs');
+await loadModule('src/progression/components/adventuring-jobs.mjs');
+await loadModule('src/progression/components/adventuring-job-small.mjs');
 
 export class AdventuringCharacterElement extends HTMLElement {
     constructor() {

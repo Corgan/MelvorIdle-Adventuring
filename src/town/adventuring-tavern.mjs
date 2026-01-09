@@ -1,7 +1,9 @@
 const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringPage } = await loadModule('src/ui/adventuring-page.mjs');
-const { AdventuringTavernElement } = await loadModule('src/town/components/adventuring-tavern.mjs');
+
+// Side-effect import to register custom element
+await loadModule('src/town/components/adventuring-tavern.mjs');
 
 const MAX_EQUIPPED_DRINKS = 3;
 
@@ -44,6 +46,9 @@ export class AdventuringTavern extends AdventuringPage {
         this.selectedTier = 1;
 
         this.component.back.onclick = () => this.back();
+        
+        // Subscribe to dungeon lifecycle events
+        this.manager.on('dungeon:ended', () => this.consumeCharges());
     }
 
     back() {
@@ -103,12 +108,7 @@ export class AdventuringTavern extends AdventuringPage {
         drink.renderQueue.updateAll();
         this.renderQueue.equipped = true;
         this.renderQueue.details = true;
-        this.manager.overview.renderQueue.buffs = true;
-        
-        // Invalidate effect cache if equipped
-        if (this.isEquipped(drink)) {
-            this.invalidateAllHeroEffects();
-        }
+        this.manager.emit('tavern:drink-changed', { drink, tier, action: 'charges-added' });
     }
 
     /**
@@ -125,14 +125,12 @@ export class AdventuringTavern extends AdventuringPage {
         drink.renderQueue.updateAll();
         this.renderQueue.equipped = true;
         this.renderQueue.details = true;
-        this.manager.overview.renderQueue.buffs = true;
+        this.manager.emit('tavern:drink-changed', { drink, tier, action: 'charges-removed' });
 
         // If charges depleted and this tier is equipped, unequip
         const equippedTier = this.getEquippedTier(drink);
         if (newCharges <= 0 && equippedTier === tier) {
             this.unequip(drink);
-        } else if (this.isEquipped(drink)) {
-            this.invalidateAllHeroEffects();
         }
     }
 
@@ -193,10 +191,9 @@ export class AdventuringTavern extends AdventuringPage {
         drink.renderQueue.updateAll();
         this.renderQueue.equipped = true;
         this.renderQueue.details = true;
-        this.manager.overview.renderQueue.buffs = true;
+        this.manager.emit('tavern:drink-changed', { drink, tier, action: 'equipped' });
         this.manager.log.add(`Equipped ${drink.getTierName(tier)}`);
         
-        this.invalidateAllHeroEffects();
         return true;
     }
 
@@ -211,10 +208,9 @@ export class AdventuringTavern extends AdventuringPage {
         drink.renderQueue.updateAll();
         this.renderQueue.equipped = true;
         this.renderQueue.details = true;
-        this.manager.overview.renderQueue.buffs = true;
+        this.manager.emit('tavern:drink-changed', { drink, tier, action: 'unequipped' });
         this.manager.log.add(`Unequipped ${drink.getTierName(tier)}`);
         
-        this.invalidateAllHeroEffects();
         return true;
     }
 
@@ -292,19 +288,6 @@ export class AdventuringTavern extends AdventuringPage {
         }
         
         return results;
-    }
-
-    /**
-     * Invalidate effect cache for all heroes.
-     */
-    invalidateAllHeroEffects() {
-        if (this.manager.party) {
-            this.manager.party.all.forEach(hero => {
-                if (hero.effectCache) {
-                    hero.invalidateEffects('tavern');
-                }
-            });
-        }
     }
 
     // =========================================

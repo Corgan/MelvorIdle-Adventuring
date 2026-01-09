@@ -225,7 +225,8 @@ export class AdventuringModifiers {
         const passiveEffects = this.effectCache.getEffects('passive');
         for (const effect of passiveEffects) {
             if (effect.type === 'spawn_rate_percent' && effect.spawnType === spawnType) {
-                total += effect.value ?? effect.amount ?? 0;
+                const val = (effect.value !== undefined) ? effect.value : ((effect.amount !== undefined) ? effect.amount : 0);
+                total += val;
             }
         }
         

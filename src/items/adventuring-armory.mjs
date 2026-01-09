@@ -4,9 +4,10 @@ const { AdventuringPage } = await loadModule('src/ui/adventuring-page.mjs');
 const { AdventuringStats } = await loadModule('src/core/adventuring-stats.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
 
-const { AdventuringEquipment } = await loadModule('src/items/adventuring-equipment.mjs');
-const { AdventuringArmoryElement } = await loadModule('src/items/components/adventuring-armory.mjs');
-const { AdventuringMaterialElement } = await loadModule('src/items/components/adventuring-material.mjs');
+// Side-effect imports to register custom elements and load dependencies
+await loadModule('src/items/adventuring-equipment.mjs');
+await loadModule('src/items/components/adventuring-armory.mjs');
+await loadModule('src/items/components/adventuring-material.mjs');
 
 class AdventuringArmoryRenderQueue {
     constructor(){
@@ -28,6 +29,8 @@ export class AdventuringArmory extends AdventuringPage {
         this.unlocked = new Map();
         this.viewed = new Map();  // Track if item has been viewed in UI
         this.masterfulItems = new Map();  // Track Masterful rank items
+        this.droppedItems = new Map();  // Track items unlocked via loot/drop system
+        this.artifactTiers = new Map();  // Track artifact prestige tiers (0, 1, 2)
         this.activeCategory = 'melee'; // Currently selected category
 
         this.component = createElement('adventuring-armory');
@@ -232,6 +235,70 @@ export class AdventuringArmory extends AdventuringPage {
     }
 
     /**
+     * Mark an item as dropped (unlocked via loot system).
+     * This satisfies the 'dropped' requirement type.
+     * @param {AdventuringItemBase} item - The item to mark as dropped
+     * @param {boolean} notify - Whether to show a notification (default true)
+     * @param {string} rarity - Rarity tier for notification styling (optional)
+     */
+    markDropped(item, notify = true, rarity = null) {
+        if (this.droppedItems.get(item) === true) return; // Already dropped
+        
+        this.droppedItems.set(item, true);
+        item.renderQueue.updateAll();
+        
+        if (notify) {
+            // Determine rarity from item or parameter
+            const itemRarity = rarity || item.rarity || 'common';
+            const message = this.getDropMessage(item.name, itemRarity);
+            const logType = this.getLogTypeForRarity(itemRarity);
+            this.manager.log.add(message, logType, item.media);
+        }
+        
+        // Trigger unlock check since dropped items may now meet requirements
+        this.checkUnlocked();
+    }
+    
+    /**
+     * Get notification message based on rarity
+     * @param {string} name - Item name
+     * @param {string} rarity - Rarity tier
+     * @returns {string} Formatted message
+     */
+    getDropMessage(name, rarity) {
+        switch(rarity) {
+            case 'legendary':
+                return `★★★ LEGENDARY: ${name}! ★★★`;
+            case 'epic':
+                return `★★ Epic Drop: ${name}! ★★`;
+            case 'rare':
+                return `★ Rare: ${name}!`;
+            case 'uncommon':
+                return `Found ${name}!`;
+            default:
+                return `Found ${name}!`;
+        }
+    }
+    
+    /**
+     * Get log type (affects styling) based on rarity
+     * @param {string} rarity - Rarity tier
+     * @returns {string} Log message type
+     */
+    getLogTypeForRarity(rarity) {
+        switch(rarity) {
+            case 'legendary':
+                return 'legendary';
+            case 'epic':
+                return 'epic';
+            case 'rare':
+                return 'rare';
+            default:
+                return 'info';
+        }
+    }
+
+    /**
      * Pre-craft an item by unlocking it and setting upgrade level to 1.
      * Used for starter gear that heroes begin with.
      * @param {string} itemId - The full item ID (e.g. 'adventuring:bronze_sword1h')
@@ -385,6 +452,66 @@ export class AdventuringArmory extends AdventuringPage {
         this.renderQueue.details = true;
         return true;
     }
+    
+    // === ARTIFACT PRESTIGE SYSTEM ===
+    
+    /**
+     * Prestige an artifact to the next tier
+     * Requires: level 99 mastery + next tier's materials
+     * Effect: Resets mastery to level 1, increments tier, updates stats/effects
+     */
+    prestigeArtifact(item) {
+        if(!item.isArtifact) return false;
+        if(!item.canPrestige) return false;
+        
+        const currentTier = this.artifactTiers.get(item) || 0;
+        const nextTier = currentTier + 1;
+        
+        if(nextTier >= item.tiers.length) return false;
+        
+        // Deduct next tier's materials
+        const nextTierData = item.tiers[nextTier];
+        if(nextTierData && nextTierData.materials) {
+            for(const [material, cost] of nextTierData.materials) {
+                this.manager.stash.remove(material, cost);
+            }
+        }
+        
+        // Increment tier
+        this.artifactTiers.set(item, nextTier);
+        
+        // Reset mastery XP to level 1
+        this.manager.setMasteryXP(item, this.manager.getMasteryXPForLevel(1));
+        
+        // Apply new tier's stats/effects
+        item.applyArtifactTier(nextTier);
+        
+        // Update render
+        item.renderQueue.updateAll();
+        if(item.currentSlot !== undefined) {
+            item.currentSlot.renderQueue.updateAll();
+            // Recalculate character stats
+            if(item.currentSlot.equipment.character) {
+                item.currentSlot.equipment.character.invalidateStats();
+                item.currentSlot.equipment.character.calculateStats();
+            }
+        }
+        
+        this.renderQueue.details = true;
+        
+        // Log the prestige
+        this.manager.log.add(`${item.name} has been unlocked!`, 'legendary', item.media);
+        
+        return true;
+    }
+    
+    /**
+     * Get the artifact tier for an item
+     */
+    getArtifactTier(item) {
+        if(!item.isArtifact) return 0;
+        return this.artifactTiers.get(item) || 0;
+    }
 
     updateSelectHighlight() {
         this.manager.baseItems.forEach(item => {
@@ -498,6 +625,15 @@ export class AdventuringArmory extends AdventuringPage {
             writer.writeNamespacedObject(key);
             writer.writeBoolean(value);
         });
+        writer.writeComplexMap(this.droppedItems, (key, value, writer) => {
+            writer.writeNamespacedObject(key);
+            writer.writeBoolean(value);
+        });
+        // Artifact prestige tiers
+        writer.writeComplexMap(this.artifactTiers, (key, value, writer) => {
+            writer.writeNamespacedObject(key);
+            writer.writeUint8(value);
+        });
 
         return writer;
     }
@@ -527,5 +663,27 @@ export class AdventuringArmory extends AdventuringPage {
             if(typeof key !== "string" && key.id !== "adventuring:none")
                 this.masterfulItems.set(key, value);
         });
+        reader.getComplexMap((reader) => {
+            let key = reader.getNamespacedObject(this.manager.baseItems);
+            let value = reader.getBoolean();
+            if(typeof key !== "string" && key.id !== "adventuring:none")
+                this.droppedItems.set(key, value);
+        });
+        // Artifact prestige tiers (added in save version with artifacts)
+        // Try-catch for backwards compatibility with saves before this feature
+        try {
+            reader.getComplexMap((reader) => {
+                let key = reader.getNamespacedObject(this.manager.baseItems);
+                let value = reader.getUint8();
+                if(typeof key !== "string" && key.id !== "adventuring:none" && key.isArtifact) {
+                    this.artifactTiers.set(key, value);
+                    // Apply the loaded tier
+                    key.applyArtifactTier(value);
+                }
+            });
+        } catch(e) {
+            // Old save without artifact tiers - initialize to 0
+            console.log('[Adventuring] No artifact tier data in save, using defaults');
+        }
     }
 }

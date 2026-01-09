@@ -2,309 +2,562 @@
     "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
     "namespace": "adventuring",
     "data": {
-        "skillData": [{
-            "skillID": "adventuring:Adventuring",
-            "data": {
-                "passives": [
-                    {
-                        "id": "troll_regeneration",
-                        "name": "Troll Regeneration",
-                        "effects": [
-                            {
-                                "trigger": "round_start",
-                                "type": "heal_flat",
-                                "target": "self",
-                                "amount": { "base": 5, "scaling": [] },
-                                "stacks": { "base": 1, "scaling": [] }
-                            }
-                        ]
-                    }
-                ],
-                "areas": [
-                    {
-                        "id": "cave_of_trolls",
-                        "name": "Cave of Trolls",
-                        "media": "melvor:assets/media/monsters/ice_troll.png",
-                        "requirements": [
-                            { "type": "skill_level", "level": 38 }
-                        ],
-                        "height": 8,
-                        "width": 6,
-                        "floors": [
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:cave_troll", "weight": 100 }
-                                ],
-                                "exit": ["adventuring:cave_troll", "adventuring:cave_troll", "adventuring:cave_troll"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:cave_troll", "weight": 60 },
-                                    { "id": "adventuring:mountain_troll", "weight": 40 }
-                                ],
-                                "exit": ["adventuring:cave_troll", "adventuring:cave_troll", "adventuring:mountain_troll"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:cave_troll", "weight": 30 },
-                                    { "id": "adventuring:mountain_troll", "weight": 70 }
-                                ],
-                                "exit": ["adventuring:cave_troll", "adventuring:mountain_troll", "adventuring:mountain_troll"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:mountain_troll", "weight": 60 },
-                                    { "id": "adventuring:ancient_troll", "weight": 40 }
-                                ],
-                                "exit": ["adventuring:mountain_troll", "adventuring:mountain_troll", "adventuring:ancient_troll"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:mountain_troll", "weight": 30 },
-                                    { "id": "adventuring:ancient_troll", "weight": 70 }
-                                ],
-                                "exit": ["adventuring:mountain_troll", "adventuring:ancient_troll", "adventuring:ancient_troll"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:ancient_troll", "weight": 100 }
-                                ],
-                                "exit": ["adventuring:ancient_troll", "adventuring:ancient_troll", "adventuring:ancient_troll"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:ancient_troll", "weight": 100 }
-                                ],
-                                "exit": ["adventuring:ancient_troll", "adventuring:ancient_troll", "adventuring:frost_troll"]
-                            }
-                        ]
-                    }
-                ],
-                "monsters": [
-                    {
-                        "id": "cave_troll",
-                        "name": "Cave Troll",
-                        "media": "melvor:assets/media/monsters/ice_troll.png",
-                        "tags": ["troll", "beast"],
-                        "xp": 40,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "amount": 38 },
-                            { "id": "adventuring:defence", "amount": 22 },
-                            { "id": "adventuring:agility", "amount": 16 },
-                            { "id": "adventuring:strength", "amount": 30 },
-                            { "id": "adventuring:ranged", "amount": 12 },
-                            { "id": "adventuring:magic", "amount": 14 },
-                            { "id": "adventuring:prayer", "amount": 16 }
-                        ],
-                        "generator": "adventuring:troll_club",
-                        "spender": "adventuring:ground_slam",
-                        "passives": ["adventuring:troll_regeneration"],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 32, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 10, "weight": 35 },
-                            { "id": "adventuring:troll_hide", "qty": 1, "weight": 25 }
-                        ]
-                    },
-                    {
-                        "id": "mountain_troll",
-                        "name": "Mountain Troll",
-                        "media": "melvor:assets/media/monsters/ice_troll.png",
-                        "tags": ["troll", "beast"],
-                        "xp": 48,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "amount": 45 },
-                            { "id": "adventuring:defence", "amount": 26 },
-                            { "id": "adventuring:agility", "amount": 18 },
-                            { "id": "adventuring:strength", "amount": 35 },
-                            { "id": "adventuring:ranged", "amount": 14 },
-                            { "id": "adventuring:magic", "amount": 17 },
-                            { "id": "adventuring:prayer", "amount": 18 }
-                        ],
-                        "generator": "adventuring:troll_club",
-                        "spender": "adventuring:boulder_throw",
-                        "passives": ["adventuring:troll_regeneration"],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 40, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 12, "weight": 40 },
-                            { "id": "adventuring:troll_hide", "qty": 1, "weight": 30 }
-                        ]
-                    },
-                    {
-                        "id": "ancient_troll",
-                        "name": "Ancient Troll",
-                        "media": "melvor:assets/media/monsters/ice_troll.png",
-                        "tags": ["troll", "beast"],
-                        "xp": 56,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "amount": 55 },
-                            { "id": "adventuring:defence", "amount": 30 },
-                            { "id": "adventuring:agility", "amount": 20 },
-                            { "id": "adventuring:strength", "amount": 40 },
-                            { "id": "adventuring:ranged", "amount": 16 },
-                            { "id": "adventuring:magic", "amount": 20 },
-                            { "id": "adventuring:prayer", "amount": 22 }
-                        ],
-                        "generator": "adventuring:troll_club",
-                        "spender": "adventuring:boulder_throw",
-                        "passives": ["adventuring:troll_regeneration"],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 48, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 14, "weight": 45 },
-                            { "id": "adventuring:troll_hide", "qty": 2, "weight": 35 }
-                        ]
-                    },
-                    {
-                        "id": "frost_troll",
-                        "name": "Frost Troll",
-                        "media": "melvor:assets/media/monsters/ice_troll.png",
-                        "tags": ["troll", "beast", "boss"],
-                        "isBoss": true,
-                        "xp": 120,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "amount": 100 },
-                            { "id": "adventuring:defence", "amount": 40 },
-                            { "id": "adventuring:agility", "amount": 24 },
-                            { "id": "adventuring:strength", "amount": 52 },
-                            { "id": "adventuring:ranged", "amount": 22 },
-                            { "id": "adventuring:magic", "amount": 28 },
-                            { "id": "adventuring:prayer", "amount": 28 }
-                        ],
-                        "generator": "adventuring:frost_slam",
-                        "spender": "adventuring:boulder_barrage",
-                        "passives": ["adventuring:troll_regeneration"],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 110, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 25, "weight": 55 },
-                            { "id": "adventuring:big_parts", "qty": 8, "weight": 40 },
-                            { "id": "adventuring:troll_hide", "qty": 4, "weight": 50 }
-                        ]
-                    }
-                ],
-                "generators": [
-                    {
-                        "id": "troll_club",
-                        "name": "Troll Club",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "energy": 55,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 12,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "amount": 1.0 }
-                                            ]
-                                        }
+        "skillData": [
+            {
+                "skillID": "adventuring:Adventuring",
+                "data": {
+                    "passives": [
+                        {
+                            "id": "troll_regeneration",
+                            "name": "Troll Regeneration",
+                            "effects": [
+                                {
+                                    "trigger": "round_start",
+                                    "type": "heal_flat",
+                                    "target": "self",
+                                    "amount": {
+                                        "base": 5,
+                                        "scaling": []
+                                    },
+                                    "stacks": {
+                                        "base": 1,
+                                        "scaling": []
                                     }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "frost_slam",
-                        "name": "Frost Slam",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "energy": 60,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 10,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "amount": 0.8 }
-                                            ]
+                                }
+                            ]
+                        }
+                    ],
+                    "areas": [
+                        {
+                            "id": "cave_of_trolls",
+                            "name": "Cave of Trolls",
+                            "media": "melvor:assets/media/monsters/ice_troll.png",
+                            "requirements": [
+                                {
+                                    "type": "skill_level",
+                                    "level": 38
+                                }
+                            ],
+                            "height": 8,
+                            "width": 6,
+                            "floors": [
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:cave_troll",
+                                            "weight": 100
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ],
-                "spenders": [
-                    {
-                        "id": "ground_slam",
-                        "name": "Ground Slam",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 100,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 25,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "amount": 1.5 }
-                                            ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:cave_troll",
+                                        "adventuring:cave_troll",
+                                        "adventuring:cave_troll"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:cave_troll",
+                                            "weight": 60
+                                        },
+                                        {
+                                            "id": "adventuring:mountain_troll",
+                                            "weight": 40
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "boulder_throw",
-                        "name": "Boulder Throw",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 100,
-                        "hits": [
-                            {
-                                "target": "random",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 30,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "amount": 1.8 }
-                                            ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:cave_troll",
+                                        "adventuring:cave_troll",
+                                        "adventuring:mountain_troll"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:cave_troll",
+                                            "weight": 30
+                                        },
+                                        {
+                                            "id": "adventuring:mountain_troll",
+                                            "weight": 70
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "boulder_barrage",
-                        "name": "Boulder Barrage",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 100,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 28,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "amount": 1.6 }
-                                            ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:cave_troll",
+                                        "adventuring:mountain_troll",
+                                        "adventuring:mountain_troll"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:mountain_troll",
+                                            "weight": 60
+                                        },
+                                        {
+                                            "id": "adventuring:ancient_troll",
+                                            "weight": 40
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:mountain_troll",
+                                        "adventuring:mountain_troll",
+                                        "adventuring:ancient_troll"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:mountain_troll",
+                                            "weight": 30
+                                        },
+                                        {
+                                            "id": "adventuring:ancient_troll",
+                                            "weight": 70
+                                        }
+                                    ],
+                                    "exit": [
+                                        "adventuring:mountain_troll",
+                                        "adventuring:ancient_troll",
+                                        "adventuring:ancient_troll"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:ancient_troll",
+                                            "weight": 100
+                                        }
+                                    ],
+                                    "exit": [
+                                        "adventuring:ancient_troll",
+                                        "adventuring:ancient_troll",
+                                        "adventuring:ancient_troll"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:ancient_troll",
+                                            "weight": 100
+                                        }
+                                    ],
+                                    "exit": [
+                                        "adventuring:ancient_troll",
+                                        "adventuring:ancient_troll",
+                                        "adventuring:frost_troll"
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "monsters": [
+                        {
+                            "id": "cave_troll",
+                            "name": "Cave Troll",
+                            "media": "melvor:assets/media/monsters/ice_troll.png",
+                            "tags": [
+                                "troll",
+                                "beast"
+                            ],
+                            "xp": 40,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "amount": 38
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "amount": 22
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "amount": 16
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "amount": 30
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "amount": 12
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "amount": 14
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "amount": 16
+                                }
+                            ],
+                            "generator": "adventuring:troll_club",
+                            "spender": "adventuring:ground_slam",
+                            "passives": [
+                                "adventuring:troll_regeneration"
+                            ],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 32,
+                                    "type": "currency"
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 10,
+                                    "type": "salvage"
+                                },
+                                {
+                                    "id": "adventuring:troll_hide",
+                                    "qty": 1,
+                                    "type": "materials",
+                                    "chance": 0.25
+                                }
+                            ]
+                        },
+                        {
+                            "id": "mountain_troll",
+                            "name": "Mountain Troll",
+                            "media": "melvor:assets/media/monsters/ice_troll.png",
+                            "tags": [
+                                "troll",
+                                "beast"
+                            ],
+                            "xp": 48,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "amount": 45
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "amount": 26
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "amount": 18
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "amount": 35
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "amount": 14
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "amount": 17
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "amount": 18
+                                }
+                            ],
+                            "generator": "adventuring:troll_club",
+                            "spender": "adventuring:boulder_throw",
+                            "passives": [
+                                "adventuring:troll_regeneration"
+                            ],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 40,
+                                    "type": "currency"
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 12,
+                                    "type": "salvage"
+                                },
+                                {
+                                    "id": "adventuring:troll_hide",
+                                    "qty": 1,
+                                    "type": "materials",
+                                    "chance": 0.3
+                                }
+                            ]
+                        },
+                        {
+                            "id": "ancient_troll",
+                            "name": "Ancient Troll",
+                            "media": "melvor:assets/media/monsters/ice_troll.png",
+                            "tags": [
+                                "troll",
+                                "beast"
+                            ],
+                            "xp": 56,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "amount": 55
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "amount": 30
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "amount": 20
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "amount": 40
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "amount": 16
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "amount": 20
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "amount": 22
+                                }
+                            ],
+                            "generator": "adventuring:troll_club",
+                            "spender": "adventuring:boulder_throw",
+                            "passives": [
+                                "adventuring:troll_regeneration"
+                            ],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 48,
+                                    "type": "currency"
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 14,
+                                    "type": "salvage"
+                                },
+                                {
+                                    "id": "adventuring:troll_hide",
+                                    "qty": 2,
+                                    "type": "materials",
+                                    "chance": 0.35
+                                }
+                            ]
+                        },
+                        {
+                            "id": "frost_troll",
+                            "name": "Frost Troll",
+                            "media": "melvor:assets/media/monsters/ice_troll.png",
+                            "tags": [
+                                "troll",
+                                "beast",
+                                "boss"
+                            ],
+                            "isBoss": true,
+                            "xp": 120,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "amount": 100
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "amount": 40
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "amount": 24
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "amount": 52
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "amount": 22
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "amount": 28
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "amount": 28
+                                }
+                            ],
+                            "generator": "adventuring:frost_slam",
+                            "spender": "adventuring:boulder_barrage",
+                            "passives": [
+                                "adventuring:troll_regeneration"
+                            ],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 110,
+                                    "type": "currency"
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 25,
+                                    "type": "salvage"
+                                },
+                                {
+                                    "type": "salvage",
+                                    "id": "adventuring:pristine_salvage",
+                                    "qty": 2
+                                },
+                                {
+                                    "id": "adventuring:big_parts",
+                                    "qty": 8,
+                                    "type": "salvage"
+                                },
+                                {
+                                    "id": "adventuring:troll_hide",
+                                    "qty": 4,
+                                    "type": "materials",
+                                    "chance": 0.5
+                                }
+                            ]
+                        }
+                    ],
+                    "generators": [
+                        {
+                            "id": "troll_club",
+                            "name": "Troll Club",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "energy": 55,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 12,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "amount": 1
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "frost_slam",
+                            "name": "Frost Slam",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "energy": 60,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 10,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "amount": 0.8
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "spenders": [
+                        {
+                            "id": "ground_slam",
+                            "name": "Ground Slam",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 100,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 25,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "amount": 1.5
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "boulder_throw",
+                            "name": "Boulder Throw",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 100,
+                            "hits": [
+                                {
+                                    "target": "random",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 30,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "amount": 1.8
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "boulder_barrage",
+                            "name": "Boulder Barrage",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 100,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 28,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "amount": 1.6
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
             }
-        }]
+        ]
     }
 }

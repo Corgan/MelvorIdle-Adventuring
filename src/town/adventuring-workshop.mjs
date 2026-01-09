@@ -4,10 +4,12 @@ const { AdventuringPage } = await loadModule('src/ui/adventuring-page.mjs');
 const { AdventuringWorkOrder } = await loadModule('src/town/adventuring-work-order.mjs');
 const { formatRequirements } = await loadModule('src/core/adventuring-utils.mjs');
 
-const { AdventuringWorkshopElement } = await loadModule('src/town/components/adventuring-workshop.mjs');
-const { AdventuringStoredItemElement } = await loadModule('src/items/components/adventuring-stored-item.mjs');
+// Side-effect imports to register custom elements
+await loadModule('src/town/components/adventuring-workshop.mjs');
+await loadModule('src/items/components/adventuring-stored-item.mjs');
+await loadModule('src/town/components/adventuring-workshop-product.mjs');
+
 const { AdventuringRequirementElement } = await loadModule('src/ui/components/adventuring-requirement.mjs');
-const { AdventuringWorkshopProductElement } = await loadModule('src/town/components/adventuring-workshop-product.mjs');
 
 class AdventuringWorkshopRenderQueue {
     constructor() {
@@ -259,7 +261,9 @@ export class AdventuringWorkshop extends AdventuringPage {
      */
     updateRequirementsDisplay() {
         const tier = this.selectedTier;
-        const requirements = this.selectedProduct?.getRequirements(tier) || [];
+        const requirements = (this.selectedProduct && typeof this.selectedProduct.getRequirements === 'function') 
+            ? this.selectedProduct.getRequirements(tier) 
+            : [];
         
         if(!this.selectedProduct || requirements.length === 0) {
             this.component.requirementsDisplay.classList.add('d-none');

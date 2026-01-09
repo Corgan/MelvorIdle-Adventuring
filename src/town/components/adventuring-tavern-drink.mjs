@@ -57,7 +57,9 @@ export class AdventuringTavernDrinkElement extends AdventuringTooltipElement {
      * Remove from DOM
      */
     remove() {
-        this.parentElement?.removeChild(this);
+        if (this.parentElement) {
+            this.parentElement.removeChild(this);
+        }
     }
 
     /**

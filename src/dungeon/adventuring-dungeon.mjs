@@ -59,8 +59,8 @@ export class AdventuringDungeon extends AdventuringPage {
             const scaling = this.waveScaling;
             if(!scaling) return [];
             
-            const statPercent = (scaling.statPercentPerWave ?? 5) * this.endlessWave;
-            const rewardPercent = (scaling.rewardPercentPerWave ?? 2) * this.endlessWave;
+            const statPercent = ((scaling.statPercentPerWave !== undefined) ? scaling.statPercentPerWave : 5) * this.endlessWave;
+            const rewardPercent = ((scaling.rewardPercentPerWave !== undefined) ? scaling.rewardPercentPerWave : 2) * this.endlessWave;
             const source = `Endless Wave ${this.endlessWave + 1}`;
             
             return [
@@ -234,7 +234,7 @@ export class AdventuringDungeon extends AdventuringPage {
         }
         this.floor.step();
         this.exploreTimer.start(this.getEffectiveExploreInterval());
-        this.manager.overview.renderQueue.turnProgressBar = true;
+        this.manager.emit('dungeon:explored', {});
     }
 
     triggerTile(tile) {
@@ -464,14 +464,12 @@ export class AdventuringDungeon extends AdventuringPage {
         
         // Use centralized trigger system for dungeon_start
         this.manager.triggerEffects('dungeon_start', {});
+        
+        // Emit dungeon started event
+        this.manager.emit('dungeon:started', { area: this.area, isEndless: this.isEndless });
 
-        this.manager.overview.renderQueue.status = true;
-        this.manager.overview.renderQueue.buffs = true;
         this.next();
         this.manager.start();
-
-        // Trigger tutorial for first dungeon
-        this.manager.tutorialManager.checkTriggers('event', { event: 'dungeonStart' });
     }
     
     /**
@@ -502,9 +500,8 @@ export class AdventuringDungeon extends AdventuringPage {
         // Invalidate effect cache on reset
         this.effectCache.invalidateAll();
         
-        this.manager.overview.renderQueue.turnProgressBar = true;
-        this.manager.overview.renderQueue.status = true;
-        this.manager.overview.renderQueue.buttons = true;
+        // Emit dungeon reset event for UI updates
+        this.manager.emit('dungeon:reset', {});
 
         this.groupGenerator.reset();
         this.floor.reset();
@@ -521,12 +518,11 @@ export class AdventuringDungeon extends AdventuringPage {
         if(this.area !== undefined)
             this.manager.log.add(`Abandoned ${this.area.name} on floor ${this.progress+1}`);
 
-        // Consume charges from equipped consumables and tavern drinks
-        this.manager.consumables.onDungeonEnd();
+        // Emit dungeon ended event (abandoned)
+        this.manager.emit('dungeon:ended', { area: this.area, abandoned: true, completed: false });
 
         this.reset();
         this.manager.stop();
-        this.manager.overview.renderQueue.buffs = true;
 
         if(this.active)
             this.manager.town.go();
@@ -543,23 +539,17 @@ export class AdventuringDungeon extends AdventuringPage {
             this.area.addXP(areaXP);
         }
 
-        // Track dungeon clear for Slayer tasks
-        this.manager.slayers.onDungeonCleared(this.area);
-
-        // Track dungeon clear for Achievements
-        if(this.manager.achievementManager) {
-            const difficulty = this.difficulty ? this.difficulty.id.replace('adventuring:', '') : 'normal';
-            this.manager.achievementManager.recordDungeonClear(
-                this.area, 
-                difficulty, 
-                this.isEndless, 
-                this.endlessWave
-            );
-        }
+        // Emit dungeon cleared event for cross-cutting concerns
+        const difficulty = this.difficulty ? this.difficulty.id.replace('adventuring:', '') : 'normal';
+        this.manager.emit('dungeon:cleared', { 
+            area: this.area, 
+            difficulty,
+            isEndless: this.isEndless, 
+            endlessWave: this.endlessWave 
+        });
 
         // Consume charges from equipped consumables
-        this.manager.consumables.onDungeonEnd();
-        this.manager.overview.renderQueue.buffs = true;
+        this.manager.emit('dungeon:ended', { area: this.area, abandoned: false, completed: true });
 
         if(!this.manager.party.all.every(hero => hero.dead)) {
             // Handle endless mode - continue to next wave

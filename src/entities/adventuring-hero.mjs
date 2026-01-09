@@ -76,6 +76,9 @@ export class AdventuringHero extends AdventuringCharacter {
 
         this.locked = false;
         this.equipment = new AdventuringEquipment(this.manager, this.game, this);
+        
+        // Dirty flag for stat calculation optimization
+        this._statsDirty = true;
 
         this.component.equipment.classList.remove('d-none');
         this.equipment.component.mount(this.component.equipment);
@@ -210,8 +213,24 @@ export class AdventuringHero extends AdventuringCharacter {
         // Recalculate stats after equipping
         this.calculateStats();
     }
+    
+    /**
+     * Mark stats as needing recalculation.
+     * Call this when equipment, jobs, or other stat sources change.
+     */
+    invalidateStats() {
+        this._statsDirty = true;
+    }
 
-    calculateStats() {
+    /**
+     * Recalculate all stats from base + equipment + jobs.
+     * Skips recalculation if stats are not dirty (optimization).
+     * @param {boolean} [force=false] - Force recalculation even if not dirty
+     */
+    calculateStats(force = false) {
+        if (!force && !this._statsDirty) return;
+        this._statsDirty = false;
+        
         let shouldAdjust = true;
         if(this.manager.isActive || this.hitpoints > this.maxHitpoints) // Loading Shenanigans
             shouldAdjust = false;
@@ -232,9 +251,9 @@ export class AdventuringHero extends AdventuringCharacter {
         
         // Aggregate all stat sources
         StatCalculator.aggregate(this.stats,
-            this.combatJob?.stats,
-            this.passiveJob?.stats,
-            this.equipment?.stats
+            this.combatJob ? this.combatJob.stats : null,
+            this.passiveJob ? this.passiveJob.stats : null,
+            this.equipment ? this.equipment.stats : null
         );
 
         // Tavern drink bonuses are now applied in getEffectiveStat()
@@ -509,6 +528,7 @@ export class AdventuringHero extends AdventuringCharacter {
      * Recalculates stats, validates abilities, and queues renders
      */
     _onJobChange() {
+        this.invalidateStats();
         this.calculateStats();
 
         if(!this.generator.canEquip(this))
@@ -524,7 +544,7 @@ export class AdventuringHero extends AdventuringCharacter {
 
         this.equipment.slots.forEach(slot => slot.renderQueue.valid = true);
 
-        this.manager.party.all.forEach(member => member.renderQueue.jobs = true);
+        this.manager.party.forEach(member => member.renderQueue.jobs = true);
     }
 
     setCombatJob(combatJob) {

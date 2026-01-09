@@ -137,49 +137,34 @@ export async function setup({ gameData, patch, loadTemplates, loadModule, loadSt
     await load('data/items/materials.json');
 
     // Items - Tier 1
-    await load('data/items/tier1_armor.json');
-    await load('data/items/tier1_weapons.json');
-    await load('data/items/tier1_accessories.json');
+    await load('data/items/tier1.json');
     
     // Items - Tier 2
-    await load('data/items/tier2_armor.json');
-    await load('data/items/tier2_weapons.json');
-    await load('data/items/tier2_themed.json');
+    await load('data/items/tier2.json');
     
     // Items - Tier 3
-    await load('data/items/tier3_armor.json');
-    await load('data/items/tier3_weapons.json');
-    await load('data/items/tier3_themed.json');
+    await load('data/items/tier3.json');
     
     // Items - Tier 4
-    await load('data/items/tier4_armor.json');
-    await load('data/items/tier4_weapons.json');
-    await load('data/items/tier4_themed.json');
+    await load('data/items/tier4.json');
     
     // Items - Tier 5
-    await load('data/items/tier5_armor.json');
-    await load('data/items/tier5_weapons.json');
-    await load('data/items/tier5_themed.json');
+    await load('data/items/tier5.json');
 
-    // Items - Tier 6+
-    await load('data/items/tier6_armor.json');
-    await load('data/items/tier6_weapons.json');
+    // Items - Tier 6
+    await load('data/items/tier6.json');
 
-    // Items - Uniques
+    // Items - Higher Tier Uniques
+    await load('data/items/tier7.json');
+    await load('data/items/tier8.json');
+    await load('data/items/tier9.json');
+
+    // Items - Uniques and Accessories
     await load('data/items/uniques.json');
-    await load('data/items/tier7_uniques.json');
-    await load('data/items/tier8_uniques.json');
-    await load('data/items/tier9_uniques.json');
-
-    // Items - Accessories and Offhands
     await load('data/items/artifacts.json');
-    await load('data/items/unique_accessories.json');
-    await load('data/items/unique_offhands.json');
-    await load('data/items/tiered_offhands.json');
 
     // Items - Boss Material Items
-    await load('data/items/boss_material_armor.json');
-    await load('data/items/boss_material_weapons.json');
+    await load('data/items/tier_boss.json');
     
     await load('data/areas/chicken_coop.json');
     await load('data/areas/farmlands.json');

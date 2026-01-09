@@ -89,8 +89,8 @@ export class AdventuringEncounter extends AdventuringPage {
         // Apply bonus starting energy from mastery pool
         const bonusEnergy = this.manager.modifiers.getBonusEnergy();
         if(bonusEnergy > 0) {
-            this.manager.party.all.forEach(member => {
-                if(!member.dead && member.maxEnergy > 0) {
+            this.manager.party.forEachLiving(member => {
+                if(member.maxEnergy > 0) {
                     member.addEnergy(bonusEnergy);
                 }
             });
@@ -118,8 +118,8 @@ export class AdventuringEncounter extends AdventuringPage {
             let resolvedEffects = member.trigger('encounter_start', { encounter: this });
         });
 
-        // Trigger tutorial for first combat
-        this.manager.tutorialManager.checkTriggers('event', { event: 'combatStart' });
+        // Emit combat started event
+        this.manager.emit('combat:started', { encounter: this });
 
         // Also trigger round_start for the first round
         this.all.forEach(member => {
@@ -145,7 +145,7 @@ export class AdventuringEncounter extends AdventuringPage {
         this.isFighting = false;
         this.turnTimer.stop();
         this.hitTimer.stop();
-        this.manager.overview.renderQueue.turnProgressBar = true;
+        this.manager.emit('encounter:timer-changed', {});
         this.updateTurnCards();
     }
 
@@ -162,7 +162,7 @@ export class AdventuringEncounter extends AdventuringPage {
         this.currentRoundOrder = this.nextRoundOrder;
         this.nextRoundOrder = [];
         this.roundCounter++;
-        this.manager.overview.renderQueue.status = true;
+        this.manager.emit('encounter:status-changed', { round: this.roundCounter });
         
         // Reset round-based effect limits (characters and party)
         this.all.forEach(member => {
@@ -193,8 +193,8 @@ export class AdventuringEncounter extends AdventuringPage {
         
         this.turnTimer.start(this.turnInterval);
         
-        this.manager.overview.renderQueue.turnProgressBar = true;
-        this.manager.overview.renderQueue.status = true;
+        this.manager.emit('encounter:timer-changed', {});
+        this.manager.emit('encounter:status-changed', { turn: this.currentTurn });
         this.updateTurnCards();
     }
 
@@ -321,7 +321,7 @@ export class AdventuringEncounter extends AdventuringPage {
         let currentHit = this.currentAction.hits[this.currentHit]; 
         if(currentHit !== undefined) {
             this.hitTimer.start(currentHit.delay !== undefined ? currentHit.delay : this.hitInterval);
-            this.manager.overview.renderQueue.turnProgressBar = true;
+            this.manager.emit('encounter:timer-changed', {});
             this.updateTurnCards();
         } else {
             this.processHit();
@@ -336,7 +336,7 @@ export class AdventuringEncounter extends AdventuringPage {
         
         let currentHit = this.currentAction.hits[this.currentHit];
 
-        let effectParty = currentHit.party ?? "enemy"; // Default to enemy if not specified
+        let effectParty = (currentHit.party !== undefined) ? currentHit.party : "enemy"; // Default to enemy if not specified
         let targetType = currentHit.target;
 
         let targetParty;
@@ -462,7 +462,7 @@ export class AdventuringEncounter extends AdventuringPage {
         } else {
             this.hitTimer.start(endTurnDelay);
         }
-        this.manager.overview.renderQueue.turnProgressBar = true;
+        this.manager.emit('encounter:timer-changed', {});
     }
 
     endTurn() {
@@ -556,30 +556,26 @@ export class AdventuringEncounter extends AdventuringPage {
             let resolvedEffects = member.trigger('encounter_end');
         });
 
-        // Track monster kills for Slayer tasks and Monster Mastery
+        // Emit monster kill events for cross-cutting concerns
         this.party.all.forEach(enemy => {
             if(enemy.dead && enemy.base) {
-                this.manager.slayers.onMonsterKilled(enemy.base);
-                this.manager.bestiary.registerKill(enemy.base);
+                this.manager.emit('combat:monster-killed', { monster: enemy.base, enemy });
             }
         });
 
-        // Track combat achievements
-        if(this.manager.achievementManager) {
-            const heroes = this.manager.party.all;
-            const aliveHeroes = heroes.filter(h => !h.dead);
-            const flawless = heroes.every(h => !h.dead && h.hitpoints >= h.maxHitpoints);
-            const lastStand = aliveHeroes.length === 1;
-            
-            // Record combat end stats (damage/healing tracked elsewhere)
-            this.manager.achievementManager.recordCombatEnd(
-                flawless,
-                this.round,
-                lastStand,
-                0, // Total damage - would need more tracking
-                0  // Total healing - would need more tracking
-            );
-        }
+        // Emit combat ended event with stats
+        const heroes = this.manager.party.all;
+        const aliveHeroes = heroes.filter(h => !h.dead);
+        const flawless = heroes.every(h => !h.dead && h.hitpoints >= h.maxHitpoints);
+        const lastStand = aliveHeroes.length === 1;
+        
+        this.manager.emit('combat:ended', {
+            flawless,
+            rounds: this.round,
+            lastStand,
+            heroes,
+            aliveHeroes
+        });
 
         this.reset();
 
@@ -594,7 +590,7 @@ export class AdventuringEncounter extends AdventuringPage {
             floor.complete();
         }
         this.manager.dungeon.updateFloorCards();
-        this.manager.overview.renderQueue.status = true;
+        this.manager.emit('encounter:status-changed', { ended: true });
     }
 
     updateTurnCards() {
@@ -683,8 +679,6 @@ export class AdventuringEncounter extends AdventuringPage {
         // Also add to old learnedAbilities Set for backward compatibility
         if(learned) {
             this.manager.learnedAbilities.add(learned.id);
-            // Check achievements for learned ability count requirements
-            this.manager.achievementManager.checkAchievements();
         }
     }
 

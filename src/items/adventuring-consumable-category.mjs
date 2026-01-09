@@ -15,7 +15,7 @@ export class AdventuringConsumableCategory extends NamespacedObject {
         this.description = data.description || '';
         
         // Display order for sorting in UI
-        this.order = data.order ?? 0;
+        this.order = (data.order !== undefined) ? data.order : 0;
     }
 
     get name() {

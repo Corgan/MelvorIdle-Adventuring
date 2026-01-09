@@ -74,15 +74,15 @@ export class AdventuringArea extends AdventuringMasteryAction {
         this.bestEndlessStreak = 0;
 
         // Gauntlet mode properties
-        this.isGauntlet = data.isGauntlet ?? false;
-        this.gauntletTier = data.gauntletTier ?? 0;
-        this.gauntletRewardMultiplier = data.gauntletRewardMultiplier ?? 1.0;
+        this.isGauntlet = (data.isGauntlet !== undefined) ? data.isGauntlet : false;
+        this.gauntletTier = (data.gauntletTier !== undefined) ? data.gauntletTier : 0;
+        this.gauntletRewardMultiplier = (data.gauntletRewardMultiplier !== undefined) ? data.gauntletRewardMultiplier : 1.0;
         
         // Area description (for UI display)
-        this.description = data.description ?? '';
+        this.description = (data.description !== undefined) ? data.description : '';
         
         // Area-specific passive effects
-        this._passives = data.passives ?? [];
+        this._passives = data.passives || [];
 
         // Mastery aura id (looked up during postDataRegistration)
         this._masteryAuraId = data.masteryAuraId;

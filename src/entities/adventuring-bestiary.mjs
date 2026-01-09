@@ -15,6 +15,9 @@ export class AdventuringBestiary extends AdventuringPage {
         this.killCounts = new Map();
 
         this.monsters = [];
+        
+        // Subscribe to combat events
+        this.manager.on('combat:monster-killed', ({ monster }) => this.registerKill(monster));
     }
 
     onLoad() {
@@ -91,14 +94,12 @@ export class AdventuringBestiary extends AdventuringPage {
 
         monster.renderQueue.updateAll();
 
-        // Track unique monster discovery for achievements
-        if(wasNew && this.manager.achievementManager) {
-            this.manager.achievementManager.recordUniqueMonster();
-        }
-
-        // Trigger bestiary tutorial on first monster discovery
-        if(wasEmpty) {
-            this.manager.tutorialManager.checkTriggers('event', { event: 'firstMonsterSeen' });
+        // Emit event for cross-cutting concerns
+        if(wasNew) {
+            this.manager.emit('bestiary:monster-seen', { 
+                monster, 
+                isFirstEver: wasEmpty 
+            });
         }
     }
 

@@ -2,444 +2,773 @@
     "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
     "namespace": "adventuring",
     "data": {
-        "skillData": [{
-            "skillID": "adventuring:Adventuring",
-            "data": {
-                "passives": [
-                    {
-                        "id": "heavenly_radiance",
-                        "name": "Heavenly Radiance",
-                        "effects": [
-                            {
-                                "trigger": "round_start",
-                                "type": "heal_flat",
-                                "target": "all", "party": "ally",
-                                "amount": { "base": 5, "scaling": [] },
-                                "stacks": { "base": 1, "scaling": [] }
-                            }
-                        ]
-                    }
-                ],
-                "areas": [
-                    {
-                        "id": "holy_grounds",
-                        "name": "Holy Grounds",
-                        "media": "melvor:assets/media/monsters/angel.png",
-                        "requirements": [
-                            { "type": "skill_level", "level": 72 }
-                        ],
-                        "height": 10,
-                        "width": 8,
-                        "floors": [
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:fairy", "weight": 100 }
-                                ],
-                                "exit": ["adventuring:fairy", "adventuring:fairy", "adventuring:fairy"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:fairy", "weight": 60 },
-                                    { "id": "adventuring:holy_archer", "weight": 40 }
-                                ],
-                                "exit": ["adventuring:fairy", "adventuring:fairy", "adventuring:holy_archer"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:fairy", "weight": 30 },
-                                    { "id": "adventuring:holy_archer", "weight": 50 },
-                                    { "id": "adventuring:valkyrie", "weight": 20 }
-                                ],
-                                "exit": ["adventuring:holy_archer", "adventuring:holy_archer", "adventuring:valkyrie"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:holy_archer", "weight": 40 },
-                                    { "id": "adventuring:valkyrie", "weight": 60 }
-                                ],
-                                "exit": ["adventuring:holy_archer", "adventuring:valkyrie", "adventuring:valkyrie"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:valkyrie", "weight": 60 },
-                                    { "id": "adventuring:angel", "weight": 40 }
-                                ],
-                                "exit": ["adventuring:valkyrie", "adventuring:valkyrie", "adventuring:angel"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:valkyrie", "weight": 40 },
-                                    { "id": "adventuring:angel", "weight": 60 }
-                                ],
-                                "exit": ["adventuring:valkyrie", "adventuring:angel", "adventuring:angel"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:angel", "weight": 100 }
-                                ],
-                                "exit": ["adventuring:angel", "adventuring:angel", "adventuring:angel"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:angel", "weight": 100 }
-                                ],
-                                "exit": ["adventuring:angel", "adventuring:angel", "adventuring:angel"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:angel", "weight": 100 }
-                                ],
-                                "exit": ["adventuring:angel", "adventuring:angel", "adventuring:seraph"]
-                            }
-                        ]
-                    }
-                ],
-                "monsters": [
-                    {
-                        "id": "fairy",
-                        "name": "Fairy",
-                        "media": "melvor:assets/media/monsters/fairy.png",
-                        "tags": ["holy", "flying", "mage"],
-                        "xp": 110,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "amount": 75 },
-                            { "id": "adventuring:defence", "amount": 42 },
-                            { "id": "adventuring:agility", "amount": 65 },
-                            { "id": "adventuring:strength", "amount": 35 },
-                            { "id": "adventuring:ranged", "amount": 45 },
-                            { "id": "adventuring:magic", "amount": 72 },
-                            { "id": "adventuring:prayer", "amount": 55 }
-                        ],
-                        "generator": "adventuring:fairy_dust",
-                        "spender": "adventuring:pixie_blast",
-                        "passives": [],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 68, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 20, "weight": 45 },
-                            { "id": "adventuring:holy_dust", "qty": 1, "weight": 25 }
-                        ]
-                    },
-                    {
-                        "id": "holy_archer",
-                        "name": "Holy Archer",
-                        "media": "melvor:assets/media/monsters/holy_archer.png",
-                        "tags": ["holy", "humanoid"],
-                        "xp": 125,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "amount": 85 },
-                            { "id": "adventuring:defence", "amount": 48 },
-                            { "id": "adventuring:agility", "amount": 58 },
-                            { "id": "adventuring:strength", "amount": 45 },
-                            { "id": "adventuring:ranged", "amount": 78 },
-                            { "id": "adventuring:magic", "amount": 50 },
-                            { "id": "adventuring:prayer", "amount": 60 }
-                        ],
-                        "generator": "adventuring:light_arrow",
-                        "spender": "adventuring:holy_volley",
-                        "passives": [],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 78, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 22, "weight": 48 },
-                            { "id": "adventuring:holy_dust", "qty": 1, "weight": 30 }
-                        ]
-                    },
-                    {
-                        "id": "valkyrie",
-                        "name": "Valkyrie",
-                        "media": "melvor:assets/media/monsters/valkyrie.png",
-                        "tags": ["holy", "humanoid", "flying"],
-                        "xp": 140,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "amount": 98 },
-                            { "id": "adventuring:defence", "amount": 58 },
-                            { "id": "adventuring:agility", "amount": 55 },
-                            { "id": "adventuring:strength", "amount": 68 },
-                            { "id": "adventuring:ranged", "amount": 52 },
-                            { "id": "adventuring:magic", "amount": 55 },
-                            { "id": "adventuring:prayer", "amount": 65 }
-                        ],
-                        "generator": "adventuring:divine_spear",
-                        "spender": "adventuring:valkyrie_strike",
-                        "passives": ["adventuring:heavenly_radiance"],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 88, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 24, "weight": 50 },
-                            { "id": "adventuring:holy_dust", "qty": 2, "weight": 35 }
-                        ]
-                    },
-                    {
-                        "id": "angel",
-                        "name": "Angel",
-                        "media": "melvor:assets/media/monsters/angel.png",
-                        "tags": ["holy", "mage", "flying"],
-                        "xp": 160,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "amount": 115 },
-                            { "id": "adventuring:defence", "amount": 62 },
-                            { "id": "adventuring:agility", "amount": 60 },
-                            { "id": "adventuring:strength", "amount": 55 },
-                            { "id": "adventuring:ranged", "amount": 58 },
-                            { "id": "adventuring:magic", "amount": 85 },
-                            { "id": "adventuring:prayer", "amount": 75 }
-                        ],
-                        "generator": "adventuring:holy_light",
-                        "spender": "adventuring:holy_wrath",
-                        "passives": ["adventuring:heavenly_radiance"],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 100, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 26, "weight": 52 },
-                            { "id": "adventuring:big_parts", "qty": 8, "weight": 38 },
-                            { "id": "adventuring:holy_dust", "qty": 2, "weight": 40 }
-                        ]
-                    },
-                    {
-                        "id": "seraph",
-                        "name": "Seraph",
-                        "media": "melvor:assets/media/monsters/angel.png",
-                        "tags": ["holy", "mage", "flying", "boss"],
-                        "isBoss": true,
-                        "xp": 350,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "amount": 280 },
-                            { "id": "adventuring:defence", "amount": 85 },
-                            { "id": "adventuring:agility", "amount": 70 },
-                            { "id": "adventuring:strength", "amount": 72 },
-                            { "id": "adventuring:ranged", "amount": 70 },
-                            { "id": "adventuring:magic", "amount": 115 },
-                            { "id": "adventuring:prayer", "amount": 95 }
-                        ],
-                        "generator": "adventuring:celestial_flash",
-                        "spender": "adventuring:holy_wrath",
-                        "passives": ["adventuring:heavenly_radiance"],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 200, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 40, "weight": 65 },
-                            { "id": "adventuring:big_parts", "qty": 18, "weight": 50 },
-                            { "id": "adventuring:holy_dust", "qty": 6, "weight": 60 }
-                        ]
-                    }
-                ],
-                "generators": [
-                    {
-                        "id": "fairy_dust",
-                        "name": "Fairy Dust",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "energy": 55,
-                        "hits": [
-                            {
-                                "target": "random",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 14,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "amount": 1.1 }
-                                            ]
-                                        }
+        "skillData": [
+            {
+                "skillID": "adventuring:Adventuring",
+                "data": {
+                    "passives": [
+                        {
+                            "id": "heavenly_radiance",
+                            "name": "Heavenly Radiance",
+                            "effects": [
+                                {
+                                    "trigger": "round_start",
+                                    "type": "heal_flat",
+                                    "target": "all",
+                                    "party": "ally",
+                                    "amount": {
+                                        "base": 5,
+                                        "scaling": []
+                                    },
+                                    "stacks": {
+                                        "base": 1,
+                                        "scaling": []
                                     }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "light_arrow",
-                        "name": "Light Arrow",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "energy": 55,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 16,
-                                            "scaling": [
-                                                { "id": "adventuring:ranged", "amount": 1.2 }
-                                            ]
+                                }
+                            ]
+                        }
+                    ],
+                    "areas": [
+                        {
+                            "id": "holy_grounds",
+                            "name": "Holy Grounds",
+                            "media": "melvor:assets/media/monsters/angel.png",
+                            "requirements": [
+                                {
+                                    "type": "skill_level",
+                                    "level": 72
+                                }
+                            ],
+                            "height": 10,
+                            "width": 8,
+                            "floors": [
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:fairy",
+                                            "weight": 100
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "divine_spear",
-                        "name": "Divine Spear",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "energy": 55,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 18,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "amount": 1.2 }
-                                            ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:fairy",
+                                        "adventuring:fairy",
+                                        "adventuring:fairy"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:fairy",
+                                            "weight": 60
+                                        },
+                                        {
+                                            "id": "adventuring:holy_archer",
+                                            "weight": 40
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "holy_light",
-                        "name": "Holy Light",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "energy": 60,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 20,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "amount": 1.4 }
-                                            ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:fairy",
+                                        "adventuring:fairy",
+                                        "adventuring:holy_archer"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:fairy",
+                                            "weight": 30
+                                        },
+                                        {
+                                            "id": "adventuring:holy_archer",
+                                            "weight": 50
+                                        },
+                                        {
+                                            "id": "adventuring:valkyrie",
+                                            "weight": 20
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "celestial_flash",
-                        "name": "Celestial Flash",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "energy": 65,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 18,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "amount": 1.2 }
-                                            ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:holy_archer",
+                                        "adventuring:holy_archer",
+                                        "adventuring:valkyrie"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:holy_archer",
+                                            "weight": 40
+                                        },
+                                        {
+                                            "id": "adventuring:valkyrie",
+                                            "weight": 60
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ],
-                "spenders": [
-                    {
-                        "id": "pixie_blast",
-                        "name": "Pixie Blast",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 100,
-                        "hits": [
-                            {
-                                "target": "random",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 28,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "amount": 1.6 }
-                                            ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:holy_archer",
+                                        "adventuring:valkyrie",
+                                        "adventuring:valkyrie"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:valkyrie",
+                                            "weight": 60
+                                        },
+                                        {
+                                            "id": "adventuring:angel",
+                                            "weight": 40
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "holy_volley",
-                        "name": "Holy Volley",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 100,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 22,
-                                            "scaling": [
-                                                { "id": "adventuring:ranged", "amount": 1.4 }
-                                            ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:valkyrie",
+                                        "adventuring:valkyrie",
+                                        "adventuring:angel"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:valkyrie",
+                                            "weight": 40
+                                        },
+                                        {
+                                            "id": "adventuring:angel",
+                                            "weight": 60
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "valkyrie_strike",
-                        "name": "Valkyrie Strike",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 100,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 35,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "amount": 1.8 }
-                                            ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:valkyrie",
+                                        "adventuring:angel",
+                                        "adventuring:angel"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:angel",
+                                            "weight": 100
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "holy_wrath",
-                        "name": "Holy Wrath",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 100,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 35,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "amount": 2.0 }
-                                            ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:angel",
+                                        "adventuring:angel",
+                                        "adventuring:angel"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:angel",
+                                            "weight": 100
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:angel",
+                                        "adventuring:angel",
+                                        "adventuring:angel"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:angel",
+                                            "weight": 100
+                                        }
+                                    ],
+                                    "exit": [
+                                        "adventuring:angel",
+                                        "adventuring:angel",
+                                        "adventuring:seraph"
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "monsters": [
+                        {
+                            "id": "fairy",
+                            "name": "Fairy",
+                            "media": "melvor:assets/media/monsters/fairy.png",
+                            "tags": [
+                                "holy",
+                                "flying",
+                                "mage"
+                            ],
+                            "xp": 110,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "amount": 75
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "amount": 42
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "amount": 65
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "amount": 35
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "amount": 45
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "amount": 72
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "amount": 55
+                                }
+                            ],
+                            "generator": "adventuring:fairy_dust",
+                            "spender": "adventuring:pixie_blast",
+                            "passives": [],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 68,
+                                    "type": "currency"
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 20,
+                                    "type": "salvage"
+                                },
+                                {
+                                    "id": "adventuring:holy_dust",
+                                    "qty": 1,
+                                    "type": "materials",
+                                    "chance": 0.25
+                                }
+                            ]
+                        },
+                        {
+                            "id": "holy_archer",
+                            "name": "Holy Archer",
+                            "media": "melvor:assets/media/monsters/holy_archer.png",
+                            "tags": [
+                                "holy",
+                                "humanoid"
+                            ],
+                            "xp": 125,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "amount": 85
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "amount": 48
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "amount": 58
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "amount": 45
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "amount": 78
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "amount": 50
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "amount": 60
+                                }
+                            ],
+                            "generator": "adventuring:light_arrow",
+                            "spender": "adventuring:holy_volley",
+                            "passives": [],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 78,
+                                    "type": "currency"
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 22,
+                                    "type": "salvage"
+                                },
+                                {
+                                    "id": "adventuring:holy_dust",
+                                    "qty": 1,
+                                    "type": "materials",
+                                    "chance": 0.3
+                                }
+                            ]
+                        },
+                        {
+                            "id": "valkyrie",
+                            "name": "Valkyrie",
+                            "media": "melvor:assets/media/monsters/valkyrie.png",
+                            "tags": [
+                                "holy",
+                                "humanoid",
+                                "flying"
+                            ],
+                            "xp": 140,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "amount": 98
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "amount": 58
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "amount": 55
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "amount": 68
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "amount": 52
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "amount": 55
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "amount": 65
+                                }
+                            ],
+                            "generator": "adventuring:divine_spear",
+                            "spender": "adventuring:valkyrie_strike",
+                            "passives": [
+                                "adventuring:heavenly_radiance"
+                            ],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 88,
+                                    "type": "currency"
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 24,
+                                    "type": "salvage"
+                                },
+                                {
+                                    "id": "adventuring:holy_dust",
+                                    "qty": 2,
+                                    "type": "materials",
+                                    "chance": 0.35
+                                }
+                            ]
+                        },
+                        {
+                            "id": "angel",
+                            "name": "Angel",
+                            "media": "melvor:assets/media/monsters/angel.png",
+                            "tags": [
+                                "holy",
+                                "mage",
+                                "flying"
+                            ],
+                            "xp": 160,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "amount": 115
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "amount": 62
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "amount": 60
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "amount": 55
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "amount": 58
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "amount": 85
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "amount": 75
+                                }
+                            ],
+                            "generator": "adventuring:holy_light",
+                            "spender": "adventuring:holy_wrath",
+                            "passives": [
+                                "adventuring:heavenly_radiance"
+                            ],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 100,
+                                    "type": "currency"
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 26,
+                                    "type": "salvage"
+                                },
+                                {
+                                    "id": "adventuring:big_parts",
+                                    "qty": 8,
+                                    "type": "salvage"
+                                },
+                                {
+                                    "id": "adventuring:holy_dust",
+                                    "qty": 2,
+                                    "type": "materials",
+                                    "chance": 0.4
+                                }
+                            ]
+                        },
+                        {
+                            "id": "seraph",
+                            "name": "Seraph",
+                            "media": "melvor:assets/media/monsters/angel.png",
+                            "tags": [
+                                "holy",
+                                "mage",
+                                "flying",
+                                "boss"
+                            ],
+                            "isBoss": true,
+                            "xp": 350,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "amount": 280
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "amount": 85
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "amount": 70
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "amount": 72
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "amount": 70
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "amount": 115
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "amount": 95
+                                }
+                            ],
+                            "generator": "adventuring:celestial_flash",
+                            "spender": "adventuring:holy_wrath",
+                            "passives": [
+                                "adventuring:heavenly_radiance"
+                            ],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 200,
+                                    "type": "currency"
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 40,
+                                    "type": "salvage"
+                                },
+                                {
+                                    "type": "salvage",
+                                    "id": "adventuring:legendary_salvage",
+                                    "qty": 2
+                                },
+                                {
+                                    "id": "adventuring:big_parts",
+                                    "qty": 18,
+                                    "type": "salvage"
+                                },
+                                {
+                                    "id": "adventuring:holy_dust",
+                                    "qty": 6,
+                                    "type": "materials",
+                                    "chance": 0.6
+                                }
+                            ]
+                        }
+                    ],
+                    "generators": [
+                        {
+                            "id": "fairy_dust",
+                            "name": "Fairy Dust",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "energy": 55,
+                            "hits": [
+                                {
+                                    "target": "random",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 14,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "amount": 1.1
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "light_arrow",
+                            "name": "Light Arrow",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "energy": 55,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 16,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:ranged",
+                                                        "amount": 1.2
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "divine_spear",
+                            "name": "Divine Spear",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "energy": 55,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 18,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "amount": 1.2
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "holy_light",
+                            "name": "Holy Light",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "energy": 60,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 20,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "amount": 1.4
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "celestial_flash",
+                            "name": "Celestial Flash",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "energy": 65,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 18,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "amount": 1.2
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "spenders": [
+                        {
+                            "id": "pixie_blast",
+                            "name": "Pixie Blast",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 100,
+                            "hits": [
+                                {
+                                    "target": "random",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 28,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "amount": 1.6
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "holy_volley",
+                            "name": "Holy Volley",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 100,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 22,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:ranged",
+                                                        "amount": 1.4
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "valkyrie_strike",
+                            "name": "Valkyrie Strike",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 100,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 35,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "amount": 1.8
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "holy_wrath",
+                            "name": "Holy Wrath",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 100,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 35,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "amount": 2
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
             }
-        }]
+        ]
     }
 }

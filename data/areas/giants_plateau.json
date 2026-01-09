@@ -2,386 +2,665 @@
     "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
     "namespace": "adventuring",
     "data": {
-        "skillData": [{
-            "skillID": "adventuring:Adventuring",
-            "data": {
-                "passives": [
-                    {
-                        "id": "giants_vitality",
-                        "name": "Giant's Vitality",
-                        "effects": [
-                            {
-                                "trigger": "turn_start",
-                                "type": "heal_flat",
-                                "target": "self",
-                                "amount": { "base": 3, "scaling": [] },
-                                "stacks": { "base": 1, "scaling": [] }
-                            }
-                        ]
-                    },
-                    {
-                        "id": "crushing_stomp",
-                        "name": "Crushing Stomp",
-                        "effects": [
-                            {
-                                "trigger": "encounter_start",
-                                "type": "debuff",
-                                "id": "adventuring:weaken",
-                                "target": "all", "party": "enemy",
-                                "stacks": { "base": 3, "scaling": [] }
-                            }
-                        ]
-                    }
-                ],
-                "areas": [
-                    {
-                        "id": "giants_plateau",
-                        "name": "Giant's Plateau",
-                        "media": "melvor:assets/media/monsters/turkul_giant.png",
-                        "requirements": [
-                            { "type": "skill_level", "level": 40 }
-                        ],
-                        "height": 6,
-                        "width": 6,
-                        "floors": [
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:hill_giant", "weight": 100 }
-                                ],
-                                "exit": ["adventuring:hill_giant", "adventuring:hill_giant", "adventuring:hill_giant"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:hill_giant", "weight": 70 },
-                                    { "id": "adventuring:moss_giant", "weight": 30 }
-                                ],
-                                "exit": ["adventuring:hill_giant", "adventuring:hill_giant", "adventuring:moss_giant"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:hill_giant", "weight": 50 },
-                                    { "id": "adventuring:moss_giant", "weight": 50 }
-                                ],
-                                "exit": ["adventuring:hill_giant", "adventuring:moss_giant", "adventuring:moss_giant"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:moss_giant", "weight": 70 },
-                                    { "id": "adventuring:ice_giant", "weight": 30 }
-                                ],
-                                "exit": ["adventuring:moss_giant", "adventuring:moss_giant", "adventuring:ice_giant"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:moss_giant", "weight": 50 },
-                                    { "id": "adventuring:ice_giant", "weight": 50 }
-                                ],
-                                "exit": ["adventuring:moss_giant", "adventuring:ice_giant", "adventuring:ice_giant"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:ice_giant", "weight": 70 },
-                                    { "id": "adventuring:moss_giant", "weight": 30 }
-                                ],
-                                "exit": ["adventuring:ice_giant", "adventuring:ice_giant", "adventuring:ice_giant"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:ice_giant", "weight": 80 },
-                                    { "id": "adventuring:moss_giant", "weight": 20 }
-                                ],
-                                "exit": ["adventuring:moss_giant", "adventuring:ice_giant", "adventuring:ice_giant"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:ice_giant", "weight": 100 }
-                                ],
-                                "exit": ["adventuring:ice_giant", "adventuring:ice_giant", "adventuring:turkul_giant"]
-                            }
-                        ]
-                    }
-                ],
-                "monsters": [
-                    {
-                        "id": "hill_giant",
-                        "name": "Hill Giant",
-                        "media": "melvor:assets/media/monsters/turkul_giant.png#shade=brown",
-                        "tags": ["giant", "humanoid"],
-                        "xp": 55,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "amount": 36 },
-                            { "id": "adventuring:defence", "amount": 23 },
-                            { "id": "adventuring:agility", "amount": 15 },
-                            { "id": "adventuring:strength", "amount": 33 },
-                            { "id": "adventuring:ranged", "amount": 13 },
-                            { "id": "adventuring:magic", "amount": 10 },
-                            { "id": "adventuring:prayer", "amount": 18 }
-                        ],
-                        "generator": "adventuring:boulder_toss",
-                        "spender": "adventuring:colossus_slam",
-                        "passives": [],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 22, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 8, "weight": 30 },
-                            { "id": "adventuring:giants_toe", "qty": 1, "weight": 25 }
-                        ]
-                    },
-                    {
-                        "id": "moss_giant",
-                        "name": "Moss Giant",
-                        "media": "melvor:assets/media/monsters/turkul_giant.png#shade=green",
-                        "tags": ["giant", "humanoid"],
-                        "xp": 65,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "amount": 42 },
-                            { "id": "adventuring:defence", "amount": 26 },
-                            { "id": "adventuring:agility", "amount": 18 },
-                            { "id": "adventuring:strength", "amount": 36 },
-                            { "id": "adventuring:ranged", "amount": 16 },
-                            { "id": "adventuring:magic", "amount": 13 },
-                            { "id": "adventuring:prayer", "amount": 22 }
-                        ],
-                        "generator": "adventuring:boulder_toss",
-                        "spender": "adventuring:nature_crush",
-                        "passives": [],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 28, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 10, "weight": 32 },
-                            { "id": "adventuring:giants_toe", "qty": 1, "weight": 30 }
-                        ]
-                    },
-                    {
-                        "id": "ice_giant",
-                        "name": "Ice Giant",
-                        "media": "melvor:assets/media/monsters/turkul_giant.png#shade=cyan",
-                        "tags": ["giant", "humanoid"],
-                        "xp": 75,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "amount": 47 },
-                            { "id": "adventuring:defence", "amount": 29 },
-                            { "id": "adventuring:agility", "amount": 20 },
-                            { "id": "adventuring:strength", "amount": 38 },
-                            { "id": "adventuring:ranged", "amount": 20 },
-                            { "id": "adventuring:magic", "amount": 23 },
-                            { "id": "adventuring:prayer", "amount": 25 }
-                        ],
-                        "generator": "adventuring:frost_breath",
-                        "spender": "adventuring:avalanche",
-                        "passives": [],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 32, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 12, "weight": 35 },
-                            { "id": "adventuring:giants_toe", "qty": 2, "weight": 35 },
-                            { "id": "adventuring:frozen_essence", "qty": 1, "weight": 15 }
-                        ]
-                    },
-                    {
-                        "id": "turkul_giant",
-                        "name": "Turkul Giant",
-                        "media": "melvor:assets/media/monsters/turkul_giant.png",
-                        "tags": ["boss", "giant", "humanoid"],
-                        "isBoss": true,
-                        "xp": 150,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "amount": 78 },
-                            { "id": "adventuring:defence", "amount": 39 },
-                            { "id": "adventuring:agility", "amount": 25 },
-                            { "id": "adventuring:strength", "amount": 52 },
-                            { "id": "adventuring:ranged", "amount": 26 },
-                            { "id": "adventuring:magic", "amount": 29 },
-                            { "id": "adventuring:prayer", "amount": 35 }
-                        ],
-                        "generator": "adventuring:boulder_toss",
-                        "spender": "adventuring:titans_wrath",
-                        "passives": [],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 65, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 18, "weight": 50 },
-                            { "id": "adventuring:big_parts", "qty": 6, "weight": 40 },
-                            { "id": "adventuring:giants_toe", "qty": 3, "weight": 60 }
-                        ]
-                    }
-                ],
-                "generators": [
-                    {
-                        "id": "boulder_toss",
-                        "name": "Boulder Toss",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "energy": 50,
-                        "hits": [
-                            {
-                                "target": "random",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 12,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "amount": 1.2 }
-                                            ]
-                                        }
+        "skillData": [
+            {
+                "skillID": "adventuring:Adventuring",
+                "data": {
+                    "passives": [
+                        {
+                            "id": "giants_vitality",
+                            "name": "Giant's Vitality",
+                            "effects": [
+                                {
+                                    "trigger": "turn_start",
+                                    "type": "heal_flat",
+                                    "target": "self",
+                                    "amount": {
+                                        "base": 3,
+                                        "scaling": []
+                                    },
+                                    "stacks": {
+                                        "base": 1,
+                                        "scaling": []
                                     }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "frost_breath",
-                        "name": "Frost Breath",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "energy": 45,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 6,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "amount": 0.8 }
-                                            ]
-                                        }
+                                }
+                            ]
+                        },
+                        {
+                            "id": "crushing_stomp",
+                            "name": "Crushing Stomp",
+                            "effects": [
+                                {
+                                    "trigger": "encounter_start",
+                                    "type": "debuff",
+                                    "id": "adventuring:weaken",
+                                    "target": "all",
+                                    "party": "enemy",
+                                    "stacks": {
+                                        "base": 3,
+                                        "scaling": []
                                     }
-                                ]
-                            }
-                        ]
-                    }
-                ],
-                "spenders": [
-                    {
-                        "id": "colossus_slam",
-                        "name": "Colossus Slam",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 90,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 18,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "amount": 1.8 }
-                                            ]
+                                }
+                            ]
+                        }
+                    ],
+                    "areas": [
+                        {
+                            "id": "giants_plateau",
+                            "name": "Giant's Plateau",
+                            "media": "melvor:assets/media/monsters/turkul_giant.png",
+                            "requirements": [
+                                {
+                                    "type": "skill_level",
+                                    "level": 40
+                                }
+                            ],
+                            "height": 6,
+                            "width": 6,
+                            "floors": [
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:hill_giant",
+                                            "weight": 100
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "nature_crush",
-                        "name": "Nature's Crush",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 95,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 28,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "amount": 2 }
-                                            ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:hill_giant",
+                                        "adventuring:hill_giant",
+                                        "adventuring:hill_giant"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:hill_giant",
+                                            "weight": 70
+                                        },
+                                        {
+                                            "id": "adventuring:moss_giant",
+                                            "weight": 30
                                         }
-                                    }
-                                ]
-                            },
-                            {
-                                "target": "self",
-                                "party": "ally",
-                                "effects": [
-                                    {
-                                        "type": "heal_flat",
-                                        "amount": {
-                                            "base": 10,
-                                            "scaling": [
-                                                { "id": "adventuring:prayer", "amount": 1.2 }
-                                            ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:hill_giant",
+                                        "adventuring:hill_giant",
+                                        "adventuring:moss_giant"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:hill_giant",
+                                            "weight": 50
+                                        },
+                                        {
+                                            "id": "adventuring:moss_giant",
+                                            "weight": 50
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "avalanche",
-                        "name": "Avalanche",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 100,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 22,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "amount": 1.5 },
-                                                { "id": "adventuring:strength", "amount": 1 }
-                                            ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:hill_giant",
+                                        "adventuring:moss_giant",
+                                        "adventuring:moss_giant"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:moss_giant",
+                                            "weight": 70
+                                        },
+                                        {
+                                            "id": "adventuring:ice_giant",
+                                            "weight": 30
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "titans_wrath",
-                        "name": "Titan's Wrath",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 100,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 45,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "amount": 2.5 }
-                                            ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:moss_giant",
+                                        "adventuring:moss_giant",
+                                        "adventuring:ice_giant"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:moss_giant",
+                                            "weight": 50
+                                        },
+                                        {
+                                            "id": "adventuring:ice_giant",
+                                            "weight": 50
                                         }
-                                    }
-                                ]
-                            },
-                            {
-                                "target": "all",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 15,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "amount": 1 }
-                                            ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:moss_giant",
+                                        "adventuring:ice_giant",
+                                        "adventuring:ice_giant"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:ice_giant",
+                                            "weight": 70
+                                        },
+                                        {
+                                            "id": "adventuring:moss_giant",
+                                            "weight": 30
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:ice_giant",
+                                        "adventuring:ice_giant",
+                                        "adventuring:ice_giant"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:ice_giant",
+                                            "weight": 80
+                                        },
+                                        {
+                                            "id": "adventuring:moss_giant",
+                                            "weight": 20
+                                        }
+                                    ],
+                                    "exit": [
+                                        "adventuring:moss_giant",
+                                        "adventuring:ice_giant",
+                                        "adventuring:ice_giant"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:ice_giant",
+                                            "weight": 100
+                                        }
+                                    ],
+                                    "exit": [
+                                        "adventuring:ice_giant",
+                                        "adventuring:ice_giant",
+                                        "adventuring:turkul_giant"
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "monsters": [
+                        {
+                            "id": "hill_giant",
+                            "name": "Hill Giant",
+                            "media": "melvor:assets/media/monsters/turkul_giant.png#shade=brown",
+                            "tags": [
+                                "giant",
+                                "humanoid"
+                            ],
+                            "xp": 55,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "amount": 36
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "amount": 23
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "amount": 15
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "amount": 33
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "amount": 13
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "amount": 10
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "amount": 18
+                                }
+                            ],
+                            "generator": "adventuring:boulder_toss",
+                            "spender": "adventuring:colossus_slam",
+                            "passives": [],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 22,
+                                    "type": "currency"
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 8,
+                                    "type": "salvage"
+                                },
+                                {
+                                    "id": "adventuring:giants_toe",
+                                    "qty": 1,
+                                    "type": "materials",
+                                    "chance": 0.25
+                                }
+                            ]
+                        },
+                        {
+                            "id": "moss_giant",
+                            "name": "Moss Giant",
+                            "media": "melvor:assets/media/monsters/turkul_giant.png#shade=green",
+                            "tags": [
+                                "giant",
+                                "humanoid"
+                            ],
+                            "xp": 65,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "amount": 42
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "amount": 26
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "amount": 18
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "amount": 36
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "amount": 16
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "amount": 13
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "amount": 22
+                                }
+                            ],
+                            "generator": "adventuring:boulder_toss",
+                            "spender": "adventuring:nature_crush",
+                            "passives": [],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 28,
+                                    "type": "currency"
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 10,
+                                    "type": "salvage"
+                                },
+                                {
+                                    "id": "adventuring:giants_toe",
+                                    "qty": 1,
+                                    "type": "materials",
+                                    "chance": 0.3
+                                }
+                            ]
+                        },
+                        {
+                            "id": "ice_giant",
+                            "name": "Ice Giant",
+                            "media": "melvor:assets/media/monsters/turkul_giant.png#shade=cyan",
+                            "tags": [
+                                "giant",
+                                "humanoid"
+                            ],
+                            "xp": 75,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "amount": 47
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "amount": 29
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "amount": 20
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "amount": 38
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "amount": 20
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "amount": 23
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "amount": 25
+                                }
+                            ],
+                            "generator": "adventuring:frost_breath",
+                            "spender": "adventuring:avalanche",
+                            "passives": [],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 32,
+                                    "type": "currency"
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 12,
+                                    "type": "salvage"
+                                },
+                                {
+                                    "id": "adventuring:giants_toe",
+                                    "qty": 2,
+                                    "type": "materials",
+                                    "chance": 0.35
+                                },
+                                {
+                                    "id": "adventuring:frozen_essence",
+                                    "qty": 1,
+                                    "type": "materials",
+                                    "chance": 0.15
+                                }
+                            ]
+                        },
+                        {
+                            "id": "turkul_giant",
+                            "name": "Turkul Giant",
+                            "media": "melvor:assets/media/monsters/turkul_giant.png",
+                            "tags": [
+                                "boss",
+                                "giant",
+                                "humanoid"
+                            ],
+                            "isBoss": true,
+                            "xp": 150,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "amount": 78
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "amount": 39
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "amount": 25
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "amount": 52
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "amount": 26
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "amount": 29
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "amount": 35
+                                }
+                            ],
+                            "generator": "adventuring:boulder_toss",
+                            "spender": "adventuring:titans_wrath",
+                            "passives": [],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 65,
+                                    "type": "currency"
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 18,
+                                    "type": "salvage"
+                                },
+                                {
+                                    "type": "salvage",
+                                    "id": "adventuring:pristine_salvage",
+                                    "qty": 2
+                                },
+                                {
+                                    "id": "adventuring:big_parts",
+                                    "qty": 6,
+                                    "type": "salvage"
+                                },
+                                {
+                                    "id": "adventuring:giants_toe",
+                                    "qty": 3,
+                                    "type": "materials",
+                                    "chance": 0.6
+                                }
+                            ]
+                        }
+                    ],
+                    "generators": [
+                        {
+                            "id": "boulder_toss",
+                            "name": "Boulder Toss",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "energy": 50,
+                            "hits": [
+                                {
+                                    "target": "random",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 12,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "amount": 1.2
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "frost_breath",
+                            "name": "Frost Breath",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "energy": 45,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 6,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "amount": 0.8
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "spenders": [
+                        {
+                            "id": "colossus_slam",
+                            "name": "Colossus Slam",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 90,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 18,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "amount": 1.8
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "nature_crush",
+                            "name": "Nature's Crush",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 95,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 28,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "amount": 2
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                },
+                                {
+                                    "target": "self",
+                                    "party": "ally",
+                                    "effects": [
+                                        {
+                                            "type": "heal_flat",
+                                            "amount": {
+                                                "base": 10,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:prayer",
+                                                        "amount": 1.2
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "avalanche",
+                            "name": "Avalanche",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 100,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 22,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "amount": 1.5
+                                                    },
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "amount": 1
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "titans_wrath",
+                            "name": "Titan's Wrath",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 100,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 45,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "amount": 2.5
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                },
+                                {
+                                    "target": "all",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 15,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "amount": 1
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
             }
-        }]
+        ]
     }
 }

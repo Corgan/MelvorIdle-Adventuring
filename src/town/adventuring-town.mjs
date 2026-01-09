@@ -38,7 +38,7 @@ export class AdventuringTown extends AdventuringPage {
             return;
         }
 
-        this.manager.party.all.forEach(character => this.runAction(character));
+        this.manager.party.forEach(character => this.runAction(character));
     }
 
     /**
@@ -46,13 +46,13 @@ export class AdventuringTown extends AdventuringPage {
      * Requires all party members to be alive and at full HP
      */
     checkAutoRepeatReady() {
-        return this.manager.party.all.every(member => 
+        return this.manager.party.every(member => 
             !member.dead && member.hitpoints >= member.maxHitpoints
         );
     }
 
     resetActions() {
-        this.manager.party.all.forEach(character => {
+        this.manager.party.forEach(character => {
             let newAction = this.findNewAction(character);
             this.characterAction.set(character, newAction);
             this.updateTownCards();
@@ -60,7 +60,7 @@ export class AdventuringTown extends AdventuringPage {
     }
 
     checkActions() {
-        this.manager.party.all.forEach(character => {
+        this.manager.party.forEach(character => {
             if(this.characterAction.get(character) === undefined) {
                 let newAction = this.findNewAction(character);
                 this.characterAction.set(character, newAction);
@@ -151,7 +151,7 @@ export class AdventuringTown extends AdventuringPage {
 
     onLoad() {
         super.onLoad();
-        this.manager.party.all.forEach(member => {
+        this.manager.party.forEach(member => {
             this.cards.set(member, new AdventuringCard(this.manager, this.game));
         });
         this.updateTownCards();

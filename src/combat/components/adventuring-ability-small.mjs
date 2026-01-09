@@ -2,6 +2,8 @@ const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringTooltipElement } = await loadModule('src/core/adventuring-tooltip-element.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
+const { AdventuringGrimoireRowElement } = await loadModule('src/ui/components/adventuring-grimoire-row.mjs');
+const { AdventuringEmptyStateElement } = await loadModule('src/ui/components/adventuring-empty-state.mjs');
 
 /**
  * Selector row element for ability picker popup
@@ -203,9 +205,8 @@ export class AdventuringAbilitySmallElement extends AdventuringTooltipElement {
         const unlockedAreas = this.skill.crossroads.areas.filter(a => a.unlocked);
         
         if(unlockedAreas.length === 0) {
-            const emptyMsg = document.createElement('div');
-            emptyMsg.className = 'text-center text-muted p-2';
-            emptyMsg.textContent = 'No areas discovered yet.';
+            const emptyMsg = new AdventuringEmptyStateElement();
+            emptyMsg.setMessage('No areas discovered yet.', 'p-2');
             container.appendChild(emptyMsg);
         } else {
             unlockedAreas.forEach(area => {
@@ -224,22 +225,19 @@ export class AdventuringAbilitySmallElement extends AdventuringTooltipElement {
         const grimoire = this.skill.grimoire;
         const learnedCount = grimoire.getLearnedForArea(area, this.selectorType).length;
         
-        const row = document.createElement('div');
-        row.className = 'd-flex align-items-center p-2 bg-combat-inner-dark rounded mb-1 pointer-enabled';
-        row.style.cursor = 'pointer';
-        row.innerHTML = `
-            <img class="skill-icon-xs mr-2" src="${area.media}">
-            <span class="font-size-sm font-w600">${area.name}</span>
-            <span class="ml-auto badge ${learnedCount > 0 ? 'badge-success' : 'badge-secondary'} font-size-xs">${learnedCount}</span>
-            <i class="fa fa-chevron-right ml-2 text-muted"></i>
-        `;
-        
-        row.onclick = () => {
-            this.grimoireSelectedArea = area;
-            if(this.selectorPopup) {
-                this.selectorPopup.setContent(this.buildGrimoireSelectorContent());
+        const row = new AdventuringGrimoireRowElement();
+        row.setArea({
+            icon: area.media,
+            name: area.name,
+            count: learnedCount,
+            showChevron: true,
+            onClick: () => {
+                this.grimoireSelectedArea = area;
+                if(this.selectorPopup) {
+                    this.selectorPopup.setContent(this.buildGrimoireSelectorContent());
+                }
             }
-        };
+        });
         
         return row;
     }
@@ -291,9 +289,8 @@ export class AdventuringAbilitySmallElement extends AdventuringTooltipElement {
         const registry = this.selectorType === 'generator' ? this.skill.generators : this.skill.spenders;
         
         if(monsters.length === 0) {
-            const emptyMsg = document.createElement('div');
-            emptyMsg.className = 'text-center text-muted p-2';
-            emptyMsg.textContent = 'No monsters in this area.';
+            const emptyMsg = new AdventuringEmptyStateElement();
+            emptyMsg.setMessage('No monsters in this area.', 'p-2');
             container.appendChild(emptyMsg);
             return container;
         }
@@ -317,9 +314,8 @@ export class AdventuringAbilitySmallElement extends AdventuringTooltipElement {
         }
         
         if(abilityMonsterMap.size === 0) {
-            const emptyMsg = document.createElement('div');
-            emptyMsg.className = 'text-center text-muted p-2';
-            emptyMsg.textContent = 'No abilities of this type in this area.';
+            const emptyMsg = new AdventuringEmptyStateElement();
+            emptyMsg.setMessage('No abilities of this type in this area.', 'p-2');
             container.appendChild(emptyMsg);
             return container;
         }
@@ -341,93 +337,26 @@ export class AdventuringAbilitySmallElement extends AdventuringTooltipElement {
      * Build a row showing a slayer ability with its source monsters.
      */
     buildSlayerAbilityRow(ability, sourceMonsters, anySeen, learned) {
-        const bestiary = this.skill.bestiary;
-        const row = document.createElement('div');
-        row.className = 'd-flex align-items-center p-2 rounded mb-1';
-        
-        if(learned) {
-            row.classList.add('bg-combat-inner-dark', 'pointer-enabled');
-            row.style.cursor = 'pointer';
-        } else {
-            row.classList.add('bg-secondary');
-            row.style.opacity = '0.6';
-        }
-        
-        // Ability icon (use ability media if learned/seen, else first monster icon if any seen, else question mark)
-        const iconContainer = document.createElement('div');
-        iconContainer.className = 'mr-2 d-flex align-items-center justify-content-center';
-        iconContainer.style.width = '24px';
-        iconContainer.style.height = '24px';
-        
-        // Show first monster icon as a hint, or question mark if no monsters
         const firstMonster = sourceMonsters[0];
-        if(firstMonster) {
-            const icon = document.createElement('img');
-            icon.className = 'skill-icon-xs';
-            icon.src = firstMonster.media;
-            iconContainer.appendChild(icon);
-        } else {
-            const question = document.createElement('i');
-            question.className = 'fa fa-question text-muted';
-            question.style.fontSize = '16px';
-            iconContainer.appendChild(question);
-        }
-        row.appendChild(iconContainer);
+        const isSelected = learned && this.selectorCharacter[this.selectorType] === ability;
         
-        // Ability name (or ??? if not seen)
-        const nameSpan = document.createElement('span');
-        nameSpan.className = 'font-size-sm';
-        if(anySeen) {
-            nameSpan.textContent = ability.name;
-        } else {
-            nameSpan.textContent = '???';
-            nameSpan.classList.add('text-muted');
-        }
-        row.appendChild(nameSpan);
-        
-        // Learned badge or lock icon
-        const statusContainer = document.createElement('div');
-        statusContainer.className = 'ml-auto';
-        
-        if(learned) {
-            const badge = document.createElement('span');
-            badge.className = 'badge badge-success font-size-xs';
-            badge.textContent = 'Learned';
-            statusContainer.appendChild(badge);
-        } else if(anySeen) {
-            const lockIcon = document.createElement('i');
-            lockIcon.className = 'fa fa-lock text-muted';
-            statusContainer.appendChild(lockIcon);
-        }
-        row.appendChild(statusContainer);
-        
-        // Add tooltip with ability info and monster sources
-        if(anySeen) {
-            const tooltipContent = this.buildSlayerAbilityTooltip(ability, sourceMonsters);
-            tippy(row, {
-                content: tooltipContent,
-                placement: 'right',
-                allowHTML: true,
-                interactive: false
-            });
-        }
-        
-        // Click to equip if learned
-        if(learned) {
-            const isSelected = this.selectorCharacter[this.selectorType] === ability;
-            if(isSelected) {
-                row.classList.add('border', 'border-success');
-            }
-            
-            row.onclick = () => {
+        const row = new AdventuringGrimoireRowElement();
+        row.setSlayerAbility({
+            icon: firstMonster ? firstMonster.media : null,
+            name: ability.name,
+            isLearned: learned,
+            isEquipped: isSelected,
+            isSeen: anySeen,
+            onClick: learned ? () => {
                 if(this.selectorType === 'generator') {
                     this.selectorCharacter.setGenerator(ability);
                 } else {
                     this.selectorCharacter.setSpender(ability);
                 }
                 if(this.selectorPopup) this.selectorPopup.hide();
-            };
-        }
+            } : null,
+            tooltipContent: anySeen ? this.buildSlayerAbilityTooltip(ability, sourceMonsters) : null
+        });
         
         return row;
     }

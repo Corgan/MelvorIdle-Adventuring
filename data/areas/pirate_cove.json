@@ -2,391 +2,680 @@
     "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
     "namespace": "adventuring",
     "data": {
-        "skillData": [{
-            "skillID": "adventuring:Adventuring",
-            "data": {
-                "passives": [
-                    {
-                        "id": "pirates_rally",
-                        "name": "Pirate's Rally",
-                        "effects": [
-                            {
-                                "trigger": "encounter_start",
-                                "type": "buff",
-                                "id": "adventuring:might",
-                                "target": "all", "party": "ally",
-                                "stacks": { "base": 2, "scaling": [] }
-                            }
-                        ]
-                    }
-                ],
-                "areas": [
-                    {
-                        "id": "pirate_cove",
-                        "name": "Pirate Cove",
-                        "media": "melvor:assets/media/monsters/pirate_captain.png",
-                        "requirements": [
-                            { "type": "skill_level", "level": 50 }
-                        ],
-                        "height": 8,
-                        "width": 6,
-                        "floors": [
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:pirate", "weight": 100 }
-                                ],
-                                "exit": ["adventuring:pirate", "adventuring:pirate", "adventuring:pirate"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:pirate", "weight": 70 },
-                                    { "id": "adventuring:first_mate", "weight": 30 }
-                                ],
-                                "exit": ["adventuring:pirate", "adventuring:pirate", "adventuring:first_mate"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:pirate", "weight": 50 },
-                                    { "id": "adventuring:first_mate", "weight": 50 }
-                                ],
-                                "exit": ["adventuring:pirate", "adventuring:first_mate", "adventuring:first_mate"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:first_mate", "weight": 70 },
-                                    { "id": "adventuring:pirate_captain", "weight": 30 }
-                                ],
-                                "exit": ["adventuring:first_mate", "adventuring:first_mate", "adventuring:pirate_captain"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:first_mate", "weight": 50 },
-                                    { "id": "adventuring:pirate_captain", "weight": 50 }
-                                ],
-                                "exit": ["adventuring:first_mate", "adventuring:pirate_captain", "adventuring:pirate_captain"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:pirate_captain", "weight": 60 },
-                                    { "id": "adventuring:first_mate", "weight": 40 }
-                                ],
-                                "exit": ["adventuring:pirate_captain", "adventuring:pirate_captain", "adventuring:pirate_captain"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:pirate_captain", "weight": 80 },
-                                    { "id": "adventuring:first_mate", "weight": 20 }
-                                ],
-                                "exit": ["adventuring:first_mate", "adventuring:pirate_captain", "adventuring:pirate_captain"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:pirate_captain", "weight": 100 }
-                                ],
-                                "exit": ["adventuring:pirate_captain", "adventuring:pirate_captain", "adventuring:pirate_captain"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:pirate_captain", "weight": 100 }
-                                ],
-                                "exit": ["adventuring:pirate_captain", "adventuring:pirate_captain", "adventuring:kraken"]
-                            }
-                        ]
-                    }
-                ],
-                "monsters": [
-                    {
-                        "id": "pirate",
-                        "name": "Pirate",
-                        "media": "melvor:assets/media/monsters/pirate.png",
-                        "tags": ["humanoid", "bandit"],
-                        "xp": 75,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "amount": 45 },
-                            { "id": "adventuring:defence", "amount": 30 },
-                            { "id": "adventuring:agility", "amount": 42 },
-                            { "id": "adventuring:strength", "amount": 34 },
-                            { "id": "adventuring:ranged", "amount": 32 },
-                            { "id": "adventuring:magic", "amount": 16 },
-                            { "id": "adventuring:prayer", "amount": 30 }
-                        ],
-                        "generator": "adventuring:cutlass_slash",
-                        "spender": "adventuring:plunder",
-                        "passives": [],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 40, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 14, "weight": 38 },
-                            { "id": "adventuring:pirates_doubloon", "qty": 1, "weight": 22 }
-                        ]
-                    },
-                    {
-                        "id": "first_mate",
-                        "name": "First Mate",
-                        "media": "melvor:assets/media/monsters/first_mate.png",
-                        "tags": ["humanoid", "bandit"],
-                        "xp": 90,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "amount": 53 },
-                            { "id": "adventuring:defence", "amount": 34 },
-                            { "id": "adventuring:agility", "amount": 48 },
-                            { "id": "adventuring:strength", "amount": 38 },
-                            { "id": "adventuring:ranged", "amount": 36 },
-                            { "id": "adventuring:magic", "amount": 20 },
-                            { "id": "adventuring:prayer", "amount": 35 }
-                        ],
-                        "generator": "adventuring:cutlass_slash",
-                        "spender": "adventuring:boarding_action",
-                        "passives": [],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 48, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 16, "weight": 42 },
-                            { "id": "adventuring:pirates_doubloon", "qty": 1, "weight": 28 }
-                        ]
-                    },
-                    {
-                        "id": "pirate_captain",
-                        "name": "Pirate Captain",
-                        "media": "melvor:assets/media/monsters/pirate_captain.png",
-                        "tags": ["humanoid", "bandit"],
-                        "xp": 110,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "amount": 62 },
-                            { "id": "adventuring:defence", "amount": 38 },
-                            { "id": "adventuring:agility", "amount": 52 },
-                            { "id": "adventuring:strength", "amount": 42 },
-                            { "id": "adventuring:ranged", "amount": 40 },
-                            { "id": "adventuring:magic", "amount": 23 },
-                            { "id": "adventuring:prayer", "amount": 40 }
-                        ],
-                        "generator": "adventuring:pistol_shot",
-                        "spender": "adventuring:captains_orders",
-                        "passives": [],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 60, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 18, "weight": 45 },
-                            { "id": "adventuring:big_parts", "qty": 5, "weight": 32 },
-                            { "id": "adventuring:pirates_doubloon", "qty": 2, "weight": 35 }
-                        ]
-                    },
-                    {
-                        "id": "kraken",
-                        "name": "Kraken",
-                        "media": "melvor:assets/media/monsters/kraken.png",
-                        "tags": ["boss", "beast"],
-                        "isBoss": true,
-                        "xp": 200,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "amount": 98 },
-                            { "id": "adventuring:defence", "amount": 45 },
-                            { "id": "adventuring:agility", "amount": 40 },
-                            { "id": "adventuring:strength", "amount": 55 },
-                            { "id": "adventuring:ranged", "amount": 33 },
-                            { "id": "adventuring:magic", "amount": 49 },
-                            { "id": "adventuring:prayer", "amount": 45 }
-                        ],
-                        "generator": "adventuring:tentacle_lash",
-                        "spender": "adventuring:tidal_wave",
-                        "passives": [],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 100, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 25, "weight": 55 },
-                            { "id": "adventuring:big_parts", "qty": 10, "weight": 45 },
-                            { "id": "adventuring:pirates_doubloon", "qty": 5, "weight": 60 },
-                            { "id": "adventuring:water_essence", "qty": 2, "weight": 25 }
-                        ]
-                    }
-                ],
-                "generators": [
-                    {
-                        "id": "cutlass_slash",
-                        "name": "Cutlass Slash",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "energy": 50,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 12,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "amount": 1.2 }
-                                            ]
-                                        }
+        "skillData": [
+            {
+                "skillID": "adventuring:Adventuring",
+                "data": {
+                    "passives": [
+                        {
+                            "id": "pirates_rally",
+                            "name": "Pirate's Rally",
+                            "effects": [
+                                {
+                                    "trigger": "encounter_start",
+                                    "type": "buff",
+                                    "id": "adventuring:might",
+                                    "target": "all",
+                                    "party": "ally",
+                                    "stacks": {
+                                        "base": 2,
+                                        "scaling": []
                                     }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "pistol_shot",
-                        "name": "Pistol Shot",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "energy": 55,
-                        "hits": [
-                            {
-                                "target": "back",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 15,
-                                            "scaling": [
-                                                { "id": "adventuring:ranged", "amount": 1.4 }
-                                            ]
+                                }
+                            ]
+                        }
+                    ],
+                    "areas": [
+                        {
+                            "id": "pirate_cove",
+                            "name": "Pirate Cove",
+                            "media": "melvor:assets/media/monsters/pirate_captain.png",
+                            "requirements": [
+                                {
+                                    "type": "skill_level",
+                                    "level": 50
+                                }
+                            ],
+                            "height": 8,
+                            "width": 6,
+                            "floors": [
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:pirate",
+                                            "weight": 100
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "tentacle_lash",
-                        "name": "Tentacle Lash",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "energy": 55,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 10,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "amount": 0.9 }
-                                            ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:pirate",
+                                        "adventuring:pirate",
+                                        "adventuring:pirate"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:pirate",
+                                            "weight": 70
+                                        },
+                                        {
+                                            "id": "adventuring:first_mate",
+                                            "weight": 30
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ],
-                "spenders": [
-                    {
-                        "id": "plunder",
-                        "name": "Plunder",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 90,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 30,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "amount": 1.8 },
-                                                { "id": "adventuring:agility", "amount": 1 }
-                                            ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:pirate",
+                                        "adventuring:pirate",
+                                        "adventuring:first_mate"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:pirate",
+                                            "weight": 50
+                                        },
+                                        {
+                                            "id": "adventuring:first_mate",
+                                            "weight": 50
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "boarding_action",
-                        "name": "Boarding Action",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 95,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 28,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "amount": 1.6 }
-                                            ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:pirate",
+                                        "adventuring:first_mate",
+                                        "adventuring:first_mate"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:first_mate",
+                                            "weight": 70
+                                        },
+                                        {
+                                            "id": "adventuring:pirate_captain",
+                                            "weight": 30
                                         }
-                                    }
-                                ]
-                            },
-                            {
-                                "target": "random",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 18,
-                                            "scaling": [
-                                                { "id": "adventuring:ranged", "amount": 1.2 }
-                                            ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:first_mate",
+                                        "adventuring:first_mate",
+                                        "adventuring:pirate_captain"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:first_mate",
+                                            "weight": 50
+                                        },
+                                        {
+                                            "id": "adventuring:pirate_captain",
+                                            "weight": 50
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "captains_orders",
-                        "name": "Captain's Orders",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 100,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 25,
-                                            "scaling": [
-                                                { "id": "adventuring:ranged", "amount": 1.8 },
-                                                { "id": "adventuring:strength", "amount": 0.8 }
-                                            ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:first_mate",
+                                        "adventuring:pirate_captain",
+                                        "adventuring:pirate_captain"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:pirate_captain",
+                                            "weight": 60
+                                        },
+                                        {
+                                            "id": "adventuring:first_mate",
+                                            "weight": 40
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "tidal_wave",
-                        "name": "Tidal Wave",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 100,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 40,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "amount": 2.2 },
-                                                { "id": "adventuring:strength", "amount": 1.2 }
-                                            ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:pirate_captain",
+                                        "adventuring:pirate_captain",
+                                        "adventuring:pirate_captain"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:pirate_captain",
+                                            "weight": 80
+                                        },
+                                        {
+                                            "id": "adventuring:first_mate",
+                                            "weight": 20
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:first_mate",
+                                        "adventuring:pirate_captain",
+                                        "adventuring:pirate_captain"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:pirate_captain",
+                                            "weight": 100
+                                        }
+                                    ],
+                                    "exit": [
+                                        "adventuring:pirate_captain",
+                                        "adventuring:pirate_captain",
+                                        "adventuring:pirate_captain"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:pirate_captain",
+                                            "weight": 100
+                                        }
+                                    ],
+                                    "exit": [
+                                        "adventuring:pirate_captain",
+                                        "adventuring:pirate_captain",
+                                        "adventuring:kraken"
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "monsters": [
+                        {
+                            "id": "pirate",
+                            "name": "Pirate",
+                            "media": "melvor:assets/media/monsters/pirate.png",
+                            "tags": [
+                                "humanoid",
+                                "bandit"
+                            ],
+                            "xp": 75,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "amount": 45
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "amount": 30
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "amount": 42
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "amount": 34
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "amount": 32
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "amount": 16
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "amount": 30
+                                }
+                            ],
+                            "generator": "adventuring:cutlass_slash",
+                            "spender": "adventuring:plunder",
+                            "passives": [],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 40,
+                                    "type": "currency"
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 14,
+                                    "type": "salvage"
+                                },
+                                {
+                                    "id": "adventuring:pirates_doubloon",
+                                    "qty": 1,
+                                    "type": "materials",
+                                    "chance": 0.22
+                                }
+                            ]
+                        },
+                        {
+                            "id": "first_mate",
+                            "name": "First Mate",
+                            "media": "melvor:assets/media/monsters/first_mate.png",
+                            "tags": [
+                                "humanoid",
+                                "bandit"
+                            ],
+                            "xp": 90,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "amount": 53
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "amount": 34
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "amount": 48
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "amount": 38
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "amount": 36
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "amount": 20
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "amount": 35
+                                }
+                            ],
+                            "generator": "adventuring:cutlass_slash",
+                            "spender": "adventuring:boarding_action",
+                            "passives": [],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 48,
+                                    "type": "currency"
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 16,
+                                    "type": "salvage"
+                                },
+                                {
+                                    "id": "adventuring:pirates_doubloon",
+                                    "qty": 1,
+                                    "type": "materials",
+                                    "chance": 0.28
+                                }
+                            ]
+                        },
+                        {
+                            "id": "pirate_captain",
+                            "name": "Pirate Captain",
+                            "media": "melvor:assets/media/monsters/pirate_captain.png",
+                            "tags": [
+                                "humanoid",
+                                "bandit"
+                            ],
+                            "xp": 110,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "amount": 62
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "amount": 38
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "amount": 52
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "amount": 42
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "amount": 40
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "amount": 23
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "amount": 40
+                                }
+                            ],
+                            "generator": "adventuring:pistol_shot",
+                            "spender": "adventuring:captains_orders",
+                            "passives": [],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 60,
+                                    "type": "currency"
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 18,
+                                    "type": "salvage"
+                                },
+                                {
+                                    "id": "adventuring:big_parts",
+                                    "qty": 5,
+                                    "type": "salvage"
+                                },
+                                {
+                                    "id": "adventuring:pirates_doubloon",
+                                    "qty": 2,
+                                    "type": "materials",
+                                    "chance": 0.35
+                                }
+                            ]
+                        },
+                        {
+                            "id": "kraken",
+                            "name": "Kraken",
+                            "media": "melvor:assets/media/monsters/kraken.png",
+                            "tags": [
+                                "boss",
+                                "beast"
+                            ],
+                            "isBoss": true,
+                            "xp": 200,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "amount": 98
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "amount": 45
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "amount": 40
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "amount": 55
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "amount": 33
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "amount": 49
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "amount": 45
+                                }
+                            ],
+                            "generator": "adventuring:tentacle_lash",
+                            "spender": "adventuring:tidal_wave",
+                            "passives": [],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 100,
+                                    "type": "currency"
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 25,
+                                    "type": "salvage"
+                                },
+                                {
+                                    "type": "salvage",
+                                    "id": "adventuring:superior_salvage",
+                                    "qty": 2
+                                },
+                                {
+                                    "id": "adventuring:big_parts",
+                                    "qty": 10,
+                                    "type": "salvage"
+                                },
+                                {
+                                    "id": "adventuring:pirates_doubloon",
+                                    "qty": 5,
+                                    "type": "materials",
+                                    "chance": 0.6
+                                },
+                                {
+                                    "id": "adventuring:water_essence",
+                                    "qty": 2,
+                                    "type": "materials",
+                                    "chance": 0.25
+                                }
+                            ]
+                        }
+                    ],
+                    "generators": [
+                        {
+                            "id": "cutlass_slash",
+                            "name": "Cutlass Slash",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "energy": 50,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 12,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "amount": 1.2
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "pistol_shot",
+                            "name": "Pistol Shot",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "energy": 55,
+                            "hits": [
+                                {
+                                    "target": "back",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 15,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:ranged",
+                                                        "amount": 1.4
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "tentacle_lash",
+                            "name": "Tentacle Lash",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "energy": 55,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 10,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "amount": 0.9
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "spenders": [
+                        {
+                            "id": "plunder",
+                            "name": "Plunder",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 90,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 30,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "amount": 1.8
+                                                    },
+                                                    {
+                                                        "id": "adventuring:agility",
+                                                        "amount": 1
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "boarding_action",
+                            "name": "Boarding Action",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 95,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 28,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "amount": 1.6
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                },
+                                {
+                                    "target": "random",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 18,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:ranged",
+                                                        "amount": 1.2
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "captains_orders",
+                            "name": "Captain's Orders",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 100,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 25,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:ranged",
+                                                        "amount": 1.8
+                                                    },
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "amount": 0.8
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "tidal_wave",
+                            "name": "Tidal Wave",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 100,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 40,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "amount": 2.2
+                                                    },
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "amount": 1.2
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
             }
-        }]
+        ]
     }
 }

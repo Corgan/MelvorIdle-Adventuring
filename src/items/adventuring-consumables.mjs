@@ -4,6 +4,7 @@ const { AdventuringPage } = await loadModule('src/ui/adventuring-page.mjs');
 const { AdventuringConsumablesElement } = await loadModule('src/items/components/adventuring-consumables.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
 const { evaluateCondition } = await loadModule('src/core/adventuring-utils.mjs');
+const { AdventuringCategorySectionElement } = await loadModule('src/ui/components/adventuring-category-section.mjs');
 
 const MAX_EQUIPPED_CONSUMABLES = 3;
 
@@ -61,6 +62,10 @@ export class AdventuringConsumables extends AdventuringPage {
             const tier = i + 1;
             this.component.tierButtonElements[i].onclick = () => this.selectTier(tier);
         }
+        
+        // Subscribe to dungeon lifecycle events
+        this.manager.on('dungeon:started', () => this.onDungeonStart());
+        this.manager.on('dungeon:ended', () => this.onDungeonEnd());
     }
 
     back() {
@@ -102,17 +107,12 @@ export class AdventuringConsumables extends AdventuringPage {
         
         // Create sections for each job
         consumablesByJob.forEach((jobConsumables, job) => {
-            // Create section container
-            const section = document.createElement('div');
-            section.className = 'mb-3';
+            // Create section using category element
+            const section = new AdventuringCategorySectionElement();
+            section.setSection({ title: job.name });
             
-            // Create simple header
-            const header = document.createElement('h6');
-            header.className = 'font-w600 text-muted mb-2';
-            header.textContent = job.name;
-            
-            // Create content container
-            const content = document.createElement('div');
+            // Create content container with row layout
+            const content = section.getContent();
             content.className = 'row no-gutters';
             
             // Mount consumables into this section
@@ -121,8 +121,6 @@ export class AdventuringConsumables extends AdventuringPage {
                 consumable.component.clickable.onclick = () => this.selectConsumable(consumable);
             });
             
-            section.appendChild(header);
-            section.appendChild(content);
             this.component.jobSections.appendChild(section);
         });
 
@@ -236,14 +234,14 @@ export class AdventuringConsumables extends AdventuringPage {
         
         consumable.renderQueue.updateAll();
         
-        // Invalidate effect cache if this consumable is equipped at this tier
+        // Emit event if this consumable is equipped at this tier (effects may have changed)
         const equipped = this.getEquippedEntry(consumable);
         if (equipped && equipped.tier === tier) {
-            this.invalidateAllHeroEffects();
+            this.manager.emit('consumable:charges-changed', { consumable, tier, amount });
         }
         
         this.renderQueue.slots = true;
-        this.manager.overview.renderQueue.buffs = true;
+        this.manager.emit('consumable:charges-added', { consumable, tier, amount });
     }
 
     /**
@@ -275,23 +273,11 @@ export class AdventuringConsumables extends AdventuringPage {
         if (newCharges <= 0 && equipped && equipped.tier === tier) {
             this.unequip(consumable);
         } else if (equipped && equipped.tier === tier) {
-            this.invalidateAllHeroEffects();
+            // Emit event for effect recalculation
+            this.manager.emit('consumable:charges-changed', { consumable, tier, amount: -amount });
         }
         
         this.renderQueue.slots = true;
-    }
-
-    /**
-     * Invalidate effect cache for all heroes
-     */
-    invalidateAllHeroEffects() {
-        if (this.manager.party) {
-            this.manager.party.all.forEach(hero => {
-                if (hero.effectCache) {
-                    hero.invalidateEffects('consumables');
-                }
-            });
-        }
     }
 
     // =========================================
@@ -350,10 +336,11 @@ export class AdventuringConsumables extends AdventuringPage {
         this.equipped.push({ consumable, tier });
         consumable.renderQueue.equipped = true;
         this.renderQueue.slots = true;
-        this.manager.overview.renderQueue.buffs = true;
         this.manager.log.add(`Equipped ${consumable.getTierName(tier)}`);
         
-        this.invalidateAllHeroEffects();
+        // Emit event for cross-cutting concerns
+        this.manager.emit('consumable:equipped', { consumable, tier });
+        
         return true;
     }
 
@@ -368,9 +355,10 @@ export class AdventuringConsumables extends AdventuringPage {
         this.equipped.splice(index, 1);
         consumable.renderQueue.equipped = true;
         this.renderQueue.slots = true;
-        this.manager.overview.renderQueue.buffs = true;
         
-        this.invalidateAllHeroEffects();
+        // Emit event for cross-cutting concerns
+        this.manager.emit('consumable:unequipped', { consumable, tier: entry.tier });
+        
         return true;
     }
 

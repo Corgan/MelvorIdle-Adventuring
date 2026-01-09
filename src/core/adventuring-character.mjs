@@ -3,7 +3,7 @@ const { loadModule } = mod.getContext(import.meta);
 const { AdventuringCard } = await loadModule('src/progression/adventuring-card.mjs');
 const { AdventuringStats } = await loadModule('src/core/adventuring-stats.mjs');
 const { AdventuringAuras } = await loadModule('src/combat/adventuring-auras.mjs');
-const { createEffect, EffectCache, defaultEffectProcessor, SimpleEffectInstance, evaluateCondition, buildEffectContext, StatCalculator } = await loadModule('src/core/adventuring-utils.mjs');
+const { createEffect, EffectCache, defaultEffectProcessor, SimpleEffectInstance, evaluateCondition, buildEffectContext, StatCalculator, EffectLimitTracker } = await loadModule('src/core/adventuring-utils.mjs');
 
 const { AdventuringCharacterElement } = await loadModule('src/core/components/adventuring-character.mjs');
 
@@ -53,13 +53,8 @@ class AdventuringCharacter {
         // Effect cache for this character
         this.effectCache = new EffectCache();
         
-        // Effect trigger limit tracking
-        // Maps effectKey -> triggerCount for each limit period
-        this.effectTriggerCounts = {
-            combat: new Map(),   // Reset at encounter_start
-            round: new Map(),    // Reset at round_start
-            turn: new Map()      // Reset at turn_start
-        };
+        // Effect trigger limit tracking (shared implementation)
+        this.effectLimitTracker = new EffectLimitTracker();
 
         this.stats = new AdventuringStats(this.manager, this.game);
         this.stats.component.mount(this.component.stats);
@@ -126,26 +121,8 @@ class AdventuringCharacter {
     }
     
     // =========================================================================
-    // Effect Limit System
+    // Effect Limit System (delegates to EffectLimitTracker)
     // =========================================================================
-    
-    /**
-     * Generate a unique key for an effect to track its trigger count.
-     * @param {object} effect - The effect object
-     * @param {object} source - The source (item, consumable, etc.)
-     * @returns {string} Unique key for this effect
-     */
-    getEffectKey(effect, source) {
-        const sourceId = source?.id || source?.localID || 'unknown';
-        const effectStr = JSON.stringify({
-            type: effect.type,
-            trigger: effect.trigger,
-            id: effect.id,
-            stat: effect.stat,
-            amount: effect.amount
-        });
-        return `${sourceId}:${effectStr}`;
-    }
     
     /**
      * Check if an effect can trigger based on its limit settings.
@@ -154,19 +131,7 @@ class AdventuringCharacter {
      * @returns {boolean} Whether the effect can trigger
      */
     canEffectTrigger(effect, source) {
-        if (!effect.limit) return true; // No limit = always can trigger
-        
-        const key = this.getEffectKey(effect, source);
-        const times = effect.times || 1;
-        const countMap = this.effectTriggerCounts[effect.limit];
-        
-        if (!countMap) {
-            console.warn(`Unknown limit type: ${effect.limit}`);
-            return true;
-        }
-        
-        const currentCount = countMap.get(key) || 0;
-        return currentCount < times;
+        return this.effectLimitTracker.canTrigger(effect, source);
     }
     
     /**
@@ -175,15 +140,7 @@ class AdventuringCharacter {
      * @param {object} source - The source object for key generation
      */
     recordEffectTrigger(effect, source) {
-        if (!effect.limit) return; // No limit = don't track
-        
-        const key = this.getEffectKey(effect, source);
-        const countMap = this.effectTriggerCounts[effect.limit];
-        
-        if (!countMap) return;
-        
-        const currentCount = countMap.get(key) || 0;
-        countMap.set(key, currentCount + 1);
+        this.effectLimitTracker.record(effect, source);
     }
     
     /**
@@ -192,9 +149,7 @@ class AdventuringCharacter {
      * @param {string} limitType - 'combat', 'round', or 'turn'
      */
     resetEffectLimits(limitType) {
-        if (this.effectTriggerCounts[limitType]) {
-            this.effectTriggerCounts[limitType].clear();
-        }
+        this.effectLimitTracker.reset(limitType);
     }
     
     // =========================================================================
@@ -484,24 +439,29 @@ class AdventuringCharacter {
             // Calculate XP based on damage dealt (balanced to match job XP progression)
             const equipmentXP = Math.max(1, Math.floor(amount / 5));
             
-            character.equipment?.slots?.forEach((equipmentSlot, slotType) => {
-                if(!equipmentSlot.empty && !equipmentSlot.occupied && equipmentSlot.item) {
-                    equipmentSlot.item.addXP(equipmentXP);
-                }
-            });
+            if (character.equipment && character.equipment.slots) {
+                character.equipment.slots.forEach((equipmentSlot, slotType) => {
+                    if(!equipmentSlot.empty && !equipmentSlot.occupied && equipmentSlot.item) {
+                        equipmentSlot.item.addXP(equipmentXP);
+                    }
+                });
+            }
         }
         
         // Equipment gains mastery XP from damage taken (defender's equipment, heroes only)
         // This allows tanks to level their gear through surviving hits
-        if(this.isHero && !character?.isHero && amount > 0 && !this.dead) {
+        const isCharacterEnemy = character && !character.isHero;
+        if(this.isHero && isCharacterEnemy && amount > 0 && !this.dead) {
             // Calculate XP based on damage taken (same rate as damage dealt)
             const equipmentXP = Math.max(1, Math.floor(amount / 5));
             
-            this.equipment?.slots?.forEach((equipmentSlot, slotType) => {
-                if(!equipmentSlot.empty && !equipmentSlot.occupied && equipmentSlot.item) {
-                    equipmentSlot.item.addXP(equipmentXP);
-                }
-            });
+            if (this.equipment && this.equipment.slots) {
+                this.equipment.slots.forEach((equipmentSlot, slotType) => {
+                    if(!equipmentSlot.empty && !equipmentSlot.occupied && equipmentSlot.item) {
+                        equipmentSlot.item.addXP(equipmentXP);
+                    }
+                });
+            }
         }
 
         if(!loadingOfflineProgress) {
@@ -539,7 +499,14 @@ class AdventuringCharacter {
                 
                 // Trigger ally_death on all living party members
                 if(this.manager && this.manager.party) {
-                    const party = this.isHero ? this.manager.party.all : (this.manager.encounter?.party?.all || []);
+                    let party;
+                    if(this.isHero) {
+                        party = this.manager.party.all;
+                    } else if(this.manager.encounter && this.manager.encounter.party && this.manager.encounter.party.all) {
+                        party = this.manager.encounter.party.all;
+                    } else {
+                        party = [];
+                    }
                     party.forEach(member => {
                         if(member !== this && !member.dead) {
                             member.trigger('ally_death', { deadAlly: this });
@@ -578,11 +545,13 @@ class AdventuringCharacter {
             // Calculate XP based on healing done (2x rate of damage since heals are less frequent)
             const equipmentXP = Math.max(1, Math.floor(actualHeal / 5));
             
-            character.equipment?.slots?.forEach((equipmentSlot, slotType) => {
-                if(!equipmentSlot.empty && !equipmentSlot.occupied && equipmentSlot.item) {
-                    equipmentSlot.item.addXP(equipmentXP);
-                }
-            });
+            if (character.equipment && character.equipment.slots) {
+                character.equipment.slots.forEach((equipmentSlot, slotType) => {
+                    if(!equipmentSlot.empty && !equipmentSlot.occupied && equipmentSlot.item) {
+                        equipmentSlot.item.addXP(equipmentXP);
+                    }
+                });
+            }
         }
         
         // Equipment gains mastery XP from being healed (target's equipment)
@@ -591,11 +560,13 @@ class AdventuringCharacter {
             // Calculate XP based on healing received (same rate as damage taken)
             const equipmentXP = Math.max(1, Math.floor(actualHeal / 5));
             
-            this.equipment?.slots?.forEach((equipmentSlot, slotType) => {
-                if(!equipmentSlot.empty && !equipmentSlot.occupied && equipmentSlot.item) {
-                    equipmentSlot.item.addXP(equipmentXP);
-                }
-            });
+            if (this.equipment && this.equipment.slots) {
+                this.equipment.slots.forEach((equipmentSlot, slotType) => {
+                    if(!equipmentSlot.empty && !equipmentSlot.occupied && equipmentSlot.item) {
+                        equipmentSlot.item.addXP(equipmentXP);
+                    }
+                });
+            }
         }
 
         if(!loadingOfflineProgress) {

@@ -12,7 +12,7 @@ export class AdventuringTutorial extends NamespacedObject {
         super(namespace, data.id);
         this.manager = manager;
         this._name = data.name;
-        this.priority = data.priority ?? 10;
+        this.priority = (data.priority !== undefined) ? data.priority : 10;
         this.trigger = data.trigger;
         this.chainTo = data.chainTo || null;
         this.requiresState = data.requiresState || null; // 'town' or 'dungeon'

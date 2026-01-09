@@ -82,6 +82,16 @@ export class AdventuringTooltipElement extends HTMLElement {
     }
 
     /**
+     * Clear the tooltip content (for pooling)
+     */
+    clearTooltip() {
+        if (this.tooltip) {
+            this.tooltip.setContent('');
+        }
+        this._pendingTooltipContent = null;
+    }
+
+    /**
      * Mount element to a parent
      * @param {HTMLElement} parent - Parent element to append to
      */

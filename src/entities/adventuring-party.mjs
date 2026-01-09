@@ -3,7 +3,7 @@ const { loadModule } = mod.getContext(import.meta);
 const { AdventuringHero } = await loadModule('src/entities/adventuring-hero.mjs');
 const { AdventuringEnemy } = await loadModule('src/entities/adventuring-enemy.mjs');
 const { AdventuringPartyElement } = await loadModule('src/entities/components/adventuring-party.mjs');
-const { evaluateCondition, buildEffectContext, createEffect } = await loadModule('src/core/adventuring-utils.mjs');
+const { evaluateCondition, buildEffectContext, createEffect, EffectLimitTracker } = await loadModule('src/core/adventuring-utils.mjs');
 
 class AdventuringParty {
     constructor(manager, game) {
@@ -12,12 +12,26 @@ class AdventuringParty {
         
         this.component = createElement('adventuring-party');
         
-        // Effect trigger limit tracking for party-scoped effects
-        this.effectTriggerCounts = {
-            combat: new Map(),
-            round: new Map(),
-            turn: new Map()
-        };
+        // Effect trigger limit tracking (shared implementation)
+        this.effectLimitTracker = new EffectLimitTracker();
+        
+        // Subscribe to events that require effect invalidation
+        this.manager.on('consumable:equipped', () => this.invalidateAllEffects('consumables'));
+        this.manager.on('consumable:unequipped', () => this.invalidateAllEffects('consumables'));
+        this.manager.on('consumable:charges-changed', () => this.invalidateAllEffects('consumables'));
+        this.manager.on('tavern:drink-changed', () => this.invalidateAllEffects('tavern'));
+    }
+    
+    /**
+     * Invalidate effect cache for all party members
+     * @param {string} source - The source of the invalidation
+     */
+    invalidateAllEffects(source) {
+        this.forEach(hero => {
+            if (hero.effectCache) {
+                hero.invalidateEffects(source);
+            }
+        });
     }
 
     get all() {
@@ -32,6 +46,73 @@ class AdventuringParty {
     /** Get all dead party members */
     get dead() {
         return this.all.filter(member => member.dead);
+    }
+    
+    // =========================================================================
+    // Party Convenience Methods
+    // =========================================================================
+    
+    /**
+     * Iterate over all party members.
+     * @param {function} callback - Function called with (member, index)
+     */
+    forEach(callback) {
+        this.all.forEach(callback);
+    }
+    
+    /**
+     * Iterate over all living party members.
+     * @param {function} callback - Function called with (member, index)
+     */
+    forEachLiving(callback) {
+        this.alive.forEach(callback);
+    }
+    
+    /**
+     * Find a party member matching a predicate.
+     * @param {function} predicate - Function returning true for match
+     * @returns {object|undefined} Matching member or undefined
+     */
+    find(predicate) {
+        return this.all.find(predicate);
+    }
+    
+    /**
+     * Check if any party member matches a predicate.
+     * @param {function} predicate - Function returning true for match
+     * @returns {boolean}
+     */
+    some(predicate) {
+        return this.all.some(predicate);
+    }
+    
+    /**
+     * Check if all party members match a predicate.
+     * @param {function} predicate - Function returning true for match
+     * @returns {boolean}
+     */
+    every(predicate) {
+        return this.all.every(predicate);
+    }
+    
+    /**
+     * Get the member with the lowest HP (among living).
+     * @returns {object|undefined} Member with lowest HP
+     */
+    get lowestHp() {
+        const living = this.alive;
+        if (living.length === 0) return undefined;
+        return living.reduce((low, m) => m.hitpoints < low.hitpoints ? m : low);
+    }
+    
+    /**
+     * Get a random living party member.
+     * @returns {object|undefined} Random living member
+     */
+    get randomLiving() {
+        const living = this.alive;
+        if (living.length === 0) return undefined;
+        return living[Math.floor(Math.random() * living.length)];
     }
 
     /** Set locked state for all party members */
@@ -173,16 +254,14 @@ class AdventuringParty {
         const target = effect.target || 'all';
         const amount = effect.amount || 0;
         
-        // Resolve targets within this party
+        // Resolve targets within this party using convenience methods
         let targets = [];
         switch (target) {
             case 'all':
                 targets = this.alive;
                 break;
             case 'lowest':
-                targets = this.alive.length > 0 
-                    ? [this.alive.reduce((low, m) => m.hitpoints < low.hitpoints ? m : low)]
-                    : [];
+                targets = this.lowestHp ? [this.lowestHp] : [];
                 break;
             case 'front':
                 targets = this.front && !this.front.dead ? [this.front] : [];
@@ -191,9 +270,7 @@ class AdventuringParty {
                 targets = this.back && !this.back.dead ? [this.back] : [];
                 break;
             case 'random':
-                targets = this.alive.length > 0 
-                    ? [this.alive[Math.floor(Math.random() * this.alive.length)]]
-                    : [];
+                targets = this.randomLiving ? [this.randomLiving] : [];
                 break;
             default:
                 targets = this.alive;
@@ -236,49 +313,19 @@ class AdventuringParty {
     }
     
     // =========================================================================
-    // Effect Limit System (same as character)
+    // Effect Limit System (delegates to EffectLimitTracker)
     // =========================================================================
     
-    getEffectKey(effect, source) {
-        const sourceId = source?.id || source?.localID || 'unknown';
-        const effectStr = JSON.stringify({
-            type: effect.type,
-            trigger: effect.trigger,
-            id: effect.id,
-            amount: effect.amount
-        });
-        return `${sourceId}:${effectStr}`;
-    }
-    
     canEffectTrigger(effect, source) {
-        if (!effect.limit) return true;
-        
-        const key = this.getEffectKey(effect, source);
-        const times = effect.times || 1;
-        const countMap = this.effectTriggerCounts[effect.limit];
-        
-        if (!countMap) return true;
-        
-        const currentCount = countMap.get(key) || 0;
-        return currentCount < times;
+        return this.effectLimitTracker.canTrigger(effect, source);
     }
     
     recordEffectTrigger(effect, source) {
-        if (!effect.limit) return;
-        
-        const key = this.getEffectKey(effect, source);
-        const countMap = this.effectTriggerCounts[effect.limit];
-        
-        if (!countMap) return;
-        
-        const currentCount = countMap.get(key) || 0;
-        countMap.set(key, currentCount + 1);
+        this.effectLimitTracker.record(effect, source);
     }
     
     resetEffectLimits(limitType) {
-        if (this.effectTriggerCounts[limitType]) {
-            this.effectTriggerCounts[limitType].clear();
-        }
+        this.effectLimitTracker.reset(limitType);
     }
 
     onLoad() {

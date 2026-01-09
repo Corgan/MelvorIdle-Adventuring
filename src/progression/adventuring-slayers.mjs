@@ -2,8 +2,8 @@ const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringPage } = await loadModule('src/ui/adventuring-page.mjs');
 const { AdventuringSlayerTask, SlayerTaskGenerator } = await loadModule('src/progression/adventuring-slayer-task.mjs');
-const { AdventuringSlayersElement } = await loadModule('src/progression/components/adventuring-slayers.mjs');
-const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
+// Side-effect import to register custom element
+await loadModule('src/progression/components/adventuring-slayers.mjs');
 const { AdventuringTaskRewardElement } = await loadModule('src/progression/components/adventuring-task-reward.mjs');
 const { AdventuringStatBadgeElement } = await loadModule('src/progression/components/adventuring-stat-badge.mjs');
 const { AdventuringAchievementRewardElement } = await loadModule('src/progression/components/adventuring-achievement-reward.mjs');
@@ -52,6 +52,15 @@ export class AdventuringSlayers extends AdventuringPage {
 
         this.component.back.onclick = () => this.back();
         this.component.refreshButton.onclick = () => this.tryRefreshTasks();
+        
+        // Subscribe to combat events
+        this.manager.on('combat:monster-killed', ({ monster }) => this.onMonsterKilled(monster));
+        
+        // Subscribe to stash events
+        this.manager.on('stash:material-added', ({ material, qty }) => this.onMaterialCollected(material, qty));
+        
+        // Subscribe to dungeon events
+        this.manager.on('dungeon:cleared', ({ area }) => this.onDungeonCleared(area));
         
         // Tab switching
         this.component.tabTasks.onclick = () => this.switchTab('tasks');
@@ -241,10 +250,8 @@ export class AdventuringSlayers extends AdventuringPage {
             this.activeTasks.splice(index, 1);
             this.totalTasksCompleted++;
 
-            // Track for achievements
-            if(this.manager.achievementManager) {
-                this.manager.achievementManager.recordSlayerTask();
-            }
+            // Emit event for cross-cutting concerns
+            this.manager.emit('slayer:task-completed', { task, rewards: task.rewards });
             
             // Build reward message
             const rewardStrings = task.rewards.map(r => {
@@ -722,20 +729,22 @@ export class AdventuringSlayers extends AdventuringPage {
             const reward = new AdventuringTaskRewardElement();
             container.appendChild(reward);
             
-            if(r.rewardType?.localID === 'material' && r.item) {
+            const rewardLocalID = (r.rewardType && r.rewardType.localID) ? r.rewardType.localID : null;
+            
+            if(rewardLocalID === 'material' && r.item) {
                 // Material with icon and tooltip
                 reward.setReward({
                     quantity: r.qty + ' ',
                     iconSrc: r.item.media,
                     tooltipContent: r.item.name
                 });
-            } else if(r.rewardType?.localID === 'job_xp' && r.item) {
+            } else if(rewardLocalID === 'job_xp' && r.item) {
                 // Job XP
                 reward.setReward({
                     quantity: `${r.qty} ${r.item.name} XP`,
                     colorClass: 'text-success'
                 });
-            } else if(r.rewardType?.localID === 'consumable' && r.item) {
+            } else if(rewardLocalID === 'consumable' && r.item) {
                 // Consumable
                 reward.setReward({
                     quantity: r.qty + ' ',

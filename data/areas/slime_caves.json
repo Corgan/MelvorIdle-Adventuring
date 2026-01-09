@@ -2,308 +2,547 @@
     "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
     "namespace": "adventuring",
     "data": {
-        "skillData": [{
-            "skillID": "adventuring:Adventuring",
-            "data": {
-                "passives": [
-                    {
-                        "id": "slime_split",
-                        "name": "Slime Split",
-                        "effects": [
-                            {
-                                "trigger": "round_start",
-                                "type": "buff",
-                                "id": "adventuring:might",
-                                "target": "all", "party": "ally",
-                                "stacks": { "base": 1, "scaling": [] }
-                            }
-                        ]
-                    }
-                ],
-                "areas": [
-                    {
-                        "id": "slime_caves",
-                        "name": "Slime Caves",
-                        "media": "melvor:assets/media/monsters/goo_monster.png",
-                        "requirements": [
-                            { "type": "skill_level", "level": 32 }
-                        ],
-                        "height": 7,
-                        "width": 6,
-                        "floors": [
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:goo_monster", "weight": 100 }
-                                ],
-                                "exit": ["adventuring:goo_monster", "adventuring:goo_monster", "adventuring:goo_monster"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:goo_monster", "weight": 60 },
-                                    { "id": "adventuring:green_goo_monster", "weight": 40 }
-                                ],
-                                "exit": ["adventuring:goo_monster", "adventuring:goo_monster", "adventuring:green_goo_monster"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:goo_monster", "weight": 30 },
-                                    { "id": "adventuring:green_goo_monster", "weight": 50 },
-                                    { "id": "adventuring:purple_goo_monster", "weight": 20 }
-                                ],
-                                "exit": ["adventuring:green_goo_monster", "adventuring:green_goo_monster", "adventuring:purple_goo_monster"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:green_goo_monster", "weight": 40 },
-                                    { "id": "adventuring:purple_goo_monster", "weight": 60 }
-                                ],
-                                "exit": ["adventuring:green_goo_monster", "adventuring:purple_goo_monster", "adventuring:purple_goo_monster"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:purple_goo_monster", "weight": 100 }
-                                ],
-                                "exit": ["adventuring:purple_goo_monster", "adventuring:purple_goo_monster", "adventuring:purple_goo_monster"]
-                            },
-                            {
-                                "monsters": [
-                                    { "id": "adventuring:purple_goo_monster", "weight": 100 }
-                                ],
-                                "exit": ["adventuring:purple_goo_monster", "adventuring:purple_goo_monster", "adventuring:scattered_goo_monster"]
-                            }
-                        ]
-                    }
-                ],
-                "monsters": [
-                    {
-                        "id": "goo_monster",
-                        "name": "Goo Monster",
-                        "media": "melvor:assets/media/monsters/goo_monster.png",
-                        "tags": ["slime"],
-                        "xp": 42,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "amount": 35 },
-                            { "id": "adventuring:defence", "amount": 18 },
-                            { "id": "adventuring:agility", "amount": 12 },
-                            { "id": "adventuring:strength", "amount": 22 },
-                            { "id": "adventuring:ranged", "amount": 15 },
-                            { "id": "adventuring:magic", "amount": 20 },
-                            { "id": "adventuring:prayer", "amount": 15 }
-                        ],
-                        "generator": "adventuring:slime_spit",
-                        "spender": "adventuring:engulf",
-                        "passives": [],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 22, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 8, "weight": 30 },
-                            { "id": "adventuring:goo", "qty": 1, "weight": 25 }
-                        ]
-                    },
-                    {
-                        "id": "green_goo_monster",
-                        "name": "Green Goo Monster",
-                        "media": "melvor:assets/media/monsters/green_goo_monster.png",
-                        "tags": ["slime"],
-                        "xp": 50,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "amount": 42 },
-                            { "id": "adventuring:defence", "amount": 22 },
-                            { "id": "adventuring:agility", "amount": 14 },
-                            { "id": "adventuring:strength", "amount": 26 },
-                            { "id": "adventuring:ranged", "amount": 18 },
-                            { "id": "adventuring:magic", "amount": 24 },
-                            { "id": "adventuring:prayer", "amount": 18 }
-                        ],
-                        "generator": "adventuring:slime_spit",
-                        "spender": "adventuring:acid_splash",
-                        "passives": [],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 28, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 10, "weight": 35 },
-                            { "id": "adventuring:goo", "qty": 1, "weight": 30 }
-                        ]
-                    },
-                    {
-                        "id": "purple_goo_monster",
-                        "name": "Purple Goo Monster",
-                        "media": "melvor:assets/media/monsters/purple_goo_monster.png",
-                        "tags": ["slime"],
-                        "xp": 58,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "amount": 50 },
-                            { "id": "adventuring:defence", "amount": 26 },
-                            { "id": "adventuring:agility", "amount": 16 },
-                            { "id": "adventuring:strength", "amount": 30 },
-                            { "id": "adventuring:ranged", "amount": 22 },
-                            { "id": "adventuring:magic", "amount": 28 },
-                            { "id": "adventuring:prayer", "amount": 22 }
-                        ],
-                        "generator": "adventuring:slime_spit",
-                        "spender": "adventuring:toxic_wave",
-                        "passives": ["adventuring:slime_split"],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 35, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 12, "weight": 40 },
-                            { "id": "adventuring:goo", "qty": 2, "weight": 35 }
-                        ]
-                    },
-                    {
-                        "id": "scattered_goo_monster",
-                        "name": "Scattered Goo Monster",
-                        "media": "melvor:assets/media/monsters/scattered_goo_monster.png",
-                        "tags": ["slime", "boss"],
-                        "isBoss": true,
-                        "xp": 140,
-                        "stats": [
-                            { "id": "adventuring:hitpoints", "amount": 110 },
-                            { "id": "adventuring:defence", "amount": 38 },
-                            { "id": "adventuring:agility", "amount": 20 },
-                            { "id": "adventuring:strength", "amount": 42 },
-                            { "id": "adventuring:ranged", "amount": 30 },
-                            { "id": "adventuring:magic", "amount": 40 },
-                            { "id": "adventuring:prayer", "amount": 30 }
-                        ],
-                        "generator": "adventuring:slime_barrage",
-                        "spender": "adventuring:toxic_wave",
-                        "passives": ["adventuring:slime_split"],
-                        "loot": [
-                            { "id": "adventuring:currency", "qty": 85, "weight": 100 },
-                            { "id": "adventuring:parts", "qty": 20, "weight": 50 },
-                            { "id": "adventuring:big_parts", "qty": 5, "weight": 35 },
-                            { "id": "adventuring:goo", "qty": 4, "weight": 50 }
-                        ]
-                    }
-                ],
-                "generators": [
-                    {
-                        "id": "slime_spit",
-                        "name": "Slime Spit",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "energy": 50,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 8,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "amount": 0.8 }
-                                            ]
-                                        }
+        "skillData": [
+            {
+                "skillID": "adventuring:Adventuring",
+                "data": {
+                    "passives": [
+                        {
+                            "id": "slime_split",
+                            "name": "Slime Split",
+                            "effects": [
+                                {
+                                    "trigger": "round_start",
+                                    "type": "buff",
+                                    "id": "adventuring:might",
+                                    "target": "all",
+                                    "party": "ally",
+                                    "stacks": {
+                                        "base": 1,
+                                        "scaling": []
                                     }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "slime_barrage",
-                        "name": "Slime Barrage",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "energy": 60,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 6,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "amount": 0.6 }
-                                            ]
+                                }
+                            ]
+                        }
+                    ],
+                    "areas": [
+                        {
+                            "id": "slime_caves",
+                            "name": "Slime Caves",
+                            "media": "melvor:assets/media/monsters/goo_monster.png",
+                            "requirements": [
+                                {
+                                    "type": "skill_level",
+                                    "level": 32
+                                }
+                            ],
+                            "height": 7,
+                            "width": 6,
+                            "floors": [
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:goo_monster",
+                                            "weight": 100
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ],
-                "spenders": [
-                    {
-                        "id": "engulf",
-                        "name": "Engulf",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 100,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 18,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "amount": 1.2 }
-                                            ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:goo_monster",
+                                        "adventuring:goo_monster",
+                                        "adventuring:goo_monster"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:goo_monster",
+                                            "weight": 60
+                                        },
+                                        {
+                                            "id": "adventuring:green_goo_monster",
+                                            "weight": 40
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "acid_splash",
-                        "name": "Acid Splash",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 100,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 15,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "amount": 1.0 }
-                                            ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:goo_monster",
+                                        "adventuring:goo_monster",
+                                        "adventuring:green_goo_monster"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:goo_monster",
+                                            "weight": 30
+                                        },
+                                        {
+                                            "id": "adventuring:green_goo_monster",
+                                            "weight": 50
+                                        },
+                                        {
+                                            "id": "adventuring:purple_goo_monster",
+                                            "weight": 20
                                         }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:weaken",
-                                        "stacks": { "base": 2, "scaling": [] }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "toxic_wave",
-                        "name": "Toxic Wave",
-                        "requirements": [],
-                        "isEnemy": true,
-                        "cost": 100,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 20,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "amount": 1.4 }
-                                            ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:green_goo_monster",
+                                        "adventuring:green_goo_monster",
+                                        "adventuring:purple_goo_monster"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:green_goo_monster",
+                                            "weight": 40
+                                        },
+                                        {
+                                            "id": "adventuring:purple_goo_monster",
+                                            "weight": 60
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ]
+                                    ],
+                                    "exit": [
+                                        "adventuring:green_goo_monster",
+                                        "adventuring:purple_goo_monster",
+                                        "adventuring:purple_goo_monster"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:purple_goo_monster",
+                                            "weight": 100
+                                        }
+                                    ],
+                                    "exit": [
+                                        "adventuring:purple_goo_monster",
+                                        "adventuring:purple_goo_monster",
+                                        "adventuring:purple_goo_monster"
+                                    ]
+                                },
+                                {
+                                    "monsters": [
+                                        {
+                                            "id": "adventuring:purple_goo_monster",
+                                            "weight": 100
+                                        }
+                                    ],
+                                    "exit": [
+                                        "adventuring:purple_goo_monster",
+                                        "adventuring:purple_goo_monster",
+                                        "adventuring:scattered_goo_monster"
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "monsters": [
+                        {
+                            "id": "goo_monster",
+                            "name": "Goo Monster",
+                            "media": "melvor:assets/media/monsters/goo_monster.png",
+                            "tags": [
+                                "slime"
+                            ],
+                            "xp": 42,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "amount": 35
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "amount": 18
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "amount": 12
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "amount": 22
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "amount": 15
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "amount": 20
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "amount": 15
+                                }
+                            ],
+                            "generator": "adventuring:slime_spit",
+                            "spender": "adventuring:engulf",
+                            "passives": [],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 22,
+                                    "type": "currency"
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 8,
+                                    "type": "salvage"
+                                },
+                                {
+                                    "id": "adventuring:goo",
+                                    "qty": 1,
+                                    "type": "materials",
+                                    "chance": 0.25
+                                }
+                            ]
+                        },
+                        {
+                            "id": "green_goo_monster",
+                            "name": "Green Goo Monster",
+                            "media": "melvor:assets/media/monsters/green_goo_monster.png",
+                            "tags": [
+                                "slime"
+                            ],
+                            "xp": 50,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "amount": 42
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "amount": 22
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "amount": 14
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "amount": 26
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "amount": 18
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "amount": 24
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "amount": 18
+                                }
+                            ],
+                            "generator": "adventuring:slime_spit",
+                            "spender": "adventuring:acid_splash",
+                            "passives": [],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 28,
+                                    "type": "currency"
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 10,
+                                    "type": "salvage"
+                                },
+                                {
+                                    "id": "adventuring:goo",
+                                    "qty": 1,
+                                    "type": "materials",
+                                    "chance": 0.3
+                                }
+                            ]
+                        },
+                        {
+                            "id": "purple_goo_monster",
+                            "name": "Purple Goo Monster",
+                            "media": "melvor:assets/media/monsters/purple_goo_monster.png",
+                            "tags": [
+                                "slime"
+                            ],
+                            "xp": 58,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "amount": 50
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "amount": 26
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "amount": 16
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "amount": 30
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "amount": 22
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "amount": 28
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "amount": 22
+                                }
+                            ],
+                            "generator": "adventuring:slime_spit",
+                            "spender": "adventuring:toxic_wave",
+                            "passives": [
+                                "adventuring:slime_split"
+                            ],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 35,
+                                    "type": "currency"
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 12,
+                                    "type": "salvage"
+                                },
+                                {
+                                    "id": "adventuring:goo",
+                                    "qty": 2,
+                                    "type": "materials",
+                                    "chance": 0.35
+                                }
+                            ]
+                        },
+                        {
+                            "id": "scattered_goo_monster",
+                            "name": "Scattered Goo Monster",
+                            "media": "melvor:assets/media/monsters/scattered_goo_monster.png",
+                            "tags": [
+                                "slime",
+                                "boss"
+                            ],
+                            "isBoss": true,
+                            "xp": 140,
+                            "stats": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "amount": 110
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "amount": 38
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "amount": 20
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "amount": 42
+                                },
+                                {
+                                    "id": "adventuring:ranged",
+                                    "amount": 30
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "amount": 40
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "amount": 30
+                                }
+                            ],
+                            "generator": "adventuring:slime_barrage",
+                            "spender": "adventuring:toxic_wave",
+                            "passives": [
+                                "adventuring:slime_split"
+                            ],
+                            "loot": [
+                                {
+                                    "id": "adventuring:currency",
+                                    "qty": 85,
+                                    "type": "currency"
+                                },
+                                {
+                                    "id": "adventuring:parts",
+                                    "qty": 20,
+                                    "type": "salvage"
+                                },
+                                {
+                                    "type": "salvage",
+                                    "id": "adventuring:pristine_salvage",
+                                    "qty": 2
+                                },
+                                {
+                                    "id": "adventuring:big_parts",
+                                    "qty": 5,
+                                    "type": "salvage"
+                                },
+                                {
+                                    "id": "adventuring:goo",
+                                    "qty": 4,
+                                    "type": "materials",
+                                    "chance": 0.5
+                                }
+                            ]
+                        }
+                    ],
+                    "generators": [
+                        {
+                            "id": "slime_spit",
+                            "name": "Slime Spit",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "energy": 50,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 8,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "amount": 0.8
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "slime_barrage",
+                            "name": "Slime Barrage",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "energy": 60,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 6,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "amount": 0.6
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "spenders": [
+                        {
+                            "id": "engulf",
+                            "name": "Engulf",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 100,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 18,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "amount": 1.2
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "acid_splash",
+                            "name": "Acid Splash",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 100,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 15,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "amount": 1
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:weaken",
+                                            "stacks": {
+                                                "base": 2,
+                                                "scaling": []
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "toxic_wave",
+                            "name": "Toxic Wave",
+                            "requirements": [],
+                            "isEnemy": true,
+                            "cost": 100,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 20,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "amount": 1.4
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
             }
-        }]
+        ]
     }
 }

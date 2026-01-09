@@ -30,7 +30,11 @@ export class AdventuringJob extends AdventuringMasteryAction {
         
         // Job tier (0-5+ for combat jobs, used for categorization)
         // If not specified, defaults to 0 for passive jobs, or detected by requirements
-        this.tier = data.tier ?? (this.isPassive ? 0 : this.detectTierFromRequirements(data.requirements));
+        let tier = this.isPassive ? 0 : this.detectTierFromRequirements(data.requirements);
+        if (data.tier !== undefined) {
+            tier = data.tier;
+        }
+        this.tier = tier;
 
         if(data.allowedItems !== undefined)
             this._allowedItems = data.allowedItems;
@@ -163,7 +167,7 @@ export class AdventuringJob extends AdventuringMasteryAction {
 
     addXP(xp) {
         addMasteryXPWithBonus(this.manager, this, xp);
-        this.manager.party.all.forEach(member => (member.renderQueue.jobs = true));
+        this.manager.party.forEach(member => (member.renderQueue.jobs = true));
     }
 
     viewDetails() {

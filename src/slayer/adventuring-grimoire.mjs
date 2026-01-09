@@ -21,10 +21,10 @@ export class AdventuringGrimoire {
      * Attempt to learn an ability from an enemy.
      */
     tryLearn(hero, enemy, learnType, learnBonus = 0) {
-        if(!enemy?.base) return null;
+        if(!enemy || !enemy.base) return null;
         
         const ability = learnType === 'generator' ? enemy.generator : enemy.spender;
-        if(!ability?.isEnemy) return null;
+        if(!ability || !ability.isEnemy) return null;
         
         // Already learned?
         if(this.learnedAbilities.has(ability.id)) return null;
@@ -35,6 +35,9 @@ export class AdventuringGrimoire {
         
         // Learn it
         this.learnedAbilities.add(ability.id);
+        
+        // Emit event for cross-cutting concerns
+        this.manager.emit('grimoire:ability-learned', { hero, enemy, ability });
         
         // Notify
         this.manager.log.add(`${hero.name} learned ${ability.name}!`);

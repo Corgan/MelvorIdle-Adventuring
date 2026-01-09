@@ -420,6 +420,43 @@
     </div>
 </template>
 
+<!-- Reusable icon button with border, badge support, and tooltip -->
+<template id="adventuring-icon-button-template">
+    <div class="pointer-enabled m-1" id="container" style="position: relative; width: fit-content;">
+        <div class="border-2x border-rounded-equip combat-equip-img fishing-img m-0 border-secondary" id="border" style="position: relative; overflow: hidden; border-width: 2px!important; border-style: solid!important;">
+            <img class="w-100 p-1" id="icon">
+            <span class="badge d-none" id="cornerBadge" style="position: absolute; top: 2px; right: 2px; font-size: 0.5rem; z-index: 10;"></span>
+        </div>
+        <div class="font-size-sm text-white text-center d-none" id="bottomBadge" style="position: absolute; bottom: -8px; width: 100%;"></div>
+    </div>
+</template>
+
+<!-- Stat row - simple label: value display -->
+<template id="adventuring-stat-row-template">
+    <div class="d-flex justify-content-between" id="row">
+        <span class="text-muted" id="label"></span>
+        <span id="value"></span>
+    </div>
+</template>
+
+<!-- Category section with header -->
+<template id="adventuring-category-section-template">
+    <div class="mb-3" id="section">
+        <h6 class="font-w600 text-muted mb-2 border-bottom border-dark pb-1" id="header"></h6>
+        <div id="content"></div>
+    </div>
+</template>
+
+<!-- Grimoire row - area or ability with icon, name, and status -->
+<template id="adventuring-grimoire-row-template">
+    <div class="d-flex align-items-center p-2 bg-combat-inner-dark rounded mb-1 pointer-enabled" id="row" style="cursor: pointer;">
+        <img class="skill-icon-xs mr-2" id="icon">
+        <span class="font-size-sm font-w600" id="name"></span>
+        <span class="ml-auto badge" id="badge"></span>
+        <i class="fa fa-chevron-right ml-2 text-muted d-none" id="chevron"></i>
+    </div>
+</template>
+
 <!-- Job selector button - used in job small selector popup -->
 <template id="adventuring-job-selector-btn-template">
     <div class="position-relative m-1" id="wrapper">
@@ -494,6 +531,11 @@
 <!-- Empty state message - centered placeholder for empty containers -->
 <template id="adventuring-empty-state-template">
     <div class="text-center text-muted p-3" id="container"></div>
+</template>
+
+<!-- Badge element - reusable styled badge for locations, tiers, etc -->
+<template id="adventuring-badge-template">
+    <span class="badge badge-secondary mr-1" id="badge"></span>
 </template>
 
 <!-- Achievement reward item - displays a reward in achievement cards -->
@@ -906,8 +948,11 @@
 
 <template id="adventuring-message-template">
     <div class="list-group-item p-1 bg-combat-inner-dark border-secondary">
-        <div class="d-flex w-100 justify-content-between">
-            <small id="body"></small>
+        <div class="d-flex w-100 justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+                <img id="icon" class="skill-icon-xxs mr-1 d-none" />
+                <small id="body"></small>
+            </div>
             <small id="ts"></small>
         </div>
     </div>
@@ -1669,5 +1714,96 @@
             <!-- Action button -->
             <button id="actionBtn" class="btn btn-sm btn-block"></button>
         </div>
+    </div>
+</template>
+
+<!-- Monster Details Page - Shows detailed drop information -->
+<template id="adventuring-monster-details-template">
+    <div id="page" class="row no-gutters d-none">
+        <button id="back" class="btn btn-alt-info ml-3 mr-3 mb-3 mt-2 position-absolute" style="z-index: 10;">Back to Bestiary</button>
+        
+        <!-- Header -->
+        <div class="col-12 text-center">
+            <img class="skill-icon-md m-0 mt-2" id="icon">
+        </div>
+        <div class="col-12">
+            <h3 id="name" class="font-w700 text-combat-smoke text-center m-0 mt-2">Name</h3>
+            <p id="tags" class="text-muted text-center mb-2"></p>
+        </div>
+        
+        <!-- Stats & Kill Count -->
+        <div class="col-12 pt-3">
+            <div class="row no-gutters">
+                <!-- Kill Count & Mastery -->
+                <div class="col-12 col-md-4">
+                    <div class="block-content p-3">
+                        <h5 class="font-w600 text-combat-smoke mb-2">Mastery</h5>
+                        <div class="block block-rounded-double bg-combat-inner-dark p-3">
+                            <div class="mb-2"><span class="text-muted">Kill Count: </span><span id="killCount">0</span></div>
+                            <div class="mb-2"><span class="text-muted">Mastery Level: </span><span id="masteryLevel">0</span></div>
+                            <div class="progress active" style="height: 12px">
+                                <progress-bar id="mastery-progress"></progress-bar>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Stats -->
+                <div class="col-12 col-md-4">
+                    <div class="block-content p-3">
+                        <h5 class="font-w600 text-combat-smoke mb-2">Base Stats</h5>
+                        <div class="block block-rounded-double bg-combat-inner-dark p-3" id="stats"></div>
+                    </div>
+                </div>
+                
+                <!-- Abilities -->
+                <div class="col-12 col-md-4">
+                    <div class="block-content p-3">
+                        <h5 class="font-w600 text-combat-smoke mb-2">Abilities</h5>
+                        <div class="block block-rounded-double bg-combat-inner-dark p-3" id="abilities"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Drops Section -->
+        <div class="col-12 pt-3">
+            <div class="block-content p-3">
+                <h5 class="font-w600 text-combat-smoke mb-2">
+                    Drops 
+                    <small id="dropLock" class="text-warning">(Reach mastery level 5 to reveal)</small>
+                </h5>
+                <div class="block block-rounded-double bg-combat-inner-dark p-3" id="drops">
+                    <!-- Header row -->
+                    <div class="d-flex align-items-center p-2 mb-2 border-bottom border-secondary">
+                        <span class="font-w600 text-muted" style="width: 32px;"></span>
+                        <span class="font-w600 text-muted">Item</span>
+                        <span class="font-w600 text-muted ml-auto">Type</span>
+                        <small class="font-w600 text-muted ml-3" style="min-width: 50px;">Qty</small>
+                        <small class="font-w600 text-muted ml-2" style="min-width: 50px;">Chance</small>
+                    </div>
+                    <div id="dropRows"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Found In Section -->
+        <div class="col-12 pt-3">
+            <div class="block-content p-3">
+                <h5 class="font-w600 text-combat-smoke mb-2">Found In</h5>
+                <div class="block block-rounded-double bg-combat-inner-dark p-3" id="locations"></div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<!-- Loot Row - Single row in drop table -->
+<template id="adventuring-loot-row-template">
+    <div class="d-flex align-items-center p-2 mb-1 border-bottom border-dark" id="row">
+        <img id="icon" class="skill-icon-xs mr-2">
+        <span class="font-w600" id="name"></span>
+        <span class="badge ml-auto" id="typeBadge"></span>
+        <small class="text-muted ml-3" id="qty" style="min-width: 50px;"></small>
+        <small class="text-muted ml-2" id="chance" style="min-width: 50px;"></small>
     </div>
 </template>

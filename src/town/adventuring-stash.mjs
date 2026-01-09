@@ -219,24 +219,12 @@ export class AdventuringStash extends AdventuringPage {
             material.renderQueue.count = true;
             this.manager.log.add(`Found ${qty} ${material.name}`);
             
-            // Track material collection for Slayer tasks
-            this.manager.slayers.onMaterialCollected(material, qty);
-
-            // Track for achievements
-            if(this.manager.achievementManager) {
-                if(material.isCurrency) {
-                    this.manager.achievementManager.recordCurrency(qty);
-                } else {
-                    this.manager.achievementManager.recordMaterials(qty);
-                }
-            }
-
-            // Check tutorial triggers
-            if(material.isCurrency) {
-                this.manager.tutorialManager.checkTriggers('currency');
-            } else {
-                this.manager.tutorialManager.checkTriggers('material');
-            }
+            // Emit event for cross-cutting concerns
+            this.manager.emit('stash:material-added', { 
+                material, 
+                qty, 
+                isCurrency: material.isCurrency 
+            });
         }
     }
 

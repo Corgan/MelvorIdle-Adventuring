@@ -13,11 +13,11 @@ export class AdventuringMasteryCategory extends NamespacedObject {
         this._media = data.media;
         
         // Maximum mastery level
-        this.maxLevel = data.maxLevel ?? 99;
+        this.maxLevel = (data.maxLevel !== undefined) ? data.maxLevel : 99;
         
         // Milestones with effects arrays
         // Each milestone: { level, scaling?, effects: [{ trigger, type, value, ... }] }
-        this.milestones = data.milestones ?? [];
+        this.milestones = data.milestones || [];
         
         // Sort milestones by level for efficient lookup
         this.milestones.sort((a, b) => a.level - b.level);
@@ -88,7 +88,8 @@ export class AdventuringMasteryCategory extends NamespacedObject {
      * @returns {Object|null} Next milestone or null if maxed
      */
     getNextMilestone(level) {
-        return this.milestones.find(m => m.level > level) ?? null;
+        const found = this.milestones.find(m => m.level > level);
+        return found || null;
     }
 
     /**
