@@ -2,250 +2,329 @@
     "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
     "namespace": "adventuring",
     "data": {
-        "skillData": [{
-            "skillID": "adventuring:Adventuring",
-            "data": {
-                "jobs": [
-                    {
-                        "id": "guardian",
-                        "tier": 2,
-                        "name": "Guardian",
-                        "media": "melvor:assets/media/skills/combat/defence.svg#tint=orange",
-                        "requirements": [
-                            { "type": "job_level", "job": "adventuring:paladin", "level": 20 }
-                        ],
-                        "isMilestoneReward": true,
-                        "allowedItems": [
-                            "adventuring:helm",
-                            "adventuring:platebody",
-                            "adventuring:platelegs",
-                            "adventuring:gauntlets",
-                            "adventuring:sabatons",
-                            "adventuring:amulet",
-                            "adventuring:ring",
-                            "adventuring:cape",
-                            "adventuring:shield",
-                            "adventuring:sword1h",
-                            "adventuring:mace"
-                        ],
-                        "scaling": [
-                            { "id": "adventuring:hitpoints", "amount": 2.0 },
-                            { "id": "adventuring:defence", "amount": 2.0 },
-                            { "id": "adventuring:agility", "amount": 0.25 },
-                            { "id": "adventuring:strength", "amount": 1.0 },
-                            { "id": "adventuring:prayer", "amount": 0.5 }
-                        ]
-                    }
-                ],
-                "generators": [
-                    {
-                        "id": "shield_wall",
-                        "name": "Shield Wall",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:guardian", "level": 1 }
-                        ],
-                        "energy": 20,
-                        "hits": [
-                            {
-                                "target": "self",
-                                "party": "ally",
-                                "effects": [
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:block",
-                                        "stacks": {
-                                            "base": 4,
-                                            "scaling": [
-                                                { "id": "adventuring:defence", "amount": 0.3 }
-                                            ]
+        "skillData": [
+            {
+                "skillID": "adventuring:Adventuring",
+                "data": {
+                    "jobs": [
+                        {
+                            "id": "guardian",
+                            "tier": 2,
+                            "name": "Guardian",
+                            "media": "melvor:assets/media/skills/combat/defence.svg#tint=orange",
+                            "requirements": [
+                                {
+                                    "type": "job_level",
+                                    "job": "adventuring:paladin",
+                                    "level": 20
+                                }
+                            ],
+                            "isMilestoneReward": true,
+                            "allowedItems": [
+                                "adventuring:helm",
+                                "adventuring:platebody",
+                                "adventuring:platelegs",
+                                "adventuring:gauntlets",
+                                "adventuring:sabatons",
+                                "adventuring:amulet",
+                                "adventuring:ring",
+                                "adventuring:cape",
+                                "adventuring:shield",
+                                "adventuring:sword1h",
+                                "adventuring:mace"
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "amount": 2
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "amount": 2
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "amount": 0.25
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "amount": 1
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "amount": 0.5
+                                }
+                            ]
+                        }
+                    ],
+                    "generators": [
+                        {
+                            "id": "shield_wall",
+                            "name": "Shield Wall",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:guardian",
+                                    "level": 1
+                                }
+                            ],
+                            "energy": 20,
+                            "hits": [
+                                {
+                                    "target": "self",
+                                    "party": "ally",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "id": "adventuring:block",
+                                            "stacks": {
+                                                "base": 4,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:defence",
+                                                        "amount": 0.3
+                                                    }
+                                                ]
+                                            }
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "punish",
-                        "name": "Punish",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:guardian", "level": 10 }
-                        ],
-                        "energy": 25,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 10,
-                                            "scaling": [
-                                                { "id": "adventuring:defence", "amount": 0.25 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:weaken",
-                                        "stacks": {
-                                            "base": 2,
-                                            "scaling": [
-                                                { "id": "adventuring:defence", "amount": 0.1 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ],
-                "spenders": [
-                    {
-                        "id": "stand_firm",
-                        "name": "Stand Firm",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:guardian", "level": 5 }
-                        ],
-                        "cost": 100,
-                        "hits": [
-                            {
-                                "target": "lowest",
-                                "party": "ally",
-                                "effects": [
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:block",
-                                        "stacks": {
-                                            "base": 5,
-                                            "scaling": [
-                                                { "id": "adventuring:defence", "amount": 0.4 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:barrier",
-                                        "stacks": {
-                                            "base": 3,
-                                            "scaling": [
-                                                { "id": "adventuring:defence", "amount": 0.2 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "bastion",
-                        "name": "Bastion",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:guardian", "level": 15 }
-                        ],
-                        "cost": 140,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "ally",
-                                "effects": [
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:block",
-                                        "stacks": {
-                                            "base": 3,
-                                            "scaling": [
-                                                { "id": "adventuring:defence", "amount": 0.3 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "last_stand",
-                        "name": "Last Stand",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:guardian", "level": 25 }
-                        ],
-                        "cost": 120,
-                        "hits": [
-                            {
-                                "target": "self",
-                                "party": "ally",
-                                "effects": [
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:block",
-                                        "stacks": {
-                                            "base": 10,
-                                            "scaling": [
-                                                { "id": "adventuring:defence", "amount": 0.75 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:thorns",
-                                        "stacks": {
-                                            "base": 5,
-                                            "scaling": [
-                                                { "id": "adventuring:defence", "amount": 0.25 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ],
-                "passives": [
-                    {
-                        "id": "iron_will",
-                        "name": "Iron Will",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:guardian", "level": 20 }
-                        ],
-                        "effects": [
-                            {
-                                "trigger": "encounter_start",
-                                "type": "buff",
-                                "target": "self",
-                                "id": "adventuring:block",
-                                "stacks": {
-                                    "base": 5,
-                                    "scaling": [
-                                        { "id": "adventuring:defence", "amount": 0.5 }
                                     ]
                                 }
-                            }
-                        ]
-                    },
-                    {
-                        "id": "stalwart_defender",
-                        "name": "Stalwart Defender",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:guardian", "level": 30 }
-                        ],
-                        "effects": [
-                            {
-                                "trigger": "round_start",
-                                "type": "buff",
-                                "target": "lowest",
-                                "party": "ally",
-                                "id": "adventuring:block",
-                                "stacks": {
-                                    "base": 2,
-                                    "scaling": [
-                                        { "id": "adventuring:defence", "amount": 0.2 }
+                            ]
+                        },
+                        {
+                            "id": "punish",
+                            "name": "Punish",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:guardian",
+                                    "level": 10
+                                }
+                            ],
+                            "energy": 25,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 10,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:defence",
+                                                        "amount": 0.25
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:weaken",
+                                            "stacks": {
+                                                "base": 2,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:defence",
+                                                        "amount": 0.1
+                                                    }
+                                                ]
+                                            }
+                                        }
                                     ]
                                 }
-                            }
-                        ]
-                    }
-                ]
+                            ]
+                        }
+                    ],
+                    "spenders": [
+                        {
+                            "id": "stand_firm",
+                            "name": "Stand Firm",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:guardian",
+                                    "level": 1
+                                }
+                            ],
+                            "cost": 100,
+                            "hits": [
+                                {
+                                    "target": "lowest",
+                                    "party": "ally",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "id": "adventuring:block",
+                                            "stacks": {
+                                                "base": 5,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:defence",
+                                                        "amount": 0.4
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "buff",
+                                            "id": "adventuring:barrier",
+                                            "stacks": {
+                                                "base": 3,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:defence",
+                                                        "amount": 0.2
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "bastion",
+                            "name": "Bastion",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:guardian",
+                                    "level": 15
+                                }
+                            ],
+                            "cost": 140,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "ally",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "id": "adventuring:block",
+                                            "stacks": {
+                                                "base": 3,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:defence",
+                                                        "amount": 0.3
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "last_stand",
+                            "name": "Last Stand",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:guardian",
+                                    "level": 25
+                                }
+                            ],
+                            "cost": 120,
+                            "hits": [
+                                {
+                                    "target": "self",
+                                    "party": "ally",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "id": "adventuring:block",
+                                            "stacks": {
+                                                "base": 10,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:defence",
+                                                        "amount": 0.75
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "buff",
+                                            "id": "adventuring:thorns",
+                                            "stacks": {
+                                                "base": 5,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:defence",
+                                                        "amount": 0.25
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "passives": [
+                        {
+                            "id": "iron_will",
+                            "name": "Iron Will",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:guardian",
+                                    "level": 20
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "encounter_start",
+                                    "type": "buff",
+                                    "target": "self",
+                                    "id": "adventuring:block",
+                                    "stacks": {
+                                        "base": 5,
+                                        "scaling": [
+                                            {
+                                                "id": "adventuring:defence",
+                                                "amount": 0.5
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "id": "stalwart_defender",
+                            "name": "Stalwart Defender",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:guardian",
+                                    "level": 30
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "round_start",
+                                    "type": "buff",
+                                    "target": "lowest",
+                                    "party": "ally",
+                                    "id": "adventuring:block",
+                                    "stacks": {
+                                        "base": 2,
+                                        "scaling": [
+                                            {
+                                                "id": "adventuring:defence",
+                                                "amount": 0.2
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
             }
-        }]
+        ]
     }
 }

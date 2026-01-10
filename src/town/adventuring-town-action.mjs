@@ -1,6 +1,6 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { RequirementsChecker } = await loadModule('src/core/adventuring-utils.mjs');
+const { RequirementsChecker, defaultEffectProcessor, buildEffectContext } = await loadModule('src/core/adventuring-utils.mjs');
 
 export class AdventuringTownAction extends NamespacedObject {
     constructor(namespace, data, manager, game) {
@@ -44,21 +44,15 @@ export class AdventuringTownAction extends NamespacedObject {
 
     execute(character, building) {
         this.effects.forEach(effect => {
-            if(effect.type === "revive") {
-                let { amount } = effect;
-                character.revive({ amount });
-            }
-            if(effect.type === "heal") {
-                let amount = Math.floor(effect.amount / 100 * character.maxHitpoints);
-                character.heal({ amount });
-            }
-            if(effect.type === "heal_flat") {
-                let amount = effect.amount;
-                character.heal({ amount });
-            }
-            if(effect.type === "work") {
-                building.page.doWork(character);
-            }
+            // Build context for effect processing
+            // The processor handlers handle targeting (target: 'all', 'self', etc.)
+            const context = {
+                character: character,
+                manager: this.manager,
+                extra: { building, source: character }
+            };
+            
+            defaultEffectProcessor.processSimple(effect, effect.amount || 0, this.name, context);
         });
     }
 

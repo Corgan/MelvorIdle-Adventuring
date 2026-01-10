@@ -341,8 +341,8 @@ export class AdventuringSlayers extends AdventuringPage {
         if(!this.renderQueue.achievements && !this.renderQueue.all)
             return;
 
-        // Auto-complete any achievements that are met before rendering
-        this.manager.achievementManager.checkAchievements();
+        // Process any pending achievement checks before rendering
+        this.manager.achievementManager.checkIfDirty();
 
         this.renderAchievementSummary();
         this.renderAchievementCategoryFilter();

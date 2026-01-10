@@ -2,380 +2,500 @@
     "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
     "namespace": "adventuring",
     "data": {
-        "skillData": [{
-            "skillID": "adventuring:Adventuring",
-            "data": {
-                "jobs": [
-                    {
-                        "id": "rogue",
-                        "tier": 1,
-                        "name": "Rogue",
-                        "media": "melvor:assets/media/skills/thieving/thieving.svg#tint=cyan",
-                        "requirements": [
-                            { "type": "skill_level", "level": 10 }
-                        ],
-                        "isMilestoneReward": true,
-                        "allowedItems": [
-                            "adventuring:cowl",
-                            "adventuring:vest",
-                            "adventuring:chaps",
-                            "adventuring:vambraces",
-                            "adventuring:boots",
-
-                            "adventuring:amulet",
-                            "adventuring:ring",
-                            "adventuring:cape",
-
-                            "adventuring:buckler",
-                            "adventuring:dagger",
-                            "adventuring:sword1h",
-                            "adventuring:scimitar",
-                            "adventuring:knives"
-                        ],
-                        "scaling": [
-                            { "id": "adventuring:hitpoints", "amount": 1 },
-                            { "id": "adventuring:defence", "amount": 0.5 },
-                            { "id": "adventuring:agility", "amount": 1.75 },
-                            { "id": "adventuring:strength", "amount": 1.25 }
-                        ]
-                    }
-                ],
-                "generators": [
-                    {
-                        "id": "stab",
-                        "name": "Stab",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:rogue", "level": 1 }
-                        ],
-                        "energy": 20,
-                        "hits": [
-                            {
-                                "target": "back",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 10,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "amount": 0.25 },
-                                                { "id": "adventuring:agility", "amount": 0.25 }
-                                            ]
+        "skillData": [
+            {
+                "skillID": "adventuring:Adventuring",
+                "data": {
+                    "jobs": [
+                        {
+                            "id": "rogue",
+                            "tier": 1,
+                            "name": "Rogue",
+                            "media": "melvor:assets/media/skills/thieving/thieving.svg#tint=cyan",
+                            "requirements": [
+                                {
+                                    "type": "skill_level",
+                                    "level": 10
+                                }
+                            ],
+                            "isMilestoneReward": true,
+                            "allowedItems": [
+                                "adventuring:cowl",
+                                "adventuring:vest",
+                                "adventuring:chaps",
+                                "adventuring:vambraces",
+                                "adventuring:boots",
+                                "adventuring:amulet",
+                                "adventuring:ring",
+                                "adventuring:cape",
+                                "adventuring:buckler",
+                                "adventuring:dagger",
+                                "adventuring:sword1h",
+                                "adventuring:scimitar",
+                                "adventuring:knives"
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "amount": 1
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "amount": 0.5
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "amount": 1.75
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "amount": 1.25
+                                }
+                            ]
+                        }
+                    ],
+                    "generators": [
+                        {
+                            "id": "stab",
+                            "name": "Stab",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:rogue",
+                                    "level": 1
+                                }
+                            ],
+                            "energy": 20,
+                            "hits": [
+                                {
+                                    "target": "back",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 10,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "amount": 0.25
+                                                    },
+                                                    {
+                                                        "id": "adventuring:agility",
+                                                        "amount": 0.25
+                                                    }
+                                                ]
+                                            }
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "twin_strike",
-                        "name": "Twin Strike",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:rogue", "level": 10 }
-                        ],
-                        "energy": 20,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 5,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "amount": 0.25 },
-                                                { "id": "adventuring:agility", "amount": 0.25 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            },
-                            {
-                                "target": "back",
-                                "party": "enemy",
-                                "delay": 0,
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 10,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "amount": 0.35 },
-                                                { "id": "adventuring:agility", "amount": 0.35 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "backstab",
-                        "name": "Backstab",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:rogue", "level": 15 }
-                        ],
-                        "energy": 25,
-                        "hits": [
-                            {
-                                "target": "back",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 20,
-                                            "scaling": [
-                                                { "id": "adventuring:agility", "amount": 0.5 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:marked",
-                                        "stacks": {
-                                            "base": 2,
-                                            "scaling": [
-                                                { "id": "adventuring:agility", "amount": 0.1 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ],
-                "spenders": [
-                    {
-                        "id": "eviscerate",
-                        "name": "Eviscerate",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:rogue", "level": 5 }
-                        ],
-                        "cost": 100,
-                        "hits": [
-                            {
-                                "target": "lowest",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 20,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "amount": 1 },
-                                                { "id": "adventuring:agility", "amount": 1 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "smoke_bomb",
-                        "name": "Smoke Bomb",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:rogue", "level": 20 }
-                        ],
-                        "cost": 80,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:stun",
-                                        "stacks": 1
-                                    }
-                                ]
-                            },
-                            {
-                                "target": "self",
-                                "party": "ally",
-                                "effects": [
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:block",
-                                        "stacks": {
-                                            "base": 2,
-                                            "scaling": [
-                                                { "id": "adventuring:agility", "amount": 0.1 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "assassinate",
-                        "name": "Assassinate",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:rogue", "level": 30 }
-                        ],
-                        "cost": 200,
-                        "hits": [
-                            {
-                                "target": "lowest",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 50,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "amount": 1.5 },
-                                                { "id": "adventuring:agility", "amount": 1.5 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "blade_flurry",
-                        "name": "Blade Flurry",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:rogue", "level": 40 }
-                        ],
-                        "cost": 150,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "delay": 60,
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 8,
-                                            "scaling": [
-                                                { "id": "adventuring:agility", "amount": 0.2 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:poison",
-                                        "stacks": { "base": 1 }
-                                    }
-                                ],
-                                "repeat": 4
-                            }
-                        ]
-                    },
-                    {
-                        "id": "death_lotus",
-                        "name": "Death Lotus",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:rogue", "level": 50 }
-                        ],
-                        "cost": 200,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 20,
-                                            "scaling": [
-                                                { "id": "adventuring:agility", "amount": 0.6 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:poison",
-                                        "stacks": {
-                                            "base": 3,
-                                            "scaling": [
-                                                { "id": "adventuring:agility", "amount": 0.1 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            },
-                            {
-                                "target": "self",
-                                "party": "ally",
-                                "effects": [
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:invisibility",
-                                        "stacks": { "base": 3 }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ],
-                "passives": [
-                    {
-                        "id": "shadow_step",
-                        "name": "Shadow Step",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:rogue", "level": 25 }
-                        ],
-                        "effects": [
-                            {
-                                "trigger": "encounter_start",
-                                "type": "buff",
-                                "target": "self",
-                                "id": "adventuring:haste",
-                                "stacks": {
-                                    "base": 3,
-                                    "scaling": [
-                                        { "id": "adventuring:agility", "amount": 0.1 }
                                     ]
                                 }
-                            }
-                        ]
-                    },
-                    {
-                        "id": "opportunist",
-                        "name": "Opportunist",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:rogue", "level": 35 }
-                        ],
-                        "effects": [
-                            {
-                                "trigger": "encounter_start",
-                                "type": "debuff",
-                                "target": "lowest", "party": "enemy",
-                                "id": "adventuring:vulnerability",
-                                "stacks": {
-                                    "base": 3,
-                                    "scaling": [
-                                        { "id": "adventuring:agility", "amount": 0.1 }
+                            ]
+                        },
+                        {
+                            "id": "twin_strike",
+                            "name": "Twin Strike",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:rogue",
+                                    "level": 10
+                                }
+                            ],
+                            "energy": 20,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 5,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "amount": 0.25
+                                                    },
+                                                    {
+                                                        "id": "adventuring:agility",
+                                                        "amount": 0.25
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                },
+                                {
+                                    "target": "back",
+                                    "party": "enemy",
+                                    "delay": 0,
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 10,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "amount": 0.35
+                                                    },
+                                                    {
+                                                        "id": "adventuring:agility",
+                                                        "amount": 0.35
+                                                    }
+                                                ]
+                                            }
+                                        }
                                     ]
                                 }
-                            }
-                        ]
-                    },
-                    {
-                        "id": "shadow_mantle",
-                        "name": "Shadow Mantle",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:rogue", "level": 45 }
-                        ],
-                        "effects": [
-                            {
-                                "trigger": "encounter_start",
-                                "type": "buff",
-                                "target": "self",
-                                "id": "adventuring:invisibility",
-                                "stacks": { "base": 2 }
-                            }
-                        ]
-                    }
-                ]
+                            ]
+                        },
+                        {
+                            "id": "backstab",
+                            "name": "Backstab",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:rogue",
+                                    "level": 15
+                                }
+                            ],
+                            "energy": 25,
+                            "hits": [
+                                {
+                                    "target": "back",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 20,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:agility",
+                                                        "amount": 0.5
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:marked",
+                                            "stacks": {
+                                                "base": 2,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:agility",
+                                                        "amount": 0.1
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "spenders": [
+                        {
+                            "id": "eviscerate",
+                            "name": "Eviscerate",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:rogue",
+                                    "level": 1
+                                }
+                            ],
+                            "cost": 100,
+                            "hits": [
+                                {
+                                    "target": "lowest",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 20,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "amount": 1
+                                                    },
+                                                    {
+                                                        "id": "adventuring:agility",
+                                                        "amount": 1
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "smoke_bomb",
+                            "name": "Smoke Bomb",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:rogue",
+                                    "level": 20
+                                }
+                            ],
+                            "cost": 80,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:stun",
+                                            "stacks": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "target": "self",
+                                    "party": "ally",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "id": "adventuring:block",
+                                            "stacks": {
+                                                "base": 2,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:agility",
+                                                        "amount": 0.1
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "assassinate",
+                            "name": "Assassinate",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:rogue",
+                                    "level": 30
+                                }
+                            ],
+                            "cost": 200,
+                            "hits": [
+                                {
+                                    "target": "lowest",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 50,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "amount": 1.5
+                                                    },
+                                                    {
+                                                        "id": "adventuring:agility",
+                                                        "amount": 1.5
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "blade_flurry",
+                            "name": "Blade Flurry",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:rogue",
+                                    "level": 40
+                                }
+                            ],
+                            "cost": 150,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "delay": 60,
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 8,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:agility",
+                                                        "amount": 0.2
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:poison",
+                                            "stacks": {
+                                                "base": 1
+                                            }
+                                        }
+                                    ],
+                                    "repeat": 4
+                                }
+                            ]
+                        },
+                        {
+                            "id": "death_lotus",
+                            "name": "Death Lotus",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:rogue",
+                                    "level": 50
+                                }
+                            ],
+                            "cost": 200,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 20,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:agility",
+                                                        "amount": 0.6
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:poison",
+                                            "stacks": {
+                                                "base": 3,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:agility",
+                                                        "amount": 0.1
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                },
+                                {
+                                    "target": "self",
+                                    "party": "ally",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "id": "adventuring:invisibility",
+                                            "stacks": {
+                                                "base": 3
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "passives": [
+                        {
+                            "id": "shadow_step",
+                            "name": "Shadow Step",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:rogue",
+                                    "level": 25
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "encounter_start",
+                                    "type": "buff",
+                                    "target": "self",
+                                    "id": "adventuring:haste",
+                                    "stacks": {
+                                        "base": 3,
+                                        "scaling": [
+                                            {
+                                                "id": "adventuring:agility",
+                                                "amount": 0.1
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "id": "opportunist",
+                            "name": "Opportunist",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:rogue",
+                                    "level": 35
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "encounter_start",
+                                    "type": "debuff",
+                                    "target": "lowest",
+                                    "party": "enemy",
+                                    "id": "adventuring:vulnerability",
+                                    "stacks": {
+                                        "base": 3,
+                                        "scaling": [
+                                            {
+                                                "id": "adventuring:agility",
+                                                "amount": 0.1
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "id": "shadow_mantle",
+                            "name": "Shadow Mantle",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:rogue",
+                                    "level": 45
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "encounter_start",
+                                    "type": "buff",
+                                    "target": "self",
+                                    "id": "adventuring:invisibility",
+                                    "stacks": {
+                                        "base": 2
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
             }
-        }]
+        ]
     }
 }

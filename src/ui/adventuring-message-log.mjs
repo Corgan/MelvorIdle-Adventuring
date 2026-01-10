@@ -30,6 +30,10 @@ export class AdventuringMessageLog {
      * @param {string} media - Optional icon URL
      */
     add(body, type = 'info', media = null) {
+        // Skip logging during offline progress to avoid unnecessary object creation
+        if(loadingOfflineProgress)
+            return;
+            
         let message;
         if(this.messages.length >= 50) {
             message = this.messages.shift();

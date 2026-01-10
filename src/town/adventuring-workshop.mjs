@@ -317,13 +317,22 @@ export class AdventuringWorkshop extends AdventuringPage {
     }
 
     hasWorkOrders(character) {
-        return [...this.workOrders].filter(order => order.active && order.product.canMake(character, order.tier)).length > 0;
+        // Use .some() instead of filter().length for early exit
+        for(const order of this.workOrders) {
+            if(order.active && order.product.canMake(character, order.tier))
+                return true;
+        }
+        return false;
     }
 
     doWork(character) {
-        let order = [...this.workOrders].find(order => order.active && order.product.canMake(character, order.tier))
-        if(order !== undefined)
-            order.progress();
+        // Use for..of loop instead of spread + find for efficiency
+        for(const order of this.workOrders) {
+            if(order.active && order.product.canMake(character, order.tier)) {
+                order.progress();
+                return;
+            }
+        }
     }
 
     onLoad() {

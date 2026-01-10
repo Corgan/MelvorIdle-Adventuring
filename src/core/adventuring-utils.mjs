@@ -1290,8 +1290,12 @@ function formatRequirement(req, manager, context = {}) {
         
         case 'area_mastery': {
             const area = manager.areas.getObjectByID(req.area);
-            const areaName = area !== undefined ? area.name : req.area;
-            text = `${areaName} Mastery ${req.level}`;
+            if (area && !area.unlocked) {
+                text = 'Explore to discover unlock requirement';
+            } else {
+                const areaName = area !== undefined ? area.name : req.area;
+                text = `${areaName} Mastery ${req.level}`;
+            }
             break;
         }
         
@@ -1318,6 +1322,46 @@ function formatRequirement(req, manager, context = {}) {
             const area = manager.areas.getObjectByID(req.area);
             const areaName = area !== undefined ? area.name : req.area;
             text = `Clear ${areaName}`;
+            break;
+        }
+        
+        case 'dropped': {
+            // Try to get specific monster sources from the context item
+            const monsters = manager?.equipmentSources?.get(context?.item);
+            if (monsters && monsters.length > 0) {
+                // Group monsters by area using monsterSources
+                const monsterSources = manager?.monsterSources;
+                const areaSet = new Set();
+                
+                for (const monster of monsters) {
+                    const areas = monsterSources?.get(monster) || [];
+                    for (const area of areas) {
+                        areaSet.add(area);
+                    }
+                }
+                
+                // Separate unlocked and locked areas
+                const allAreas = [...areaSet];
+                const unlockedAreas = allAreas.filter(a => a.unlocked);
+                const hasLockedAreas = unlockedAreas.length < allAreas.length;
+                
+                if (unlockedAreas.length === 0) {
+                    // No areas unlocked - show exploration hint
+                    text = 'Explore to discover drop sources';
+                } else if (unlockedAreas.length <= 3) {
+                    text = `Drops in: ${unlockedAreas.map(a => a.name).join(', ')}`;
+                    if (hasLockedAreas) {
+                        text += ' (explore for more)';
+                    }
+                } else {
+                    text = `Drops in: ${unlockedAreas.slice(0, 3).map(a => a.name).join(', ')} +${unlockedAreas.length - 3} more`;
+                    if (hasLockedAreas) {
+                        text += ' (explore for more)';
+                    }
+                }
+            } else {
+                text = 'Explore to discover drop sources';
+            }
             break;
         }
         
@@ -2703,15 +2747,17 @@ function createDefaultEffectProcessor() {
         const amount = getEffectAmount(effect, instance);
         const builtEffect = { amount };
         const target = effect.target || 'self';
+        const isDamage = effect.type.includes('damage');
+        const effectLabel = isDamage ? 'damage' : 'healing';
         
         if(target === 'self' || target === undefined) {
-            ctx.manager.log.add(`${ctx.character.name} receives ${amount} ${effect.type} from ${instance.base.name}`);
+            ctx.manager.log.add(`${ctx.character.name} receives ${amount} ${effectLabel} from ${instance.base.name}`);
             ctx.character.applyEffect(effect, builtEffect, ctx.character);
         } else if(target === 'attacker' && ctx.extra.attacker) {
-            ctx.manager.log.add(`${ctx.extra.attacker.name} receives ${amount} ${effect.type} from ${instance.base.name}`);
+            ctx.manager.log.add(`${ctx.extra.attacker.name} receives ${amount} ${effectLabel} from ${instance.base.name}`);
             ctx.extra.attacker.applyEffect(effect, builtEffect, ctx.character);
         } else if(target === 'target' && ctx.extra.target) {
-            ctx.manager.log.add(`${ctx.extra.target.name} receives ${amount} ${effect.type} from ${instance.base.name}`);
+            ctx.manager.log.add(`${ctx.extra.target.name} receives ${amount} ${effectLabel} from ${instance.base.name}`);
             ctx.extra.target.applyEffect(effect, builtEffect, ctx.character);
         }
         return ctx.extra;
@@ -2994,7 +3040,8 @@ function createDefaultEffectProcessor() {
     // Revive - resurrect dead character with percentage HP
     processor.register('revive', (effect, instance, ctx) => {
         const amount = getEffectAmount(effect, instance) || 100;
-        const target = effect.target === 'self' ? ctx.character : ctx.extra.target;
+        // Default to self for revive (town action case: dead hero reviving themselves)
+        const target = effect.target === 'target' ? ctx.extra.target : ctx.character;
         
         if (target && target.dead) {
             target.revive({ amount }, ctx.character);
@@ -3171,6 +3218,14 @@ function createDefaultEffectProcessor() {
         }
         if(Math.random() * 100 < chance) {
             ctx.extra.doubleCast = true;
+        }
+        return ctx.extra;
+    });
+    
+    // Work - building-specific action (used by town actions)
+    processor.register('work', (effect, instance, ctx) => {
+        if(ctx.extra.building && ctx.extra.building.page && ctx.extra.building.page.doWork) {
+            ctx.extra.building.page.doWork(ctx.character);
         }
         return ctx.extra;
     });

@@ -154,7 +154,7 @@ export class AdventuringDetailsPage extends AdventuringPage {
      * @returns {number} The level required, or 0 if not found
      */
     getUnlockLevelForCategory(categoryId, unlockType) {
-        const category = this.manager.categories.getObjectByID(categoryId);
+        const category = this.manager.masteryCategories.getObjectByID(categoryId);
         if(!category) return 0;
         
         for(const milestone of category.milestones) {

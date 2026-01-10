@@ -19,6 +19,7 @@ export class AdventuringArmoryElement extends AdventuringSubpageElement {
         this.optionMedium = getElementFromFragment(this._content, 'option-medium', 'a');
         this.optionLight = getElementFromFragment(this._content, 'option-light', 'a');
         this.optionAccessories = getElementFromFragment(this._content, 'option-accessories', 'a');
+        this.optionArtifacts = getElementFromFragment(this._content, 'option-artifacts', 'a');
         
         this.details = getElementFromFragment(this._content, 'details', 'div');
         this.icon = getElementFromFragment(this._content, 'icon', 'img');

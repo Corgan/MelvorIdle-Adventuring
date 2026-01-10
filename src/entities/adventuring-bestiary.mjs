@@ -115,6 +115,11 @@ export class AdventuringBestiary extends AdventuringPage {
 
         monster.renderQueue.updateAll();
 
+        // Update monster details page if viewing this monster
+        if(this.manager.monsterdetails && this.manager.monsterdetails.monster === monster) {
+            this.manager.monsterdetails.renderQueue.mastery = true;
+        }
+
         // Track for achievements
         if(this.manager.achievementManager) {
             this.manager.achievementManager.recordKill(monster);

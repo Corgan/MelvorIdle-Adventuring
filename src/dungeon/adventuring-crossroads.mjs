@@ -52,7 +52,7 @@ export class AdventuringCrossroads extends AdventuringPage {
     }
 
     encode(writer) {
-        // Save selected difficulty, best endless streak, and auto-repeat area
+        // Save selected difficulty, best endless streak, and auto-run area
         writer.writeUint16(this.areas.length);
         this.areas.forEach(area => {
             writer.writeNamespacedObject(area);
@@ -90,7 +90,7 @@ export class AdventuringCrossroads extends AdventuringPage {
                 area.bestEndlessStreak = bestStreak;
             }
         }
-        // Load auto-repeat area
+        // Load auto-run area
         const hasAutoRepeat = reader.getBoolean();
         if(hasAutoRepeat) {
             const autoRepeatArea = reader.getNamespacedObject(this.manager.areas);

@@ -2,17 +2,19 @@ const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringDetailsPage } = await loadModule('src/ui/adventuring-details-page.mjs');
 const { ComponentPool } = await loadModule('src/core/component-pool.mjs');
+const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
 
 // Side-effect import to register custom element
 await loadModule('src/entities/components/adventuring-monster-details.mjs');
 const { AdventuringLootRowElement } = await loadModule('src/entities/components/adventuring-loot-row.mjs');
 const { AdventuringStatRowElement } = await loadModule('src/ui/components/adventuring-stat-row.mjs');
-const { AdventuringBadgeElement } = await loadModule('src/ui/components/adventuring-badge.mjs');
+const { AdventuringStatBadgeElement } = await loadModule('src/progression/components/adventuring-stat-badge.mjs');
+const { AdventuringMonsterAbilityRowElement } = await loadModule('src/entities/components/adventuring-monster-ability-row.mjs');
 
-// Component pools for frequently created elements
-const statRowPool = new ComponentPool(() => new AdventuringStatRowElement(), 10, 50);
-const lootRowPool = new ComponentPool(() => new AdventuringLootRowElement(), 10, 30);
-const badgePool = new ComponentPool(() => new AdventuringBadgeElement(), 5, 20);
+// Component pools for frequently created elements (lazy init with 0 initial size)
+const statBadgePool = new ComponentPool(() => new AdventuringStatBadgeElement(), 0, 50);
+const abilityRowPool = new ComponentPool(() => new AdventuringMonsterAbilityRowElement(), 0, 20);
+const lootRowPool = new ComponentPool(() => new AdventuringLootRowElement(), 0, 30);
 
 export class AdventuringMonsterDetails extends AdventuringDetailsPage {
     constructor(manager, game) {
@@ -83,7 +85,7 @@ export class AdventuringMonsterDetails extends AdventuringDetailsPage {
     renderIcon() {
         if(!this.renderQueue.icon) return;
 
-        this.component.icon.src = this.monster._media;
+        this.component.icon.src = this.monster.media;
 
         this.renderQueue.icon = false;
     }
@@ -107,7 +109,9 @@ export class AdventuringMonsterDetails extends AdventuringDetailsPage {
 
         this.component.killCount.textContent = killCount.toLocaleString();
         this.component.masteryLevel.textContent = level;
-        this.component.masteryProgress.setFixedPosition(percent);
+        if(this.component.masteryProgress && this.component.masteryProgress.setFixedPosition) {
+            this.component.masteryProgress.setFixedPosition(percent);
+        }
 
         this.renderQueue.mastery = false;
     }
@@ -116,35 +120,66 @@ export class AdventuringMonsterDetails extends AdventuringDetailsPage {
         if(!this.renderQueue.stats) return;
 
         // Release pooled elements back to pool
-        statRowPool.releaseAll(this.component.stats);
+        statBadgePool.releaseAll(this.component.stats);
         this.component.stats.innerHTML = '';
         
         this.monster.stats.forEach(stat => {
             const statDef = this.manager.stats.getObjectByID(stat.id);
-            const name = statDef ? statDef.name : stat.id;
-            
-            const row = statRowPool.acquire();
-            row.setStat({ label: name, value: stat.amount.toString() });
-            this.component.stats.appendChild(row);
+            if(statDef) {
+                const badge = statBadgePool.acquire();
+                badge.setStatCompact(statDef, stat.amount);
+                this.component.stats.appendChild(badge);
+            }
         });
 
         this.renderQueue.stats = false;
+    }
+
+    /**
+     * Build a stats-like object from the monster's raw stats array
+     * Used for ability tooltip descriptions to show proper damage values
+     */
+    getMonsterStats() {
+        const statsMap = new Map();
+        this.monster.stats.forEach(({ id, amount }) => {
+            const stat = this.manager.stats.getObjectByID(id);
+            if(stat) statsMap.set(stat, amount);
+        });
+        return {
+            get: (statId) => {
+                let stat = statId;
+                if(typeof stat === 'string')
+                    stat = this.manager.stats.getObjectByID(statId);
+                return statsMap.get(stat) || 0;
+            }
+        };
     }
 
     renderAbilities() {
         if(!this.renderQueue.abilities) return;
 
         // Release pooled elements back to pool
-        statRowPool.releaseAll(this.component.abilities);
+        abilityRowPool.releaseAll(this.component.abilities);
         this.component.abilities.innerHTML = '';
         let hasAbilities = false;
+
+        // Build stats object for ability descriptions
+        const monsterStats = this.getMonsterStats();
         
         // Generator
         if(this.monster.generator) {
             const gen = this.manager.generators.getObjectByID(this.monster.generator);
             if(gen) {
-                const row = statRowPool.acquire();
-                row.setStat({ label: 'Generator', value: gen.name, valueClass: 'text-success' });
+                const row = abilityRowPool.acquire();
+                const tooltip = TooltipBuilder.forAbility(gen, { 
+                    manager: this.manager, 
+                    type: 'generator',
+                    character: monsterStats,
+                    displayMode: 'total',
+                    skipUsableBy: true,
+                    forceShowDescription: true
+                });
+                row.setAbility({ type: 'generator', name: gen.name, tooltipContent: tooltip.build() });
                 this.component.abilities.appendChild(row);
                 hasAbilities = true;
             }
@@ -154,8 +189,16 @@ export class AdventuringMonsterDetails extends AdventuringDetailsPage {
         if(this.monster.spender) {
             const spend = this.manager.spenders.getObjectByID(this.monster.spender);
             if(spend && spend.id !== 'adventuring:none') {
-                const row = statRowPool.acquire();
-                row.setStat({ label: 'Spender', value: spend.name, valueClass: 'text-warning' });
+                const row = abilityRowPool.acquire();
+                const tooltip = TooltipBuilder.forAbility(spend, { 
+                    manager: this.manager, 
+                    type: 'spender',
+                    character: monsterStats,
+                    displayMode: 'total',
+                    skipUsableBy: true,
+                    forceShowDescription: true
+                });
+                row.setAbility({ type: 'spender', name: spend.name, tooltipContent: tooltip.build() });
                 this.component.abilities.appendChild(row);
                 hasAbilities = true;
             }
@@ -166,8 +209,16 @@ export class AdventuringMonsterDetails extends AdventuringDetailsPage {
             this.monster.passives.forEach(passiveId => {
                 const passive = this.manager.auras.getObjectByID(passiveId);
                 if(passive) {
-                    const row = statRowPool.acquire();
-                    row.setStat({ label: 'Passive', value: passive.name, valueClass: 'text-info' });
+                    const row = abilityRowPool.acquire();
+                    const tooltip = TooltipBuilder.forAbility(passive, { 
+                        manager: this.manager, 
+                        type: 'passive',
+                        character: monsterStats,
+                        displayMode: 'total',
+                        skipUsableBy: true,
+                        forceShowDescription: true
+                    });
+                    row.setAbility({ type: 'passive', name: passive.name, tooltipContent: tooltip.build() });
                     this.component.abilities.appendChild(row);
                     hasAbilities = true;
                 }
@@ -211,8 +262,14 @@ export class AdventuringMonsterDetails extends AdventuringDetailsPage {
             const entries = this.expandLootEntries(this.monster.lootGenerator.table);
             
             entries.forEach(entry => {
-                const row = this.createLootRow(entry);
-                this.component.dropRows.appendChild(row);
+                if(entry.type === 'equipment_pool') {
+                    // Create header and nested items for pool
+                    const rows = this.createPoolRows(entry);
+                    rows.forEach(row => this.component.dropRows.appendChild(row));
+                } else {
+                    const row = this.createLootRow(entry);
+                    this.component.dropRows.appendChild(row);
+                }
             });
         }
 
@@ -243,13 +300,14 @@ export class AdventuringMonsterDetails extends AdventuringDetailsPage {
     /**
      * Create a loot row element for a loot entry (uses pool)
      */
-    createLootRow(entry) {
+    createLootRow(entry, nested = false) {
         // Get item info
         let icon = '';
         let name = '???';
         let type = entry.type || 'unknown';
         let qty = this.formatQty(entry);
         let chance = this.formatChance(entry);
+        let tooltipContent = '';
 
         switch(entry.type) {
             case 'currency':
@@ -259,6 +317,7 @@ export class AdventuringMonsterDetails extends AdventuringDetailsPage {
                 if(material) {
                     icon = material.media;
                     name = material.name;
+                    tooltipContent = TooltipBuilder.forMaterial(material, this.manager).build();
                 }
                 break;
             }
@@ -267,22 +326,72 @@ export class AdventuringMonsterDetails extends AdventuringDetailsPage {
                 if(item) {
                     icon = item.media;
                     name = item.name;
-                }
-                break;
-            }
-            case 'equipment_pool': {
-                const pool = this.manager.equipmentPools.getObjectByID(entry.pool);
-                if(pool && pool.items[0]) {
-                    icon = pool.items[0].media || '';
-                    name = `Pool: ${pool.id.split(':')[1]}`;
+                    tooltipContent = TooltipBuilder.forEquipment(item, this.manager).build();
                 }
                 break;
             }
         }
 
         const row = lootRowPool.acquire();
-        row.setLoot({ icon, name, type, qty, chance });
+        row.setLoot({ icon, name, type, qty, chance, nested, tooltipContent });
         return row;
+    }
+
+    /**
+     * Create header row and nested item rows for an equipment pool
+     */
+    createPoolRows(entry) {
+        const rows = [];
+        const pool = this.manager.equipmentPools.getObjectByID(entry.pool);
+        
+        if(!pool) return rows;
+
+        // Create header row for the pool
+        const headerRow = lootRowPool.acquire();
+        headerRow.setLoot({ 
+            icon: '', 
+            name: 'Equipment Drops', 
+            type: 'equipment', 
+            qty: this.formatQty(entry), 
+            chance: this.formatChance(entry),
+            isHeader: true 
+        });
+        rows.push(headerRow);
+
+        // Calculate total weight for percentage calculation
+        const totalWeight = pool.items.reduce((sum, e) => sum + e.weight, 0);
+
+        // Create nested rows for each item in the pool
+        // pool.items is array of { item, weight } objects
+        pool.items.forEach(poolEntry => {
+            const item = poolEntry.item;
+            if(!item) return;
+            
+            // Calculate this item's chance within the pool
+            const itemChance = totalWeight > 0 ? (poolEntry.weight / totalWeight) : 0;
+            const chanceText = `${(itemChance * 100).toFixed(1)}%`;
+            
+            // Check if item has already dropped
+            const isDropped = item.dropped;
+            
+            // Show ??? for undropped items
+            const displayName = isDropped ? `✓ ${item.name}` : '???';
+            const tooltipContent = TooltipBuilder.forEquipment(item, this.manager).build();
+            const itemRow = lootRowPool.acquire();
+            itemRow.setLoot({ 
+                icon: item.media, 
+                name: displayName, 
+                type: 'equipment', 
+                qty: '-', 
+                chance: chanceText,
+                nested: true,
+                tooltipContent,
+                collected: isDropped
+            });
+            rows.push(itemRow);
+        });
+
+        return rows;
     }
 
     formatQty(entry) {
@@ -303,21 +412,14 @@ export class AdventuringMonsterDetails extends AdventuringDetailsPage {
         const monsterSources = this.manager.monsterSources;
         const sources = (monsterSources && monsterSources.get(this.monster)) || [];
         
-        // Release pooled badges back to pool
-        badgePool.releaseAll(this.component.locations);
-        this.component.locations.innerHTML = '';
-        
         if(sources.length === 0) {
-            const span = document.createElement('span');
-            span.className = 'text-muted';
-            span.textContent = 'Unknown';
-            this.component.locations.appendChild(span);
+            this.component.locationRow.classList.add('d-none');
         } else {
-            sources.forEach(area => {
-                const badge = badgePool.acquire();
-                badge.setLocation(area.name);
-                this.component.locations.appendChild(badge);
-            });
+            this.component.locationRow.classList.remove('d-none');
+            // Show first area (monsters typically only appear in one area)
+            const area = sources[0];
+            this.component.locationIcon.src = area.media;
+            this.component.locationName.textContent = area.name;
         }
 
         this.renderQueue.locations = false;

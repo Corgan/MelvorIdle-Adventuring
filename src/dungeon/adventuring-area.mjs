@@ -228,9 +228,10 @@ export class AdventuringArea extends AdventuringMasteryAction {
     }
 
     /**
-     * Check if auto-repeat is unlocked for this dungeon
+     * Check if auto-run is unlocked for this dungeon
+     * Auto-run starts the dungeon automatically when party is fully healed in town after a wipe
      */
-    get autoRepeatUnlocked() {
+    get autoRunUnlocked() {
         return this.hasUnlock('auto_run');
     }
 
@@ -432,7 +433,7 @@ export class AdventuringArea extends AdventuringMasteryAction {
         this.component.adventureButton.disabled = !this.unlocked;
 
         // Show/hide auto-repeat checkbox based on unlock status
-        this.component.autoRepeatContainer.classList.toggle('d-none', !this.autoRepeatUnlocked);
+        this.component.autoRepeatContainer.classList.toggle('d-none', !this.autoRunUnlocked);
 
         this.renderQueue.clickable = false;
     }

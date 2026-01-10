@@ -1,6 +1,6 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { AdventuringStatElement } = await loadModule('src/core/components/adventuring-stat.mjs');
+const { AdventuringStatBadgeElement } = await loadModule('src/progression/components/adventuring-stat-badge.mjs');
 
 export class AdventuringStatsElement extends HTMLElement {
     constructor() {
@@ -25,18 +25,15 @@ export class AdventuringStatsElement extends HTMLElement {
             stat = this.skill.stats.getObjectByID(stat);
         let component = this.statsMap.get(stat);
         if(component === undefined) {
-            component = createElement('adventuring-stat');
-            component.icon.src = stat.media;
+            component = new AdventuringStatBadgeElement();
             this.stats.appendChild(component);
             this.statsMap.set(stat, component);
         }
         if(value !== 0 || stat.base !== undefined) {
-            component.show();
-            component.setTooltipContent(stat.name);
-            component.value.textContent = value !== 0 ? value : "-";
+            showElement(component);
+            component.setStatCompact(stat, value !== 0 ? value : "-", true);
         } else {
-            component.hide();
-            component.value.textContent =  "-";
+            hideElement(component);
         }
     }
 
@@ -45,7 +42,7 @@ export class AdventuringStatsElement extends HTMLElement {
             stat = this.skill.stats.getObjectByID(stat);
         let component = this.statsMap.get(stat);
         if(component !== undefined) {
-            component.hide();
+            hideElement(component);
         }
     }
 }

@@ -11,6 +11,11 @@ export class AdventuringMonsterDetailsElement extends AdventuringSubpageElement 
         this.nameText = getElementFromFragment(this._content, 'name', 'h3');
         this.tags = getElementFromFragment(this._content, 'tags', 'p');
         
+        // Location in header
+        this.locationRow = getElementFromFragment(this._content, 'locationRow', 'div');
+        this.locationIcon = getElementFromFragment(this._content, 'locationIcon', 'img');
+        this.locationName = getElementFromFragment(this._content, 'locationName', 'small');
+        
         this.killCount = getElementFromFragment(this._content, 'killCount', 'span');
         this.masteryLevel = getElementFromFragment(this._content, 'masteryLevel', 'span');
         this.masteryProgress = getElementFromFragment(this._content, 'mastery-progress', 'progress-bar');
@@ -20,8 +25,6 @@ export class AdventuringMonsterDetailsElement extends AdventuringSubpageElement 
         
         this.dropLock = getElementFromFragment(this._content, 'dropLock', 'small');
         this.dropRows = getElementFromFragment(this._content, 'dropRows', 'div');
-        
-        this.locations = getElementFromFragment(this._content, 'locations', 'div');
     }
 }
 window.customElements.define('adventuring-monster-details', AdventuringMonsterDetailsElement);

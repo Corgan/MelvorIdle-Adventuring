@@ -52,9 +52,9 @@ export async function setup({ gameData, patch, loadTemplates, loadModule, loadSt
     await load('data/jobs/combat/fighter.json');
     await load('data/jobs/combat/ranger.json');
     await load('data/jobs/combat/cleric.json');
-    await load('data/jobs/combat/paladin.json');
-    await load('data/jobs/combat/rogue.json');
     await load('data/jobs/combat/wizard.json');
+    await load('data/jobs/combat/rogue.json');
+    await load('data/jobs/combat/paladin.json');
 
     // Passive jobs
     await load('data/jobs/passive/astrologist.json');

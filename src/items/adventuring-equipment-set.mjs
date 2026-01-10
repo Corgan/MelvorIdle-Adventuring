@@ -41,19 +41,15 @@ export class AdventuringEquipmentSet extends NamespacedObject {
 
     /**
      * Count how many pieces of this set a character has equipped
+     * Uses cached counts from equipment for O(1) lookup
      * @param {AdventuringCharacter} character - The character to check
      * @returns {number} Number of equipped pieces
      */
     countEquippedPieces(character) {
         if(!character || !character.equipment) return 0;
         
-        let count = 0;
-        character.equipment.forEachEquipped((item) => {
-            if(this.items.includes(item)) {
-                count++;
-            }
-        });
-        return count;
+        const setCounts = character.equipment.getSetPieceCounts();
+        return setCounts.get(this) || 0;
     }
 
     /**

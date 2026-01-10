@@ -27,10 +27,15 @@ export class ComponentPool {
         this.maxSize = maxSize;
         this.pool = [];
         this.activeCount = 0;
+        this.elementConstructor = null; // Lazy initialized on first acquire
         
-        // Pre-populate pool
+        // Pre-populate pool (will set elementConstructor on first creation)
         for(let i = 0; i < initialSize; i++) {
-            this.pool.push(this.factory());
+            const element = this.factory();
+            if(!this.elementConstructor) {
+                this.elementConstructor = element.constructor;
+            }
+            this.pool.push(element);
         }
     }
 
@@ -44,6 +49,10 @@ export class ComponentPool {
             element = this.pool.pop();
         } else {
             element = this.factory();
+            // Lazy set elementConstructor on first creation
+            if(!this.elementConstructor) {
+                this.elementConstructor = element.constructor;
+            }
         }
         this.activeCount++;
         return element;
@@ -70,16 +79,20 @@ export class ComponentPool {
 
     /**
      * Release all poolable children from a container
-     * Looks for children that are instances of the pooled element type
+     * Only releases children that are instances of the pooled element type
      * @param {HTMLElement} container - Container to release children from
      */
     releaseAll(container) {
+        // If we don't know the element type yet, nothing to release
+        if(!this.elementConstructor) return;
+        
         // Get children as array since we'll be modifying the DOM
         const children = Array.from(container.children);
         for(const child of children) {
-            // Check if this child looks like it came from this pool
-            // by checking if it's the same constructor type
-            this.release(child);
+            // Only release children that match the pool's element type
+            if(child.constructor === this.elementConstructor) {
+                this.release(child);
+            }
         }
     }
 

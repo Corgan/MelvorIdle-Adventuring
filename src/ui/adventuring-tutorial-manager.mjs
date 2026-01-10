@@ -743,7 +743,7 @@ export class AdventuringTutorialManager {
                 if(value === 'any') {
                     // Find first area with auto-repeat unlocked
                     for(var ar of this.manager.crossroads.areas) {
-                        if(ar.autoRepeatUnlocked && ar.component && ar.component.autoRepeatContainer) {
+                        if(ar.autoRunUnlocked && ar.component && ar.component.autoRepeatContainer) {
                             return ar.component.autoRepeatContainer;
                         }
                     }

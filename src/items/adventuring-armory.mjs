@@ -56,7 +56,8 @@ export class AdventuringArmory extends AdventuringPage {
             heavy: 'Heavy Armor',
             medium: 'Medium Armor',
             light: 'Light Armor',
-            accessories: 'Accessories'
+            accessories: 'Accessories',
+            artifacts: 'Artifacts'
         };
         
         // Dropdown option click handlers
@@ -68,12 +69,16 @@ export class AdventuringArmory extends AdventuringPage {
         this.component.optionMedium.onclick = () => this.setCategory('medium');
         this.component.optionLight.onclick = () => this.setCategory('light');
         this.component.optionAccessories.onclick = () => this.setCategory('accessories');
+        this.component.optionArtifacts.onclick = () => this.setCategory('artifacts');
     }
 
     /**
      * Map item type IDs to categories
      */
     getItemCategory(baseItem) {
+        // Artifacts get their own category
+        if(baseItem.isArtifact) return 'artifacts';
+        
         if(!baseItem.type) return 'melee';
         const typeId = baseItem.type.id;
         
@@ -252,7 +257,7 @@ export class AdventuringArmory extends AdventuringPage {
             const itemRarity = rarity || item.rarity || 'common';
             const message = this.getDropMessage(item.name, itemRarity);
             const logType = this.getLogTypeForRarity(itemRarity);
-            this.manager.log.add(message, logType, item.media);
+            this.manager.log.add(message, logType);
         }
         
         // Trigger unlock check since dropped items may now meet requirements
@@ -500,7 +505,7 @@ export class AdventuringArmory extends AdventuringPage {
         this.renderQueue.details = true;
         
         // Log the prestige
-        this.manager.log.add(`${item.name} has been unlocked!`, 'legendary', item.media);
+        this.manager.log.add(`${item.name} has been unlocked!`, 'legendary');
         
         return true;
     }

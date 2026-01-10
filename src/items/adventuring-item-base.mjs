@@ -203,6 +203,48 @@ export class AdventuringItemBase extends AdventuringMasteryAction {
             // Set initial base/scaling/materials from tier 0 for artifacts
             this.applyArtifactTier(this.artifactTier);
         }
+        
+        // === CACHE COMPUTED PROPERTIES FOR PERFORMANCE ===
+        // These values don't change after data registration, so cache them
+        this._computeCachedProperties();
+    }
+    
+    /**
+     * Compute and cache frequently-accessed properties that don't change.
+     * Called once after postDataRegistration to avoid repeated computation.
+     */
+    _computeCachedProperties() {
+        // Cache jobs that can use this item type
+        this._cachedJobs = this.manager.jobs.allObjects.filter(
+            job => job.allowedItems !== undefined && job.allowedItems.includes(this.type)
+        );
+        
+        // Cache equipment slots this item can go in
+        if(this.type !== undefined && this.type.slots !== undefined) {
+            this._cachedSlots = this.type.slots.map(
+                slotType => this.manager.itemSlots.getObjectByID(slotType)
+            );
+        } else {
+            this._cachedSlots = [];
+        }
+        
+        // Cache slots this item occupies (for two-handed weapons, etc.)
+        if(this.type !== undefined && this.type.occupies !== undefined) {
+            this._cachedOccupies = this.type.occupies.map(
+                slotType => this.manager.itemSlots.getObjectByID(slotType)
+            );
+        } else {
+            this._cachedOccupies = [];
+        }
+        
+        // Cache paired item types
+        if(this.type !== undefined && this.type.pairs !== undefined) {
+            this._cachedPairs = this.type.pairs.map(
+                pair => this.manager.itemTypes.getObjectByID(pair)
+            );
+        } else {
+            this._cachedPairs = [];
+        }
     }
 
     calculateStats() {
@@ -246,19 +288,6 @@ export class AdventuringItemBase extends AdventuringMasteryAction {
         const tooltip = TooltipBuilder.forEquipment(this, this.manager);
 
         if(this.unlocked) {
-            // Requirements (for items that have unlock requirements)
-            if(this.requirements.length > 0) {
-                tooltip.separator();
-                tooltip.hint('Requirements:');
-                formatRequirements(this.requirements, this.manager).forEach(({ text, met }) => {
-                    if(met) {
-                        tooltip.text(`<i class="fa fa-check text-success mr-1"></i>${text}`, 'text-success');
-                    } else {
-                        tooltip.text(`<i class="fa fa-times text-danger mr-1"></i>${text}`, 'text-danger');
-                    }
-                });
-            }
-
             // Upgrade cost
             if(this.materials !== undefined) {
                 let upgradeOrUnlock = (this.upgradeLevel === 0 ? 'Unlock': 'Upgrade');
@@ -284,8 +313,8 @@ export class AdventuringItemBase extends AdventuringMasteryAction {
                 tooltip.statRow(...costItems);
             }
         } else {
-            // Item is locked - show unlock requirements
-            tooltip.unlockRequirements(this.requirements, this.manager);
+            // Item is locked - show unlock requirements (pass this item as context for source lookups)
+            tooltip.unlockRequirements(this.requirements, this.manager, { item: this });
         }
         
         return tooltip.build();
@@ -504,29 +533,19 @@ export class AdventuringItemBase extends AdventuringMasteryAction {
     }
 
     get jobs() {
-        let jobs = this.manager.jobs.allObjects.filter(job => job.allowedItems !== undefined && job.allowedItems.includes(this.type));
-        return jobs;
+        return this._cachedJobs || [];
     }
 
     get slots() {
-        let slots = [];
-        if(this.type !== undefined && this.type.slots !== undefined)
-            slots = this.type.slots.map(slotType => this.manager.itemSlots.getObjectByID(slotType));
-        return slots;
+        return this._cachedSlots || [];
     }
 
     get occupies() {
-        let occupies = [];
-        if(this.type.occupies !== undefined)
-            occupies = this.type.occupies.map(slotType => this.manager.itemSlots.getObjectByID(slotType));
-        return occupies;
+        return this._cachedOccupies || [];
     }
 
     get pairs() {
-        let pairs = [];
-        if(this.type.pairs !== undefined)
-            pairs = this.type.pairs.map(pair => this.manager.itemTypes.getObjectByID(pair))
-        return pairs;
+        return this._cachedPairs || [];
     }
 
     /**
@@ -535,7 +554,7 @@ export class AdventuringItemBase extends AdventuringMasteryAction {
      */
     get requirementsMet() {
         if(!this._reqChecker) return true;
-        return this._reqChecker.check();
+        return this._reqChecker.check({ item: this });
     }
     
     /**

@@ -415,7 +415,8 @@ export class AdventuringEncounter extends AdventuringPage {
 
                         if(effect.type === "damage" || effect.type === "damage_flat" || effect.type === "heal" || effect.type === "heal_flat") {
                             const critText = isCrit ? ' (CRIT!)' : '';
-                            this.manager.log.add(`${this.currentTurn.name} ${effect.type}s ${target.name} with ${this.currentAction.name} for ${builtEffect.amount}${critText}`);
+                            const effectVerb = (effect.type === "damage" || effect.type === "damage_flat") ? 'damages' : 'heals';
+                            this.manager.log.add(`${this.currentTurn.name} ${effectVerb} ${target.name} with ${this.currentAction.name} for ${builtEffect.amount}${critText}`);
                         }
                         
                         // Capture HP percent before applying damage (for hp_crossed_below conditions)

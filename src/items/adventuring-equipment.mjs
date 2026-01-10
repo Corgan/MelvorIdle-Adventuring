@@ -20,12 +20,13 @@ export class AdventuringEquipment {
     
     /**
      * Get an array of all equipped items (excludes empty/none slots)
+     * Note: Does not re-validate with canEquip - items are validated when equipped
      * @returns {AdventuringItemBase[]}
      */
     get equippedItems() {
         const items = [];
         this.slots.forEach((slot) => {
-            if (slot.item && slot.item !== this.manager.cached.noneItem && slot.canEquip(slot.item)) {
+            if (slot.item && slot.item !== this.manager.cached.noneItem && !slot.occupied) {
                 items.push(slot.item);
             }
         });
@@ -34,11 +35,12 @@ export class AdventuringEquipment {
     
     /**
      * Iterate over all equipped items with their slots
+     * Note: Does not re-validate with canEquip - items are validated when equipped
      * @param {Function} callback - (item, slot, slotType) => void
      */
     forEachEquipped(callback) {
         this.slots.forEach((slot, slotType) => {
-            if (slot.item && slot.item !== this.manager.cached.noneItem && slot.canEquip(slot.item)) {
+            if (slot.item && slot.item !== this.manager.cached.noneItem && !slot.occupied) {
                 callback(slot.item, slot, slotType);
             }
         });
@@ -57,6 +59,33 @@ export class AdventuringEquipment {
             }
         });
         return found;
+    }
+    
+    /**
+     * Get counts of equipped pieces per set (cached until equipment changes)
+     * @returns {Map<AdventuringEquipmentSet, number>}
+     */
+    getSetPieceCounts() {
+        // Use cached value if available
+        if(this._cachedSetCounts !== undefined) {
+            return this._cachedSetCounts;
+        }
+        
+        const counts = new Map();
+        this.forEachEquipped((item) => {
+            if(item.set) {
+                counts.set(item.set, (counts.get(item.set) || 0) + 1);
+            }
+        });
+        this._cachedSetCounts = counts;
+        return counts;
+    }
+    
+    /**
+     * Invalidate cached set piece counts (call when equipment changes)
+     */
+    invalidateSetCache() {
+        this._cachedSetCounts = undefined;
     }
     
     calculateStats() {
@@ -85,7 +114,7 @@ export class AdventuringEquipment {
                 item.stats.forEach((value, stat) => {
                     if(value !== 0) {
                         effects.push(createEffect(
-                            {
+                            {   
                                 trigger: 'passive',
                                 type: 'stat_flat',
                                 stat: stat.id,
@@ -126,9 +155,11 @@ export class AdventuringEquipment {
             }
         });
         
-        // Add equipment set bonus effects
+        // Add equipment set bonus effects (only for sets with equipped pieces)
         if(this.character && this.manager && this.manager.equipmentSets) {
-            this.manager.equipmentSets.forEach(set => {
+            const setCounts = this.getSetPieceCounts();
+            setCounts.forEach((count, set) => {
+                if(count <= 0) return;
                 const setEffects = set.getActiveEffects(this.character);
                 setEffects.forEach(effect => {
                     // Skip if filtering by trigger and doesn't match
@@ -180,9 +211,11 @@ export class AdventuringEquipment {
             });
         });
         
-        // Equipment set bonus effects
+        // Equipment set bonus effects (only for sets with equipped pieces)
         if (this.character && this.manager && this.manager.equipmentSets) {
-            this.manager.equipmentSets.forEach(set => {
+            const setCounts = this.getSetPieceCounts();
+            setCounts.forEach((count, set) => {
+                if(count <= 0) return;
                 const setEffects = set.getActiveEffects(this.character);
                 setEffects.forEach(effect => {
                     if (effect.trigger !== triggerType) return;

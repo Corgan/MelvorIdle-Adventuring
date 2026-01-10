@@ -2,356 +2,480 @@
     "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
     "namespace": "adventuring",
     "data": {
-        "skillData": [{
-            "skillID": "adventuring:Adventuring",
-            "data": {
-                "jobs": [
-                    {
-                        "id": "reaper",
-                        "tier": 3,
-                        "name": "Reaper",
-                        "media": "melvor:assets/media/skills/thieving/thieving.svg#tint=green",
-                        "requirements": [
-                            { "type": "job_level", "job": "adventuring:bard", "level": 20 },
-                            { "type": "job_level", "job": "adventuring:warlock", "level": 15 },
-                            { "type": "area_mastery", "area": "adventuring:graveyard", "level": 25 }
-                        ],
-                        "isMilestoneReward": true,
-                        "allowedItems": [
-                            "adventuring:cowl",
-                            "adventuring:vest",
-                            "adventuring:chaps",
-                            "adventuring:vambraces",
-                            "adventuring:boots",
-                            "adventuring:amulet",
-                            "adventuring:ring",
-                            "adventuring:cape",
-                            "adventuring:dagger",
-                            "adventuring:staff",
-                            "adventuring:axe"
-                        ],
-                        "scaling": [
-                            { "id": "adventuring:hitpoints", "amount": 0.75 },
-                            { "id": "adventuring:defence", "amount": 0.25 },
-                            { "id": "adventuring:agility", "amount": 1.5 },
-                            { "id": "adventuring:magic", "amount": 1.5 }
-                        ]
-                    }
-                ],
-                "generators": [
-                    {
-                        "id": "soul_reap",
-                        "name": "Soul Reap",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:reaper", "level": 1 }
-                        ],
-                        "energy": 25,
-                        "hits": [
-                            {
-                                "target": "lowest",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 15,
-                                            "scaling": [
-                                                { "id": "adventuring:agility", "amount": 0.25 },
-                                                { "id": "adventuring:magic", "amount": 0.2 }
-                                            ]
+        "skillData": [
+            {
+                "skillID": "adventuring:Adventuring",
+                "data": {
+                    "jobs": [
+                        {
+                            "id": "reaper",
+                            "tier": 3,
+                            "name": "Reaper",
+                            "media": "melvor:assets/media/skills/thieving/thieving.svg#tint=green",
+                            "requirements": [
+                                {
+                                    "type": "job_level",
+                                    "job": "adventuring:bard",
+                                    "level": 20
+                                },
+                                {
+                                    "type": "job_level",
+                                    "job": "adventuring:warlock",
+                                    "level": 15
+                                },
+                                {
+                                    "type": "area_mastery",
+                                    "area": "adventuring:graveyard",
+                                    "level": 25
+                                }
+                            ],
+                            "isMilestoneReward": true,
+                            "allowedItems": [
+                                "adventuring:cowl",
+                                "adventuring:vest",
+                                "adventuring:chaps",
+                                "adventuring:vambraces",
+                                "adventuring:boots",
+                                "adventuring:amulet",
+                                "adventuring:ring",
+                                "adventuring:cape",
+                                "adventuring:dagger",
+                                "adventuring:staff",
+                                "adventuring:axe"
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "amount": 0.75
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "amount": 0.25
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "amount": 1.5
+                                },
+                                {
+                                    "id": "adventuring:magic",
+                                    "amount": 1.5
+                                }
+                            ]
+                        }
+                    ],
+                    "generators": [
+                        {
+                            "id": "soul_reap",
+                            "name": "Soul Reap",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:reaper",
+                                    "level": 1
+                                }
+                            ],
+                            "energy": 25,
+                            "hits": [
+                                {
+                                    "target": "lowest",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 15,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:agility",
+                                                        "amount": 0.25
+                                                    },
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "amount": 0.2
+                                                    }
+                                                ]
+                                            }
                                         }
-                                    }
-                                ]
-                            },
-                            {
-                                "target": "self",
-                                "party": "ally",
-                                "effects": [
-                                    {
-                                        "type": "heal_flat",
-                                        "amount": {
-                                            "base": 8,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "amount": 0.15 }
-                                            ]
+                                    ]
+                                },
+                                {
+                                    "target": "self",
+                                    "party": "ally",
+                                    "effects": [
+                                        {
+                                            "type": "heal_flat",
+                                            "amount": {
+                                                "base": 8,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "amount": 0.15
+                                                    }
+                                                ]
+                                            }
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "deaths_touch",
-                        "name": "Death's Touch",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:reaper", "level": 15 }
-                        ],
-                        "energy": 28,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 12,
-                                            "scaling": [
-                                                { "id": "adventuring:agility", "amount": 0.2 },
-                                                { "id": "adventuring:magic", "amount": 0.2 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:curse",
-                                        "stacks": {
-                                            "base": 2,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "amount": 0.1 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:poison",
-                                        "stacks": {
-                                            "base": 2,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "amount": 0.1 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ],
-                "spenders": [
-                    {
-                        "id": "harvest_souls",
-                        "name": "Harvest Souls",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:reaper", "level": 5 }
-                        ],
-                        "cost": 140,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 15,
-                                            "scaling": [
-                                                { "id": "adventuring:agility", "amount": 0.3 },
-                                                { "id": "adventuring:magic", "amount": 0.3 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            },
-                            {
-                                "target": "self",
-                                "party": "ally",
-                                "effects": [
-                                    {
-                                        "type": "heal_flat",
-                                        "amount": {
-                                            "base": 10,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "amount": 0.25 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "death_sentence",
-                        "name": "Death Sentence",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:reaper", "level": 20 }
-                        ],
-                        "cost": 120,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:curse",
-                                        "stacks": {
-                                            "base": 4,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "amount": 0.15 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:poison",
-                                        "stacks": {
-                                            "base": 4,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "amount": 0.15 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:marked",
-                                        "stacks": {
-                                            "base": 5,
-                                            "scaling": [
-                                                { "id": "adventuring:agility", "amount": 0.15 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "soul_harvest",
-                        "name": "Soul Harvest",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:reaper", "level": 25 }
-                        ],
-                        "cost": 160,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 18,
-                                            "scaling": [
-                                                { "id": "adventuring:agility", "amount": 0.35 },
-                                                { "id": "adventuring:magic", "amount": 0.35 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:curse",
-                                        "stacks": {
-                                            "base": 3,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "amount": 0.1 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            },
-                            {
-                                "target": "self",
-                                "party": "ally",
-                                "effects": [
-                                    {
-                                        "type": "heal_flat",
-                                        "amount": {
-                                            "base": 20,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "amount": 0.4 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "reaping_strike",
-                        "name": "Reaping Strike",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:reaper", "level": 35 }
-                        ],
-                        "cost": 180,
-                        "hits": [
-                            {
-                                "target": "lowest",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 80,
-                                            "scaling": [
-                                                { "id": "adventuring:agility", "amount": 1.5 },
-                                                { "id": "adventuring:magic", "amount": 1.0 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ],
-                "passives": [
-                    {
-                        "id": "deaths_embrace",
-                        "name": "Death's Embrace",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:reaper", "level": 25 }
-                        ],
-                        "effects": [
-                            {
-                                "trigger": "encounter_start",
-                                "type": "debuff",
-                                "target": "all",
-                                "party": "enemy",
-                                "id": "adventuring:curse",
-                                "stacks": {
-                                    "base": 3,
-                                    "scaling": [
-                                        { "id": "adventuring:magic", "amount": 0.15 }
                                     ]
                                 }
-                            }
-                        ]
-                    },
-                    {
-                        "id": "life_leech",
-                        "name": "Life Leech",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:reaper", "level": 30 }
-                        ],
-                        "effects": [
-                            {
-                                "trigger": "encounter_start",
-                                "type": "buff",
-                                "target": "self",
-                                "id": "adventuring:regen",
-                                "stacks": {
-                                    "base": 4,
-                                    "scaling": [
-                                        { "id": "adventuring:magic", "amount": 0.2 }
+                            ]
+                        },
+                        {
+                            "id": "deaths_touch",
+                            "name": "Death's Touch",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:reaper",
+                                    "level": 15
+                                }
+                            ],
+                            "energy": 28,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 12,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:agility",
+                                                        "amount": 0.2
+                                                    },
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "amount": 0.2
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:curse",
+                                            "stacks": {
+                                                "base": 2,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "amount": 0.1
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:poison",
+                                            "stacks": {
+                                                "base": 2,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "amount": 0.1
+                                                    }
+                                                ]
+                                            }
+                                        }
                                     ]
                                 }
-                            },
-                            {
-                                "trigger": "encounter_start",
-                                "type": "debuff",
-                                "target": "all",
-                                "party": "enemy",
-                                "id": "adventuring:poison",
-                                "stacks": {
-                                    "base": 3,
-                                    "scaling": [
-                                        { "id": "adventuring:magic", "amount": 0.15 }
+                            ]
+                        }
+                    ],
+                    "spenders": [
+                        {
+                            "id": "harvest_souls",
+                            "name": "Harvest Souls",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:reaper",
+                                    "level": 1
+                                }
+                            ],
+                            "cost": 140,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 15,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:agility",
+                                                        "amount": 0.3
+                                                    },
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "amount": 0.3
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                },
+                                {
+                                    "target": "self",
+                                    "party": "ally",
+                                    "effects": [
+                                        {
+                                            "type": "heal_flat",
+                                            "amount": {
+                                                "base": 10,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "amount": 0.25
+                                                    }
+                                                ]
+                                            }
+                                        }
                                     ]
                                 }
-                            }
-                        ]
-                    }
-                ]
+                            ]
+                        },
+                        {
+                            "id": "death_sentence",
+                            "name": "Death Sentence",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:reaper",
+                                    "level": 20
+                                }
+                            ],
+                            "cost": 120,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:curse",
+                                            "stacks": {
+                                                "base": 4,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "amount": 0.15
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:poison",
+                                            "stacks": {
+                                                "base": 4,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "amount": 0.15
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:marked",
+                                            "stacks": {
+                                                "base": 5,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:agility",
+                                                        "amount": 0.15
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "soul_harvest",
+                            "name": "Soul Harvest",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:reaper",
+                                    "level": 25
+                                }
+                            ],
+                            "cost": 160,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 18,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:agility",
+                                                        "amount": 0.35
+                                                    },
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "amount": 0.35
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:curse",
+                                            "stacks": {
+                                                "base": 3,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "amount": 0.1
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                },
+                                {
+                                    "target": "self",
+                                    "party": "ally",
+                                    "effects": [
+                                        {
+                                            "type": "heal_flat",
+                                            "amount": {
+                                                "base": 20,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "amount": 0.4
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "reaping_strike",
+                            "name": "Reaping Strike",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:reaper",
+                                    "level": 35
+                                }
+                            ],
+                            "cost": 180,
+                            "hits": [
+                                {
+                                    "target": "lowest",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 80,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:agility",
+                                                        "amount": 1.5
+                                                    },
+                                                    {
+                                                        "id": "adventuring:magic",
+                                                        "amount": 1
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "passives": [
+                        {
+                            "id": "deaths_embrace",
+                            "name": "Death's Embrace",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:reaper",
+                                    "level": 25
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "encounter_start",
+                                    "type": "debuff",
+                                    "target": "all",
+                                    "party": "enemy",
+                                    "id": "adventuring:curse",
+                                    "stacks": {
+                                        "base": 3,
+                                        "scaling": [
+                                            {
+                                                "id": "adventuring:magic",
+                                                "amount": 0.15
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "id": "life_leech",
+                            "name": "Life Leech",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:reaper",
+                                    "level": 30
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "encounter_start",
+                                    "type": "buff",
+                                    "target": "self",
+                                    "id": "adventuring:regen",
+                                    "stacks": {
+                                        "base": 4,
+                                        "scaling": [
+                                            {
+                                                "id": "adventuring:magic",
+                                                "amount": 0.2
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "trigger": "encounter_start",
+                                    "type": "debuff",
+                                    "target": "all",
+                                    "party": "enemy",
+                                    "id": "adventuring:poison",
+                                    "stacks": {
+                                        "base": 3,
+                                        "scaling": [
+                                            {
+                                                "id": "adventuring:magic",
+                                                "amount": 0.15
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
             }
-        }]
+        ]
     }
 }

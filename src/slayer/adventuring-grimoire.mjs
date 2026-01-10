@@ -36,12 +36,12 @@ export class AdventuringGrimoire {
         // Learn it
         this.learnedAbilities.add(ability.id);
         
-        // Direct achievement check (formerly event)
-        this.manager.achievementManager.checkAchievements();
+        // Mark achievements for check
+        this.manager.achievementManager.markDirty();
         
-        // Notify
+        // Notify (skip notifications during offline progress)
         this.manager.log.add(`${hero.name} learned ${ability.name}!`);
-        if(typeof notifyPlayer === 'function') {
+        if(typeof notifyPlayer === 'function' && !loadingOfflineProgress) {
             notifyPlayer(this.manager, `Learned: ${ability.name}!`, 'success');
         }
         

@@ -8,10 +8,12 @@ class AdventuringDungeonCellRenderQueue {
     constructor() {
         this.type = false;
         this.current = false;
+        this.tooltip = false;
     }
     queueAll() {
         this.type = true;
         this.current = true;
+        this.tooltip = true;
     }
 }
 
@@ -36,6 +38,7 @@ export class AdventuringDungeonCell {
     onLoad() {
         this.renderQueue.type = true;
         this.renderQueue.current = true;
+        this.renderQueue.tooltip = true;
     }
 
     is(type) {
@@ -46,6 +49,7 @@ export class AdventuringDungeonCell {
         this.type = type;
         this.explored = explored;
         this.renderQueue.type = true;
+        this.renderQueue.tooltip = true;
     }
 
     setAltIcon(alt) {
@@ -56,6 +60,7 @@ export class AdventuringDungeonCell {
     setExplored(explored) {
         this.explored = explored;
         this.renderQueue.type = true;
+        this.renderQueue.tooltip = true;
     }
 
     setCurrent(current) {
@@ -102,11 +107,31 @@ export class AdventuringDungeonCell {
 
         // Show "???" for unexplored cells (unless always shown)
         if(!this.explored && !this.type.alwaysShowIcon) {
-            return '<span class="text-muted">???</span>';
+            return TooltipBuilder.create()
+                .header('???')
+                .build();
         }
 
         const tooltip = TooltipBuilder.create()
             .header(this.type.name);
+        
+        // Add special descriptions for exit/boss tiles
+        if(this.type.id === 'adventuring:exit') {
+            tooltip.separator();
+            tooltip.text('Clear all enemies to advance to the next floor.', 'text-info');
+        } else if(this.type.id === 'adventuring:boss') {
+            tooltip.separator();
+            tooltip.text('Defeat the boss to complete the dungeon!', 'text-danger');
+        } else if(this.type.id === 'adventuring:encounter') {
+            tooltip.separator();
+            tooltip.text('A group of enemies blocks your path.', 'text-warning');
+        } else if(this.type.id === 'adventuring:start') {
+            tooltip.separator();
+            tooltip.text('Your party enters the dungeon here.', 'text-muted');
+        } else if(this.type.id === 'adventuring:empty') {
+            tooltip.separator();
+            tooltip.text('Nothing of interest.', 'text-muted');
+        }
         
         // Add effect descriptions if tile has effects
         if(this.type.effects && this.type.effects.length > 0) {
@@ -139,7 +164,12 @@ export class AdventuringDungeonCell {
     }
 
     renderTooltip() {
+        if(!this.renderQueue.tooltip)
+            return;
+
         this.component.setTooltipContent(this.tooltip);
+
+        this.renderQueue.tooltip = false;
     }
 
     renderCurrent() {

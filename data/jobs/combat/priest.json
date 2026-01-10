@@ -2,236 +2,309 @@
     "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
     "namespace": "adventuring",
     "data": {
-        "skillData": [{
-            "skillID": "adventuring:Adventuring",
-            "data": {
-                "jobs": [
-                    {
-                        "id": "priest",
-                        "tier": 1,
-                        "name": "Priest",
-                        "media": "melvor:assets/media/skills/prayer/prayer.svg#tint=purple",
-                        "requirements": [
-                            { "type": "job_level", "job": "adventuring:cleric", "level": 20 }
-                        ],
-                        "isMilestoneReward": true,
-                        "allowedItems": [
-                            "adventuring:hat",
-                            "adventuring:robes",
-                            "adventuring:bottoms",
-                            "adventuring:mitts",
-                            "adventuring:slippers",
-                            "adventuring:amulet",
-                            "adventuring:ring",
-                            "adventuring:cape",
-                            "adventuring:staff",
-                            "adventuring:spellbook"
-                        ],
-                        "scaling": [
-                            { "id": "adventuring:hitpoints", "amount": 1.5 },
-                            { "id": "adventuring:defence", "amount": 0.5 },
-                            { "id": "adventuring:agility", "amount": 0.5 },
-                            { "id": "adventuring:prayer", "amount": 2.5 }
-                        ]
-                    }
-                ],
-                "generators": [
-                    {
-                        "id": "healing_word",
-                        "name": "Healing Word",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:priest", "level": 1 }
-                        ],
-                        "energy": 25,
-                        "hits": [
-                            {
-                                "target": "lowest",
-                                "party": "ally",
-                                "effects": [
-                                    {
-                                        "type": "heal_flat",
-                                        "amount": {
-                                            "base": 15,
-                                            "scaling": [
-                                                { "id": "adventuring:prayer", "amount": 0.35 }
-                                            ]
+        "skillData": [
+            {
+                "skillID": "adventuring:Adventuring",
+                "data": {
+                    "jobs": [
+                        {
+                            "id": "priest",
+                            "tier": 1,
+                            "name": "Priest",
+                            "media": "melvor:assets/media/skills/prayer/prayer.svg#tint=purple",
+                            "requirements": [
+                                {
+                                    "type": "job_level",
+                                    "job": "adventuring:cleric",
+                                    "level": 20
+                                }
+                            ],
+                            "isMilestoneReward": true,
+                            "allowedItems": [
+                                "adventuring:hat",
+                                "adventuring:robes",
+                                "adventuring:bottoms",
+                                "adventuring:mitts",
+                                "adventuring:slippers",
+                                "adventuring:amulet",
+                                "adventuring:ring",
+                                "adventuring:cape",
+                                "adventuring:staff",
+                                "adventuring:spellbook"
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "amount": 1.5
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "amount": 0.5
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "amount": 0.5
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "amount": 2.5
+                                }
+                            ]
+                        }
+                    ],
+                    "generators": [
+                        {
+                            "id": "healing_word",
+                            "name": "Healing Word",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:priest",
+                                    "level": 1
+                                }
+                            ],
+                            "energy": 25,
+                            "hits": [
+                                {
+                                    "target": "lowest",
+                                    "party": "ally",
+                                    "effects": [
+                                        {
+                                            "type": "heal_flat",
+                                            "amount": {
+                                                "base": 15,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:prayer",
+                                                        "amount": 0.35
+                                                    }
+                                                ]
+                                            }
                                         }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "purify",
-                        "name": "Purify",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:priest", "level": 10 }
-                        ],
-                        "energy": 30,
-                        "hits": [
-                            {
-                                "target": "lowest",
-                                "party": "ally",
-                                "effects": [
-                                    {
-                                        "type": "heal_flat",
-                                        "amount": {
-                                            "base": 10,
-                                            "scaling": [
-                                                { "id": "adventuring:prayer", "amount": 0.25 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:divine_favor",
-                                        "stacks": {
-                                            "base": 2,
-                                            "scaling": [
-                                                { "id": "adventuring:prayer", "amount": 0.05 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ],
-                "spenders": [
-                    {
-                        "id": "mass_heal",
-                        "name": "Mass Heal",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:priest", "level": 5 }
-                        ],
-                        "cost": 120,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "ally",
-                                "effects": [
-                                    {
-                                        "type": "heal_flat",
-                                        "amount": {
-                                            "base": 20,
-                                            "scaling": [
-                                                { "id": "adventuring:prayer", "amount": 0.5 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "guardian_spirit",
-                        "name": "Guardian Spirit",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:priest", "level": 15 }
-                        ],
-                        "cost": 100,
-                        "hits": [
-                            {
-                                "target": "lowest",
-                                "party": "ally",
-                                "effects": [
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:barrier",
-                                        "stacks": {
-                                            "base": 5,
-                                            "scaling": [
-                                                { "id": "adventuring:prayer", "amount": 0.5 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "divine_revival",
-                        "name": "Divine Revival",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:priest", "level": 25 }
-                        ],
-                        "cost": 200,
-                        "hits": [
-                            {
-                                "target": "dead",
-                                "party": "ally",
-                                "effects": [
-                                    {
-                                        "type": "revive",
-                                        "amount": {
-                                            "base": 30,
-                                            "scaling": [
-                                                { "id": "adventuring:prayer", "amount": 1.5 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:barrier",
-                                        "stacks": {
-                                            "base": 5,
-                                            "scaling": [
-                                                { "id": "adventuring:prayer", "amount": 0.25 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ],
-                "passives": [
-                    {
-                        "id": "blessing",
-                        "name": "Blessing",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:priest", "level": 20 }
-                        ],
-                        "effects": [
-                            {
-                                "trigger": "encounter_start",
-                                "type": "buff",
-                                "target": "all",
-                                "party": "ally",
-                                "id": "adventuring:regen",
-                                "stacks": {
-                                    "base": 3,
-                                    "scaling": [
-                                        { "id": "adventuring:prayer", "amount": 0.15 }
                                     ]
                                 }
-                            }
-                        ]
-                    },
-                    {
-                        "id": "protective_blessing",
-                        "name": "Protective Blessing",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:priest", "level": 30 }
-                        ],
-                        "effects": [
-                            {
-                                "trigger": "round_start",
-                                "type": "buff",
-                                "target": "lowest",
-                                "party": "ally",
-                                "id": "adventuring:barrier",
-                                "stacks": {
-                                    "base": 2,
-                                    "scaling": [
-                                        { "id": "adventuring:prayer", "amount": 0.15 }
+                            ]
+                        },
+                        {
+                            "id": "purify",
+                            "name": "Purify",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:priest",
+                                    "level": 10
+                                }
+                            ],
+                            "energy": 30,
+                            "hits": [
+                                {
+                                    "target": "lowest",
+                                    "party": "ally",
+                                    "effects": [
+                                        {
+                                            "type": "heal_flat",
+                                            "amount": {
+                                                "base": 10,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:prayer",
+                                                        "amount": 0.25
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "buff",
+                                            "id": "adventuring:divine_favor",
+                                            "stacks": {
+                                                "base": 2,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:prayer",
+                                                        "amount": 0.05
+                                                    }
+                                                ]
+                                            }
+                                        }
                                     ]
                                 }
-                            }
-                        ]
-                    }
-                ]
+                            ]
+                        }
+                    ],
+                    "spenders": [
+                        {
+                            "id": "mass_heal",
+                            "name": "Mass Heal",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:priest",
+                                    "level": 1
+                                }
+                            ],
+                            "cost": 120,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "ally",
+                                    "effects": [
+                                        {
+                                            "type": "heal_flat",
+                                            "amount": {
+                                                "base": 20,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:prayer",
+                                                        "amount": 0.5
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "guardian_spirit",
+                            "name": "Guardian Spirit",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:priest",
+                                    "level": 15
+                                }
+                            ],
+                            "cost": 100,
+                            "hits": [
+                                {
+                                    "target": "lowest",
+                                    "party": "ally",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "id": "adventuring:barrier",
+                                            "stacks": {
+                                                "base": 5,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:prayer",
+                                                        "amount": 0.5
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "divine_revival",
+                            "name": "Divine Revival",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:priest",
+                                    "level": 25
+                                }
+                            ],
+                            "cost": 200,
+                            "hits": [
+                                {
+                                    "target": "dead",
+                                    "party": "ally",
+                                    "effects": [
+                                        {
+                                            "type": "revive",
+                                            "amount": {
+                                                "base": 30,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:prayer",
+                                                        "amount": 1.5
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "buff",
+                                            "id": "adventuring:barrier",
+                                            "stacks": {
+                                                "base": 5,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:prayer",
+                                                        "amount": 0.25
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "passives": [
+                        {
+                            "id": "blessing",
+                            "name": "Blessing",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:priest",
+                                    "level": 20
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "encounter_start",
+                                    "type": "buff",
+                                    "target": "all",
+                                    "party": "ally",
+                                    "id": "adventuring:regen",
+                                    "stacks": {
+                                        "base": 3,
+                                        "scaling": [
+                                            {
+                                                "id": "adventuring:prayer",
+                                                "amount": 0.15
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "id": "protective_blessing",
+                            "name": "Protective Blessing",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:priest",
+                                    "level": 30
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "round_start",
+                                    "type": "buff",
+                                    "target": "lowest",
+                                    "party": "ally",
+                                    "id": "adventuring:barrier",
+                                    "stacks": {
+                                        "base": 2,
+                                        "scaling": [
+                                            {
+                                                "id": "adventuring:prayer",
+                                                "amount": 0.15
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
             }
-        }]
+        ]
     }
 }

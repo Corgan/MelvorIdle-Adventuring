@@ -130,13 +130,7 @@ export class AdventuringDungeon extends AdventuringPage {
         return super.active;
     }
 
-    /**
-     * Check if auto-repeat is currently available for this area
-     * Uses the manager's autoRepeatArea setting
-     */
-    get canAutoRepeat() {
-        return this.area && this.area === this.manager.autoRepeatArea && this.area.autoRepeatUnlocked;
-    }
+
 
     /**
      * Check if currently in endless mode based on area difficulty
@@ -444,7 +438,11 @@ export class AdventuringDungeon extends AdventuringPage {
         this.updateFloorCards();
     }
 
-    start() {
+    /**
+     * Begin a new dungeon run (shared by start and auto-repeat)
+     * Does NOT call manager.start() - caller is responsible for that
+     */
+    _beginRun() {
         this.progress = 0;
         this.endlessWave = 0;
         
@@ -468,10 +466,13 @@ export class AdventuringDungeon extends AdventuringPage {
         // Direct calls for cross-cutting concerns
         this.manager.overview.renderQueue.status = true;
         this.manager.overview.renderQueue.buffs = true;
-        this.manager.consumables.onDungeonStart();
         this.manager.tutorialManager.checkTriggers('event', { event: 'dungeonStart' });
 
         this.next();
+    }
+
+    start() {
+        this._beginRun();
         this.manager.start();
     }
     
@@ -577,17 +578,10 @@ export class AdventuringDungeon extends AdventuringPage {
             // Trigger dungeon_end effects
             this.manager.triggerEffects('dungeon_end', {});
             
-            // Check if we should auto-repeat or go back to town
-            if(this.canAutoRepeat) {
-                this.start();
-            } else {
-                // Dungeon complete, return to town
-                this.manager.log.add(`Returning to town...`);
-                this.reset();
-                this.manager.stop();
-                if(this.active)
-                    this.manager.town.go();
-            }
+            // Always auto-repeat: restart dungeon but keep current HP
+            this.manager.log.add(`Auto-repeating ${this.area.name}...`);
+            this._beginRun();
+            // Note: manager is already started, no need to call this.manager.start()
         } else {
             // Party wiped - check for endless mode record
             if(this.isEndless && this.endlessWave > 0) {

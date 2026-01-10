@@ -185,21 +185,23 @@ export class Adventuring extends SkillWithMastery {
         this.townTimer = new Timer('Town', () => this.nextTownTick());
         this.townInterval = 5000;
 
-        // Auto-repeat target area (only one at a time)
+        // Auto-run target area (starts dungeon when party heals after wipe)
+        // Note: Auto-repeat (continuing dungeon when alive) always happens
         this.autoRepeatArea = null;
     }
 
     /**
-     * Set which area is the auto-repeat target
-     * Only one area can be auto-repeat at a time
+     * Set which area is the auto-run target
+     * Auto-run: automatically start dungeon when party is fully healed in town after a wipe
+     * Only one area can be auto-run at a time
      */
     setAutoRepeatArea(area) {
         const previousArea = this.autoRepeatArea;
         this.autoRepeatArea = area;
         
-        // Queue re-render for all areas that have auto-repeat unlocked
+        // Queue re-render for all areas that have auto-run unlocked
         this.areas.allObjects.forEach(a => {
-            if(a.autoRepeatUnlocked) {
+            if(a.autoRunUnlocked) {
                 a.renderQueue.autoRepeat = true;
             }
         });
@@ -312,7 +314,7 @@ export class Adventuring extends SkillWithMastery {
         // Reset bestiary
         this.bestiary.reset();
         
-        // Reset areas - mastery XP reset above handles autoRepeatUnlocked (computed from mastery)
+        // Reset areas - mastery XP reset above handles autoRunUnlocked (computed from mastery)
         this.areas.allObjects.forEach(area => {
             area.renderQueue.updateAll();
         });
@@ -532,8 +534,8 @@ export class Adventuring extends SkillWithMastery {
             member.renderQueue.jobs = true;
         });
 
-        // Check achievements and trigger tutorials for skill level up
-        this.achievementManager.checkAchievements();
+        // Mark achievements for check and trigger tutorials for skill level up
+        this.achievementManager.markDirty();
         this.tutorialManager.checkTriggers('skill', { level: newLevel });
 
         this.jobs.forEach(job => {
@@ -784,6 +786,9 @@ export class Adventuring extends SkillWithMastery {
                 this.dungeon.exploreTimer.start(this.dungeon.exploreInterval);
             this.dungeon.exploreTimer.tick();
         }
+        
+        // Check achievements once per tick (not on every event)
+        this.achievementManager.checkIfDirty();
     }
 
     passiveTick() {
@@ -1276,6 +1281,57 @@ export class Adventuring extends SkillWithMastery {
                 }
             });
         });
+
+        // Equipment -> Monsters lookup (for "Drops from" in equipment tooltips)
+        this.equipmentSources = new Map();
+        this.monsters.forEach(monster => {
+            if(monster.lootGenerator === undefined || monster.lootGenerator.table === undefined) return;
+            this.scanLootTableForEquipment(monster.lootGenerator.table, monster);
+        });
+    }
+
+    /**
+     * Recursively scan a loot table for equipment entries and add them to equipmentSources
+     * @param {Array} entries - Loot table entries
+     * @param {AdventuringMonster} monster - The monster that drops from this table
+     */
+    scanLootTableForEquipment(entries, monster) {
+        for(const entry of entries) {
+            if(entry.type === 'table') {
+                // Recurse into referenced loot table
+                const table = this.lootTables.getObjectByID(entry.table);
+                if(table) {
+                    this.scanLootTableForEquipment(table.getEntries(), monster);
+                }
+            } else if(entry.type === 'equipment') {
+                // Direct equipment reference
+                const item = this.baseItems.getObjectByID(entry.id);
+                if(item) {
+                    if(!this.equipmentSources.has(item)) {
+                        this.equipmentSources.set(item, []);
+                    }
+                    const sources = this.equipmentSources.get(item);
+                    if(!sources.includes(monster)) {
+                        sources.push(monster);
+                    }
+                }
+            } else if(entry.type === 'equipment_pool') {
+                // Equipment pool - all items in pool can drop from this monster
+                const pool = this.equipmentPools.getObjectByID(entry.pool);
+                if(pool) {
+                    for(const poolEntry of pool.items) {
+                        const item = poolEntry.item;
+                        if(!this.equipmentSources.has(item)) {
+                            this.equipmentSources.set(item, []);
+                        }
+                        const sources = this.equipmentSources.get(item);
+                        if(!sources.includes(monster)) {
+                            sources.push(monster);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /**

@@ -6,53 +6,27 @@ const { AdventuringStats } = await loadModule('src/core/adventuring-stats.mjs');
 const { AdventuringCard } = await loadModule('src/progression/adventuring-card.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
 const { AdventuringPassiveBadgeElement } = await loadModule('src/entities/components/adventuring-passive-badge.mjs');
-const { evaluateCondition, getAuraName, StatCalculator } = await loadModule('src/core/adventuring-utils.mjs');
+const { evaluateCondition, getAuraName, StatCalculator, resolveTargets } = await loadModule('src/core/adventuring-utils.mjs');
 
 /**
  * Starter loadouts for new players.
- * Each hero position (front/center/back) gets a job, abilities, and gear set.
+ * Each hero position (front/center/back) gets a job and abilities.
  */
 const STARTER_LOADOUTS = {
     front: {
         job: 'adventuring:fighter',
         generator: 'adventuring:slash',
-        spender: 'adventuring:whirlwind',
-        gear: {
-            weapon: 'adventuring:bronze_sword1h',
-            offhand: 'adventuring:bronze_shield',
-            head: 'adventuring:might_helm',
-            body: 'adventuring:might_platebody',
-            legs: 'adventuring:might_platelegs',
-            hands: 'adventuring:might_gauntlets',
-            feet: 'adventuring:might_sabatons'
-        }
+        spender: 'adventuring:whirlwind'
     },
     center: {
         job: 'adventuring:cleric',
         generator: 'adventuring:holy_fire',
-        spender: 'adventuring:divine_heal',
-        gear: {
-            weapon: 'adventuring:healing_staff',
-            head: 'adventuring:devotion_hat',
-            body: 'adventuring:devotion_robes',
-            legs: 'adventuring:devotion_bottoms',
-            hands: 'adventuring:devotion_mitts',
-            feet: 'adventuring:devotion_slippers'
-        }
+        spender: 'adventuring:divine_heal'
     },
     back: {
         job: 'adventuring:ranger',
         generator: 'adventuring:shoot',
-        spender: 'adventuring:snipe',
-        gear: {
-            weapon: 'adventuring:normal_shortbow',
-            offhand: 'adventuring:basic_quiver',
-            head: 'adventuring:precision_cowl',
-            body: 'adventuring:precision_vest',
-            legs: 'adventuring:precision_chaps',
-            hands: 'adventuring:precision_vambraces',
-            feet: 'adventuring:precision_boots'
-        }
+        spender: 'adventuring:snipe'
     }
 };
 
@@ -194,23 +168,7 @@ export class AdventuringHero extends AdventuringCharacter {
             }
         }
 
-        // Pre-craft and equip starter gear
-        for(const [slotName, itemId] of Object.entries(loadout.gear)) {
-            // Pre-craft the item (unlock + upgrade to level 1)
-            const item = this.manager.armory.preCraftItem(itemId);
-            if(!item) continue;
-
-            // Find the equipment slot
-            const slotType = this.manager.itemSlots.getObjectByID(`adventuring:${slotName}`);
-            if(!slotType) continue;
-
-            const slot = this.equipment.slots.get(slotType);
-            if(slot && slot.canEquip(item)) {
-                slot.setEquipped(item);
-            }
-        }
-
-        // Recalculate stats after equipping
+        // Recalculate stats
         this.calculateStats();
     }
     
@@ -452,8 +410,22 @@ export class AdventuringHero extends AdventuringCharacter {
             stacks: effect.getStacks ? effect.getStacks(this) : (effect.stacks || 1)
         };
         
-        // Resolve targets using passive's target resolution
-        const targets = passive.resolveTargets(effect, this, encounter);
+        // Resolve targets using effect's target type
+        // Determine which party to target based on effect.targetParty (default: allies)
+        const targetPartyType = effect.targetParty || 'ally';
+        const targetParty = targetPartyType === 'enemy' 
+            ? encounter?.party 
+            : this.manager.party;
+        const targetType = effect.target || 'self';
+        
+        let targets;
+        if(targetType === 'self') {
+            targets = [this];
+        } else if(targetParty) {
+            targets = resolveTargets(targetType, targetParty, null);
+        } else {
+            targets = [this];
+        }
         
         let anyApplied = false;
         for (const target of targets) {

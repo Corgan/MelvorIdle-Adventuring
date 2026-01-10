@@ -226,9 +226,6 @@ export class AdventuringAchievement extends NamespacedObject {
                 return stats.slayerTasksCompleted;
             case 'job_unlocked':
                 return this._isJobUnlocked(req.job) ? 1 : 0;
-            case 'all_jobs_tier':
-                return this._areAllJobsUnlockedAtTier(req.tier) ? 1 : 0;
-            // New requirement types for flat job level system
             case 'any_passive_job_level':
                 return this._getHighestPassiveJobLevel();
             case 'all_passive_jobs_level':
@@ -274,25 +271,39 @@ export class AdventuringAchievement extends NamespacedObject {
     }
 
     /**
-     * Helper: Get highest mastery level on any single monster
+     * Helper: Get highest mastery level on any single monster (cached per check cycle)
      */
     _getHighestMonsterMastery() {
+        const cache = this.manager.achievementManager._checkCache;
+        if(cache && cache.highestMonsterMastery !== undefined) {
+            return cache.highestMonsterMastery;
+        }
+        
         let highest = 0;
         for (const monster of this.manager.monsters.allObjects) {
             const mastery = this.manager.getMasteryLevel(monster) || 0;
             if (mastery > highest) highest = mastery;
         }
+        
+        if(cache) cache.highestMonsterMastery = highest;
         return highest;
     }
 
     /**
-     * Helper: Get sum of all monster mastery levels
+     * Helper: Get sum of all monster mastery levels (cached per check cycle)
      */
     _getTotalMonsterMastery() {
+        const cache = this.manager.achievementManager._checkCache;
+        if(cache && cache.totalMonsterMastery !== undefined) {
+            return cache.totalMonsterMastery;
+        }
+        
         let total = 0;
         for (const monster of this.manager.monsters.allObjects) {
             total += this.manager.getMasteryLevel(monster) || 0;
         }
+        
+        if(cache) cache.totalMonsterMastery = total;
         return total;
     }
 
@@ -304,7 +315,9 @@ export class AdventuringAchievement extends NamespacedObject {
         // Some requirements use 'level' instead of 'target'
         if(req.level !== undefined) return req.level;
         // Boolean checks use target: 1
-        if(req.type === 'job_unlocked' || req.type === 'all_jobs_tier' || req.type === 'all_passive_jobs_level' || req.type === 'area_cleared' || req.type === 'set_bonus_active') {
+        if(req.type === 'all_passive_jobs_level')
+            return this.manager.passiveJobs.length || 1;
+        if(req.type === 'job_unlocked' || req.type === 'area_cleared' || req.type === 'set_bonus_active') {
             return 1;
         }
         return req.target || 1;
@@ -332,9 +345,14 @@ export class AdventuringAchievement extends NamespacedObject {
     }
 
     /**
-     * Helper: Get highest job level
+     * Helper: Get highest job level (cached per check cycle)
      */
     _getHighestJobLevel() {
+        const cache = this.manager.achievementManager._checkCache;
+        if(cache && cache.highestJobLevel !== undefined) {
+            return cache.highestJobLevel;
+        }
+        
         let highest = 0;
         const noneJob = this.manager.cached.noneJob;
         for(const job of this.manager.jobs.allObjects) {
@@ -342,13 +360,21 @@ export class AdventuringAchievement extends NamespacedObject {
             const level = job.level || 1;
             if(level > highest) highest = level;
         }
+        
+        if(cache) cache.highestJobLevel = highest;
         return highest;
     }
 
     /**
-     * Helper: Count jobs at or above a level
+     * Helper: Count jobs at or above a level (cached per check cycle with level key)
      */
     _getJobsAtLevel(targetLevel) {
+        const cache = this.manager.achievementManager._checkCache;
+        const cacheKey = `jobsAtLevel_${targetLevel}`;
+        if(cache && cache[cacheKey] !== undefined) {
+            return cache[cacheKey];
+        }
+        
         let count = 0;
         const noneJob = this.manager.cached.noneJob;
         for(const job of this.manager.jobs.allObjects) {
@@ -356,6 +382,8 @@ export class AdventuringAchievement extends NamespacedObject {
             const level = job.level || 1;
             if(level >= targetLevel) count++;
         }
+        
+        if(cache) cache[cacheKey] = count;
         return count;
     }
 
@@ -363,39 +391,79 @@ export class AdventuringAchievement extends NamespacedObject {
      * Helper: Check if a job is unlocked (all requirements met)
      */
     _isJobUnlocked(jobId) {
+        const cache = this.manager.achievementManager._checkCache;
+        const cacheKey = `jobUnlocked_${jobId}`;
+        if(cache && cache[cacheKey] !== undefined) {
+            return cache[cacheKey];
+        }
+        
         const job = this.manager.jobs.getObjectByID(jobId);
-        if(!job) return false;
-        if(!job.requirements || job.requirements.length === 0) return true;
+        if(!job) {
+            if(cache) cache[cacheKey] = false;
+            return false;
+        }
+        if(!job.requirements || job.requirements.length === 0) {
+            if(cache) cache[cacheKey] = true;
+            return true;
+        }
         
         for(const req of job.requirements) {
             if(req.type === 'skill_level') {
-                if(this.manager.level < req.level) return false;
+                if(this.manager.level < req.level) {
+                    if(cache) cache[cacheKey] = false;
+                    return false;
+                }
             }
             if(req.type === 'job_level') {
                 const prereqJob = this.manager.jobs.getObjectByID(req.job);
-                if(!prereqJob) return false;
-                if(this.manager.getMasteryLevel(prereqJob) < req.level) return false;
+                if(!prereqJob) {
+                    if(cache) cache[cacheKey] = false;
+                    return false;
+                }
+                if(this.manager.getMasteryLevel(prereqJob) < req.level) {
+                    if(cache) cache[cacheKey] = false;
+                    return false;
+                }
             }
         }
+        
+        if(cache) cache[cacheKey] = true;
         return true;
     }
 
     /**
-     * Helper: Check if all jobs of a tier are unlocked
+     * Helper: Check if all jobs of a tier are unlocked (cached per check cycle)
      */
     _areAllJobsUnlockedAtTier(tier) {
+        const cache = this.manager.achievementManager._checkCache;
+        const cacheKey = `allJobsTier_${tier}`;
+        if(cache && cache[cacheKey] !== undefined) {
+            return cache[cacheKey];
+        }
+        
         const noneJob = this.manager.cached.noneJob;
         const tierJobs = this.manager.jobs.allObjects.filter(job => 
             job !== noneJob && job.tier === tier
         );
-        if(tierJobs.length === 0) return false;
-        return tierJobs.every(job => this._isJobUnlocked(job.id));
+        if(tierJobs.length === 0) {
+            if(cache) cache[cacheKey] = false;
+            return false;
+        }
+        const result = tierJobs.every(job => this._isJobUnlocked(job.id));
+        
+        if(cache) cache[cacheKey] = result;
+        return result;
     }
 
     /**
-     * Helper: Get highest passive job level
+     * Helper: Get highest passive job level (cached per check cycle)
      */
     _getHighestPassiveJobLevel() {
+        const cache = this.manager.achievementManager._checkCache;
+        if(cache && cache.highestPassiveJobLevel !== undefined) {
+            return cache.highestPassiveJobLevel;
+        }
+        
         let highest = 0;
         const noneJob = this.manager.cached.noneJob;
         for(const job of this.manager.jobs.allObjects) {
@@ -403,22 +471,36 @@ export class AdventuringAchievement extends NamespacedObject {
             const level = this.manager.getMasteryLevel(job) || 1;
             if(level > highest) highest = level;
         }
+        
+        if(cache) cache.highestPassiveJobLevel = highest;
         return highest;
     }
 
     /**
-     * Helper: Check if all passive jobs are at or above a level
+     * Helper: Check if all passive jobs are at or above a level (cached per check cycle)
      */
     _getAllPassiveJobsAtLevel(targetLevel) {
+        const cache = this.manager.achievementManager._checkCache;
+        const cacheKey = `allPassiveJobsAtLevel_${targetLevel}`;
+        if(cache && cache[cacheKey] !== undefined) {
+            return cache[cacheKey];
+        }
+        
         const noneJob = this.manager.cached.noneJob;
         const passiveJobs = this.manager.jobs.allObjects.filter(job => 
             job !== noneJob && job.isPassive
         );
-        if(passiveJobs.length === 0) return false;
-        return passiveJobs.every(job => {
+        if(passiveJobs.length === 0) {
+            if(cache) cache[cacheKey] = false;
+            return false;
+        }
+        const result = passiveJobs.every(job => {
             const level = this.manager.getMasteryLevel(job) || 1;
             return level >= targetLevel;
         });
+        
+        if(cache) cache[cacheKey] = result;
+        return result;
     }
 
     /**
@@ -431,14 +513,21 @@ export class AdventuringAchievement extends NamespacedObject {
     }
 
     /**
-     * Helper: Get highest area mastery level
+     * Helper: Get highest area mastery level (cached per check cycle)
      */
     _getHighestAreaMastery() {
+        const cache = this.manager.achievementManager._checkCache;
+        if(cache && cache.highestAreaMastery !== undefined) {
+            return cache.highestAreaMastery;
+        }
+        
         let highest = 0;
         for(const area of this.manager.areas.allObjects) {
             const level = this.manager.getMasteryLevel(area) || 1;
             if(level > highest) highest = level;
         }
+        
+        if(cache) cache.highestAreaMastery = highest;
         return highest;
     }
 
@@ -500,6 +589,10 @@ export class AchievementManager {
         
         // Effect cache for permanent bonuses from achievements
         this.bonusEffects = null; // Will be initialized when EffectCache is available
+        
+        // Dirty flag - marks achievements as needing a check
+        // Checked once per tick instead of on every event
+        this._needsCheck = false;
     }
 
     /**
@@ -609,7 +702,7 @@ export class AchievementManager {
             }
         }
         
-        this.checkAchievements();
+        this.markDirty();
     }
 
     /**
@@ -633,7 +726,7 @@ export class AchievementManager {
             this.stats.totalEndlessWaves += endlessWave;
         }
         
-        this.checkAchievements();
+        this.markDirty();
     }
 
     /**
@@ -641,7 +734,7 @@ export class AchievementManager {
      */
     recordMaterials(qty) {
         this.stats.totalMaterials += qty;
-        this.checkAchievements();
+        this.markDirty();
     }
 
     /**
@@ -649,7 +742,7 @@ export class AchievementManager {
      */
     recordCurrency(qty) {
         this.stats.totalCurrencyEarned += qty;
-        this.checkAchievements();
+        this.markDirty();
     }
 
     /**
@@ -657,7 +750,7 @@ export class AchievementManager {
      */
     recordUniqueMonster() {
         this.stats.uniqueMonstersSeen++;
-        this.checkAchievements();
+        this.markDirty();
     }
 
     /**
@@ -679,7 +772,7 @@ export class AchievementManager {
         this.stats.totalDamage += totalDamage;
         this.stats.totalHealing += totalHealing;
         
-        this.checkAchievements();
+        this.markDirty();
     }
 
     /**
@@ -687,7 +780,24 @@ export class AchievementManager {
      */
     recordSlayerTask() {
         this.stats.slayerTasksCompleted++;
-        this.checkAchievements();
+        this.markDirty();
+    }
+
+    /**
+     * Mark achievements as needing a check (called by stat recording methods)
+     */
+    markDirty() {
+        this._needsCheck = true;
+    }
+
+    /**
+     * Check achievements if dirty (called once per tick)
+     */
+    checkIfDirty() {
+        if(this._needsCheck) {
+            this._needsCheck = false;
+            this.checkAchievements();
+        }
     }
 
     /**
@@ -696,12 +806,18 @@ export class AchievementManager {
     checkAchievements() {
         let newCompletions = false;
         
+        // Cache expensive computed values for this check cycle
+        this._checkCache = {};
+        
         for(const achievement of this.manager.achievements.allObjects) {
             if(!achievement.isComplete() && achievement.isMet()) {
                 this.completeAchievement(achievement);
                 newCompletions = true;
             }
         }
+        
+        // Clear the cache
+        this._checkCache = null;
         
         if(newCompletions) {
             this.renderQueue.completed = true;
@@ -725,8 +841,8 @@ export class AchievementManager {
         // Rebuild bonus effects cache
         this.rebuildBonuses();
         
-        // Show notification
-        if(typeof notifyPlayer === 'function') {
+        // Show notification (skip during offline progress)
+        if(typeof notifyPlayer === 'function' && !loadingOfflineProgress) {
             notifyPlayer(this.manager, `Achievement Unlocked: ${achievement.name}`, 'success');
         }
         

@@ -157,7 +157,7 @@ export class AdventuringEquipmentSlot {
                     this.setEmpty();
                     if (this.equipment.character.invalidateStats) this.equipment.character.invalidateStats();
                     this.equipment.character.calculateStats();
-                    this.manager.achievementManager.checkAchievements();
+                    this.manager.achievementManager.markDirty();
                     if(this.selectorPopup) this.selectorPopup.hide();
                 }
             });
@@ -297,8 +297,8 @@ export class AdventuringEquipmentSlot {
         if (this.equipment.character.invalidateStats) this.equipment.character.invalidateStats();
         this.equipment.character.calculateStats();
         
-        // Direct achievement check
-        this.manager.achievementManager.checkAchievements();
+        // Mark achievements for check
+        this.manager.achievementManager.markDirty();
     }
 
     setOccupied(slot) {
@@ -329,7 +329,8 @@ export class AdventuringEquipmentSlot {
         this.renderQueue.valid = true;
         this.renderQueue.upgrade = true;
         
-        // Invalidate effect cache
+        // Invalidate caches
+        this.equipment.invalidateSetCache();
         if(this.equipment.character && this.equipment.character.effectCache) {
             this.equipment.character.invalidateEffects('equipment');
         }
@@ -348,7 +349,8 @@ export class AdventuringEquipmentSlot {
         this.renderQueue.valid = true;
         this.renderQueue.upgrade = true;
         
-        // Invalidate effect cache
+        // Invalidate caches
+        this.equipment.invalidateSetCache();
         if(this.equipment.character && this.equipment.character.effectCache) {
             this.equipment.character.invalidateEffects('equipment');
         }

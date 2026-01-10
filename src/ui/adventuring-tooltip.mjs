@@ -139,15 +139,29 @@ export class TooltipBuilder {
     /**
      * Add source hints from an array of source objects (monsters, areas, etc.)
      * Shows up to 3 sources with "+N more" if there are more
-     * @param {Array} sources - Array of source objects with .name property
+     * Only shows unlocked sources, with exploration hint if there are locked ones
+     * @param {Array} sources - Array of source objects with .name and .unlocked properties
      * @param {string} prefix - Prefix text (e.g., "Drops from", "Found in")
      */
     sourceHint(sources, prefix) {
         if(!sources || sources.length === 0) return this;
-        const sourceNames = sources.slice(0, 3).map(s => s.name);
+        
+        // Filter to unlocked sources only
+        const unlockedSources = sources.filter(s => s.unlocked);
+        const hasLockedSources = unlockedSources.length < sources.length;
+        
+        if(unlockedSources.length === 0) {
+            // No unlocked sources - show exploration hint
+            return this.source('Explore to discover sources');
+        }
+        
+        const sourceNames = unlockedSources.slice(0, 3).map(s => s.name);
         let sourceText = sourceNames.join(', ');
-        if(sources.length > 3) {
-            sourceText += ` +${sources.length - 3} more`;
+        if(unlockedSources.length > 3) {
+            sourceText += ` +${unlockedSources.length - 3} more`;
+        }
+        if(hasLockedSources) {
+            sourceText += ' (explore for more)';
         }
         return this.source(`${prefix}: ${sourceText}`);
     }
@@ -350,8 +364,9 @@ export class TooltipBuilder {
      * @returns {TooltipBuilder} This builder for chaining
      */
     static forJob(job, manager) {
+        const displayName = job.unlocked ? job.name : '???';
         const tooltip = TooltipBuilder.create()
-            .header(job.name, job.media);
+            .header(displayName, job.media);
 
         if(job.unlocked && job.isMilestoneReward) {
             tooltip.masteryProgressFor(manager, job);
@@ -374,10 +389,11 @@ export class TooltipBuilder {
      * @param {boolean} [options.showUnlockLevel=false] - Whether to show unlock level info
      * @param {Object} [options.masteryAction] - Action to check mastery level for unlock requirements
      * @param {boolean} [options.hideIfLocked=false] - Whether to show ??? for locked abilities (grimoire mode)
+     * @param {boolean} [options.skipUsableBy=false] - Whether to skip the "Usable by" section (for bestiary)
      * @returns {TooltipBuilder} This builder for chaining
      */
     static forAbility(ability, options = {}) {
-        const { character, manager, type, showUnlockLevel = false, masteryAction, hideIfLocked = false, forceShowDescription = false, displayMode = 'total' } = options;
+        const { character, manager, type, showUnlockLevel = false, masteryAction, hideIfLocked = false, forceShowDescription = false, displayMode = 'total', skipUsableBy = false } = options;
         const isUnlocked = ability.unlocked !== undefined ? ability.unlocked : true;
         const showDetails = isUnlocked || !hideIfLocked || forceShowDescription;
         
@@ -392,7 +408,7 @@ export class TooltipBuilder {
         }
         
         // Usable by section (before description when type is provided)
-        if(manager && type) {
+        if(manager && type && !skipUsableBy) {
             const req = ability.requirements !== undefined ? ability.requirements.find(r => r.type === 'job_level' || r.type === 'current_job_level') : undefined;
             if(ability.isEnemy) {
                 // Enemy abilities are usable only by Slayer
@@ -440,7 +456,7 @@ export class TooltipBuilder {
         }
         
         // Usable by section (after description when no type is provided - combat selector style)
-        if(manager && !type) {
+        if(manager && !type && !skipUsableBy) {
             const req = ability.requirements !== undefined ? ability.requirements.find(r => r.type === 'job_level' || r.type === 'current_job_level') : undefined;
             if(ability.isEnemy) {
                 // Enemy abilities are usable only by Slayer
@@ -494,8 +510,17 @@ export class TooltipBuilder {
      * @returns {TooltipBuilder} This builder for chaining
      */
     static forEquipment(item, manager, character = null) {
+        // Show ??? for items that haven't dropped yet
+        const isDropped = item.dropped;
+        const displayName = isDropped ? item.name : '???';
+        
         const tooltip = TooltipBuilder.create()
-            .header(item.name, item.media);
+            .header(displayName, item.media);
+
+        // Only show details if item has dropped
+        if(!isDropped) {
+            return tooltip;
+        }
 
         if(item.unlocked) {
             // Upgrade stars - centered
@@ -577,8 +602,9 @@ export class TooltipBuilder {
      * @returns {TooltipBuilder} This builder for chaining
      */
     static forMonster(monster, manager) {
+        const displayName = monster.unlocked ? monster.name : '???';
         const tooltip = TooltipBuilder.create()
-            .header(monster.name, monster.media);
+            .header(displayName, monster.media);
 
         if(monster.unlocked) {
             tooltip.masteryProgressFor(manager, monster);
@@ -618,7 +644,7 @@ export class TooltipBuilder {
             tooltip.effects(area.getMasteryBonusEffects(), manager);
             
             // Auto-run status (special case - not an effect)
-            if(area.autoRepeatUnlocked) {
+            if(area.autoRunUnlocked) {
                 const isActive = manager.autoRepeatArea === area;
                 if(isActive) {
                     tooltip.info('Auto-Run ACTIVE');
@@ -886,15 +912,16 @@ export class TooltipBuilder {
      * Add unlock requirements for locked items
      * @param {Array} requirements - Array of requirement objects
      * @param {Object} manager - The adventuring manager for checking current levels
+     * @param {Object} [context] - Optional context for requirement checking (e.g., { item })
      */
-    unlockRequirements(requirements, manager) {
+    unlockRequirements(requirements, manager, context = {}) {
         if(!requirements || requirements.length === 0) return this;
         
         this.separator();
         this.sectionTitle('Unlock Requirements');
         
         requirements.forEach(req => {
-            const { text, met } = formatRequirement(req, manager);
+            const { text, met } = formatRequirement(req, manager, context);
             const color = met ? 'text-success' : 'text-danger';
             this.sections.push(`<div><small class="${color}">${text}</small></div>`);
         });

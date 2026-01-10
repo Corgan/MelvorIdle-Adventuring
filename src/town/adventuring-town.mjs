@@ -31,8 +31,9 @@ export class AdventuringTown extends AdventuringPage {
     }
 
     performActions() {
-        // Check if auto-repeat dungeon should start (party at full HP)
-        if(this.manager.autoRepeatArea && this.checkAutoRepeatReady()) {
+        // Check if auto-run should start (party at full HP after wipe)
+        // This is different from auto-repeat which happens during dungeon completion
+        if(this.manager.autoRepeatArea && this.checkAutoRunReady()) {
             this.manager.log.add(`Auto-run: Starting ${this.manager.autoRepeatArea.name}...`);
             this.manager.selectArea(this.manager.autoRepeatArea);
             return;
@@ -45,7 +46,7 @@ export class AdventuringTown extends AdventuringPage {
      * Check if conditions are met to auto-start the repeat dungeon
      * Requires all party members to be alive and at full HP
      */
-    checkAutoRepeatReady() {
+    checkAutoRunReady() {
         return this.manager.party.every(member => 
             !member.dead && member.hitpoints >= member.maxHitpoints
         );
