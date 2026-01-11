@@ -12,7 +12,7 @@ export class AdventuringStoredItemElement extends AdventuringTooltipElement {
         this.border = getElementFromFragment(this._content, 'border', 'div');
         this.icon = getElementFromFragment(this._content, 'icon', 'img');
         this.count = getElementFromFragment(this._content, 'count', 'small');
-        
+
         this._tooltipTarget = this.clickable;
     }
 

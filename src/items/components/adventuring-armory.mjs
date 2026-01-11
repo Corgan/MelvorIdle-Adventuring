@@ -7,9 +7,7 @@ export class AdventuringArmoryElement extends AdventuringSubpageElement {
         super('adventuring-armory-template');
 
         this.items = getElementFromFragment(this._content, 'items', 'div');
-        this.back = getElementFromFragment(this._content, 'back', 'button');
-        
-        // Category dropdown
+        this.back = getElementFromFragment(this._content, 'back', 'button');
         this.categoryDropdownButton = getElementFromFragment(this._content, 'category-dropdown-button', 'button');
         this.optionMelee = getElementFromFragment(this._content, 'option-melee', 'a');
         this.optionRanged = getElementFromFragment(this._content, 'option-ranged', 'a');
@@ -20,7 +18,7 @@ export class AdventuringArmoryElement extends AdventuringSubpageElement {
         this.optionLight = getElementFromFragment(this._content, 'option-light', 'a');
         this.optionAccessories = getElementFromFragment(this._content, 'option-accessories', 'a');
         this.optionArtifacts = getElementFromFragment(this._content, 'option-artifacts', 'a');
-        
+
         this.details = getElementFromFragment(this._content, 'details', 'div');
         this.icon = getElementFromFragment(this._content, 'icon', 'img');
         this.nameText = getElementFromFragment(this._content, 'name', 'h5');

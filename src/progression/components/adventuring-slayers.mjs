@@ -6,21 +6,15 @@ export class AdventuringSlayersElement extends AdventuringSubpageElement {
     constructor() {
         super('adventuring-slayers-template');
 
-        this.back = getElementFromFragment(this._content, 'back', 'button');
-        
-        // Tab navigation
+        this.back = getElementFromFragment(this._content, 'back', 'button');
         this.tabTasks = getElementFromFragment(this._content, 'tab-tasks', 'button');
         this.tabAchievements = getElementFromFragment(this._content, 'tab-achievements', 'button');
-        this.achievementsBadge = getElementFromFragment(this._content, 'achievements-badge', 'span');
-        
-        // Tasks tab content
+        this.achievementsBadge = getElementFromFragment(this._content, 'achievements-badge', 'span');
         this.tasksContent = getElementFromFragment(this._content, 'tasks-content', 'div');
         this.activeTasks = getElementFromFragment(this._content, 'active-tasks', 'div');
         this.availableTasks = getElementFromFragment(this._content, 'available-tasks', 'div');
         this.refreshButton = getElementFromFragment(this._content, 'refresh-button', 'button');
-        this.refreshCost = getElementFromFragment(this._content, 'refresh-cost', 'span');
-        
-        // Achievements tab content
+        this.refreshCost = getElementFromFragment(this._content, 'refresh-cost', 'span');
         this.achievementsContent = getElementFromFragment(this._content, 'achievements-content', 'div');
         this.achievementSummary = getElementFromFragment(this._content, 'achievement-summary', 'span');
         this.achievementProgressBar = getElementFromFragment(this._content, 'achievement-progress-bar', 'div');

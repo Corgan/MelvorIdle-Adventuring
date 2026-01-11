@@ -3,9 +3,7 @@ const { loadModule } = mod.getContext(import.meta);
 const { AdventuringPage } = await loadModule('src/ui/adventuring-page.mjs');
 const { AdventuringStats } = await loadModule('src/core/adventuring-stats.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
-const { AdventuringAbilityRowElement } = await loadModule('src/progression/components/adventuring-ability-row.mjs');
-
-// Side-effect import to register custom element
+const { AdventuringAbilityRowElement } = await loadModule('src/progression/components/adventuring-ability-row.mjs');
 await loadModule('src/progression/components/adventuring-job-details.mjs');
 
 class AdventuringJobDetailsRenderQueue {
@@ -35,7 +33,7 @@ export class AdventuringJobDetails extends AdventuringPage {
 
         this.renderQueue = new AdventuringJobDetailsRenderQueue();
         this.component.back.onclick = () => this.back();
-        
+
         this.abilityTooltips = [];
     }
 
@@ -102,18 +100,12 @@ export class AdventuringJobDetails extends AdventuringPage {
         this.renderQueue.icon = false;
     }
 
-    /**
-     * Get unlock level for an ability (for sorting)
-     */
     getUnlockLevel(ability) {
         if(!ability.requirements || ability.requirements.length === 0) return 0;
         const req = ability.requirements.find(r => r.type === 'job_level' || r.type === 'current_job_level');
         return req ? req.level : 0;
     }
 
-    /**
-     * Build tooltip for an ability
-     */
     buildAbilityTooltip(ability, type) {
         return TooltipBuilder.forAbility(ability, {
             manager: this.manager,
@@ -124,13 +116,10 @@ export class AdventuringJobDetails extends AdventuringPage {
         }).build();
     }
 
-    /**
-     * Create ability row element
-     */
     createAbilityRow(ability, type) {
         const isUnlocked = ability.unlocked !== undefined ? ability.unlocked : true;
         const unlockLevel = this.getUnlockLevel(ability);
-        
+
         const row = new AdventuringAbilityRowElement();
         row.setAbility({
             name: ability.name,
@@ -138,13 +127,11 @@ export class AdventuringJobDetails extends AdventuringPage {
             type,
             unlockLevel,
             tooltipContent: this.buildAbilityTooltip(ability, type)
-        });
-        
-        // Mark as seen
+        });
         if(isUnlocked && ability.id) {
             this.manager.seenAbilities.add(ability.id);
         }
-        
+
         return row;
     }
 
@@ -155,9 +142,7 @@ export class AdventuringJobDetails extends AdventuringPage {
         if(this.job.isPassive) {
             this.component.abilitiesSection.classList.add('d-none');
         } else {
-            this.component.abilitiesSection.classList.remove('d-none');
-            
-            // Collect all abilities for this job
+            this.component.abilitiesSection.classList.remove('d-none');
             const generators = this.manager.generators.allObjects
                 .filter(g => g.unlockedBy(this.job))
                 .map(a => ({ ability: a, type: 'generator' }));
@@ -165,15 +150,11 @@ export class AdventuringJobDetails extends AdventuringPage {
                 .filter(s => s.unlockedBy(this.job))
                 .map(a => ({ ability: a, type: 'spender' }));
             const passives = this.manager.getPassivesForJob(this.job)
-                .map(a => ({ ability: a, type: 'passive' }));
-            
-            // Combine and sort by unlock level
+                .map(a => ({ ability: a, type: 'passive' }));
             const allAbilities = [...generators, ...spenders, ...passives]
-                .sort((a, b) => this.getUnlockLevel(a.ability) - this.getUnlockLevel(b.ability));
-            
-            // Create rows
+                .sort((a, b) => this.getUnlockLevel(a.ability) - this.getUnlockLevel(b.ability));
             const rows = allAbilities.map(({ ability, type }) => this.createAbilityRow(ability, type));
-            
+
             this.component.abilitiesList.replaceChildren(...rows);
         }
 

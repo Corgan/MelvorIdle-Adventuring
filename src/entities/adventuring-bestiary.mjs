@@ -22,8 +22,7 @@ export class AdventuringBestiary extends AdventuringPage {
     }
 
     onShow() {
-        this.manager.party.setAllLocked(this.manager.isActive);
-        // Mark all visible seen monsters as viewed
+        this.manager.party.setAllLocked(this.manager.isActive);
         this.markAllViewed();
     }
 
@@ -31,9 +30,6 @@ export class AdventuringBestiary extends AdventuringPage {
         this.manager.party.setAllLocked(this.manager.isActive);
     }
 
-    /**
-     * Mark a monster as viewed in the UI (removes NEW badge)
-     */
     markViewed(monster) {
         if(typeof monster === "string")
             monster = this.manager.monsters.getObjectByID(monster);
@@ -43,9 +39,6 @@ export class AdventuringBestiary extends AdventuringPage {
         }
     }
 
-    /**
-     * Mark all seen monsters as viewed
-     */
     markAllViewed() {
         this.seen.forEach((seen, monster) => {
             if(seen && !this.viewed.get(monster)) {
@@ -55,16 +48,10 @@ export class AdventuringBestiary extends AdventuringPage {
         });
     }
 
-    /**
-     * Check if a monster is new (seen but not viewed)
-     */
     isNew(monster) {
         return this.seen.get(monster) === true && this.viewed.get(monster) !== true;
     }
 
-    /**
-     * Count how many monsters are new
-     */
     getNewCount() {
         let count = 0;
         this.seen.forEach((seen, monster) => {
@@ -84,51 +71,37 @@ export class AdventuringBestiary extends AdventuringPage {
     registerSeen(monster) {
         if(typeof monster === "string")
             monster = this.manager.monsters.getObjectByID(monster);
-        
+
         const wasNew = !this.seen.has(monster) || !this.seen.get(monster);
         const wasEmpty = this.seen.size === 0;
         this.seen.set(monster, true);
 
-        monster.renderQueue.updateAll();
-
-        // Direct calls for cross-cutting concerns (formerly events)
-        if(wasNew) {
-            // Tutorial trigger for first monster seen
+        monster.renderQueue.updateAll();
+        if(wasNew) {
             if(wasEmpty) {
                 this.manager.tutorialManager.checkTriggers('event', { event: 'firstMonsterSeen' });
-            }
-            // Achievement tracking
+            }
             this.manager.achievementManager.recordUniqueMonster();
         }
     }
 
-    /**
-     * Record a monster kill
-     */
     registerKill(monster) {
         if(typeof monster === "string")
             monster = this.manager.monsters.getObjectByID(monster);
-        
+
         const currentKills = this.killCounts.get(monster) || 0;
         const newKills = currentKills + 1;
         this.killCounts.set(monster, newKills);
 
-        monster.renderQueue.updateAll();
-
-        // Update monster details page if viewing this monster
+        monster.renderQueue.updateAll();
         if(this.manager.monsterdetails && this.manager.monsterdetails.monster === monster) {
             this.manager.monsterdetails.renderQueue.mastery = true;
-        }
-
-        // Track for achievements
+        }
         if(this.manager.achievementManager) {
             this.manager.achievementManager.recordKill(monster);
         }
     }
 
-    /**
-     * Get the kill count for a monster
-     */
     getKillCount(monster) {
         if(typeof monster === "string")
             monster = this.manager.monsters.getObjectByID(monster);

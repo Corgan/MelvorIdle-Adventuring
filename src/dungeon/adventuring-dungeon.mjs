@@ -29,61 +29,44 @@ export class AdventuringDungeon extends AdventuringPage {
         this.numFloors = 0;
 
         this.tileCount = new Map();
-        
-        this.exploreTimer = new Timer('Explore', () => this.explore());
-        this.exploreInterval = 1500;
 
-        // Endless mode wave counter (difficulty is set via area)
-        this.endlessWave = 0;
-        
-        // Effect cache for dungeon-level effects (difficulty, endless, party effects targeting enemies)
+        this.exploreTimer = new Timer('Explore', () => this.explore());
+        this.exploreInterval = 1500;
+        this.endlessWave = 0;
         this.effectCache = new EffectCache();
         this._setupEffectSources();
     }
-    
-    /**
-     * Set up effect sources for the dungeon effect cache
-     */
-    _setupEffectSources() {
-        // Difficulty effects (stat/xp/loot bonuses, floor_end heals, enemy_spawn buffs)
+
+    _setupEffectSources() {
         this.effectCache.registerSource('difficulty', () => {
             if(this.area === undefined) return [];
             const difficulty = this.area.getDifficulty();
             return difficulty ? difficulty.getEffects() : [];
-        });
-        
-        // Endless mode wave scaling (additive percentages)
+        });
         this.effectCache.registerSource('endless', () => {
             if(!this.isEndless || this.endlessWave === 0) return [];
-            
+
             const scaling = this.waveScaling;
             if(!scaling) return [];
-            
+
             const statPercent = ((scaling.statPercentPerWave !== undefined) ? scaling.statPercentPerWave : 5) * this.endlessWave;
             const rewardPercent = ((scaling.rewardPercentPerWave !== undefined) ? scaling.rewardPercentPerWave : 2) * this.endlessWave;
             const source = `Endless Wave ${this.endlessWave + 1}`;
-            
+
             return [
                 createEffect({ trigger: 'passive', type: 'all_stat_percent', target: 'all', party: 'enemy', value: statPercent }, this, source),
                 createEffect({ trigger: 'passive', type: 'xp_percent', value: rewardPercent }, this, source),
                 createEffect({ trigger: 'passive', type: 'loot_percent', value: rewardPercent }, this, source)
             ];
-        });
-        
-        // Party effects that target enemies (future: equipment with "enemies take 5% more damage")
+        });
         this.effectCache.registerSource('party_enemy_effects', () => {
             return this._gatherPartyEnemyEffects();
         });
     }
-    
-    /**
-     * Gather effects from party members that target enemies
-     */
+
     _gatherPartyEnemyEffects() {
         const effects = [];
-        if(this.manager === undefined || this.manager.party === undefined) return effects;
-        
-        // Collect from all party members
+        if(this.manager === undefined || this.manager.party === undefined) return effects;
         for(const hero of this.manager.party.all) {
             const allEffects = hero.getAllEffects();
             for(const effect of allEffects) {
@@ -91,9 +74,7 @@ export class AdventuringDungeon extends AdventuringPage {
                     effects.push(effect);
                 }
             }
-        }
-        
-        // Collect from consumables
+        }
         if(this.manager.consumables) {
             for(const effect of this.manager.consumables.getEffects()) {
                 if(effect.party === 'enemy') {
@@ -101,25 +82,14 @@ export class AdventuringDungeon extends AdventuringPage {
                 }
             }
         }
-        
+
         return effects;
     }
-    
-    /**
-     * Get bonus value for a passive effect type (additive stacking)
-     * @param {string} effectType - Effect type (e.g., 'stats_percent', 'xp_percent')
-     * @param {Object} [filter={}] - Optional filter for effect properties (e.g., { target: 'all', party: 'enemy' })
-     * @returns {number} Total bonus percentage
-     */
+
     getBonus(effectType, filter = {}) {
         return this.effectCache.getBonus(effectType, filter);
     }
-    
-    /**
-     * Get effects for a specific trigger
-     * @param {string} trigger - Trigger type (e.g., 'floor_end', 'enemy_spawn')
-     * @returns {Array} Effects for that trigger
-     */
+
     getEffectsForTrigger(trigger) {
         return this.effectCache.getEffects(trigger);
     }
@@ -130,11 +100,6 @@ export class AdventuringDungeon extends AdventuringPage {
         return super.active;
     }
 
-
-
-    /**
-     * Check if currently in endless mode based on area difficulty
-     */
     get isEndless() {
         if (this.area === undefined) return false;
         const difficulty = this.area.getDifficulty();
@@ -142,9 +107,6 @@ export class AdventuringDungeon extends AdventuringPage {
         return difficulty.isEndless !== undefined ? difficulty.isEndless : false;
     }
 
-    /**
-     * Get the wave generation configuration from the current difficulty
-     */
     get waveGeneration() {
         if (this.area === undefined) return null;
         const difficulty = this.area.getDifficulty();
@@ -152,9 +114,6 @@ export class AdventuringDungeon extends AdventuringPage {
         return difficulty.waveGeneration !== undefined ? difficulty.waveGeneration : null;
     }
 
-    /**
-     * Get the wave scaling configuration from the current difficulty
-     */
     get waveScaling() {
         if (this.area === undefined) return null;
         const difficulty = this.area.getDifficulty();
@@ -162,33 +121,24 @@ export class AdventuringDungeon extends AdventuringPage {
         return difficulty.waveScaling !== undefined ? difficulty.waveScaling : null;
     }
 
-    /**
-     * Get the current floor based on difficulty's floor selection strategy
-     * For infinite modes, floors are selected based on waveGeneration.floorSelection
-     */
     get currentFloor() {
         if (this.area === undefined || this.area.floors === undefined || !this.area.floors.length) return undefined;
-        
+
         const waveGen = this.waveGeneration;
         if (waveGen && waveGen.type === 'infinite') {
             const floors = this.area.floors;
             const selection = waveGen.floorSelection !== undefined ? waveGen.floorSelection : 'first';
-            
+
             switch (selection) {
-                case 'cycle':
-                    // Rotate through all floors based on wave number
+                case 'cycle':
                     return floors[this.endlessWave % floors.length];
-                case 'random':
-                    // Random floor each wave (seeded by wave for consistency)
+                case 'random':
                     return floors[Math.floor(Math.random() * floors.length)];
                 case 'first':
-                default:
-                    // Always use first floor
+                default:
                     return floors[0];
             }
-        }
-        
-        // Standard mode: use progress-based floor selection
+        }
         return this.area.floors[Math.max(0, Math.min(this.progress, this.numFloors - 1))];
     }
 
@@ -210,12 +160,9 @@ export class AdventuringDungeon extends AdventuringPage {
         this.floor.postDataRegistration();
     }
 
-    /**
-     * Get effective explore interval with Dungeon Mastery speed bonus
-     */
     getEffectiveExploreInterval() {
         if(!this.area) return this.exploreInterval;
-        
+
         const bonuses = this.area.getMasteryBonuses();
         const speedMultiplier = 1 - (bonuses.exploreSpeedBonus || 0);
         return Math.floor(this.exploreInterval * speedMultiplier);
@@ -223,6 +170,10 @@ export class AdventuringDungeon extends AdventuringPage {
 
     explore() {
         if(this.manager.timersPaused) {
+            this.exploreTimer.start(this.getEffectiveExploreInterval());
+            return;
+        }
+        if(this.manager.encounter.isFighting) {
             this.exploreTimer.start(this.getEffectiveExploreInterval());
             return;
         }
@@ -236,7 +187,7 @@ export class AdventuringDungeon extends AdventuringPage {
             this.manager.log.add(`Starting ${this.area.name} floor ${this.progress+1}`);
             return;
         }
-        
+
         if(tile.type.id === 'adventuring:exit' || tile.type.id === 'adventuring:boss') {
             this.manager.log.add(`Starting floor exit encounter`);
             this.manager.encounter.generateEncounter(true);
@@ -253,24 +204,17 @@ export class AdventuringDungeon extends AdventuringPage {
 
         if(!tile.type.activatable)
             return;
-        
+
         if(tile.type.effects !== undefined) {
             for(let effect of tile.type.effects) {
                 this.processTileEffect(effect, tile.type.name);
-            }
-            
-            // Check for party wipe after all effects
+            }
             if(this.manager.party.all.every(member => member.dead)) {
                 this.abandon();
             }
         }
     }
 
-    /**
-     * Process a single tile effect - centralizes tile effect handling
-     * @param {object} effect - The effect data from tile definition
-     * @param {string} sourceName - Name of the tile for logging
-     */
     processTileEffect(effect, sourceName) {
         switch(effect.type) {
             case "damage":
@@ -292,10 +236,6 @@ export class AdventuringDungeon extends AdventuringPage {
         }
     }
 
-    /**
-     * Process tile damage effect
-     * Note: effect.amount is whole percent (10 = 10% of max HP)
-     */
     processTileDamage(effect, sourceName) {
         let damagePercent = effect.amount;
         this.manager.party.all.forEach(member => {
@@ -305,16 +245,11 @@ export class AdventuringDungeon extends AdventuringPage {
         });
     }
 
-    /**
-     * Process tile heal effect (including revive)
-     * Note: effect.amount is whole percent (20 = 20% of max HP)
-     */
     processTileHeal(effect, sourceName) {
         let healPercent = effect.amount;
         this.manager.party.all.forEach(member => {
             let amount = Math.floor(member.maxHitpoints * healPercent / 100);
-            if(member.dead) {
-                // Pass the percent directly to revive (it expects whole percent)
+            if(member.dead) {
                 member.revive({ amount: healPercent });
                 this.manager.log.add(`${sourceName} revived ${member.name} to ${amount} health.`);
             } else {
@@ -324,9 +259,6 @@ export class AdventuringDungeon extends AdventuringPage {
         });
     }
 
-    /**
-     * Process tile loot effect
-     */
     processTileLoot(effect, sourceName) {
         this.tileLootGenerator.loadTable(effect.pool);
         let { id, qty } = this.tileLootGenerator.getEntry();
@@ -334,12 +266,8 @@ export class AdventuringDungeon extends AdventuringPage {
         this.manager.log.add(`${sourceName} gave ${qty}x loot!`);
     }
 
-    /**
-     * Process tile XP effect
-     */
     processTileXP(effect, sourceName) {
-        if(effect.job === "adventuring:any") {
-            // Grant XP to all living party members' combat jobs
+        if(effect.job === "adventuring:any") {
             this.manager.party.all.filter(member => !member.dead).forEach(member => {
                 if(member.combatJob && member.combatJob.isMilestoneReward) {
                     member.combatJob.addXP(effect.amount);
@@ -356,10 +284,7 @@ export class AdventuringDungeon extends AdventuringPage {
     }
 
     setArea(area) {
-        this.area = area;
-        
-        // For infinite modes, numFloors represents floors per wave
-        // For standard modes, numFloors is the total floor count
+        this.area = area;
         const difficulty = area.getDifficulty();
         if (difficulty && difficulty.waveGeneration && difficulty.waveGeneration.type === 'infinite') {
             this.numFloors = difficulty.waveGeneration.floorsPerWave !== undefined ? difficulty.waveGeneration.floorsPerWave : 1;
@@ -368,20 +293,16 @@ export class AdventuringDungeon extends AdventuringPage {
         }
 
         if(this.currentFloor !== undefined)
-            this.groupGenerator.loadTable(this.currentFloor.monsters);
-        
-        // Invalidate effect cache when area changes (new difficulty)
+            this.groupGenerator.loadTable(this.currentFloor.monsters);
         this.effectCache.invalidateAll();
     }
 
     updateFloorCards() {
-        this.manager.overview.cards.renderQueue.cards.clear();
-
-        // In endless mode, show wave counter instead of floor list
+        this.manager.overview.cards.renderQueue.cards.clear();
         if(this.isEndless) {
             if(this.floorCards[0] === undefined)
                 this.floorCards[0] = new AdventuringCard(this.manager, this.game);
-            
+
             const statBonus = 100 + this.getBonus('all_stat_percent', { target: 'all', party: 'enemy' });
             this.floorCards[0].name = `Wave ${this.endlessWave + 1} (${statBonus}%)`;
             this.floorCards[0].renderQueue.name = true;
@@ -389,12 +310,10 @@ export class AdventuringDungeon extends AdventuringPage {
             this.floorCards[0].renderQueue.icon = true;
             this.floorCards[0].setFade(false);
             this.floorCards[0].setHighlight(true);
-            this.manager.overview.cards.renderQueue.cards.add(this.floorCards[0]);
-            
-            // Show best streak
+            this.manager.overview.cards.renderQueue.cards.add(this.floorCards[0]);
             if(this.floorCards[1] === undefined)
                 this.floorCards[1] = new AdventuringCard(this.manager, this.game);
-            
+
             const bestStreak = this.area ? this.area.bestEndlessStreak : 0;
             this.floorCards[1].name = `Best: ${bestStreak} waves`;
             this.floorCards[1].renderQueue.name = true;
@@ -403,7 +322,7 @@ export class AdventuringDungeon extends AdventuringPage {
             this.floorCards[1].setFade(false);
             this.floorCards[1].setHighlight(false);
             this.manager.overview.cards.renderQueue.cards.add(this.floorCards[1]);
-            
+
             this.manager.overview.cards.renderQueue.update = true;
             return;
         }
@@ -417,10 +336,10 @@ export class AdventuringDungeon extends AdventuringPage {
 
             this.floorCards[i].icon = (i+1 === this.numFloors ? cdnMedia('assets/media/main/hardcore.svg') : cdnMedia('assets/media/skills/combat/combat.svg'));
             this.floorCards[i].renderQueue.icon = true;
-            
+
             this.floorCards[i].setFade(i < this.progress);
             this.floorCards[i].setHighlight(i === this.progress);
-            
+
             this.manager.overview.cards.renderQueue.cards.add(this.floorCards[i]);
         }
         this.manager.overview.cards.renderQueue.update = true;
@@ -429,41 +348,24 @@ export class AdventuringDungeon extends AdventuringPage {
     next() {
         if(this.currentFloor !== undefined)
             this.groupGenerator.loadTable(this.currentFloor.monsters);
-        this.floor.generate(this.area.height, this.area.width);
-
-        // Use centralized trigger system for floor_start
-        // This handles both party-scoped and character-scoped effects
+        this.floor.generate(this.area.height, this.area.width);
         this.manager.triggerEffects('floor_start', {});
 
         this.updateFloorCards();
     }
 
-    /**
-     * Begin a new dungeon run (shared by start and auto-repeat)
-     * Does NOT call manager.start() - caller is responsible for that
-     */
     _beginRun() {
         this.progress = 0;
-        this.endlessWave = 0;
-        
-        // Invalidate and rebuild effect cache for the new run
+        this.endlessWave = 0;
         this.effectCache.invalidateAll();
-        
+
         this.tileCount.clear();
         this.manager.tiles.allObjects.forEach(tile => {
             this.tileCount.set(tile, 0);
-        });
-
-        // Initialize consumable state for dungeon start
-        this.manager.consumables.onDungeonStart();
-
-        // Apply mastery auras from all level 99 dungeons
-        this.applyMasteryAuras();
-        
-        // Use centralized trigger system for dungeon_start
-        this.manager.triggerEffects('dungeon_start', {});
-        
-        // Direct calls for cross-cutting concerns
+        });
+        this.manager.consumables.onDungeonStart();
+        this.applyMasteryAuras();
+        this.manager.triggerEffects('dungeon_start', {});
         this.manager.overview.renderQueue.status = true;
         this.manager.overview.renderQueue.buffs = true;
         this.manager.tutorialManager.checkTriggers('event', { event: 'dungeonStart' });
@@ -475,15 +377,10 @@ export class AdventuringDungeon extends AdventuringPage {
         this._beginRun();
         this.manager.start();
     }
-    
-    /**
-     * Apply mastery auras from all dungeons that have reached level 99
-     * These provide passive bonuses for the entire dungeon run
-     */
+
     applyMasteryAuras() {
         this.manager.areas.allObjects.forEach(area => {
-            if(area.masteryAuraUnlocked && area.masteryAura) {
-                // Apply aura to all party members
+            if(area.masteryAuraUnlocked && area.masteryAura) {
                 this.manager.party.all.forEach(member => {
                     if(!member.dead) {
                         member.auras.add(area.masteryAura, { stacks: 1 }, area);
@@ -499,12 +396,8 @@ export class AdventuringDungeon extends AdventuringPage {
         this.area = undefined;
         this.numFloors = 0;
         this.progress = 0;
-        this.endlessWave = 0;
-        
-        // Invalidate effect cache on reset
-        this.effectCache.invalidateAll();
-        
-        // Direct UI updates
+        this.endlessWave = 0;
+        this.effectCache.invalidateAll();
         this.manager.overview.renderQueue.turnProgressBar = true;
         this.manager.overview.renderQueue.status = true;
         this.manager.overview.renderQueue.buttons = true;
@@ -520,11 +413,9 @@ export class AdventuringDungeon extends AdventuringPage {
             });
             this.manager.encounter.reset();
         }
-        
-        if(this.area !== undefined)
-            this.manager.log.add(`Abandoned ${this.area.name} on floor ${this.progress+1}`);
 
-        // Direct calls for cross-cutting concerns
+        if(this.area !== undefined)
+            this.manager.log.add(`Abandoned ${this.area.name} on floor ${this.progress+1}`);
         this.manager.overview.renderQueue.buffs = true;
         this.manager.consumables.onDungeonEnd();
         this.manager.tavern.consumeCharges();
@@ -537,58 +428,40 @@ export class AdventuringDungeon extends AdventuringPage {
     }
 
     complete() {
-        this.manager.log.add(`Completed ${this.area.name}`);
-        
-        // Area mastery XP from clears (not kills)
-        // Calculate XP based on area difficulty/level
+        this.manager.log.add(`Completed ${this.area.name}`);
         if (this.area) {
             const areaLevel = this.area.level || 1;
-            const areaXP = Math.floor(areaLevel * 10);  // 10 XP per area level on clear
-            this.area.addXP(areaXP);
-        }
-
-        // Direct calls for cross-cutting concerns
+            const difficultyXPBonus = this.getBonus('xp_percent') / 100;
+            const baseAreaXP = this.area.masteryXP || 2000;
+            const areaXP = Math.floor(baseAreaXP * (1 + difficultyXPBonus));
+            this.area.addXP(areaXP);
+        }
         const difficulty = this.difficulty ? this.difficulty.id.replace('adventuring:', '') : 'normal';
         this.manager.achievementManager.recordDungeonClear(this.area, difficulty, this.isEndless, this.endlessWave);
-        this.manager.slayers.onDungeonCleared(this.area);
-
-        // Consume charges from equipped consumables and tavern drinks
+        this.manager.slayers.onDungeonCleared(this.area);
         this.manager.overview.renderQueue.buffs = true;
         this.manager.consumables.onDungeonEnd();
         this.manager.tavern.consumeCharges();
 
-        if(!this.manager.party.all.every(hero => hero.dead)) {
-            // Handle endless mode - continue to next wave
+        if(!this.manager.party.all.every(hero => hero.dead)) {
             if(this.isEndless) {
                 this.endlessWave++;
-                this.manager.log.add(`Endless Wave ${this.endlessWave + 1} starting...`);
-                
-                // Invalidate effect cache for new wave scaling
-                this.effectCache.invalidateAll();
-                
-                // Update best streak if this is a new record
-                this.area.updateBestEndlessStreak(this.endlessWave);
-                
-                // Reset progress and continue with scaled difficulty
+                this.manager.log.add(`Endless Wave ${this.endlessWave + 1} starting...`);
+                this.effectCache.invalidateAll();
+                this.area.updateBestEndlessStreak(this.endlessWave);
                 this.progress = 0;
                 this.next();
                 return;
-            }
-            
-            // Trigger dungeon_end effects
-            this.manager.triggerEffects('dungeon_end', {});
-            
-            // Always auto-repeat: restart dungeon but keep current HP
+            }
+            this.manager.triggerEffects('dungeon_end', {});
             this.manager.log.add(`Auto-repeating ${this.area.name}...`);
-            this._beginRun();
-            // Note: manager is already started, no need to call this.manager.start()
-        } else {
-            // Party wiped - check for endless mode record
+            this._beginRun();
+        } else {
             if(this.isEndless && this.endlessWave > 0) {
                 this.manager.log.add(`Endless run ended at Wave ${this.endlessWave + 1}!`);
                 this.area.updateBestEndlessStreak(this.endlessWave);
             }
-            
+
             this.reset();
             this.manager.stop();
             if(this.active)

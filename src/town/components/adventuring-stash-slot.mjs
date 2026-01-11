@@ -7,9 +7,9 @@ export class AdventuringStashSlotElement extends AdventuringTooltipElement {
         super();
         this._content = new DocumentFragment();
         this._content.append(getTemplateNode('adventuring-stash-slot-template'));
-        
+
         this.icon = getElementFromFragment(this._content, 'icon', 'img');
-        
+
         this._tooltipTarget = this.icon;
     }
 

@@ -6,9 +6,6 @@ const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
 
 const { AdventuringWeightedTable, addMasteryXPWithBonus, RequirementsChecker, AdventuringMasteryRenderQueue, getLockedMedia, UNKNOWN_MEDIA } = await loadModule('src/core/adventuring-utils.mjs');
 
-/**
- * Area-specific RenderQueue with autoRepeat support
- */
 class AdventuringAreaRenderQueue extends AdventuringMasteryRenderQueue {
     constructor(){
         super();
@@ -41,50 +38,31 @@ export class AdventuringArea extends AdventuringMasteryAction {
 
         this.tiles = data.tiles;
 
-        this.loot = data.loot;
-        
-        this.lootPoolGenerator = new AdventuringWeightedTable(this.manager, this.game);
-        //this.lootPoolGenerator.loadTable(this.loot.pool);
-        
-        /*if(this.tiles.treasure.loot) {
-            this.treasurePoolGenerator = new AdventuringWeightedTable(this.manager, this.game);
-            this.treasurePoolGenerator.loadTable(this.tiles.treasure.loot.pool);
-        }*/
+        this.loot = data.loot;
+        this.masteryXP = data.masteryXP || 2000;
 
-        // Adventure button click handler
+        this.lootPoolGenerator = new AdventuringWeightedTable(this.manager, this.game);
         this.component.adventureButton.onclick = () => {
             if(this.unlocked)
                 this.manager.selectArea(this);
-        };
-
-        // Auto-repeat checkbox handler
+        };
         this.component.autoRepeat.onchange = () => {
             if(this.component.autoRepeat.checked) {
                 this.manager.setAutoRepeatArea(this);
             } else {
                 this.manager.setAutoRepeatArea(null);
             }
-        };
-
-        // Difficulty selection - stores the difficulty object directly
+        };
         this.selectedDifficulty = null; // Set in postDataRegistration
-        this.difficultyOptionElements = [];
-
-        // Endless mode streak tracking
-        this.bestEndlessStreak = 0;
-
-        // Gauntlet mode properties
+        this.difficultyOptionElements = [];
+        this.bestEndlessStreak = 0;
         this.isGauntlet = (data.isGauntlet !== undefined) ? data.isGauntlet : false;
         this.gauntletTier = (data.gauntletTier !== undefined) ? data.gauntletTier : 0;
-        this.gauntletRewardMultiplier = (data.gauntletRewardMultiplier !== undefined) ? data.gauntletRewardMultiplier : 1.0;
-        
-        // Area description (for UI display)
-        this.description = (data.description !== undefined) ? data.description : '';
-        
-        // Area-specific passive effects
-        this._passives = data.passives || [];
-
-        // Mastery aura id (looked up during postDataRegistration)
+        this.gauntletRewardMultiplier = (data.gauntletRewardMultiplier !== undefined) ? data.gauntletRewardMultiplier : 1.0;
+        this.encounterFloorMax = data.encounterFloorMax; // undefined = use tile default
+        this.encounterWeight = data.encounterWeight; // undefined = use tile default
+        this.description = (data.description !== undefined) ? data.description : '';
+        this._passives = data.passives || [];
         this._masteryAuraId = data.masteryAuraId;
         this.masteryAura = null;
     }
@@ -93,20 +71,14 @@ export class AdventuringArea extends AdventuringMasteryAction {
         return 'adventuring:areas';
     }
 
-    /**
-     * Get all registered difficulties
-     */
     getAllDifficulties() {
         return this.manager.difficulties.allObjects;
     }
 
-    /**
-     * Initialize difficulty dropdown options
-     */
     initDifficultyDropdown() {
         this.component.difficultyOptions.replaceChildren();
         this.difficultyOptionElements = [];
-        
+
         this.getAllDifficulties().forEach((difficulty) => {
             const option = createElement('a', {
                 className: 'dropdown-item pointer-enabled',
@@ -115,34 +87,24 @@ export class AdventuringArea extends AdventuringMasteryAction {
             option.onclick = () => this.setDifficulty(difficulty);
             this.component.difficultyOptions.appendChild(option);
             this.difficultyOptionElements.push(option);
-        });
-        
-        // Set default difficulty to first one (Normal)
+        });
         if(!this.selectedDifficulty && this.getAllDifficulties().length > 0) {
             this.selectedDifficulty = this.getAllDifficulties()[0];
         }
     }
 
-    /**
-     * Set the selected difficulty
-     */
     setDifficulty(difficulty) {
-        if(!difficulty) return;
-        
-        // Check if this difficulty is unlocked
+        if(!difficulty) return;
         if(!difficulty.isUnlocked(this)) {
             this.manager.log.add(`${difficulty.name} mode requires Mastery Level ${difficulty.unlockLevel}!`);
             return;
         }
-        
+
         this.selectedDifficulty = difficulty;
         this.renderQueue.name = true;
         this.renderQueue.tooltip = true;
     }
 
-    /**
-     * Cycle to next available difficulty mode (for keyboard shortcut if needed)
-     */
     cycleDifficulty() {
         const availableDifficulties = this.getAvailableDifficulties();
         if(availableDifficulties.length <= 1) return;
@@ -150,21 +112,15 @@ export class AdventuringArea extends AdventuringMasteryAction {
         const currentIndex = availableDifficulties.indexOf(this.selectedDifficulty);
         const nextIndex = (currentIndex + 1) % availableDifficulties.length;
         this.selectedDifficulty = availableDifficulties[nextIndex];
-        
+
         this.renderQueue.name = true;
         this.renderQueue.tooltip = true;
     }
 
-    /**
-     * Get difficulties unlocked for this area based on mastery effects
-     */
     getAvailableDifficulties() {
         return this.getAllDifficulties().filter(d => d.isUnlocked(this));
     }
 
-    /**
-     * Get the currently selected difficulty mode
-     */
     getDifficulty() {
         return this.selectedDifficulty || this.getAllDifficulties()[0];
     }
@@ -181,9 +137,6 @@ export class AdventuringArea extends AdventuringMasteryAction {
         return this.manager.getMasteryLevel(this);
     }
 
-    /**
-     * Get the skill level required to unlock this area
-     */
     getUnlockLevel() {
         for (const requirement of this.requirements) {
             if (requirement.type === "skill_level") {
@@ -198,28 +151,23 @@ export class AdventuringArea extends AdventuringMasteryAction {
         return this._reqChecker.check();
     }
 
-    /**
-     * Get all unique monsters that can appear in this area.
-     * Collects monsters from all floors and deduplicates.
-     * @returns {AdventuringMonster[]}
-     */
     get monsters() {
         if (!this.floors) return [];
-        
+
         const seen = new Set();
         const monsters = [];
-        
+
         for (const floor of this.floors) {
             if (!floor.monsters) continue;
             for (const entry of floor.monsters) {
                 if (seen.has(entry.id)) continue;
                 seen.add(entry.id);
-                
+
                 const monster = this.manager.monsters.getObjectByID(entry.id);
                 if (monster) monsters.push(monster);
             }
         }
-        
+
         return monsters;
     }
 
@@ -227,32 +175,19 @@ export class AdventuringArea extends AdventuringMasteryAction {
         return this.manager.categories.getObjectByID('adventuring:Areas');
     }
 
-    /**
-     * Check if auto-run is unlocked for this dungeon
-     * Auto-run starts the dungeon automatically when party is fully healed in town after a wipe
-     */
     get autoRunUnlocked() {
         return this.hasUnlock('auto_run');
     }
 
-    /**
-     * Check if endless difficulty is unlocked for this dungeon
-     */
     get endlessModeUnlocked() {
         const endlessDifficulty = this.manager.difficulties.getObjectByID('adventuring:endless');
         return endlessDifficulty ? endlessDifficulty.isUnlocked(this) : false;
     }
 
-    /**
-     * Check if mastery aura is unlocked for this dungeon
-     */
     get masteryAuraUnlocked() {
         return this.hasUnlock('mastery_aura');
     }
 
-    /**
-     * Update best endless streak if new record
-     */
     updateBestEndlessStreak(waves) {
         if(waves > this.bestEndlessStreak) {
             this.bestEndlessStreak = waves;
@@ -261,70 +196,47 @@ export class AdventuringArea extends AdventuringMasteryAction {
         }
     }
 
-    /**
-     * Get current dungeon mastery bonuses from modifier system
-     */
-    getMasteryBonuses() {
-        // Query modifiers from the centralized modifier system
+    getMasteryBonuses() {
         const xpBonus = this.manager.modifiers.getDungeonXPBonus(this);
         const exploreSpeedBonus = this.manager.modifiers.getExploreSpeedBonus(this);
-        
+
         return { xpBonus, exploreSpeedBonus };
     }
 
-    /**
-     * Get tooltip-ready effects for current mastery bonuses
-     * Converts decimal bonuses to percentage values that describeEffect can format
-     * @returns {Array} Array of {type, value} effect objects
-     */
     getMasteryBonusEffects() {
         const { xpBonus, exploreSpeedBonus } = this.getMasteryBonuses();
         const effects = [];
-        
+
         if(xpBonus > 0) {
             effects.push({ type: 'xp_percent', value: Math.round(xpBonus * 100) });
         }
         if(exploreSpeedBonus > 0) {
             effects.push({ type: 'explore_speed_percent', value: Math.round(exploreSpeedBonus * 100) });
         }
-        
+
         return effects;
     }
 
-    /**
-     * Get tile weight modifiers based on mastery level from modifier system
-     * Returns a map of tile ID to weight multiplier
-     */
-    getTileModifiers() {
-        // Query tile spawn rate modifiers
+    getTileModifiers() {
         const trapMod = this.manager.modifiers.getTrapSpawnRateMod();
         const fountainMod = this.manager.modifiers.getFountainSpawnRateMod();
         const treasureMod = this.manager.modifiers.getTreasureSpawnRateMod();
         const shrineMod = this.manager.modifiers.getShrineSpawnRateMod();
-        
-        const modifiers = {};
-        
-        // Convert percentage modifiers to weight multipliers
-        // -100% = 0 weight, -50% = 0.5 weight, +50% = 1.5 weight, +100% = 2.0 weight
+
+        const modifiers = {};
         if(trapMod !== 0) modifiers['adventuring:trap'] = Math.max(0, 1 + trapMod / 100);
         if(fountainMod !== 0) modifiers['adventuring:fountain'] = 1 + fountainMod / 100;
         if(treasureMod > 0) modifiers['adventuring:treasure'] = treasureMod / 100;  // Treasure only spawns when unlocked
         if(shrineMod > 0) modifiers['adventuring:shrine'] = shrineMod / 100;  // Shrine only spawns when unlocked
-        
+
         return modifiers;
     }
 
-    /**
-     * Get milestones achieved based on mastery category
-     */
     getAchievedMilestones() {
         const category = this.masteryCategory;
         return category ? category.getAchievedMilestones(this.level) : [];
     }
 
-    /**
-     * Get next milestone to achieve for this area's mastery category
-     */
     getNextMilestone() {
         const category = this.masteryCategory;
         return category ? category.getNextMilestone(this.level) : null;
@@ -344,9 +256,7 @@ export class AdventuringArea extends AdventuringMasteryAction {
 
     postDataRegistration() {
         this._reqChecker = new RequirementsChecker(this.manager, this.requirements);
-        this.initDifficultyDropdown();
-        
-        // Look up mastery aura by id if defined
+        this.initDifficultyDropdown();
         if(this._masteryAuraId) {
             this.masteryAura = this.manager.dungeonAuras.getObjectByID(this._masteryAuraId);
         }
@@ -373,13 +283,9 @@ export class AdventuringArea extends AdventuringMasteryAction {
             const difficulty = this.getDifficulty();
             this.component.nameText.textContent = this.name;
             this.component.level.textContent = ` (${this.level})`;
-            this.component.level.className = difficulty.color;
-            
-            // Update dropdown button
+            this.component.level.className = difficulty.color;
             this.component.difficultyButton.textContent = difficulty.name;
-            this.component.difficultyButton.className = `btn btn-sm dropdown-toggle ${difficulty.color.replace('text-', 'btn-')}`;
-            
-            // Update dropdown options (enable/disable based on level)
+            this.component.difficultyButton.className = `btn btn-sm dropdown-toggle ${difficulty.color.replace('text-', 'btn-')}`;
             this.getAllDifficulties().forEach((mode, index) => {
                 const option = this.difficultyOptionElements[index];
                 if(option) {
@@ -426,13 +332,9 @@ export class AdventuringArea extends AdventuringMasteryAction {
 
     renderClickable() {
         if(!this.renderQueue.clickable)
-            return;
-
-        // Show/hide controls based on unlock status
+            return;
         this.component.controls.classList.toggle('d-none', !this.unlocked);
-        this.component.adventureButton.disabled = !this.unlocked;
-
-        // Show/hide auto-repeat checkbox based on unlock status
+        this.component.adventureButton.disabled = !this.unlocked;
         this.component.autoRepeatContainer.classList.toggle('d-none', !this.autoRunUnlocked);
 
         this.renderQueue.clickable = false;
@@ -440,9 +342,7 @@ export class AdventuringArea extends AdventuringMasteryAction {
 
     renderAutoRepeat() {
         if(!this.renderQueue.autoRepeat)
-            return;
-
-        // Update checkbox state based on whether this area is the auto-repeat target
+            return;
         const isAutoRepeatArea = this.manager.autoRepeatArea === this;
         this.component.autoRepeat.checked = isAutoRepeatArea;
 

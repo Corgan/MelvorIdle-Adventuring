@@ -2,38 +2,31 @@ const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringTooltipElement } = await loadModule('src/core/adventuring-tooltip-element.mjs');
 
-/**
- * Tavern drink icon element - displays drink with charges badge and selection state
- */
 export class AdventuringTavernDrinkElement extends AdventuringTooltipElement {
     constructor() {
         super();
         this._content = new DocumentFragment();
         this._content.append(getTemplateNode('adventuring-tavern-drink-template'));
-        
+
         this.clickable = getElementFromFragment(this._content, 'clickable', 'div');
         this.border = getElementFromFragment(this._content, 'border', 'div');
         this.icon = getElementFromFragment(this._content, 'icon', 'img');
         this.charges = getElementFromFragment(this._content, 'charges', 'small');
         this.chargesBadge = getElementFromFragment(this._content, 'charges-badge', 'div');
         this.equippedBadge = getElementFromFragment(this._content, 'equipped-badge', 'span');
-        
+
         this._tooltipTarget = this.clickable;
     }
 
     connectedCallback() {
         this.appendChild(this._content);
-        super.connectedCallback();
-        // Set onclick handler if one was queued
+        super.connectedCallback();
         if (this._pendingOnClick) {
             this.clickable.onclick = this._pendingOnClick;
             this._pendingOnClick = null;
         }
     }
 
-    /**
-     * Set click handler - queues if not yet connected
-     */
     setOnClick(handler) {
         if (this.isConnected && this.clickable) {
             this.clickable.onclick = handler;
@@ -46,25 +39,16 @@ export class AdventuringTavernDrinkElement extends AdventuringTooltipElement {
         super.disconnectedCallback();
     }
 
-    /**
-     * Mount the element to a parent
-     */
     mount(parent) {
         parent.appendChild(this);
     }
 
-    /**
-     * Remove from DOM
-     */
     remove() {
         if (this.parentElement) {
             this.parentElement.removeChild(this);
         }
     }
 
-    /**
-     * Update selection state
-     */
     setSelected(selected) {
         if (selected) {
             this.border.classList.remove('border-secondary');
@@ -75,9 +59,6 @@ export class AdventuringTavernDrinkElement extends AdventuringTooltipElement {
         }
     }
 
-    /**
-     * Update charges display
-     */
     setCharges(count) {
         if (count > 0) {
             this.charges.textContent = count;
@@ -87,9 +68,6 @@ export class AdventuringTavernDrinkElement extends AdventuringTooltipElement {
         }
     }
 
-    /**
-     * Update equipped indicator
-     */
     setEquipped(equipped) {
         if (equipped) {
             this.equippedBadge.classList.remove('d-none');

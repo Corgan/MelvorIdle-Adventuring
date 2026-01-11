@@ -17,11 +17,7 @@ export class AdventuringAuras {
         this.game = game;
         this.character = character;
 
-        this.auras = new Set();
-        
-        // Map for O(1) lookup of aura instances by base aura
-        // Maps: aura.id -> Map(source -> instance) for bySource mode
-        //       or aura.id -> instance for stack/refresh modes
+        this.auras = new Set();
         this.aurasByBase = new Map();
 
         this.effectByType = new Map();
@@ -35,35 +31,23 @@ export class AdventuringAuras {
         this.renderQueue.auras = true;
     }
 
-    /**
-     * Get all aura effects for a trigger type in standard format.
-     * This integrates auras into the unified trigger/effect system.
-     * @param {string} type - Trigger type
-     * @param {object} context - Effect context from buildEffectContext
-     * @returns {Array<{effect, source, sourceName, sourceType}>}
-     */
     getEffectsForTrigger(type, context = {}) {
         const results = [];
-        const resolved = this.effectByType.get(type) || [];
-        
-        // Increment age of all auras at round_end
+        const resolved = this.effectByType.get(type) || [];
         if (type === 'round_end') {
             this.incrementAges();
         }
-        
+
         for (const { effect, instance } of resolved) {
-            if (instance.base === undefined || instance.stacks <= 0) continue;
-            
-            // Pre-resolve amount from instance (handles perStack, etc.)
+            if (instance.base === undefined || instance.stacks <= 0) continue;
             const amount = effect.getAmount ? effect.getAmount(instance) : (effect.amount || 0);
             const stacks = instance.stacks;
-            
+
             results.push({
                 effect: {
                     ...effect,
                     amount,
-                    stacks,
-                    // Copy standard effect properties
+                    stacks,
                     type: effect.type,
                     trigger: effect.trigger,
                     target: effect.target,
@@ -80,14 +64,10 @@ export class AdventuringAuras {
                 sourceType: 'aura'
             });
         }
-        
+
         return results;
     }
-    
-    /**
-     * Increment the age of all active auras.
-     * Age tracks how many rounds the aura has been active.
-     */
+
     incrementAges() {
         for (const auraInstance of this.auras.values()) {
             if (auraInstance.base === undefined || auraInstance.stacks <= 0) continue;
@@ -95,23 +75,17 @@ export class AdventuringAuras {
         }
     }
 
-    /**
-     * Get all effects from active auras as standardized effect objects.
-     * Maps aura effect types to standard format.
-     * @returns {StandardEffect[]} Array of standardized effects
-     */
     getEffects() {
         const effects = [];
-        
+
         for(const auraInstance of this.auras.values()) {
             if(auraInstance.base === undefined || auraInstance.stacks <= 0) continue;
-            
+
             auraInstance.base.effects.forEach(effectData => {
                 const trigger = effectData.trigger;
-                const type = effectData.type;
-                // getAmount already handles perStack multiplication
+                const type = effectData.type;
                 const value = effectData.getAmount ? effectData.getAmount(auraInstance) : (effectData.amount || 0);
-                
+
                 effects.push(createEffect(
                     {
                         trigger: trigger,
@@ -124,15 +98,14 @@ export class AdventuringAuras {
                 ));
             });
         }
-        
+
         return effects;
     }
 
     cleanAuras() {
         let auras = this.auras.values();
         for(let aura of auras) {
-            if(aura.stacks === 0) {
-                // Fire 'removed' trigger before the aura is cleaned up
+            if(aura.stacks === 0) {
                 if (this.character && aura.base && aura.base.effects) {
                     const removedEffects = aura.base.effects.filter(e => e.trigger === 'removed');
                     if (removedEffects.length > 0) {
@@ -145,26 +118,21 @@ export class AdventuringAuras {
                             this.character.processEffect(effect, aura, ctx);
                         }
                     }
-                }
-                
-                // stacks is already 0, so disconnectedCallback will destroy the tooltip
+                }
                 this._removeFromCache(aura.base, aura.source);
                 this.auras.delete(aura);
             }
         }
     }
 
-    clear() {
-        // Set all stacks to 0 so tooltips get destroyed on disconnect
+    clear() {
         for(let aura of this.auras.values()) {
             aura.stacks = 0;
         }
         this.auras.clear();
         this.aurasByBase.clear();
         this.effectByType.clear();
-        this.renderQueue.auras = true;
-        
-        // Invalidate effect cache
+        this.renderQueue.auras = true;
         if(this.character && this.character.effectCache) {
             this.character.invalidateEffects('auras');
         }
@@ -192,114 +160,84 @@ export class AdventuringAuras {
         }
     }
 
-    /**
-     * Capture stats from a source character for snapshot-based scaling.
-     * @param {object} source - The source character
-     * @returns {Map<string, number>|null} Map of stat values, or null if no stats
-     */
     _captureSnapshot(source) {
         if (!source || !source.stats) return null;
-        
+
         const snapshot = new Map();
         source.stats.forEach((value, key) => {
             snapshot.set(key, value);
         });
         return snapshot;
     }
-    
-    /**
-     * Check if an aura has any effects that use snapshot scaling.
-     * @param {object} aura - The aura definition
-     * @returns {boolean} True if any effect uses scaleFrom: 'snapshot'
-     */
+
     _needsSnapshot(aura) {
         if (!aura || !aura.effects) return false;
         return aura.effects.some(effect => effect.scaleFrom === 'snapshot');
     }
 
-    add(aura, { stacks = 1 }, source) {
-        // Handle undefined or null early
+    add(aura, { stacks = 1 }, source) {
         if(!aura) {
             console.warn('[Auras.add] Invalid aura: undefined or null', new Error().stack);
             return;
         }
-        
+
         const originalAuraId = aura;
-        if(typeof aura === "string") {
-            // Add namespace if missing
+        if(typeof aura === "string") {
             if(!aura.includes(':')) {
                 aura = `adventuring:${aura}`;
             }
             aura = this.manager.auras.getObjectByID(aura);
         }
-        
+
         if(!aura || typeof aura === 'string') {
             console.warn(`[Auras.add] Aura not found: ${originalAuraId}`, new Error().stack);
             return;
-        }
-
-        // Determine if we should find an existing instance based on combineMode
+        }
         let existing = undefined;
         if(aura.combineMode === 'stack' || aura.combineMode === 'refresh') {
             existing = this.get(aura); // Find any existing instance
         } else if(aura.combineMode === 'bySource') {
             existing = this.get(aura, source); // Find instance from same source
-        }
-        // combineMode === 'separate' always creates new instance
-        
-        // Capture snapshot if needed
+        }
         const needsSnap = this._needsSnapshot(aura);
         let snapshot = null;
         if (needsSnap) {
             snapshot = this._captureSnapshot(source);
         }
 
-        if(existing === undefined) {
-            // Create a new instance
+        if(existing === undefined) {
             let instance = new AdventuringAuraInstance(this.manager, this.game, this, source);
             this.auras.add(instance);
-            instance.setAura(aura, stacks, snapshot);
-            
-            // Add to aurasByBase cache
+            instance.setAura(aura, stacks, snapshot);
             this._addToCache(aura, instance, source);
-        } else {
-            // Update existing instance based on combineMode
+        } else {
             let newStacks = existing.stacks;
             if(aura.combineMode === 'stack' || aura.combineMode === 'bySource') { // Both modes add stacks
-                newStacks = existing.stacks + stacks;
-                // For stack mode with snapshot, update snapshot to latest caster's stats
+                newStacks = existing.stacks + stacks;
                 if (needsSnap && snapshot) {
                     existing.snapshotStats = snapshot;
                 }
             } else if(aura.combineMode === 'refresh') {
                 newStacks = stacks;
-                existing.age = 0; // Reset age on refresh
-                // For refresh mode, replace snapshot with new caster's stats
+                existing.age = 0; // Reset age on refresh
                 if (needsSnap && snapshot) {
                     existing.snapshotStats = snapshot;
                 }
-            }
-            
-            // Enforce maxStacks if defined
+            }
             if(aura.maxStacks !== undefined) {
                 newStacks = Math.min(newStacks, aura.maxStacks);
             }
-            
+
             if(newStacks !== existing.stacks) {
                 existing.setStacks(newStacks);
             }
         }
-        this.renderQueue.auras = true;
-        
-        // Invalidate effect cache
+        this.renderQueue.auras = true;
         if(this.character && this.character.effectCache) {
             this.character.invalidateEffects('auras');
         }
     }
-    
-    /**
-     * Add an instance to the aurasByBase cache
-     */
+
     _addToCache(aura, instance, source) {
         if (!this.aurasByBase.has(aura.id)) {
             this.aurasByBase.set(aura.id, new Map());
@@ -307,10 +245,7 @@ export class AdventuringAuras {
         const sourceKey = source !== undefined ? source : '_default';
         this.aurasByBase.get(aura.id).set(sourceKey, instance);
     }
-    
-    /**
-     * Remove an instance from the aurasByBase cache
-     */
+
     _removeFromCache(aura, source) {
         if (!aura || !this.aurasByBase.has(aura.id)) return;
         const sourceKey = source !== undefined ? source : '_default';
@@ -322,19 +257,16 @@ export class AdventuringAuras {
     }
 
     get(aura, source) {
-        if(typeof aura === "string") 
+        if(typeof aura === "string")
             aura = this.manager.auras.getObjectByID(aura);
-        
-        if (!aura) return undefined;
-        
-        // Use cache for O(1) lookup
+
+        if (!aura) return undefined;
         const instances = this.aurasByBase.get(aura.id);
         if (!instances) return undefined;
-        
+
         if (source !== undefined) {
             return instances.get(source);
-        }
-        // If no source specified, return first matching instance
+        }
         for (const instance of instances.values()) {
             if (instance.base === aura) return instance;
         }
@@ -342,7 +274,7 @@ export class AdventuringAuras {
     }
 
     onLoad() {
-        
+
     }
 
     postDataRegistration() {
@@ -353,9 +285,7 @@ export class AdventuringAuras {
         this.auras.forEach(aura => aura.render());
 
         if(!this.renderQueue.auras)
-            return;
-
-        // Filter out hidden auras from the UI (they still function mechanically)
+            return;
         let auras = [...this.auras.values()]
             .filter(aura => aura.base !== undefined && aura.stacks > 0 && !aura.base.hidden)
             .sort((a,b) => b.stacks - a.stacks);

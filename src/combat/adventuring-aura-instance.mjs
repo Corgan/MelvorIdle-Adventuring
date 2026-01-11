@@ -27,12 +27,7 @@ export class AdventuringAuraInstance {
         this.auras = auras;
         this.source = source;
         this.stacks = 0;
-        
-        /**
-         * Captured stats from source at application time.
-         * Used when any effect has scaleFrom: 'snapshot'.
-         * @type {Map<string, number>|null}
-         */
+
         this.snapshotStats = null;
 
         this.component = createElement('adventuring-aura-instance');
@@ -40,28 +35,18 @@ export class AdventuringAuraInstance {
 
         this.renderQueue = new AdventuringAuraInstanceRenderQueue();
     }
-    
-    /**
-     * Capture stats from a character for snapshot-based scaling.
-     * @param {object} character - The character whose stats to capture
-     */
+
     captureSnapshot(character) {
         if (!character || !character.stats) {
             this.snapshotStats = null;
             return;
-        }
-        
-        // Copy all current stat values into a Map
+        }
         this.snapshotStats = new Map();
         character.stats.forEach((value, key) => {
             this.snapshotStats.set(key, value);
         });
     }
-    
-    /**
-     * Check if this aura has any effects that use snapshot scaling.
-     * @returns {boolean} True if any effect uses scaleFrom: 'snapshot'
-     */
+
     needsSnapshot() {
         if (!this.base || !this.base.effects) return false;
         return this.base.effects.some(effect => effect.scaleFrom === 'snapshot');
@@ -71,29 +56,21 @@ export class AdventuringAuraInstance {
         try {
             if(this.base !== undefined && typeof this.base !== 'string' && this.base.name) {
                 const tooltip = TooltipBuilder.create()
-                    .header(this.base.name, this.base.media);
-                
-                // Show aura type (buff/debuff)
+                    .header(this.base.name, this.base.media);
                 const isBuff = this.base.isBuff !== undefined ? this.base.isBuff : false;
                 const typeText = isBuff ? 'Buff' : 'Debuff';
-                tooltip.subheader(typeText);
-                
-                // Show description with resolved values
+                tooltip.subheader(typeText);
                 const desc = this.base.getDescription(this);
                 if(desc) {
                     tooltip.separator().info(desc);
-                }
-                
-                // Show trigger information
+                }
                 const triggers = this.getUniqueTriggers();
                 if(triggers.length > 0) {
                     tooltip.separator().hint('Triggers:');
                     triggers.forEach(trigger => {
                         tooltip.hint(`• ${formatTrigger(trigger)}`);
                     });
-                }
-                
-                // Show stacks and amount
+                }
                 tooltip.separator();
                 if(this.stacks > 1) {
                     tooltip.hint(`Stacks: ${this.stacks}`);
@@ -101,7 +78,7 @@ export class AdventuringAuraInstance {
                 if(this.age > 0) {
                     tooltip.hint(`Age: ${this.age}`);
                 }
-                
+
                 return tooltip.build();
             } else {
                 console.warn('[Aura Tooltip] Invalid base:', {
@@ -123,20 +100,15 @@ export class AdventuringAuraInstance {
         return '<div>Unknown Aura</div>';
     }
 
-    /**
-     * Get unique triggers from all effects
-     */
     getUniqueTriggers() {
-        if(!this.base || !this.base.effects) return [];
-        
-        // Standard cleanup only has trigger and type: 'remove', no other properties
+        if(!this.base || !this.base.effects) return [];
         const isStandardCleanup = (e) => {
             if (e.type !== 'remove') return false;
             if (e.trigger !== 'encounter_end' && e.trigger !== 'death') return false;
             const keys = Object.keys(e).filter(k => k !== 'trigger' && k !== 'type');
             return keys.length === 0;
         };
-        
+
         const triggers = new Set();
         this.base.effects.forEach(effect => {
             if(effect.trigger && !isStandardCleanup(effect)) {
@@ -148,48 +120,36 @@ export class AdventuringAuraInstance {
 
     setAura(aura, stacks=1, snapshot=null) {
         this.base = aura;
-        this.stacks = stacks;
-        
-        // Store snapshot if provided
+        this.stacks = stacks;
         if (snapshot) {
             this.snapshotStats = snapshot;
-        }
-        
-        // Enforce maxStacks if defined
+        }
         if(aura.maxStacks !== undefined) {
             this.stacks = Math.min(this.stacks, aura.maxStacks);
-        }
-        
-        // Initialize age - tracks how many rounds this aura has been active
+        }
         this.age = 0;
-        
+
         this.auras.buildEffects();
         this.renderQueue.icon = true;
         this.renderQueue.stacks = true;
         this.renderQueue.tooltip = true;
-        this.auras.renderQueue.auras = true;
-        
-        // Invalidate effect cache
+        this.auras.renderQueue.auras = true;
         if (this.auras.character !== undefined && this.auras.character.invalidateEffects !== undefined) {
             this.auras.character.invalidateEffects('auras');
         }
     }
 
     setStacks(stacks) {
-        this.stacks = stacks;
-        
-        // Enforce maxStacks if defined
+        this.stacks = stacks;
         if(this.base !== undefined && this.base.maxStacks !== undefined) {
             this.stacks = Math.min(this.stacks, this.base.maxStacks);
         }
-        
+
         this.auras.buildEffects();
         this.renderQueue.icon = true;
         this.renderQueue.stacks = true;
         this.renderQueue.tooltip = true;
-        this.auras.renderQueue.auras = true;
-        
-        // Invalidate effect cache
+        this.auras.renderQueue.auras = true;
         if (this.auras.character !== undefined && this.auras.character.invalidateEffects !== undefined) {
             this.auras.character.invalidateEffects('auras');
         }
@@ -202,9 +162,7 @@ export class AdventuringAuraInstance {
         this.renderQueue.icon = true;
         this.renderQueue.stacks = true;
         this.renderQueue.tooltip = true;
-        this.auras.renderQueue.auras = true;
-        
-        // Invalidate effect cache
+        this.auras.renderQueue.auras = true;
         if (this.auras.character !== undefined && this.auras.character.invalidateEffects !== undefined) {
             this.auras.character.invalidateEffects('auras');
         }
@@ -212,11 +170,8 @@ export class AdventuringAuraInstance {
 
     remove_stacks(count) {
         const previousStacks = this.stacks;
-        this.stacks = Math.max(this.stacks - count, 0);
-        
-        // Fire stacks_depleted trigger if stacks just reached 0
-        if (previousStacks > 0 && this.stacks === 0 && this.auras.character) {
-            // Process stacks_depleted effects from this aura before it's cleaned up
+        this.stacks = Math.max(this.stacks - count, 0);
+        if (previousStacks > 0 && this.stacks === 0 && this.auras.character) {
             const depletedEffects = this.base.effects.filter(e => e.trigger === 'stacks_depleted');
             if (depletedEffects.length > 0) {
                 const ctx = {
@@ -234,9 +189,7 @@ export class AdventuringAuraInstance {
         this.renderQueue.icon = true;
         this.renderQueue.stacks = true;
         this.renderQueue.tooltip = true;
-        this.auras.renderQueue.auras = true;
-        
-        // Invalidate effect cache
+        this.auras.renderQueue.auras = true;
         if (this.auras.character !== undefined && this.auras.character.invalidateEffects !== undefined) {
             this.auras.character.invalidateEffects('auras');
         }
@@ -289,9 +242,7 @@ export class AdventuringAuraInstance {
         writer.writeNamespacedObject(this.base);
         writer.writeUint32(this.stacks);
         writer.writeUint8(this.manager.encounter.all.indexOf(this.source));
-        writer.writeUint16(this.age || 0);
-        
-        // Encode snapshot stats
+        writer.writeUint16(this.age || 0);
         const hasSnapshot = this.snapshotStats !== null && this.snapshotStats.size > 0;
         writer.writeBoolean(hasSnapshot);
         if (hasSnapshot) {
@@ -301,22 +252,19 @@ export class AdventuringAuraInstance {
                 writer.writeFloat64(value);
             });
         }
-        
+
         return writer;
     }
 
     decode(reader, version) {
-        const base = reader.getNamespacedObject(this.manager.auras);
-        // Only set base if it was successfully found (not a string/error)
+        const base = reader.getNamespacedObject(this.manager.auras);
         if(typeof base !== 'string') {
             this.base = base;
         }
         this.stacks = reader.getUint32();
         let sourceIdx = reader.getUint8();
         this.source = this.manager.encounter.all[sourceIdx];
-        this.age = reader.getUint16();
-        
-        // Decode snapshot stats (if present - version check)
+        this.age = reader.getUint16();
         try {
             const hasSnapshot = reader.getBoolean();
             if (hasSnapshot) {
@@ -328,8 +276,7 @@ export class AdventuringAuraInstance {
                     this.snapshotStats.set(key, value);
                 }
             }
-        } catch (e) {
-            // Old save format without snapshot - that's fine
+        } catch (e) {
             this.snapshotStats = null;
         }
     }

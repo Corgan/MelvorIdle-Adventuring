@@ -7,7 +7,7 @@ export class AdventuringSpender extends AdventuringAbility {
         super(namespace, data, manager, game);
         this.abilityType = 'spender';
     }
-    
+
     get isGenerator() { return false; }
     get isSpender() { return true; }
 }

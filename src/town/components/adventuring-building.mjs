@@ -10,7 +10,7 @@ export class AdventuringBuildingElement extends AdventuringTooltipElement {
 
         this.clickable = getElementFromFragment(this._content, 'clickable', 'div');
         this.icon = getElementFromFragment(this._content, 'icon', 'img');
-        
+
         this._tooltipTarget = this.clickable;
     }
 

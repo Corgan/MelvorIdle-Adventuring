@@ -43,15 +43,13 @@ export class AdventuringTownAction extends NamespacedObject {
     }
 
     execute(character, building) {
-        this.effects.forEach(effect => {
-            // Build context for effect processing
-            // The processor handlers handle targeting (target: 'all', 'self', etc.)
+        this.effects.forEach(effect => {
             const context = {
                 character: character,
                 manager: this.manager,
                 extra: { building, source: character }
             };
-            
+
             defaultEffectProcessor.processSimple(effect, effect.amount || 0, this.name, context);
         });
     }

@@ -35,9 +35,7 @@ class AdventuringAbilityHitEffect extends AdventuringScalableEffect {
     }
 
     postDataRegistration() {
-        super.postDataRegistration();
-        
-        // Auto-populate stacks for buff/debuff effects (default to 1)
+        super.postDataRegistration();
         if(this.type === "buff" || this.type === "debuff") {
             if(this.stacks === undefined) {
                 this.stacks = { base: 1 };
@@ -84,9 +82,8 @@ export class AdventuringAbility extends NamespacedObject {
             this.learnType = data.learnType;
         if(data.learnBonus !== undefined)
             this.learnBonus = data.learnBonus;
-        this.isEnemy = data.isEnemy === true;
-        // Auto-detect achievement abilities by checking requirements
-        this.isAchievementAbility = data.isAchievementAbility === true || 
+        this.isEnemy = data.isEnemy === true;
+        this.isAchievementAbility = data.isAchievementAbility === true ||
             (data.requirements && data.requirements.some(r => r.type === 'achievement_completion'));
         this.requirements = data.requirements;
         this.highlight = false;
@@ -100,68 +97,39 @@ export class AdventuringAbility extends NamespacedObject {
     }
 
     postDataRegistration() {
-        this.hits.forEach(hit => hit.postDataRegistration());
-        // Create requirements checker for this ability
+        this.hits.forEach(hit => hit.postDataRegistration());
         this._reqChecker = new RequirementsChecker(this.manager, this.requirements);
     }
 
-    /**
-     * Check if this ability is unlocked by a specific job
-     * @param {object} job - Job to check
-     * @returns {boolean} True if this ability references the job in requirements
-     */
     unlockedBy(job) {
         if(this.isEnemy) return false;
         if (this._reqChecker === undefined) return false;
         return this._reqChecker.referencesJob(job.id);
     }
 
-    get unlocked() {
-        // Enemy abilities are unlocked if learned by Blue Mage
+    get unlocked() {
         if(this.isEnemy)
-            return this.manager.learnedAbilities.has(this.id);
-        
-        // Achievement abilities are unlocked via achievement completion
+            return this.manager.learnedAbilities.has(this.id);
         if(this.isAchievementAbility)
-            return this.manager.achievementManager.isAbilityUnlocked(this.id);
-        
-        // Use RequirementsChecker for standard job_level requirements
-        // Note: For unlocked, we treat current_job_level same as job_level
+            return this.manager.achievementManager.isAbilityUnlocked(this.id);
         if (this._reqChecker === undefined) return true;
         return this._reqChecker.check();
     }
 
-    canEquip(character) {
-        // Blue Mage (Slayer) can equip learned enemy abilities
+    canEquip(character) {
         if(this.isEnemy) {
             if(!this.manager.learnedAbilities.has(this.id)) return false;
             const slayerJob = this.manager.cached.slayerJob;
             if(slayerJob === undefined) return false;
             return (character.combatJob === slayerJob) || (character.passiveJob === slayerJob);
-        }
-        
-        // Achievement abilities can be equipped by anyone once unlocked
+        }
         if(this.isAchievementAbility) {
             return this.manager.achievementManager.isAbilityUnlocked(this.id);
-        }
-        
-        // Use RequirementsChecker with character context for current_job_level
+        }
         if (this._reqChecker === undefined) return true;
         return this._reqChecker.check({ character });
     }
 
-    /**
-     * Get the ability description with effect values.
-     * 
-     * Display modes:
-     * - 'total': Just totals (25) - for tooltips/ability-small
-     * - 'scaled': Base + scaled value (5 + 20 icon) - for ability selector
-     * - 'multiplier': Base + multiplier (5 + 0.5 icon) - for job overview
-     * - false: Raw numbers for logic
-     * 
-     * @param {object} stats - Stats source for scaling calculations
-     * @param {string} displayMode - Display mode: 'total', 'scaled', 'multiplier', or falsy for raw
-     */
     getDescription(stats, displayMode) {
         const desc = buildDescription({
             hits: this.hits,
@@ -210,12 +178,8 @@ export class AdventuringAbility extends NamespacedObject {
         if(this.unlocked) {
             let stats = undefined;
             if(this.renderQueue.descriptionCharacter)
-                stats = this.renderQueue.descriptionCharacter.stats;
-
-            // Ability selector: show base + scaled value (5 + 20 icon)
-            this.component.description.innerHTML = this.getDescription(stats, 'scaled');
-            
-            // Job overview/details: show base + multiplier (5 + 0.5 icon)
+                stats = this.renderQueue.descriptionCharacter.stats;
+            this.component.description.innerHTML = this.getDescription(stats, 'scaled');
             this.details.description.innerHTML = this.getDescription(undefined, 'multiplier');
 
         } else {
@@ -237,13 +201,13 @@ export class AdventuringAbility extends NamespacedObject {
     renderNewBadge() {
         if(!this.renderQueue.newBadge)
             return;
-        
+
         let isNew = this.unlocked && !this.manager.seenAbilities.has(this.id);
         if(this.component.newBadge !== undefined)
             this.component.newBadge.classList.toggle('d-none', !isNew);
         if(this.details.newBadge !== undefined)
             this.details.newBadge.classList.toggle('d-none', !isNew);
-        
+
         this.renderQueue.newBadge = false;
     }
 }

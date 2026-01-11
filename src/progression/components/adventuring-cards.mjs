@@ -3,7 +3,7 @@ export class AdventuringCardsElement extends HTMLElement {
         super();
         this._content = new DocumentFragment();
         this._content.append(getTemplateNode('adventuring-cards-template'));
-        
+
         this.cards = getElementFromFragment(this._content, 'cards', 'div');
     }
 

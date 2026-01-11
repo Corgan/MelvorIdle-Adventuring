@@ -10,15 +10,11 @@ export class AdventuringTavernElement extends AdventuringSubpageElement {
         super('adventuring-tavern-template');
 
         this.back = getElementFromFragment(this._content, 'back', 'button');
-        this.drinks = getElementFromFragment(this._content, 'drinks', 'div');
-        
-        // Equipment slots
+        this.drinks = getElementFromFragment(this._content, 'drinks', 'div');
         this.slots = [];
         for (let i = 0; i < 3; i++) {
             this.slots.push(getElementFromFragment(this._content, `slot-${i}`, 'div'));
-        }
-        
-        // Details panel
+        }
         this.detailsContainer = getElementFromFragment(this._content, 'details-container', 'div');
         this.details = getElementFromFragment(this._content, 'details', 'div');
         this.detailsPlaceholder = getElementFromFragment(this._content, 'details-placeholder', 'div');
@@ -29,16 +25,12 @@ export class AdventuringTavernElement extends AdventuringSubpageElement {
         this.detailMaterials = getElementFromFragment(this._content, 'detail-materials', 'div');
         this.detailCharges = getElementFromFragment(this._content, 'detail-charges', 'span');
         this.craftButton = getElementFromFragment(this._content, 'craft-button', 'button');
-        this.equipButton = getElementFromFragment(this._content, 'equip-button', 'button');
-        
-        // Tier buttons
+        this.equipButton = getElementFromFragment(this._content, 'equip-button', 'button');
         this.tierButtons = getElementFromFragment(this._content, 'tier-buttons', 'div');
         this.tierButtonElements = [];
         for (let i = 1; i <= 4; i++) {
             this.tierButtonElements.push(getElementFromFragment(this._content, `tier-${i}`, 'button'));
-        }
-        
-        // Track drink icon elements for selection styling
+        }
         this.drinkIcons = new Map();
     }
 
@@ -46,19 +38,16 @@ export class AdventuringTavernElement extends AdventuringSubpageElement {
         this.details.classList.remove('d-none');
         this.detailsPlaceholder.classList.add('d-none');
     }
-    
+
     hideDetails() {
         this.details.classList.add('d-none');
         this.detailsPlaceholder.classList.remove('d-none');
     }
 
-    /**
-     * Render the drink grid (icon list)
-     */
     renderDrinkGrid(drinks, selectedDrink, onSelect, manager) {
         this.drinks.replaceChildren();
         this.drinkIcons.clear();
-        
+
         for (const drink of drinks) {
             const icon = this.createDrinkIcon(drink, drink === selectedDrink, () => onSelect(drink), manager);
             this.drinks.appendChild(icon);
@@ -66,13 +55,10 @@ export class AdventuringTavernElement extends AdventuringSubpageElement {
         }
     }
 
-    /**
-     * Create a drink icon element
-     */
     createDrinkIcon(drink, isSelected, onClick, manager) {
         const totalCharges = drink.totalCharges;
         const tooltipContent = TooltipBuilder.forTavernDrink(drink, totalCharges).build();
-        
+
         const iconBtn = new AdventuringIconButtonElement();
         iconBtn.setIcon({
             icon: drink.media,
@@ -84,20 +70,17 @@ export class AdventuringTavernElement extends AdventuringSubpageElement {
             tooltipContent,
             onClick
         });
-        
+
         return iconBtn;
     }
 
-    /**
-     * Render the equipped slots at the top
-     */
     renderEquippedSlots(activeDrinks, maxSlots, onUnequip) {
         for (let i = 0; i < this.slots.length; i++) {
             const slot = this.slots[i];
             const active = activeDrinks[i];
-            
+
             slot.replaceChildren();
-            
+
             if (active) {
                 const iconBtn = new AdventuringIconButtonElement();
                 iconBtn.setIcon({
@@ -107,8 +90,7 @@ export class AdventuringTavernElement extends AdventuringSubpageElement {
                     bottomBadgeClass: 'bg-success',
                     tooltipContent: `${active.drink.getTierName(active.tier)} (${active.runsRemaining} runs) - Click to unequip`,
                     onClick: () => onUnequip(active.drink)
-                });
-                // Remove the outer container margin since slot already has margin
+                });
                 iconBtn.container.classList.remove('m-1');
                 slot.appendChild(iconBtn);
                 slot.classList.remove('border-secondary');
@@ -127,36 +109,25 @@ export class AdventuringTavernElement extends AdventuringSubpageElement {
         }
     }
 
-    /**
-     * Render the details panel for a selected drink
-     */
     renderDetails({ drink, tier, charges, equippedTier, canAfford, onSelectTier, onCraft, onEquip }) {
-        this.showDetails();
-        
-        // Icon and name
+        this.showDetails();
         this.detailIcon.src = drink.getTierMedia(tier);
         this.detailName.textContent = drink.getTierName(tier);
-        this.detailDescription.innerHTML = drink.getTierDescription(tier);
-        
-        // Tier buttons
+        this.detailDescription.innerHTML = drink.getTierDescription(tier);
         for (let i = 0; i < 4; i++) {
             const btn = this.tierButtonElements[i];
             const t = i + 1;
             btn.classList.toggle('active', t === tier);
             btn.classList.toggle('btn-info', t === tier);
-            btn.classList.toggle('btn-outline-info', t !== tier);
-            
-            // Show charge count on tier button
+            btn.classList.toggle('btn-outline-info', t !== tier);
             const tierCharges = drink.getCharges(t);
             btn.textContent = ['I', 'II', 'III', 'IV'][i];
             if (tierCharges > 0) {
                 btn.textContent += ` (${tierCharges})`;
             }
-            
+
             btn.onclick = () => onSelectTier(t);
-        }
-        
-        // Materials - use adventuring-material components like armory
+        }
         const materials = drink.getTierMaterials(tier);
         this.detailMaterials.replaceChildren();
         if (materials.size > 0) {
@@ -167,16 +138,14 @@ export class AdventuringTavernElement extends AdventuringSubpageElement {
                 const component = document.createElement('adventuring-material');
                 container.appendChild(component);
                 component.icon.src = mat.media;
-                component.count.textContent = qty;
-                // Border based on affordability
+                component.count.textContent = qty;
                 if (owned >= qty) {
                     component.border.classList.remove('border-danger');
                     component.border.classList.add('border-success');
                 } else {
                     component.border.classList.remove('border-success');
                     component.border.classList.add('border-danger');
-                }
-                // Set tooltip content using the component's built-in tooltip
+                }
                 const tooltipContent = TooltipBuilder.create()
                     .header(mat.name, mat.media)
                     .text(`Owned: ${owned}`, owned >= qty ? 'text-success' : 'text-danger')
@@ -186,21 +155,15 @@ export class AdventuringTavernElement extends AdventuringSubpageElement {
             this.detailMaterials.appendChild(container);
         } else {
             this.detailMaterials.innerHTML = '<span class="text-muted">None</span>';
-        }
-        
-        // Charges
-        this.detailCharges.textContent = charges;
-        
-        // Craft button
+        }
+        this.detailCharges.textContent = charges;
         this.craftButton.disabled = !canAfford;
         this.craftButton.classList.toggle('btn-info', canAfford);
         this.craftButton.classList.toggle('btn-secondary', !canAfford);
-        this.craftButton.onclick = onCraft;
-        
-        // Equip button
+        this.craftButton.onclick = onCraft;
         const isThisTierEquipped = equippedTier === tier;
         const hasCharges = charges > 0;
-        
+
         if (isThisTierEquipped) {
             this.equipButton.textContent = 'Unequip';
             this.equipButton.classList.remove('btn-success', 'btn-secondary');
@@ -217,13 +180,10 @@ export class AdventuringTavernElement extends AdventuringSubpageElement {
             this.equipButton.classList.add('btn-secondary');
             this.equipButton.disabled = true;
         }
-        
+
         this.equipButton.onclick = onEquip;
     }
 
-    /**
-     * Render empty details placeholder
-     */
     renderEmptyDetails() {
         this.hideDetails();
     }

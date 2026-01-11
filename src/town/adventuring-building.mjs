@@ -36,9 +36,7 @@ export class AdventuringBuilding extends NamespacedObject {
 
         this.requirements = data.requirements;
         if(data.actions !== undefined)
-            this._actions = data.actions;
-
-        //this.idle = new AdventuringBuildingAction(this.manager, this.game, { status: data.idle !== undefined ? data.idle : `Loitering`, requirements: [], effects: [] }, this);
+            this._actions = data.actions;
 
         if(data.itemSlotOrder !== undefined)
             this.itemSlotOrder = data.itemSlotOrder;

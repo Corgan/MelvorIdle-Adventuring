@@ -1,8 +1,6 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { AdventuringPage } = await loadModule('src/ui/adventuring-page.mjs');
-
-// Side-effect import to register custom element
+const { AdventuringPage } = await loadModule('src/ui/adventuring-page.mjs');
 await loadModule('src/town/components/adventuring-tavern.mjs');
 
 const MAX_EQUIPPED_DRINKS = 3;
@@ -23,25 +21,15 @@ class AdventuringTavernRenderQueue {
     }
 }
 
-/**
- * Tavern manager - handles tavern drinks (passive run-length effects)
- * Now with tiered drinks similar to consumables.
- */
 export class AdventuringTavern extends AdventuringPage {
     constructor(manager, game) {
         super(manager, game);
         this.manager = manager;
         this.game = game;
         this.component = createElement('adventuring-tavern');
-        this.renderQueue = new AdventuringTavernRenderQueue();
-
-        // Charges per drink per tier (Map<drinkId, Map<tier, count>>)
-        this.charges = new Map();
-        
-        // Equipped drinks with their tier (Map<drink, tier>)
-        this.equipped = new Map();
-        
-        // Currently selected drink for detail view
+        this.renderQueue = new AdventuringTavernRenderQueue();
+        this.charges = new Map();
+        this.equipped = new Map();
         this.selectedDrink = null;
         this.selectedTier = 1;
 
@@ -60,9 +48,7 @@ export class AdventuringTavern extends AdventuringPage {
 
     onShow() {
         this.manager.party.setAllLocked(false);
-        this.renderQueue.all = true;
-        
-        // Select first drink by default
+        this.renderQueue.all = true;
         const drinks = this.manager.tavernDrinks.allObjects;
         if (drinks.length > 0 && !this.selectedDrink) {
             this.selectedDrink = drinks[0];
@@ -74,26 +60,15 @@ export class AdventuringTavern extends AdventuringPage {
         this.manager.party.setAllLocked(true);
     }
 
-    postDataRegistration() {
-        // Nothing special needed
-    }
+    postDataRegistration() {
+    }
 
-    // =========================================
-    // Charge Management (per tier)
-    // =========================================
-
-    /**
-     * Get charge count for a drink's specific tier
-     */
     getCharges(drink, tier) {
         const drinkCharges = this.charges.get(drink.id);
         if (!drinkCharges) return 0;
         return drinkCharges.get(tier) || 0;
     }
 
-    /**
-     * Add charges to a drink's specific tier
-     */
     addCharges(drink, tier, amount) {
         if (!this.charges.has(drink.id)) {
             this.charges.set(drink.id, new Map());
@@ -101,39 +76,31 @@ export class AdventuringTavern extends AdventuringPage {
         const drinkCharges = this.charges.get(drink.id);
         const current = drinkCharges.get(tier) || 0;
         drinkCharges.set(tier, current + amount);
-        
+
         drink.renderQueue.updateAll();
         this.renderQueue.equipped = true;
         this.renderQueue.details = true;
         this.manager.party.invalidateAllEffects('tavern');
     }
 
-    /**
-     * Remove charges from a drink's specific tier
-     */
     removeCharges(drink, tier, amount) {
         if (!this.charges.has(drink.id)) return;
-        
+
         const drinkCharges = this.charges.get(drink.id);
         const current = drinkCharges.get(tier) || 0;
         const newCharges = Math.max(current - amount, 0);
         drinkCharges.set(tier, newCharges);
-        
+
         drink.renderQueue.updateAll();
         this.renderQueue.equipped = true;
         this.renderQueue.details = true;
-        this.manager.party.invalidateAllEffects('tavern');
-
-        // If charges depleted and this tier is equipped, unequip
+        this.manager.party.invalidateAllEffects('tavern');
         const equippedTier = this.getEquippedTier(drink);
         if (newCharges <= 0 && equippedTier === tier) {
             this.unequip(drink);
         }
     }
 
-    /**
-     * Consume one charge from all equipped drinks (called at dungeon end)
-     */
     consumeCharges() {
         for (const [drink, tier] of this.equipped.entries()) {
             if (this.getCharges(drink, tier) > 0) {
@@ -142,38 +109,22 @@ export class AdventuringTavern extends AdventuringPage {
         }
     }
 
-    /**
-     * Reset all tavern drink state (for skill reset)
-     */
     resetDrinks() {
         this.charges.clear();
         this.equipped.clear();
         this.selectedDrink = null;
         this.selectedTier = 1;
         this.renderQueue.queueAll();
-    }
+    }
 
-    // =========================================
-    // Equipment Management
-    // =========================================
-
-    /**
-     * Check if a drink is equipped (any tier)
-     */
     isEquipped(drink) {
         return this.equipped.has(drink);
     }
 
-    /**
-     * Get the equipped tier for a drink (0 if not equipped)
-     */
     getEquippedTier(drink) {
         return this.equipped.get(drink) || 0;
     }
 
-    /**
-     * Equip a drink at a specific tier
-     */
     equip(drink, tier) {
         if (this.equipped.size >= MAX_EQUIPPED_DRINKS && !this.isEquipped(drink)) {
             this.manager.log.add(`Cannot equip more than ${MAX_EQUIPPED_DRINKS} drinks.`);
@@ -190,13 +141,10 @@ export class AdventuringTavern extends AdventuringPage {
         this.renderQueue.details = true;
         this.manager.party.invalidateAllEffects('tavern');
         this.manager.log.add(`Equipped ${drink.getTierName(tier)}`);
-        
+
         return true;
     }
 
-    /**
-     * Unequip a drink
-     */
     unequip(drink) {
         if (!this.isEquipped(drink)) return false;
 
@@ -208,32 +156,21 @@ export class AdventuringTavern extends AdventuringPage {
         this.manager.party.invalidateAllEffects('tavern');
         this.manager.log.add(`Unequipped ${drink.getTierName(tier)}`);
         this.manager.overview.renderQueue.buffs = true;
-        
+
         return true;
     }
 
-    /**
-     * Toggle equip state for a drink at a tier
-     */
     toggleEquip(drink, tier) {
         if (this.isEquipped(drink) && this.getEquippedTier(drink) === tier) {
             return this.unequip(drink);
-        } else {
-            // If already equipped at different tier, unequip first
+        } else {
             if (this.isEquipped(drink)) {
                 this.unequip(drink);
             }
             return this.equip(drink, tier);
         }
-    }
+    }
 
-    // =========================================
-    // Effect Getters
-    // =========================================
-
-    /**
-     * Get all active equipped drinks with their remaining charges
-     */
     getActiveDrinks() {
         const active = [];
         for (const [drink, tier] of this.equipped.entries()) {
@@ -245,60 +182,43 @@ export class AdventuringTavern extends AdventuringPage {
         return active;
     }
 
-    /**
-     * Get all effects from equipped drinks.
-     * @returns {StandardEffect[]} Array of standardized effects
-     */
     getEffects() {
         const effects = [];
-        
+
         for (const [drink, tier] of this.equipped.entries()) {
             if (this.getCharges(drink, tier) > 0) {
                 effects.push(...drink.getTierEffects(tier));
             }
         }
-        
+
         return effects;
     }
-    
-    /**
-     * Get all effects from equipped drinks that match a trigger type.
-     * Does NOT evaluate conditions or limits - those are handled by the central dispatcher.
-     * @param {string} triggerType - The trigger type to match
-     * @param {object} context - Context for evaluation (not used here, passed for interface consistency)
-     * @returns {Array<{drink: object, effect: object}>}
-     */
+
     getEffectsForTrigger(triggerType, context = {}) {
         const results = [];
-        
+
         for (const [drink, tier] of this.equipped.entries()) {
             if (this.getCharges(drink, tier) <= 0) continue;
-            
+
             const tierEffects = drink.getTierEffects(tier);
             for (const effect of tierEffects) {
                 if (effect.trigger !== triggerType) continue;
-                
+
                 results.push({
                     drink: drink,
                     effect: effect
                 });
             }
         }
-        
-        return results;
-    }
 
-    // =========================================
-    // Selection
-    // =========================================
+        return results;
+    }
 
     selectDrink(drink) {
         const previousDrink = this.selectedDrink;
         this.selectedDrink = drink;
         this.selectedTier = 1;
-        this.renderQueue.details = true;
-        
-        // Update selection styling on both drinks
+        this.renderQueue.details = true;
         if (previousDrink) {
             previousDrink.component.setSelected(false);
         }
@@ -310,11 +230,7 @@ export class AdventuringTavern extends AdventuringPage {
     selectTier(tier) {
         this.selectedTier = tier;
         this.renderQueue.details = true;
-    }
-
-    // =========================================
-    // Rendering
-    // =========================================
+    }
 
     render() {
         this.renderDrinks();
@@ -324,16 +240,12 @@ export class AdventuringTavern extends AdventuringPage {
 
     renderDrinks() {
         if (!this.renderQueue.drinks && !this.renderQueue.all)
-            return;
-
-        // Mount drink components once
+            return;
         this.component.drinks.replaceChildren();
-        for (const drink of this.manager.tavernDrinks.allObjects) {
-            // Check if component has mount method (may be undefined if custom element not registered)
+        for (const drink of this.manager.tavernDrinks.allObjects) {
             if (typeof drink.component.mount === 'function') {
                 drink.component.mount(this.component.drinks);
-            } else {
-                // Fallback: manually append element
+            } else {
                 this.component.drinks.appendChild(drink.component);
             }
             if (typeof drink.component.setSelected === 'function') {
@@ -398,14 +310,9 @@ export class AdventuringTavern extends AdventuringPage {
         });
 
         this.renderQueue.details = false;
-    }
+    }
 
-    // =========================================
-    // Save/Load
-    // =========================================
-
-    encode(writer) {
-        // Save charges for each drink (nested map: drinkId -> tier -> count)
+    encode(writer) {
         writer.writeUint32(this.charges.size);
         for (const [drinkId, tierCharges] of this.charges) {
             writer.writeString(drinkId);
@@ -414,20 +321,17 @@ export class AdventuringTavern extends AdventuringPage {
                 writer.writeUint8(tier);
                 writer.writeUint32(count);
             }
-        }
-        
-        // Save equipped drinks with their tier
+        }
         writer.writeUint32(this.equipped.size);
         for (const [drink, tier] of this.equipped) {
             writer.writeNamespacedObject(drink);
             writer.writeUint8(tier);
         }
-        
+
         return writer;
     }
 
-    decode(reader, version) {
-        // Load charges
+    decode(reader, version) {
         this.charges = new Map();
         const chargesCount = reader.getUint32();
         for (let i = 0; i < chargesCount; i++) {
@@ -440,9 +344,7 @@ export class AdventuringTavern extends AdventuringPage {
                 tierCharges.set(tier, count);
             }
             this.charges.set(drinkId, tierCharges);
-        }
-        
-        // Load equipped drinks
+        }
         this.equipped = new Map();
         const equippedCount = reader.getUint32();
         for (let i = 0; i < equippedCount; i++) {
@@ -452,7 +354,7 @@ export class AdventuringTavern extends AdventuringPage {
                 this.equipped.set(drink, tier);
             }
         }
-        
+
         return reader;
     }
 }

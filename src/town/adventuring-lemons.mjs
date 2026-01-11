@@ -3,9 +3,7 @@ const { loadModule } = mod.getContext(import.meta);
 const { AdventuringPage } = await loadModule('src/ui/adventuring-page.mjs');
 
 const { AdventuringLemonsElement } = await loadModule('src/town/components/adventuring-lemons.mjs');
-const { AdventuringStatCardElement } = await loadModule('src/ui/components/adventuring-stat-card.mjs');
-
-// Lemon wisdom and jokes
+const { AdventuringStatCardElement } = await loadModule('src/ui/components/adventuring-stat-card.mjs');
 const LEMON_QUOTES = [
     "When life gives you lemons, make lemonade!",
     "You're the zest!",
@@ -22,9 +20,7 @@ const LEMON_QUOTES = [
     "You look like you could use some vitamin C-ombat stats!",
     "Our lemonade is totally natural - no artificial flavorings or magic!",
     "This is where the cool adventurers hang out. Very refreshing.",
-];
-
-// Easter egg secrets
+];
 const LEMON_SECRETS = [
     "Psst! Did you know lemons were first grown in Assam, India?",
     "Fun fact: The average lemon contains about 3 tablespoons of juice!",
@@ -54,15 +50,11 @@ export class AdventuringLemons extends AdventuringPage {
         this.manager = manager;
         this.game = game;
         this.component = createElement('adventuring-lemons');
-        this.renderQueue = new AdventuringLemonRenderQueue();
-
-        // Lemon statistics
+        this.renderQueue = new AdventuringLemonRenderQueue();
         this.lemonadesConsumed = 0;
         this.lemonsSquashed = 0;
         this.timesVisited = 0;
-        this.secretsFound = new Set();
-        
-        // Current displayed quote
+        this.secretsFound = new Set();
         this.currentQuote = this.getRandomQuote();
 
         this.component.back.onclick = () => this.back();
@@ -83,9 +75,7 @@ export class AdventuringLemons extends AdventuringPage {
         this.manager.party.setAllLocked(false);
         this.timesVisited++;
         this.currentQuote = this.getRandomQuote();
-        this.renderQueue.all = true;
-        
-        // 10% chance to discover a secret on visit
+        this.renderQueue.all = true;
         if(Math.random() < 0.1) {
             this.discoverSecret();
         }
@@ -95,8 +85,7 @@ export class AdventuringLemons extends AdventuringPage {
         this.manager.party.setAllLocked(true);
     }
 
-    postDataRegistration() {
-        // Nothing needed
+    postDataRegistration() {
     }
 
     getRandomQuote() {
@@ -119,10 +108,10 @@ export class AdventuringLemons extends AdventuringPage {
             this.manager.log.add("You can't afford lemonade! How sad.");
             return;
         }
-        
+
         this.manager.stash.removeCurrency(cost);
         this.lemonadesConsumed++;
-        
+
         const messages = [
             "Ahh, refreshing!",
             "That hit the spot!",
@@ -131,23 +120,21 @@ export class AdventuringLemons extends AdventuringPage {
             "You feel invigorated!",
             "The tartness awakens your senses!",
         ];
-        
-        this.manager.log.add(`🍋 ${messages[Math.floor(Math.random() * messages.length)]}`);
-        
-        // Easter egg: Every 10 lemonades, get a small bonus
+
+        this.manager.log.add(`🍋 ${messages[Math.floor(Math.random() * messages.length)]}`);
         if(this.lemonadesConsumed % 10 === 0) {
             const bonus = Math.floor(this.lemonadesConsumed / 10);
             this.manager.log.add(`🍋 Loyalty reward! You've had ${this.lemonadesConsumed} lemonades!`);
             this.manager.stash.addCurrency(bonus * 5);
         }
-        
+
         this.currentQuote = this.getRandomQuote();
         this.renderQueue.all = true;
     }
 
     squashLemon() {
         this.lemonsSquashed++;
-        
+
         const outcomes = [
             { msg: "Splat! That was satisfying.", weight: 40 },
             { msg: "You got lemon juice in your eye! Ow!", weight: 20 },
@@ -157,10 +144,10 @@ export class AdventuringLemons extends AdventuringPage {
             { msg: "A golden lemon! You find 20 coins inside!", weight: 4, coins: 20 },
             { msg: "MEGA SQUASH! The town applauds!", weight: 1, coins: 100 },
         ];
-        
+
         const totalWeight = outcomes.reduce((sum, o) => sum + o.weight, 0);
         let roll = Math.random() * totalWeight;
-        
+
         for(const outcome of outcomes) {
             roll -= outcome.weight;
             if(roll <= 0) {
@@ -171,43 +158,37 @@ export class AdventuringLemons extends AdventuringPage {
                 break;
             }
         }
-        
+
         this.currentQuote = this.getRandomQuote();
         this.renderQueue.all = true;
     }
 
     render() {
         if(!this.renderQueue.all && !this.renderQueue.quote && !this.renderQueue.stats)
-            return;
-
-        // Quote display
+            return;
         if(this.component.quote) {
             this.component.quote.textContent = `"${this.currentQuote}"`;
-        }
-
-        // Stats display
+        }
         if(this.component.stats) {
             this.component.stats.replaceChildren();
             const row = document.createElement('div');
             row.className = 'row';
-            
+
             const stats = [
                 { value: this.lemonadesConsumed, label: 'Lemonades Consumed' },
                 { value: this.lemonsSquashed, label: 'Lemons Squashed' },
                 { value: `${this.secretsFound.size}/${LEMON_SECRETS.length}`, label: 'Secrets Found' }
             ];
-            
+
             stats.forEach(stat => {
                 const card = new AdventuringStatCardElement();
                 card.setColumnClass('col-4');
                 card.setStat({ value: stat.value, label: stat.label });
                 row.appendChild(card);
             });
-            
-            this.component.stats.appendChild(row);
-        }
 
-        // Secrets display
+            this.component.stats.appendChild(row);
+        }
         if(this.component.secrets) {
             if(this.secretsFound.size > 0) {
                 let html = '<ul class="list-unstyled mb-0">';
@@ -219,9 +200,7 @@ export class AdventuringLemons extends AdventuringPage {
             } else {
                 this.component.secrets.innerHTML = '<small class="text-muted">No secrets discovered yet. Keep visiting!</small>';
             }
-        }
-
-        // Action buttons
+        }
         if(this.component.buyBtn) {
             this.component.buyBtn.onclick = () => this.buyLemonade();
         }
@@ -234,9 +213,6 @@ export class AdventuringLemons extends AdventuringPage {
         this.renderQueue.stats = false;
     }
 
-    /**
-     * Reset all lemon stats (for skill reset)
-     */
     resetStats() {
         this.lemonadesConsumed = 0;
         this.lemonsSquashed = 0;

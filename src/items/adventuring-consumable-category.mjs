@@ -1,9 +1,5 @@
 const { loadModule } = mod.getContext(import.meta);
 
-/**
- * Represents a category of consumables for organization in alchemy/crafting buildings.
- * Examples: drink, potion, oil, food, charm, scroll, banner, ward, bomb, salve
- */
 export class AdventuringConsumableCategory extends NamespacedObject {
     constructor(namespace, data, manager, game) {
         super(namespace, data.id);
@@ -12,9 +8,7 @@ export class AdventuringConsumableCategory extends NamespacedObject {
 
         this._name = data.name;
         this._media = data.media;
-        this.description = data.description || '';
-        
-        // Display order for sorting in UI
+        this.description = data.description || '';
         this.order = (data.order !== undefined) ? data.order : 0;
     }
 
@@ -26,10 +20,6 @@ export class AdventuringConsumableCategory extends NamespacedObject {
         return this._media ? this.getMediaURL(this._media) : '';
     }
 
-    /**
-     * Get all consumables in this category
-     * @returns {AdventuringConsumable[]}
-     */
     getConsumables() {
         return this.manager.consumableTypes.allObjects.filter(c => c.category === this);
     }

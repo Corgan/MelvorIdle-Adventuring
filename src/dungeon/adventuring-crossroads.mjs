@@ -25,8 +25,7 @@ export class AdventuringCrossroads extends AdventuringPage {
     }
 
     onShow() {
-        this.manager.party.setAllLocked(false);
-        // Trigger auto-repeat checkbox render for all areas
+        this.manager.party.setAllLocked(false);
         this.areas.forEach(area => {
             area.renderQueue.autoRepeat = true;
         });
@@ -36,8 +35,7 @@ export class AdventuringCrossroads extends AdventuringPage {
         this.manager.party.setAllLocked(true);
     }
 
-    postDataRegistration() {
-        // Get all areas and sort by unlock level
+    postDataRegistration() {
         this.areas = [...this.manager.areas.allObjects].sort((a, b) => {
             return a.getUnlockLevel() - b.getUnlockLevel();
         });
@@ -51,20 +49,17 @@ export class AdventuringCrossroads extends AdventuringPage {
         this.areas.forEach(area => area.render());
     }
 
-    encode(writer) {
-        // Save selected difficulty, best endless streak, and auto-run area
+    encode(writer) {
         writer.writeUint16(this.areas.length);
         this.areas.forEach(area => {
-            writer.writeNamespacedObject(area);
-            // Save difficulty as namespaced object (or null if none)
+            writer.writeNamespacedObject(area);
             const difficulty = area.selectedDifficulty;
             writer.writeBoolean(difficulty !== null);
             if(difficulty !== null) {
                 writer.writeNamespacedObject(difficulty);
             }
             writer.writeUint16(area.bestEndlessStreak);
-        });
-        // Save auto-repeat area (or null)
+        });
         writer.writeBoolean(this.manager.autoRepeatArea !== null);
         if(this.manager.autoRepeatArea !== null) {
             writer.writeNamespacedObject(this.manager.autoRepeatArea);
@@ -75,8 +70,7 @@ export class AdventuringCrossroads extends AdventuringPage {
     decode(reader, version) {
         const areaCount = reader.getUint16();
         for(let i = 0; i < areaCount; i++) {
-            const area = reader.getNamespacedObject(this.manager.areas);
-            // Read difficulty as namespaced object
+            const area = reader.getNamespacedObject(this.manager.areas);
             const hasDifficulty = reader.getBoolean();
             let difficulty = null;
             if(hasDifficulty) {
@@ -89,8 +83,7 @@ export class AdventuringCrossroads extends AdventuringPage {
                 }
                 area.bestEndlessStreak = bestStreak;
             }
-        }
-        // Load auto-run area
+        }
         const hasAutoRepeat = reader.getBoolean();
         if(hasAutoRepeat) {
             const autoRepeatArea = reader.getNamespacedObject(this.manager.areas);

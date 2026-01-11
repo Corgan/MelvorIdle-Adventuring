@@ -75,12 +75,8 @@ export class Adventuring extends SkillWithMastery {
         this._media = 'melvor:assets/media/main/adventure.svg';
         this.renderQueue = new AdventuringRenderQueue();
         this.isActive = false;
-        this.timersPaused = false; // Used by tutorial system to pause exploration/combat
-
-        // Blue Mage (Slayer) learned abilities
-        this.learnedAbilities = new Set();
-        
-        // Track which abilities have been seen in picker (for NEW badge)
+        this.timersPaused = false; // Used by tutorial system to pause exploration/combat
+        this.learnedAbilities = new Set();
         this.seenAbilities = new Set();
 
         this.stats = new NamespaceRegistry(this.game.registeredNamespaces);
@@ -102,9 +98,7 @@ export class Adventuring extends SkillWithMastery {
         this.slayerTaskTypes = new NamespaceRegistry(this.game.registeredNamespaces);
         this.rewardTypes = new NamespaceRegistry(this.game.registeredNamespaces);
         this.achievementCategories = new NamespaceRegistry(this.game.registeredNamespaces);
-        this.achievements = new NamespaceRegistry(this.game.registeredNamespaces);
-        
-        // Achievement system (manager.achievements)
+        this.achievements = new NamespaceRegistry(this.game.registeredNamespaces);
         this.achievementManager = new AchievementManager(this, game);
 
         this.itemSlots = new NamespaceRegistry(this.game.registeredNamespaces);
@@ -120,9 +114,7 @@ export class Adventuring extends SkillWithMastery {
         this.equipmentSets = new NamespaceRegistry(this.game.registeredNamespaces);
         this.equipmentPools = new NamespaceRegistry(this.game.registeredNamespaces);
         this.lootTables = new NamespaceRegistry(this.game.registeredNamespaces);
-        this.masteryCategories = new NamespaceRegistry(this.game.registeredNamespaces);
-
-        // Tutorial system
+        this.masteryCategories = new NamespaceRegistry(this.game.registeredNamespaces);
         this.tutorials = new NamespaceRegistry(this.game.registeredNamespaces);
 
         this.component = createElement('adventuring-page');
@@ -155,14 +147,9 @@ export class Adventuring extends SkillWithMastery {
         this.grimoire = new AdventuringGrimoire(this, this.game);
         this.crossroads = new AdventuringCrossroads(this, this.game);
         this.dungeon = new AdventuringDungeon(this, this.game);
-        this.encounter = new AdventuringEncounter(this, this.game);
-
-        // Tutorial manager (after all pages created)
-        this.tutorialManager = new AdventuringTutorialManager(this, this.game);
-
-        // Centralized modifier system
+        this.encounter = new AdventuringEncounter(this, this.game);
+        this.tutorialManager = new AdventuringTutorialManager(this, this.game);
         this.modifiers = new AdventuringModifiers(this, this.game);
-
 
         this.pages.register('town', this.town);
 
@@ -183,29 +170,19 @@ export class Adventuring extends SkillWithMastery {
         this.pages.register('encounter', this.encounter);
 
         this.townTimer = new Timer('Town', () => this.nextTownTick());
-        this.townInterval = 5000;
-
-        // Auto-run target area (starts dungeon when party heals after wipe)
-        // Note: Auto-repeat (continuing dungeon when alive) always happens
+        this.townInterval = 5000;
         this.autoRepeatArea = null;
     }
 
-    /**
-     * Set which area is the auto-run target
-     * Auto-run: automatically start dungeon when party is fully healed in town after a wipe
-     * Only one area can be auto-run at a time
-     */
     setAutoRepeatArea(area) {
         const previousArea = this.autoRepeatArea;
-        this.autoRepeatArea = area;
-        
-        // Queue re-render for all areas that have auto-run unlocked
+        this.autoRepeatArea = area;
         this.areas.allObjects.forEach(a => {
             if(a.autoRunUnlocked) {
                 a.renderQueue.autoRepeat = true;
             }
         });
-        
+
         if(area) {
             this.log.add(`Auto-run set to ${area.name}`);
         } else if(previousArea) {
@@ -213,28 +190,17 @@ export class Adventuring extends SkillWithMastery {
         }
     }
 
-    reset() {
-        // Reset party members to initial state
+    reset() {
         this.party.forEach(member => {
             member.hitpoints = member.maxHitpoints;
             member.energy = 0;
             member.dead = false;
             member.auras.clear();
-        });
-
-        // Reset stash
-        this.stash.reset();
-
-        // Reset bestiary
-        this.bestiary.reset();
-
-        // Reset dungeon state
-        this.dungeon.reset();
-
-        // Reset encounter state
-        this.encounter.reset();
-
-        // Stop all timers
+        });
+        this.stash.reset();
+        this.bestiary.reset();
+        this.dungeon.reset();
+        this.encounter.reset();
         if (this.townTimer.isActive)
             this.townTimer.stop();
         if (this.dungeon.exploreTimer.isActive)
@@ -242,128 +208,68 @@ export class Adventuring extends SkillWithMastery {
         if (this.encounter.turnTimer.isActive)
             this.encounter.turnTimer.stop();
         if (this.encounter.hitTimer.isActive)
-            this.encounter.hitTimer.stop();
-
-        // Reset active state
+            this.encounter.hitTimer.stop();
         this.isActive = false;
     }
-    
-    /**
-     * Full skill reset - resets all progression to initial state (like starting a new save).
-     * This is different from reset() which just resets combat/dungeon state.
-     */
-    resetSkill() {
-        // First, do the regular combat/dungeon reset
-        this.reset();
-        
-        // Stop any ongoing activities
+
+    resetSkill() {
+        this.reset();
         if (this.townTimer.isActive)
-            this.townTimer.stop();
-        
-        // Reset skill XP and mastery
+            this.townTimer.stop();
         this._xp = 0;
         this.masteryPoolXP = 0;
         this.actionMastery.forEach((data, action) => {
             data.xp = 0;
-        });
-        
-        // Clear learned abilities (Blue Mage)
-        this.learnedAbilities.clear();
-        
-        // Clear seen abilities
-        this.seenAbilities.clear();
-        
-        // Reset auto-repeat
-        this.autoRepeatArea = null;
-        
-        // Reset armory - clear all item unlocks and upgrades
+        });
+        this.learnedAbilities.clear();
+        this.seenAbilities.clear();
+        this.autoRepeatArea = null;
         this.armory.unlocked.clear();
         this.armory.viewed.clear();
         this.armory.upgradeLevels.forEach((level, item) => {
             this.armory.upgradeLevels.set(item, 0);
         });
-        this.armory.clearSelected();
-        
-        // Reset stash - clear all materials (stash.reset() clears materialCounts and unlocked)
+        this.armory.clearSelected();
         this.stash.reset();
         this.materials.allObjects.forEach(material => {
             material.renderQueue.updateAll();
-        });
-        
-        // Reset tavern - clear active drinks
-        this.tavern.resetDrinks();
-        
-        // Reset consumables
-        this.consumables.resetCharges();
-        
-        // Reset slayer tasks
-        this.slayers.resetTasks();
-        
-        // Reset lemons
-        this.lemons.resetStats();
-        
-        // Reset achievements
-        this.achievementManager.resetAll();
-        
-        // Reset grimoire (learned monster abilities)
-        this.grimoire.resetAll();
-        
-        // Reset tutorial state
-        this.tutorialManager.resetState();
-        
-        // Reset bestiary
-        this.bestiary.reset();
-        
-        // Reset areas - mastery XP reset above handles autoRunUnlocked (computed from mastery)
+        });
+        this.tavern.resetDrinks();
+        this.consumables.resetCharges();
+        this.slayers.resetTasks();
+        this.lemons.resetStats();
+        this.achievementManager.resetAll();
+        this.grimoire.resetAll();
+        this.tutorialManager.resetState();
+        this.bestiary.reset();
         this.areas.allObjects.forEach(area => {
             area.renderQueue.updateAll();
-        });
-        
-        // Reset heroes
-        this.party.forEach(hero => {
-            // Clear name so onLoad detects as new player
-            hero.name = undefined;
-            
-            // Reset jobs to none
+        });
+        this.party.forEach(hero => {
+            hero.name = undefined;
             hero.setCombatJob(this.jobs.getObjectByID('adventuring:none'));
-            hero.setPassiveJob(this.jobs.getObjectByID('adventuring:none'));
-            
-            // Reset abilities to default
+            hero.setPassiveJob(this.jobs.getObjectByID('adventuring:none'));
             hero.setGenerator(this.generators.getObjectByID('adventuring:slap'));
-            hero.setSpender(this.spenders.getObjectByID('adventuring:backhand'));
-            
-            // Clear equipment
+            hero.setSpender(this.spenders.getObjectByID('adventuring:backhand'));
             hero.equipment.slots.forEach(slot => {
                 slot.setEmpty();
-            });
-            
-            // Reset character state
+            });
             hero.dead = false;
             hero.energy = 0;
-            hero.auras.clear();
-            
-            // Reset stats
+            hero.auras.clear();
             hero.stats.reset();
             this.stats.allObjects.forEach(stat => {
                 if(stat.base !== undefined)
                     hero.stats.set(stat, stat.base);
-            });
-            
-            // Reset hitpoints will be done after calculateStats
-        });
-        
-        // Recalculate stats for all heroes
+            });
+        });
         this.party.forEach(hero => {
             hero.calculateStats();
             hero.hitpoints = hero.maxHitpoints;
-        });
-        
-        // Apply starter loadouts (job, gear, abilities)
+        });
         this.party.forEach(hero => {
             hero._applyStarterLoadout();
-        });
-        
-        // Trigger re-render
+        });
         this.jobs.allObjects.forEach(job => job.renderQueue.updateAll());
         this.areas.allObjects.forEach(area => area.renderQueue.updateAll());
         this.baseItems.allObjects.forEach(item => item.renderQueue.updateAll());
@@ -371,41 +277,21 @@ export class Adventuring extends SkillWithMastery {
         this.materials.allObjects.forEach(material => material.renderQueue.updateAll());
         this.tavernDrinks.allObjects.forEach(drink => drink.renderQueue.updateAll());
         this.consumableTypes.allObjects.forEach(consumable => consumable.renderQueue.updateAll());
-        this.party.forEach(hero => hero.renderQueue.updateAll());
-        
-        // Go back to town
+        this.party.forEach(hero => hero.renderQueue.updateAll());
         this.town.go();
-        
-        this.log.add('Skill has been reset to initial state.');
-    }
 
-    // =========================================
-    // Centralized Effect Trigger System
-    // =========================================
-    
-    /**
-     * Centralized trigger system - fires effects from ALL sources for a given trigger
-     * Sources include:
-     * - Party member auras
-     * - Dungeon effectCache (difficulty effects, endless scaling, etc.)
-     * 
-     * @param {string} trigger - The trigger type (e.g., 'floor_end', 'floor_start', 'dungeon_start')
-     * @param {Object} context - Optional context data passed to effects
-     */
-    triggerEffects(trigger, context = {}) {
-        // 1. Party-scoped effects (scope: 'party') - fire once for party
+        this.log.add('Skill has been reset to initial state.');
+    }
+
+    triggerEffects(trigger, context = {}) {
         if(this.party) {
             this.party.trigger(trigger, context);
-        }
-        
-        // 2. Character-scoped effects - fire for each party member
+        }
         if(this.party) {
             this.party.forEach(member => {
                 member.trigger(trigger, context);
             });
-        }
-        
-        // 3. Apply dungeon-level effects from effectCache
+        }
         if(this.dungeon && this.dungeon.effectCache) {
             const effects = this.dungeon.getEffectsForTrigger(trigger);
             for(const effect of effects) {
@@ -413,33 +299,20 @@ export class Adventuring extends SkillWithMastery {
             }
         }
     }
-    
-    /**
-     * Apply a single effect from the effect cache
-     * Handles all effect types in a centralized way
-     * 
-     * @param {Object} effect - The effect to apply
-     * @param {string} trigger - The trigger that caused this effect
-     * @param {Object} context - Optional context data
-     */
+
     applyEffect(effect, trigger, context = {}) {
         switch(effect.type) {
-            case 'heal_percent': {
-                // Use 'amount' for percent of max HP for heal_percent/heal_party
+            case 'heal_percent': {
                 const healPercent = effect.amount || 0;
                 let healAmount = 0;
                 if (effect.amount && typeof effect.amount === 'object' && effect.amount.base !== undefined) {
                     healAmount = effect.amount.base;
                 } else if (effect.amount !== undefined) {
                     healAmount = effect.amount;
-                }
-                
-                // Determine targets based on party property
-                // 'enemy' targets enemies, 'hero'/'ally' targets the hero party
-                // In non-combat context (like floor_end), 'ally' defaults to hero party
+                }
                 const targetParty = effect.party === 'enemy' ? null : this.party.all;
                 if(!targetParty) break; // heal_percent with party: 'enemy' not applicable here
-                
+
                 targetParty.forEach(hero => {
                     if(!hero.dead) {
                         let heal = healAmount;
@@ -451,7 +324,7 @@ export class Adventuring extends SkillWithMastery {
                         }
                     }
                 });
-                
+
                 if(healPercent > 0) {
                     this.log.add(`Party healed for ${healPercent}% at ${trigger}`);
                 } else if(healAmount > 0) {
@@ -459,28 +332,22 @@ export class Adventuring extends SkillWithMastery {
                 }
                 break;
             }
-            
-            case 'buff': {
-                // Apply buff based on party property
+
+            case 'buff': {
                 const auraId = effect.id;
-                if(auraId && effect.party !== 'enemy') {
-                    // Party buffs applied to living heroes
+                if(auraId && effect.party !== 'enemy') {
                     this.party.forEachLiving(hero => {
                         hero.auras.add(auraId, effect.stacks || 1, effect.sourceName);
                     });
-                }
-                // Enemy buffs handled by encounter system at spawn
+                }
                 break;
             }
-            
-            case 'debuff': {
-                // These are applied to enemies at spawn, handled by encounter system
-                // No action needed here - stored in cache for encounter to retrieve
+
+            case 'debuff': {
                 break;
             }
-            
-            default:
-                // Unknown effect type - can extend here for new types
+
+            default:
                 break;
         }
     }
@@ -503,23 +370,19 @@ export class Adventuring extends SkillWithMastery {
         this.pages.onLoad();
 
         this.overview.onLoad();
-        this.party.onLoad();
-
-        // Handle pending reset from failed decode - AFTER all components are loaded
+        this.party.onLoad();
         if(this._pendingReset) {
             this._pendingReset = false;
             try {
                 this.resetSkill();
                 this.log.add('Save data was corrupted. Skill has been reset.');
             } catch(e) {
-                console.warn('Adventuring resetSkill failed after decode error:', e);
-                // Continue loading even if reset fails - the skill may be in a partial state
-                // but it's better than completely breaking the game
+                console.warn('Adventuring resetSkill failed after decode error:', e);
             }
         }
 
         this.town.checkActions();
-        
+
         if(this.isActive) {
             this.dungeon.go();
         } else {
@@ -532,9 +395,7 @@ export class Adventuring extends SkillWithMastery {
         this.party.forEach(member => {
             member.calculateStats();
             member.renderQueue.jobs = true;
-        });
-
-        // Mark achievements for check and trigger tutorials for skill level up
+        });
         this.achievementManager.markDirty();
         this.tutorialManager.checkTriggers('skill', { level: newLevel });
 
@@ -566,20 +427,16 @@ export class Adventuring extends SkillWithMastery {
             monster.renderQueue.icon = true;
             monster.renderQueue.clickable = true;
             monster.renderQueue.mastery = true;
-        });
-        
-        // Check for newly unlocked equipment based on skill level requirements
+        });
         this.armory.checkUnlocked();
     }
 
     onMasteryLevelUp(action, oldLevel, newLevel) {
-        super.onMasteryLevelUp(action, oldLevel, newLevel);
-        
-        // Invalidate the mastery effects cache for this action
+        super.onMasteryLevelUp(action, oldLevel, newLevel);
         if (action.invalidateMasteryCache) {
             action.invalidateMasteryCache();
         }
-        
+
         this.party.forEach(member => {
             member.calculateStats();
             member.renderQueue.jobs = true;
@@ -665,10 +522,6 @@ export class Adventuring extends SkillWithMastery {
         return scope;
     }
 
-    /**
-     * Get a modifier query with no action scope - for skill-wide modifiers
-     * Uses cached modQuery created in Skill constructor
-     */
     getModifierQuery() {
         return this.modQuery;
     }
@@ -682,14 +535,7 @@ export class Adventuring extends SkillWithMastery {
         }
     }
 
-    /**
-     * Get the next mastery level unlock for a specific category
-     * @param {number} level - Current mastery level
-     * @param {string} categoryId - SkillCategory ID (e.g., 'adventuring:Areas')
-     * @returns {object|undefined} Next milestone for this category, or undefined if maxed
-     */
-    getNextMasteryUnlock(level, categoryId) {
-        // Map SkillCategory IDs to MasteryCategory IDs (Areas -> areas, Jobs -> jobs, etc.)
+    getNextMasteryUnlock(level, categoryId) {
         const masteryId = categoryId.replace(/([A-Z])/g, (match) => match.toLowerCase());
         const masteryCategory = this.masteryCategories.getObjectByID(masteryId);
         return masteryCategory ? masteryCategory.getNextMilestone(level) : undefined;
@@ -705,7 +551,7 @@ export class Adventuring extends SkillWithMastery {
         }
         );
     }
-    
+
     getTotalUnlockedMasteryActions() {
         return this.actions.reduce(levelUnlockSum(this), 0);
     }
@@ -713,20 +559,18 @@ export class Adventuring extends SkillWithMastery {
     start() {
         if (!this.canStart)
             return false;
-        
+
         this.isActive = true;
         this.game.renderQueue.activeSkills = true;
         this.game.activeAction = this;
 
         if(!this.dungeon.exploreTimer.isActive)
             this.dungeon.exploreTimer.start(this.dungeon.exploreInterval);
-        
+
         if(this.townTimer.isActive)
             this.townTimer.stop();
-        
-        this.overview.renderQueue.turnProgressBar = true;
 
-        // Notify tutorial system of state change
+        this.overview.renderQueue.turnProgressBar = true;
         this.tutorialManager.onStateChange();
 
         saveData();
@@ -736,13 +580,13 @@ export class Adventuring extends SkillWithMastery {
     stop() {
         if(!this.canStop)
             return false;
-        
+
         if(this.dungeon.exploreTimer.isActive)
             this.dungeon.exploreTimer.stop();
-        
+
         if(this.encounter.turnTimer.isActive)
             this.encounter.turnTimer.stop();
-    
+
         if(this.encounter.hitTimer.isActive)
             this.encounter.hitTimer.stop();
 
@@ -755,12 +599,10 @@ export class Adventuring extends SkillWithMastery {
 
         if(!this.townTimer.isActive)
             this.townTimer.start(this.townInterval);
-        
-        this.town.resetActions();
-        
-        this.overview.renderQueue.turnProgressBar = true;
 
-        // Notify tutorial system of state change
+        this.town.resetActions();
+
+        this.overview.renderQueue.turnProgressBar = true;
         this.tutorialManager.onStateChange();
 
         saveData();
@@ -785,25 +627,23 @@ export class Adventuring extends SkillWithMastery {
             if(!this.dungeon.exploreTimer.isActive)
                 this.dungeon.exploreTimer.start(this.dungeon.exploreInterval);
             this.dungeon.exploreTimer.tick();
-        }
-        
-        // Check achievements once per tick (not on every event)
+        }
         this.achievementManager.checkIfDirty();
     }
 
     passiveTick() {
         if(this.isActive)
             return;
-        
+
         if(this.dungeon.exploreTimer.isActive)
             this.dungeon.exploreTimer.stop();
-        
+
         if(this.encounter.turnTimer.isActive)
             this.encounter.turnTimer.stop();
-    
+
         if(this.encounter.hitTimer.isActive)
             this.encounter.hitTimer.stop();
-        
+
         this.party.forEach(member => {
             if(member.energy > 0)
                 member.setEnergy(0);
@@ -813,26 +653,22 @@ export class Adventuring extends SkillWithMastery {
             this.townTimer.start(this.townInterval);
 
             this.town.resetActions();
-        
+
             this.overview.renderQueue.turnProgressBar = true;
         }
-        
+
         if(this.townTimer.isActive)
             this.townTimer.tick();
     }
 
-    getMasteryXP(action) {
-        //if(!action.unlocked)
-        //    return -Infinity;
+    getMasteryXP(action) {
         return super.getMasteryXP(action);
     }
 
     addMasteryXP(action, xp) {
         const oldLevel = this.getMasteryLevel(action);
         super.addMasteryXP(action, xp);
-        const newLevel = this.getMasteryLevel(action);
-
-        // Check for mastery level up triggers
+        const newLevel = this.getMasteryLevel(action);
         if(newLevel > oldLevel) {
             let category = 'other';
             const firstJob = this.jobs.registeredObjects.values().next().value;
@@ -843,7 +679,10 @@ export class Adventuring extends SkillWithMastery {
             } else if(this.baseItems.allObjects.includes(action)) {
                 category = 'equipment';
             }
-            this.tutorialManager.checkTriggers('mastery', { category, level: newLevel });
+            this.tutorialManager.checkTriggers('mastery', { category, level: newLevel });
+            if(newLevel >= 99 && this.modifiers) {
+                this.modifiers.onMasteryMaxed();
+            }
         }
     }
 
@@ -852,28 +691,25 @@ export class Adventuring extends SkillWithMastery {
         this.pages.onPageChange();
     }
 
-    onShow() {
-        // Called when the adventuring page becomes visible
+    onShow() {
         this.tutorialManager.onPageVisible();
     }
 
-    onPageVisible() {
-        // Called when the adventuring page becomes visible
+    onPageVisible() {
         this.tutorialManager.onPageVisible();
     }
 
     nextTownTick() {
         if(this.isActive)
             return;
-            
+
         this.town.performActions();
 
         this.townTimer.start(this.townInterval);
         this.overview.renderQueue.turnProgressBar = true;
     }
 
-    render() {
-        // Skip rendering if a reset is pending (save data was corrupt)
+    render() {
         if (this._pendingReset)
             return;
         super.render();
@@ -1001,9 +837,7 @@ export class Adventuring extends SkillWithMastery {
             data.areas.forEach(data => {
                 let area = new AdventuringArea(namespace, data, this, this.game);
                 this.areas.registerObject(area);
-                this.actions.registerObject(area);
-                
-                // Register dungeon mastery aura if defined
+                this.actions.registerObject(area);
                 if(data.masteryAura) {
                     let aura = new AdventuringBuff(namespace, data.masteryAura, this, this.game);
                     this.dungeonAuras.registerObject(aura);
@@ -1011,7 +845,7 @@ export class Adventuring extends SkillWithMastery {
                 }
             });
         }
-        
+
         if(data.monsters !== undefined) {
             data.monsters.forEach(data => {
                 let monster = new AdventuringMonster(namespace, data, this, this.game);
@@ -1019,7 +853,7 @@ export class Adventuring extends SkillWithMastery {
                 this.actions.registerObject(monster);
             });
         }
-        
+
         if(data.tiles !== undefined) {
             data.tiles.forEach(data => {
                 let tile = new AdventuringDungeonTile(namespace, data, this, this.game);
@@ -1076,9 +910,7 @@ export class Adventuring extends SkillWithMastery {
                 let consumable = new AdventuringConsumable(namespace, data, this, this.game);
                 this.consumableTypes.registerObject(consumable);
             });
-        }
-
-        // Also support consumableTypes key (used in job files)
+        }
         if(data.consumableTypes !== undefined) {
             data.consumableTypes.forEach(data => {
                 let consumable = new AdventuringConsumable(namespace, data, this, this.game);
@@ -1147,16 +979,12 @@ export class Adventuring extends SkillWithMastery {
         this.areas.forEach(area => area.postDataRegistration());
         this.generators.forEach(generator => generator.postDataRegistration());
         this.spenders.forEach(spender => spender.postDataRegistration());
-        this.passives.forEach(passive => passive.postDataRegistration());
-        
-        // Build passives-by-job cache for O(1) lookup
+        this.passives.forEach(passive => passive.postDataRegistration());
         this.passivesByJob = new Map();
         this.jobs.forEach(job => {
             const jobPassives = this.passives.allObjects.filter(p => p.unlockedBy(job));
             this.passivesByJob.set(job.id, jobPassives);
-        });
-        
-        // Cache frequently accessed objects to avoid repeated lookups
+        });
         this.cached = {
             noneJob: this.jobs.getObjectByID('adventuring:none'),
             slayerJob: this.jobs.getObjectByID('adventuring:slayer'),
@@ -1166,21 +994,17 @@ export class Adventuring extends SkillWithMastery {
             currency: this.materials.getObjectByID('adventuring:currency'),
             defaultGenerator: this.generators.getObjectByID('adventuring:basic_attack'),
             defaultSpender: this.spenders.getObjectByID('adventuring:basic_strike')
-        };
-        
-        // Cache job lists for filtering
+        };
         this.combatJobs = this.jobs.allObjects.filter(job => job.id !== 'adventuring:none' && !job.isPassive);
         this.passiveJobs = this.jobs.allObjects.filter(job => job.id !== 'adventuring:none' && job.isPassive);
-        
+
         this.auras.forEach(aura => aura.postDataRegistration());
         this.materials.forEach(material => material.postDataRegistration());
         this.baseItems.forEach(baseItem => baseItem.postDataRegistration());
         this.consumableTypes.forEach(consumable => consumable.postDataRegistration());
         this.tavernDrinks.forEach(drink => drink.postDataRegistration());
         this.equipmentSets.forEach(set => set.postDataRegistration());
-        this.equipmentPools.forEach(pool => pool.postDataRegistration());
-
-        // Build source lookup tables for tooltips
+        this.equipmentPools.forEach(pool => pool.postDataRegistration());
         this.buildSourceLookups();
 
         let jobMilestones = this.jobs.allObjects.filter(job => job.isMilestoneReward);
@@ -1198,7 +1022,7 @@ export class Adventuring extends SkillWithMastery {
 
         this.milestones.push(...milestones);
         this.sortMilestones();
-        
+
         this.sortedMasteryActions = [];
 
         this.overview.postDataRegistration();
@@ -1207,9 +1031,7 @@ export class Adventuring extends SkillWithMastery {
 
         this.pages.postDataRegistration();
 
-        this.tutorialManager.postDataRegistration();
-
-        // Initialize achievement system
+        this.tutorialManager.postDataRegistration();
         this.achievementManager.init();
 
         let capesToExclude = ["melvorF:Max_Skillcape", "melvorTotH:Superior_Max_Skillcape"];
@@ -1224,17 +1046,11 @@ export class Adventuring extends SkillWithMastery {
         });
     }
 
-    /**
-     * Build reverse lookup tables for source hints in tooltips
-     * Maps materials -> monsters that drop them, monsters -> areas they appear in
-     */
-    buildSourceLookups() {
-        // Monster -> Areas lookup
+    buildSourceLookups() {
         this.monsterSources = new Map();
         this.areas.forEach(area => {
             if(!area.floors) return;
-            area.floors.forEach(floor => {
-                // Check floor monsters (random encounter pool)
+            area.floors.forEach(floor => {
                 if(floor.monsters) {
                     floor.monsters.forEach(entry => {
                         const monster = this.monsters.getObjectByID(entry.id);
@@ -1247,8 +1063,7 @@ export class Adventuring extends SkillWithMastery {
                             sources.push(area);
                         }
                     });
-                }
-                // Check exit encounters (includes bosses)
+                }
                 if(floor.exit) {
                     floor.exit.forEach(monsterId => {
                         const monster = this.monsters.getObjectByID(monsterId);
@@ -1263,9 +1078,7 @@ export class Adventuring extends SkillWithMastery {
                     });
                 }
             });
-        });
-
-        // Material -> Monsters lookup
+        });
         this.materialSources = new Map();
         this.monsters.forEach(monster => {
             if(monster.lootGenerator === undefined || monster.lootGenerator.table === undefined) return;
@@ -1280,9 +1093,7 @@ export class Adventuring extends SkillWithMastery {
                     sources.push(monster);
                 }
             });
-        });
-
-        // Equipment -> Monsters lookup (for "Drops from" in equipment tooltips)
+        });
         this.equipmentSources = new Map();
         this.monsters.forEach(monster => {
             if(monster.lootGenerator === undefined || monster.lootGenerator.table === undefined) return;
@@ -1290,21 +1101,14 @@ export class Adventuring extends SkillWithMastery {
         });
     }
 
-    /**
-     * Recursively scan a loot table for equipment entries and add them to equipmentSources
-     * @param {Array} entries - Loot table entries
-     * @param {AdventuringMonster} monster - The monster that drops from this table
-     */
     scanLootTableForEquipment(entries, monster) {
         for(const entry of entries) {
-            if(entry.type === 'table') {
-                // Recurse into referenced loot table
+            if(entry.type === 'table') {
                 const table = this.lootTables.getObjectByID(entry.table);
                 if(table) {
                     this.scanLootTableForEquipment(table.getEntries(), monster);
                 }
-            } else if(entry.type === 'equipment') {
-                // Direct equipment reference
+            } else if(entry.type === 'equipment') {
                 const item = this.baseItems.getObjectByID(entry.id);
                 if(item) {
                     if(!this.equipmentSources.has(item)) {
@@ -1315,8 +1119,7 @@ export class Adventuring extends SkillWithMastery {
                         sources.push(monster);
                     }
                 }
-            } else if(entry.type === 'equipment_pool') {
-                // Equipment pool - all items in pool can drop from this monster
+            } else if(entry.type === 'equipment_pool') {
                 const pool = this.equipmentPools.getObjectByID(entry.pool);
                 if(pool) {
                     for(const poolEntry of pool.items) {
@@ -1334,22 +1137,12 @@ export class Adventuring extends SkillWithMastery {
         }
     }
 
-    /**
-     * Get passives that are unlocked by a specific job (uses cached lookup)
-     * @param {AdventuringJob} job - The job to get passives for
-     * @returns {AdventuringPassive[]} Array of passives unlocked by this job
-     */
     getPassivesForJob(job) {
         if (this.passivesByJob === undefined) return [];
         const passives = this.passivesByJob.get(job.id);
         return passives !== undefined ? passives : [];
     }
 
-    /**
-     * Get an ability by ID from either generators or spenders registry
-     * @param {string} id - The ability ID
-     * @returns {AdventuringAbility|undefined}
-     */
     getAbilityByID(id) {
         const gen = this.generators.getObjectByID(id);
         if (gen !== undefined) return gen;
@@ -1363,44 +1156,25 @@ export class Adventuring extends SkillWithMastery {
 
         this.party.encode(writer);
         this.pages.encode(writer);
-        writer.writeBoolean(this.isActive);
-
-        // Encode learned abilities (Blue Mage)
+        writer.writeBoolean(this.isActive);
         writer.writeUint32(this.learnedAbilities.size);
         this.learnedAbilities.forEach(abilityId => {
             const ability = this.getAbilityByID(abilityId);
             writer.writeNamespacedObject(ability);
-        });
-
-        // Encode slayer tasks (version 6+)
-        this.slayers.encode(writer);
-
-        // Encode tavern drinks (version 7+)
-        this.tavern.encode(writer);
-
-        // Encode lemon stats (version 7+)
-        this.lemons.encode(writer);
-
-        // Encode consumables (version 9+)
-        this.consumables.encode(writer);
-
-        // Encode seen abilities (version 11+)
-        // Filter out any undefined abilities before writing
+        });
+        this.slayers.encode(writer);
+        this.tavern.encode(writer);
+        this.lemons.encode(writer);
+        this.consumables.encode(writer);
         const validSeenAbilities = [...this.seenAbilities]
             .map(id => this.getAbilityByID(id))
             .filter(ability => ability !== undefined);
         writer.writeUint32(validSeenAbilities.length);
         validSeenAbilities.forEach(ability => {
             writer.writeNamespacedObject(ability);
-        });
-
-        // Encode tutorial state (version 12+)
-        this.tutorialManager.encode(writer);
-
-        // Encode achievement state (version 13+)
-        this.achievementManager.encode(writer);
-
-        // Encode grimoire state (version 5+)
+        });
+        this.tutorialManager.encode(writer);
+        this.achievementManager.encode(writer);
         this.grimoire.encode(writer);
 
         return writer;
@@ -1419,63 +1193,40 @@ export class Adventuring extends SkillWithMastery {
 
             this.party.decode(reader, version);
             this.pages.decode(reader, version);
-            this.isActive = reader.getBoolean();
-
-            // Decode learned abilities (Blue Mage)
+            this.isActive = reader.getBoolean();
             const numLearned = reader.getUint32();
-            for(let i = 0; i < numLearned; i++) {
-                // Try generators first, then spenders
+            for(let i = 0; i < numLearned; i++) {
                 let ability = reader.getNamespacedObject(this.generators);
-                if(typeof ability === 'string') {
-                    // Not found in generators, try spenders
+                if(typeof ability === 'string') {
                     ability = this.spenders.getObjectByID(ability);
                 }
                 if(ability !== undefined && typeof ability !== 'string') {
                     this.learnedAbilities.add(ability.id);
                 }
-            }
-
-            // Decode slayer tasks
-            this.slayers.decode(reader, version);
-
-            // Decode tavern and lemons
+            }
+            this.slayers.decode(reader, version);
             this.tavern.decode(reader, version);
-            this.lemons.decode(reader, version);
-
-            // Decode consumables (includes tavern drinks as charges)
-            this.consumables.decode(reader, version);
-
-            // Decode seen abilities
+            this.lemons.decode(reader, version);
+            this.consumables.decode(reader, version);
             const numSeen = reader.getUint32();
-            for(let i = 0; i < numSeen; i++) {
-                // Try generators first, then spenders
+            for(let i = 0; i < numSeen; i++) {
                 let ability = reader.getNamespacedObject(this.generators);
-                if(typeof ability === 'string') {
-                    // Not found in generators, try spenders
+                if(typeof ability === 'string') {
                     ability = this.spenders.getObjectByID(ability);
                 }
                 if(ability !== undefined && typeof ability !== 'string') {
                     this.seenAbilities.add(ability.id);
                 }
-            }
-
-            // Decode tutorial state (version 12+)
-            this.tutorialManager.decode(reader, version);
-
-            // Decode achievement state (version 13+)
-            this.achievementManager.decode(reader, version);
-
-            // Decode grimoire state (version 5+)
+            }
+            this.tutorialManager.decode(reader, version);
+            this.achievementManager.decode(reader, version);
             if(this.saveVersion >= 5) {
                 this.grimoire.decode(reader, version);
             }
-        } catch(e) { 
-            // Save data is corrupt or incompatible - do a full reset instead of partial load
+        } catch(e) {
             console.warn('Adventuring save decode failed, performing full reset:', e);
             reader.byteOffset = start;
-            reader.getFixedLengthBuffer(skillDataSize);
-            
-            // Schedule reset after load completes (can't reset during decode)
+            reader.getFixedLengthBuffer(skillDataSize);
             this._pendingReset = true;
         }
     }

@@ -1,6 +1,4 @@
-const { loadModule } = mod.getContext(import.meta);
-
-// Side-effect imports to register custom elements
+const { loadModule } = mod.getContext(import.meta);
 await loadModule('src/combat/components/adventuring-abilities.mjs');
 await loadModule('src/combat/components/adventuring-ability-small.mjs');
 await loadModule('src/progression/components/adventuring-jobs.mjs');
@@ -17,7 +15,7 @@ export class AdventuringCharacterElement extends HTMLElement {
         this.icon = getElementFromFragment(this._content, 'icon', 'div');
 
         this.hitpointsSplash = getElementFromFragment(this._content, 'hitpoints-splash', 'div');
-        
+
         this.hitpoints = getElementFromFragment(this._content, 'hitpoints', 'span');
         this.maxHitpoints = getElementFromFragment(this._content, 'max-hitpoints', 'span');
         this.hitpointsProgress = getElementFromFragment(this._content, 'hitpoints-progress', 'progress-bar');
@@ -27,9 +25,7 @@ export class AdventuringCharacterElement extends HTMLElement {
         this.energyProgress = getElementFromFragment(this._content, 'energy-progress', 'progress-bar');
 
         this.auras = getElementFromFragment(this._content, 'auras', 'div');
-        this.stats = getElementFromFragment(this._content, 'stats', 'div');
-
-        // Passive abilities section
+        this.stats = getElementFromFragment(this._content, 'stats', 'div');
         this.passiveAbilitiesContainer = getElementFromFragment(this._content, 'passive-abilities', 'div');
         this.passiveAbilitiesList = getElementFromFragment(this._content, 'passive-abilities-list', 'div');
 
@@ -44,7 +40,7 @@ export class AdventuringCharacterElement extends HTMLElement {
 
         this.combatJob = createElement('adventuring-job-small');
         this.passiveJob = createElement('adventuring-job-small');
-        
+
         this.equipment = getElementFromFragment(this._content, 'equipment', 'div');
     }
 
@@ -55,11 +51,10 @@ export class AdventuringCharacterElement extends HTMLElement {
     connectedCallback() {
         this.appendChild(this._content);
         this.splash = new SplashManager(this.hitpointsSplash);
-        
+
         this.abilitiesContainer.appendChild(this.abilities);
         this.abilities.container.appendChild(this.generator);
-        this.abilities.container.appendChild(this.spender);
-        // Move passive abilities to after the abilities element
+        this.abilities.container.appendChild(this.spender);
         this.abilitiesContainer.appendChild(this.passiveAbilitiesContainer);
 
         this.jobsContainer.appendChild(this.jobs);
@@ -68,9 +63,6 @@ export class AdventuringCharacterElement extends HTMLElement {
         this.jobs.hide();
     }
 
-    /**
-     * Set callback for when name is clicked (enables clickable name styling)
-     */
     setNameClickHandler(callback) {
         this._onNameClick = callback;
         if(callback) {

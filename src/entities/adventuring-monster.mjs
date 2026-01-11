@@ -12,7 +12,8 @@ export class AdventuringMonster extends AdventuringMasteryAction {
         this._name = data.name;
         this._media = data.media;
         this.stats = data.stats;
-        this.xp = data.xp;
+        this.xp = data.xp;  // Skill XP (for adventuring skill leveling)
+        this.masteryXP = data.masteryXP || 100;  // Monster mastery XP (independent, default 100)
         this.generator = data.generator;
         this.spender = data.spender;
         this.passives = data.passives;
@@ -50,6 +51,23 @@ export class AdventuringMonster extends AdventuringMasteryAction {
 
     get tooltip() {
         return TooltipBuilder.forMonster(this, this.manager).build();
+    }
+
+    getScaledStats(statBonusPercent = 0) {
+        const scaled = new Map();
+        const multiplier = 1 + (statBonusPercent / 100);
+
+        for (const { id, amount } of this.stats) {
+            scaled.set(id, Math.floor(amount * multiplier));
+        }
+
+        return scaled;
+    }
+
+    getMaxHitpoints(statBonusPercent = 0) {
+        const stats = this.getScaledStats(statBonusPercent);
+        const hpStat = stats.get('adventuring:hitpoints') || 10;
+        return hpStat * 10;
     }
 
     onLoad() {
@@ -126,9 +144,7 @@ export class AdventuringMonster extends AdventuringMasteryAction {
         if(!this.renderQueue.clickable)
             return;
 
-        this.component.clickable.classList.toggle('pointer-enabled', this.unlocked);
-        
-        // Add click handler to view details
+        this.component.clickable.classList.toggle('pointer-enabled', this.unlocked);
         this.component.clickable.onclick = () => this.viewDetails();
 
         this.renderQueue.clickable = false;

@@ -35,15 +35,13 @@ export class AdventuringEncounter extends AdventuringPage {
         this.party.component.mount(this.component.enemies);
 
         this.roundCard = new AdventuringCard(this.manager, this.game);
-        
+
         this.turnTimer = new Timer('Turn', () => this.processTurn());
         this.turnInterval = 1500;
 
         this.hitTimer = new Timer('Hit', () => this.processHit());
         this.hitInterval = 150;
-        this.endTurnInterval = 100;
-        
-        // Passive effect processor for unified damage/heal calculations
+        this.endTurnInterval = 100;
         this.passiveEffects = new PassiveEffectProcessor(this);
     }
 
@@ -84,9 +82,7 @@ export class AdventuringEncounter extends AdventuringPage {
         this.currentRoundOrder = sortByAgility([...this.all].filter(c => !c.dead), this.manager.stats);
         this.nextRoundOrder = [];
         this.roundCounter = 1;
-        this.isFighting = true;
-
-        // Apply bonus starting energy from mastery pool
+        this.isFighting = true;
         const bonusEnergy = this.manager.modifiers.getBonusEnergy();
         if(bonusEnergy > 0) {
             this.manager.party.forEachLiving(member => {
@@ -94,9 +90,7 @@ export class AdventuringEncounter extends AdventuringPage {
                     member.addEnergy(bonusEnergy);
                 }
             });
-        }
-
-        // Reset effect limits for combat start (characters and party)
+        }
         this.all.forEach(member => {
             member.resetEffectLimits('combat');
             member.resetEffectLimits('round');
@@ -104,30 +98,18 @@ export class AdventuringEncounter extends AdventuringPage {
         });
         this.manager.party.resetEffectLimits('combat');
         this.manager.party.resetEffectLimits('round');
-        this.manager.party.resetEffectLimits('turn');
-
-        // Job passives are now handled by hero's getAllPendingEffectsForTrigger()
-        // Monster passives are now handled by enemy's getAllPendingEffectsForTrigger()
-        // via the central trigger dispatcher
-
-        // Party-scoped effects fire first via party.trigger()
-        this.manager.party.trigger('encounter_start', { encounter: this });
-        
-        // Then character-scoped effects (includes monster passives for enemies)
+        this.manager.party.resetEffectLimits('turn');
+        this.manager.party.trigger('encounter_start', { encounter: this });
         this.all.forEach(member => {
             let resolvedEffects = member.trigger('encounter_start', { encounter: this });
-        });
-
-        // Notify tutorial manager of combat start
-        this.manager.tutorialManager.checkTriggers('event', { event: 'combatStart' });
-
-        // Also trigger round_start for the first round
+        });
+        this.manager.tutorialManager.checkTriggers('event', { event: 'combatStart' });
         this.all.forEach(member => {
             let resolvedEffects = member.trigger('round_start', { encounter: this });
         });
 
         this.nextTurn();
-        
+
         if(this.manager.dungeon.active)
             this.manager.encounter.go();
     }
@@ -162,58 +144,40 @@ export class AdventuringEncounter extends AdventuringPage {
         this.currentRoundOrder = this.nextRoundOrder;
         this.nextRoundOrder = [];
         this.roundCounter++;
-        this.manager.overview.renderQueue.status = true;
-        
-        // Reset round-based effect limits (characters and party)
+        this.manager.overview.renderQueue.status = true;
         this.all.forEach(member => {
             member.resetEffectLimits('round');
             member.resetEffectLimits('turn');
         });
         this.manager.party.resetEffectLimits('round');
-        this.manager.party.resetEffectLimits('turn');
-
-        // Job and monster passives are now handled by getAllPendingEffectsForTrigger()
-
-        // Party-scoped effects fire first via party.trigger()
-        this.manager.party.trigger('round_start', { encounter: this });
-        
-        // Then character-scoped effects (includes monster passives for enemies)
+        this.manager.party.resetEffectLimits('turn');
+        this.manager.party.trigger('round_start', { encounter: this });
         this.all.forEach(member => {
             let resolvedEffects = member.trigger('round_start', { encounter: this });
         });
     }
 
     nextTurn() {
-        this.currentTurn = this.currentRoundOrder.shift();
-        
-        // Reset turn-based effect limits for the active character
+        this.currentTurn = this.currentRoundOrder.shift();
         if (this.currentTurn) {
             this.currentTurn.resetEffectLimits('turn');
         }
-        
+
         this.turnTimer.start(this.turnInterval);
-        
+
         this.manager.overview.renderQueue.turnProgressBar = true;
         this.manager.overview.renderQueue.status = true;
         this.updateTurnCards();
     }
 
-    /**
-     * Process damage effect modifiers (miss, dodge, bonus, reduction, crit)
-     * Uses CombatModifierProcessor for unified modifier pipeline.
-     * @param {Object} effect - The effect being applied
-     * @param {Object} builtEffect - The built effect with calculated amounts
-     * @param {Object} target - The target character
-     * @returns {Object|null} Modified builtEffect with isCrit flag, or null if skipped
-     */
     _processDamageEffect(effect, builtEffect, target) {
         const result = this.passiveEffects.processDamage(
-            this.currentTurn, 
-            target, 
+            this.currentTurn,
+            target,
             builtEffect.amount,
             builtEffect
         );
-        
+
         if (result.negated === 'miss') {
             this.manager.log.add(`${this.currentTurn.name}'s attack misses ${target.name}!`);
             return null;
@@ -221,7 +185,7 @@ export class AdventuringEncounter extends AdventuringPage {
         if (result.negated === 'dodge') {
             return null;
         }
-        
+
         return {
             ...builtEffect,
             amount: result.amount,
@@ -229,14 +193,6 @@ export class AdventuringEncounter extends AdventuringPage {
         };
     }
 
-    /**
-     * Process healing effect modifiers
-     * Uses PassiveEffectProcessor for unified modifier pipeline.
-     * @param {Object} effect - The effect being applied
-     * @param {Object} builtEffect - The built effect with calculated amounts
-     * @param {Object} target - The target character
-     * @returns {Object} Modified builtEffect
-     */
     _processHealEffect(effect, builtEffect, target) {
         const result = this.passiveEffects.processHealing(
             this.currentTurn,
@@ -244,73 +200,52 @@ export class AdventuringEncounter extends AdventuringPage {
             builtEffect.amount,
             builtEffect
         );
-        
+
         return {
             ...builtEffect,
             amount: result.amount
         };
     }
 
-    /**
-     * Handle post-damage effects (execute, reflect, lifesteal, on_kill)
-     * Uses PassiveEffectProcessor for execute and reflect calculations.
-     * @param {Object} target - The target that was damaged
-     * @param {number} damageDealt - Amount of damage dealt
-     * @param {Object} builtEffect - The built effect
-     * @param {boolean} isCrit - Whether this was a critical hit
-     * @param {number} hpPercentBefore - Target's HP% before damage was applied
-     */
-    _afterDamageDealt(target, damageDealt, builtEffect, isCrit, hpPercentBefore = 100) {
-        // Trigger crit if this was a critical hit
+    _afterDamageDealt(target, damageDealt, builtEffect, isCrit, hpPercentBefore = 100) {
         if(isCrit) {
             this.currentTurn.trigger('crit', { target, damageDealt, encounter: this });
         }
-        
-        target.trigger('after_damage_received', { 
-            attacker: this.currentTurn, 
-            damageReceived: damageDealt, 
+
+        target.trigger('after_damage_received', {
+            attacker: this.currentTurn,
+            damageReceived: damageDealt,
             hpPercentBefore,
             encounter: this,
-            ...builtEffect 
-        });
-        
-        // Check execute threshold
+            ...builtEffect
+        });
         if(this.passiveEffects.checkExecute(this.currentTurn, target)) {
             this.manager.log.add(`${this.currentTurn.name} executes ${target.name}!`);
             target.hitpoints = 0;
             target.damage({ amount: 0 }, this.currentTurn);
-        }
-        
-        // Check reflect damage
+        }
         const reflectAmount = this.passiveEffects.calculateReflect(this.currentTurn, target, damageDealt);
         if(reflectAmount > 0) {
             this.currentTurn.damage({ amount: reflectAmount }, target);
             this.manager.log.add(`${target.name} reflects ${reflectAmount} damage to ${this.currentTurn.name}!`);
-        }
-        
-        // Trigger lifesteal with damage dealt
-        this.currentTurn.trigger('after_damage_delivered', { target, damageDealt, encounter: this, ...builtEffect });
-        
-        // Check if target died and trigger kill
+        }
+        this.currentTurn.trigger('after_damage_delivered', { target, damageDealt, encounter: this, ...builtEffect });
         if(target.dead) {
             this.currentTurn.trigger('kill', { target, damageDealt, encounter: this });
         }
     }
 
-    processTurn() {
-        // If timers are paused (e.g., tutorial informational step), restart timer and wait
+    processTurn() {
         if(this.manager.timersPaused) {
             this.turnTimer.start(this.turnInterval);
             return;
         }
-        
+
         this.currentAction = this.currentTurn.action;
         this.currentHit = 0;
         this.hitRepeat = 0;
-        this.hitHistory = [];
-        
-        // Job and monster passives are now handled by getAllPendingEffectsForTrigger()
-        
+        this.hitHistory = [];
+
         let resolvedEffects = this.currentTurn.trigger('turn_start', { skip: false, encounter: this });
 
         if(this.currentTurn.dead || resolvedEffects.skip === true) {
@@ -318,7 +253,7 @@ export class AdventuringEncounter extends AdventuringPage {
             return;
         }
 
-        let currentHit = this.currentAction.hits[this.currentHit]; 
+        let currentHit = this.currentAction.hits[this.currentHit];
         if(currentHit !== undefined) {
             this.hitTimer.start(currentHit.delay !== undefined ? currentHit.delay : this.hitInterval);
             this.manager.overview.renderQueue.turnProgressBar = true;
@@ -333,7 +268,7 @@ export class AdventuringEncounter extends AdventuringPage {
             this.endTurn();
             return;
         }
-        
+
         let currentHit = this.currentAction.hits[this.currentHit];
 
         let effectParty = (currentHit.party !== undefined) ? currentHit.party : "enemy"; // Default to enemy if not specified
@@ -360,22 +295,17 @@ export class AdventuringEncounter extends AdventuringPage {
             targets = [this.currentTurn];
         } else {
             targets = resolveTargets(targetType, targetParty);
-        }
-
-        // Check for taunt (force_target) - only for enemy targeting
+        }
         if(effectParty === "enemy" && targets.length > 0) {
             let tauntCheck = this.currentTurn.trigger('targeting', {});
             if(tauntCheck.forcedTarget && !tauntCheck.forcedTarget.dead) {
                 targets = [tauntCheck.forcedTarget];
                 this.manager.log.add(`${this.currentTurn.name} is forced to attack ${tauntCheck.forcedTarget.name}!`);
             }
-        }
-
-        // Check for confusion (chance_hit_ally) - swap target to ally
+        }
         if(effectParty === "enemy" && targets.length > 0) {
             let confuseCheck = this.currentTurn.trigger('targeting', {});
-            if(confuseCheck.hitAlly) {
-                // Get current turn's party
+            if(confuseCheck.hitAlly) {
                 let allyParty = this.currentTurn instanceof AdventuringHero ? this.manager.party : this.party;
                 let potentialAllies = allyParty.all.filter(ally => !ally.dead && ally !== this.currentTurn);
                 if(potentialAllies.length > 0) {
@@ -396,34 +326,30 @@ export class AdventuringEncounter extends AdventuringPage {
                         let builtEffect = {
                             amount: effect.getAmount(this.currentTurn)
                         };
-                        
+
                         if(effect.stacks !== undefined)
                             builtEffect.stacks = effect.getStacks(this.currentTurn);
 
                         let isCrit = false;
-                        
+
                         if(effect.type === "damage" || effect.type === "damage_flat") {
                             builtEffect = this._processDamageEffect(effect, builtEffect, target);
                             if(!builtEffect) return; // Skipped (miss/dodge)
                             isCrit = builtEffect.isCrit;
                         } else if(effect.type === "heal" || effect.type === "heal_flat") {
                             builtEffect = this._processHealEffect(effect, builtEffect, target);
-                        }
-
-                        // Track damage for lifesteal
+                        }
                         let damageDealt = (effect.type === "damage" || effect.type === "damage_flat") ? builtEffect.amount : 0;
 
                         if(effect.type === "damage" || effect.type === "damage_flat" || effect.type === "heal" || effect.type === "heal_flat") {
                             const critText = isCrit ? ' (CRIT!)' : '';
                             const effectVerb = (effect.type === "damage" || effect.type === "damage_flat") ? 'damages' : 'heals';
                             this.manager.log.add(`${this.currentTurn.name} ${effectVerb} ${target.name} with ${this.currentAction.name} for ${builtEffect.amount}${critText}`);
-                        }
-                        
-                        // Capture HP percent before applying damage (for hp_crossed_below conditions)
+                        }
                         const hpPercentBefore = target.hitpointsPercent;
-                        
+
                         target.applyEffect(effect, builtEffect, this.currentTurn);
-                        
+
                         if(effect.type === "damage" || effect.type === "damage_flat") {
                             this._afterDamageDealt(target, damageDealt, builtEffect, isCrit, hpPercentBefore);
                         } else if(effect.type === "heal" || effect.type === "heal_flat") {
@@ -436,13 +362,12 @@ export class AdventuringEncounter extends AdventuringPage {
                     this.currentTurn.trigger('after_hit_delivered', { targets: targets });
                 }
             });
-            
+
             this.currentTurn.trigger('after_ability_cast', { targets: targets });
             this.hitHistory.push(targets);
         }
 
-        if(currentHit.energy !== undefined) {
-            // Apply energy gain bonus modifier
+        if(currentHit.energy !== undefined) {
             const totalEnergy = this.passiveEffects.processEnergyGain(this.currentTurn, currentHit.energy);
             this.currentTurn.addEnergy(totalEnergy);
         }
@@ -466,19 +391,16 @@ export class AdventuringEncounter extends AdventuringPage {
         this.manager.overview.renderQueue.turnProgressBar = true;
     }
 
-    endTurn() {
-        // Check spell echo BEFORE consuming energy (spenders only)
+    endTurn() {
         const isSpender = this.currentAction.cost !== undefined && this.currentAction.cost > 0;
         let shouldEcho = false;
-        
+
         if(isSpender && !this.isEchoAction) {
             if(this.passiveEffects.checkSpellEcho(this.currentTurn)) {
                 shouldEcho = true;
                 this.manager.log.add(`${this.currentTurn.name}'s spell echoes!`);
             }
-        }
-        
-        // Apply cost reduction for spenders
+        }
         if(this.currentAction.cost !== undefined && this.currentAction.cost > 0) {
             const effectiveCost = this.passiveEffects.processCostReduction(this.currentTurn, this.currentAction.cost);
             if(effectiveCost <= this.currentTurn.energy) {
@@ -486,20 +408,15 @@ export class AdventuringEncounter extends AdventuringPage {
             }
         }
 
-        if(this.currentAction.energy !== undefined) {
-            // Apply energy gain bonus modifier
+        if(this.currentAction.energy !== undefined) {
             const totalEnergy = this.passiveEffects.processEnergyGain(this.currentTurn, this.currentAction.energy);
             this.currentTurn.addEnergy(totalEnergy);
-        }
-        
-        // Trigger generator/spender based on ability type
+        }
         if(isSpender) {
             this.currentTurn.trigger('spender', { ability: this.currentAction, encounter: this });
         } else {
             this.currentTurn.trigger('generator', { ability: this.currentAction, encounter: this });
-        }
-
-        // If spell echo triggered, repeat the action
+        }
         if(shouldEcho) {
             this.isEchoAction = true;
             this.currentHit = 0;
@@ -512,12 +429,8 @@ export class AdventuringEncounter extends AdventuringPage {
                 this.processHit();
             }
             return;
-        }
-        
-        // Reset echo flag
-        this.isEchoAction = false;
-
-        // Blue Mage (Slayer) ability learning
+        }
+        this.isEchoAction = false;
         this.tryLearnAbility();
 
         let resolvedEffects = this.currentTurn.trigger('turn_end');
@@ -531,14 +444,10 @@ export class AdventuringEncounter extends AdventuringPage {
             this.complete();
             return;
         }
-        
-        if(this.manager.party.all.every(hero => hero.dead)) {
-            // Fire party_wipe trigger - consumables/equipment with revive effects can respond
-            this.manager.party.trigger('party_wipe', { encounter: this });
-            
-            // Check if any hero was revived by the trigger
-            if(this.manager.party.all.some(hero => !hero.dead)) {
-                // Party was revived, continue combat
+
+        if(this.manager.party.all.every(hero => hero.dead)) {
+            this.manager.party.trigger('party_wipe', { encounter: this });
+            if(this.manager.party.all.some(hero => !hero.dead)) {
                 this.nextTurn();
                 return;
             }
@@ -555,22 +464,18 @@ export class AdventuringEncounter extends AdventuringPage {
     complete() {
         this.all.forEach(member => {
             let resolvedEffects = member.trigger('encounter_end');
-        });
-
-        // Record monster kills for cross-cutting concerns
+        });
         this.party.all.forEach(enemy => {
             if(enemy.dead && enemy.base) {
                 this.manager.bestiary.registerKill(enemy.base);
                 this.manager.slayers.onMonsterKilled(enemy.base);
             }
-        });
-
-        // Record combat stats for achievements
+        });
         const heroes = this.manager.party.all;
         const aliveHeroes = heroes.filter(h => !h.dead);
         const flawless = heroes.every(h => !h.dead && h.hitpoints >= h.maxHitpoints);
         const lastStand = aliveHeroes.length === 1;
-        
+
         this.manager.achievementManager.recordCombatEnd({
             flawless,
             rounds: this.round,
@@ -612,9 +517,8 @@ export class AdventuringEncounter extends AdventuringPage {
         }
 
         cards.push(...this.nextRoundOrder.map(c => c.card));
-        
+
         this.manager.overview.cards.renderQueue.cards.clear();
-        
 
         this.all.forEach(character => {
             character.setHighlight(character === this.currentTurn);
@@ -625,32 +529,19 @@ export class AdventuringEncounter extends AdventuringPage {
             this.manager.overview.cards.renderQueue.cards.add(card)
         });
         this.manager.overview.cards.renderQueue.update = true;
-    }
-
-    // Blue Mage (Slayer) ability learning
-    tryLearnAbility() {
-        // Only heroes can learn abilities
+    }
+    tryLearnAbility() {
         if(!(this.currentTurn instanceof AdventuringHero))
-            return;
-        
-        // Check if the ability has a learnType property
+            return;
         if(!this.currentAction.learnType)
-            return;
-        
-        // Check if character has the Slayer job as combat job (must be active to learn)
+            return;
         const slayerJob = this.manager.cached.slayerJob;
         if(slayerJob === undefined)
-            return;
-        
-        // Only the combat job can use learning abilities
+            return;
         if(this.currentTurn.combatJob !== slayerJob)
-            return;
-        
-        // Get targets that were hit (from hitHistory)
+            return;
         if(this.hitHistory.length === 0)
-            return;
-        
-        // Find the first living enemy that was hit (preferring front)
+            return;
         let targetEnemy = null;
         for(const targets of this.hitHistory) {
             for(const target of targets) {
@@ -662,23 +553,17 @@ export class AdventuringEncounter extends AdventuringPage {
             if(targetEnemy)
                 break;
         }
-        
+
         if(!targetEnemy)
-            return;
-        
-        // Use the Grimoire to try learning
+            return;
         const learnType = this.currentAction.learnType;
-        const learnBonus = this.currentAction.learnBonus || 0;
-        
-        // Grimoire handles the roll, logging, and notification
+        const learnBonus = this.currentAction.learnBonus || 0;
         const learned = this.manager.grimoire.tryLearn(
             this.currentTurn,
             targetEnemy,
             learnType,
             learnBonus
-        );
-        
-        // Also add to old learnedAbilities Set for backward compatibility
+        );
         if(learned) {
             this.manager.learnedAbilities.add(learned.id);
         }

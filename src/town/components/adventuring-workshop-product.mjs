@@ -7,11 +7,11 @@ export class AdventuringWorkshopProductElement extends AdventuringTooltipElement
         super();
         this._content = new DocumentFragment();
         this._content.append(getTemplateNode('adventuring-workshop-product-template'));
-        
+
         this.clickable = getElementFromFragment(this._content, 'clickable', 'div');
         this.border = getElementFromFragment(this._content, 'border', 'div');
         this.icon = getElementFromFragment(this._content, 'icon', 'img');
-        
+
         this._tooltipTarget = this.clickable;
     }
 
@@ -24,19 +24,9 @@ export class AdventuringWorkshopProductElement extends AdventuringTooltipElement
         super.disconnectedCallback();
     }
 
-    /**
-     * Set the product display
-     * @param {object} options
-     * @param {string} options.iconSrc - Icon source URL
-     * @param {string} options.name - Product name for tooltip
-     * @param {boolean} options.selected - Whether this product is selected
-     * @param {boolean} options.active - Whether this product has an active work order
-     */
     setProduct({ iconSrc, name, selected = false, active = false }) {
         this.icon.src = iconSrc;
-        this.setTooltipContent(name);
-        
-        // Update border state
+        this.setTooltipContent(name);
         this.border.classList.remove('border-secondary', 'border-info', 'border-warning');
         if (selected) {
             this.border.classList.add('border-info');

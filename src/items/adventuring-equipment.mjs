@@ -10,19 +10,14 @@ export class AdventuringEquipment {
         this.game = game;
         this.manager = manager;
         this.character = character;
-        
+
         this.component = createElement('adventuring-equipment');
 
         this.locked = false;
         this.slots = new Map();
         this.stats = new AdventuringStats(this.manager, this.game);
     }
-    
-    /**
-     * Get an array of all equipped items (excludes empty/none slots)
-     * Note: Does not re-validate with canEquip - items are validated when equipped
-     * @returns {AdventuringItemBase[]}
-     */
+
     get equippedItems() {
         const items = [];
         this.slots.forEach((slot) => {
@@ -32,12 +27,7 @@ export class AdventuringEquipment {
         });
         return items;
     }
-    
-    /**
-     * Iterate over all equipped items with their slots
-     * Note: Does not re-validate with canEquip - items are validated when equipped
-     * @param {Function} callback - (item, slot, slotType) => void
-     */
+
     forEachEquipped(callback) {
         this.slots.forEach((slot, slotType) => {
             if (slot.item && slot.item !== this.manager.cached.noneItem && !slot.occupied) {
@@ -45,12 +35,7 @@ export class AdventuringEquipment {
             }
         });
     }
-    
-    /**
-     * Check if a specific item is equipped
-     * @param {AdventuringItemBase} item
-     * @returns {boolean}
-     */
+
     hasItemEquipped(item) {
         let found = false;
         this.slots.forEach((slot) => {
@@ -60,17 +45,12 @@ export class AdventuringEquipment {
         });
         return found;
     }
-    
-    /**
-     * Get counts of equipped pieces per set (cached until equipment changes)
-     * @returns {Map<AdventuringEquipmentSet, number>}
-     */
-    getSetPieceCounts() {
-        // Use cached value if available
+
+    getSetPieceCounts() {
         if(this._cachedSetCounts !== undefined) {
             return this._cachedSetCounts;
         }
-        
+
         const counts = new Map();
         this.forEachEquipped((item) => {
             if(item.set) {
@@ -80,18 +60,15 @@ export class AdventuringEquipment {
         this._cachedSetCounts = counts;
         return counts;
     }
-    
-    /**
-     * Invalidate cached set piece counts (call when equipment changes)
-     */
+
     invalidateSetCache() {
         this._cachedSetCounts = undefined;
     }
-    
+
     calculateStats() {
         this.stats.reset();
-        this.forEachEquipped((item, slot) => {
-            item.calculateStats();
+        this.forEachEquipped((item, slot) => {
+            item.calculateStats(this.character);
             slot.stats.forEach((value, stat) => {
                 let old = this.stats.get(stat);
                 this.stats.set(stat, old + value);
@@ -99,22 +76,15 @@ export class AdventuringEquipment {
         });
     }
 
-    /**
-     * Get all effects from equipped items as StandardEffect objects.
-     * Includes both passive stat bonuses and trigger-based effects.
-     * @param {string} [trigger] - Optional filter by trigger type
-     * @returns {StandardEffect[]} Array of standardized effects
-     */
     getEffects(trigger = null) {
         const effects = [];
-        
-        this.forEachEquipped((item, slot) => {
-            // Add passive stat bonuses from equipment stats
+
+        this.forEachEquipped((item, slot) => {
             if(trigger === null || trigger === 'passive') {
                 item.stats.forEach((value, stat) => {
                     if(value !== 0) {
                         effects.push(createEffect(
-                            {   
+                            {
                                 trigger: 'passive',
                                 type: 'stat_flat',
                                 stat: stat.id,
@@ -125,20 +95,15 @@ export class AdventuringEquipment {
                         ));
                     }
                 });
-            }
-            
-            // Add trigger-based effects from item effects array
+            }
             if(item.effects && item.effects.length > 0) {
-                item.effects.forEach(effect => {
-                    // Skip if filtering by trigger and doesn't match
-                    if(trigger !== null && effect.trigger !== trigger) return;
-                    
-                    // Calculate effect amount based on item level scaling
+                item.effects.forEach(effect => {
+                    if(trigger !== null && effect.trigger !== trigger) return;
                     let amount = effect.amount || 0;
                     if(effect.scaling && item.level > 0) {
                         amount += Math.floor(item.level * effect.scaling);
                     }
-                    
+
                     effects.push(createEffect(
                         {
                             trigger: effect.trigger || 'passive',
@@ -153,18 +118,15 @@ export class AdventuringEquipment {
                     ));
                 });
             }
-        });
-        
-        // Add equipment set bonus effects (only for sets with equipped pieces)
+        });
         if(this.character && this.manager && this.manager.equipmentSets) {
             const setCounts = this.getSetPieceCounts();
             setCounts.forEach((count, set) => {
                 if(count <= 0) return;
                 const setEffects = set.getActiveEffects(this.character);
-                setEffects.forEach(effect => {
-                    // Skip if filtering by trigger and doesn't match
+                setEffects.forEach(effect => {
                     if(trigger !== null && effect.trigger !== trigger) return;
-                    
+
                     effects.push(createEffect(
                         {
                             trigger: effect.trigger || 'passive',
@@ -183,35 +145,24 @@ export class AdventuringEquipment {
                 });
             });
         }
-        
+
         return effects;
     }
-    
-    /**
-     * Get all effects from equipment that match a trigger type.
-     * Does NOT evaluate conditions or limits - those are handled by the central dispatcher.
-     * @param {string} triggerType - The trigger type to match
-     * @param {object} context - Context for evaluation (not used here, passed for interface consistency)
-     * @returns {Array<{item: object, effect: object}>}
-     */
+
     getEffectsForTrigger(triggerType, context = {}) {
-        const results = [];
-        
-        // Individual equipment item effects
+        const results = [];
         this.forEachEquipped((item, slot) => {
             if (!item.effects || item.effects.length === 0) return;
-            
+
             item.effects.forEach(effect => {
                 if (effect.trigger !== triggerType) return;
-                
+
                 results.push({
                     item: item,
                     effect: effect
                 });
             });
-        });
-        
-        // Equipment set bonus effects (only for sets with equipped pieces)
+        });
         if (this.character && this.manager && this.manager.equipmentSets) {
             const setCounts = this.getSetPieceCounts();
             setCounts.forEach((count, set) => {
@@ -219,9 +170,9 @@ export class AdventuringEquipment {
                 const setEffects = set.getActiveEffects(this.character);
                 setEffects.forEach(effect => {
                     if (effect.trigger !== triggerType) return;
-                    
+
                     results.push({
-                        item: { 
+                        item: {
                             name: effect.sourceName,
                             level: 0,
                             isSetBonus: true
@@ -231,7 +182,7 @@ export class AdventuringEquipment {
                 });
             });
         }
-        
+
         return results;
     }
 
@@ -253,7 +204,7 @@ export class AdventuringEquipment {
             if(slot !== this.manager.cached.noneItemSlot)
                 this.slots.set(slot, new AdventuringEquipmentSlot(this.manager, this.game, this, slot))
         });
-        
+
         this.slots.forEach(slot => {
             let $anchor = this.component.equipment.querySelector(`[data-slot="${slot.slotType.id}"]`);
             if($anchor)

@@ -1,62 +1,22 @@
-const { loadModule } = mod.getContext(import.meta);
+const { loadModule } = mod.getContext(import.meta);
 
-/**
- * Adventuring Utility Functions
- * 
- * Shared helper functions to reduce duplicate code across the mod.
- */
-
-// ============================================================================
-// Stat Calculation
-// ============================================================================
-
-/**
- * StatCalculator - Unified stat calculation pipeline
- * 
- * Consolidates the pattern: base → add sources → apply flat → apply percent → apply global
- * 
- * Usage:
- *   // Calculate effective stat with bonuses
- *   const final = StatCalculator.calculate(baseValue, { flat: 10, percent: 25 }, allStatBonus);
- *   
- *   // Aggregate stats from multiple sources
- *   StatCalculator.aggregate(targetStats, job1.stats, job2.stats, equipment.stats);
- *   
- *   // Calculate equipment stats with level scaling
- *   const stats = StatCalculator.calculateWithScaling(base, scaling, level, bonusPercent);
- */
 class StatCalculator {
-    /**
-     * Calculate final stat value with all modifiers.
-     * Applies: base + flat, then percent, then global percent.
-     * 
-     * @param {number} baseValue - The base stat value
-     * @param {object} bonuses - { flat: number, percent: number } bonuses
-     * @param {number} [globalPercent=0] - Global multiplier (e.g., all_stat_bonus)
-     * @returns {number} Final calculated value (floored)
-     */
+
     static calculate(baseValue, bonuses = { flat: 0, percent: 0 }, globalPercent = 0) {
         const flat = bonuses.flat || 0;
         const percent = bonuses.percent || 0;
-        
+
         const withFlat = baseValue + flat;
         const withPercent = withFlat * (1 + percent / 100);
         const withGlobal = withPercent * (1 + globalPercent / 100);
-        
+
         return Math.floor(withGlobal);
     }
-    
-    /**
-     * Aggregate stats from multiple sources into a target map.
-     * Adds all source values to existing target values.
-     * 
-     * @param {Map} target - Target stats map to aggregate into
-     * @param {...(Map|undefined)} sources - Stats maps to aggregate (undefined sources are skipped)
-     */
+
     static aggregate(target, ...sources) {
         for (const source of sources) {
             if (!source) continue;
-            
+
             if (typeof source.forEach === 'function') {
                 source.forEach((value, stat) => {
                     target.set(stat, (target.get(stat) || 0) + value);
@@ -64,29 +24,13 @@ class StatCalculator {
             }
         }
     }
-    
-    /**
-     * Calculate stats with base values, level scaling, and optional percent bonus.
-     * Used for equipment stat calculation.
-     * 
-     * @param {Map} target - Target stats map to write to
-     * @param {Map} base - Base stats map
-     * @param {Map} scaling - Per-level scaling map
-     * @param {number} level - Current level for scaling
-     * @param {number} [bonusPercent=0] - Flat percent bonus to apply (e.g., mastery bonus)
-     */
+
     static calculateWithScaling(target, base, scaling, level, bonusPercent = 0) {
-        target.reset();
-        
-        // Apply base stats
-        base.forEach((value, stat) => target.set(stat, value));
-        
-        // Apply level scaling
+        target.reset();
+        base.forEach((value, stat) => target.set(stat, value));
         scaling.forEach((value, stat) => {
             target.set(stat, (target.get(stat) || 0) + Math.floor(level * value));
-        });
-        
-        // Apply percent bonus if any
+        });
         if (bonusPercent > 0) {
             target.forEach((value, stat) => {
                 const bonus = Math.floor(value * bonusPercent / 100);
@@ -94,57 +38,26 @@ class StatCalculator {
             });
         }
     }
-    
-    /**
-     * Apply a multiplier to all stats in a map.
-     * Used for masterful scaling, difficulty modifiers, etc.
-     * 
-     * @param {Map} target - Stats map to modify
-     * @param {number} multiplier - Multiplier to apply
-     */
+
     static applyMultiplier(target, multiplier) {
         if (multiplier === 1) return;
-        
+
         target.forEach((value, stat) => {
             target.set(stat, Math.floor(value * multiplier));
         });
     }
-}
+}
 
-// ============================================================================
-// Effect Limit Tracker
-// ============================================================================
-
-/**
- * EffectLimitTracker - Tracks effect trigger counts for limit enforcement.
- * 
- * Handles effects with limit: 'combat', 'round', or 'turn' properties.
- * Consolidates duplicated code from AdventuringCharacter and AdventuringParty.
- * 
- * Usage:
- *   const tracker = new EffectLimitTracker();
- *   if (tracker.canTrigger(effect, source)) {
- *       // Process effect
- *       tracker.record(effect, source);
- *   }
- *   tracker.reset('turn');  // Reset turn-limited effects
- */
 class EffectLimitTracker {
     constructor() {
-        /** @type {{ combat: Map<string, number>, round: Map<string, number>, turn: Map<string, number> }} */
+
         this.counts = {
             combat: new Map(),
             round: new Map(),
             turn: new Map()
         };
     }
-    
-    /**
-     * Generate a unique key for an effect to track its trigger count.
-     * @param {object} effect - The effect object
-     * @param {object} source - The source (item, consumable, etc.)
-     * @returns {string} Unique key for this effect
-     */
+
     getKey(effect, source) {
         let sourceId = 'unknown';
         if (source && source.id) {
@@ -161,260 +74,148 @@ class EffectLimitTracker {
         });
         return `${sourceId}:${effectStr}`;
     }
-    
-    /**
-     * Check if an effect can trigger based on its limit settings.
-     * @param {object} effect - The effect with optional limit/times properties
-     * @param {object} source - The source object for key generation
-     * @returns {boolean} Whether the effect can trigger
-     */
+
     canTrigger(effect, source) {
         if (!effect.limit) return true;
-        
+
         const key = this.getKey(effect, source);
         const times = effect.times || 1;
         const countMap = this.counts[effect.limit];
-        
+
         if (!countMap) {
             console.warn(`EffectLimitTracker: Unknown limit type: ${effect.limit}`);
             return true;
         }
-        
+
         const currentCount = countMap.get(key) || 0;
         return currentCount < times;
     }
-    
-    /**
-     * Record that an effect has triggered (increment its count).
-     * @param {object} effect - The effect that triggered
-     * @param {object} source - The source object for key generation
-     */
+
     record(effect, source) {
         if (!effect.limit) return;
-        
+
         const key = this.getKey(effect, source);
         const countMap = this.counts[effect.limit];
-        
+
         if (!countMap) return;
-        
+
         const currentCount = countMap.get(key) || 0;
         countMap.set(key, currentCount + 1);
     }
-    
-    /**
-     * Reset trigger counts for a specific limit period.
-     * @param {string} limitType - 'combat', 'round', or 'turn'
-     */
+
     reset(limitType) {
         if (this.counts[limitType]) {
             this.counts[limitType].clear();
         }
     }
-    
-    /**
-     * Reset all limit periods.
-     */
+
     resetAll() {
         this.counts.combat.clear();
         this.counts.round.clear();
         this.counts.turn.clear();
     }
-}
-
-// ============================================================================
-// Passive Effect Processor
-// ============================================================================
-
-// Base crit damage multiplier (50% = 1.5x damage)
+}
 const BASE_CRIT_MULTIPLIER = 1.5;
 
-/**
- * PassiveEffectProcessor - Handles passive effect application pipeline.
- * 
- * Centralizes damage, healing, and resource modifier calculations.
- * Uses character.getPassiveBonus(effectType) to query summed passive bonuses.
- * 
- * Usage:
- *   const processor = new PassiveEffectProcessor(encounter);
- *   const result = processor.processDamage(attacker, target, baseAmount);
- *   if (result.negated) { // Attack missed or dodged }
- *   const healResult = processor.processHealing(caster, target, baseAmount);
- */
 class PassiveEffectProcessor {
     constructor(encounter) {
         this.encounter = encounter;
         this.manager = encounter.manager;
     }
-    
-    /**
-     * Apply damage modifier pipeline.
-     * Handles miss/dodge checks, damage bonus, reduction, and crits.
-     * 
-     * @param {object} attacker - Attacking character
-     * @param {object} target - Target character
-     * @param {number} baseAmount - Base damage amount
-     * @param {object} [context={}] - Additional context for triggers
-     * @returns {object} { amount, isCrit, negated }
-     */
-    processDamage(attacker, target, baseAmount, context = {}) {
-        // Early exit if target is already dead or no damage
+
+    processDamage(attacker, target, baseAmount, context = {}) {
         if (target.dead || baseAmount <= 0) {
             return { amount: 0, isCrit: false, negated: target.dead ? 'dead' : 'zero' };
         }
-        
-        let amount = baseAmount;
-        
-        // Pre-damage trigger: miss check (e.g., Blind debuff)
+
+        let amount = baseAmount;
         const missCheck = attacker.trigger('before_damage_delivered', { target, amount, ...context });
         if (missCheck.missed) {
             return { negated: 'miss', amount: 0 };
         }
-        amount = (missCheck.amount !== undefined && missCheck.amount !== null) ? missCheck.amount : amount;
-        
-        // Pre-damage trigger: dodge check (e.g., Evasion buff, conditional dodge)
+        amount = (missCheck.amount !== undefined && missCheck.amount !== null) ? missCheck.amount : amount;
         const dodgeCheck = target.trigger('before_damage_received', { attacker, amount, ...context });
         if (dodgeCheck.dodged) {
             target.trigger('dodge', { attacker, ...context });
             return { negated: 'dodge', amount: 0 };
         }
-        amount = (dodgeCheck.amount !== undefined && dodgeCheck.amount !== null) ? dodgeCheck.amount : amount;
-        
-        // Passive dodge check (sum of passive dodge bonuses, including conditional)
+        amount = (dodgeCheck.amount !== undefined && dodgeCheck.amount !== null) ? dodgeCheck.amount : amount;
         const dodgeChance = target.getConditionalBonus('dodge', { target: attacker });
         if (dodgeChance > 0 && Math.random() * 100 < dodgeChance) {
             target.trigger('dodge', { attacker, ...context });
             return { negated: 'dodge', amount: 0 };
-        }
-        
-        // Apply attacker's damage bonus
-        amount = this._applyPercentBonus(amount, attacker, 'damage_bonus');
-        
-        // Apply target's damage reduction
-        amount = this._applyPercentReduction(amount, target, 'damage_reduction');
-        
-        // Process critical hit
+        }
+        amount = this._applyPercentBonus(amount, attacker, 'damage_bonus');
+        amount = this._applyPercentReduction(amount, target, 'damage_reduction');
         const critResult = this._processCritical(amount, attacker);
-        
+
         return {
             amount: critResult.amount,
             isCrit: critResult.isCrit,
             negated: false
         };
     }
-    
-    /**
-     * Apply healing modifier pipeline.
-     * Handles healing bonus from caster and healing received by target.
-     * 
-     * @param {object} caster - Character doing the healing
-     * @param {object} target - Character receiving healing
-     * @param {number} baseAmount - Base heal amount
-     * @param {object} [context={}] - Additional context for triggers
-     * @returns {object} { amount } with modified healing
-     */
+
     processHealing(caster, target, baseAmount, context = {}) {
-        let amount = baseAmount;
-        
-        // Apply caster's healing bonus
-        amount = this._applyPercentBonus(amount, caster, 'healing_bonus');
-        
-        // Apply target's healing received bonus
-        amount = this._applyPercentBonus(amount, target, 'healing_received');
-        
-        // Healing triggers
+        let amount = baseAmount;
+        amount = this._applyPercentBonus(amount, caster, 'healing_bonus');
+        amount = this._applyPercentBonus(amount, target, 'healing_received');
         const deliverResult = caster.trigger('before_heal_delivered', { target, amount, ...context });
         amount = (deliverResult.amount !== undefined && deliverResult.amount !== null) ? deliverResult.amount : amount;
-        
+
         const receiveResult = target.trigger('before_heal_received', { caster, amount, ...context });
         amount = (receiveResult.amount !== undefined && receiveResult.amount !== null) ? receiveResult.amount : amount;
-        
+
         return { amount };
     }
-    
-    /**
-     * Apply energy gain modifiers.
-     * 
-     * @param {object} character - Character gaining energy
-     * @param {number} baseEnergy - Base energy amount
-     * @returns {number} Modified energy amount
-     */
+
     processEnergyGain(character, baseEnergy) {
         const bonus = character.getPassiveBonus('energy_gain_bonus');
         return baseEnergy + Math.floor(baseEnergy * (bonus / 100));
     }
-    
-    /**
-     * Apply ability cost reduction.
-     * 
-     * @param {object} character - Character using ability
-     * @param {number} baseCost - Base ability cost
-     * @returns {number} Modified cost (minimum 0)
-     */
+
     processCostReduction(character, baseCost) {
         const reduction = character.getPassiveBonus('cost_reduction');
         return Math.max(0, baseCost - reduction);
     }
-    
-    /**
-     * Check for spell echo (spender repeat).
-     * 
-     * @param {object} character - Character casting
-     * @returns {boolean} True if spell should echo
-     */
+
     checkSpellEcho(character) {
         const echoChance = character.getPassiveBonus('spell_echo');
         return echoChance > 0 && Math.random() * 100 < echoChance;
     }
-    
-    /**
-     * Check and apply execute threshold.
-     * 
-     * @param {object} attacker - Attacking character
-     * @param {object} target - Target character
-     * @returns {boolean} True if target was executed
-     */
+
     checkExecute(attacker, target) {
         if (target.dead) return false;
-        
+
         const threshold = attacker.getPassiveBonus('execute');
         if (threshold > 0 && target.hitpointsPercent < threshold) {
             return true;
         }
         return false;
     }
-    
-    /**
-     * Calculate and apply reflect damage.
-     * 
-     * @param {object} attacker - Character that dealt damage
-     * @param {object} target - Character that has reflect
-     * @param {number} damageDealt - Amount of damage dealt to target
-     * @returns {number} Amount of damage reflected (0 if none)
-     */
+
     calculateReflect(attacker, target, damageDealt) {
         if (damageDealt <= 0) return 0;
-        
+
         const reflectPercent = target.getPassiveBonus('reflect_damage');
         if (reflectPercent > 0) {
             return Math.ceil(damageDealt * (reflectPercent / 100));
         }
         return 0;
-    }
-    
-    // === Private Helpers ===
-    
+    }
+
     _processCritical(amount, attacker) {
         const critChance = attacker.getPassiveBonus('crit_chance');
-        
+
         if (critChance > 0 && Math.random() * 100 < critChance) {
             const critDamage = attacker.getPassiveBonus('crit_damage');
             const multiplier = BASE_CRIT_MULTIPLIER + (critDamage / 100);
             return { amount: Math.ceil(amount * multiplier), isCrit: true };
         }
-        
+
         return { amount, isCrit: false };
     }
-    
+
     _applyPercentBonus(amount, character, effectType) {
         const bonus = character.getPassiveBonus(effectType);
         if (bonus > 0) {
@@ -422,7 +223,7 @@ class PassiveEffectProcessor {
         }
         return amount;
     }
-    
+
     _applyPercentReduction(amount, character, effectType) {
         const reduction = character.getPassiveBonus(effectType);
         if (reduction > 0) {
@@ -430,139 +231,82 @@ class PassiveEffectProcessor {
         }
         return amount;
     }
-}
+}
 
-// ============================================================================
-// Basic Utilities
-// ============================================================================
-
-/**
- * Get a random element from an array
- * @param {Array} array - Array to select from
- * @returns {*} Random element or undefined if array is empty
- */
 function randomElement(array) {
     if(!array || array.length === 0) return undefined;
     return array[Math.floor(Math.random() * array.length)];
 }
 
-/**
- * Get a random integer between min and max (inclusive)
- * @param {number} min - Minimum value
- * @param {number} max - Maximum value
- * @returns {number} Random integer
- */
 function randomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-/**
- * Roll a percentage chance
- * @param {number} chance - Percentage chance (0-100)
- * @returns {boolean} True if roll succeeds
- */
 function rollChance(chance) {
     return Math.random() * 100 < chance;
 }
 
-/**
- * Clamp a value between min and max
- * @param {number} value - Value to clamp
- * @param {number} min - Minimum value
- * @param {number} max - Maximum value
- * @returns {number} Clamped value
- */
 function clamp(value, min, max) {
     return Math.max(min, Math.min(max, value));
 }
 
-/**
- * Default media URL for locked/unknown content
- */
 const UNKNOWN_MEDIA = 'melvor:assets/media/main/question.png';
 
-/**
- * Get media URL accounting for locked state
- * Returns question mark media if locked, otherwise the actual media
- * @param {object} obj - Object with unlocked, getMediaURL, and _media properties
- * @returns {string} Media URL
- */
 function getLockedMedia(obj) {
     return obj.unlocked ? obj.getMediaURL(obj._media) : obj.getMediaURL(UNKNOWN_MEDIA);
 }
 
-/**
- * Calculate percentage
- * @param {number} value - Current value
- * @param {number} max - Maximum value
- * @returns {number} Percentage (0-100)
- */
 function toPercent(value, max) {
     if(max <= 0) return 0;
     return clamp((value / max) * 100, 0, 100);
 }
 
-/**
- * Resolve targets from a party based on target type
- * @param {string} targetType - Target selection type (front, back, random, lowest, aoe, dead)
- * @param {object} party - Party object with front, center, back, all getters
- * @param {object} [exclude] - Character to exclude from selection
- * @returns {Array} Array of target characters
- */
 function resolveTargets(targetType, party, exclude = null) {
     const alive = party.all.filter(t => !t.dead && t !== exclude);
-    
+
     switch(targetType) {
         case "none":
             return [];
-            
-        case "front": {
-            // Priority: front > center > back
+
+        case "front": {
             if(!party.front.dead && party.front !== exclude) return [party.front];
             if(!party.center.dead && party.center !== exclude) return [party.center];
             if(!party.back.dead && party.back !== exclude) return [party.back];
             return [];
         }
-        
-        case "back": {
-            // Priority: back > center > front
+
+        case "back": {
             if(!party.back.dead && party.back !== exclude) return [party.back];
             if(!party.center.dead && party.center !== exclude) return [party.center];
             if(!party.front.dead && party.front !== exclude) return [party.front];
             return [];
         }
-        
+
         case "random":
             return alive.length > 0 ? [randomElement(alive)] : [];
-            
+
         case "lowest": {
             if(alive.length === 0) return [];
-            const lowest = alive.reduce((min, t) => 
+            const lowest = alive.reduce((min, t) =>
                 (min === undefined || t.hitpointsPercent < min.hitpointsPercent) ? t : min
             , undefined);
             return lowest ? [lowest] : [];
         }
-        
+
         case "aoe":
             return alive;
-            
+
         case "dead":
             return party.all.filter(t => t.dead && t !== exclude);
-            
+
         default:
             return [];
     }
 }
 
-/**
- * Sort characters by agility stat (highest first)
- * @param {Array} characters - Characters to sort
- * @param {object} statsRegistry - Stats registry to look up agility
- * @returns {Array} Sorted copy of characters
- */
 function sortByAgility(characters, statsRegistry) {
     const agility = statsRegistry.getObjectByID("adventuring:agility");
-    return [...characters].sort((a, b) => 
+    return [...characters].sort((a, b) =>
         b.getEffectiveStat(agility) - a.getEffectiveStat(agility)
     );
 }
@@ -607,43 +351,18 @@ class AdventuringWeightedTable {
             itemWeight += weight;
             return dropRoll < itemWeight;
         });
-        const drop = this.table[lootIndex];
-        
-        // Calculate qty from minQty/maxQty if needed
+        const drop = this.table[lootIndex];
         if (drop && drop.qty === undefined && drop.minQty !== undefined && drop.maxQty !== undefined) {
             drop.qty = drop.minQty + Math.floor(Math.random() * (drop.maxQty - drop.minQty + 1));
         }
-        
+
         return drop;
     }
 }
 
-/**
- * Standard Effect object structure
- * All effect sources (auras, consumables, equipment, etc.) should return effects in this format.
- * 
- * @typedef {Object} StandardEffect
- * @property {string} trigger - When the effect activates: 'passive', 'turn_start', 'before_damage_delivered', etc.
- * @property {string} type - What the effect does: 'stat_flat', 'stat_percent', 'damage', 'heal', 'buff', 'debuff', etc.
- * @property {string} [stat] - For stat effects, the stat ID (e.g., 'adventuring:strength')
- * @property {number} [value] - The effect value/amount
- * @property {object} source - Reference to the source object (consumable, aura instance, equipment, etc.)
- * @property {string} sourceName - Display name of the source
- * @property {string} [target] - Target of the effect: 'self', 'attacker', 'party', etc.
- */
-
-/**
- * Create a standardized effect object
- * @param {object} effectData - Raw effect data
- * @param {object} source - The source object (consumable, aura, equipment, etc.)
- * @param {string} sourceName - Display name for the source
- * @returns {StandardEffect} Standardized effect object
- */
 function createEffect(effectData, source, sourceName) {
-    return {
-        // Spread original data first to preserve type-specific fields (healAmount, threshold, etc.)
-        ...effectData,
-        // Then apply standard field mappings (these may override spreaded values)
+    return {
+        ...effectData,
         trigger: effectData.trigger || 'passive',
         type: effectData.type,
         stat: effectData.stat || effectData.id,  // stat effects use 'stat', auras use 'id'
@@ -658,34 +377,15 @@ function createEffect(effectData, source, sourceName) {
     };
 }
 
-/**
- * Build a standard context object for condition evaluation.
- * This ensures all effect sources use consistent context format.
- * 
-/**
- * Pool of reusable context objects to reduce garbage collection.
- * Contexts are acquired via getPooledContext() and released via releaseContext().
- */
 const contextPool = [];
 const MAX_POOL_SIZE = 16;
 
-/**
- * Get a context object from the pool or create a new one.
- * @returns {object} A context object ready for use
- */
 function getPooledContext() {
     return contextPool.pop() || {};
 }
 
-/**
- * Release a context object back to the pool.
- * Clears all properties to prevent memory leaks.
- * @param {object} ctx - Context to release
- */
 function releaseContext(ctx) {
-    if (!ctx || contextPool.length >= MAX_POOL_SIZE) return;
-    
-    // Clear all properties
+    if (!ctx || contextPool.length >= MAX_POOL_SIZE) return;
     for (const key in ctx) {
         if (Object.prototype.hasOwnProperty.call(ctx, key)) {
             ctx[key] = undefined;
@@ -694,24 +394,14 @@ function releaseContext(ctx) {
     contextPool.push(ctx);
 }
 
-/**
- * Build a standardized context object for condition evaluation and effect processing.
- * Uses object pooling for reduced memory allocation in hot paths.
- * 
- * @param {object} character - The character triggering effects (can be null for party-level triggers)
- * @param {object} extra - Additional context from the trigger
- * @param {object} [pooledCtx] - Optional pre-allocated context to reuse
- * @returns {object} Standardized context for evaluateCondition()
- */
-function buildEffectContext(character, extra = {}, pooledCtx = null) {
-    // Support null character for party-level triggers - use manager from extra if provided
+function buildEffectContext(character, extra = {}, pooledCtx = null) {
     let manager = null;
     if (character && character.manager) {
         manager = character.manager;
     } else if (extra.manager) {
         manager = extra.manager;
     }
-    
+
     let partyMembers = [];
     if (manager && manager.party) {
         if (manager.party.members) {
@@ -719,11 +409,9 @@ function buildEffectContext(character, extra = {}, pooledCtx = null) {
         } else if (manager.party.all) {
             partyMembers = manager.party.all;
         }
-    }
-    
-    // Reuse provided context or create new
+    }
     const ctx = pooledCtx || {};
-    
+
     ctx.character = character;
     ctx.target = extra.target || null;
     ctx.attacker = extra.attacker || null;
@@ -731,108 +419,59 @@ function buildEffectContext(character, extra = {}, pooledCtx = null) {
     ctx.manager = manager;
     ctx.hpPercentBefore = extra.hpPercentBefore;
     ctx.damageDealt = extra.damageDealt;
-    ctx.damageReceived = extra.damageReceived;
-    
-    // Copy any additional properties from extra
+    ctx.damageReceived = extra.damageReceived;
     for (const key in extra) {
         if (Object.prototype.hasOwnProperty.call(extra, key) && ctx[key] === undefined) {
             ctx[key] = extra[key];
         }
     }
-    
+
     return ctx;
 }
 
-/**
- * Filter effects by trigger type
- * @param {StandardEffect[]} effects - Array of effects
- * @param {string} trigger - Trigger to filter by
- * @returns {StandardEffect[]} Filtered effects
- */
 function filterEffectsByTrigger(effects, trigger) {
     return effects.filter(e => e.trigger === trigger);
 }
 
-/**
- * Filter effects by type
- * @param {StandardEffect[]} effects - Array of effects
- * @param {string} type - Type to filter by
- * @returns {StandardEffect[]} Filtered effects
- */
 function filterEffectsByType(effects, type) {
     return effects.filter(e => e.type === type);
 }
 
-/**
- * Get stat effects for a specific stat
- * @param {StandardEffect[]} effects - Array of effects  
- * @param {string} statId - Stat ID to filter by
- * @returns {StandardEffect[]} Effects targeting this stat
- */
 function getStatEffects(effects, statId) {
-    return effects.filter(e => 
-        (e.type === 'stat_flat' || e.type === 'stat_percent') && 
+    return effects.filter(e =>
+        (e.type === 'stat_flat' || e.type === 'stat_percent') &&
         e.stat === statId
     );
 }
 
-/**
- * EffectCache - Caches aggregated effects from all sources for performance.
- * 
- * Sources register themselves and the cache aggregates their effects.
- * Cache is invalidated when any source changes (via dirty flags).
- * 
- * Usage:
- *   cache.registerSource('equipment', () => equipment.getEffects());
- *   cache.invalidate('equipment');  // Call when equipment changes
- *   const effects = cache.getEffects('passive');  // Returns cached or rebuilds
- */
 class EffectCache {
     constructor() {
-        /** @type {Map<string, () => StandardEffect[]>} */
+
         this.sources = new Map();
-        
-        /** @type {Map<string, boolean>} */
+
         this.dirtyFlags = new Map();
-        
-        /** @type {Map<string, StandardEffect[]>} */
+
         this.cachedByTrigger = new Map();
-        
-        /** @type {StandardEffect[]|null} */
+
         this.allEffectsCache = null;
-        
-        /** @type {Map<string, number>} Cached computed bonuses */
+
         this.bonusCache = new Map();
-        
-        /** @type {boolean} */
+
         this.globalDirty = true;
     }
-    
-    /**
-     * Register an effect source
-     * @param {string} sourceId - Unique identifier for this source
-     * @param {() => StandardEffect[]} getEffectsFn - Function that returns effects from this source
-     */
+
     registerSource(sourceId, getEffectsFn) {
         this.sources.set(sourceId, getEffectsFn);
         this.dirtyFlags.set(sourceId, true);
         this.globalDirty = true;
     }
-    
-    /**
-     * Unregister an effect source
-     * @param {string} sourceId - Source to remove
-     */
+
     unregisterSource(sourceId) {
         this.sources.delete(sourceId);
         this.dirtyFlags.delete(sourceId);
         this.globalDirty = true;
     }
-    
-    /**
-     * Mark a source as dirty (needs refresh)
-     * @param {string} sourceId - Source that changed
-     */
+
     invalidate(sourceId) {
         if(this.dirtyFlags.has(sourceId)) {
             this.dirtyFlags.set(sourceId, true);
@@ -842,10 +481,7 @@ class EffectCache {
             this.bonusCache.clear();
         }
     }
-    
-    /**
-     * Mark all sources as dirty
-     */
+
     invalidateAll() {
         this.dirtyFlags.forEach((_, key) => this.dirtyFlags.set(key, true));
         this.globalDirty = true;
@@ -853,22 +489,16 @@ class EffectCache {
         this.cachedByTrigger.clear();
         this.bonusCache.clear();
     }
-    
-    /**
-     * Check if cache needs rebuild
-     */
+
     isDirty() {
         return this.globalDirty;
     }
-    
-    /**
-     * Rebuild the cache from all sources
-     */
+
     rebuild() {
         if(!this.globalDirty) return;
-        
+
         const allEffects = [];
-        
+
         this.sources.forEach((getEffectsFn, sourceId) => {
             try {
                 const effects = getEffectsFn();
@@ -880,61 +510,42 @@ class EffectCache {
             }
             this.dirtyFlags.set(sourceId, false);
         });
-        
+
         this.allEffectsCache = allEffects;
         this.globalDirty = false;
         this.cachedByTrigger.clear();
         this.bonusCache.clear();
     }
-    
-    /**
-     * Get all effects, optionally filtered by trigger
-     * @param {string} [trigger] - Optional trigger filter
-     * @returns {StandardEffect[]}
-     */
+
     getEffects(trigger = null) {
         this.rebuild();
-        
+
         if(trigger === null) {
             return this.allEffectsCache || [];
-        }
-        
-        // Check trigger cache
+        }
         if(this.cachedByTrigger.has(trigger)) {
             return this.cachedByTrigger.get(trigger);
-        }
-        
-        // Build and cache filtered results
+        }
         const filtered = (this.allEffectsCache || []).filter(e => e.trigger === trigger);
         this.cachedByTrigger.set(trigger, filtered);
         return filtered;
     }
-    
-    /**
-     * Get computed bonus for a specific effect type.
-     * Sums all passive effects of the given type, optionally filtered by properties.
-     * @param {string} effectType - Effect type to sum (e.g., 'stats_percent')
-     * @param {object} [filter={}] - Optional property filters (e.g., { target: 'all', party: 'enemy' })
-     * @returns {number} Total bonus value
-     */
+
     getBonus(effectType, filter = {}) {
-        this.rebuild();
-        
-        // Build cache key from type + filter
-        const filterKey = Object.keys(filter).length > 0 
+        this.rebuild();
+        const filterKey = Object.keys(filter).length > 0
             ? ':' + Object.entries(filter).sort().map(([k,v]) => `${k}=${v}`).join(',')
             : '';
         const cacheKey = `bonus:${effectType}${filterKey}`;
-        
+
         if(this.bonusCache.has(cacheKey)) {
             return this.bonusCache.get(cacheKey);
         }
-        
+
         const passiveEffects = this.getEffects('passive');
         const total = passiveEffects
             .filter(e => {
-                if(e.type !== effectType) return false;
-                // Check all filter properties match
+                if(e.type !== effectType) return false;
                 for(const [key, value] of Object.entries(filter)) {
                     if(e[key] !== value) return false;
                 }
@@ -944,28 +555,23 @@ class EffectCache {
                 const val = (e.value !== undefined) ? e.value : ((e.amount !== undefined) ? e.amount : 0);
                 return sum + val;
             }, 0);
-        
+
         this.bonusCache.set(cacheKey, total);
         return total;
     }
-    
-    /**
-     * Get computed stat bonus (flat + percent).
-     * @param {string} statId - Stat ID to calculate
-     * @returns {{ flat: number, percent: number }} Bonuses
-     */
+
     getStatBonus(statId) {
         this.rebuild();
-        
+
         const cacheKey = `stat:${statId}`;
         if(this.bonusCache.has(cacheKey)) {
             return this.bonusCache.get(cacheKey);
         }
-        
+
         const passiveEffects = this.getEffects('passive');
         let flat = 0;
         let percent = 0;
-        
+
         passiveEffects.forEach(e => {
             if(e.stat === statId) {
                 if(e.type === 'stat_flat') {
@@ -975,38 +581,26 @@ class EffectCache {
                 }
             }
         });
-        
+
         const result = { flat, percent };
         this.bonusCache.set(cacheKey, result);
         return result;
     }
-    
-    /**
-     * Clear all caches
-     */
+
     clear() {
         this.allEffectsCache = null;
         this.cachedByTrigger.clear();
         this.bonusCache.clear();
         this.globalDirty = true;
     }
-    
-    /**
-     * Get computed bonus for a specific effect type with condition evaluation.
-     * Unlike getBonus(), this evaluates conditions and is not cached.
-     * Use this for effects that may have runtime conditions (e.g., hp_below).
-     * @param {string} effectType - Effect type to sum
-     * @param {object} context - Context for condition evaluation (character, target, manager)
-     * @returns {number} Total bonus value (including only effects whose conditions pass)
-     */
+
     getConditionalBonus(effectType, context) {
         this.rebuild();
-        
+
         const passiveEffects = this.getEffects('passive');
         return passiveEffects
             .filter(e => {
-                if (e.type !== effectType) return false;
-                // If effect has condition, evaluate it
+                if (e.type !== effectType) return false;
                 if (e.condition) {
                     return evaluateCondition(e.condition, context);
                 }
@@ -1017,57 +611,33 @@ class EffectCache {
                 return sum + val;
             }, 0);
     }
-}
+}
 
-// ============================================================================
-// REQUIREMENTS CHECKER
-// ============================================================================
-
-/**
- * Centralized requirement checking utility.
- * Consolidates all requirement.type checks into a single location.
- */
 class RequirementsChecker {
-    /**
-     * @param {object} manager - The adventuring manager
-     * @param {Array} requirements - Array of requirement objects
-     */
+
     constructor(manager, requirements = []) {
         this.manager = manager;
         this.requirements = requirements;
     }
-    
-    /**
-     * Check if all requirements are met
-     * @param {object} [context] - Optional context (character, etc.)
-     * @returns {boolean} True if all requirements are met
-     */
+
     check(context = {}) {
         if(!this.requirements || this.requirements.length === 0) return true;
         return this.requirements.every(req => this.checkSingle(req, context));
     }
-    
-    /**
-     * Check a single requirement
-     * @param {object} req - Requirement object
-     * @param {object} context - Context with optional character
-     * @returns {boolean} True if requirement is met
-     */
-    checkSingle(req, context = {}) {
-        // Skip malformed requirements
+
+    checkSingle(req, context = {}) {
         if(!req || !req.type) {
             console.warn(`Malformed requirement:`, req);
             return true;
         }
-        
+
         const { character } = context;
-        
+
         switch(req.type) {
             case 'skill_level':
                 return this.manager.level >= req.level;
-            
-            case 'melvor_skill_level': {
-                // Check if player has required level in a Melvor skill
+
+            case 'melvor_skill_level': {
                 const skill = this.manager.game.skills.getObjectByID(req.skill);
                 if (!skill) {
                     console.warn(`[Adventuring] Unknown Melvor skill: ${req.skill}`);
@@ -1075,46 +645,44 @@ class RequirementsChecker {
                 }
                 return skill.level >= req.level;
             }
-                
+
             case 'job_level':
                 return this._checkJobLevel(req.job, req.level);
-                
+
             case 'current_job_level':
                 return this._checkCurrentJobLevel(req.job, req.level, character);
-                
+
             case 'slayer_tasks_completed': {
                 const totalTasks = this.manager.slayers !== undefined ? this.manager.slayers.totalTasksCompleted : 0;
                 return totalTasks >= req.count;
             }
-                
+
             case 'current_job':
                 return this._hasCurrentJob(req.job, character);
-                
+
             case 'dead':
                 return character !== undefined ? character.dead : false;
-                
+
             case 'comparison':
                 return this._checkComparison(req, character);
-                
+
             case 'area_mastery': {
                 const area = this.manager.areas.getObjectByID(req.area);
                 return area ? this.manager.getMasteryLevel(area) >= req.level : false;
             }
-                
+
             case 'item_upgrade': {
                 const item = this.manager.baseItems.getObjectByID(req.item);
                 return item ? item.upgradeLevel >= req.level : false;
             }
-                
-            case 'achievement_completion': {
-                // Check if the required achievement is completed
+
+            case 'achievement_completion': {
                 if (this.manager.achievements === undefined) return false;
                 const achievement = this.manager.achievements.getObjectByID(req.id);
                 return achievement ? achievement.isComplete : false;
             }
-            
-            case 'area_cleared': {
-                // Check if an area has been cleared at least once by checking if it has any XP
+
+            case 'area_cleared': {
                 const area = this.manager.areas.getObjectByID(req.area);
                 if (!area) return false;
                 let xp = 0;
@@ -1126,13 +694,11 @@ class RequirementsChecker {
                 }
                 return xp > 0;
             }
-            
-            case 'dropped':
-                // Check if the item has been dropped/unlocked via loot system
+
+            case 'dropped':
                 return context.item && context.item.dropped === true;
-            
-            case 'always_false':
-                // Placeholder for items that require special unlock methods (drops, etc.)
+
+            case 'always_false':
                 return false;
 
             default:
@@ -1140,54 +706,37 @@ class RequirementsChecker {
                 return false; // Fail safe: unknown requirements should block, not pass
         }
     }
-    
-    /**
-     * Check if a job has reached the required mastery level
-     */
+
     _checkJobLevel(jobId, level) {
         const job = this.manager.jobs.getObjectByID(jobId);
         if(!job) return false;
         return this.manager.getMasteryLevel(job) >= level;
     }
-    
-    /**
-     * Check if character's current job meets level requirement
-     */
+
     _checkCurrentJobLevel(jobId, level, character) {
-        if(!character) return this._checkJobLevel(jobId, level);
-        
-        // Check if character has this job equipped (combat or passive)
+        if(!character) return this._checkJobLevel(jobId, level);
         const hasCombatJob = character.combatJob !== undefined && character.combatJob.id === jobId;
         const hasPassiveJob = character.passiveJob !== undefined && character.passiveJob.id === jobId;
-        
-        if(!hasCombatJob && !hasPassiveJob) return false;
-        
-        // Check mastery level of that job
+
+        if(!hasCombatJob && !hasPassiveJob) return false;
         const job = this.manager.jobs.getObjectByID(jobId);
         if(!job) return false;
         return this.manager.getMasteryLevel(job) >= level;
     }
-    
-    /**
-     * Check if character has a specific job equipped
-     */
+
     _hasCurrentJob(jobId, character) {
         if(!character) return false;
         const combatMatch = character.combatJob !== undefined && character.combatJob.id === jobId;
         const passiveMatch = character.passiveJob !== undefined && character.passiveJob.id === jobId;
         return combatMatch || passiveMatch;
     }
-    
-    /**
-     * Check comparison requirements (e.g., HP thresholds, material counts)
-     * Format: { property, operator: '<'|'>'|'=='|'<='|'>=', value }
-     */
+
     _checkComparison(req, character) {
         let value;
-        
+
         const property = req.property;
         const target = req.value;
-        
+
         switch(property) {
             case 'hitpoints_percent':
                 if(!character) return false;
@@ -1211,7 +760,7 @@ class RequirementsChecker {
             default:
                 return false;
         }
-        
+
         const op = req.operator;
         switch(op) {
             case '<':
@@ -1228,66 +777,53 @@ class RequirementsChecker {
                 return false;
         }
     }
-    
-    /**
-     * Check if any requirement references a specific job (for unlockedBy checks)
-     * @param {string} jobId - Job ID to check for
-     * @returns {boolean} True if any requirement references this job
-     */
+
     referencesJob(jobId) {
-        return this.requirements.some(req => 
-            (req.type === 'job_level' || req.type === 'current_job_level') && 
+        return this.requirements.some(req =>
+            (req.type === 'job_level' || req.type === 'current_job_level') &&
             req.job === jobId
         );
     }
 }
 
-/**
- * Format a single requirement into a human-readable description with met status.
- * 
- * @param {object} req - Requirement object
- * @param {object} manager - AdventuringManager for resolving names
- * @param {object} [context] - Optional context (character, etc.)
- * @returns {{ text: string, met: boolean }} Formatted requirement
- */
 function formatRequirement(req, manager, context = {}) {
     const checker = new RequirementsChecker(manager, [req]);
     const met = checker.check(context);
     let text = '';
-    
+
     switch(req.type) {
         case 'skill_level':
             text = `Adventuring Level ${req.level}`;
             break;
-        
+
         case 'melvor_skill_level': {
             const skill = manager.game.skills.getObjectByID(req.skill);
             const skillName = skill !== undefined ? skill.name : req.skill;
             text = `${skillName} Level ${req.level}`;
             break;
         }
-            
+
         case 'job_level': {
             const job = manager.jobs.getObjectByID(req.job);
             const jobName = job !== undefined ? job.name : req.job;
             text = `${jobName} Level ${req.level}`;
             break;
         }
-        
+
         case 'current_job': {
             const job = manager.jobs.getObjectByID(req.job);
             const jobName = job !== undefined ? job.name : req.job;
             text = `Requires ${jobName} equipped`;
             break;
         }
-        
+
         case 'current_job_level': {
             const job = manager.jobs.getObjectByID(req.job);
             const jobName = job !== undefined ? job.name : req.job;
             text = `${jobName} Level ${req.level} (equipped)`;
             break;
         }
-        
+
         case 'area_mastery': {
             const area = manager.areas.getObjectByID(req.area);
             if (area && !area.unlocked) {
@@ -1298,18 +834,18 @@ function formatRequirement(req, manager, context = {}) {
             }
             break;
         }
-        
+
         case 'item_upgrade': {
             const item = manager.baseItems.getObjectByID(req.item);
             const itemName = item !== undefined ? item.name : req.item;
             text = `${itemName} +${req.level}`;
             break;
         }
-        
+
         case 'slayer_tasks_completed':
             text = `${req.count} Slayer Tasks Completed`;
             break;
-        
+
         case 'comparison': {
             const operand = req.property || req.operand;
             const target = req.value !== undefined ? req.value : req.amount;
@@ -1317,36 +853,31 @@ function formatRequirement(req, manager, context = {}) {
             text = `${operand.replace(/_/g, ' ')} ${opSymbol} ${target}`;
             break;
         }
-        
+
         case 'area_cleared': {
             const area = manager.areas.getObjectByID(req.area);
             const areaName = area !== undefined ? area.name : req.area;
             text = `Clear ${areaName}`;
             break;
         }
-        
-        case 'dropped': {
-            // Try to get specific monster sources from the context item
+
+        case 'dropped': {
             const monsters = manager?.equipmentSources?.get(context?.item);
-            if (monsters && monsters.length > 0) {
-                // Group monsters by area using monsterSources
+            if (monsters && monsters.length > 0) {
                 const monsterSources = manager?.monsterSources;
                 const areaSet = new Set();
-                
+
                 for (const monster of monsters) {
                     const areas = monsterSources?.get(monster) || [];
                     for (const area of areas) {
                         areaSet.add(area);
                     }
-                }
-                
-                // Separate unlocked and locked areas
+                }
                 const allAreas = [...areaSet];
                 const unlockedAreas = allAreas.filter(a => a.unlocked);
                 const hasLockedAreas = unlockedAreas.length < allAreas.length;
-                
-                if (unlockedAreas.length === 0) {
-                    // No areas unlocked - show exploration hint
+
+                if (unlockedAreas.length === 0) {
                     text = 'Explore to discover drop sources';
                 } else if (unlockedAreas.length <= 3) {
                     text = `Drops in: ${unlockedAreas.map(a => a.name).join(', ')}`;
@@ -1364,133 +895,101 @@ function formatRequirement(req, manager, context = {}) {
             }
             break;
         }
-        
+
         case 'always_false':
             text = req.hint || 'Special unlock required';
             break;
-        
+
         default:
             text = `${req.type}: ${req.level || req.value || '?'}`;
     }
-    
+
     return { text, met };
 }
 
-/**
- * Format an array of requirements into human-readable descriptions with met status.
- * 
- * @param {Array} requirements - Array of requirement objects
- * @param {object} manager - AdventuringManager for resolving names
- * @param {object} [context] - Optional context (character, etc.)
- * @returns {Array<{ text: string, met: boolean }>} Formatted requirements
- */
 function formatRequirements(requirements, manager, context = {}) {
     if(!requirements || requirements.length === 0) return [];
     return requirements.map(req => formatRequirement(req, manager, context));
-}
+}
 
-// ============================================================================
-// CONDITION SYSTEM
-// ============================================================================
-
-/**
- * Evaluate a condition object against a character context.
- * Conditions can be combined with effects to create conditional triggers.
- * 
- * Supported condition types:
- *   - hp_below: { type: "hp_below", threshold: 50 } - HP below 50%
- *   - hp_above: { type: "hp_above", threshold: 80 } - HP above 80%
- *   - has_buff: { type: "has_buff", id: "adventuring:might" } - Has specific buff
- *   - has_debuff: { type: "has_debuff", id: "adventuring:poison" } - Has specific debuff
- *   - buff_stacks: { type: "buff_stacks", id: "...", min: 3 } - Has at least N stacks of buff
- *   - missing_hp: { type: "missing_hp", min: 20 } - Missing at least N HP
- *   - enemy_hp_below: { type: "enemy_hp_below", threshold: 25 } - Target HP below %
- *   - chance: { type: "chance", value: 25 } - 25% chance to trigger
- * 
- * @param {object} condition - Condition object with type and parameters
- * @param {object} context - Context object containing character, target, manager, etc.
- * @returns {boolean} Whether the condition is met
- */
 function evaluateCondition(condition, context) {
     if(!condition) return true; // No condition = always true
-    
+
     const { character, target, manager } = context;
-    
+
     switch(condition.type) {
         case 'hp_below': {
             if(!character) return false;
             const hpPercent = (character.hitpoints / character.maxHitpoints) * 100;
             return hpPercent < (condition.threshold || 30);
         }
-        
+
         case 'hp_above': {
             if(!character) return false;
             const hpPercent = (character.hitpoints / character.maxHitpoints) * 100;
             return hpPercent > (condition.threshold || 50);
         }
-        
+
         case 'missing_hp': {
             if(!character) return false;
             const missingHp = character.maxHitpoints - character.hitpoints;
             return missingHp >= (condition.min || 1);
         }
-        
+
         case 'has_buff': {
             if(!character || !character.auras) return false;
             return character.auras.has(condition.id);
         }
-        
+
         case 'has_debuff': {
             if(!character || !character.auras) return false;
             return character.auras.has(condition.id);
         }
-        
+
         case 'buff_stacks': {
             if(!character || !character.auras) return false;
             const aura = character.auras.get(condition.id);
             return aura && aura.stacks >= (condition.min || 1);
         }
-        
+
         case 'enemy_hp_below': {
             if(!target) return false;
             const hpPercent = (target.hitpoints / target.maxHitpoints) * 100;
             return hpPercent < (condition.threshold || 25);
         }
-        
+
         case 'enemy_hp_above': {
             if(!target) return false;
             const hpPercent = (target.hitpoints / target.maxHitpoints) * 100;
             return hpPercent > (condition.threshold || 50);
         }
-        
+
         case 'chance': {
             const roll = Math.random() * 100;
             return roll < (condition.value || 0);
         }
-        
+
         case 'is_injured': {
             if(!character) return false;
             return character.hitpoints < character.maxHitpoints;
         }
-        
+
         case 'is_full_hp': {
             if(!character) return false;
             return character.hitpoints >= character.maxHitpoints;
         }
-        
+
         case 'any_ally_injured': {
             if(!context.party) return false;
-            return context.party.some(member => 
+            return context.party.some(member =>
                 !member.dead && member.hitpoints < member.maxHitpoints
             );
         }
-        
+
         case 'all_allies_alive': {
             if(!context.party) return false;
             return context.party.every(member => !member.dead);
-        }
-        
-        // Threshold crossing conditions - check if value just crossed a boundary
+        }
         case 'hp_crossed_below': {
             if(!character) return false;
             const hpPercent = (character.hitpoints / character.maxHitpoints) * 100;
@@ -1498,7 +997,7 @@ function evaluateCondition(condition, context) {
             const threshold = condition.threshold || 30;
             return hpBefore >= threshold && hpPercent < threshold;
         }
-        
+
         case 'hp_crossed_above': {
             if(!character) return false;
             const hpPercent = (character.hitpoints / character.maxHitpoints) * 100;
@@ -1506,23 +1005,16 @@ function evaluateCondition(condition, context) {
             const threshold = condition.threshold || 50;
             return hpBefore < threshold && hpPercent >= threshold;
         }
-        
+
         default:
             console.warn(`Unknown condition type: ${condition.type}`);
             return true;
     }
 }
 
-/**
- * Generate a human-readable description for a condition.
- * 
- * @param {object} condition - Condition object
- * @param {object} manager - AdventuringManager for resolving names
- * @returns {string} Human-readable condition description
- */
 function describeCondition(condition, manager) {
     if(!condition) return '';
-    
+
     const auraName = (auraId) => {
         if (manager === undefined) return auraId || 'Unknown';
         let aura = undefined;
@@ -1531,7 +1023,7 @@ function describeCondition(condition, manager) {
         if (aura === undefined && manager.debuffs !== undefined) aura = manager.debuffs.getObjectByID(auraId);
         return aura !== undefined ? aura.name : (auraId || 'Unknown');
     };
-    
+
     switch(condition.type) {
         case 'hp_below':
             return `when below ${condition.threshold}% HP`;
@@ -1568,18 +1060,11 @@ function describeCondition(condition, manager) {
     }
 }
 
-/**
- * Generate a human-readable description for an effect limit.
- * 
- * @param {string} limitType - 'combat', 'round', or 'turn'
- * @param {number} times - Maximum trigger count
- * @returns {string} Human-readable limit description
- */
 function describeLimitSuffix(limitType, times) {
     if (!limitType) return '';
-    
+
     const timesText = times === 1 ? 'once' : `${times} times`;
-    
+
     switch(limitType) {
         case 'combat':
         case 'encounter':
@@ -1591,25 +1076,11 @@ function describeLimitSuffix(limitType, times) {
         default:
             return `(${timesText} per ${limitType})`;
     }
-}
+}
 
-// ============================================================================
-// DESCRIPTION PARSER
-// ============================================================================
-
-/**
- * Parse a template description string, replacing placeholders with values.
- * Supports formats:
- *   {effect.0.amount}, {effect.0.stacks}
- *   {hit.0.effect.0.amount}, {hit.0.effect.0.stacks}
- * 
- * @param {string} template - Description template with placeholders
- * @param {object} replacements - Map of placeholder to value
- * @returns {string} Parsed description
- */
 function parseDescription(template, replacements) {
     if(!template) return '';
-    
+
     let result = template;
     for(const [key, value] of Object.entries(replacements)) {
         result = result.replace(new RegExp(`\\{${key}\\}`, 'g'), value);
@@ -1617,17 +1088,8 @@ function parseDescription(template, replacements) {
     return result;
 }
 
-/**
- * Get the display name for an aura/buff/debuff.
- * Looks up the aura in the registry and falls back to prettifying the ID.
- * 
- * @param {object} manager - AdventuringManager for lookups
- * @param {string} auraId - The aura ID to look up
- * @returns {string} Human-readable aura name
- */
 function getAuraName(manager, auraId) {
-    if (!auraId) return 'Unknown';
-    // Prettify the ID as fallback (e.g., 'arcane_power' -> 'Arcane Power')
+    if (!auraId) return 'Unknown';
     const idPart = auraId.split(':').pop();
     const prettified = idPart ? idPart.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) : 'Unknown';
     if (manager === undefined || manager.auras === undefined) {
@@ -1637,12 +1099,6 @@ function getAuraName(manager, auraId) {
     return aura !== undefined ? aura.name : prettified;
 }
 
-/**
- * Return the first defined value from a list of values.
- * Used for display string fallbacks.
- * @param  {...any} values - Values to check in order
- * @returns {*} First defined value, or the last value if all undefined
- */
 function firstDefined(...values) {
     for (let i = 0; i < values.length; i++) {
         if (values[i] !== undefined) return values[i];
@@ -1650,46 +1106,31 @@ function firstDefined(...values) {
     return values[values.length - 1];
 }
 
-/**
- * Effect description registry - maps effect types to description generator functions.
- * Each function receives: (effect, value, stacks, amount, manager, helpers)
- * - effect: The full effect object
- * - value: Resolved amount value (same as amount - kept for registry function signature)
- * - stacks: Resolved stacks count
- * - amount: Resolved amount
- * - manager: AdventuringManager for lookups
- * - helpers: { sign, percent, stat, aura, prettify }
- */
-const effectDescriptionRegistry = new Map([
-    // Stat modifiers
+const effectDescriptionRegistry = new Map([
     ['stat_flat', (effect, value, stacks, amount, manager, helpers) => {
         const v = firstDefined(value, amount, 1);
         const absV = Math.abs(v);
-        return effect.perStack 
-            ? `${helpers.sign(v)}${absV} ${helpers.stat(effect.stat)} per stack` 
+        return effect.perStack
+            ? `${helpers.sign(v)}${absV} ${helpers.stat(effect.stat)} per stack`
             : `${helpers.sign(v)}${absV} ${helpers.stat(effect.stat)}`;
     }],
     ['stat_percent', (effect, value, stacks, amount, manager, helpers) => {
         const v = firstDefined(value, amount, 1);
         const absV = Math.abs(v);
-        return effect.perStack 
-            ? `${helpers.sign(v)}${absV}% ${helpers.stat(effect.stat)} per stack` 
+        return effect.perStack
+            ? `${helpers.sign(v)}${absV}% ${helpers.stat(effect.stat)} per stack`
             : `${helpers.sign(v)}${absV}% ${helpers.stat(effect.stat)}`;
-    }],
-    
-    // Damage/Healing
-    ['damage_flat', (effect, value, stacks, amount, manager, helpers) => 
+    }],
+    ['damage_flat', (effect, value, stacks, amount, manager, helpers) =>
         effect.perStack ? `Deal ${firstDefined(value, amount, 1)} damage per stack` : `Deal ${firstDefined(value, amount, '?')} damage`],
-    ['heal_flat', (effect, value, stacks, amount, manager, helpers) => 
+    ['heal_flat', (effect, value, stacks, amount, manager, helpers) =>
         effect.perStack ? `Heal ${firstDefined(value, amount, effect.count, 1)} HP per stack` : `Heal ${firstDefined(value, amount, effect.count, '?')} HP`],
-    ['heal_percent', (effect, value, stacks, amount, manager, helpers) => 
+    ['heal_percent', (effect, value, stacks, amount, manager, helpers) =>
         `Restore ${helpers.percent(firstDefined(value, amount))}% HP`],
-    ['lifesteal', (effect, value, stacks, amount, manager, helpers) => 
-        effect.perStack 
-            ? `Heal ${helpers.percent(firstDefined(value, amount, 0))}% of damage per stack` 
-            : `Heal for ${helpers.percent(firstDefined(value, amount, 0))}% of damage dealt`],
-    
-    // Damage modifiers
+    ['lifesteal', (effect, value, stacks, amount, manager, helpers) =>
+        effect.perStack
+            ? `Heal ${helpers.percent(firstDefined(value, amount, 0))}% of damage per stack`
+            : `Heal for ${helpers.percent(firstDefined(value, amount, 0))}% of damage dealt`],
     ['damage_modifier_flat', (effect, value, stacks, amount, manager, helpers) => {
         const v = firstDefined(value, amount, 1);
         const absV = Math.abs(v);
@@ -1699,15 +1140,13 @@ const effectDescriptionRegistry = new Map([
         const v = firstDefined(value, amount, 1);
         const absV = Math.abs(v);
         return effect.perStack ? `${helpers.sign(v)}${absV}% Damage per stack` : `${helpers.sign(v)}${absV}% Damage`;
-    }],
-    
-    // Buffs/Debuffs - use 'id' property for aura reference, or random: true
+    }],
     ['buff', (effect, value, stacks, amount, manager, helpers) => {
         if (effect.random) {
             const count = firstDefined(effect.count, 1);
             const stackCount = firstDefined(stacks, 1);
-            return count === 1 
-                ? `Apply a random buff (${stackCount} stack${stackCount !== 1 ? 's' : ''})` 
+            return count === 1
+                ? `Apply a random buff (${stackCount} stack${stackCount !== 1 ? 's' : ''})`
                 : `Apply ${count} random buffs (${stackCount} stack${stackCount !== 1 ? 's' : ''} each)`;
         }
         return `Apply ${firstDefined(stacks, 1)} ${helpers.aura(effect.id)}`;
@@ -1716,29 +1155,24 @@ const effectDescriptionRegistry = new Map([
         if (effect.random) {
             const count = firstDefined(effect.count, 1);
             const stackCount = firstDefined(stacks, 1);
-            return count === 1 
-                ? `Apply a random debuff (${stackCount} stack${stackCount !== 1 ? 's' : ''})` 
+            return count === 1
+                ? `Apply a random debuff (${stackCount} stack${stackCount !== 1 ? 's' : ''})`
                 : `Apply ${count} random debuffs (${stackCount} stack${stackCount !== 1 ? 's' : ''} each)`;
         }
         return `Apply ${firstDefined(stacks, 1)} ${helpers.aura(effect.id)}`;
     }],
-    ['cleanse', (effect, value, stacks, amount, manager, helpers) => 
-        effect.id ? `Remove ${helpers.aura(effect.id)}` : 'Cleanse debuffs'],
-    
-    // Energy
+    ['cleanse', (effect, value, stacks, amount, manager, helpers) =>
+        effect.id ? `Remove ${helpers.aura(effect.id)}` : 'Cleanse debuffs'],
     ['energy', (effect, value, stacks, amount, manager, helpers) => {
         const v = firstDefined(value, amount, 0);
         const absV = Math.abs(v);
         return `${helpers.sign(v)}${absV} Energy`;
-    }],
-    
-    // XP modifiers - category specifies which XP type (monsters, jobs, areas, equipment)
+    }],
     ['xp_percent', (effect, value, stacks, amount, manager, helpers) => {
         const v = firstDefined(value, amount, 0);
         const absV = Math.abs(v);
         if (effect.category) {
-            const catId = effect.category;
-            // Strip namespace prefix for display
+            const catId = effect.category;
             const catName = catId.includes(':') ? catId.split(':').pop() : catId;
             const label = catName.charAt(0).toUpperCase() + catName.slice(1);
             return `${helpers.sign(v)}${absV}% ${label} XP`;
@@ -1749,78 +1183,51 @@ const effectDescriptionRegistry = new Map([
         const v = firstDefined(value, amount, 0);
         const absV = Math.abs(v);
         return `${helpers.sign(v)}${absV}% Loot`;
-    }],
-    
-    // Revival - amount is whole number percent (e.g., 50 = 50% HP)
-    ['revive', (effect, value, stacks, amount) => 
-        `Revive with ${amount || 100}% HP`],
-    
-    // Town work action - hero works in their town job building
-    ['work', () => 'Work in town job building'],
-    
-    // Tile effects
+    }],
+    ['revive', (effect, value, stacks, amount) =>
+        `Revive with ${amount || 100}% HP`],
+    ['work', () => 'Work in town job building'],
     ['teleport', () => 'Teleport to a random tile'],
     ['loot', () => 'Contains random loot'],
-    ['xp', (effect, value, stacks, amount, manager, helpers) => `Grant ${firstDefined(amount, value)} Job XP`],
-    
-    // Percentage-based damage
-    ['damage_percent', (effect, value, stacks, amount, manager, helpers) => 
+    ['xp', (effect, value, stacks, amount, manager, helpers) => `Grant ${firstDefined(amount, value)} Job XP`],
+    ['damage_percent', (effect, value, stacks, amount, manager, helpers) =>
         `Deal ${firstDefined(amount, value)}% HP damage`],
-    ['damage_bonus', (effect, value, stacks, amount, manager, helpers) => 
+    ['damage_bonus', (effect, value, stacks, amount, manager, helpers) =>
         `+${helpers.percent(value)}% damage`],
-    ['damage_reduction', (effect, value, stacks, amount, manager, helpers) => 
-        `${helpers.percent(value)}% damage reduction`],
-    
-    // Immunity - use 'id' property for aura reference
+    ['damage_reduction', (effect, value, stacks, amount, manager, helpers) =>
+        `${helpers.percent(value)}% damage reduction`],
     ['immune', (effect, value, stacks, amount, manager, helpers) => {
         return effect.id ? `Immune to ${helpers.aura(effect.id)}` : 'Immune to debuffs';
-    }],
-    
-    // Crit
-    ['crit_chance', (effect, value, stacks, amount, manager, helpers) => 
+    }],
+    ['crit_chance', (effect, value, stacks, amount, manager, helpers) =>
         `+${helpers.percent(value)}% critical chance`],
-    ['crit_damage', (effect, value, stacks, amount, manager, helpers) => 
-        `+${helpers.percent(value)}% critical damage`],
-    
-    // Cost reduction
-    ['cost_reduction', (effect, value, stacks, amount, manager, helpers) => 
-        `-${helpers.percent(value)}% ability cost`],
-    
-    // Healing modifiers
-    ['healing_bonus', (effect, value, stacks, amount, manager, helpers) => 
+    ['crit_damage', (effect, value, stacks, amount, manager, helpers) =>
+        `+${helpers.percent(value)}% critical damage`],
+    ['cost_reduction', (effect, value, stacks, amount, manager, helpers) =>
+        `-${helpers.percent(value)}% ability cost`],
+    ['healing_bonus', (effect, value, stacks, amount, manager, helpers) =>
         `+${helpers.percent(value)}% healing done`],
-    ['healing_received', (effect, value, stacks, amount, manager, helpers) => 
-        `+${helpers.percent(value)}% healing received`],
-    
-    // Reflect
-    ['reflect', (effect, value, stacks, amount, manager, helpers) => 
-        effect.perStack 
-            ? `Reflect ${helpers.percent(firstDefined(amount, value))}% damage per stack` 
-            : `Reflect ${helpers.percent(firstDefined(value, amount))}% damage taken`],
-    
-    // Execute
+    ['healing_received', (effect, value, stacks, amount, manager, helpers) =>
+        `+${helpers.percent(value)}% healing received`],
+    ['reflect', (effect, value, stacks, amount, manager, helpers) =>
+        effect.perStack
+            ? `Reflect ${helpers.percent(firstDefined(amount, value))}% damage per stack`
+            : `Reflect ${helpers.percent(firstDefined(value, amount))}% damage taken`],
     ['execute', (effect, value, stacks, amount, manager, helpers) => {
-        let threshold = firstDefined(effect.threshold, value, 0.2);
-        // Convert decimal (0.25) to percentage (25), but leave whole numbers as-is
+        let threshold = firstDefined(effect.threshold, value, 0.2);
         if (threshold > 0 && threshold < 1) threshold = Math.round(threshold * 100);
         return `Execute enemies below ${threshold}% HP`;
-    }],
-    
-    // All stat percent bonus (with optional party scoping)
+    }],
     ['all_stat_percent', (effect, value, stacks, amount, manager, helpers) => {
         if (effect.party === 'enemy') return `+${value}% enemy stats`;
         if (effect.party === 'hero') return `+${value}% party stats`;
         return `+${value}% all stats`;
-    }],
-    
-    // Dispel effects - removes buffs from enemies
+    }],
     ['dispel', (effect, value, stacks, amount, manager, helpers) => {
         if (effect.id) return `Remove ${helpers.aura(effect.id)} from target`;
         const dispelCount = effect.count || 1;
         return dispelCount === 'all' ? 'Remove all buffs from target' : `Remove ${dispelCount} buff${dispelCount !== 1 ? 's' : ''} from target`;
-    }],
-    
-    // Mastery unlocks - consolidated unlock type with unlockType property
+    }],
     ['unlock', (effect) => {
         const unlockType = effect.unlockType || 'unknown';
         switch (unlockType) {
@@ -1835,9 +1242,7 @@ const effectDescriptionRegistry = new Map([
             case 'mastered_variant': return 'Unlock Mastered Variant';
             default: return `Unlock ${unlockType.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}`;
         }
-    }],
-    
-    // Mastery stat bonuses
+    }],
     ['job_stats_percent', (effect, value) => `+${value}% Job Stats`],
     ['drop_rate_percent', (effect, value) => `+${value}% Drop Rate`],
     ['drop_quantity_percent', (effect, value) => `+${value}% Drop Quantity`],
@@ -1850,9 +1255,7 @@ const effectDescriptionRegistry = new Map([
     ['ability_learn_chance_percent', (effect, value) => `+${value}% Ability Learn Chance`],
     ['equipment_xp_percent', (effect, value) => `+${value}% Equipment XP`],
     ['upgrade_cost_percent', (effect, value) => `${value > 0 ? '+' : ''}${value}% Upgrade Cost`],
-    ['equipment_stats_percent', (effect, value) => `+${value}% Equipment Stats`],
-    
-    // Aura internal effects
+    ['equipment_stats_percent', (effect, value) => `+${value}% Equipment Stats`],
     ['remove', () => ''],
     ['remove_stacks', (effect, value, stacks, amount) => `Remove ${firstDefined(effect.count, amount, 1)} stack(s)`],
     ['consume_charge', (effect) => `Consume ${firstDefined(effect.count, 1)} charge(s)`],
@@ -1861,11 +1264,9 @@ const effectDescriptionRegistry = new Map([
         if (effect.condition && effect.condition.type === 'chance') return `${effect.condition.value}% chance to skip turn`;
         return 'Skip turn';
     }],
-    ['dodge', (effect, value, stacks, amount) => {
-        // Passive dodge with amount (percent chance)
+    ['dodge', (effect, value, stacks, amount) => {
         const dodgeAmount = firstDefined(amount, effect.amount);
-        if (dodgeAmount !== undefined) return `+${dodgeAmount}% dodge chance`;
-        // Conditional dodge
+        if (dodgeAmount !== undefined) return `+${dodgeAmount}% dodge chance`;
         if (effect.condition && effect.condition.type === 'chance') return `${effect.condition.value}% chance to dodge`;
         if (effect.condition && effect.condition.type === 'hp_below') return `Dodge attacks when HP below ${effect.condition.threshold}%`;
         return 'Dodge attack';
@@ -1890,123 +1291,81 @@ const effectDescriptionRegistry = new Map([
         }
         return 'Survive lethal damage once';
     }],
-    ['reduce_damage_percent', (effect, value, stacks, amount) => 
+    ['reduce_damage_percent', (effect, value, stacks, amount) =>
         `${firstDefined(amount, 0)}% damage reduction${effect.perStack ? ' per stack' : ''}`],
-    ['reduce_heal_percent', (effect, value, stacks, amount) => 
-        `-${firstDefined(amount, 0)}% healing received${effect.perStack ? ' per stack' : ''}`],
-    
-    // Double cast
+    ['reduce_heal_percent', (effect, value, stacks, amount) =>
+        `-${firstDefined(amount, 0)}% healing received${effect.perStack ? ' per stack' : ''}`],
     ['double_cast', (effect, value, stacks, amount, manager, helpers) => {
         if (effect.condition && effect.condition.type === 'chance') return `${effect.condition.value}% chance to cast spells twice`;
         return `${firstDefined(effect.chance, amount, value)}% chance to cast spells twice`;
     }],
 ]);
 
-/**
- * Generate a human-readable description for an effect.
- * Centralizes effect description logic for use across tooltips, logs, etc.
- * 
- * @param {object} effect - Effect object with type, value, stat, etc.
- * @param {object} manager - AdventuringManager for resolving stat names
- * @param {string|boolean} displayMode - Display mode: 'total', 'scaled', 'multiplier', or legacy boolean
- * @returns {string} Human-readable description
- */
 function describeEffect(effect, manager, displayMode = false) {
-    if(!effect) return '';
-    
-    // If effect has explicit description, use it
+    if(!effect) return '';
     if(effect.description) return effect.description;
-    
-    const sign = (val) => val >= 0 ? '+' : '-';
-    // Convert decimal to percentage if needed (0.25 -> 25, but 25 stays 25)
+
+    const sign = (val) => val >= 0 ? '+' : '-';
     const toPercent = (val) => {
         if (val === undefined || val === null) return 0;
         return Math.abs(val) < 1 && val !== 0 ? Math.round(val * 100) : val;
-    };
-    
-    // Extract value from effect - handles both raw data and AdventuringScalableEffect objects
-    // displayMode controls how scaling is shown: 'total', 'scaled', 'multiplier', or false for raw
+    };
     const getVal = (key) => {
         const raw = effect[key];
-        if (raw === undefined || raw === null) return undefined;
-        // If it's a primitive, use it directly
-        if (typeof raw !== 'object') return raw;
-        // If effect has a method for this value, use it
+        if (raw === undefined || raw === null) return undefined;
+        if (typeof raw !== 'object') return raw;
         const methodName = key === 'amount' ? 'getAmount' : key === 'stacks' ? 'getStacks' : null;
-        if (methodName && typeof effect[methodName] === 'function') {
-            // Pass displayMode; use 'multiplier' as default for descriptions if no mode specified
+        if (methodName && typeof effect[methodName] === 'function') {
             return effect[methodName](null, displayMode !== false ? displayMode : 'multiplier');
-        }
-        // If it's an object with a base property (scalable format), use base
-        if (raw.base !== undefined) return raw.base;
-        // Last resort
+        }
+        if (raw.base !== undefined) return raw.base;
         return raw;
-    };
-    
-    // Convenience getters for common fields
+    };
     const amount = getVal('amount');
     const stacks = getVal('stacks');
     const value = amount; // 'amount' is the canonical property
-    
+
     const statName = (statId) => {
         if (!manager || !manager.stats) return null;
-        const stat = manager.stats.getObjectByID(statId);
-        // Return the actual name if found, otherwise return null for prettifying later
+        const stat = manager.stats.getObjectByID(statId);
         return (stat && stat.name) ? stat.name : null;
-    };
-    // Prettify a stat ID (e.g., 'xp_bonus' -> 'XP Bonus', 'all' -> 'All Stats')
-    const prettifyStatId = (statId) => {
-        // Handle special cases
+    };
+    const prettifyStatId = (statId) => {
         if (statId === 'all') return 'All Stats';
         if (!statId) return 'Unknown';
         const parts = statId.split(':');
         const lastPart = parts.length > 0 ? parts[parts.length - 1] : '';
         return lastPart ? lastPart.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) : 'Unknown';
-    };
-    // Get stat name with fallback to prettified ID
+    };
     const getStatDisplay = (statId) => statName(statId) || prettifyStatId(statId);
     const auraName = (auraId) => {
-        if (!manager || !manager.auras) return prettifyStatId(auraId);
-        // Try direct lookup first
-        let aura = manager.auras.getObjectByID(auraId);
-        // If not found and no namespace, try with adventuring: prefix
+        if (!manager || !manager.auras) return prettifyStatId(auraId);
+        let aura = manager.auras.getObjectByID(auraId);
         if (!aura && auraId && !auraId.includes(':')) {
             aura = manager.auras.getObjectByID(`adventuring:${auraId}`);
         }
         return (aura && aura.name) ? aura.name : prettifyStatId(auraId);
-    };
-    
-    // Build helpers object for registry functions
+    };
     const helpers = {
         sign,
         percent: toPercent,
         stat: getStatDisplay,
         aura: auraName,
         prettify: prettifyStatId
-    };
-    
-    // Look up description generator from registry
+    };
     const describer = effectDescriptionRegistry.get(effect.type);
     if (describer) {
         return describer(effect, value, stacks, amount, manager, helpers);
-    }
-    
-    // Fallback for unknown effect types
+    }
     if (amount !== undefined) {
         return `${effect.type}: ${amount}`;
     }
     return effect.type || 'Unknown effect';
 }
 
-/**
- * Format a trigger type into a human-readable string.
- * 
- * @param {string} trigger - Trigger type (e.g., 'round_start', 'kill')
- * @returns {string} Human-readable trigger description
- */
 function formatTrigger(trigger) {
     if(!trigger) return '';
-    
+
     const triggerNames = {
         'passive': 'Passive',
         'turn_start': 'At turn start',
@@ -2055,45 +1414,26 @@ function formatTrigger(trigger) {
     return triggerNames[trigger] || trigger.replace(/_/g, ' ');
 }
 
-/**
- * Format target type into human-readable text.
- * Handles both simple targets and target+party combinations.
- * 
- * @param {string} target - Target type (e.g., 'front', 'all', 'random')
- * @param {string} party - Party type (e.g., 'enemy', 'ally')
- * @returns {string} Human-readable target description
- */
 function formatTarget(target, party) {
-    if(!target || target === 'self') return '';
-    
-    // Map of target types to human-readable base names
-    const targetNames = {
-        // Simple targets (no party needed)
+    if(!target || target === 'self') return '';
+    const targetNames = {
         'self': 'self',
         'attacker': 'attacker',
         'target': 'target',
         'hit_target': 'target',
         'heal_target': 'target',
-        'dead': 'dead',
-        
-        // Position-based targets
+        'dead': 'dead',
         'front': 'front',
-        'back': 'back',
-        
-        // Selection-based targets
+        'back': 'back',
         'all': 'all',
         'random': 'random',
         'lowest': 'lowest HP'
-    };
-    
-    // Check for explicit mapping first
+    };
     if(targetNames[target]) {
-        const baseName = targetNames[target];
-        // If the base name is a special target that doesn't need party info, return as-is
+        const baseName = targetNames[target];
         if(baseName === 'attacker' || baseName === 'target') {
             return baseName;
-        }
-        // Combine with party if provided, default to 'enemy' for combat targets
+        }
         const effectiveParty = party || 'enemy';
         if(effectiveParty === 'enemy') {
             if(baseName === 'all') return 'all enemies';
@@ -2103,8 +1443,7 @@ function formatTarget(target, party) {
             if(baseName === 'lowest HP') return 'lowest HP enemy';
             if(baseName === 'dead') return 'dead enemy';
             return `${baseName} enemy`;
-        }
-        // 'hero' = always hero party, 'ally' or 'player' = same party as caster (all display as "ally")
+        }
         if(effectiveParty === 'hero' || effectiveParty === 'ally' || effectiveParty === 'player') {
             if(baseName === 'all') return 'all allies';
             if(baseName === 'front') return 'front ally';
@@ -2115,24 +1454,13 @@ function formatTarget(target, party) {
             return `${baseName} ally`;
         }
         return baseName;
-    }
-    
-    // Fallback: replace underscores with spaces
+    }
     return target.replace(/_/g, ' ');
 }
 
-/**
- * Join effect descriptions with proper grammar (commas and Oxford comma).
- * Groups effects by action word and removes repeated action words within groups.
- * 
- * @param {string[]} descriptions - Array of effect descriptions
- * @returns {string} Joined description with proper punctuation
- */
 function joinEffectDescriptions(descriptions) {
     if (descriptions.length === 0) return '';
-    if (descriptions.length === 1) return descriptions[0];
-    
-    // Helper to lowercase first letter, preserving acronyms
+    if (descriptions.length === 1) return descriptions[0];
     const lowercaseFirst = (str) => {
         if (!str) return str;
         const firstWord = str.split(/[\s,]/)[0];
@@ -2140,128 +1468,83 @@ function joinEffectDescriptions(descriptions) {
             return str;  // Keep as-is for acronyms like "XP", "HP", etc.
         }
         return str.charAt(0).toLowerCase() + str.slice(1);
-    };
-    
-    // Action words we can deduplicate
-    const actionWords = ['Apply', 'Deal', 'Heal', 'Remove', 'Grant'];
-    
-    // Group consecutive descriptions by action word
+    };
+    const actionWords = ['Apply', 'Deal', 'Heal', 'Remove', 'Grant'];
     const groups = [];
     let currentGroup = null;
-    
+
     for (const desc of descriptions) {
         const firstWord = desc.split(' ')[0];
         const isActionWord = actionWords.includes(firstWord);
-        
-        if (isActionWord && currentGroup && currentGroup.action === firstWord) {
-            // Same action word - add to current group
+
+        if (isActionWord && currentGroup && currentGroup.action === firstWord) {
             currentGroup.items.push(desc);
-        } else {
-            // Different action or not an action word - start new group
+        } else {
             currentGroup = {
                 action: isActionWord ? firstWord : null,
                 items: [desc]
             };
             groups.push(currentGroup);
         }
-    }
-    
-    // Process each group - deduplicate action words within groups
+    }
     const processedParts = [];
     for (const group of groups) {
-        if (group.action && group.items.length > 1) {
-            // Multiple items with same action - strip action from subsequent
+        if (group.action && group.items.length > 1) {
             const first = group.items[0];
             const rest = group.items.slice(1).map(d => d.substring(group.action.length + 1));
             processedParts.push(first);
             processedParts.push(...rest);
-        } else {
-            // Single item or no action word - keep as-is
+        } else {
             processedParts.push(...group.items);
         }
-    }
-    
-    // Join all parts with proper grammar
+    }
     if (processedParts.length === 1) {
         return processedParts[0];
     } else if (processedParts.length === 2) {
         return `${processedParts[0]} and ${lowercaseFirst(processedParts[1])}`;
-    }
-    
-    // Oxford comma for 3+
-    const parts = processedParts.map((d, idx) => 
+    }
+    const parts = processedParts.map((d, idx) =>
         idx > 0 ? lowercaseFirst(d) : d
     );
     const lastPart = parts.pop();
     return `${parts.join(', ')}, and ${lastPart}`;
 }
 
-/**
- * Generate a full effect description including trigger and target.
- * Trigger is placed naturally at the end: "Deal 10 damage when hit" instead of "On hit: Deal 10 damage"
- * 
- * @param {object} effect - Effect object with type, trigger, value, etc.
- * @param {object} manager - AdventuringManager for resolving names
- * @param {object} options - Options for formatting
- * @param {boolean} options.includeTrigger - Whether to include trigger info (default: true)
- * @param {boolean} options.includeChance - Whether to include chance info (default: true)
- * @param {string} options.target - Target from parent hit (if effect doesn't have one)
- * @param {string} options.party - Party from parent hit (if effect doesn't have one)
- * @param {string|boolean} options.displayMode - Display mode: 'total', 'scaled', 'multiplier', or false
- * @returns {string} Full effect description
- */
 function describeEffectFull(effect, manager, options = {}) {
     const { includeTrigger = true, includeChance = true, displayMode = false } = options;
-    
-    let desc = describeEffect(effect, manager, displayMode);
-    
-    // Add target info - use effect's target or fall back to options
+
+    let desc = describeEffect(effect, manager, displayMode);
     const target = effect.target || options.target;
-    const party = effect.party || options.party;
-    
-    // For self-targeting damage, explicitly say "to self"
+    const party = effect.party || options.party;
     if (target === 'self' && (effect.type === 'damage' || effect.type === 'damage_flat')) {
         desc = `${desc} to self`;
     } else if(target && target !== 'self') {
-        const targetName = formatTarget(target, party);
-        // Only add if not already implied in the description
+        const targetName = formatTarget(target, party);
         if(targetName && !desc.toLowerCase().includes(targetName.toLowerCase())) {
             desc = `${desc} to ${targetName}`;
         }
-    }
-    
-    // Add chance if present (unless it's 100% or already shown in description)
+    }
     const chance = effect.chance || options.chance;
     if(includeChance && chance && chance < 100 && !desc.includes('% chance')) {
         desc = `${desc} (${chance}% chance)`;
-    }
-    
-    // Add condition suffix if present
-    // Skip if the effect type already handled the condition in its description
+    }
     const typesWithBuiltInCondition = ['skip', 'miss', 'confuse', 'dodge'];
     if(effect.condition && !typesWithBuiltInCondition.includes(effect.type)) {
         const conditionDesc = describeCondition(effect.condition, manager);
         if(conditionDesc) {
             desc = `${desc} ${conditionDesc}`;
         }
-    }
-    
-    // Add limit description if present
+    }
     if(effect.limit) {
         const times = effect.times || 1;
         const limitDesc = describeLimitSuffix(effect.limit, times);
         if(limitDesc) {
             desc = `${desc} ${limitDesc}`;
         }
-    }
-    
-    // Add scope description if party-scoped
+    }
     if(effect.scope === 'party') {
         desc = `[Party] ${desc}`;
-    }
-    
-    // Add trigger as a natural suffix (not a prefix)
-    // Skip if the description already contains condition text like "when below X%" to avoid "when below 50% HP when damaged"
+    }
     const trigger = effect.trigger || options.trigger;
     const descLower = desc.toLowerCase();
     const hasWhenClause = descLower.includes('when below') || descLower.includes('when above');
@@ -2271,20 +1554,13 @@ function describeEffectFull(effect, manager, options = {}) {
             desc = `${desc} ${triggerSuffix}`;
         }
     }
-    
+
     return desc;
 }
 
-/**
- * Format a trigger as a suffix phrase for natural reading.
- * E.g., "kill" -> "on kill", "round_start" -> "each round"
- * 
- * @param {string} trigger - Trigger type
- * @returns {string} Natural suffix phrase
- */
 function formatTriggerSuffix(trigger) {
     if(!trigger || trigger === 'passive' || trigger === 'on_use') return '';
-    
+
     const suffixes = {
         'turn_start': 'each turn',
         'turn_end': 'at the end of the turn',
@@ -2337,143 +1613,100 @@ function formatTriggerSuffix(trigger) {
         'after_hit_delivered': 'after hitting',
         'after_hit_received': 'after being hit'
     };
-    
+
     const suffix = suffixes[trigger];
     return suffix !== undefined ? suffix : trigger.replace(/_/g, ' ');
 }
 
-/**
- * Combine multiple effects into a single description with "and".
- * Also handles aura-specific cleanup by summarizing removal effects.
- * 
- * When effects share the same target and trigger, factors them out:
- * "Deal 10 damage and apply 2 Bleeding to front enemy" instead of
- * "Deal 10 damage to front enemy and apply 2 Bleeding to front enemy"
- * 
- * @param {Array} effects - Array of effects
- * @param {object} manager - AdventuringManager
- * @param {object} options - Options passed to describeEffectFull
- * @param {boolean} options.isAura - Whether this is for an aura (filters removal effects)
- * @returns {string} Combined description
- */
 function describeEffects(effects, manager, options = {}) {
     if (!effects || effects.length === 0) return '';
-    
-    const { isAura = false } = options;
-    
-    // Separate main effects from cleanup effects (for auras)
+
+    const { isAura = false } = options;
     let mainEffects = effects;
-    
-    if (isAura) {
-        // Standard cleanup only has trigger and type: 'remove', no other properties
+
+    if (isAura) {
         const isStandardCleanup = (e) => {
             if (e.type !== 'remove') return false;
             if (e.trigger !== 'encounter_end' && e.trigger !== 'death') return false;
             const keys = Object.keys(e).filter(k => k !== 'trigger' && k !== 'type');
             return keys.length === 0;
         };
-        
+
         mainEffects = effects.filter(e => !isStandardCleanup(e));
-    }
-    
-    // Helper to get effective target/trigger for an effect
+    }
     const getTarget = (e) => e.target || options.target;
     const getParty = (e) => e.party || options.party;
-    const getTrigger = (e) => e.trigger || options.trigger;
-    
-    // Check if all effects share the same target and trigger
+    const getTrigger = (e) => e.trigger || options.trigger;
     const firstTarget = getTarget(mainEffects[0]);
     const firstParty = getParty(mainEffects[0]);
     const firstTrigger = getTrigger(mainEffects[0]);
-    
-    const allSameTarget = mainEffects.every(e => 
+
+    const allSameTarget = mainEffects.every(e =>
         getTarget(e) === firstTarget && getParty(e) === firstParty
     );
-    const allSameTrigger = mainEffects.every(e => getTrigger(e) === firstTrigger);
-    
-    // Helper to lowercase the first letter (for combining with "and")
-    // Preserves acronyms by checking if first word is all uppercase
+    const allSameTrigger = mainEffects.every(e => getTrigger(e) === firstTrigger);
     const lowercaseFirst = (str) => {
-        if (!str) return str;
-        // Check if first word is an acronym (all uppercase, 2+ chars)
+        if (!str) return str;
         const firstWord = str.split(/[\s,]/)[0];
         if (firstWord.length >= 2 && firstWord === firstWord.toUpperCase()) {
             return str;  // Keep as-is for acronyms like "XP", "HP", etc.
         }
         return str.charAt(0).toLowerCase() + str.slice(1);
     };
-    
+
     let combined;
-    
-    if (allSameTarget && allSameTrigger) {
-        // Factor out shared target and trigger - describe effects without them first
-        const descriptions = mainEffects.map(e => 
-            describeEffectFull(e, manager, { 
-                ...options, 
-                includeTrigger: false,
-                // Don't add target in individual descriptions
+
+    if (allSameTarget && allSameTrigger) {
+        const descriptions = mainEffects.map(e =>
+            describeEffectFull(e, manager, {
+                ...options,
+                includeTrigger: false,
                 target: null,
                 party: null
             })
-        );
-        
-        // Combine effect descriptions using joinEffectDescriptions for action word deduplication
-        combined = joinEffectDescriptions(descriptions);
-        
-        // Add shared target at the end
+        );
+        combined = joinEffectDescriptions(descriptions);
         if (firstTarget && firstTarget !== 'self') {
             const targetName = formatTarget(firstTarget, firstParty);
             if (targetName && !combined.toLowerCase().includes(targetName.toLowerCase())) {
                 combined = `${combined} to ${targetName}`;
             }
-        }
-        
-        // Add shared trigger at the end
+        }
         if (firstTrigger && firstTrigger !== 'passive' && firstTrigger !== 'on_use') {
             const triggerSuffix = formatTriggerSuffix(firstTrigger);
             if (triggerSuffix && !combined.toLowerCase().includes('when below') && !combined.toLowerCase().includes('when above')) {
                 combined = `${combined} ${triggerSuffix}`;
             }
         }
-    } else {
-        // Different triggers - group effects by trigger, then combine
+    } else {
         const triggerGroups = new Map();
-        
+
         for (const e of mainEffects) {
             const trigger = getTrigger(e) || 'passive';
             if (!triggerGroups.has(trigger)) {
                 triggerGroups.set(trigger, []);
             }
             triggerGroups.get(trigger).push(e);
-        }
-        
-        // Describe each trigger group
+        }
         const groupDescriptions = [];
-        
-        for (const [trigger, groupEffects] of triggerGroups) {
-            // Describe effects in this group without triggers
-            const descriptions = groupEffects.map(e => 
-                describeEffectFull(e, manager, { 
-                    ...options, 
+
+        for (const [trigger, groupEffects] of triggerGroups) {
+            const descriptions = groupEffects.map(e =>
+                describeEffectFull(e, manager, {
+                    ...options,
                     includeTrigger: false
                 })
-            );
-            
-            // Combine effect descriptions using joinEffectDescriptions for action word deduplication
-            let groupCombined = joinEffectDescriptions(descriptions);
-            
-            // Add shared trigger suffix for this group
+            );
+            let groupCombined = joinEffectDescriptions(descriptions);
             if (trigger && trigger !== 'passive' && trigger !== 'on_use') {
                 const triggerSuffix = formatTriggerSuffix(trigger);
                 if (triggerSuffix && !groupCombined.toLowerCase().includes('when below') && !groupCombined.toLowerCase().includes('when above')) {
                     groupCombined = `${groupCombined} ${triggerSuffix}`;
                 }
             }
-            
+
             groupDescriptions.push(groupCombined);
-        }
-        
-        // Join all trigger groups (don't use joinEffectDescriptions here - groups have different actions)
+        }
         if (groupDescriptions.length === 1) {
             combined = groupDescriptions[0];
         } else if (groupDescriptions.length === 2) {
@@ -2485,72 +1718,35 @@ function describeEffects(effects, manager, options = {}) {
             combined = `${first}, ${middle}, and ${lowercaseFirst(last)}`;
         }
     }
-    
+
     return combined;
 }
 
-/**
- * Generate comma-separated effect descriptions for inline display.
- * Uses short-form descriptions without triggers.
- * 
- * @param {Array} effects - Array of effects to describe
- * @param {object} manager - AdventuringManager for resolving names
- * @param {object} [options] - Options for description generation
- * @param {string} [options.separator=', '] - Separator between descriptions
- * @returns {string} Comma-separated effect descriptions
- */
 function describeEffectsInline(effects, manager, options = {}) {
     if (!effects || effects.length === 0) return '';
     const { separator = ', ' } = options;
     return effects.map(e => describeEffect(e, manager)).join(separator);
 }
 
-/**
- * Get an array of effect descriptions for itemized display.
- * Each description includes trigger prefix for non-passive effects.
- * Used for tooltip effect lists where each effect is on its own line.
- * 
- * @param {Array} effects - Array of effects to describe
- * @param {object} manager - AdventuringManager for resolving names
- * @param {object} [options] - Options for description generation
- * @param {boolean} [options.includeChance=true] - Include chance prefix if < 100%
- * @returns {Array<string>} Array of formatted effect descriptions
- */
 function getEffectDescriptionsList(effects, manager, options = {}) {
     if (!effects || effects.length === 0) return [];
     const { includeChance = true } = options;
-    
-    return effects.map(effect => {
-        // Use description if explicitly provided
-        if (effect.description) return effect.description;
-        
-        // Build description from effect data
+
+    return effects.map(effect => {
+        if (effect.description) return effect.description;
         const trigger = formatTrigger(effect.trigger);
-        let desc = describeEffect(effect, manager);
-        
-        // Add chance if applicable (chance is whole percent, 100 = always)
+        let desc = describeEffect(effect, manager);
         if (includeChance && effect.chance !== undefined && effect.chance < 100) {
             desc = `${effect.chance}% chance: ${desc}`;
-        }
-        
-        // Combine trigger and description for non-passive effects
+        }
         if (trigger && effect.trigger !== 'passive') {
             return `${trigger}: ${desc}`;
         }
-        
+
         return desc;
     });
 }
 
-/**
- * Build replacements object from effects array for standard effect descriptions.
- * Works with auras, passives, etc. that use {effect.N.amount} format.
- * 
- * @param {Array} effects - Array of effects with getAmount/getStacks methods
- * @param {object} context - Context to pass to getAmount/getStacks (stats, instance, etc.)
- * @param {string|boolean} displayMode - Display mode: 'total', 'scaled', 'multiplier', or legacy boolean
- * @returns {object} Replacements object for parseDescription
- */
 function buildEffectReplacements(effects, context, displayMode = false) {
     const replacements = {};
     effects.forEach((effect, i) => {
@@ -2564,14 +1760,6 @@ function buildEffectReplacements(effects, context, displayMode = false) {
     return replacements;
 }
 
-/**
- * Build replacements object from ability hits for {hit.N.effect.M.amount} format.
- * 
- * @param {Array} hits - Array of ability hits containing effects
- * @param {object} stats - Stats context for getAmount/getStacks
- * @param {string|boolean} displayMode - Display mode: 'total', 'scaled', 'multiplier', or legacy boolean
- * @returns {object} Replacements object for parseDescription
- */
 function buildHitEffectReplacements(hits, stats, displayMode = false) {
     const replacements = {};
     hits.forEach((hit, i) => {
@@ -2585,16 +1773,8 @@ function buildHitEffectReplacements(hits, stats, displayMode = false) {
         });
     });
     return replacements;
-}
+}
 
-// ============================================================================
-// EFFECT PROCESSOR
-// ============================================================================
-
-/**
- * Simple effect instance wrapper for equipment/consumable effects.
- * Provides the same interface as aura instances so both can use the unified processor.
- */
 class SimpleEffectInstance {
     constructor(amount, sourceName, stacks = 1) {
         this.amount = amount;
@@ -2603,135 +1783,78 @@ class SimpleEffectInstance {
         this.source = null;
         this.age = 0;
         this._isSimple = true; // Flag to identify simple instances
-    }
-    
-    // No-op for simple instances (no stack management)
+    }
     remove_stacks(count) { }
     remove() { }
 }
 
-/**
- * Get the amount from an effect, handling both aura effects (with getAmount method)
- * and simple effects (raw JSON with amount property).
- * @param {object} effect - The effect object
- * @param {object} instance - The effect instance (aura or simple)
- * @returns {number} The calculated amount
- */
-function getEffectAmount(effect, instance) {
-    // Simple instance - amount is pre-calculated and stored on instance
+function getEffectAmount(effect, instance) {
     if(instance._isSimple) {
         return instance.amount;
-    }
-    // Aura effect - use getAmount method if available
+    }
     if(effect.getAmount) {
         return effect.getAmount(instance);
-    }
-    // Fallback to raw amount
+    }
     return effect.amount || 0;
 }
 
-/**
- * Centralized effect processor with registered handlers.
- * Handles effects from auras, equipment, and consumables with a unified interface.
- */
 class EffectProcessor {
     constructor() {
-        /** @type {Map<string, Function>} */
+
         this.handlers = new Map();
     }
-    
-    /**
-     * Register a handler for an effect type
-     * @param {string} type - Effect type (e.g., 'damage', 'heal', 'buff')
-     * @param {Function} handler - Handler function(effect, instance, context) => extra
-     */
+
     register(type, handler) {
         this.handlers.set(type, handler);
     }
-    
-    /**
-     * Process an effect from an aura (has instance with getAmount method)
-     * @param {object} resolved - Resolved effect from aura trigger { effect, instance }
-     * @param {object} context - Processing context { character, extra, manager }
-     * @returns {object} Modified extra object
-     */
+
     process(resolved, context) {
         const { effect, instance } = resolved;
         const handler = this.handlers.get(effect.type);
-        
+
         if(handler) {
             return handler(effect, instance, context);
-        }
-        
-        // No handler - might be handled elsewhere (like stat calculation)
+        }
         return context.extra;
     }
-    
-    /**
-     * Process an effect from equipment/consumables (pre-calculated amount)
-     * @param {object} effect - The effect object
-     * @param {number} amount - Pre-calculated effect amount
-     * @param {string} sourceName - Name of the source for logging
-     * @param {object} context - Processing context { character, extra, manager }
-     * @returns {object} Modified extra object
-     */
+
     processSimple(effect, amount, sourceName, context) {
         const handler = this.handlers.get(effect.type);
-        
-        if(handler) {
-            // Create a simple instance wrapper
+
+        if(handler) {
             const instance = new SimpleEffectInstance(amount, sourceName, effect.stacks || 1);
             return handler(effect, instance, context);
         }
-        
+
         return context.extra;
     }
-    
-    /**
-     * Process multiple resolved effects from auras
-     * @param {Array} resolvedEffects - Array of { effect, instance }
-     * @param {object} context - Processing context
-     * @returns {object} Modified extra object
-     */
+
     processAll(resolvedEffects, context) {
         resolvedEffects.forEach(resolved => {
-            const { effect, instance } = resolved;
-            
-            // Check condition if present on the effect
-            if (effect.condition) {
-                // Build context for condition evaluation
+            const { effect, instance } = resolved;
+            if (effect.condition) {
                 const evalContext = buildEffectContext(context.character, context.extra);
                 if (!evaluateCondition(effect.condition, evalContext)) {
                     return; // Skip this effect
                 }
-            }
-            
-            // Check chance if present
+            }
             const chance = effect.chance || 100;
             if (Math.random() * 100 > chance) {
                 return; // Skip this effect
             }
-            
+
             context.extra = this.process(resolved, context);
         });
         return context.extra;
     }
 }
 
-/**
- * Create the default effect processor with all standard handlers.
- * @returns {EffectProcessor} Configured processor
- */
 function createDefaultEffectProcessor() {
-    const processor = new EffectProcessor();
-    
-    // Skip turn
+    const processor = new EffectProcessor();
     processor.register('skip', (effect, instance, ctx) => {
         ctx.extra.skip = true;
         return ctx.extra;
-    });
-    
-    // Shield/block damage (flat amount)
+    });
     processor.register('reduce_amount', (effect, instance, ctx) => {
         const amount = getEffectAmount(effect, instance);
         const reduce = Math.min(ctx.extra.amount || 0, amount);
@@ -2740,16 +1863,14 @@ function createDefaultEffectProcessor() {
             instance.remove_stacks(reduce);
         }
         return ctx.extra;
-    });
-    
-    // Damage or heal (with target resolution)
+    });
     const damageOrHeal = (effect, instance, ctx) => {
         const amount = getEffectAmount(effect, instance);
         const builtEffect = { amount };
         const target = effect.target || 'self';
         const isDamage = effect.type.includes('damage');
         const effectLabel = isDamage ? 'damage' : 'healing';
-        
+
         if(target === 'self' || target === undefined) {
             ctx.manager.log.add(`${ctx.character.name} receives ${amount} ${effectLabel} from ${instance.base.name}`);
             ctx.character.applyEffect(effect, builtEffect, ctx.character);
@@ -2763,19 +1884,12 @@ function createDefaultEffectProcessor() {
         return ctx.extra;
     };
     processor.register('damage_flat', damageOrHeal);
-    processor.register('heal_flat', damageOrHeal);
-    
-    // Heal percent of max HP - supports target/party properties
+    processor.register('heal_flat', damageOrHeal);
     processor.register('heal_percent', (effect, instance, ctx) => {
         const percentValue = (effect.amount !== undefined) ? effect.amount : ((instance.amount !== undefined) ? instance.amount : 0);
-        if(percentValue <= 0) return ctx.extra;
-        
-        // Determine targets based on target/party properties
-        // 'ally' means same party as caster, which for heroes is the hero party
+        if(percentValue <= 0) return ctx.extra;
         const party = effect.party || 'ally';
-        const target = effect.target || 'all';
-        
-        // For hero characters, 'ally' and 'hero' both target the hero party
+        const target = effect.target || 'all';
         if((party === 'hero' || party === 'ally') && ctx.manager.party) {
             if(target === 'all') {
                 ctx.manager.party.all.forEach(hero => {
@@ -2790,36 +1904,26 @@ function createDefaultEffectProcessor() {
             }
             const characterName = (ctx.character && ctx.character.name) ? ctx.character.name : 'Effect';
             ctx.manager.log.add(`${characterName} heals for ${percentValue}%`);
-        }
-        // Enemy healing not typically used, but could be extended here
+        }
         return ctx.extra;
-    });
-    
-    // Buff pools for random buff application
+    });
     const BUFF_POOL = [
         'adventuring:might', 'adventuring:fortify', 'adventuring:haste',
         'adventuring:regeneration', 'adventuring:barrier', 'adventuring:focus',
         'adventuring:arcane_power', 'adventuring:stealth'
-    ];
-    
-    // Debuff pools for random debuff application
+    ];
     const DEBUFF_POOL = [
         'adventuring:weaken', 'adventuring:slow', 'adventuring:blind',
         'adventuring:poison', 'adventuring:burn', 'adventuring:decay',
         'adventuring:vulnerability', 'adventuring:chill'
-    ];
-    
-    // Apply buff aura - uses 'id' property for aura reference, or random: true with optional pool
+    ];
     processor.register('buff', (effect, instance, ctx) => {
         const stacks = instance.stacks || effect.stacks || 1;
         const builtEffect = { stacks };
         const target = effect.target || 'self';
-        const count = effect.count || 1;
-        
-        // Determine which auras to apply
+        const count = effect.count || 1;
         let auraIds = [];
-        if (effect.random) {
-            // Use custom pool if provided, otherwise use default buff pool
+        if (effect.random) {
             const pool = effect.pool || BUFF_POOL;
             for (let i = 0; i < count; i++) {
                 auraIds.push(pool[Math.floor(Math.random() * pool.length)]);
@@ -2830,9 +1934,7 @@ function createDefaultEffectProcessor() {
                 return ctx.extra;
             }
             auraIds.push(effect.id);
-        }
-        
-        // Apply each aura
+        }
         for (const auraId of auraIds) {
             if (target === 'self' || target === undefined) {
                 ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} applies ${auraId}`);
@@ -2843,19 +1945,14 @@ function createDefaultEffectProcessor() {
             }
         }
         return ctx.extra;
-    });
-    
-    // Apply debuff aura - uses 'id' property for aura reference, or random: true with optional pool
+    });
     processor.register('debuff', (effect, instance, ctx) => {
         const stacks = instance.stacks || effect.stacks || 1;
         const builtEffect = { stacks };
         const target = effect.target || 'target';
-        const count = effect.count || 1;
-        
-        // Determine which auras to apply
+        const count = effect.count || 1;
         let auraIds = [];
-        if (effect.random) {
-            // Use custom pool if provided, otherwise use default debuff pool
+        if (effect.random) {
             const pool = effect.pool || DEBUFF_POOL;
             for (let i = 0; i < count; i++) {
                 auraIds.push(pool[Math.floor(Math.random() * pool.length)]);
@@ -2866,9 +1963,7 @@ function createDefaultEffectProcessor() {
                 return ctx.extra;
             }
             auraIds.push(effect.id);
-        }
-        
-        // Resolve target character
+        }
         let targetChar = null;
         if (target === 'self') {
             targetChar = ctx.character;
@@ -2876,9 +1971,7 @@ function createDefaultEffectProcessor() {
             targetChar = ctx.extra.attacker;
         } else if (target === 'target' && ctx.extra.target) {
             targetChar = ctx.extra.target;
-        }
-        
-        // Apply each aura
+        }
         if (targetChar && !targetChar.dead) {
             for (const auraId of auraIds) {
                 ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} applies ${auraId} to ${targetChar.name}`);
@@ -2886,28 +1979,24 @@ function createDefaultEffectProcessor() {
             }
         }
         return ctx.extra;
-    });
-    
-    // Energy gain
+    });
     processor.register('energy', (effect, instance, ctx) => {
         const amount = getEffectAmount(effect, instance);
         ctx.character.energy = Math.min(ctx.character.maxEnergy, ctx.character.energy + amount);
         ctx.character.renderQueue.energy = true;
         return ctx.extra;
-    });
-    
-    // Stack manipulation
+    });
     processor.register('remove_stacks', (effect, instance, ctx) => {
         let count = 1;
         if(effect.count !== undefined) {
-            count = effect.count < 1 
+            count = effect.count < 1
                 ? Math.ceil(instance.stacks * effect.count)
                 : effect.count;
         }
         instance.remove_stacks(count);
         return ctx.extra;
     });
-    
+
     processor.register('remove', (effect, instance, ctx) => {
         if (effect.age !== undefined) {
             if (instance.age >= effect.age) {
@@ -2917,37 +2006,33 @@ function createDefaultEffectProcessor() {
             instance.remove();
         }
         return ctx.extra;
-    });
-    
-    // Damage modifiers
+    });
     processor.register('damage_modifier_flat', (effect, instance, ctx) => {
         const amount = getEffectAmount(effect, instance);
         ctx.extra.amount = (ctx.extra.amount || 0) + amount;
         return ctx.extra;
     });
-    
+
     processor.register('damage_modifier_percent', (effect, instance, ctx) => {
         const amount = getEffectAmount(effect, instance);
         const increase = Math.ceil((ctx.extra.amount || 0) * (amount / 100));
         ctx.extra.amount = (ctx.extra.amount || 0) + increase;
         return ctx.extra;
     });
-    
+
     processor.register('reduce_damage_percent', (effect, instance, ctx) => {
         const amount = getEffectAmount(effect, instance);
         const reduction = Math.ceil((ctx.extra.amount || 0) * (amount / 100));
         ctx.extra.amount = Math.max(0, (ctx.extra.amount || 0) - reduction);
         return ctx.extra;
     });
-    
+
     processor.register('reduce_heal_percent', (effect, instance, ctx) => {
         const amount = getEffectAmount(effect, instance);
         const reduction = Math.ceil((ctx.extra.amount || 0) * (amount / 100));
         ctx.extra.amount = Math.max(0, (ctx.extra.amount || 0) - reduction);
         return ctx.extra;
-    });
-    
-    // Condition-based effects - check condition before applying
+    });
     const checkCondition = (effect, instance) => {
         if (!effect.condition) return true;
         if (effect.condition.type === 'chance') {
@@ -2956,7 +2041,7 @@ function createDefaultEffectProcessor() {
         }
         return true;
     };
-    
+
     processor.register('skip', (effect, instance, ctx) => {
         if (checkCondition(effect, instance)) {
             ctx.extra.skip = true;
@@ -2964,7 +2049,7 @@ function createDefaultEffectProcessor() {
         }
         return ctx.extra;
     });
-    
+
     processor.register('dodge', (effect, instance, ctx) => {
         if (checkCondition(effect, instance)) {
             ctx.extra.amount = 0;
@@ -2973,7 +2058,7 @@ function createDefaultEffectProcessor() {
         }
         return ctx.extra;
     });
-    
+
     processor.register('miss', (effect, instance, ctx) => {
         if (checkCondition(effect, instance)) {
             ctx.extra.amount = 0;
@@ -2982,75 +2067,63 @@ function createDefaultEffectProcessor() {
         }
         return ctx.extra;
     });
-    
+
     processor.register('confuse', (effect, instance, ctx) => {
         if (checkCondition(effect, instance)) {
             ctx.extra.hitAlly = true;
             ctx.manager.log.add(`${ctx.character.name} is confused and attacks an ally!`);
         }
         return ctx.extra;
-    });
-    
-    // Status effects
+    });
     processor.register('untargetable', (effect, instance, ctx) => {
         ctx.extra.untargetable = true;
         return ctx.extra;
     });
-    
+
     processor.register('prevent_debuff', (effect, instance, ctx) => {
         ctx.extra.prevented = true;
         ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} prevents the debuff!`);
         return ctx.extra;
     });
-    
+
     processor.register('prevent_ability', (effect, instance, ctx) => {
         ctx.extra.prevented = true;
         return ctx.extra;
     });
-    
+
     processor.register('prevent_death', (effect, instance, ctx) => {
-        ctx.extra.prevented = true;
-        // Pass through heal amount for death prevention healing (whole number percent)
+        ctx.extra.prevented = true;
         ctx.extra.preventDeathHealAmount = getEffectAmount(effect, instance) || 0;
         ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} prevents death!`);
         return ctx.extra;
     });
-    
+
     processor.register('force_target', (effect, instance, ctx) => {
         if(instance.source) {
             ctx.extra.forcedTarget = instance.source;
         }
         return ctx.extra;
-    });
-    
-    // Immune to specific aura - prevents application of specified debuff
-    processor.register('immune', (effect, instance, ctx) => {
-        // Check if incoming aura matches the immunity
+    });
+    processor.register('immune', (effect, instance, ctx) => {
         if (effect.id && ctx.extra.auraId === effect.id) {
             ctx.extra.prevented = true;
             ctx.manager.log.add(`${ctx.character.name} is immune to ${effect.id}!`);
-        } else if (!effect.id) {
-            // General debuff immunity
+        } else if (!effect.id) {
             ctx.extra.prevented = true;
             ctx.manager.log.add(`${ctx.character.name} is immune to debuffs!`);
         }
         return ctx.extra;
-    });
-    
-    // Revive - resurrect dead character with percentage HP
+    });
     processor.register('revive', (effect, instance, ctx) => {
-        const amount = getEffectAmount(effect, instance) || 100;
-        // Default to self for revive (town action case: dead hero reviving themselves)
+        const amount = getEffectAmount(effect, instance) || 100;
         const target = effect.target === 'target' ? ctx.extra.target : ctx.character;
-        
+
         if (target && target.dead) {
             target.revive({ amount }, ctx.character);
             ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} revives ${target.name} with ${amount}% HP!`);
         }
         return ctx.extra;
-    });
-    
-    // Lifesteal
+    });
     processor.register('lifesteal', (effect, instance, ctx) => {
         const amount = getEffectAmount(effect, instance);
         const healAmount = Math.ceil((ctx.extra.damageDealt || 0) * (amount / 100));
@@ -3059,9 +2132,7 @@ function createDefaultEffectProcessor() {
             ctx.manager.log.add(`${ctx.character.name} heals for ${healAmount} from ${instance.base.name}`);
         }
         return ctx.extra;
-    });
-    
-    // Reflect damage
+    });
     processor.register('reflect', (effect, instance, ctx) => {
         const amount = getEffectAmount(effect, instance);
         if(ctx.extra.damageReceived && ctx.extra.attacker) {
@@ -3070,12 +2141,10 @@ function createDefaultEffectProcessor() {
             ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} reflects ${reflectAmount} damage`);
         }
         return ctx.extra;
-    });
-    
-    // Cleanse debuffs
+    });
     processor.register('cleanse', (effect, instance, ctx) => {
         const amount = getEffectAmount(effect, instance) || effect.count || 999;
-        const target = effect.target === 'self' || effect.target === undefined ? ctx.character : 
+        const target = effect.target === 'self' || effect.target === undefined ? ctx.character :
                       (effect.target === 'attacker' ? ctx.extra.attacker : ctx.extra.target);
         if(target && !target.dead && target.auras) {
             let removed = 0;
@@ -3095,13 +2164,9 @@ function createDefaultEffectProcessor() {
             }
         }
         return ctx.extra;
-    });
-    
-    // Deal damage as percentage of target's max HP
+    });
     processor.register('damage_percent', (effect, instance, ctx) => {
-        const percent = getEffectAmount(effect, instance);
-        
-        // Resolve target
+        const percent = getEffectAmount(effect, instance);
         let target;
         const targetType = effect.target || 'target';
         if (targetType === 'self') {
@@ -3111,45 +2176,37 @@ function createDefaultEffectProcessor() {
         } else if (ctx.extra.target) {
             target = ctx.extra.target;
         }
-        
+
         if (target && !target.dead) {
             const amount = Math.floor(target.maxHitpoints * (percent / 100));
             target.damage({ amount }, ctx.character);
             ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} deals ${amount} damage (${percent}% HP)`);
         }
         return ctx.extra;
-    });
-    
-    // XP and loot bonuses
+    });
     processor.register('xp_percent', (effect, instance, ctx) => {
         const amount = getEffectAmount(effect, instance);
         const increase = Math.ceil((ctx.extra.amount || 0) * (amount / 100));
         ctx.extra.amount = (ctx.extra.amount || 0) + increase;
         return ctx.extra;
     });
-    
+
     processor.register('loot_percent', (effect, instance, ctx) => {
         const amount = getEffectAmount(effect, instance);
         const increase = Math.ceil((ctx.extra.amount || 0) * (amount / 100));
         ctx.extra.amount = (ctx.extra.amount || 0) + increase;
         return ctx.extra;
-    });
-    
-    // Prevent lethal damage (unkillable buff) - damage cannot reduce HP below 1
+    });
     processor.register('prevent_lethal', (effect, instance, ctx) => {
         const currentHP = ctx.character.hitpoints;
-        const incomingDamage = ctx.extra.amount || 0;
-        
-        // If this damage would kill, reduce it to leave 1 HP
+        const incomingDamage = ctx.extra.amount || 0;
         if(currentHP - incomingDamage <= 0 && currentHP > 0) {
             ctx.extra.amount = currentHP - 1;
             ctx.extra.preventedLethal = true;
             ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} prevents lethal damage!`);
         }
         return ctx.extra;
-    });
-    
-    // Evade (phase buff) - completely avoid next attack
+    });
     processor.register('evade', (effect, instance, ctx) => {
         ctx.extra.amount = 0;
         ctx.extra.evaded = true;
@@ -3158,38 +2215,31 @@ function createDefaultEffectProcessor() {
         }
         ctx.manager.log.add(`${ctx.character.name} evades the attack with ${instance.base.name}!`);
         return ctx.extra;
-    });
-    
-    // Absorb damage (shield buff) - absorbs damage up to stack count
+    });
     processor.register('absorb', (effect, instance, ctx) => {
         const amountPerStack = firstDefined(effect.amount, 1);
         const totalAbsorb = amountPerStack * instance.stacks;
         const damage = ctx.extra.amount || 0;
-        
+
         const absorbed = Math.min(damage, totalAbsorb);
-        ctx.extra.amount = damage - absorbed;
-        
-        // Consume stacks based on damage absorbed
+        ctx.extra.amount = damage - absorbed;
         if(effect.consume !== false && absorbed > 0) {
             const stacksToRemove = Math.ceil(absorbed / amountPerStack);
             instance.remove_stacks(stacksToRemove);
         }
-        
+
         if(absorbed > 0) {
             ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} absorbs ${absorbed} damage`);
         }
         return ctx.extra;
-    });
-    
-    // Dispel buffs from target
+    });
     processor.register('dispel', (effect, instance, ctx) => {
         const count = effect.count || 1;
-        const target = effect.target === 'self' ? ctx.character : 
+        const target = effect.target === 'self' ? ctx.character :
                       (effect.target === 'attacker' ? ctx.extra.attacker : ctx.extra.target);
-        
+
         if(target && !target.dead && target.auras) {
-            let removed = 0;
-            // Iterate through auras and remove buffs (non-debuffs)
+            let removed = 0;
             for(const auraInstance of [...target.auras.auras.values()]) {
                 if(auraInstance.base && !auraInstance.base.isDebuff && removed < count) {
                     auraInstance.stacks = 0;
@@ -3206,9 +2256,7 @@ function createDefaultEffectProcessor() {
             }
         }
         return ctx.extra;
-    });
-    
-    // Double cast - chance to cast abilities twice
+    });
     processor.register('double_cast', (effect, instance, ctx) => {
         let chance;
         if (effect.condition && effect.condition.type === 'chance') {
@@ -3220,73 +2268,33 @@ function createDefaultEffectProcessor() {
             ctx.extra.doubleCast = true;
         }
         return ctx.extra;
-    });
-    
-    // Work - building-specific action (used by town actions)
+    });
     processor.register('work', (effect, instance, ctx) => {
         if(ctx.extra.building && ctx.extra.building.page && ctx.extra.building.page.doWork) {
             ctx.extra.building.page.doWork(ctx.character);
         }
         return ctx.extra;
-    });
-    
-    // Note: stat_percent and reduce_stat_percent are NOT registered here.
-    // They use trigger: "stats" and are handled in stat calculation (adventuring-auras.mjs),
-    // never through the character.trigger() method.
-    
+    });
+
     return processor;
-}
+}
+const defaultEffectProcessor = createDefaultEffectProcessor();
 
-// Create the singleton processor
-const defaultEffectProcessor = createDefaultEffectProcessor();
-
-// ============================================================================
-// XP BONUS UTILITY
-// ============================================================================
-
-/**
- * Add mastery XP with modifier bonus applied.
- * Consolidates the duplicate addXP pattern from jobs, monsters, areas.
- * 
- * @param {object} manager - The adventuring manager
- * @param {object} action - The mastery action (job, monster, area)
- * @param {number} baseXP - Base XP amount before modifiers
- * @param {object} [options] - Optional settings
- * @param {boolean} [options.updateTooltip=true] - Queue tooltip render update
- */
 function addMasteryXPWithBonus(manager, action, baseXP, options = {}) {
-    const { updateTooltip = true } = options;
-    
-    // Apply mastery XP bonus from modifier system
+    const { updateTooltip = true } = options;
     const xpBonus = manager.modifiers.getMasteryXPBonus(action);
     const modifiedXP = Math.floor(baseXP * (1 + xpBonus));
-    
+
     manager.addMasteryXP(action, modifiedXP);
     manager.addMasteryPoolXP(modifiedXP);
-    
+
     if(updateTooltip && action.renderQueue) {
         action.renderQueue.tooltip = true;
     }
-    
+
     return modifiedXP;
 }
 
-/**
- * Build a description from effects, with optional template and flavor text.
- * This helper standardizes description generation across items, passives, abilities, etc.
- * 
- * @param {Object} config - Configuration object
- * @param {Array} [config.effects] - Array of effects to describe (flat mode)
- * @param {Array} [config.hits] - Array of hit objects with { target, party, effects[] } (ability mode)
- * @param {Object} config.manager - The adventuring manager (for describeEffectFull)
- * @param {string} [config.template] - Optional description template with placeholders
- * @param {string} [config.flavorText] - Optional flavor text to append
- * @param {Object} [config.stats] - Stats source for scaling calculations
- * @param {string} [config.displayMode] - Display mode: 'total', 'scaled', 'multiplier'
- * @param {boolean} [config.includeTrigger=true] - Whether to include trigger text
- * @param {Function} [config.buildReplacements] - Custom replacement builder function
- * @returns {string} The formatted description
- */
 function buildDescription(config) {
     const {
         effects,
@@ -3299,53 +2307,43 @@ function buildDescription(config) {
         includeTrigger = true,
         buildReplacements
     } = config;
-    
-    let desc = '';
-    
-    // If we have a template, use it with replacements
+
+    let desc = '';
     if (template !== undefined && template !== null) {
         const source = hits !== undefined ? hits : effects;
-        const replacements = buildReplacements 
+        const replacements = buildReplacements
             ? buildReplacements(source, stats, displayMode)
             : buildEffectReplacements(effects, stats, true);
         desc = parseDescription(template, replacements);
-    } 
-    // Hits mode - for abilities with multiple hits
+    }
     else if (hits !== undefined && hits.length > 0) {
-        const hitDescs = [];
-        
-        // Helper: determine if effect type normally targets self (heals/buffs) vs target (damage/debuffs)
-        // When hit targets allies, all effects go together. When targeting enemies, heals/buffs split off to self.
-        const isSelfTargetingEffect = (effectType, hitParty) => {
-            // If the hit targets allies, all effects go to that ally
-            if (hitParty === 'ally') return false;
-            // Otherwise, heals/buffs/energy/shield go to self
+        const hitDescs = [];
+        const isSelfTargetingEffect = (effectType, hitParty) => {
+            if (hitParty === 'ally') return false;
             const selfTypes = ['heal_flat', 'heal_percent', 'buff', 'energy', 'shield'];
             return selfTypes.includes(effectType);
         };
-        
+
         for (let i = 0; i < hits.length; i++) {
             const hit = hits[i];
-            if (hit.effects === undefined || hit.effects.length === 0) continue;
-            
-            // Group effects by their implicit target
+            if (hit.effects === undefined || hit.effects.length === 0) continue;
             const selfEffects = [];
             const targetEffects = [];
-            
+
             for (let j = 0; j < hit.effects.length; j++) {
                 const effect = hit.effects[j];
                 const effectObj = {
                     type: effect.type,
                     trigger: effect.trigger !== undefined ? effect.trigger : 'on_use',
-                    amount: effect.getAmount !== undefined 
-                        ? effect.getAmount(stats, displayMode) 
-                        : (effect.amount !== undefined && effect.amount.base !== undefined 
-                            ? effect.amount.base 
+                    amount: effect.getAmount !== undefined
+                        ? effect.getAmount(stats, displayMode)
+                        : (effect.amount !== undefined && effect.amount.base !== undefined
+                            ? effect.amount.base
                             : (effect.amount !== undefined ? effect.amount : 0)),
-                    stacks: effect.getStacks !== undefined 
-                        ? effect.getStacks(stats, displayMode) 
-                        : (effect.stacks !== undefined && effect.stacks.base !== undefined 
-                            ? effect.stacks.base 
+                    stacks: effect.getStacks !== undefined
+                        ? effect.getStacks(stats, displayMode)
+                        : (effect.stacks !== undefined && effect.stacks.base !== undefined
+                            ? effect.stacks.base
                             : (effect.stacks !== undefined ? effect.stacks : 0)),
                     id: effect.id,
                     condition: effect.condition,
@@ -3354,27 +2352,19 @@ function buildDescription(config) {
                     count: effect.count,
                     threshold: effect.threshold
                 };
-                let effectDesc = describeEffectFull(effectObj, manager, { displayMode, includeTrigger: false });
-                
-                // Categorize by implicit target
+                let effectDesc = describeEffectFull(effectObj, manager, { displayMode, includeTrigger: false });
                 if (isSelfTargetingEffect(effect.type, hit.party)) {
                     selfEffects.push(effectDesc);
                 } else {
                     targetEffects.push(effectDesc);
                 }
-            }
-            
-            // Build descriptions with appropriate targets
+            }
             const target = hit.target;
             const party = hit.party;
-            const hitParts = [];
-            
-            // Target effects (damage, debuffs) go to hit target
+            const hitParts = [];
             if (targetEffects.length > 0) {
                 let targetDesc = joinEffectDescriptions(targetEffects);
-                if (target === 'self') {
-                    // Self-targeting damage/debuffs - explicitly say "to self"
-                    // Check if description contains damage (which is unusual for self)
+                if (target === 'self') {
                     if (targetDesc.toLowerCase().includes('deal')) {
                         targetDesc = `${targetDesc} to self`;
                     }
@@ -3385,42 +2375,33 @@ function buildDescription(config) {
                     }
                 }
                 hitParts.push(targetDesc);
-            }
-            
-            // Self effects (heals, buffs) go to self - no target suffix needed
+            }
             if (selfEffects.length > 0) {
-                let selfDesc = joinEffectDescriptions(selfEffects);
-                // Lowercase first letter if this follows target effects
+                let selfDesc = joinEffectDescriptions(selfEffects);
                 if (hitParts.length > 0) {
                     selfDesc = selfDesc.charAt(0).toLowerCase() + selfDesc.slice(1);
                 }
                 hitParts.push(selfDesc);
             }
-            
+
             if (hitParts.length > 0) {
                 hitDescs.push(hitParts.join(' and '));
             }
-        }
-        
-        // Format multi-hit descriptions naturally
+        }
         if (hitDescs.length === 1) {
             desc = hitDescs[0];
-        } else if (hitDescs.length === 2) {
-            // Check if both hits are identical
+        } else if (hitDescs.length === 2) {
             if (hitDescs[0] === hitDescs[1]) {
                 desc = `${hitDescs[0]} (hits twice)`;
-            } else {
-                // Natural sentence: "Deal X, then heal Y"
+            } else {
                 const second = hitDescs[1].charAt(0).toLowerCase() + hitDescs[1].slice(1);
                 desc = `${hitDescs[0]}, then ${second}`;
             }
-        } else if (hitDescs.length > 2) {
-            // Check if all hits are identical
+        } else if (hitDescs.length > 2) {
             const allSame = hitDescs.every(h => h === hitDescs[0]);
             if (allSame) {
                 desc = `${hitDescs[0]} (hits ${hitDescs.length} times)`;
-            } else {
-                // Natural flow: "Deal X, then deal Y, then heal Z"
+            } else {
                 const parts = hitDescs.map((h, i) => {
                     if (i === 0) return h;
                     return h.charAt(0).toLowerCase() + h.slice(1);
@@ -3428,12 +2409,11 @@ function buildDescription(config) {
                 desc = parts.join(', then ');
             }
         }
-        
+
         if (desc !== '') {
             desc = desc + '.';
         }
-    }
-    // Flat effects mode
+    }
     else if (effects !== undefined && effects.length > 0) {
         const effectDescs = [];
         for (let i = 0; i < effects.length; i++) {
@@ -3441,15 +2421,15 @@ function buildDescription(config) {
             const effectObj = {
                 type: effect.type,
                 trigger: effect.trigger !== undefined ? effect.trigger : 'passive',
-                amount: effect.getAmount !== undefined 
-                    ? effect.getAmount(stats, displayMode) 
-                    : (effect.amount !== undefined && effect.amount.base !== undefined 
-                        ? effect.amount.base 
+                amount: effect.getAmount !== undefined
+                    ? effect.getAmount(stats, displayMode)
+                    : (effect.amount !== undefined && effect.amount.base !== undefined
+                        ? effect.amount.base
                         : (effect.amount !== undefined ? effect.amount : 0)),
-                stacks: effect.getStacks !== undefined 
-                    ? effect.getStacks(stats, displayMode) 
-                    : (effect.stacks !== undefined && effect.stacks.base !== undefined 
-                        ? effect.stacks.base 
+                stacks: effect.getStacks !== undefined
+                    ? effect.getStacks(stats, displayMode)
+                    : (effect.stacks !== undefined && effect.stacks.base !== undefined
+                        ? effect.stacks.base
                         : (effect.stacks !== undefined ? effect.stacks : 0)),
                 id: effect.id,
                 stat: effect.stat,
@@ -3467,20 +2447,14 @@ function buildDescription(config) {
         if (desc !== '') {
             desc = desc + '.';
         }
-    }
-    
-    // Append flavor text if present (in italics, with line break for HTML)
+    }
     if (flavorText !== undefined && flavorText !== null && flavorText !== '') {
         desc = desc !== '' ? `${desc}<br><br><em>${flavorText}</em>` : `<em>${flavorText}</em>`;
     }
-    
+
     return desc !== '' ? desc : '';
 }
 
-/**
- * Base RenderQueue class for mastery actions with common properties.
- * Provides: name, tooltip, icon, clickable, mastery
- */
 class AdventuringMasteryRenderQueue {
     constructor() {
         this.name = false;
@@ -3490,9 +2464,6 @@ class AdventuringMasteryRenderQueue {
         this.mastery = false;
     }
 
-    /**
-     * Queue all common properties for re-render
-     */
     queueAll() {
         this.name = true;
         this.tooltip = true;
@@ -3501,18 +2472,11 @@ class AdventuringMasteryRenderQueue {
         this.mastery = true;
     }
 
-    /**
-     * Alias for queueAll - marks all properties for update
-     */
     updateAll() {
         this.queueAll();
     }
 }
 
-/**
- * Extended RenderQueue with newBadge support.
- * Used by entities that can show a "new" badge when first unlocked.
- */
 class AdventuringBadgeRenderQueue extends AdventuringMasteryRenderQueue {
     constructor() {
         super();
@@ -3525,18 +2489,13 @@ class AdventuringBadgeRenderQueue extends AdventuringMasteryRenderQueue {
     }
 }
 
-/**
- * RenderQueue for equipment items.
- * Adds: upgrade, selected, highlight, equipped
- */
 class AdventuringEquipmentRenderQueue extends AdventuringBadgeRenderQueue {
     constructor() {
-        super();
-        // Override - equipment doesn't use name/clickable/mastery in same way
+        super();
         this.name = undefined;
         this.clickable = undefined;
         this.mastery = undefined;
-        
+
         this.upgrade = false;
         this.selected = false;
         this.highlight = false;
@@ -3552,25 +2511,11 @@ class AdventuringEquipmentRenderQueue extends AdventuringBadgeRenderQueue {
         this.highlight = true;
         this.equipped = true;
     }
-}
+}
 
-// ============================================================================
-// Registry Lookup Helpers
-// ============================================================================
-
-/**
- * Safely look up an object from a registry with optional warning.
- * Standardizes the pattern of checking for undefined results.
- * 
- * @param {object} registry - The registry to search (must have getObjectByID method)
- * @param {string} id - The ID to look up
- * @param {string} [context] - Context for warning message (e.g., 'area', 'item')
- * @param {boolean} [warn=false] - Whether to log a warning if not found
- * @returns {object|undefined} The found object or undefined
- */
 function getFromRegistry(registry, id, context = 'object', warn = false) {
     if (!registry || !id) return undefined;
-    
+
     const obj = registry.getObjectByID(id);
     if (!obj && warn) {
         console.warn(`[Adventuring] Unknown ${context}: ${id}`);
@@ -3578,20 +2523,11 @@ function getFromRegistry(registry, id, context = 'object', warn = false) {
     return obj;
 }
 
-/**
- * Look up an object from a registry, throwing an error if not found.
- * Use for required lookups where missing data indicates a bug.
- * 
- * @param {object} registry - The registry to search
- * @param {string} id - The ID to look up
- * @param {string} context - Context for error message
- * @returns {object} The found object (throws if not found)
- */
 function requireFromRegistry(registry, id, context = 'object') {
     if (!registry) {
         throw new Error(`[Adventuring] Registry is undefined when looking up ${context}: ${id}`);
     }
-    
+
     const obj = registry.getObjectByID(id);
     if (!obj) {
         throw new Error(`[Adventuring] Required ${context} not found: ${id}`);
@@ -3599,7 +2535,7 @@ function requireFromRegistry(registry, id, context = 'object') {
     return obj;
 }
 
-export { 
+export {
     AdventuringWeightedTable,
     randomElement,
     randomInt,
@@ -3613,8 +2549,7 @@ export {
     filterEffectsByTrigger,
     filterEffectsByType,
     getStatEffects,
-    EffectCache,
-    // New utilities
+    EffectCache,
     RequirementsChecker,
     formatRequirement,
     formatRequirements,
@@ -3629,33 +2564,25 @@ export {
     formatTarget,
     buildEffectReplacements,
     buildHitEffectReplacements,
-    buildDescription,
-    // Effect processing (unified)
+    buildDescription,
     SimpleEffectInstance,
     getEffectAmount,
     EffectProcessor,
     defaultEffectProcessor,
-    addMasteryXPWithBonus,
-    // Condition system
+    addMasteryXPWithBonus,
     evaluateCondition,
     describeCondition,
     buildEffectContext,
     getPooledContext,
-    releaseContext,
-    // RenderQueue base classes
+    releaseContext,
     AdventuringMasteryRenderQueue,
     AdventuringBadgeRenderQueue,
-    AdventuringEquipmentRenderQueue,
-    // Media helpers
+    AdventuringEquipmentRenderQueue,
     UNKNOWN_MEDIA,
-    getLockedMedia,
-    // Stat calculation
-    StatCalculator,
-    // Passive effect processor
-    PassiveEffectProcessor,
-    // Effect limit tracking
-    EffectLimitTracker,
-    // Registry helpers
+    getLockedMedia,
+    StatCalculator,
+    PassiveEffectProcessor,
+    EffectLimitTracker,
     getFromRegistry,
     requireFromRegistry
 }

@@ -7,7 +7,7 @@ export class AdventuringBuff extends AdventuringAura {
         super(namespace, data, manager, game);
         this.auraType = 'buff';
     }
-    
+
     get isBuff() { return true; }
     get isDebuff() { return false; }
 }

@@ -22,22 +22,16 @@ export class AdventuringTutorialTooltipElement extends HTMLElement {
     }
 
     connectedCallback() {
-        this.appendChild(this._content);
-
-        // Click blocker prevents clicks but allows hover events through
+        this.appendChild(this._content);
         this.clickBlocker.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
-        }, true);
-
-        // Next button handler - always advances to next step
+        }, true);
         this.nextBtn.onclick = (e) => {
             e.preventDefault();
             e.stopPropagation();
             if(this.manager) this.manager.advanceStep();
-        };
-
-        // Skip button handlers
+        };
         this.skipBtn.onclick = (e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -48,25 +42,19 @@ export class AdventuringTutorialTooltipElement extends HTMLElement {
             e.preventDefault();
             e.stopPropagation();
             if(this.manager) this.manager.setSkipAll(true);
-        };
-
-        // Handle window resize
+        };
         this._resizeObserver = new ResizeObserver(() => {
             if(this._visible && this._currentTarget) {
                 this.updatePosition();
             }
         });
-        this._resizeObserver.observe(document.body);
-
-        // Handle scroll
+        this._resizeObserver.observe(document.body);
         this._scrollHandler = () => {
             if(this._visible && this._currentTarget) {
                 this.updatePosition();
             }
         };
-        window.addEventListener('scroll', this._scrollHandler, true);
-
-        // Initially hidden
+        window.addEventListener('scroll', this._scrollHandler, true);
         this.overlay.classList.add('d-none');
     }
 
@@ -85,35 +73,18 @@ export class AdventuringTutorialTooltipElement extends HTMLElement {
         }
     }
 
-    /**
-     * Show the tutorial tooltip pointing at a target element
-     * @param {HTMLElement} targetElement - Element to highlight (null for centered tooltip)
-     * @param {string} messageText - Message to display
-     * @param {string} preferredPosition - 'top', 'bottom', 'left', 'right'
-     */
     show(targetElement, messageText, preferredPosition = 'bottom') {
         this._currentTarget = targetElement;
         this._preferredPosition = preferredPosition;
-        this._visible = true;
-
-        // Set message
-        this.message.textContent = messageText;
-
-        // Show overlay
-        this.overlay.classList.remove('d-none');
-
-        // Position everything
-        this.updatePosition();
-
-        // Scroll target into view if needed
+        this._visible = true;
+        this.message.textContent = messageText;
+        this.overlay.classList.remove('d-none');
+        this.updatePosition();
         if(targetElement) {
             this.scrollTargetIntoView(targetElement);
         }
     }
 
-    /**
-     * Hide the tutorial tooltip
-     */
     hide() {
         this._visible = false;
         this._currentTarget = null;
@@ -126,55 +97,32 @@ export class AdventuringTutorialTooltipElement extends HTMLElement {
         }
     }
 
-    /**
-     * Update positions based on current target location
-     */
     updatePosition() {
-        if(!this._visible) return;
-
-        // For informational steps with no target, center the tooltip
-        if(!this._currentTarget) {
-            // Block all clicks - full overlay, no hole
+        if(!this._visible) return;
+        if(!this._currentTarget) {
             this.overlay.style.clipPath = 'none';
-            this.highlight.style.display = 'none';
-            
-            // Center tooltip on screen
+            this.highlight.style.display = 'none';
             this.tooltip.style.left = '0';
             this.tooltip.style.top = '0';
             const tooltipRect = this.tooltip.getBoundingClientRect();
             this.centerOnScreen(tooltipRect);
             return;
-        }
-
-        // Show highlight
-        this.highlight.style.display = '';
-
-        // For elements with display:contents, get the first child's rect instead
+        }
+        this.highlight.style.display = '';
         var targetForRect = this._currentTarget;
-        var targetRect = targetForRect.getBoundingClientRect();
-        
-        // If element has no size (likely display:contents), try first child
+        var targetRect = targetForRect.getBoundingClientRect();
         if(targetRect.width === 0 && targetRect.height === 0 && this._currentTarget.firstElementChild) {
             targetForRect = this._currentTarget.firstElementChild;
             targetRect = targetForRect.getBoundingClientRect();
-        }
-        
-        // If still no size, wait for render
+        }
         if(targetRect.width === 0 && targetRect.height === 0) {
             this._waitForRender();
             return;
-        }
-        
-        // Position highlight over target
-        this.positionHighlight(targetRect);
-
-        // Position tooltip near target with auto-adjustment
+        }
+        this.positionHighlight(targetRect);
         this.positionTooltip(targetRect, this._preferredPosition);
     }
 
-    /**
-     * Wait for element to render before positioning
-     */
     _waitForRender() {
         if(this._renderWaitTimeout) {
             clearTimeout(this._renderWaitTimeout);
@@ -185,35 +133,24 @@ export class AdventuringTutorialTooltipElement extends HTMLElement {
         }, 50);
     }
 
-    /**
-     * Position the highlight box and update overlay clip-path to create visual hole
-     */
     positionHighlight(targetRect) {
         const padding = 4;
         const left = targetRect.left - padding;
         const top = targetRect.top - padding;
         const width = targetRect.width + padding * 2;
-        const height = targetRect.height + padding * 2;
-        
-        // Position highlight (visual ring)
+        const height = targetRect.height + padding * 2;
         this.highlight.style.left = `${left}px`;
         this.highlight.style.top = `${top}px`;
         this.highlight.style.width = `${width}px`;
-        this.highlight.style.height = `${height}px`;
-        
-        // Update overlay clip-path to create a visual hole
+        this.highlight.style.height = `${height}px`;
         const right = left + width;
         const bottom = top + height;
         const vw = window.innerWidth;
-        const vh = window.innerHeight;
-        
-        // Create clip-path with hole using polygon
+        const vh = window.innerHeight;
         this.overlay.style.clipPath = `polygon(
             0 0, ${vw}px 0, ${vw}px ${vh}px, 0 ${vh}px, 0 0,
             ${left}px ${top}px, ${left}px ${bottom}px, ${right}px ${bottom}px, ${right}px ${top}px, ${left}px ${top}px
-        )`;
-        
-        // Always show click blocker over the hole to block clicks
+        )`;
         this.clickBlocker.classList.remove('d-none');
         this.clickBlocker.style.left = `${left}px`;
         this.clickBlocker.style.top = `${top}px`;
@@ -221,19 +158,12 @@ export class AdventuringTutorialTooltipElement extends HTMLElement {
         this.clickBlocker.style.height = `${height}px`;
     }
 
-    /**
-     * Position tooltip with auto-adjustment if it would go off-screen
-     */
     positionTooltip(targetRect, preferredPosition) {
         const padding = 12;
-        const arrowSize = 10;
-
-        // Reset position to measure
+        const arrowSize = 10;
         this.tooltip.style.left = '0';
         this.tooltip.style.top = '0';
-        const tooltipRect = this.tooltip.getBoundingClientRect();
-
-        // Try positions in order of preference
+        const tooltipRect = this.tooltip.getBoundingClientRect();
         const positions = this.getPositionOrder(preferredPosition);
 
         for(const pos of positions) {
@@ -242,23 +172,15 @@ export class AdventuringTutorialTooltipElement extends HTMLElement {
                 this.applyPosition(coords, pos);
                 return;
             }
-        }
-
-        // Fallback: position at center of viewport
+        }
         this.centerOnScreen(tooltipRect);
     }
 
-    /**
-     * Get position order starting with preferred
-     */
     getPositionOrder(preferred) {
         const all = ['bottom', 'top', 'right', 'left'];
         return [preferred, ...all.filter(p => p !== preferred)];
     }
 
-    /**
-     * Calculate tooltip position for a given placement
-     */
     calculatePosition(target, tooltip, position, padding, arrow) {
         let x, y;
 
@@ -284,9 +206,6 @@ export class AdventuringTutorialTooltipElement extends HTMLElement {
         return { x, y };
     }
 
-    /**
-     * Check if tooltip fits in viewport at given coordinates
-     */
     fitsInViewport(coords, tooltipRect) {
         const margin = 10;
         return coords.x >= margin &&
@@ -295,20 +214,12 @@ export class AdventuringTutorialTooltipElement extends HTMLElement {
                coords.y + tooltipRect.height <= window.innerHeight - margin;
     }
 
-    /**
-     * Apply position and update arrow
-     */
     applyPosition(coords, position) {
         this.tooltip.style.left = `${coords.x}px`;
-        this.tooltip.style.top = `${coords.y}px`;
-
-        // Update arrow direction
+        this.tooltip.style.top = `${coords.y}px`;
         this.arrow.className = `tutorial-arrow tutorial-arrow-${position}`;
     }
 
-    /**
-     * Center tooltip on screen (fallback)
-     */
     centerOnScreen(tooltipRect) {
         const x = (window.innerWidth - tooltipRect.width) / 2;
         const y = (window.innerHeight - tooltipRect.height) / 2;
@@ -317,9 +228,6 @@ export class AdventuringTutorialTooltipElement extends HTMLElement {
         this.arrow.className = 'tutorial-arrow d-none';
     }
 
-    /**
-     * Scroll target into view if not visible
-     */
     scrollTargetIntoView(element) {
         const rect = element.getBoundingClientRect();
         const isVisible = rect.top >= 0 &&
@@ -328,8 +236,7 @@ export class AdventuringTutorialTooltipElement extends HTMLElement {
                          rect.right <= window.innerWidth;
 
         if(!isVisible) {
-            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            // Re-position after scroll completes
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
             setTimeout(() => this.updatePosition(), 300);
         }
     }

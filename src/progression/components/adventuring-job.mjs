@@ -15,7 +15,7 @@ export class AdventuringJobElement extends AdventuringTooltipElement {
 
         this.progressContainer = getElementFromFragment(this._content, 'progress-container', 'div');
         this.masteryProgress = getElementFromFragment(this._content, 'mastery-progress', 'progress-bar');
-        
+
         this._tooltipTarget = this.clickable;
     }
 

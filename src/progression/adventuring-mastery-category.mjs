@@ -1,8 +1,4 @@
-/**
- * Represents a mastery category (areas, jobs, monsters, equipment)
- * All objects in a category share the same milestone definitions.
- * Example: All areas get auto-run at mastery 10, endless at 75, etc.
- */
+
 export class AdventuringMasteryCategory extends NamespacedObject {
     constructor(namespace, data, manager, game) {
         super(namespace, data.id);
@@ -10,16 +6,9 @@ export class AdventuringMasteryCategory extends NamespacedObject {
         this.game = game;
 
         this._name = data.name;
-        this._media = data.media;
-        
-        // Maximum mastery level
-        this.maxLevel = (data.maxLevel !== undefined) ? data.maxLevel : 99;
-        
-        // Milestones with effects arrays
-        // Each milestone: { level, scaling?, effects: [{ trigger, type, value, ... }] }
-        this.milestones = data.milestones || [];
-        
-        // Sort milestones by level for efficient lookup
+        this._media = data.media;
+        this.maxLevel = (data.maxLevel !== undefined) ? data.maxLevel : 99;
+        this.milestones = data.milestones || [];
         this.milestones.sort((a, b) => a.level - b.level);
     }
 
@@ -31,72 +20,44 @@ export class AdventuringMasteryCategory extends NamespacedObject {
         return this.getMediaURL(this._media);
     }
 
-    /**
-     * Get all effects that are active at the given mastery level.
-     * For non-scaling effects with the same type, only the highest level milestone applies.
-     * Exception: unlock effects accumulate since each unlocks something different.
-     * For scaling effects, the value is multiplied by the current level.
-     * @param {number} level - Current mastery level
-     * @returns {Array} Array of effect objects
-     */
-    getEffectsAtLevel(level) {
-        // Map to track highest-level effect for each type (non-scaling only)
-        const effectsByType = new Map();
+    getEffectsAtLevel(level) {
+        const accumulatedByType = new Map();
         const scalingEffects = [];
-        const accumulatedEffects = []; // Effects that accumulate (unlock types, etc.)
-        
+        const unlockEffects = []; // Unlocks collected separately
+
         for (const milestone of this.milestones) {
             if (level >= milestone.level) {
                 if (milestone.effects) {
                     for (const effect of milestone.effects) {
-                        if (milestone.scaling && effect.amount !== undefined) {
-                            // Scaling effects: multiply amount by level, add directly
+                        if (milestone.scaling && effect.amount !== undefined) {
                             scalingEffects.push({
                                 ...effect,
                                 amount: effect.amount * level
                             });
-                        } else if (effect.type === 'unlock') {
-                            // Unlock effects accumulate - each unlocks something different
-                            accumulatedEffects.push(effect);
-                        } else {
-                            // Non-scaling: track by type, keep highest level's effect
-                            const existing = effectsByType.get(effect.type);
-                            if (!existing || milestone.level > existing.milestoneLevel) {
-                                effectsByType.set(effect.type, {
-                                    effect: effect,
-                                    milestoneLevel: milestone.level
-                                });
-                            }
+                        } else if (effect.type === 'unlock') {
+                            unlockEffects.push(effect);
+                        } else {
+                            const value = effect.value ?? effect.amount ?? 0;
+                            const existing = accumulatedByType.get(effect.type) || 0;
+                            accumulatedByType.set(effect.type, existing + value);
                         }
                     }
                 }
             }
+        }
+        const results = [...scalingEffects, ...unlockEffects];
+        for (const [type, totalValue] of accumulatedByType.entries()) {
+            results.push({ type, value: totalValue });
         }
-        
-        // Combine: all scaling effects + accumulated unlocks + one per type for non-scaling
-        const results = [...scalingEffects, ...accumulatedEffects];
-        for (const entry of effectsByType.values()) {
-            results.push(entry.effect);
-        }
-        
+
         return results;
     }
 
-    /**
-     * Get the next milestone after the given level
-     * @param {number} level - Current mastery level
-     * @returns {Object|null} Next milestone or null if maxed
-     */
     getNextMilestone(level) {
         const found = this.milestones.find(m => m.level > level);
         return found || null;
     }
 
-    /**
-     * Get all milestones achieved at the given level
-     * @param {number} level - Current mastery level
-     * @returns {Array} Array of achieved milestones
-     */
     getAchievedMilestones(level) {
         return this.milestones.filter(m => level >= m.level);
     }

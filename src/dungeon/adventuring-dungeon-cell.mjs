@@ -26,9 +26,7 @@ export class AdventuringDungeonCell {
         this.game = game;
         this.floor = floor;
 
-        this.renderQueue = new AdventuringDungeonCellRenderQueue();
-
-        //this.icon = cdnMedia('assets/media/main/question.png');
+        this.renderQueue = new AdventuringDungeonCellRenderQueue();
         this.explored = false;
         this.current = false;
 
@@ -95,17 +93,10 @@ export class AdventuringDungeonCell {
         this.renderQueue.type = false;
     }
 
-    /**
-     * Get tooltip HTML for this cell
-     * @returns {string} Tooltip HTML or empty string if no tooltip
-     */
-    get tooltip() {
-        // No tooltip for empty cells or walls
+    get tooltip() {
         if(this.type === undefined || this.type === this.floor.wall) {
             return '';
-        }
-
-        // Show "???" for unexplored cells (unless always shown)
+        }
         if(!this.explored && !this.type.alwaysShowIcon) {
             return TooltipBuilder.create()
                 .header('???')
@@ -113,9 +104,7 @@ export class AdventuringDungeonCell {
         }
 
         const tooltip = TooltipBuilder.create()
-            .header(this.type.name);
-        
-        // Add special descriptions for exit/boss tiles
+            .header(this.type.name);
         if(this.type.id === 'adventuring:exit') {
             tooltip.separator();
             tooltip.text('Clear all enemies to advance to the next floor.', 'text-info');
@@ -131,14 +120,11 @@ export class AdventuringDungeonCell {
         } else if(this.type.id === 'adventuring:empty') {
             tooltip.separator();
             tooltip.text('Nothing of interest.', 'text-muted');
-        }
-        
-        // Add effect descriptions if tile has effects
+        }
         if(this.type.effects && this.type.effects.length > 0) {
             tooltip.separator();
             this.type.effects.forEach(effect => {
-                const desc = describeEffect(effect, this.manager);
-                // Color based on effect type
+                const desc = describeEffect(effect, this.manager);
                 let colorClass = 'text-info';
                 if(effect.type === 'damage' || effect.type === 'damage_flat' || effect.type === 'damage_percent' || effect.type === 'debuff') {
                     colorClass = 'text-danger';
@@ -149,9 +135,7 @@ export class AdventuringDungeonCell {
                 }
                 tooltip.text(desc, colorClass);
             });
-        }
-        
-        // Show requirements if any
+        }
         if(this.type.requirements && this.type.requirements.length > 0) {
             tooltip.separator();
             this.type.requirements.forEach(req => {
@@ -159,7 +143,7 @@ export class AdventuringDungeonCell {
                 tooltip.text(text, 'text-muted');
             });
         }
-        
+
         return tooltip.build();
     }
 

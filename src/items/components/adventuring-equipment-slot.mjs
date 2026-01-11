@@ -12,7 +12,7 @@ export class AdventuringEquipmentSlotElement extends AdventuringTooltipElement {
         this.border = getElementFromFragment(this._content, 'border', 'div');
         this.icon = getElementFromFragment(this._content, 'icon', 'img');
         this.upgrade = getElementFromFragment(this._content, 'upgrade', 'small');
-        
+
         this._tooltipTarget = this.clickable;
         this._tooltipOptions = { placement: 'right' };
     }

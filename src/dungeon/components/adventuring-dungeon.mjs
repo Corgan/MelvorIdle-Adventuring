@@ -5,7 +5,7 @@ const { AdventuringSubpageElement } = await loadModule('src/ui/components/advent
 export class AdventuringDungeonElement extends AdventuringSubpageElement {
     constructor() {
         super('adventuring-dungeon-template');
-        
+
         this.dungeon = getElementFromFragment(this._content, 'dungeon', 'div');
     }
 }

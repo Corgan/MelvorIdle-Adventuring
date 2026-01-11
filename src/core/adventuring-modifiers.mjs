@@ -2,119 +2,80 @@ const { loadModule } = mod.getContext(import.meta);
 
 const { createEffect, EffectCache } = await loadModule('src/core/adventuring-utils.mjs');
 
-/**
- * AdventuringModifiers - Centralized modifier system for the Adventuring skill
- * 
- * This system aggregates modifiers from multiple sources using the standard effect system:
- * - Consumable effects
- * - Tavern drink effects
- * - Achievement rewards
- * - Mastery effects (monster/area/job/equipment)
- * 
- * All bonuses use the standard effect format: { trigger: 'passive', type: stat.id, value }
- * Effect types use simple names with positive/negative values:
- *   - drop_rate_percent: +10 = 10% more drops
- *   - upgrade_cost_percent: -25 = 25% cheaper upgrades
- */
-
 export class AdventuringModifiers {
     constructor(manager, game) {
         this.manager = manager;
-        this.game = game;
-        
-        // Use EffectCache for aggregating effects from global sources
-        this.effectCache = new EffectCache();
-        
-        // Register global effect sources
+        this.game = game;
+        this.effectCache = new EffectCache();
         this.effectCache.registerSource('consumables', () => this.getConsumableEffects());
         this.effectCache.registerSource('tavern', () => this.getTavernEffects());
         this.effectCache.registerSource('achievements', () => this.getAchievementEffects());
+        this.effectCache.registerSource('mastery_completion', () => this.getMasteryCompletionEffects());
     }
 
-    /**
-     * Invalidate the modifier cache (call when consumables, tavern, etc. change)
-     */
     invalidateCache() {
         this.effectCache.invalidateAll();
     }
 
-    /**
-     * Get all passive effects from global sources.
-     * Used by heroes to include global modifiers in their effect cache.
-     * @returns {StandardEffect[]} Array of standardized effects
-     */
+    onMasteryMaxed() {
+        this.effectCache.invalidateSource('mastery_completion');
+    }
+
     getEffects() {
         return this.effectCache.getEffects('passive');
     }
 
-    /**
-     * Get a passive bonus by effect type.
-     * Sums all passive effects of the given type from global sources.
-     * @param {string} effectType - Effect type (e.g., 'drop_rate_percent')
-     * @param {object} [context] - Optional context with action for mastery effects
-     * @returns {number} - The total bonus value (positive = increase, negative = decrease)
-     */
     getBonus(effectType, context = {}) {
-        let total = this.effectCache.getBonus(effectType);
-        
-        // Add mastery effects if an action is provided
+        let total = this.effectCache.getBonus(effectType);
         if (context.action && typeof context.action.getMasteryEffectValue === 'function') {
             total += context.action.getMasteryEffectValue(effectType);
         }
-        
+
         return total;
     }
 
-    // ========================================================================
-    // Effect Source Getters
-    // ========================================================================
+    getCategoryBonus(effectType, categoryId) {
+        let total = 0;
+        const passiveEffects = this.effectCache.getEffects('passive');
+        for (const effect of passiveEffects) {
+            if (effect.type === effectType && effect.category === categoryId) {
+                total += effect.value ?? effect.amount ?? 0;
+            }
+        }
 
-    /**
-     * Get effects from active consumables
-     */
+        return total;
+    }
+
     getConsumableEffects() {
         const effects = [];
-        
+
         if (!this.manager.consumables || !this.manager.consumables.equipped) return effects;
-        
+
         this.manager.consumables.equipped.forEach(({ consumable, tier }) => {
             if (!consumable) return;
             const charges = this.manager.consumables.getCharges(consumable, tier);
             if (charges <= 0) return;
-            
+
             const tierEffects = consumable.getTierEffects(tier);
-            tierEffects.forEach(effectData => {
-                // Only include passive effects here - triggered effects handled separately
+            tierEffects.forEach(effectData => {
                 if (effectData.trigger === 'passive') {
                     effects.push(createEffect(effectData, consumable, consumable.getTierName(tier)));
                 }
             });
         });
-        
+
         return effects;
     }
 
-    /**
-     * Get effects from active tavern drinks
-     */
     getTavernEffects() {
-        if (!this.manager.tavern) return [];
-        
-        // The tavern's getEffects() returns all effects from equipped drinks
+        if (!this.manager.tavern) return [];
         return this.manager.tavern.getEffects();
     }
 
-    /**
-     * Get effects from permanent achievement bonuses
-     */
     getAchievementEffects() {
         const effects = [];
-        
-        if (!this.manager.achievementManager) return effects;
-        
-        // Achievement bonuses are now derived from completed achievements
-        
-        // Convert achievement bonuses to standard effects
+
+        if (!this.manager.achievementManager) return effects;
         for (const stat of this.manager.stats.allObjects) {
             const value = this.manager.achievementManager.getStatBonus(stat.id);
             if (value !== 0) {
@@ -125,193 +86,146 @@ export class AdventuringModifiers {
                 ));
             }
         }
-        
+
         return effects;
     }
 
-    // ========================================================================
-    // Convenience Methods - Use effect types directly
-    // ========================================================================
-    
-    /**
-     * Get mastery XP bonus (as decimal multiplier, e.g., 0.1 for 10%)
-     */
+    getMasteryCompletionEffects() {
+        const effects = [];
+        const registries = [
+            this.manager.areas,
+            this.manager.monsters,
+            this.manager.jobs,
+            this.manager.baseItems
+        ];
+
+        for (const registry of registries) {
+            if (!registry) continue;
+
+            registry.forEach(action => {
+                if (this.manager.getMasteryLevel(action) >= 99) {
+                    const masteryCategory = action.masteryCategory;
+                    if (!masteryCategory) return;
+                    const categoryId = masteryCategory.id || `adventuring:${masteryCategory.localID}`;
+                    const milestoneEffects = masteryCategory.getEffectsAtLevel(99) || [];
+                    for (const effectData of milestoneEffects) {
+                        if (effectData.type === 'category_xp_percent') {
+                            effects.push(createEffect(
+                                { ...effectData, category: categoryId },
+                                action,
+                                `${action.name} Mastery`
+                            ));
+                        }
+                    }
+                }
+            });
+        }
+
+        return effects;
+    }
+
     getMasteryXPBonus(action) {
-        return this.getBonus('mastery_xp_percent', { action }) / 100;
+        let bonus = this.getBonus('xp_percent', { action });
+        if (action && action.masteryCategory) {
+            const categoryId = action.masteryCategory.id || `adventuring:${action.masteryCategory.localID}`;
+            bonus += this.getCategoryBonus('category_xp_percent', categoryId);
+        }
+
+        return bonus / 100;
     }
-    
-    /**
-     * Get job stat bonus (as decimal multiplier)
-     */
+
     getJobStatBonus(job) {
         return this.getBonus('job_stats_percent', { action: job }) / 100;
     }
-    
-    /**
-     * Get monster drop rate bonus (as decimal multiplier)
-     */
+
     getMonsterDropRateBonus(monster) {
         return this.getBonus('drop_rate_percent', { action: monster }) / 100;
     }
-    
-    /**
-     * Get monster drop quantity bonus (as decimal multiplier)
-     */
+
     getMonsterDropQtyBonus(monster) {
         return this.getBonus('drop_quantity_percent', { action: monster }) / 100;
     }
-    
-    /**
-     * Get material drop rate bonus (as decimal multiplier)
-     */
+
     getMaterialDropRateBonus() {
         return this.getBonus('material_drop_percent') / 100;
     }
-    
-    /**
-     * Get explore speed bonus (as decimal multiplier)
-     */
+
     getExploreSpeedBonus(area) {
         return this.getBonus('explore_speed_percent', { action: area }) / 100;
     }
-    
-    /**
-     * Get upgrade cost modifier (as decimal multiplier)
-     * Negative value = cost reduction (e.g., -0.25 = 25% cheaper)
-     */
+
     getUpgradeCostReduction(item) {
         return this.getBonus('upgrade_cost_percent', { action: item }) / 100;
     }
-    
-    /**
-     * Get consumable preservation chance (as decimal)
-     */
+
     getConsumablePreservationChance() {
         return this.getBonus('consumable_preservation_percent') / 100;
     }
-    
-    /**
-     * Get bonus energy (flat value)
-     */
+
     getBonusEnergy() {
         return this.getBonus('energy_flat');
     }
-    
-    /**
-     * Get ability learn chance bonus (as decimal multiplier)
-     */
+
     getAbilityLearnChanceBonus() {
         return this.getBonus('ability_learn_chance_percent') / 100;
     }
 
-    /**
-     * Get dungeon XP bonus (as decimal multiplier)
-     */
     getDungeonXPBonus(area) {
         return this.getBonus('dungeon_xp_percent', { action: area }) / 100;
     }
 
-    /**
-     * Get spawn rate modifier for a specific spawn type.
-     * Uses the consolidated spawn_rate_percent effect type with spawnType filter.
-     * @param {string} spawnType - The spawn type: 'trap', 'fountain', 'treasure', 'shrine'
-     * @param {object} [context] - Optional context with action for mastery effects
-     * @returns {number} Spawn rate modifier (percentage points, negative = fewer spawns)
-     */
     getSpawnRateMod(spawnType, context = {}) {
-        let total = 0;
-        
-        // Get effects from the global cache
+        let total = 0;
         const passiveEffects = this.effectCache.getEffects('passive');
         for (const effect of passiveEffects) {
             if (effect.type === 'spawn_rate_percent' && effect.spawnType === spawnType) {
                 const val = (effect.value !== undefined) ? effect.value : ((effect.amount !== undefined) ? effect.amount : 0);
                 total += val;
             }
-        }
-        
-        // Add mastery effects if an action is provided
+        }
         if (context.action && typeof context.action.getMasteryEffectValue === 'function') {
             total += context.action.getMasteryEffectValue('spawn_rate_percent', { spawnType });
         }
-        
+
         return total;
     }
 
-    /**
-     * Get trap spawn rate modifier (percentage points, negative = fewer traps)
-     */
     getTrapSpawnRateMod(context = {}) {
         return this.getSpawnRateMod('trap', context);
     }
 
-    /**
-     * Get fountain spawn rate modifier (percentage points)
-     */
     getFountainSpawnRateMod(context = {}) {
         return this.getSpawnRateMod('fountain', context);
     }
 
-    /**
-     * Get treasure spawn rate modifier (percentage points)
-     */
     getTreasureSpawnRateMod(context = {}) {
         return this.getSpawnRateMod('treasure', context);
     }
 
-    /**
-     * Get shrine spawn rate modifier (percentage points)
-     */
     getShrineSpawnRateMod(context = {}) {
         return this.getSpawnRateMod('shrine', context);
+    }
+
+    getMilestoneDamageBonusVsType(tags) {
+        return 0;
     }
 
-    // ========================================================================
-    // Combat-specific modifiers (milestone-based vs_type bonuses)
-    // ========================================================================
-    
-    /**
-     * Get milestone damage bonus vs monster types (as decimal multiplier)
-     */
-    getMilestoneDamageBonusVsType(tags) {
-        // Milestone bonuses now handled by mastery system
+    getMilestoneDamageReductionVsType(tags) {
         return 0;
     }
-    
-    /**
-     * Get milestone damage reduction vs monster types (as decimal multiplier)
-     */
-    getMilestoneDamageReductionVsType(tags) {
-        // Milestone bonuses now handled by mastery system
+
+    getMilestoneXPBonusVsType(tags) {
         return 0;
     }
-    
-    /**
-     * Get milestone XP bonus vs monster types (as decimal multiplier)
-     */
-    getMilestoneXPBonusVsType(tags) {
-        // Milestone bonuses now handled by mastery system
+
+    getMilestoneMaterialBonus(tags) {
         return 0;
     }
-    
-    /**
-     * Get milestone material bonus for monster types (as decimal multiplier)
-     */
-    getMilestoneMaterialBonus(tags) {
-        // Milestone bonuses now handled by mastery system
-        return 0;
-    }
-    
-    /**
-     * Get total damage bonus vs types (milestones only now, equipment uses aura system)
-     */
+
     getTotalDamageBonusVsType(attacker, tags) {
         return this.getMilestoneDamageBonusVsType(tags);
     }
-    
-    /**
-     * Get total damage reduction vs types (milestones only now, equipment uses aura system)
-     */
+
     getTotalDamageReductionVsType(defender, tags) {
         return this.getMilestoneDamageReductionVsType(tags);
     }

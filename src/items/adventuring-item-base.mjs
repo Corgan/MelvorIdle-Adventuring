@@ -29,9 +29,7 @@ export class AdventuringItemBase extends AdventuringMasteryAction {
         if(data.materials !== undefined) {
             this._materials = data.materials;
             this.materials = new Map();
-        }
-        
-        // Tiered upgrade materials (higher upgrade levels require later-game materials)
+        }
         if(data.upgradeMaterials !== undefined) {
             this._upgradeMaterials = data.upgradeMaterials;
         }
@@ -40,28 +38,14 @@ export class AdventuringItemBase extends AdventuringMasteryAction {
         this._type = data.type;
         this.maxUpgrades = 10;
         this.selected = false;
-        this.highlight = false;
-        
-        // Special effects for unique items (trigger-based)
-        this.effects = data.effects || [];
-        
-        // Unlock requirements (skill_level, job_level, etc.)
+        this.highlight = false;
+        this.effects = data.effects || [];
         this.requirements = data.requirements || [];
-        this._reqChecker = null; // Created in postDataRegistration
-        
-        // Equipment set membership (set by AdventuringEquipmentSet.postDataRegistration)
-        this.set = null;
-        
-        // Item tier (for sorting/filtering)
-        this.tier = (data.tier !== undefined) ? data.tier : 1;
-        
-        // Optional flavor text and custom description override
+        this._reqChecker = null; // Created in postDataRegistration
+        this.set = null;
+        this.tier = (data.tier !== undefined) ? data.tier : 1;
         this.flavorText = data.flavorText;
-        this.customDescription = data.customDescription;
-        
-        // === ARTIFACT SYSTEM ===
-        // Artifacts have multiple prestige tiers with different stats/effects/materials
-        // Only ONE artifact can be equipped per character (enforced in equipment slot)
+        this.customDescription = data.customDescription;
         this.isArtifact = data.isArtifact === true;
         if(data.tiers !== undefined) {
             this._tiers = data.tiers; // Raw tier data, parsed in postDataRegistration
@@ -76,20 +60,14 @@ export class AdventuringItemBase extends AdventuringMasteryAction {
     get masteryCategoryId() {
         return 'adventuring:equipment';
     }
-    
-    /**
-     * Get the description for this item.
-     * Priority: customDescription > auto-generated from effects
-     * FlavorText is appended after the description.
-     */
-    get description() {
-        // Custom description takes priority
+
+    get description() {
         if(this.customDescription) {
-            return this.flavorText 
+            return this.flavorText
                 ? `${this.customDescription}\n\n${this.flavorText}`
                 : this.customDescription;
         }
-        
+
         return buildDescription({
             effects: this.effects,
             manager: this.manager,
@@ -131,9 +109,7 @@ export class AdventuringItemBase extends AdventuringMasteryAction {
                     this.materials.set(material, qty);
             });
             delete this._materials;
-        }
-        
-        // Parse tiered upgrade materials
+        }
         if(this._upgradeMaterials !== undefined) {
             for (const [threshold, matIds] of Object.entries(this._upgradeMaterials)) {
                 const materials = [];
@@ -153,15 +129,10 @@ export class AdventuringItemBase extends AdventuringMasteryAction {
         if(this._type !== undefined) {
             this.type = this.manager.itemTypes.getObjectByID(this._type);
             delete this._type;
-        }
-        
-        // Create requirements checker
+        }
         if(this.requirements.length > 0) {
             this._reqChecker = new RequirementsChecker(this.manager, this.requirements);
-        }
-        
-        // === ARTIFACT TIER PARSING ===
-        // Parse artifact tiers: each tier has its own name, base, scaling, effects, materials
+        }
         if(this._tiers !== undefined && this._tiers.length > 0) {
             this.tiers = this._tiers.map((tierData, tierIndex) => {
                 const tier = {
@@ -170,23 +141,17 @@ export class AdventuringItemBase extends AdventuringMasteryAction {
                     scaling: new AdventuringStats(this.manager, this.game),
                     effects: tierData.effects || [],
                     materials: new Map()
-                };
-                
-                // Parse base stats
+                };
                 if(tierData.base) {
                     tierData.base.forEach(({ id, amount }) => {
                         tier.base.set(id, amount);
                     });
-                }
-                
-                // Parse scaling stats
+                }
                 if(tierData.scaling) {
                     tierData.scaling.forEach(({ id, amount }) => {
                         tier.scaling.set(id, amount);
                     });
-                }
-                
-                // Parse materials
+                }
                 if(tierData.materials) {
                     tierData.materials.forEach(({ id, qty }) => {
                         const material = this.manager.materials.getObjectByID(id);
@@ -195,49 +160,33 @@ export class AdventuringItemBase extends AdventuringMasteryAction {
                         }
                     });
                 }
-                
+
                 return tier;
             });
-            delete this._tiers;
-            
-            // Set initial base/scaling/materials from tier 0 for artifacts
+            delete this._tiers;
             this.applyArtifactTier(this.artifactTier);
-        }
-        
-        // === CACHE COMPUTED PROPERTIES FOR PERFORMANCE ===
-        // These values don't change after data registration, so cache them
+        }
         this._computeCachedProperties();
     }
-    
-    /**
-     * Compute and cache frequently-accessed properties that don't change.
-     * Called once after postDataRegistration to avoid repeated computation.
-     */
-    _computeCachedProperties() {
-        // Cache jobs that can use this item type
+
+    _computeCachedProperties() {
         this._cachedJobs = this.manager.jobs.allObjects.filter(
             job => job.allowedItems !== undefined && job.allowedItems.includes(this.type)
-        );
-        
-        // Cache equipment slots this item can go in
+        );
         if(this.type !== undefined && this.type.slots !== undefined) {
             this._cachedSlots = this.type.slots.map(
                 slotType => this.manager.itemSlots.getObjectByID(slotType)
             );
         } else {
             this._cachedSlots = [];
-        }
-        
-        // Cache slots this item occupies (for two-handed weapons, etc.)
+        }
         if(this.type !== undefined && this.type.occupies !== undefined) {
             this._cachedOccupies = this.type.occupies.map(
                 slotType => this.manager.itemSlots.getObjectByID(slotType)
             );
         } else {
             this._cachedOccupies = [];
-        }
-        
-        // Cache paired item types
+        }
         if(this.type !== undefined && this.type.pairs !== undefined) {
             this._cachedPairs = this.type.pairs.map(
                 pair => this.manager.itemTypes.getObjectByID(pair)
@@ -247,48 +196,49 @@ export class AdventuringItemBase extends AdventuringMasteryAction {
         }
     }
 
-    calculateStats() {
-        // Calculate base stats with level scaling and mastery bonus
+    getEffectiveLevel(character) {
+        const itemLevel = this.level;
+        if (!character || !character.combatJob) return itemLevel;
+
+        const jobLevel = this.manager.getMasteryLevel(character.combatJob);
+        return Math.min(itemLevel, jobLevel);
+    }
+
+    isLevelCapped(character) {
+        if (!character || !character.combatJob) return false;
+        const jobLevel = this.manager.getMasteryLevel(character.combatJob);
+        return this.level > jobLevel;
+    }
+
+    calculateStats(character = null) {
+        const effectiveLevel = character ? this.getEffectiveLevel(character) : this.level;
         const statBonus = this.getMasteryEffectValue('equipment_stats_percent');
-        StatCalculator.calculateWithScaling(this.stats, this.base, this.scaling, this.level, statBonus);
-        
-        // Masterful rank: Apply normalization to bring all items to same power level
+        StatCalculator.calculateWithScaling(this.stats, this.base, this.scaling, effectiveLevel, statBonus);
         if (this.isMasterful) {
             this.applyMasterfulScaling();
         }
     }
-    
-    /**
-     * Apply Masterful rank scaling - normalizes all Masterful items to same power level
-     * This brings lower-tier items up to high-tier power when both are Masterful
-     */
+
     applyMasterfulScaling() {
         const multiplier = this.getMasterfulMultiplier();
         if (multiplier > 1) {
             StatCalculator.applyMultiplier(this.stats, multiplier);
         }
     }
-    
-    /**
-     * Get the multiplier needed to bring this item to Masterful power level
-     * Higher tier items get lower multipliers, lower tier items get higher multipliers
-     */
+
     getMasterfulMultiplier() {
         const tier = this.tier || 1;
-        const maxTier = 10; // Assumed max tier
-        
-        // Inverse relationship: lower tier gets bigger boost
-        // Tier 10 items get 1.0x, tier 1 items get 1.9x
+        const maxTier = 10; // Assumed max tier
         const multiplier = 1 + (maxTier - tier) * 0.1;
-        
+
         return multiplier;
     }
 
-    get tooltip() {
-        const tooltip = TooltipBuilder.forEquipment(this, this.manager);
+    get tooltip() {
+        const character = this.currentSlot?.equipment?.character || null;
+        const tooltip = TooltipBuilder.forEquipment(this, this.manager, character);
 
-        if(this.unlocked) {
-            // Upgrade cost
+        if(this.unlocked) {
             if(this.materials !== undefined) {
                 let upgradeOrUnlock = (this.upgradeLevel === 0 ? 'Unlock': 'Upgrade');
                 tooltip.separator();
@@ -298,9 +248,7 @@ export class AdventuringItemBase extends AdventuringMasteryAction {
                     const owned = material.count;
                     const color = owned >= cost ? 'text-success' : 'text-danger';
                     costItems.push(tooltip.iconValue(material.media, `<span class="${color}">${cost}</span> <small class="text-muted">(${owned})</small>`));
-                });
-                
-                // Add tiered upgrade materials (if any apply to next upgrade level)
+                });
                 const tieredMats = this.getUpgradeTierMaterials();
                 for (const material of tieredMats) {
                     const cost = this.getUpgradeTierCost(material);
@@ -308,66 +256,50 @@ export class AdventuringItemBase extends AdventuringMasteryAction {
                     const color = owned >= cost ? 'text-success' : 'text-danger';
                     costItems.push(tooltip.iconValue(material.media, `<span class="${color}">${cost}</span> <small class="text-muted">(${owned})</small>`));
                 }
-                
+
                 tooltip.hint(`${upgradeOrUnlock} Cost:`);
                 tooltip.statRow(...costItems);
             }
-        } else {
-            // Item is locked - show unlock requirements (pass this item as context for source lookups)
+        } else {
             tooltip.unlockRequirements(this.requirements, this.manager, { item: this });
         }
-        
+
         return tooltip.build();
     }
 
-    get name() {
-        // Artifacts use tier-specific names
+    get name() {
         if(this.isArtifact && this.tiers.length > 0) {
             const tier = this.tiers[this.artifactTier];
             if(tier) return tier.name;
         }
-        
-        const baseName = this._name;
-        // Add "Mastered" prefix at level 99 equipment mastery
+
+        const baseName = this._name;
         if (this.unlocked && this.hasUnlock('mastered_variant')) {
             return `Mastered ${baseName}`;
         }
         return baseName;
     }
-    
-    /**
-     * Get the current artifact tier (0, 1, or 2)
-     * Tracked in armory.artifactTiers Map
-     */
+
     get artifactTier() {
         if(!this.isArtifact) return 0;
         return this.manager.armory.artifactTiers.get(this) || 0;
     }
-    
-    /**
-     * Check if artifact can prestige to next tier
-     * Requires: level 99 mastery + can afford next tier's materials
-     */
+
     get canPrestige() {
         if(!this.isArtifact) return false;
         if(this.artifactTier >= this.tiers.length - 1) return false; // Already max tier
-        if(this.level < 99) return false; // Must be level 99
-        
-        // Check next tier's materials
+        if(this.level < 99) return false; // Must be level 99
         const nextTier = this.tiers[this.artifactTier + 1];
         if(!nextTier || !nextTier.materials) return false;
-        
+
         for(const [material, cost] of nextTier.materials) {
             const owned = this.manager.stash.materialCounts.get(material) || 0;
             if(owned < cost) return false;
         }
-        
+
         return true;
     }
-    
-    /**
-     * Get the materials required for prestige to next tier
-     */
+
     get prestigeMaterials() {
         if(!this.isArtifact || this.artifactTier >= this.tiers.length - 1) {
             return new Map();
@@ -375,33 +307,21 @@ export class AdventuringItemBase extends AdventuringMasteryAction {
         const nextTier = this.tiers[this.artifactTier + 1];
         return nextTier ? nextTier.materials : new Map();
     }
-    
-    /**
-     * Apply artifact tier stats/effects/materials to base properties
-     * Called when artifact tier changes (prestige) or on load
-     */
+
     applyArtifactTier(tierIndex) {
         if(!this.isArtifact || this.tiers.length === 0) return;
-        
+
         const tier = this.tiers[tierIndex] || this.tiers[0];
-        if(!tier) return;
-        
-        // Update base stats
+        if(!tier) return;
         this.base.reset();
         tier.base.forEach((value, stat) => {
             this.base.set(stat, value);
-        });
-        
-        // Update scaling stats
+        });
         this.scaling.reset();
         tier.scaling.forEach((value, stat) => {
             this.scaling.set(stat, value);
-        });
-        
-        // Update effects
-        this.effects = tier.effects || [];
-        
-        // Recalculate stats with new base/scaling
+        });
+        this.effects = tier.effects || [];
         this.calculateStats();
     }
 
@@ -413,17 +333,13 @@ export class AdventuringItemBase extends AdventuringMasteryAction {
         return this.manager.getMasteryLevel(this);
     }
 
-    get levelCap() {
-        // 10 upgrade levels: 1→10, 2→20, ..., 9→90, 10→99
+    get levelCap() {
         if (this.upgradeLevel >= this.maxUpgrades) {
             return 99;
         }
         return this.upgradeLevel * 10;
     }
-    
-    /**
-     * Check if this item has been upgraded to Masterful rank
-     */
+
     get isMasterful() {
         if (this.manager.armory.masterfulItems && this.manager.armory.masterfulItems.has(this)) {
             return true;
@@ -431,9 +347,6 @@ export class AdventuringItemBase extends AdventuringMasteryAction {
         return false;
     }
 
-    /**
-     * Check if this item has been unlocked via the drop system
-     */
     get dropped() {
         if (this.manager.armory.droppedItems && this.manager.armory.droppedItems.get(this) === true) {
             return true;
@@ -457,57 +370,35 @@ export class AdventuringItemBase extends AdventuringMasteryAction {
         if(this.upgradeLevel >= this.maxUpgrades)
             return false;
         if(this.materials === undefined)
-            return false;
-        
-        // Must reach current level cap before upgrading
-        // This ensures players USE equipment to level it before upgrading
+            return false;
         if(this.level < this.levelCap)
-            return false;
-        
-        // Check base materials
+            return false;
         for(let material of this.materials.keys()) {
             if(this.getCost(material) > this.manager.stash.materialCounts.get(material))
                 return false;
-        }
-        
-        // Check tiered upgrade materials (higher upgrade levels need later-game materials)
+        }
         const tieredMats = this.getUpgradeTierMaterials();
         for (const material of tieredMats) {
             const cost = this.getUpgradeTierCost(material);
             if (cost > (this.manager.stash.materialCounts.get(material) || 0))
                 return false;
         }
-        
+
         return true;
     }
-    
-    /**
-     * Get materials required for the current upgrade tier
-     * Materials are REPLACED at each tier (not cumulative)
-     * +1 to +3: uses threshold 1 materials
-     * +4 to +6: uses threshold 4 materials
-     * +7 to +10: uses threshold 7 materials
-     */
+
     getUpgradeTierMaterials() {
-        const nextLevel = this.upgradeLevel + 1;
-        
-        // Find the highest threshold that applies to our next upgrade level
+        const nextLevel = this.upgradeLevel + 1;
         let activeThreshold = 1;
         for (const threshold of this.upgradeMaterials.keys()) {
             if (nextLevel >= threshold && threshold > activeThreshold) {
                 activeThreshold = threshold;
             }
-        }
-        
-        // Return only the materials for that threshold
+        }
         return this.upgradeMaterials.get(activeThreshold) || [];
     }
-    
-    /**
-     * Get cost for a tiered upgrade material (flat cost, doesn't scale with level)
-     */
-    getUpgradeTierCost(material) {
-        // Tiered materials have a flat cost of 1-3 based on tier
+
+    getUpgradeTierCost(material) {
         return Math.ceil((this.upgradeLevel + 1) / 3);
     }
 
@@ -548,43 +439,29 @@ export class AdventuringItemBase extends AdventuringMasteryAction {
         return this._cachedPairs || [];
     }
 
-    /**
-     * Check if all requirements are met to unlock/craft this item
-     * @returns {boolean} True if requirements are met (or no requirements exist)
-     */
     get requirementsMet() {
         if(!this._reqChecker) return true;
         return this._reqChecker.check({ item: this });
     }
-    
-    /**
-     * Get formatted effect descriptions for tooltip display
-     * @returns {Array<string>} Array of effect description strings
-     */
+
     getEffectDescriptions() {
         return getEffectDescriptionsList(this.effects, this.manager);
     }
 
     getCost(material) {
         let amount = this.materials.get(material);
-        if(amount === undefined) return 0;
-        
-        // Apply upgrade cost modifier from mastery
-        const costReduction = this.manager.modifiers.getUpgradeCostReduction(this);
-        
-        // Linear scaling: (upgradeLevel + 1) * amount
-        // Level 0→1: 1x, 1→2: 2x, 2→3: 3x, 3→4: 4x, ..., 9→10: 10x
+        if(amount === undefined) return 0;
+        const costReduction = this.manager.modifiers.getUpgradeCostReduction(this);
         const baseCost = (this.upgradeLevel + 1) * amount;
         return Math.max(1, Math.floor(baseCost * (1 + costReduction)));
     }
 
     addXP(xp) {
         let { currentXP, level, percent, nextLevelXP } = this.manager.getMasteryProgress(this);
-        if(level < this.levelCap) {
-            // Apply equipment mastery XP bonus from modifier system
+        if(level < this.levelCap) {
             const xpBonus = this.manager.modifiers.getMasteryXPBonus(this);
             const modifiedXP = Math.floor(xp * (1 + xpBonus));
-            
+
             this.manager.addMasteryXP(this, modifiedXP);
             this.manager.addMasteryPoolXP(modifiedXP);
         }
@@ -600,9 +477,7 @@ export class AdventuringItemBase extends AdventuringMasteryAction {
             return;
 
         if(!this.unlocked)
-            return;
-
-        // Just select/deselect items - no equipping from armory
+            return;
         if(this.manager.armory.selectedItem === this) {
             this.manager.armory.clearSelected();
         } else {

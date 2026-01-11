@@ -35,9 +35,7 @@ export class AdventuringPages {
             this.current = page;
 
             page.component.show();
-            page.onShow();
-            
-            // Notify tutorial manager of page change
+            page.onShow();
             if(this.manager.tutorialManager && this.manager.tutorialManager.onOverviewPageChange) {
                 this.manager.tutorialManager.onOverviewPageChange();
             }

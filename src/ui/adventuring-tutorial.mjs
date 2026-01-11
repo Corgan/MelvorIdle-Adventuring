@@ -15,9 +15,7 @@ export class AdventuringTutorial extends NamespacedObject {
         this.priority = (data.priority !== undefined) ? data.priority : 10;
         this.trigger = data.trigger;
         this.chainTo = data.chainTo || null;
-        this.requiresState = data.requiresState || null; // 'town' or 'dungeon'
-        
-        // Build steps
+        this.requiresState = data.requiresState || null; // 'town' or 'dungeon'
         this.steps = [];
         if(data.steps) {
             data.steps.forEach(stepData => {
@@ -30,12 +28,6 @@ export class AdventuringTutorial extends NamespacedObject {
         return this._name;
     }
 
-    /**
-     * Check if this tutorial's trigger conditions are met
-     * @param {string} triggerType - The type of trigger event ('immediate', 'currency', 'material', 'mastery', 'event')
-     * @param {object} context - Additional context for the trigger check
-     * @returns {boolean}
-     */
     checkTrigger(triggerType, context = {}) {
         if(!this.trigger) return false;
         if(this.trigger.type !== triggerType) return false;
@@ -44,8 +36,7 @@ export class AdventuringTutorial extends NamespacedObject {
             case 'immediate':
                 return true;
 
-            case 'chained':
-                // Chained tutorials are only activated via chainTo, not trigger checks
+            case 'chained':
                 return false;
 
             case 'currency':
@@ -70,29 +61,22 @@ export class AdventuringTutorial extends NamespacedObject {
         }
     }
 
-    /**
-     * Check material-based triggers
-     */
     checkMaterialTrigger() {
         var manager = this.manager;
-        
-        if(this.trigger.check === 'anyUpgrade') {
-            // Check if player can afford any equipment upgrade
+
+        if(this.trigger.check === 'anyUpgrade') {
             return manager.baseItems.allObjects.some(function(item) {
                 if(!item.unlocked) return false;
                 return item.upgradeable;
             });
         }
 
-        if(this.trigger.check === 'anyCraft') {
-            // Check if player can afford any consumable craft
+        if(this.trigger.check === 'anyCraft') {
             return manager.consumableTypes.allObjects.some(function(consumable) {
                 if(typeof consumable.canAfford !== 'function') return false;
                 return consumable.canAfford();
             });
-        }
-
-        // Specific material requirements
+        }
         if(this.trigger.materials) {
             return this.trigger.materials.every(function(req) {
                 var material = manager.materials.getObjectByID(req.id);

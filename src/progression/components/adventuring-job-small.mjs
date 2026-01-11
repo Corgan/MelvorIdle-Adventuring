@@ -11,7 +11,7 @@ export class AdventuringJobSmallElement extends AdventuringTooltipElement {
 
         this.styling = getElementFromFragment(this._content, 'styling', 'div');
         this.icon = getElementFromFragment(this._content, 'icon', 'img');
-        
+
         this.selectorPopup = null;
         this._tooltipTarget = this.styling;
     }
@@ -35,9 +35,7 @@ export class AdventuringJobSmallElement extends AdventuringTooltipElement {
 
     attachSelector(character, type) {
         this.selectorType = type;
-        this.selectorCharacter = character;
-        
-        // Create click-triggered popup for job selection
+        this.selectorCharacter = character;
         this.selectorPopup = tippy(this.styling, {
             content: '',
             allowHTML: true,
@@ -53,8 +51,7 @@ export class AdventuringJobSmallElement extends AdventuringTooltipElement {
                 }
                 instance.setContent(this.buildSelectorContent());
             },
-            onHide: () => {
-                // Re-render character to update display
+            onHide: () => {
                 if(this.selectorCharacter.renderQueue) {
                     this.selectorCharacter.renderQueue.jobs = true;
                 }
@@ -64,39 +61,33 @@ export class AdventuringJobSmallElement extends AdventuringTooltipElement {
 
     buildSelectorContent() {
         const container = document.createElement('div');
-        container.className = 'p-2';
-        
-        // Header
+        container.className = 'p-2';
         const header = document.createElement('div');
         header.className = 'text-center mb-2 pb-2 border-bottom border-dark';
         const headerText = document.createElement('strong');
         headerText.className = 'text-white';
         headerText.textContent = this.selectorType === 'combatJob' ? 'Select Combat Job' : 'Select Passive Job';
         header.appendChild(headerText);
-        container.appendChild(header);
-        
-        // Job grid
+        container.appendChild(header);
         const grid = document.createElement('div');
-        grid.className = 'd-flex flex-wrap justify-content-center';
-        
-        // Unified job filtering logic
+        grid.className = 'd-flex flex-wrap justify-content-center';
         const isPassiveSelector = this.selectorType === 'passiveJob';
         const jobProp = isPassiveSelector ? 'passiveJob' : 'combatJob';
-        
-        let jobs = this.skill.jobs.allObjects.filter(job => 
+
+        let jobs = this.skill.jobs.allObjects.filter(job =>
             job.unlocked && (job.id === "adventuring:none" || job.isPassive === isPassiveSelector)
         );
-        jobs = jobs.filter(job => 
-            this.selectorCharacter[jobProp] === job || 
-            job.allowMultiple || 
+        jobs = jobs.filter(job =>
+            this.selectorCharacter[jobProp] === job ||
+            job.allowMultiple ||
             !this.skill.party.all.map(member => member[jobProp]).includes(job)
         );
-        
+
         jobs.forEach(job => {
             const jobBtn = this.createJobButton(job);
             grid.appendChild(jobBtn);
         });
-        
+
         container.appendChild(grid);
         return container;
     }
@@ -104,7 +95,7 @@ export class AdventuringJobSmallElement extends AdventuringTooltipElement {
     createJobButton(job) {
         const isSelected = this.selectorCharacter[this.selectorType] === job;
         const masteryLevel = this.skill.getMasteryLevel(job);
-        
+
         const btn = new AdventuringJobSelectorBtnElement();
         btn.setJob({
             job,
@@ -113,7 +104,7 @@ export class AdventuringJobSmallElement extends AdventuringTooltipElement {
             tooltipContent: job.tooltip,
             onSelect: (selectedJob) => this.selectJob(selectedJob)
         });
-        
+
         return btn;
     }
 
@@ -122,15 +113,13 @@ export class AdventuringJobSmallElement extends AdventuringTooltipElement {
             this.selectorCharacter.setCombatJob(job);
         } else if(this.selectorType === 'passiveJob') {
             this.selectorCharacter.setPassiveJob(job);
-        }
-        // Close the popup
+        }
         if(this.selectorPopup) {
             this.selectorPopup.hide();
         }
     }
 
-    showSelector() {
-        // Legacy method - now handled by tippy popup
+    showSelector() {
         if(this.selectorPopup && !this.selectorCharacter.locked) {
             this.selectorPopup.show();
         }

@@ -7,12 +7,12 @@ export class AdventuringConsumableElement extends AdventuringTooltipElement {
         super();
         this._content = new DocumentFragment();
         this._content.append(getTemplateNode('adventuring-consumable-template'));
-        
+
         this.clickable = getElementFromFragment(this._content, 'clickable', 'div');
         this.border = getElementFromFragment(this._content, 'border', 'div');
         this.icon = getElementFromFragment(this._content, 'icon', 'img');
         this.charges = getElementFromFragment(this._content, 'charges', 'small');
-        
+
         this._tooltipTarget = this.clickable;
     }
 

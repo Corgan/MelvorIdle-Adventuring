@@ -6,18 +6,12 @@ export class AdventuringConsumablesElement extends HTMLElement {
 
         this.page = getElementFromFragment(this._content, 'page', 'div');
         this.back = getElementFromFragment(this._content, 'back', 'button');
-        this.slotsContainer = getElementFromFragment(this._content, 'slots', 'div');
-        
-        // Collapsible job sections container
-        this.jobSections = getElementFromFragment(this._content, 'job-sections', 'div');
-        
-        // Get individual slot elements
+        this.slotsContainer = getElementFromFragment(this._content, 'slots', 'div');
+        this.jobSections = getElementFromFragment(this._content, 'job-sections', 'div');
         this.slots = [];
         for(let i = 0; i < 3; i++) {
             this.slots.push(getElementFromFragment(this._content, `slot-${i}`, 'div'));
-        }
-        
-        // Details panel elements
+        }
         this.detailsContainer = getElementFromFragment(this._content, 'details-container', 'div');
         this.details = getElementFromFragment(this._content, 'details', 'div');
         this.detailsPlaceholder = getElementFromFragment(this._content, 'details-placeholder', 'div');
@@ -26,9 +20,7 @@ export class AdventuringConsumablesElement extends HTMLElement {
         this.detailDescription = getElementFromFragment(this._content, 'detail-description', 'p');
         this.detailEffects = getElementFromFragment(this._content, 'detail-effects', 'div');
         this.detailCharges = getElementFromFragment(this._content, 'detail-charges', 'span');
-        this.equipButton = getElementFromFragment(this._content, 'equip-button', 'button');
-        
-        // Tier buttons
+        this.equipButton = getElementFromFragment(this._content, 'equip-button', 'button');
         this.tierButtons = getElementFromFragment(this._content, 'tier-buttons', 'div');
         this.tierButtonElements = [];
         for(let i = 1; i <= 4; i++) {
@@ -51,12 +43,12 @@ export class AdventuringConsumablesElement extends HTMLElement {
     hide() {
         this.page.classList.add('d-none');
     }
-    
+
     showDetails() {
         this.details.classList.remove('d-none');
         this.detailsPlaceholder.classList.add('d-none');
     }
-    
+
     hideDetails() {
         this.details.classList.add('d-none');
         this.detailsPlaceholder.classList.remove('d-none');

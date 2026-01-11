@@ -10,7 +10,7 @@ export class AdventuringDungeonCellElement extends AdventuringTooltipElement {
 
         this.styling = getElementFromFragment(this._content, 'styling', 'div');
         this.icon = getElementFromFragment(this._content, 'icon', 'img');
-        
+
         this._tooltipTarget = this.styling;
         this._tooltipOptions = { placement: 'top' };
     }

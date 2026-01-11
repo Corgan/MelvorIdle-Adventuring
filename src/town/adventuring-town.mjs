@@ -30,9 +30,7 @@ export class AdventuringTown extends AdventuringPage {
         return super.active;
     }
 
-    performActions() {
-        // Check if auto-run should start (party at full HP after wipe)
-        // This is different from auto-repeat which happens during dungeon completion
+    performActions() {
         if(this.manager.autoRepeatArea && this.checkAutoRunReady()) {
             this.manager.log.add(`Auto-run: Starting ${this.manager.autoRepeatArea.name}...`);
             this.manager.selectArea(this.manager.autoRepeatArea);
@@ -42,12 +40,8 @@ export class AdventuringTown extends AdventuringPage {
         this.manager.party.forEach(character => this.runAction(character));
     }
 
-    /**
-     * Check if conditions are met to auto-start the repeat dungeon
-     * Requires all party members to be alive and at full HP
-     */
     checkAutoRunReady() {
-        return this.manager.party.every(member => 
+        return this.manager.party.every(member =>
             !member.dead && member.hitpoints >= member.maxHitpoints
         );
     }
@@ -97,7 +91,7 @@ export class AdventuringTown extends AdventuringPage {
         }
         return actions[0];
     }
-    
+
     updateTownCards() {
         this.manager.overview.cards.renderQueue.cards.clear();
 
@@ -122,8 +116,7 @@ export class AdventuringTown extends AdventuringPage {
         this.manager.overview.cards.renderQueue.update = true;
     }
 
-    go() {
-        // Always go to main town page, clear any building selection
+    go() {
         this.building = undefined;
         super.go();
     }
@@ -133,8 +126,7 @@ export class AdventuringTown extends AdventuringPage {
             building = this.manager.buildings.getObjectByID(building);
         if(building === undefined || building.page !== undefined)
             this.building = building;
-        if(building && building.page !== undefined) {
-            // Go to the building's subpage directly
+        if(building && building.page !== undefined) {
             building.go();
         } else if(this.active) {
             this.go();
@@ -160,7 +152,7 @@ export class AdventuringTown extends AdventuringPage {
 
     postDataRegistration() {
         super.postDataRegistration();
-        
+
         this.manager.buildings.allObjects.forEach(building => {
             this.buildings.add(building);
             building.component.mount(this.component.buildings);

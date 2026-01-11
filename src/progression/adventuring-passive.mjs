@@ -43,10 +43,6 @@ export class AdventuringPassive extends NamespacedObject {
         return this._reqChecker.check({ character });
     }
 
-    /**
-     * Get the description with effect values substituted for placeholders
-     * If no template provided, auto-generates from effects
-     */
     getDescription(character) {
         return buildDescription({
             effects: this.effects,

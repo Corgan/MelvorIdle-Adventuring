@@ -23,17 +23,10 @@ export class AdventuringMessageLog {
         this.messages = [];
     }
 
-    /**
-     * Add a message to the log
-     * @param {string} body - Message text
-     * @param {string} type - Message type for styling (info, rare, epic, legendary)
-     * @param {string} media - Optional icon URL
-     */
-    add(body, type = 'info', media = null) {
-        // Skip logging during offline progress to avoid unnecessary object creation
+    add(body, type = 'info', media = null) {
         if(loadingOfflineProgress)
             return;
-            
+
         let message;
         if(this.messages.length >= 50) {
             message = this.messages.shift();
@@ -47,7 +40,7 @@ export class AdventuringMessageLog {
         this.messages.push(message);
         this.renderQueue.messages = true;
     }
-    
+
     render() {
         this.renderMessages();
     }

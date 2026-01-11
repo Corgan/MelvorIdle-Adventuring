@@ -20,7 +20,7 @@ export class AdventuringCards {
         this.component = createElement('adventuring-cards');
         this.cards = [];
     }
-    
+
     render() {
         this.renderCards();
     }

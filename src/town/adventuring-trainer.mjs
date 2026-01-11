@@ -22,7 +22,7 @@ export class AdventuringTrainer extends AdventuringPage {
             'passive': []
         };
         this.currentFilter = 'all';
-        
+
         this.component.back.onclick = () => this.back();
         this.component.categoryFilter.onchange = () => this.onFilterChange();
     }
@@ -51,19 +51,12 @@ export class AdventuringTrainer extends AdventuringPage {
         this.manager.party.setAllLocked(true);
     }
 
-    /**
-     * Determine the tier category of a job based on its tier property
-     * Uses the job's data-driven tier value instead of hardcoded lists
-     */
     getJobTier(job) {
-        if(job.isPassive) return 'passive';
-        
-        // Use the job's tier property (0-4+)
+        if(job.isPassive) return 'passive';
         const tier = (job.tier !== undefined) ? job.tier : 0;
         if(tier <= 4) {
             return `combat-tier${tier}`;
-        }
-        // Tier 5+ jobs fall into tier4 category for UI purposes
+        }
         return 'combat-tier4';
     }
 
@@ -73,76 +66,53 @@ export class AdventuringTrainer extends AdventuringPage {
     }
 
     updateVisibleJobs() {
-        const jobsToShow = this.currentFilter === 'all' 
-            ? this.masteryJobs 
+        const jobsToShow = this.currentFilter === 'all'
+            ? this.masteryJobs
             : this.jobsByCategory[this.currentFilter];
-        
+
         this.masteryJobs.forEach(job => {
             const shouldShow = jobsToShow.includes(job);
             job.component.classList.toggle('d-none', !shouldShow);
         });
     }
 
-    /**
-     * Get the minimum job level requirement for a job
-     */
     getMinJobLevelRequirement(job) {
         const jobReqs = job.requirements.filter(r => r.type === 'job_level');
         if(jobReqs.length === 0) return 0;
         return Math.min(...jobReqs.map(r => r.level));
     }
 
-    /**
-     * Get the total levels required across all job_level requirements
-     */
     getTotalLevelRequirement(job) {
         return job.requirements
             .filter(r => r.type === 'job_level')
             .reduce((sum, r) => sum + r.level, 0);
     }
 
-    /**
-     * Sort jobs by: job level requirement, then total levels required, then name
-     */
     sortJobsByRequirements(jobs) {
-        return jobs.sort((a, b) => {
-            // First by minimum job level requirement
+        return jobs.sort((a, b) => {
             const aMinLevel = this.getMinJobLevelRequirement(a);
             const bMinLevel = this.getMinJobLevelRequirement(b);
-            if(aMinLevel !== bMinLevel) return aMinLevel - bMinLevel;
-            
-            // Then by total levels required
+            if(aMinLevel !== bMinLevel) return aMinLevel - bMinLevel;
             const aTotalLevels = this.getTotalLevelRequirement(a);
             const bTotalLevels = this.getTotalLevelRequirement(b);
-            if(aTotalLevels !== bTotalLevels) return aTotalLevels - bTotalLevels;
-            
-            // Finally by name
+            if(aTotalLevels !== bTotalLevels) return aTotalLevels - bTotalLevels;
             return a.name.localeCompare(b.name);
         });
     }
 
-    postDataRegistration() {
-        // Categorize all milestone jobs
+    postDataRegistration() {
         let combatJobs = this.manager.jobs.allObjects.filter(job => job.isMilestoneReward && !job.isPassive);
-        let passiveJobs = this.manager.jobs.allObjects.filter(job => job.isMilestoneReward && job.isPassive);
-
-        // Sort combat jobs by tier then by requirements
+        let passiveJobs = this.manager.jobs.allObjects.filter(job => job.isMilestoneReward && job.isPassive);
         combatJobs.forEach(job => {
             const tier = this.getJobTier(job);
             this.jobsByCategory[tier].push(job);
-        });
-        
-        // Sort each tier by requirements (job level, total levels, then name)
+        });
         this.jobsByCategory['combat-tier0'] = this.sortJobsByRequirements(this.jobsByCategory['combat-tier0']);
         this.jobsByCategory['combat-tier1'] = this.sortJobsByRequirements(this.jobsByCategory['combat-tier1']);
         this.jobsByCategory['combat-tier2'] = this.sortJobsByRequirements(this.jobsByCategory['combat-tier2']);
         this.jobsByCategory['combat-tier3'] = this.sortJobsByRequirements(this.jobsByCategory['combat-tier3']);
-        this.jobsByCategory['combat-tier4'] = this.sortJobsByRequirements(this.jobsByCategory['combat-tier4']);
-        
-        // Add passive jobs sorted by requirements
-        this.jobsByCategory['passive'] = this.sortJobsByRequirements(passiveJobs);
-
-        // Build all jobs list in order: tier0, tier1, tier2, tier3, tier4, passive
+        this.jobsByCategory['combat-tier4'] = this.sortJobsByRequirements(this.jobsByCategory['combat-tier4']);
+        this.jobsByCategory['passive'] = this.sortJobsByRequirements(passiveJobs);
         this.masteryJobs = [
             ...this.jobsByCategory['combat-tier0'],
             ...this.jobsByCategory['combat-tier1'],
@@ -150,12 +120,8 @@ export class AdventuringTrainer extends AdventuringPage {
             ...this.jobsByCategory['combat-tier3'],
             ...this.jobsByCategory['combat-tier4'],
             ...this.jobsByCategory['passive']
-        ];
-        
-        // Add all to the 'all' category
-        this.jobsByCategory['all'] = this.masteryJobs;
-
-        // Mount all jobs to DOM
+        ];
+        this.jobsByCategory['all'] = this.masteryJobs;
         this.masteryJobs.forEach(job => {
             job.component.mount(this.component.jobs);
         });

@@ -51,7 +51,7 @@ export class AdventuringStats extends Map {
     render() {
         if(!this.renderQueue.stats)
             return;
-            
+
         this.component.statsMap.forEach((_, stat) => {
             if(super.get(stat) === undefined)
                 this.component.delete(stat);

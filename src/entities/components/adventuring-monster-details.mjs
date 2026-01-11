@@ -9,20 +9,18 @@ export class AdventuringMonsterDetailsElement extends AdventuringSubpageElement 
         this.back = getElementFromFragment(this._content, 'back', 'button');
         this.icon = getElementFromFragment(this._content, 'icon', 'img');
         this.nameText = getElementFromFragment(this._content, 'name', 'h3');
-        this.tags = getElementFromFragment(this._content, 'tags', 'p');
-        
-        // Location in header
+        this.tags = getElementFromFragment(this._content, 'tags', 'p');
         this.locationRow = getElementFromFragment(this._content, 'locationRow', 'div');
         this.locationIcon = getElementFromFragment(this._content, 'locationIcon', 'img');
         this.locationName = getElementFromFragment(this._content, 'locationName', 'small');
-        
+
         this.killCount = getElementFromFragment(this._content, 'killCount', 'span');
         this.masteryLevel = getElementFromFragment(this._content, 'masteryLevel', 'span');
         this.masteryProgress = getElementFromFragment(this._content, 'mastery-progress', 'progress-bar');
-        
+
         this.stats = getElementFromFragment(this._content, 'stats', 'div');
         this.abilities = getElementFromFragment(this._content, 'abilities', 'div');
-        
+
         this.dropLock = getElementFromFragment(this._content, 'dropLock', 'small');
         this.dropRows = getElementFromFragment(this._content, 'dropRows', 'div');
     }

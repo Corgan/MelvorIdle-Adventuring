@@ -1,9 +1,7 @@
 const { loadModule, getResourceUrl } = mod.getContext(import.meta);
 
 const { AdventuringCards } = await loadModule('src/progression/adventuring-cards.mjs');
-const { describeEffect } = await loadModule('src/core/adventuring-utils.mjs');
-
-// Side-effect imports to register custom elements
+const { describeEffect } = await loadModule('src/core/adventuring-utils.mjs');
 await loadModule('src/ui/components/adventuring-overview.mjs');
 await loadModule('src/ui/components/adventuring-overview-button.mjs');
 const { AdventuringEffectIconElement } = await loadModule('src/ui/components/adventuring-effect-icon.mjs');
@@ -34,7 +32,7 @@ class AdventuringOverviewButton {
     get page() {
         return this.manager.pages.byId.get(this.data.page);
     }
-    
+
     get active() {
         if(this.data.page !== undefined)
             if(this.page.active)
@@ -97,19 +95,13 @@ export class AdventuringOverview {
         this.buttons = new Set();
 
         this.cards = new AdventuringCards(this.manager, this.game);
-        
+
         this.cards.component.mount(this.component.cards);
     }
 
-    /**
-     * Get the current page ID for tutorial targeting
-     * @returns {string|null}
-     */
     get activePage() {
         const current = this.manager.pages.current;
-        if(!current) return null;
-        
-        // Find the page ID from the byId map
+        if(!current) return null;
         for(const [id, page] of this.manager.pages.byId) {
             if(page === current) return id;
         }
@@ -137,11 +129,6 @@ export class AdventuringOverview {
 
     }
 
-    /**
-     * Get a button element by its page ID (for tutorial targeting)
-     * @param {string} pageId - The page ID (e.g., 'trainer', 'crossroads')
-     * @returns {HTMLElement|null}
-     */
     getButtonElement(pageId) {
         for(const button of this.buttons) {
             if(button.data.page === pageId) {
@@ -217,18 +204,14 @@ export class AdventuringOverview {
 
     renderBuffs() {
         if(!this.renderQueue.buffs)
-            return;
-
-        // Clear existing effects and destroy old tooltips
+            return;
         while(this.component.effectsContainer.firstChild) {
             const child = this.component.effectsContainer.firstChild;
             if(child._tippy) child._tippy.destroy();
             this.component.effectsContainer.removeChild(child);
         }
 
-        const effects = [];
-
-        // 1. Current difficulty mode (only when in dungeon)
+        const effects = [];
         if(this.manager.isActive) {
             const difficulty = this.manager.dungeon.area !== undefined ? this.manager.dungeon.area.getDifficulty() : undefined;
             if(difficulty) {
@@ -239,9 +222,7 @@ export class AdventuringOverview {
                     colorClass: difficulty.color
                 });
             }
-        }
-
-        // 2. Equipped consumables - always visible
+        }
         const equipped = this.manager.consumables.equipped;
         equipped.forEach(({ consumable, tier }) => {
             if(consumable) {
@@ -251,9 +232,7 @@ export class AdventuringOverview {
                     tooltip: this.buildConsumableTooltip(consumable, tier)
                 });
             }
-        });
-
-        // 3. Active tavern drinks - always visible
+        });
         const tavernDrinks = this.manager.tavern.getActiveDrinks();
         tavernDrinks.forEach(({ drink, tier, runsRemaining }) => {
             effects.push({
@@ -261,9 +240,7 @@ export class AdventuringOverview {
                 media: drink.getTierMedia(tier),
                 tooltip: this.buildTavernDrinkTooltip(drink, tier, runsRemaining)
             });
-        });
-
-        // 4. Active mastery auras - always visible
+        });
         this.manager.areas.allObjects.forEach(area => {
             if(area.masteryAuraUnlocked && area.masteryAura) {
                 const aura = area.masteryAura;
@@ -273,11 +250,7 @@ export class AdventuringOverview {
                     tooltip: this.buildAuraTooltip(aura, area)
                 });
             }
-        });
-
-        // Always show section (no d-none toggle)
-
-        // Render effect icons
+        });
         effects.forEach(effect => {
             const icon = new AdventuringEffectIconElement();
             this.component.effectsContainer.appendChild(icon);
@@ -287,37 +260,27 @@ export class AdventuringOverview {
         this.renderQueue.buffs = false;
     }
 
-    /**
-     * Build tooltip HTML for a consumable buff at a specific tier
-     */
     buildConsumableTooltip(consumable, tier) {
         const lines = [];
         lines.push(`<div class="font-w700">${consumable.getTierName(tier)}</div>`);
         lines.push(`<div class="text-muted font-size-sm">${consumable.type ? consumable.type.charAt(0).toUpperCase() + consumable.type.slice(1) : 'Consumable'}</div>`);
-        
+
         const description = consumable.getTierDescription(tier);
         if(description) {
             lines.push(`<hr class="my-1">`);
             lines.push(`<div class="text-info">${description}</div>`);
-        }
-        
-        // Show charges for this tier
+        }
         lines.push(`<hr class="my-1">`);
         const charges = this.manager.consumables.getCharges(consumable, tier);
         lines.push(`<div class="text-muted">Charges: ${charges}</div>`);
-        
+
         return lines.join('');
     }
 
-    /**
-     * Build tooltip HTML for a tavern drink
-     */
     buildTavernDrinkTooltip(drink, tier, runsRemaining) {
         const lines = [];
         lines.push(`<div class="font-w700">${drink.getTierName(tier)}</div>`);
-        lines.push(`<div class="text-muted font-size-sm">Tavern Drink</div>`);
-        
-        // Show effects
+        lines.push(`<div class="text-muted font-size-sm">Tavern Drink</div>`);
         const effects = drink.getTierEffects(tier);
         if(effects && effects.length > 0) {
             lines.push(`<hr class="my-1">`);
@@ -325,31 +288,26 @@ export class AdventuringOverview {
                 const desc = describeEffect(effect, this.manager);
                 lines.push(`<div class="text-success">${desc}</div>`);
             });
-        }
-        
-        // Show runs remaining
+        }
         lines.push(`<hr class="my-1">`);
         lines.push(`<div class="text-warning">${runsRemaining} run${runsRemaining !== 1 ? 's' : ''} remaining</div>`);
-        
+
         return lines.join('');
     }
 
-    /**
-     * Build tooltip HTML for a mastery aura
-     */
     buildAuraTooltip(aura, area) {
         const lines = [];
         lines.push(`<div class="font-w700">${aura.name || area.name + ' Aura'}</div>`);
         lines.push(`<div class="text-muted font-size-sm">Mastery Aura</div>`);
-        
+
         if(aura.description) {
             lines.push(`<hr class="my-1">`);
             lines.push(`<div class="text-info">${aura.description}</div>`);
         }
-        
+
         lines.push(`<hr class="my-1">`);
         lines.push(`<div class="text-muted font-size-sm">Unlocked from ${area.name} Level 99</div>`);
-        
+
         return lines.join('');
     }
 }

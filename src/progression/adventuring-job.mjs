@@ -23,13 +23,10 @@ export class AdventuringJob extends AdventuringMasteryAction {
         this.requirements = data.requirements || [];
         this._scaling = data.scaling;
         this.scaling = new AdventuringStats(this.manager, this.game);
-        
+
         this.stats = new AdventuringStats(this.manager, this.game);
 
-        this.isPassive = data.isPassive === true;
-        
-        // Job tier (0-5+ for combat jobs, used for categorization)
-        // If not specified, defaults to 0 for passive jobs, or detected by requirements
+        this.isPassive = data.isPassive === true;
         let tier = this.isPassive ? 0 : this.detectTierFromRequirements(data.requirements);
         if (data.tier !== undefined) {
             tier = data.tier;
@@ -38,7 +35,7 @@ export class AdventuringJob extends AdventuringMasteryAction {
 
         if(data.allowedItems !== undefined)
             this._allowedItems = data.allowedItems;
-        
+
         this.isMilestoneReward = data.isMilestoneReward !== undefined && data.isMilestoneReward;
         this.alwaysMultiple = data.alwaysMultiple !== undefined && data.alwaysMultiple;
 
@@ -69,16 +66,9 @@ export class AdventuringJob extends AdventuringMasteryAction {
         return this._reqChecker.check();
     }
 
-    /**
-     * Detect job tier based on requirements when not explicitly specified
-     * Tier 0: No job requirements
-     * Tier 1: Requires 1 job at low level
-     * Tier 2: Requires 2+ jobs or 1 job at high level
-     * Tier 3+: Requires tier 2+ jobs (detected later)
-     */
     detectTierFromRequirements(requirements) {
         if(!requirements || requirements.length === 0) return 0;
-        
+
         const jobReqs = requirements.filter(r => r.type === 'job_level');
         if(jobReqs.length === 0) return 0;
         if(jobReqs.length === 1 && (jobReqs[0].level || 0) <= 25) return 1;
@@ -105,36 +95,23 @@ export class AdventuringJob extends AdventuringMasteryAction {
         this.renderQueue.clickable = true;
         this.renderQueue.mastery = true;
     }
-    
+
     calculateStats() {
-        this.stats.reset();
-        
-        // Get stat bonus from modifier system (includes Melvor mastery + other sources)
+        this.stats.reset();
         const statBonus = this.manager.modifiers.getJobStatBonus(this);
-        
+
         this.scaling.forEach((value, stat) => {
             const baseValue = Math.floor(this.level * value);
             this.stats.set(stat, Math.floor(baseValue * (1 + statBonus)));
         });
     }
-    
-    /**
-     * Get passive effects from this job that match a trigger type.
-     * @param {AdventuringCharacter} character - The character to check requirements against
-     * @param {string} triggerType - Trigger type to match (e.g., 'turn_start', 'after_damage_dealt')
-     * @returns {Array<{passive: object, effect: object}>}
-     */
+
     getPassivesForTrigger(character, triggerType) {
-        const results = [];
-        
-        // Use the cached passives lookup from manager
+        const results = [];
         const passives = this.manager.getPassivesForJob(this);
-        
-        for (const passive of passives) {
-            // Check if passive can be equipped by this character
-            if (!passive.canEquip(character)) continue;
-            
-            // Check each effect for matching trigger
+
+        for (const passive of passives) {
+            if (!passive.canEquip(character)) continue;
             if (!passive.effects) continue;
             for (const effect of passive.effects) {
                 if (effect.trigger === triggerType) {
@@ -142,13 +119,13 @@ export class AdventuringJob extends AdventuringMasteryAction {
                 }
             }
         }
-        
+
         return results;
     }
 
     postDataRegistration() {
         this._reqChecker = new RequirementsChecker(this.manager, this.requirements);
-        
+
         if(this._scaling !== undefined) {
             this._scaling.forEach(({ id, amount }) => {
                 this.scaling.set(id, amount);

@@ -13,7 +13,7 @@ export class AdventuringMaterialElement extends AdventuringTooltipElement {
         this.icon = getElementFromFragment(this._content, 'icon', 'img');
         this.count = getElementFromFragment(this._content, 'count', 'small');
         this.newBadge = getElementFromFragment(this._content, 'new-badge', 'span');
-        
+
         this._tooltipTarget = this.clickable;
     }
 

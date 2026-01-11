@@ -74,20 +74,17 @@ export class AdventuringWorkOrder {
         this.workshop.renderQueue.workOrders = true;
     }
 
-    /**
-     * Get which party members can work on this order
-     */
     getCraftableByText() {
         if(!this.product) return '';
-        
-        const canWork = this.manager.party.all.filter(member => 
+
+        const canWork = this.manager.party.all.filter(member =>
             this.product.canMake(member, this.tier)
         );
-        
+
         if(canWork.length === 0) {
             return '<span class="text-warning"><i class="fas fa-exclamation-triangle mr-1"></i>No party member can craft this</span>';
         }
-        
+
         const names = canWork.map(m => m.name).join(', ');
         return `<span class="text-success"><i class="fas fa-check mr-1"></i>Can be crafted by: ${names}</span>`;
     }
@@ -98,8 +95,7 @@ export class AdventuringWorkOrder {
 
         this.component.active.classList.toggle('d-none', !this.active)
         this.component.inactive.classList.toggle('d-none', this.active)
-        if(this.active) {
-            // Use tier-aware methods for consumables
+        if(this.active) {
             if (this.product.outputType === 'consumable' && this.product.hasTiers) {
                 this.component.icon.src = this.product.getMedia(this.tier);
                 this.component.nameText.textContent = this.product.getName(this.tier);
@@ -107,13 +103,9 @@ export class AdventuringWorkOrder {
                 this.component.icon.src = this.product.media;
                 this.component.nameText.textContent = this.product.name;
             }
-            this.component.progressText.textContent = `${this.completed} / ${this.count} completed`;
-            
-            // Update progress bar
+            this.component.progressText.textContent = `${this.completed} / ${this.count} completed`;
             const percent = this.count > 0 ? (this.completed / this.count) * 100 : 0;
-            this.component.progressBar.style.width = `${percent}%`;
-            
-            // Show who can craft this
+            this.component.progressBar.style.width = `${percent}%`;
             this.component.craftableBy.innerHTML = this.getCraftableByText();
         }
 

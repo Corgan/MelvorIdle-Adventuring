@@ -71,8 +71,7 @@ export class AdventuringMaterial extends NamespacedObject {
             if (!this.category) {
                 console.warn(`Material ${this.id} has unknown category: ${this._categoryID}`);
             }
-        }
-        // Register with stash for tracking and UI mounting
+        }
         this.manager.stash.registerMaterial(this);
     }
 
@@ -127,11 +126,11 @@ export class AdventuringMaterial extends NamespacedObject {
     renderNewBadge() {
         if(!this.renderQueue.newBadge)
             return;
-        
+
         let isNew = this.unlocked && !this.manager.stash.seenMaterials.has(this.id);
         if(this.component.newBadge !== undefined)
             this.component.newBadge.classList.toggle('d-none', !isNew);
-        
+
         this.renderQueue.newBadge = false;
     }
 }

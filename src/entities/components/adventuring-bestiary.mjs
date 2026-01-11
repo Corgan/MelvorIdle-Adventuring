@@ -5,7 +5,7 @@ const { AdventuringSubpageElement } = await loadModule('src/ui/components/advent
 export class AdventuringBestiaryElement extends AdventuringSubpageElement {
     constructor() {
         super('adventuring-bestiary-template');
-        
+
         this.monsters = getElementFromFragment(this._content, 'monsters', 'div');
     }
 }

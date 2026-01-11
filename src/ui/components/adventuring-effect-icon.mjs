@@ -2,18 +2,15 @@ const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringTooltipElement } = await loadModule('src/core/adventuring-tooltip-element.mjs');
 
-/**
- * Effect icon element with tooltip - used in overview buffs display
- */
 export class AdventuringEffectIconElement extends AdventuringTooltipElement {
     constructor() {
         super();
         this._content = new DocumentFragment();
         this._content.append(getTemplateNode('adventuring-effect-icon-template'));
-        
+
         this.icon = getElementFromFragment(this._content, 'icon', 'div');
         this.img = getElementFromFragment(this._content, 'img', 'img');
-        
+
         this._tooltipTarget = this.icon;
     }
 
@@ -26,18 +23,14 @@ export class AdventuringEffectIconElement extends AdventuringTooltipElement {
         super.disconnectedCallback();
     }
 
-    /**
-     * Set the effect to display
-     * @param {Object} effect - Effect object with media, name, colorClass, tooltip
-     */
     setEffect(effect) {
         this.img.src = effect.media;
         this.img.alt = effect.name;
-        
+
         if (effect.colorClass) {
             this.icon.classList.add(effect.colorClass);
         }
-        
+
         this.setTooltipContent(effect.tooltip);
     }
 }

@@ -3,7 +3,7 @@ export class AdventuringMessageLogElement extends HTMLElement {
         super();
         this._content = new DocumentFragment();
         this._content.append(getTemplateNode('adventuring-message-log-template'));
-        
+
         this.messages = getElementFromFragment(this._content, 'messages', 'div');
     }
 

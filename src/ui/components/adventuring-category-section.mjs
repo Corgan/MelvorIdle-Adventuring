@@ -1,12 +1,10 @@
-/**
- * Category section with header and content container
- */
+
 export class AdventuringCategorySectionElement extends HTMLElement {
     constructor() {
         super();
         this._content = new DocumentFragment();
         this._content.append(getTemplateNode('adventuring-category-section-template'));
-        
+
         this.section = getElementFromFragment(this._content, 'section', 'div');
         this.header = getElementFromFragment(this._content, 'header', 'h6');
         this.content = getElementFromFragment(this._content, 'content', 'div');
@@ -16,12 +14,6 @@ export class AdventuringCategorySectionElement extends HTMLElement {
         this.appendChild(this._content);
     }
 
-    /**
-     * Set the section header and optional content
-     * @param {Object} options
-     * @param {string} options.title - Section header text
-     * @param {string} [options.headerClass] - Optional additional class for header
-     */
     setSection({ title, headerClass }) {
         this.header.textContent = title;
         if(headerClass) {
@@ -29,17 +21,10 @@ export class AdventuringCategorySectionElement extends HTMLElement {
         }
     }
 
-    /**
-     * Get the content container for appending children
-     * @returns {HTMLElement}
-     */
     getContent() {
         return this.content;
     }
 
-    /**
-     * Clear the content container
-     */
     clearContent() {
         this.content.replaceChildren();
     }

@@ -8,10 +8,6 @@ const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
 const { AdventuringPassiveBadgeElement } = await loadModule('src/entities/components/adventuring-passive-badge.mjs');
 const { evaluateCondition, getAuraName, StatCalculator, resolveTargets } = await loadModule('src/core/adventuring-utils.mjs');
 
-/**
- * Starter loadouts for new players.
- * Each hero position (front/center/back) gets a job and abilities.
- */
 const STARTER_LOADOUTS = {
     front: {
         job: 'adventuring:fighter',
@@ -49,9 +45,7 @@ export class AdventuringHero extends AdventuringCharacter {
         super(manager, game, party);
 
         this.locked = false;
-        this.equipment = new AdventuringEquipment(this.manager, this.game, this);
-        
-        // Dirty flag for stat calculation optimization
+        this.equipment = new AdventuringEquipment(this.manager, this.game, this);
         this._statsDirty = true;
 
         this.component.equipment.classList.remove('d-none');
@@ -87,12 +81,8 @@ export class AdventuringHero extends AdventuringCharacter {
     }
 
     onLoad() {
-        super.onLoad();
-
-        // Set up name click handler for renaming via component callback
-        this.component.setNameClickHandler(() => this.promptRename());
-
-        // Check if this is a new player (no name = first time)
+        super.onLoad();
+        this.component.setNameClickHandler(() => this.promptRename());
         const isNewPlayer = this.name === undefined || this.name === "";
 
         if(this.combatJob === undefined) // Default to None
@@ -110,13 +100,10 @@ export class AdventuringHero extends AdventuringCharacter {
         this.equipment.onLoad();
 
         this.calculateStats();
-            
-        if(isNewPlayer) {
-            // Assign name
-            this.name = this.getRandomName(this.manager.party.all.map(member => member.name));
-            this.renderQueue.name = true;
 
-            // Apply starter loadout based on party position
+        if(isNewPlayer) {
+            this.name = this.getRandomName(this.manager.party.all.map(member => member.name));
+            this.renderQueue.name = true;
             this._applyStarterLoadout();
 
             this.hitpoints = this.maxHitpoints;
@@ -127,10 +114,6 @@ export class AdventuringHero extends AdventuringCharacter {
         this.renderQueue.icon = true;
     }
 
-    /**
-     * Determine this hero's position in the party (front/center/back)
-     * @returns {string} 'front', 'center', or 'back'
-     */
     _getPartyPosition() {
         if(this === this.manager.party.front) return 'front';
         if(this === this.manager.party.center) return 'center';
@@ -138,84 +121,56 @@ export class AdventuringHero extends AdventuringCharacter {
         return 'front'; // fallback
     }
 
-    /**
-     * Apply starter job, abilities, and gear for new players based on party position.
-     */
     _applyStarterLoadout() {
         const position = this._getPartyPosition();
         const loadout = STARTER_LOADOUTS[position];
-        if(!loadout) return;
-
-        // Set combat job
+        if(!loadout) return;
         const job = this.manager.jobs.getObjectByID(loadout.job);
         if(job) {
             this.setCombatJob(job);
-        }
-
-        // Set generator
+        }
         if(loadout.generator) {
             const generator = this.manager.generators.getObjectByID(loadout.generator);
             if(generator) {
                 this.setGenerator(generator);
             }
-        }
-
-        // Set spender
+        }
         if(loadout.spender) {
             const spender = this.manager.spenders.getObjectByID(loadout.spender);
             if(spender) {
                 this.setSpender(spender);
             }
-        }
-
-        // Recalculate stats
+        }
         this.calculateStats();
     }
-    
-    /**
-     * Mark stats as needing recalculation.
-     * Call this when equipment, jobs, or other stat sources change.
-     */
+
     invalidateStats() {
         this._statsDirty = true;
     }
 
-    /**
-     * Recalculate all stats from base + equipment + jobs.
-     * Skips recalculation if stats are not dirty (optimization).
-     * @param {boolean} [force=false] - Force recalculation even if not dirty
-     */
     calculateStats(force = false) {
         if (!force && !this._statsDirty) return;
         this._statsDirty = false;
-        
+
         let shouldAdjust = true;
         if(this.manager.isActive || this.hitpoints > this.maxHitpoints) // Loading Shenanigans
             shouldAdjust = false;
         let hitpointPct = this.hitpoints / this.maxHitpoints;
 
-        this.stats.reset();
-
-        // Set base stats
+        this.stats.reset();
         this.manager.stats.forEach(stat => {
             if(stat.base !== undefined)
                 this.stats.set(stat, stat.base);
-        });
-
-        // Calculate job and equipment stats
+        });
         if(this.combatJob !== undefined) this.combatJob.calculateStats();
         if(this.passiveJob !== undefined) this.passiveJob.calculateStats();
-        if(this.equipment !== undefined) this.equipment.calculateStats();
-        
-        // Aggregate all stat sources
+        if(this.equipment !== undefined) this.equipment.calculateStats();
         StatCalculator.aggregate(this.stats,
             this.combatJob ? this.combatJob.stats : null,
             this.passiveJob ? this.passiveJob.stats : null,
             this.equipment ? this.equipment.stats : null
-        );
+        );
 
-        // Tavern drink bonuses are now applied in getEffectiveStat()
-        
         if(shouldAdjust)
             this.hitpoints = Math.min(this.maxHitpoints, Math.floor(this.maxHitpoints * hitpointPct));
 
@@ -225,28 +180,17 @@ export class AdventuringHero extends AdventuringCharacter {
         this.renderQueue.generator = true;
         this.renderQueue.spender = true;
     }
-    
-    /**
-     * Override to register hero-specific effect sources.
-     */
+
     initEffectCache() {
-        super.initEffectCache();
-        
-        // Register equipment as an effect source
-        this.effectCache.registerSource('equipment', () => this.equipment.getEffects());
-        
-        // Register tavern drinks (passive run-length effects)
-        this.effectCache.registerSource('tavern', () => 
+        super.initEffectCache();
+        this.effectCache.registerSource('equipment', () => this.equipment.getEffects());
+        this.effectCache.registerSource('tavern', () =>
             this.manager.tavern ? this.manager.tavern.getEffects() : []
-        );
-        
-        // Register consumables (triggered effects)
-        this.effectCache.registerSource('consumables', () => 
+        );
+        this.effectCache.registerSource('consumables', () =>
             this.manager.consumables ? this.manager.consumables.getEffects() : []
-        );
-        
-        // Register Melvor modifiers as an effect source
-        this.effectCache.registerSource('modifiers', () => 
+        );
+        this.effectCache.registerSource('modifiers', () =>
             this.manager.modifiers ? this.manager.modifiers.getEffects() : []
         );
     }
@@ -258,15 +202,8 @@ export class AdventuringHero extends AdventuringCharacter {
         this.renderQueue.spender = true;
     }
 
-    /**
-     * Override to add hero-specific effect sources: equipment, consumables, passives.
-     * @override
-     */
-    getAllPendingEffectsForTrigger(type, context) {
-        // Get base sources (currently empty in parent, but could have party-level sources)
-        const pending = super.getAllPendingEffectsForTrigger(type, context);
-        
-        // Add equipment effects (character-scoped only, party-scoped handled by Party.trigger)
+    getAllPendingEffectsForTrigger(type, context) {
+        const pending = super.getAllPendingEffectsForTrigger(type, context);
         if (this.equipment) {
             const equipmentEffects = this.equipment.getEffectsForTrigger(type, context);
             for (const { item, effect } of equipmentEffects) {
@@ -278,9 +215,7 @@ export class AdventuringHero extends AdventuringCharacter {
                     sourceType: 'equipment'
                 });
             }
-        }
-        
-        // Add consumable effects (character-scoped only, party-scoped handled by Party.trigger)
+        }
         if (this.manager.consumables) {
             const consumableEffects = this.manager.consumables.getEffectsForTrigger(type, context);
             for (const { consumable, tier, effect } of consumableEffects) {
@@ -293,9 +228,7 @@ export class AdventuringHero extends AdventuringCharacter {
                     sourceType: 'consumable'
                 });
             }
-        }
-        
-        // Add job passive effects (combat job) - use job's own method
+        }
         if (this.combatJob && this.combatJob.getPassivesForTrigger) {
             const passiveEffects = this.combatJob.getPassivesForTrigger(this, type);
             for (const { passive, effect } of passiveEffects) {
@@ -306,9 +239,7 @@ export class AdventuringHero extends AdventuringCharacter {
                     sourceType: 'jobPassive'
                 });
             }
-        }
-        
-        // Add passive job effects
+        }
         if (this.passiveJob && this.passiveJob !== this.combatJob && this.passiveJob.getPassivesForTrigger) {
             const passiveEffects = this.passiveJob.getPassivesForTrigger(this, type);
             for (const { passive, effect } of passiveEffects) {
@@ -319,9 +250,7 @@ export class AdventuringHero extends AdventuringCharacter {
                     sourceType: 'jobPassive'
                 });
             }
-        }
-        
-        // Add tavern drink effects (character-scoped only, party-scoped handled by Party.trigger)
+        }
         if (this.manager.tavern) {
             const drinkEffects = this.manager.tavern.getEffectsForTrigger(type, context);
             for (const { drink, effect } of drinkEffects) {
@@ -334,90 +263,56 @@ export class AdventuringHero extends AdventuringCharacter {
                 });
             }
         }
-        
+
         return pending;
     }
-    
-    /**
-     * Override to handle special processing for different source types.
-     * - Consumables: consume a charge after triggering
-     * - Job Passives: use passive's target resolution
-     * - consume_charge effects: explicitly consume charges
-     * @override
-     */
+
     processPendingEffect(pending, context) {
-        const { effect, source, sourceTier, sourceName, sourceType } = pending;
-        
-        // For job passives, use the passive's built-in apply logic (with target resolution)
+        const { effect, source, sourceTier, sourceName, sourceType } = pending;
         if (sourceType === 'jobPassive') {
             return this.processJobPassiveEffect(pending, context);
-        }
-        
-        // Handle consume_charge effect type (for consumables with passive effects)
+        }
         if (effect.type === 'consume_charge' && sourceType === 'consumable') {
             const count = effect.count || 1;
             this.manager.consumables.removeCharges(source, sourceTier, count);
             this.manager.log.add(`${sourceName} consumed ${count} charge(s).`);
             return true;
-        }
-        
-        // For other sources, use the standard processing
-        const applied = super.processPendingEffect(pending, context);
-        
-        // If this was a consumable effect that applied (not passive), consume a charge
+        }
+        const applied = super.processPendingEffect(pending, context);
         if (applied && sourceType === 'consumable' && effect.trigger !== 'passive') {
             this.manager.consumables.removeCharges(source, sourceTier, 1);
             this.manager.log.add(`${sourceName} consumed a charge.`);
         }
-        
+
         return applied;
     }
-    
-    /**
-     * Process a job passive effect with condition/limit checking.
-     * Uses the passive's target resolution but adds unified condition/limit evaluation.
-     * @param {object} pending - Pending effect with passive and effect
-     * @param {object} context - Effect context
-     * @returns {boolean} Whether the effect was applied
-     */
+
     processJobPassiveEffect(pending, context) {
-        const { effect, source: passive, sourceName } = pending;
-        
-        // Check condition if present (evaluateCondition imported at module level)
+        const { effect, source: passive, sourceName } = pending;
         if (effect.condition) {
             if (!evaluateCondition(effect.condition, context)) {
                 return false;
             }
-        }
-        
-        // Check limit if present
+        }
         if (!this.canEffectTrigger(effect, passive)) {
             return false;
-        }
-        
-        // Roll for chance if present
+        }
         const chance = effect.chance || 100;
         if (Math.random() * 100 > chance) {
             return false;
-        }
-        
-        // Use the passive's built-in apply logic for this single effect
-        // Get encounter from context (passed in from encounter triggers)
+        }
         const encounter = context.encounter;
-        
+
         let builtEffect = {
             amount: effect.getAmount ? effect.getAmount(this) : (effect.amount || 0),
             stacks: effect.getStacks ? effect.getStacks(this) : (effect.stacks || 1)
-        };
-        
-        // Resolve targets using effect's target type
-        // Determine which party to target based on effect.targetParty (default: allies)
+        };
         const targetPartyType = effect.targetParty || 'ally';
-        const targetParty = targetPartyType === 'enemy' 
-            ? encounter?.party 
+        const targetParty = targetPartyType === 'enemy'
+            ? encounter?.party
             : this.manager.party;
         const targetType = effect.target || 'self';
-        
+
         let targets;
         if(targetType === 'self') {
             targets = [this];
@@ -426,11 +321,11 @@ export class AdventuringHero extends AdventuringCharacter {
         } else {
             targets = [this];
         }
-        
+
         let anyApplied = false;
         for (const target of targets) {
             if (target.dead) continue;
-            
+
             if (effect.type === "buff") {
                 const auraId = effect.id;
                 if (!auraId) continue;
@@ -452,13 +347,11 @@ export class AdventuringHero extends AdventuringCharacter {
                 this.manager.log.add(`${this.name}'s ${passive.name} deals ${builtEffect.amount} damage to ${target.name}`);
                 anyApplied = true;
             }
-        }
-        
-        // Record trigger if any effect applied
+        }
         if (anyApplied) {
             this.recordEffectTrigger(effect, passive);
         }
-        
+
         return anyApplied;
     }
 
@@ -467,9 +360,6 @@ export class AdventuringHero extends AdventuringCharacter {
         this.renderQueue.name = true;
     }
 
-    /**
-     * Prompt user to rename this hero using SweetAlert2 modal
-     */
     promptRename() {
         SwalLocale.fire({
             title: 'Rename Hero',
@@ -495,17 +385,13 @@ export class AdventuringHero extends AdventuringCharacter {
         });
     }
 
-    /**
-     * Common logic after changing a job (combat or passive)
-     * Recalculates stats, validates abilities, and queues renders
-     */
     _onJobChange() {
         this.invalidateStats();
         this.calculateStats();
 
         if(!this.generator.canEquip(this))
             this.setGenerator(this.manager.generators.getObjectByID('adventuring:slap'));
-        
+
         if(!this.spender.canEquip(this))
             this.setSpender(this.manager.spenders.getObjectByID('adventuring:backhand'));
 
@@ -528,7 +414,7 @@ export class AdventuringHero extends AdventuringCharacter {
         this.passiveJob = passiveJob;
         this._onJobChange();
     }
-    
+
     render() {
         super.render();
         this.renderJobs();
@@ -579,53 +465,37 @@ export class AdventuringHero extends AdventuringCharacter {
         this.component.passiveJob.icon.src = this.passiveJob.media;
         this.component.passiveJob.setTooltipContent(this.passiveJob.tooltip);
         this.component.passiveJob.styling.classList.toggle('pointer-enabled', !this.locked);
-        this.component.passiveJob.styling.classList.toggle('bg-combat-inner-dark', this.locked);
-
-        // Trigger passive abilities update when jobs change
+        this.component.passiveJob.styling.classList.toggle('bg-combat-inner-dark', this.locked);
         this.renderQueue.passiveAbilities = true;
 
         this.renderQueue.jobs = false;
     }
 
-    /**
-     * Render active passive abilities for this character
-     */
     renderPassiveAbilities() {
         if(!this.renderQueue.passiveAbilities)
-            return;
-
-        // Get passive abilities that this character has from their jobs
-        const activePassives = [];
-        
-        // Get passives from combatJob (use cached lookup)
+            return;
+        const activePassives = [];
         if(this.combatJob && this.combatJob.id !== 'adventuring:none') {
             const combatPassives = this.manager.getPassivesForJob(this.combatJob)
                 .filter(p => p.canEquip(this));
             activePassives.push(...combatPassives);
-        }
-        
-        // Get passives from passiveJob (if different, use cached lookup)
+        }
         if(this.passiveJob && this.passiveJob !== this.combatJob && this.passiveJob.id !== 'adventuring:none') {
             const passiveJobPassives = this.manager.getPassivesForJob(this.passiveJob)
                 .filter(p => p.canEquip(this) && !activePassives.includes(p));
             activePassives.push(...passiveJobPassives);
-        }
-
-        // Update UI
+        }
         if(activePassives.length === 0) {
             this.component.passiveAbilitiesContainer.classList.add('d-none');
         } else {
             this.component.passiveAbilitiesContainer.classList.remove('d-none');
             this.component.passiveAbilitiesList.replaceChildren();
-            
-            activePassives.forEach(passive => {
-                // Build tooltip using TooltipBuilder
+
+            activePassives.forEach(passive => {
                 const tooltip = new TooltipBuilder();
                 tooltip.header(passive.name, passive.media);
                 tooltip.separator();
-                tooltip.info(passive.getDescription(this));
-                
-                // Show which job provides this passive
+                tooltip.info(passive.getDescription(this));
                 const sourceJob = passive.requirements.find(r => r.type === 'current_job_level');
                 if(sourceJob) {
                     const job = this.manager.jobs.getObjectByID(sourceJob.job);
@@ -634,7 +504,7 @@ export class AdventuringHero extends AdventuringCharacter {
                         tooltip.text(`From: <img class="skill-icon-xxs mx-1" src="${job.media}">${job.name} Lv.${sourceJob.level}`, 'text-muted text-center');
                     }
                 }
-                
+
                 const badge = new AdventuringPassiveBadgeElement();
                 this.component.passiveAbilitiesList.appendChild(badge);
                 badge.setPassive(passive.name, tooltip.build());
@@ -696,7 +566,7 @@ export class AdventuringHero extends AdventuringCharacter {
 
         return names[Math.floor(Math.random()*names.length)];
     }
-    
+
     encode(writer) {
         super.encode(writer);
         writer.writeString(this.name);

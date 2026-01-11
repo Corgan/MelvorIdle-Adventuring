@@ -21,8 +21,7 @@ export class AdventuringPage {
 
     onLoad() { }
 
-    onPageChange() {
-        // Called when the main game page changes - override in subclasses if needed
+    onPageChange() {
     }
 
     postDataRegistration() {
@@ -33,8 +32,7 @@ export class AdventuringPage {
 
     }
 
-    reset() {
-        // Override in subclasses to reset state
+    reset() {
     }
 
     getErrorLog() {

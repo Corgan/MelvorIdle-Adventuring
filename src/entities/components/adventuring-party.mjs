@@ -3,7 +3,7 @@ export class AdventuringPartyElement extends HTMLElement {
         super();
         this._content = new DocumentFragment();
         this._content.append(getTemplateNode('adventuring-party-template'));
-        
+
         this.party = getElementFromFragment(this._content, 'party', 'div');
     }
 

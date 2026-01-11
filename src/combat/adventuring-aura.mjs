@@ -21,20 +21,8 @@ class AdventuringAuraRenderQueue {
     }
 }
 
-/**
- * Aura effect that extends ScalableEffect for stat-based scaling.
- * 
- * Supports all ScalableEffect features plus:
- * - consume: remove stacks when triggered
- * - perStack: multiply amount by stack count
- * - scaleFrom: 'source' | 'target' | 'snapshot'
- * - age: for remove effects that trigger after N rounds
- * - modifier: legacy multiplier support
- * - count: stack count multiplier
- */
 class AdventuringAuraEffect extends AdventuringScalableEffect {
-    constructor(manager, game, aura, data) {
-        // Normalize amount to ScalableEffect format if it's a plain number
+    constructor(manager, game, aura, data) {
         const normalizedData = { ...data };
         if (data.amount !== undefined && typeof data.amount === 'number') {
             normalizedData.amount = { base: data.amount };
@@ -42,16 +30,16 @@ class AdventuringAuraEffect extends AdventuringScalableEffect {
         if (data.stacks !== undefined && typeof data.stacks === 'number') {
             normalizedData.stacks = { base: data.stacks };
         }
-        
+
         super(manager, game, normalizedData);
-        
+
         this.aura = aura;
         this.consume = data.consume === true; // Remove stacks when triggered
         this.age = data.age; // For remove effects: trigger this many times before removal
-        
+
         if(data.modifier !== undefined)
            this.modifier = data.modifier;
-        if(data.count !== undefined) 
+        if(data.count !== undefined)
             this.count = data.count;
         if(data.condition !== undefined)
             this.condition = data.condition;
@@ -63,77 +51,43 @@ class AdventuringAuraEffect extends AdventuringScalableEffect {
         super.postDataRegistration();
     }
 
-    /**
-     * Resolve which stats source to use based on scaleFrom setting.
-     * @param {object} instance - The aura instance
-     * @returns {object|Map|null} Stats source for scaling calculation
-     */
     _resolveStatsSource(instance) {
         if (!instance) return null;
-        
+
         const scaleFrom = this.scaleFrom || 'source';
-        
+
         switch (scaleFrom) {
-            case 'source':
-                // Use caster's current stats
+            case 'source':
                 return instance.source;
-            case 'target':
-                // Use aura holder's current stats
+            case 'target':
                 return instance.auras && instance.auras.character ? instance.auras.character : undefined;
-            case 'snapshot':
-                // Use stats captured at application time
+            case 'snapshot':
                 return instance.snapshotStats;
             default:
                 return instance.source;
         }
     }
 
-    /**
-     * Get the amount value for this aura effect.
-     * Handles perStack, modifier, and stat scaling.
-     * 
-     * @param {object} instance - The aura instance (has stacks, source, snapshotStats)
-     * @param {string} displayMode - Display mode for formatting
-     * @returns {number|string} Calculated amount
-     */
-    getAmount(instance, displayMode) {
-        // Resolve stats source for scaling
-        const statsSource = this._resolveStatsSource(instance);
-        
-        // Get base amount using ScalableEffect's calculation
-        let amount = super.getAmount(statsSource, displayMode);
-        
-        // For raw number mode (no displayMode), apply modifiers
-        if (!displayMode) {
-            // Apply perStack multiplier
+    getAmount(instance, displayMode) {
+        const statsSource = this._resolveStatsSource(instance);
+        let amount = super.getAmount(statsSource, displayMode);
+        if (!displayMode) {
             if (this.perStack && instance) {
                 const stackCount = this.getStacks(instance);
                 amount = Math.ceil(amount * stackCount);
-            }
-            
-            // Apply legacy modifier
+            }
             if (this.modifier) {
                 amount = Math.ceil(amount * this.modifier);
             }
         }
-        
+
         return amount;
     }
 
-    /**
-     * Get the stacks value for this aura effect.
-     * Uses instance stacks, optionally modified by count.
-     * 
-     * @param {object} instance - The aura instance
-     * @param {string} displayMode - Display mode for formatting
-     * @returns {number} Stack count
-     */
     getStacks(instance, displayMode) {
         if (!instance) return 0;
-        
-        let stacks = instance.stacks || 0;
 
-        // Apply count modifier if present
+        let stacks = instance.stacks || 0;
         if (this.count) {
             stacks = Math.ceil(stacks * this.count);
         }
@@ -151,15 +105,9 @@ export class AdventuringAura extends NamespacedObject {
         this.name = data.name;
         this._descriptionTemplate = data.description; // Template with placeholders
         this.flavorText = data.flavorText; // Optional flavor text
-        this.effects = data.effects.map(effect => new AdventuringAuraEffect(this.manager, this.game, this, effect));
-
-        // combineMode: how the aura behaves when reapplied
-        // - 'stack': add new stacks to existing (default if stackable)
-        // - 'refresh': replace stacks with new value
-        // - 'bySource': separate instances per source (ability, character, etc.)
-        // - 'separate': always create new instance
+        this.effects = data.effects.map(effect => new AdventuringAuraEffect(this.manager, this.game, this, effect));
         this.combineMode = data.combineMode || (data.stackable ? 'stack' : 'separate');
-        
+
         this.stackable = data.stackable === true; // Whether this aura can have multiple stacks
         this.maxStacks = data.maxStacks; // Optional cap on stack count
         this.hidden = data.hidden === true; // Don't show in aura bar UI
@@ -174,15 +122,14 @@ export class AdventuringAura extends NamespacedObject {
     }
 
     onLoad() {
-        
+
     }
 
     postDataRegistration() {
         this.effects.forEach(effect => effect.postDataRegistration());
     }
 
-    getDescription(instance) {
-        // If we have a template description, use it with placeholders
+    getDescription(instance) {
         if(this._descriptionTemplate) {
             const replacements = buildEffectReplacements(this.effects, instance, true);
             let desc = parseDescription(this._descriptionTemplate, replacements);
@@ -190,21 +137,15 @@ export class AdventuringAura extends NamespacedObject {
                 desc = `${desc}\n\n${this.flavorText}`;
             }
             return desc;
-        }
-        
-        // Filter out standard cleanup effects - the minimal { trigger, type: 'remove' } patterns
-        // that are defined on every aura for encounter_end and death
+        }
         const isStandardCleanup = (e) => {
             if (e.type !== 'remove') return false;
-            if (e.trigger !== 'encounter_end' && e.trigger !== 'death') return false;
-            // Standard cleanup only has trigger and type, no other properties
+            if (e.trigger !== 'encounter_end' && e.trigger !== 'death') return false;
             const keys = Object.keys(e).filter(k => k !== 'trigger' && k !== 'type');
             return keys.length === 0;
         };
-        
-        const mainEffects = this.effects.filter(e => !isStandardCleanup(e));
-        
-        // Auto-generate from effects
+
+        const mainEffects = this.effects.filter(e => !isStandardCleanup(e));
         const effectDescs = mainEffects.map(effect => {
             const effectObj = {
                 type: effect.type,
@@ -218,7 +159,7 @@ export class AdventuringAura extends NamespacedObject {
             };
             return describeEffectFull(effectObj, this.manager);
         });
-        
+
         let generated = effectDescs.join('. ');
         if(this.flavorText) {
             generated = generated ? `${generated}.\n\n${this.flavorText}` : this.flavorText;
@@ -248,7 +189,7 @@ export class AdventuringAura extends NamespacedObject {
     renderDescription() {
         if(!this.renderQueue.description)
             return;
-        
+
         this.component.description.innerHTML = this.getDescription();
 
         this.renderQueue.description = false;

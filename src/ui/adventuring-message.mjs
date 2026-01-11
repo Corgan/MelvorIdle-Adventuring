@@ -12,15 +12,10 @@ export class AdventuringMessage {
         this.media = null;
     }
 
-    render() {
-        // Update body content
-        this.component.body.innerHTML = this.body;
-        
-        // Update type class for styling
+    render() {
+        this.component.body.innerHTML = this.body;
         this.component.classList.remove('msg-info', 'msg-rare', 'msg-epic', 'msg-legendary');
-        this.component.classList.add(`msg-${this.type}`);
-        
-        // Update icon if present
+        this.component.classList.add(`msg-${this.type}`);
         if(this.media && this.component.icon) {
             this.component.icon.src = this.media;
             this.component.icon.classList.remove('d-none');

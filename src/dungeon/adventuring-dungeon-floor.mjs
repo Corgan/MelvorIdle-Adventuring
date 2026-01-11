@@ -121,7 +121,7 @@ export class AdventuringDungeonFloor {
 
         if(this.canMoveTo(x, y + 1) && !this.is(x, y + 1, this.exit))
             nodes.push([x, y + 1]);
-        
+
         if(nodes.length > 0) {
             if(nodes.length > 1)
                 fromStack ? this.forkStack.unshift([x, y]) : this.forkStack.push([x, y]);
@@ -148,7 +148,7 @@ export class AdventuringDungeonFloor {
         if(this.grid.length > this.height * this.width)
             for(let i = this.grid.length - (this.height * this.width); i < this.grid.length; i++)
                 this.grid[i].set();
-            
+
         for(let i = 0; i < this.grid.length; i++)
             this.grid[i].set(this.wall);
 
@@ -205,44 +205,48 @@ export class AdventuringDungeonFloor {
         return 0;
     }
 
-    chooseTile(x, y) {
-        // Get tile modifiers from dungeon mastery
+    chooseTile(x, y) {
         const area = this.dungeon.area;
-        const tileModifiers = area ? area.getTileModifiers() : {};
-        
-        // Check if current floor has no random encounters
-        const hasMonsters = this.dungeon.currentFloor && this.dungeon.currentFloor.monsters && this.dungeon.currentFloor.monsters.length > 0;
-        
+        const tileModifiers = area ? area.getTileModifiers() : {};
+        const hasMonsters = this.dungeon.currentFloor && this.dungeon.currentFloor.monsters && this.dungeon.currentFloor.monsters.length > 0;
+        const areaEncounterFloorMax = area?.encounterFloorMax;
+        const areaEncounterWeight = area?.encounterWeight;
+
         let toLoad = this.manager.tiles.allObjects.filter(tile => {
             if(tile.weight === undefined)
                 return false;
             if(!tile.spawnable)
-                return false;
-            // Skip encounter tiles if floor has no monsters
+                return false;
             if(!hasMonsters && tile === this.encounter)
                 return false;
             if(tile.dungeon_max !== undefined && tile.dungeon_max !== -1 && this.dungeon.tileCount.get(tile) >= tile.dungeon_max)
-                return false;
-            if(tile.floor_max !== undefined && tile.floor_max !== -1 && this.tileCount.get(tile) >= tile.floor_max)
-                return false;
-            
-            // Check if tile requires mastery unlock (weight 0 until unlocked)
+                return false;
+            const floorMax = (tile === this.encounter && areaEncounterFloorMax !== undefined)
+                ? areaEncounterFloorMax
+                : tile.floor_max;
+            if(floorMax !== undefined && floorMax !== -1 && this.tileCount.get(tile) >= floorMax)
+                return false;
             if(tile.masteryUnlock) {
                 const modifier = tileModifiers[tile.id] || 0;
                 if(modifier <= 0) return false;
             }
-            
+
             return true;
         }).map(tile => {
-            // Apply mastery-based weight modifiers
+            let weight = tile.weight;
+            if(tile === this.encounter && areaEncounterWeight !== undefined) {
+                weight = areaEncounterWeight;
+            }
             const modifier = tileModifiers[tile.id];
             if(modifier !== undefined) {
-                return { ...tile, weight: Math.floor(tile.weight * modifier) };
+                weight = Math.floor(weight * modifier);
+            }
+
+            if(weight !== tile.weight) {
+                return { ...tile, weight };
             }
             return tile;
-        }).filter(tile => tile.weight > 0); // Remove tiles with 0 weight
-
-        // Fallback to empty if no tiles available
+        }).filter(tile => tile.weight > 0); // Remove tiles with 0 weight
         if(toLoad.length === 0)
             return this.empty;
 
@@ -251,14 +255,6 @@ export class AdventuringDungeonFloor {
             return this.empty;
 
         return this.manager.tiles.getObjectByID(entry.id) || this.empty;
-        
-        /*if(this.emptyCount >= 2 && Math.random() <= this.encounter.chance) {
-            if( !this.is(x + 1, y, this.encounter) &&
-                !this.is(x - 1, y, this.encounter) &&
-                !this.is(x, y + 1, this.encounter) &&
-                !this.is(x, y - 1, this.encounter))
-            return this.encounter;
-        }*/
 
         return this.empty;
     }
@@ -274,7 +270,7 @@ export class AdventuringDungeonFloor {
         let cell = this.at(x, y);
         return cell !== false && (cell.type === this.start || cell.explored);
     }
-    
+
     move(x, y) {
         this.current.setCurrent(false);
         this.currentPos = [x, y];
@@ -306,10 +302,9 @@ export class AdventuringDungeonFloor {
         return false;
     }
 
-    complete() {
-        // Use centralized trigger system for floor_end
+    complete() {
         this.manager.triggerEffects('floor_end', {});
-        
+
         this.manager.dungeon.progress++;
         this.manager.overview.renderQueue.status = true;
 
@@ -346,7 +341,7 @@ export class AdventuringDungeonFloor {
 
             if(this.cellRowEnds[rowEnds] === undefined)
                 this.cellRowEnds[rowEnds] = createElement('div', { className: 'w-100' });
-        
+
             cells.push(this.cellRowEnds[rowEnds++]);
         }
 
@@ -372,8 +367,7 @@ export class AdventuringDungeonFloor {
 
         writer.writeArray(this.tileMap, (tile, writer) => {
             writer.writeNamespacedObject(tile);
-        });
-        // Only encode cells up to expected grid size
+        });
         let expectedSize = this.height * this.width;
         let grid = this.grid.slice(0, expectedSize);
         writer.writeArray(grid, (cell, writer) => {
@@ -399,9 +393,7 @@ export class AdventuringDungeonFloor {
             let cell = new AdventuringDungeonCell(this.manager, this.game, this);
             cell.decode(reader, version, tileMap);
             return cell;
-        });
-
-        // Ensure grid has the correct number of cells
+        });
         const expectedSize = this.height * this.width;
         while(this.grid.length < expectedSize) {
             let cell = new AdventuringDungeonCell(this.manager, this.game, this);

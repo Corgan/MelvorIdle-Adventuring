@@ -5,11 +5,10 @@ export class AdventuringGameGuideElement extends HTMLElement {
         this._content.append(getTemplateNode('adventuring-game-guide-template'));
     }
 
-    connectedCallback() {
-        // Move the id and class onto this element
+    connectedCallback() {
         this.id = 'tutorial-page-Adventuring';
         this.className = 'py-2 text-center';
-        
+
         this.appendChild(this._content);
     }
 }
