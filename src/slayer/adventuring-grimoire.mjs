@@ -2,8 +2,10 @@
 export class AdventuringGrimoire {
     constructor(manager, game) {
         this.manager = manager;
-        this.game = game;
-        this.learnedAbilities = new Set();
+        this.game = game;
+
+        this.learnedAbilities = new Set();
+
         this.baseLearnChance = 0.5;
     }
 
@@ -11,12 +13,17 @@ export class AdventuringGrimoire {
         if(!enemy || !enemy.base) return null;
 
         const ability = learnType === 'generator' ? enemy.generator : enemy.spender;
-        if(!ability || !ability.isEnemy) return null;
-        if(this.learnedAbilities.has(ability.id)) return null;
+        if(!ability || !ability.isEnemy) return null;
+
+        if(this.learnedAbilities.has(ability.id)) return null;
+
         const chance = this.baseLearnChance * (1 + learnBonus / 100);
-        if(Math.random() * 100 > chance) return null;
-        this.learnedAbilities.add(ability.id);
-        this.manager.achievementManager.markDirty();
+        if(Math.random() * 100 > chance) return null;
+
+        this.learnedAbilities.add(ability.id);
+
+        this.manager.achievementManager.markDirty();
+
         this.manager.log.add(`${hero.name} learned ${ability.name}!`);
         if(typeof notifyPlayer === 'function' && !loadingOfflineProgress) {
             notifyPlayer(this.manager, `Learned: ${ability.name}!`, 'success');
@@ -61,7 +68,8 @@ export class AdventuringGrimoire {
     encode(writer) {
         writer.writeUint32(this.learnedAbilities.size);
         for(const abilityId of this.learnedAbilities) {
-            writer.writeString(abilityId);
+            const ability = this.manager.getAbilityByID(abilityId);
+            writer.writeNamespacedObject(ability);
         }
         return writer;
     }
@@ -69,8 +77,13 @@ export class AdventuringGrimoire {
     decode(reader, version) {
         const count = reader.getUint32();
         for(let i = 0; i < count; i++) {
-            const abilityId = reader.getString();
-            this.learnedAbilities.add(abilityId);
+            let ability = reader.getNamespacedObject(this.manager.generators);
+            if (typeof ability === 'string') {
+                ability = this.manager.spenders.getObjectByID(ability);
+            }
+            if (ability && typeof ability !== 'string') {
+                this.learnedAbilities.add(ability.id);
+            }
         }
     }
 }

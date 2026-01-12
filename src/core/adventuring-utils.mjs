@@ -1,5 +1,43 @@
 const { loadModule } = mod.getContext(import.meta);
 
+function createLoggingWriter(manager, writer) {
+    if (!manager.debugSaveSize) return writer;
+
+    const path = [];
+    const startOffsets = [];
+
+    return new Proxy(writer, {
+        get(target, prop) {
+            if (prop === 'pushPath') {
+                return (name) => {
+                    path.push(name);
+                    startOffsets.push(target.byteOffset);
+                };
+            }
+            if (prop === 'popPath') {
+                return () => {
+                    const name = path.pop();
+                    const start = startOffsets.pop();
+                    const bytes = target.byteOffset - start;
+                    const indent = '  '.repeat(path.length + 1);
+                    console.log(`${indent}${name}: ${bytes} bytes`);
+                };
+            }
+            if (prop === 'unwrap') {
+                return () => target;
+            }
+            if (prop === 'byteOffset') {
+                return target.byteOffset;
+            }
+            const value = target[prop];
+            if (typeof value === 'function') {
+                return value.bind(target);
+            }
+            return value;
+        }
+    });
+}
+
 class StatCalculator {
 
     static calculate(baseValue, bonuses = { flat: 0, percent: 0 }, globalPercent = 0) {
@@ -1565,7 +1603,8 @@ function formatTarget(target, party) {
     return target.replace(/_/g, ' ');
 }
 
-function joinEffectDescriptions(descriptions) {
+function joinEffectDescriptions(descriptions) {
+
     const filtered = descriptions.filter(d => d && d.trim());
     if (filtered.length === 0) return '';
     if (filtered.length === 1) return filtered[0];
@@ -1628,7 +1667,8 @@ function joinEffectDescriptions(descriptions) {
     return `${parts.join(', ')}, and ${lastPart}`;
 }
 
-function describeEffectFull(effect, manager, options = {}) {
+function describeEffectFull(effect, manager, options = {}) {
+
     if (effect.describe === false) return '';
     
     const { includeTrigger = true, includeChance = true, displayMode = false } = options;
@@ -1747,7 +1787,8 @@ function formatTriggerSuffix(trigger) {
 }
 
 function describeEffects(effects, manager, options = {}) {
-    if (!effects || effects.length === 0) return '';
+    if (!effects || effects.length === 0) return '';
+
     let mainEffects = effects.filter(e => e.describe !== false);
     
     if (mainEffects.length === 0) return '';
@@ -1941,28 +1982,32 @@ function getEffectAmount(effect, instance) {
     }
 
     return effect.amount || 0;
-}
+}
+
 const UTILITY_EFFECT_XP = {
     skip: 3,
     miss: 2,
     confuse: 4,
     prevent_ability: 2,
     dodge: 2  // when granted by buff, not self-dodge
-};
+};
+
 function awardSourceXP(instance, amount, ctx) {
     if(!instance || !instance.source || !instance.source.isHero) return;
     if(amount <= 0) return;
     
     const source = instance.source;
     const difficultyXPBonus = ctx.manager.dungeon?.getBonus('xp_percent') / 100 || 0;
-    const equipmentXP = Math.floor(amount * (1 + difficultyXPBonus));
+    const equipmentXP = Math.floor(amount * (1 + difficultyXPBonus));
+
     if(source.equipment && source.equipment.slots) {
         source.equipment.slots.forEach((slot, type) => {
             if(!slot.empty && !slot.occupied && slot.item) {
                 slot.item.addXP(equipmentXP);
             }
         });
-    }
+    }
+
     if(source.combatJob && source.combatJob.isMilestoneReward) {
         source.combatJob.addXP(Math.floor(equipmentXP / 2));
     }
@@ -2058,7 +2103,8 @@ function createDefaultEffectProcessor() {
         } else if(target === 'target' && ctx.extra.target) {
             ctx.manager.log.add(`${ctx.extra.target.name} receives ${amount} ${effectLabel} from ${instance.base.name}`);
             ctx.extra.target.applyEffect(effect, builtEffect, ctx.character);
-        }
+        }
+
         if(amount > 0 && instance.source) {
             awardSourceXP(instance, Math.floor(amount / 2), ctx);
         }
@@ -2092,7 +2138,8 @@ function createDefaultEffectProcessor() {
             }
             const characterName = (ctx.character && ctx.character.name) ? ctx.character.name : 'Effect';
             ctx.manager.log.add(`${characterName} heals for ${percentValue}%`);
-        }
+        }
+
         if(totalHealing > 0 && instance.source) {
             awardSourceXP(instance, Math.floor(totalHealing / 2), ctx);
         }
@@ -2215,7 +2262,8 @@ function createDefaultEffectProcessor() {
 
     processor.register('damage_modifier_flat', (effect, instance, ctx) => {
         const amount = getEffectAmount(effect, instance);
-        ctx.extra.amount = (ctx.extra.amount || 0) + amount;
+        ctx.extra.amount = (ctx.extra.amount || 0) + amount;
+
         if(amount > 0 && instance.source) {
             ctx.extra.damageContributions = ctx.extra.damageContributions || [];
             ctx.extra.damageContributions.push({ source: instance.source, amount });
@@ -2227,7 +2275,8 @@ function createDefaultEffectProcessor() {
     processor.register('damage_modifier_percent', (effect, instance, ctx) => {
         const amount = getEffectAmount(effect, instance);
         const increase = Math.ceil((ctx.extra.amount || 0) * (amount / 100));
-        ctx.extra.amount = (ctx.extra.amount || 0) + increase;
+        ctx.extra.amount = (ctx.extra.amount || 0) + increase;
+
         if(increase > 0 && instance.source) {
             ctx.extra.damageContributions = ctx.extra.damageContributions || [];
             ctx.extra.damageContributions.push({ source: instance.source, amount: increase });
@@ -2262,7 +2311,8 @@ function createDefaultEffectProcessor() {
     processor.register('skip', (effect, instance, ctx) => {
         if (checkCondition(effect, instance)) {
             ctx.extra.skip = true;
-            ctx.manager.log.add(`${ctx.character.name} is overcome with ${instance.base.name}!`);
+            ctx.manager.log.add(`${ctx.character.name} is overcome with ${instance.base.name}!`);
+
             if(instance.source) {
                 awardSourceXP(instance, UTILITY_EFFECT_XP.skip, ctx);
             }
@@ -2274,7 +2324,8 @@ function createDefaultEffectProcessor() {
         if (checkCondition(effect, instance)) {
             ctx.extra.amount = 0;
             ctx.extra.dodged = true;
-            ctx.manager.log.add(`${ctx.character.name} dodges the attack!`);
+            ctx.manager.log.add(`${ctx.character.name} dodges the attack!`);
+
             if(instance.source && instance.source !== ctx.character) {
                 awardSourceXP(instance, UTILITY_EFFECT_XP.dodge, ctx);
             }
@@ -2286,7 +2337,8 @@ function createDefaultEffectProcessor() {
         if (checkCondition(effect, instance)) {
             ctx.extra.amount = 0;
             ctx.extra.missed = true;
-            ctx.manager.log.add(`${ctx.character.name} misses due to ${instance.base.name}!`);
+            ctx.manager.log.add(`${ctx.character.name} misses due to ${instance.base.name}!`);
+
             if(instance.source) {
                 awardSourceXP(instance, UTILITY_EFFECT_XP.miss, ctx);
             }
@@ -2297,7 +2349,8 @@ function createDefaultEffectProcessor() {
     processor.register('confuse', (effect, instance, ctx) => {
         if (checkCondition(effect, instance)) {
             ctx.extra.hitAlly = true;
-            ctx.manager.log.add(`${ctx.character.name} is confused and attacks an ally!`);
+            ctx.manager.log.add(`${ctx.character.name} is confused and attacks an ally!`);
+
             if(instance.source) {
                 awardSourceXP(instance, UTILITY_EFFECT_XP.confuse, ctx);
             }
@@ -2317,7 +2370,8 @@ function createDefaultEffectProcessor() {
     });
 
     processor.register('prevent_ability', (effect, instance, ctx) => {
-        ctx.extra.prevented = true;
+        ctx.extra.prevented = true;
+
         if(instance.source) {
             awardSourceXP(instance, UTILITY_EFFECT_XP.prevent_ability, ctx);
         }
@@ -2690,7 +2744,8 @@ function buildDescription(config) {
         }
     }
 
-    else if (effects !== undefined && effects.length > 0) {
+    else if (effects !== undefined && effects.length > 0) {
+
         const effectObjs = effects.map(effect => ({
             type: effect.type,
             trigger: effect.trigger !== undefined ? effect.trigger : 'passive',
@@ -2714,7 +2769,8 @@ function buildDescription(config) {
             count: effect.count,
             threshold: effect.threshold,
             describe: effect.describe
-        }));
+        }));
+
         desc = describeEffects(effectObjs, manager, { displayMode, includeTrigger });
         if (desc !== '') {
             desc = desc + '.';
@@ -2867,6 +2923,8 @@ export {
     EffectLimitTracker,
 
     getFromRegistry,
-    requireFromRegistry
+    requireFromRegistry,
+
+    createLoggingWriter
 }
 

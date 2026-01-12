@@ -529,8 +529,14 @@ export class AdventuringDungeon extends AdventuringPage {
     }
 
     encode(writer) {
+        writer.pushPath?.('exploreTimer');
         this.exploreTimer.encode(writer);
+        writer.popPath?.();
+
+        writer.pushPath?.('floor');
         this.floor.encode(writer);
+        writer.popPath?.();
+
         writer.writeUint32(this.progress);
         writer.writeBoolean(this.area !== undefined);
         if(this.area !== undefined)

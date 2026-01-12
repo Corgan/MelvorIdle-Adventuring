@@ -46,7 +46,8 @@ export class AdventuringEquipment {
         return found;
     }
 
-    getSetPieceCounts() {
+    getSetPieceCounts() {
+
         if(this._cachedSetCounts !== undefined) {
             return this._cachedSetCounts;
         }
@@ -67,7 +68,8 @@ export class AdventuringEquipment {
 
     calculateStats() {
         this.stats.reset();
-        this.forEachEquipped((item, slot) => {
+        this.forEachEquipped((item, slot) => {
+
             item.calculateStats(this.character);
             slot.stats.forEach((value, stat) => {
                 let old = this.stats.get(stat);
@@ -79,7 +81,8 @@ export class AdventuringEquipment {
     getEffects(trigger = null) {
         const effects = [];
 
-        this.forEachEquipped((item, slot) => {
+        this.forEachEquipped((item, slot) => {
+
             if(trigger === null || trigger === 'passive') {
                 item.stats.forEach((value, stat) => {
                     if(value !== 0) {
@@ -95,10 +98,13 @@ export class AdventuringEquipment {
                         ));
                     }
                 });
-            }
+            }
+
             if(item.effects && item.effects.length > 0) {
-                item.effects.forEach(effect => {
-                    if(trigger !== null && effect.trigger !== trigger) return;
+                item.effects.forEach(effect => {
+
+                    if(trigger !== null && effect.trigger !== trigger) return;
+
                     let amount = effect.amount || 0;
                     if(effect.scaling && item.level > 0) {
                         amount += Math.floor(item.level * effect.scaling);
@@ -118,13 +124,15 @@ export class AdventuringEquipment {
                     ));
                 });
             }
-        });
+        });
+
         if(this.character && this.manager && this.manager.equipmentSets) {
             const setCounts = this.getSetPieceCounts();
             setCounts.forEach((count, set) => {
                 if(count <= 0) return;
                 const setEffects = set.getActiveEffects(this.character);
-                setEffects.forEach(effect => {
+                setEffects.forEach(effect => {
+
                     if(trigger !== null && effect.trigger !== trigger) return;
 
                     effects.push(createEffect(
@@ -150,7 +158,8 @@ export class AdventuringEquipment {
     }
 
     getEffectsForTrigger(triggerType, context = {}) {
-        const results = [];
+        const results = [];
+
         this.forEachEquipped((item, slot) => {
             if (!item.effects || item.effects.length === 0) return;
 
@@ -162,7 +171,8 @@ export class AdventuringEquipment {
                     effect: effect
                 });
             });
-        });
+        });
+
         if (this.character && this.manager && this.manager.equipmentSets) {
             const setCounts = this.getSetPieceCounts();
             setCounts.forEach((count, set) => {
@@ -215,7 +225,9 @@ export class AdventuringEquipment {
     encode(writer) {
         writer.writeComplexMap(this.slots, (key, value, writer) => {
             writer.writeNamespacedObject(key);
+            writer.pushPath?.(key.id);
             value.encode(writer);
+            writer.popPath?.();
         });
     }
 

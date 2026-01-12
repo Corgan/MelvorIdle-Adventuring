@@ -51,15 +51,21 @@ export class AdventuringSlayerTaskType extends NamespacedObject {
         this._name = data.name;
         this.descriptionTemplate = data.descriptionTemplate;
         this.progressVerb = data.progressVerb;
-        this.targetType = data.targetType; // 'monster', 'material', 'area', 'monster_tag'
+        this.targetType = data.targetType;
 
-        this.targetTag = (data.targetTag !== undefined) ? data.targetTag : null;
+        this._targetTagId = data.targetTag || null;
 
         this.baseRequirements = data.baseRequirements;
         this.requirementVariance = data.requirementVariance;
         this.baseRewards = data.baseRewards;
         this.materialRewardChance = data.materialRewardChance;
         this.consumableRewardChance = data.consumableRewardChance || [0, 0, 0, 0, 0];
+    }
+
+    get targetTag() {
+        if (!this._targetTagId) return null;
+        const fullId = this._targetTagId.includes(':') ? this._targetTagId : `adventuring:${this._targetTagId}`;
+        return this.manager.tags.getObjectByID(fullId);
     }
 
     get name() {
@@ -228,13 +234,12 @@ export class AdventuringSlayerTask {
     }
 
     encode(writer) {
+        writer.writeNamespacedObject(this.taskType);
 
-        writer.writeNamespacedObject(this.taskType);
         const isTagTarget = this.target && this.target.isTagTarget;
         writer.writeBoolean(isTagTarget);
         if(isTagTarget) {
-            writer.writeString(this.target.tag);
-            writer.writeString(this.target.name);
+            writer.writeNamespacedObject(this.target.tag);
         } else {
             writer.writeNamespacedObject(this.target);
         }
@@ -261,21 +266,23 @@ export class AdventuringSlayerTask {
         const taskType = reader.getNamespacedObject(this.manager.slayerTaskTypes);
         if(typeof taskType !== 'string' && taskType !== undefined) {
             this.taskType = taskType;
-        }
+        }
+
         const isTagTarget = reader.getBoolean();
         if(isTagTarget) {
-            const tag = reader.getString();
-            const name = reader.getString();
-            const seenMonsters = this.manager.monsters.allObjects.filter(m =>
-                this.manager.bestiary.seen.has(m) && m.tags && m.tags.includes(tag)
-            );
-            this.target = {
-                id: `tag:${tag}`,
-                name: name,
-                media: seenMonsters.length > 0 ? seenMonsters[0].media : cdnMedia('assets/media/main/question.png'),
-                isTagTarget: true,
-                tag: tag
-            };
+            const tag = reader.getNamespacedObject(this.manager.tags);
+            if (tag && typeof tag !== 'string') {
+                const seenMonsters = this.manager.monsters.allObjects.filter(m =>
+                    this.manager.bestiary.seen.has(m) && m.tags && m.tags.includes(tag.localID)
+                );
+                this.target = {
+                    id: tag.id,
+                    name: tag.name,
+                    media: seenMonsters.length > 0 ? seenMonsters[0].media : tag.media,
+                    isTagTarget: true,
+                    tag: tag
+                };
+            }
         } else {
             const registry = this.getTargetRegistry() || this.manager.monsters;
             const target = reader.getNamespacedObject(registry);
@@ -364,16 +371,21 @@ export class SlayerTaskGenerator {
         return seenMonsters[Math.floor(Math.random() * seenMonsters.length)];
     }
 
-    pickMonsterTagTarget(tag) {
+    pickMonsterTagTarget(tag) {
+        if (!tag) return null;
+
+        const tagId = tag.localID || tag.id || tag;
+
         const seenMonsters = this.manager.monsters.allObjects.filter(m =>
-            this.manager.bestiary.seen.has(m) && m.tags && m.tags.includes(tag)
+            this.manager.bestiary.seen.has(m) && m.tags && m.tags.includes(tagId)
         );
 
-        if(seenMonsters.length === 0) return null;
+        if(seenMonsters.length === 0) return null;
+
         return {
-            id: `tag:${tag}`,
-            name: tag.charAt(0).toUpperCase() + tag.slice(1) + 's',
-            media: seenMonsters[0].media, // Use first matching monster's icon
+            id: tag.id,
+            name: tag.name,
+            media: seenMonsters[0].media,
             isTagTarget: true,
             tag: tag
         };
@@ -395,14 +407,18 @@ export class SlayerTaskGenerator {
         return unlockedAreas[Math.floor(Math.random() * unlockedAreas.length)];
     }
 
-    canGenerateTaskType(taskType) {
+    canGenerateTaskType(taskType) {
         switch(taskType.targetType) {
             case 'monster':
                 return this.manager.monsters.allObjects.some(m => this.manager.bestiary.seen.has(m));
-            case 'monster_tag':
+            case 'monster_tag': {
+                const tag = taskType.targetTag;
+                if (!tag) return false;
+                const tagId = tag.localID || tag.id || tag;
                 return this.manager.monsters.allObjects.some(m => 
-                    this.manager.bestiary.seen.has(m) && m.tags && m.tags.includes(taskType.targetTag)
+                    this.manager.bestiary.seen.has(m) && m.tags && m.tags.includes(tagId)
                 );
+            }
             case 'material':
                 return this.manager.materials.allObjects.some(m => 
                     m.id !== 'adventuring:currency' && this.manager.stash.seenMaterials.has(m)
@@ -418,10 +434,12 @@ export class SlayerTaskGenerator {
         const tasks = [];
         const allTaskTypes = [...this.manager.slayerTaskTypes.allObjects];
 
-        if(allTaskTypes.length === 0) return tasks;
+        if(allTaskTypes.length === 0) return tasks;
+
         const taskTypes = allTaskTypes.filter(tt => this.canGenerateTaskType(tt));
         
-        if(taskTypes.length === 0) return tasks;
+        if(taskTypes.length === 0) return tasks;
+
         const killType = this.manager.slayerTaskTypes.getObjectByID('adventuring:kill');
         if(killType && taskTypes.includes(killType)) {
             taskTypes.push(killType);

@@ -249,7 +249,8 @@ export class AdventuringEncounter extends AdventuringPage {
 
         if(target.dead) {
             this.currentTurn.trigger('kill', { target, damageDealt, encounter: this });
-        }
+        }
+
         if(builtEffect.damageContributions && builtEffect.damageContributions.length > 0) {
             this._processDamageContributions(builtEffect.damageContributions);
         }
@@ -263,14 +264,16 @@ export class AdventuringEncounter extends AdventuringPage {
             if(contribution.amount <= 0) continue;
             
             const source = contribution.source;
-            const equipmentXP = Math.floor((contribution.amount / 2) * (1 + difficultyXPBonus));
+            const equipmentXP = Math.floor((contribution.amount / 2) * (1 + difficultyXPBonus));
+
             if(source.equipment && source.equipment.slots) {
                 source.equipment.slots.forEach((slot, type) => {
                     if(!slot.empty && !slot.occupied && slot.item) {
                         slot.item.addXP(equipmentXP);
                     }
                 });
-            }
+            }
+
             if(source.combatJob && source.combatJob.isMilestoneReward) {
                 source.combatJob.addXP(Math.floor(equipmentXP / 2));
             }
@@ -646,10 +649,18 @@ export class AdventuringEncounter extends AdventuringPage {
 
     encode(writer) {
         writer.writeBoolean(this.isFighting);
-        this.party.encode(writer);
 
+        writer.pushPath?.('party');
+        this.party.encode(writer);
+        writer.popPath?.();
+
+        writer.pushPath?.('turnTimer');
         this.turnTimer.encode(writer);
+        writer.popPath?.();
+
+        writer.pushPath?.('hitTimer');
         this.hitTimer.encode(writer);
+        writer.popPath?.();
 
         writer.writeUint8(this.all.indexOf(this.currentTurn));
         writer.writeBoolean(this.currentTurn !== undefined && this.currentAction === this.currentTurn.spender);

@@ -420,7 +420,8 @@ export class AdventuringWorkshop extends AdventuringPage {
                 return product.getName(tier);
             }
             case 'item':
-            default: {
+            default: {
+
                 const tooltip = TooltipBuilder.create()
                     .header(output.name, output.media);
                 if(output.description) {
@@ -468,7 +469,8 @@ export class AdventuringWorkshop extends AdventuringPage {
                 this.itemComponents[componentCount] = component;
             }
 
-            component.mount(this.component.store);
+            component.mount(this.component.store);
+
             const tooltip = TooltipBuilder.create()
                 .header(item.name, item.media);
             if(item.description) {
@@ -490,7 +492,6 @@ export class AdventuringWorkshop extends AdventuringPage {
     }
 
     encode(writer) {
-
         writer.writeUint32(this.storedItems.size);
         this.storedItems.forEach((count, item) => {
             writer.writeNamespacedObject(item);
@@ -498,7 +499,9 @@ export class AdventuringWorkshop extends AdventuringPage {
         });
 
         writer.writeSet(this.workOrders, (order, writer) => {
+            writer.pushPath?.('workOrder');
             order.encode(writer);
+            writer.popPath?.();
         });
     }
 

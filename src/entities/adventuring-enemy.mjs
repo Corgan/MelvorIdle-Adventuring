@@ -464,7 +464,10 @@ export class AdventuringEnemy extends AdventuringCharacter {
     }
 
     encode(writer) {
+        writer.pushPath?.('character');
         super.encode(writer);
+        writer.popPath?.();
+
         writer.writeBoolean(this.base !== undefined);
         if (this.base !== undefined)
             writer.writeNamespacedObject(this.base);

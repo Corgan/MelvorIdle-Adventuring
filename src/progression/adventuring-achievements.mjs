@@ -48,13 +48,15 @@ export class AchievementStats {
         writer.writeFloat64(this.totalDamage);
         writer.writeFloat64(this.totalHealing);
         writer.writeUint32(this.slayerTasksCompleted);
-        writer.writeUint32(this.totalEndlessWaves);
+        writer.writeUint32(this.totalEndlessWaves);
+
         const tagEntries = Object.entries(this.killsByTag);
         writer.writeUint16(tagEntries.length);
         for(const [tag, count] of tagEntries) {
             writer.writeString(tag);
             writer.writeUint32(count);
-        }
+        }
+
         const fastEntries = Object.entries(this.fastWins);
         writer.writeUint16(fastEntries.length);
         for(const [rounds, count] of fastEntries) {
@@ -77,14 +79,16 @@ export class AchievementStats {
         this.totalDamage = reader.getFloat64();
         this.totalHealing = reader.getFloat64();
         this.slayerTasksCompleted = reader.getUint32();
-        this.totalEndlessWaves = reader.getUint32();
+        this.totalEndlessWaves = reader.getUint32();
+
         this.killsByTag = {};
         const tagCount = reader.getUint16();
         for(let i = 0; i < tagCount; i++) {
             const tag = reader.getString();
             const count = reader.getUint32();
             this.killsByTag[tag] = count;
-        }
+        }
+
         this.fastWins = {};
         const fastCount = reader.getUint16();
         for(let i = 0; i < fastCount; i++) {
@@ -129,7 +133,8 @@ export class AdventuringAchievement extends NamespacedObject {
         this._description = data.description;
         this._media = data.media;
         this.requirement = data.requirement;
-        this.rewards = data.rewards;
+        this.rewards = data.rewards;
+
         this.category = manager.achievementCategories.getObjectByID(data.category);
     }
 
@@ -170,10 +175,12 @@ export class AdventuringAchievement extends NamespacedObject {
                 return stats.uniqueMonstersSeen;
             case 'learned_abilities':
                 return this.manager.learnedAbilities ? this.manager.learnedAbilities.size : 0;
-            case 'job_level':
+            case 'job_level':
+
                 if(req.job) {
                     return this._getSpecificJobLevel(req.job);
-                }
+                }
+
                 return this._getHighestJobLevel();
             case 'jobs_at_level':
                 return this._getJobsAtLevel(req.level);
@@ -198,17 +205,22 @@ export class AdventuringAchievement extends NamespacedObject {
             case 'all_passive_jobs_level':
                 return this._getAllPassiveJobsAtLevel(req.level) ? 1 : 0;
             case 'specific_job_level':
-                return this._getSpecificJobLevel(req.job);
+                return this._getSpecificJobLevel(req.job);
+
             case 'area_cleared':
                 const area = this.manager.areas.getObjectByID(req.area);
                 if (!area) return 0;
-                return this.manager.getMasteryXP(area) > 0 ? 1 : 0;
+                return this.manager.getMasteryXP(area) > 0 ? 1 : 0;
+
             case 'total_endless_waves':
-                return stats.totalEndlessWaves;
+                return stats.totalEndlessWaves;
+
             case 'set_bonus_active':
-                return this._getMaxSetBonusPieces() >= req.pieces ? 1 : 0;
+                return this._getMaxSetBonusPieces() >= req.pieces ? 1 : 0;
+
             case 'monster_mastery':
-                return this._getHighestMonsterMastery();
+                return this._getHighestMonsterMastery();
+
             case 'total_monster_mastery':
                 return this._getTotalMonsterMastery();
             default:
@@ -261,8 +273,10 @@ export class AdventuringAchievement extends NamespacedObject {
     }
 
     getTarget() {
-        const req = this.requirement;
-        if(req.level !== undefined) return req.level;
+        const req = this.requirement;
+
+        if(req.level !== undefined) return req.level;
+
         if(req.type === 'all_passive_jobs_level')
             return this.manager.passiveJobs.length || 1;
         if(req.type === 'job_unlocked' || req.type === 'area_cleared' || req.type === 'set_bonus_active') {
@@ -484,14 +498,20 @@ export class AchievementManager {
     constructor(manager, game) {
         this.manager = manager;
         this.game = game;
-        this.renderQueue = new AdventuringAchievementRenderQueue();
-        this.stats = new AchievementStats();
-        this.completedAchievements = new Set();
-        this.bonusEffects = null; // Will be initialized when EffectCache is available
+        this.renderQueue = new AdventuringAchievementRenderQueue();
+
+        this.stats = new AchievementStats();
+
+        this.completedAchievements = new Set();
+
+        this.bonusEffects = null; // Will be initialized when EffectCache is available
+
+
         this._needsCheck = false;
     }
 
-    init() {
+    init() {
+
         const { EffectCache } = loadModule('src/core/adventuring-utils.mjs');
         if(typeof EffectCache !== 'undefined') {
             this.bonusEffects = new EffectCache();
@@ -504,7 +524,8 @@ export class AchievementManager {
 
         for(const achievement of this.completedAchievements) {
             for(const reward of achievement.rewards) {
-                if(reward.type === 'effect') {
+                if(reward.type === 'effect') {
+
                     for(const effect of reward.effects) {
                         effects.push({
                             ...effect,
@@ -563,7 +584,8 @@ export class AchievementManager {
     }
 
     recordKill(monster) {
-        this.stats.totalKills++;
+        this.stats.totalKills++;
+
         if(monster.tags) {
             for(const tag of monster.tags) {
                 const tagId = typeof tag === 'string' ? tag : tag.id;
@@ -584,10 +606,12 @@ export class AchievementManager {
             this.stats.mythicClears++;
         }
 
-        if(isEndless) {
+        if(isEndless) {
+
             if(endlessWave > this.stats.bestEndlessWave) {
                 this.stats.bestEndlessWave = endlessWave;
-            }
+            }
+
             this.stats.totalEndlessWaves += endlessWave;
         }
 
@@ -645,7 +669,8 @@ export class AchievementManager {
     }
 
     checkAchievements() {
-        let newCompletions = false;
+        let newCompletions = false;
+
         this._checkCache = {};
 
         for(const achievement of this.manager.achievements.allObjects) {
@@ -653,7 +678,8 @@ export class AchievementManager {
                 this.completeAchievement(achievement);
                 newCompletions = true;
             }
-        }
+        }
+
         this._checkCache = null;
 
         if(newCompletions) {
@@ -662,15 +688,20 @@ export class AchievementManager {
     }
 
     completeAchievement(achievement) {
-        if(achievement.isComplete()) return;
-        this.completedAchievements.add(achievement);
+        if(achievement.isComplete()) return;
+
+        this.completedAchievements.add(achievement);
+
         for(const reward of achievement.rewards) {
             this.grantReward(reward);
-        }
-        this.rebuildBonuses();
+        }
+
+        this.rebuildBonuses();
+
         if(typeof notifyPlayer === 'function' && !loadingOfflineProgress) {
             notifyPlayer(this.manager, `Achievement Unlocked: ${achievement.name}`, 'success');
-        }
+        }
+
         this.renderQueue.completed = true;
     }
 
@@ -688,7 +719,9 @@ export class AchievementManager {
                 if(material) {
                     this.manager.stash.add(material, reward.qty);
                 }
-                break;
+                break;
+
+
         }
     }
 
@@ -702,29 +735,38 @@ export class AchievementManager {
         return { total, completed, percent: Math.floor((completed / total) * 100) };
     }
 
-    resetAll() {
-        this.stats = new AchievementStats();
-        this.completedAchievements.clear();
+    resetAll() {
+
+        this.stats = new AchievementStats();
+
+        this.completedAchievements.clear();
+
         this.rebuildBonuses();
 
         this.renderQueue.completed = true;
     }
 
-    encode(writer) {
-        this.stats.encode(writer);
+    encode(writer) {
+        writer.pushPath?.('stats');
+        this.stats.encode(writer);
+        writer.popPath?.();
+
         writer.writeSet(this.completedAchievements, (achievement, w) => {
             w.writeNamespacedObject(achievement);
         });
     }
 
-    decode(reader, version) {
-        this.stats.decode(reader, version);
+    decode(reader, version) {
+
+        this.stats.decode(reader, version);
+
         reader.getSet((r) => {
             const achievement = r.getNamespacedObject(this.manager.achievements);
             if (achievement && typeof achievement !== 'string') {
                 this.completedAchievements.add(achievement);
             }
-        });
+        });
+
         this.rebuildBonuses();
     }
 }

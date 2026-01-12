@@ -15,7 +15,8 @@ export class AdventuringStash extends AdventuringPage {
         this.seenMaterials = new Set();  // Track which materials have been seen (for NEW badge)
 
         this.component = createElement('adventuring-stash');
-    }
+    }
+
 
     getCurrencyMaterial(currencyId = 'currency') {
         return this.manager.materials.getObjectByID(`adventuring:${currencyId}`);
@@ -43,7 +44,8 @@ export class AdventuringStash extends AdventuringPage {
     removeCurrencyById(currencyId, qty) {
         const curr = this.getCurrencyMaterial(currencyId);
         if(curr) this.remove(curr, qty);
-    }
+    }
+
 
     get currencyMaterial() {
         return this.getCurrencyMaterial('currency');
@@ -63,7 +65,8 @@ export class AdventuringStash extends AdventuringPage {
 
     removeCurrency(qty) {
         this.removeCurrencyById('currency', qty);
-    }
+    }
+
 
     get slayerCoinsMaterial() {
         return this.getCurrencyMaterial('slayer_coins');
@@ -83,7 +86,8 @@ export class AdventuringStash extends AdventuringPage {
 
     removeSlayerCoins(qty) {
         this.removeCurrencyById('slayer_coins', qty);
-    }
+    }
+
 
     getCount(material) {
         return this.materialCounts.get(material) || 0;
@@ -94,7 +98,8 @@ export class AdventuringStash extends AdventuringPage {
     }
 
     onShow() {
-        this.manager.party.setAllLocked(this.manager.isActive);
+        this.manager.party.setAllLocked(this.manager.isActive);
+
         this.markAllSeen();
     }
 
@@ -111,7 +116,8 @@ export class AdventuringStash extends AdventuringPage {
         });
     }
 
-    postDataRegistration() {
+    postDataRegistration() {
+
     }
 
     registerMaterial(material) {
@@ -144,7 +150,8 @@ export class AdventuringStash extends AdventuringPage {
             material.renderQueue.name = true;
             material.renderQueue.icon = true;
             material.renderQueue.count = true;
-            this.manager.log.add(`Found ${qty} ${material.name}`);
+            this.manager.log.add(`Found ${qty} ${material.name}`);
+
             if(material.isCurrency) {
                 this.manager.achievementManager.recordCurrency(qty);
                 this.manager.tutorialManager.checkTriggers('currency');
@@ -188,10 +195,12 @@ export class AdventuringStash extends AdventuringPage {
         writer.writeComplexMap(this.unlocked, (key, value, writer) => {
             writer.writeNamespacedObject(key);
             writer.writeBoolean(value);
-        });
+        });
+
         writer.writeUint32(this.seenMaterials.size);
         this.seenMaterials.forEach(materialId => {
-            writer.writeString(materialId);
+            const material = this.manager.materials.getObjectByID(materialId);
+            writer.writeNamespacedObject(material);
         });
 
         return writer;
@@ -214,8 +223,10 @@ export class AdventuringStash extends AdventuringPage {
 
         const numSeen = reader.getUint32();
         for(let i = 0; i < numSeen; i++) {
-            const materialId = reader.getString();
-            this.seenMaterials.add(materialId);
+            const material = reader.getNamespacedObject(this.manager.materials);
+            if (material && typeof material !== 'string') {
+                this.seenMaterials.add(material.id);
+            }
         }
     }
 }

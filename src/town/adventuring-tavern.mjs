@@ -1,6 +1,7 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { AdventuringPage } = await loadModule('src/ui/adventuring-page.mjs');
+const { AdventuringPage } = await loadModule('src/ui/adventuring-page.mjs');
+
 await loadModule('src/town/components/adventuring-tavern.mjs');
 
 const MAX_EQUIPPED_DRINKS = 3;
@@ -27,9 +28,12 @@ export class AdventuringTavern extends AdventuringPage {
         this.manager = manager;
         this.game = game;
         this.component = createElement('adventuring-tavern');
-        this.renderQueue = new AdventuringTavernRenderQueue();
-        this.charges = new Map();
-        this.equipped = new Map();
+        this.renderQueue = new AdventuringTavernRenderQueue();
+
+        this.charges = new Map();
+
+        this.equipped = new Map();
+
         this.selectedDrink = null;
         this.selectedTier = 1;
 
@@ -48,7 +52,8 @@ export class AdventuringTavern extends AdventuringPage {
 
     onShow() {
         this.manager.party.setAllLocked(false);
-        this.renderQueue.all = true;
+        this.renderQueue.all = true;
+
         const drinks = this.manager.tavernDrinks.allObjects;
         if (drinks.length > 0 && !this.selectedDrink) {
             this.selectedDrink = drinks[0];
@@ -60,8 +65,12 @@ export class AdventuringTavern extends AdventuringPage {
         this.manager.party.setAllLocked(true);
     }
 
-    postDataRegistration() {
-    }
+    postDataRegistration() {
+
+    }
+
+
+
 
     getCharges(drink, tier) {
         const drinkCharges = this.charges.get(drink.id);
@@ -94,7 +103,8 @@ export class AdventuringTavern extends AdventuringPage {
         drink.renderQueue.updateAll();
         this.renderQueue.equipped = true;
         this.renderQueue.details = true;
-        this.manager.party.invalidateAllEffects('tavern');
+        this.manager.party.invalidateAllEffects('tavern');
+
         const equippedTier = this.getEquippedTier(drink);
         if (newCharges <= 0 && equippedTier === tier) {
             this.unequip(drink);
@@ -115,7 +125,10 @@ export class AdventuringTavern extends AdventuringPage {
         this.selectedDrink = null;
         this.selectedTier = 1;
         this.renderQueue.queueAll();
-    }
+    }
+
+
+
 
     isEquipped(drink) {
         return this.equipped.has(drink);
@@ -163,13 +176,17 @@ export class AdventuringTavern extends AdventuringPage {
     toggleEquip(drink, tier) {
         if (this.isEquipped(drink) && this.getEquippedTier(drink) === tier) {
             return this.unequip(drink);
-        } else {
+        } else {
+
             if (this.isEquipped(drink)) {
                 this.unequip(drink);
             }
             return this.equip(drink, tier);
         }
-    }
+    }
+
+
+
 
     getActiveDrinks() {
         const active = [];
@@ -212,13 +229,17 @@ export class AdventuringTavern extends AdventuringPage {
         }
 
         return results;
-    }
+    }
+
+
+
 
     selectDrink(drink) {
         const previousDrink = this.selectedDrink;
         this.selectedDrink = drink;
         this.selectedTier = 1;
-        this.renderQueue.details = true;
+        this.renderQueue.details = true;
+
         if (previousDrink) {
             previousDrink.component.setSelected(false);
         }
@@ -230,7 +251,10 @@ export class AdventuringTavern extends AdventuringPage {
     selectTier(tier) {
         this.selectedTier = tier;
         this.renderQueue.details = true;
-    }
+    }
+
+
+
 
     render() {
         this.renderDrinks();
@@ -240,12 +264,15 @@ export class AdventuringTavern extends AdventuringPage {
 
     renderDrinks() {
         if (!this.renderQueue.drinks && !this.renderQueue.all)
-            return;
+            return;
+
         this.component.drinks.replaceChildren();
-        for (const drink of this.manager.tavernDrinks.allObjects) {
+        for (const drink of this.manager.tavernDrinks.allObjects) {
+
             if (typeof drink.component.mount === 'function') {
                 drink.component.mount(this.component.drinks);
-            } else {
+            } else {
+
                 this.component.drinks.appendChild(drink.component);
             }
             if (typeof drink.component.setSelected === 'function') {
@@ -310,18 +337,23 @@ export class AdventuringTavern extends AdventuringPage {
         });
 
         this.renderQueue.details = false;
-    }
+    }
 
-    encode(writer) {
+
+
+
+    encode(writer) {
         writer.writeUint32(this.charges.size);
         for (const [drinkId, tierCharges] of this.charges) {
-            writer.writeString(drinkId);
+            const drink = this.manager.tavernDrinks.getObjectByID(drinkId);
+            writer.writeNamespacedObject(drink);
             writer.writeUint32(tierCharges.size);
             for (const [tier, count] of tierCharges) {
                 writer.writeUint8(tier);
                 writer.writeUint32(count);
             }
-        }
+        }
+
         writer.writeUint32(this.equipped.size);
         for (const [drink, tier] of this.equipped) {
             writer.writeNamespacedObject(drink);
@@ -331,11 +363,12 @@ export class AdventuringTavern extends AdventuringPage {
         return writer;
     }
 
-    decode(reader, version) {
+    decode(reader, version) {
+
         this.charges = new Map();
         const chargesCount = reader.getUint32();
         for (let i = 0; i < chargesCount; i++) {
-            const drinkId = reader.getString();
+            const drink = reader.getNamespacedObject(this.manager.tavernDrinks);
             const tierCount = reader.getUint32();
             const tierCharges = new Map();
             for (let j = 0; j < tierCount; j++) {
@@ -343,8 +376,11 @@ export class AdventuringTavern extends AdventuringPage {
                 const count = reader.getUint32();
                 tierCharges.set(tier, count);
             }
-            this.charges.set(drinkId, tierCharges);
-        }
+            if (drink && typeof drink !== 'string') {
+                this.charges.set(drink.id, tierCharges);
+            }
+        }
+
         this.equipped = new Map();
         const equippedCount = reader.getUint32();
         for (let i = 0; i < equippedCount; i++) {

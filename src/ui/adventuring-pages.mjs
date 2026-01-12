@@ -35,7 +35,8 @@ export class AdventuringPages {
             this.current = page;
 
             page.component.show();
-            page.onShow();
+            page.onShow();
+
             if(this.manager.tutorialManager && this.manager.tutorialManager.onOverviewPageChange) {
                 this.manager.tutorialManager.onOverviewPageChange();
             }
@@ -60,7 +61,9 @@ export class AdventuringPages {
     encode(writer) {
         writer.writeComplexMap(this.byId, (key, value, writer) => {
             writer.writeString(key);
+            writer.pushPath?.(key);
             value.encode(writer);
+            writer.popPath?.();
         });
         return writer;
     }

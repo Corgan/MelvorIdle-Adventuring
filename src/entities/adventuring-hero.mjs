@@ -612,23 +612,18 @@ export class AdventuringHero extends AdventuringCharacter {
     }
 
     encode(writer) {
-        let mark = writer.byteOffset;
-        const log = (label) => {
-            if(this.manager.debugSaveSize) {
-                const now = writer.byteOffset;
-                console.log(`      hero.${label}: ${now - mark} bytes`);
-                mark = now;
-            }
-        };
-
+        writer.pushPath?.('character');
         super.encode(writer);
-        log('super');
+        writer.popPath?.();
+
         writer.writeString(this.name);
         writer.writeNamespacedObject(this.combatJob);
         writer.writeNamespacedObject(this.passiveJob);
-        log('base');
+
+        writer.pushPath?.('equipment');
         this.equipment.encode(writer);
-        log('equipment');
+        writer.popPath?.();
+
         return writer;
     }
 

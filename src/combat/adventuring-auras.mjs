@@ -17,7 +17,10 @@ export class AdventuringAuras {
         this.game = game;
         this.character = character;
 
-        this.auras = new Set();
+        this.auras = new Set();
+
+
+
         this.aurasByBase = new Map();
 
         this.effectByType = new Map();
@@ -33,13 +36,15 @@ export class AdventuringAuras {
 
     getEffectsForTrigger(type, context = {}) {
         const results = [];
-        const resolved = this.effectByType.get(type) || [];
+        const resolved = this.effectByType.get(type) || [];
+
         if (type === 'round_end') {
             this.incrementAges();
         }
 
         for (const { effect, instance } of resolved) {
-            if (instance.base === undefined || instance.stacks <= 0) continue;
+            if (instance.base === undefined || instance.stacks <= 0) continue;
+
             const amount = effect.getAmount ? effect.getAmount(instance) : (effect.amount || 0);
             const stacks = instance.stacks;
 
@@ -47,7 +52,8 @@ export class AdventuringAuras {
                 effect: {
                     ...effect,
                     amount,
-                    stacks,
+                    stacks,
+
                     type: effect.type,
                     trigger: effect.trigger,
                     target: effect.target,
@@ -83,7 +89,8 @@ export class AdventuringAuras {
 
             auraInstance.base.effects.forEach(effectData => {
                 const trigger = effectData.trigger;
-                const type = effectData.type;
+                const type = effectData.type;
+
                 const value = effectData.getAmount ? effectData.getAmount(auraInstance) : (effectData.amount || 0);
 
                 effects.push(createEffect(
@@ -105,7 +112,8 @@ export class AdventuringAuras {
     cleanAuras() {
         let auras = this.auras.values();
         for(let aura of auras) {
-            if(aura.stacks === 0) {
+            if(aura.stacks === 0) {
+
                 if (this.character && aura.base && aura.base.effects) {
                     const removedEffects = aura.base.effects.filter(e => e.trigger === 'removed');
                     if (removedEffects.length > 0) {
@@ -118,21 +126,24 @@ export class AdventuringAuras {
                             this.character.processEffect(effect, aura, ctx);
                         }
                     }
-                }
+                }
+
                 this._removeFromCache(aura.base, aura.source);
                 this.auras.delete(aura);
             }
         }
     }
 
-    clear() {
+    clear() {
+
         for(let aura of this.auras.values()) {
             aura.stacks = 0;
         }
         this.auras.clear();
         this.aurasByBase.clear();
         this.effectByType.clear();
-        this.renderQueue.auras = true;
+        this.renderQueue.auras = true;
+
         if(this.character && this.character.effectCache) {
             this.character.invalidateEffects('auras');
         }
@@ -175,14 +186,16 @@ export class AdventuringAuras {
         return aura.effects.some(effect => effect.scaleFrom === 'snapshot');
     }
 
-    add(aura, { stacks = 1 }, source) {
+    add(aura, { stacks = 1 }, source) {
+
         if(!aura) {
             console.warn('[Auras.add] Invalid aura: undefined or null', new Error().stack);
             return;
         }
 
         const originalAuraId = aura;
-        if(typeof aura === "string") {
+        if(typeof aura === "string") {
+
             if(!aura.includes(':')) {
                 aura = `adventuring:${aura}`;
             }
@@ -192,38 +205,47 @@ export class AdventuringAuras {
         if(!aura || typeof aura === 'string') {
             console.warn(`[Auras.add] Aura not found: ${originalAuraId}`, new Error().stack);
             return;
-        }
+        }
+
         let existing = undefined;
         if(aura.combineMode === 'stack' || aura.combineMode === 'refresh') {
             existing = this.get(aura); // Find any existing instance
         } else if(aura.combineMode === 'bySource') {
             existing = this.get(aura, source); // Find instance from same source
-        }
+        }
+
+
         const needsSnap = this._needsSnapshot(aura);
         let snapshot = null;
         if (needsSnap) {
             snapshot = this._captureSnapshot(source);
         }
 
-        if(existing === undefined) {
+        if(existing === undefined) {
+
             let instance = new AdventuringAuraInstance(this.manager, this.game, this, source);
             this.auras.add(instance);
-            instance.setAura(aura, stacks, snapshot);
+            instance.setAura(aura, stacks, snapshot);
+
             this._addToCache(aura, instance, source);
-        } else {
+        } else {
+
             let newStacks = existing.stacks;
             if(aura.combineMode === 'stack' || aura.combineMode === 'bySource') { // Both modes add stacks
-                newStacks = existing.stacks + stacks;
+                newStacks = existing.stacks + stacks;
+
                 if (needsSnap && snapshot) {
                     existing.snapshotStats = snapshot;
                 }
             } else if(aura.combineMode === 'refresh') {
                 newStacks = stacks;
-                existing.age = 0; // Reset age on refresh
+                existing.age = 0; // Reset age on refresh
+
                 if (needsSnap && snapshot) {
                     existing.snapshotStats = snapshot;
                 }
-            }
+            }
+
             if(aura.maxStacks !== undefined) {
                 newStacks = Math.min(newStacks, aura.maxStacks);
             }
@@ -232,7 +254,8 @@ export class AdventuringAuras {
                 existing.setStacks(newStacks);
             }
         }
-        this.renderQueue.auras = true;
+        this.renderQueue.auras = true;
+
         if(this.character && this.character.effectCache) {
             this.character.invalidateEffects('auras');
         }
@@ -260,13 +283,15 @@ export class AdventuringAuras {
         if(typeof aura === "string")
             aura = this.manager.auras.getObjectByID(aura);
 
-        if (!aura) return undefined;
+        if (!aura) return undefined;
+
         const instances = this.aurasByBase.get(aura.id);
         if (!instances) return undefined;
 
         if (source !== undefined) {
             return instances.get(source);
-        }
+        }
+
         for (const instance of instances.values()) {
             if (instance.base === aura) return instance;
         }
@@ -285,7 +310,8 @@ export class AdventuringAuras {
         this.auras.forEach(aura => aura.render());
 
         if(!this.renderQueue.auras)
-            return;
+            return;
+
         let auras = [...this.auras.values()]
             .filter(aura => aura.base !== undefined && aura.stacks > 0 && !aura.base.hidden)
             .sort((a,b) => b.stacks - a.stacks);
@@ -297,7 +323,9 @@ export class AdventuringAuras {
 
     encode(writer) {
         writer.writeSet(this.auras, (aura, writer) => {
+            writer.pushPath?.('aura');
             aura.encode(writer);
+            writer.popPath?.();
         });
         return writer;
     }

@@ -249,8 +249,8 @@ export class AdventuringAuraInstance {
         writer.writeBoolean(hasSnapshot);
         if (hasSnapshot) {
             writer.writeUint16(this.snapshotStats.size);
-            this.snapshotStats.forEach((value, key) => {
-                writer.writeString(key);
+            this.snapshotStats.forEach((value, stat) => {
+                writer.writeNamespacedObject(stat);
                 writer.writeFloat64(value);
             });
         }
@@ -275,13 +275,14 @@ export class AdventuringAuraInstance {
                 this.snapshotStats = new Map();
                 const count = reader.getUint16();
                 for (let i = 0; i < count; i++) {
-                    const key = reader.getString();
+                    const stat = reader.getNamespacedObject(this.manager.stats);
                     const value = reader.getFloat64();
-                    this.snapshotStats.set(key, value);
+                    if (stat && typeof stat !== 'string') {
+                        this.snapshotStats.set(stat, value);
+                    }
                 }
             }
         } catch (e) {
-
             this.snapshotStats = null;
         }
     }

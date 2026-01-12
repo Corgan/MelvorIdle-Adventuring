@@ -58,6 +58,8 @@ const { AdventuringEquipmentPool } = await loadModule('src/items/adventuring-equ
 const { AdventuringLootTable } = await loadModule('src/items/adventuring-loot-table.mjs');
 const { AdventuringModifiers } = await loadModule('src/core/adventuring-modifiers.mjs');
 const { AdventuringGrimoire } = await loadModule('src/slayer/adventuring-grimoire.mjs');
+const { AdventuringTag } = await loadModule('src/core/adventuring-tag.mjs');
+const { createLoggingWriter } = await loadModule('src/core/adventuring-utils.mjs');
 
 const { AdventuringPageElement } = await loadModule('src/core/components/adventuring.mjs');
 
@@ -97,6 +99,7 @@ export class Adventuring extends SkillWithMastery {
         this.difficulties = new NamespaceRegistry(this.game.registeredNamespaces);
         this.dungeonAuras = new NamespaceRegistry(this.game.registeredNamespaces);
         this.monsters = new NamespaceRegistry(this.game.registeredNamespaces);
+        this.tags = new NamespaceRegistry(this.game.registeredNamespaces);
         this.tiles = new NamespaceRegistry(this.game.registeredNamespaces);
         this.slayerTaskTypes = new NamespaceRegistry(this.game.registeredNamespaces);
         this.rewardTypes = new NamespaceRegistry(this.game.registeredNamespaces);
@@ -838,6 +841,13 @@ export class Adventuring extends SkillWithMastery {
             });
         }
 
+        if(data.tags !== undefined) {
+            data.tags.forEach(data => {
+                let tag = new AdventuringTag(namespace, data, this, this.game);
+                this.tags.registerObject(tag);
+            });
+        }
+
         if(data.buildings !== undefined) {
             data.buildings.forEach(data => {
                 let building = new AdventuringBuilding(namespace, data, this, this.game);
@@ -1244,66 +1254,68 @@ export class Adventuring extends SkillWithMastery {
     }
 
     encode(writer) {
-        let start = writer.byteOffset;
-        let mark = start;
-        const log = (label) => {
-            if(this.debugSaveSize) {
-                const now = writer.byteOffset;
-                console.log(`  ${label}: ${now - mark} bytes`);
-                mark = now;
-            }
-        };
+        const start = writer.byteOffset;
+        const w = createLoggingWriter(this, writer);
 
-        super.encode(writer);
-        log('super.encode');
-        writer.writeUint32(this.version);
-        log('version');
+        w.pushPath?.('super');
+        super.encode(w);
+        w.popPath?.();
 
-        this.party.encode(writer);
-        log('party');
-        this.pages.encode(writer);
-        log('pages');
-        writer.writeBoolean(this.isActive);
+        w.writeUint32(this.version);
 
-        writer.writeUint32(this.learnedAbilities.size);
+        w.pushPath?.('party');
+        this.party.encode(w);
+        w.popPath?.();
+
+        w.pushPath?.('pages');
+        this.pages.encode(w);
+        w.popPath?.();
+
+        w.writeBoolean(this.isActive);
+
+        w.writeUint32(this.learnedAbilities.size);
         this.learnedAbilities.forEach(abilityId => {
             const ability = this.getAbilityByID(abilityId);
-            writer.writeNamespacedObject(ability);
+            w.writeNamespacedObject(ability);
         });
-        log('learnedAbilities');
 
-        this.slayers.encode(writer);
-        log('slayers');
+        w.pushPath?.('slayers');
+        this.slayers.encode(w);
+        w.popPath?.();
 
-        this.tavern.encode(writer);
-        log('tavern');
+        w.pushPath?.('tavern');
+        this.tavern.encode(w);
+        w.popPath?.();
 
-        this.lemons.encode(writer);
-        log('lemons');
+        w.pushPath?.('lemons');
+        this.lemons.encode(w);
+        w.popPath?.();
 
-        this.consumables.encode(writer);
-        log('consumables');
+        w.pushPath?.('consumables');
+        this.consumables.encode(w);
+        w.popPath?.();
 
         const validSeenAbilities = [...this.seenAbilities]
             .map(id => this.getAbilityByID(id))
             .filter(ability => ability !== undefined);
-        writer.writeUint32(validSeenAbilities.length);
+        w.writeUint32(validSeenAbilities.length);
         validSeenAbilities.forEach(ability => {
-            writer.writeNamespacedObject(ability);
+            w.writeNamespacedObject(ability);
         });
-        log('seenAbilities');
 
-        this.tutorialManager.encode(writer);
-        log('tutorialManager');
+        w.pushPath?.('tutorialManager');
+        this.tutorialManager.encode(w);
+        w.popPath?.();
 
-        this.achievementManager.encode(writer);
-        log('achievementManager');
+        w.pushPath?.('achievementManager');
+        this.achievementManager.encode(w);
+        w.popPath?.();
 
-        this.grimoire.encode(writer);
-        log('grimoire');
+        w.pushPath?.('grimoire');
+        this.grimoire.encode(w);
+        w.popPath?.();
 
-        let end = writer.byteOffset;
-        console.log(`Wrote ${end - start} bytes for Adventuring save`);
+        console.log(`Wrote ${writer.byteOffset - start} bytes for Adventuring save`);
 
         return writer;
     }

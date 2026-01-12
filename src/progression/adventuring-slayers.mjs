@@ -237,7 +237,8 @@ export class AdventuringSlayers extends AdventuringPage {
 
             if(task.taskType && task.taskType.targetType === 'monster_tag') {
                 const tag = task.taskType.targetTag;
-                if(monster.tags && monster.tags.includes(tag)) {
+                const tagId = tag ? (tag.localID || tag.id || tag) : null;
+                if(tagId && monster.tags && monster.tags.includes(tagId)) {
                     task.addProgress(1);
                     this.renderQueue.activeTasks = true;
                 }
@@ -657,14 +658,21 @@ export class AdventuringSlayers extends AdventuringPage {
     }
 
     encode(writer) {
-
         writer.writeUint32(this.totalTasksCompleted);
 
         writer.writeUint8(this.activeTasks.length);
-        this.activeTasks.forEach(task => task.encode(writer));
+        this.activeTasks.forEach((task, i) => {
+            writer.pushPath?.(`activeTask[${i}]`);
+            task.encode(writer);
+            writer.popPath?.();
+        });
 
         writer.writeUint8(this.availableTasks.length);
-        this.availableTasks.forEach(task => task.encode(writer));
+        this.availableTasks.forEach((task, i) => {
+            writer.pushPath?.(`availableTask[${i}]`);
+            task.encode(writer);
+            writer.popPath?.();
+        });
     }
 
     decode(reader, version) {

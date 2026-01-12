@@ -641,24 +641,16 @@ class AdventuringCharacter {
     }
 
     encode(writer) {
-        let mark = writer.byteOffset;
-        const log = (label) => {
-            if(this.manager.debugSaveSize) {
-                const now = writer.byteOffset;
-                console.log(`      character.${label}: ${now - mark} bytes`);
-                mark = now;
-            }
-        };
-
         writer.writeBoolean(this.dead);
         writer.writeUint32(this.hitpoints);
         writer.writeUint32(this.energy);
         writer.writeNamespacedObject(this.generator);
         writer.writeNamespacedObject(this.spender);
-        log('base');
 
+        writer.pushPath?.('auras');
         this.auras.encode(writer);
-        log('auras');
+        writer.popPath?.();
+
         return writer;
     }
 

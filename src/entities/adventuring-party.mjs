@@ -258,21 +258,18 @@ class AdventuringParty {
     }
 
     encode(writer) {
-        let mark = writer.byteOffset;
-        const log = (label) => {
-            if(this.manager.debugSaveSize) {
-                const now = writer.byteOffset;
-                console.log(`    party.${label}: ${now - mark} bytes`);
-                mark = now;
-            }
-        };
-
+        writer.pushPath?.('back');
         this.back.encode(writer);
-        log('back');
+        writer.popPath?.();
+
+        writer.pushPath?.('center');
         this.center.encode(writer);
-        log('center');
+        writer.popPath?.();
+
+        writer.pushPath?.('front');
         this.front.encode(writer);
-        log('front');
+        writer.popPath?.();
+
         return writer;
     }
 
