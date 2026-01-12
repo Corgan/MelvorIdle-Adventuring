@@ -270,12 +270,10 @@ export class AdventuringEnemy extends AdventuringCharacter {
 
             this.manager.addXP(bonusXP, area || this.base);
 
-
             this.manager.party.all.forEach(member => {
                 if(member.combatJob.isMilestoneReward)
                     member.combatJob.addXP(bonusXP);
             });
-
 
             const masteryXP = this.base.masteryXP || 25;
             const bonusMasteryXP = Math.ceil(masteryXP * xpMultiplier);

@@ -14,24 +14,37 @@ export class AdventuringAchievementRewardElement extends HTMLElement {
         this.appendChild(this._content);
     }
 
-    setCurrency(amount, iconSrc) {
+    setTooltip(content) {
+        if(content && this.container) {
+            tippy(this.container, {
+                content: content,
+                placement: 'top',
+                allowHTML: true
+            });
+        }
+    }
+
+    setCurrency(amount, iconSrc, tooltipContent) {
         this.text.textContent = amount + ' ';
         this.text.className = '';
         this.icon.src = iconSrc;
         this.icon.classList.remove('d-none');
+        if(tooltipContent) this.setTooltip(tooltipContent);
     }
 
-    setStat(value, statName) {
+    setStat(value, statName, tooltipContent) {
         this.text.textContent = `+${value} ${statName}`;
         this.text.className = 'text-success';
         this.icon.classList.add('d-none');
+        if(tooltipContent) this.setTooltip(tooltipContent);
     }
 
-    setMaterial(quantity, iconSrc) {
+    setMaterial(quantity, iconSrc, tooltipContent) {
         this.text.textContent = quantity + ' ';
         this.text.className = '';
         this.icon.src = iconSrc;
         this.icon.classList.remove('d-none');
+        if(tooltipContent) this.setTooltip(tooltipContent);
     }
 }
 window.customElements.define('adventuring-achievement-reward', AdventuringAchievementRewardElement);

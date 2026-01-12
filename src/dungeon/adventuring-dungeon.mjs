@@ -317,7 +317,6 @@ export class AdventuringDungeon extends AdventuringPage {
     setArea(area) {
         this.area = area;
 
-
         const difficulty = area.getDifficulty();
         if (difficulty && difficulty.waveGeneration && difficulty.waveGeneration.type === 'infinite') {
             this.numFloors = difficulty.waveGeneration.floorsPerWave !== undefined ? difficulty.waveGeneration.floorsPerWave : 1;
@@ -385,7 +384,6 @@ export class AdventuringDungeon extends AdventuringPage {
         if(this.currentFloor !== undefined)
             this.groupGenerator.loadTable(this.currentFloor.monsters);
         this.floor.generate(this.area.height, this.area.width);
-
 
         this.manager.triggerEffects('floor_start', {});
 
@@ -476,7 +474,6 @@ export class AdventuringDungeon extends AdventuringPage {
 
     complete() {
         this.manager.log.add(`Completed ${this.area.name}`);
-
 
         if (this.area) {
             const difficultyXPBonus = this.getBonus('xp_percent') / 100;

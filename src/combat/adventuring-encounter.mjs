@@ -103,9 +103,6 @@ export class AdventuringEncounter extends AdventuringPage {
         this.manager.party.resetEffectLimits('round');
         this.manager.party.resetEffectLimits('turn');
 
-
-
-
         this.manager.party.trigger('encounter_start', { encounter: this });
 
         this.all.forEach(member => {
@@ -162,7 +159,6 @@ export class AdventuringEncounter extends AdventuringPage {
         });
         this.manager.party.resetEffectLimits('round');
         this.manager.party.resetEffectLimits('turn');
-
 
         this.manager.party.trigger('round_start', { encounter: this });
 
@@ -253,9 +249,7 @@ export class AdventuringEncounter extends AdventuringPage {
 
         if(target.dead) {
             this.currentTurn.trigger('kill', { target, damageDealt, encounter: this });
-        }
-        
-        // Award XP to damage amplification sources
+        }
         if(builtEffect.damageContributions && builtEffect.damageContributions.length > 0) {
             this._processDamageContributions(builtEffect.damageContributions);
         }
@@ -269,18 +263,14 @@ export class AdventuringEncounter extends AdventuringPage {
             if(contribution.amount <= 0) continue;
             
             const source = contribution.source;
-            const equipmentXP = Math.floor((contribution.amount / 2) * (1 + difficultyXPBonus));
-            
-            // Award equipment XP
+            const equipmentXP = Math.floor((contribution.amount / 2) * (1 + difficultyXPBonus));
             if(source.equipment && source.equipment.slots) {
                 source.equipment.slots.forEach((slot, type) => {
                     if(!slot.empty && !slot.occupied && slot.item) {
                         slot.item.addXP(equipmentXP);
                     }
                 });
-            }
-            
-            // Award job XP (50% of equipment XP)
+            }
             if(source.combatJob && source.combatJob.isMilestoneReward) {
                 source.combatJob.addXP(Math.floor(equipmentXP / 2));
             }
@@ -298,7 +288,6 @@ export class AdventuringEncounter extends AdventuringPage {
         this.currentHit = 0;
         this.hitRepeat = 0;
         this.hitHistory = [];
-
 
         let resolvedEffects = this.currentTurn.trigger('turn_start', { skip: false, encounter: this });
 

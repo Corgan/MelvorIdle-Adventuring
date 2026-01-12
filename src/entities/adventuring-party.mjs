@@ -10,7 +10,8 @@ class AdventuringParty {
         this.game = game;
         this.manager = manager;
 
-        this.component = createElement('adventuring-party');
+        this.component = createElement('adventuring-party');
+
         this.effectLimitTracker = new EffectLimitTracker();
     }
 
@@ -32,7 +33,10 @@ class AdventuringParty {
 
     get dead() {
         return this.all.filter(member => member.dead);
-    }
+    }
+
+
+
 
     forEach(callback) {
         this.all.forEach(callback);
@@ -68,22 +72,29 @@ class AdventuringParty {
 
     setAllLocked(locked) {
         this.all.forEach(member => member.setLocked(locked));
-    }
+    }
 
-    trigger(type, context = {}) {
+
+
+
+    trigger(type, context = {}) {
+
         const partyContext = buildEffectContext(null, {
             ...context,
             party: this.all,
             manager: this.manager
-        });
-        const pending = this.getAllPendingEffectsForTrigger(type, partyContext);
+        });
+
+        const pending = this.getAllPendingEffectsForTrigger(type, partyContext);
+
         for (const p of pending) {
             this.processPendingEffect(p, partyContext);
         }
     }
 
     getAllPendingEffectsForTrigger(type, context) {
-        const pending = [];
+        const pending = [];
+
         for (const hero of this.all) {
             if (!hero.equipment) continue;
             const equipmentEffects = hero.equipment.getEffectsForTrigger(type, context);
@@ -96,7 +107,8 @@ class AdventuringParty {
                     sourceType: 'equipment'
                 });
             }
-        }
+        }
+
         if (this.manager.consumables) {
             const consumableEffects = this.manager.consumables.getEffectsForTrigger(type, context);
             for (const { consumable, effect } of consumableEffects) {
@@ -108,7 +120,8 @@ class AdventuringParty {
                     sourceType: 'consumable'
                 });
             }
-        }
+        }
+
         if (this.manager.tavern) {
             const drinkEffects = this.manager.tavern.getEffectsForTrigger(type, context);
             for (const { drink, effect } of drinkEffects) {
@@ -126,21 +139,27 @@ class AdventuringParty {
     }
 
     processPendingEffect(pending, context) {
-        const { effect, source, sourceName, sourceType } = pending;
+        const { effect, source, sourceName, sourceType } = pending;
+
         if (effect.condition) {
             if (!evaluateCondition(effect.condition, context)) {
                 return false;
             }
-        }
+        }
+
         if (!this.canEffectTrigger(effect, source)) {
             return false;
-        }
+        }
+
         const chance = effect.chance || 100;
         if (Math.random() * 100 > chance) {
             return false;
-        }
-        this.applyPartyEffect(effect, source, sourceName, sourceType);
-        this.recordEffectTrigger(effect, source);
+        }
+
+        this.applyPartyEffect(effect, source, sourceName, sourceType);
+
+        this.recordEffectTrigger(effect, source);
+
         if (sourceType === 'consumable') {
             this.manager.consumables.removeCharges(source, 1);
             this.manager.log.add(`${sourceName} consumed a charge.`);
@@ -151,7 +170,8 @@ class AdventuringParty {
 
     applyPartyEffect(effect, source, sourceName, sourceType) {
         const target = effect.target || 'all';
-        const amount = effect.amount || 0;
+        const amount = effect.amount || 0;
+
         let targets = [];
         switch (target) {
             case 'all':
@@ -171,7 +191,8 @@ class AdventuringParty {
                 break;
             default:
                 targets = this.alive;
-        }
+        }
+
         for (const member of targets) {
             const builtEffect = createEffect(effect, { character: member, manager: this.manager });
 
@@ -205,7 +226,10 @@ class AdventuringParty {
                     break;
             }
         }
-    }
+    }
+
+
+
 
     canEffectTrigger(effect, source) {
         return this.effectLimitTracker.canTrigger(effect, source);
@@ -234,9 +258,21 @@ class AdventuringParty {
     }
 
     encode(writer) {
+        let mark = writer.byteOffset;
+        const log = (label) => {
+            if(this.manager.debugSaveSize) {
+                const now = writer.byteOffset;
+                console.log(`    party.${label}: ${now - mark} bytes`);
+                mark = now;
+            }
+        };
+
         this.back.encode(writer);
+        log('back');
         this.center.encode(writer);
+        log('center');
         this.front.encode(writer);
+        log('front');
         return writer;
     }
 

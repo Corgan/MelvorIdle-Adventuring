@@ -112,9 +112,6 @@ class AdventuringCharacter {
         return 100 * (!isNaN(pct) ? pct : 0);
     }
 
-
-
-
     canEffectTrigger(effect, source) {
         return this.effectLimitTracker.canTrigger(effect, source);
     }
@@ -126,9 +123,6 @@ class AdventuringCharacter {
     resetEffectLimits(limitType) {
         this.effectLimitTracker.reset(limitType);
     }
-
-
-
 
     getAllPendingEffectsForTrigger(type, context) {
         const pending = [];
@@ -347,7 +341,6 @@ class AdventuringCharacter {
             }
         }
 
-
         const isCharacterEnemy = character && !character.isHero;
         if(this.isHero && isCharacterEnemy && amount > 0 && !this.dead) {
 
@@ -419,7 +412,6 @@ class AdventuringCharacter {
             }
         } else {
 
-
         }
         this.renderQueue.hitpoints = true;
     }
@@ -441,7 +433,6 @@ class AdventuringCharacter {
             }
         }
 
-
         if(character && character.isHero && actualHeal > 0) {
 
             const equipmentXP = Math.max(1, Math.floor(actualHeal / 2));
@@ -458,7 +449,6 @@ class AdventuringCharacter {
                 character.combatJob.addXP(Math.floor(equipmentXP / 2));
             }
         }
-
 
         if(this.isHero && character && character.isHero && actualHeal > 0) {
 
@@ -582,7 +572,6 @@ class AdventuringCharacter {
         if(!this.renderQueue.highlight)
             return;
 
-
         this.renderQueue.highlight = false;
     }
 
@@ -652,13 +641,24 @@ class AdventuringCharacter {
     }
 
     encode(writer) {
+        let mark = writer.byteOffset;
+        const log = (label) => {
+            if(this.manager.debugSaveSize) {
+                const now = writer.byteOffset;
+                console.log(`      character.${label}: ${now - mark} bytes`);
+                mark = now;
+            }
+        };
+
         writer.writeBoolean(this.dead);
         writer.writeUint32(this.hitpoints);
         writer.writeUint32(this.energy);
         writer.writeNamespacedObject(this.generator);
         writer.writeNamespacedObject(this.spender);
+        log('base');
 
         this.auras.encode(writer);
+        log('auras');
         return writer;
     }
 

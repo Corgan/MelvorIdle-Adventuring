@@ -83,7 +83,6 @@ export class AdventuringEquipmentSlot {
         if(!item.jobs.includes(this.equipment.character.combatJob) && !item.jobs.includes(this.equipment.character.passiveJob))
             return false;
 
-
         if(item.isArtifact) {
 
             for(const [slotType, slot] of this.equipment.slots) {
@@ -105,7 +104,6 @@ export class AdventuringEquipmentSlot {
                     return false;
             }
         }
-
 
         if(swapSlot !== undefined && !swapSlot.canEquip(this.item))
             return false;
@@ -220,8 +218,6 @@ export class AdventuringEquipmentSlot {
             if(!item.slots.includes(this.slotType)) return false;
 
             if(!item.jobs.includes(combatJob) && !item.jobs.includes(passiveJob)) return false;
-
-
 
             if(item.isArtifact && hasEquippedArtifact && item !== equippedArtifact) {
                 return false;
@@ -423,9 +419,7 @@ export class AdventuringEquipmentSlot {
             return;
 
         this.component.upgrade.classList.toggle('d-none', this.empty || this.occupied || this.item.upgradeLevel === 0);
-        this.component.upgrade.textContent = this.item !== undefined ? this.item.level : 0;
-
-        // Reset color classes
+        this.component.upgrade.textContent = this.item !== undefined ? this.item.level : 0;
         this.component.upgrade.classList.remove('text-danger', 'text-warning');
 
         if(!this.empty && !this.occupied && this.item.upgradeLevel > 0) {

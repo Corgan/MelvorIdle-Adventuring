@@ -1,8 +1,5 @@
 const { loadModule } = mod.getContext(import.meta);
 
-
-
-
 class StatCalculator {
 
     static calculate(baseValue, bonuses = { flat: 0, percent: 0 }, globalPercent = 0) {
@@ -53,9 +50,6 @@ class StatCalculator {
         });
     }
 }
-
-
-
 
 class EffectLimitTracker {
     constructor() {
@@ -124,9 +118,6 @@ class EffectLimitTracker {
         this.counts.turn.clear();
     }
 }
-
-
-
 
 const BASE_CRIT_MULTIPLIER = 1.5;
 
@@ -235,7 +226,6 @@ class PassiveEffectProcessor {
         return 0;
     }
 
-
     _processCritical(amount, attacker) {
         const critChance = attacker.getPassiveBonus('crit_chance');
 
@@ -264,9 +254,6 @@ class PassiveEffectProcessor {
         return amount;
     }
 }
-
-
-
 
 function randomElement(array) {
     if(!array || array.length === 0) return undefined;
@@ -662,9 +649,6 @@ class EffectCache {
     }
 }
 
-
-
-
 class RequirementsChecker {
 
     constructor(manager, requirements = []) {
@@ -976,9 +960,6 @@ function formatRequirements(requirements, manager, context = {}) {
     return requirements.map(req => formatRequirement(req, manager, context));
 }
 
-
-
-
 function evaluateCondition(condition, context) {
     if(!condition) return true; // No condition = always true
 
@@ -1145,9 +1126,6 @@ function describeLimitSuffix(limitType, times) {
             return `(${timesText} per ${limitType})`;
     }
 }
-
-
-
 
 function parseDescription(template, replacements) {
     if(!template) return '';
@@ -1351,7 +1329,7 @@ const effectDescriptionRegistry = new Map([
     ['upgrade_cost_percent', (effect, value) => `${value > 0 ? '+' : ''}${value}% Upgrade Cost`],
     ['equipment_stats_percent', (effect, value) => `+${value}% Equipment Stats`],
 
-    ['remove', () => ''],
+    ['remove', () => 'Remove aura'],
     ['remove_stacks', (effect, value, stacks, amount) => {
         const count = Math.max(1, Math.ceil(firstDefined(effect.count, amount, 1)));
         return `Remove ${count} stack${count !== 1 ? 's' : ''}`;
@@ -1404,6 +1382,7 @@ const effectDescriptionRegistry = new Map([
 
 function describeEffect(effect, manager, displayMode = false) {
     if(!effect) return '';
+    if (effect.describe === false) return '';
 
     if(effect.description) return effect.description;
 
@@ -1413,7 +1392,6 @@ function describeEffect(effect, manager, displayMode = false) {
         if (val === undefined || val === null) return 0;
         return Math.abs(val) < 1 && val !== 0 ? Math.round(val * 100) : val;
     };
-
 
     const getVal = (key) => {
         const raw = effect[key];
@@ -1587,9 +1565,10 @@ function formatTarget(target, party) {
     return target.replace(/_/g, ' ');
 }
 
-function joinEffectDescriptions(descriptions) {
-    if (descriptions.length === 0) return '';
-    if (descriptions.length === 1) return descriptions[0];
+function joinEffectDescriptions(descriptions) {
+    const filtered = descriptions.filter(d => d && d.trim());
+    if (filtered.length === 0) return '';
+    if (filtered.length === 1) return filtered[0];
 
     const lowercaseFirst = (str) => {
         if (!str) return str;
@@ -1605,7 +1584,7 @@ function joinEffectDescriptions(descriptions) {
     const groups = [];
     let currentGroup = null;
 
-    for (const desc of descriptions) {
+    for (const desc of filtered) {
         const firstWord = desc.split(' ')[0];
         const isActionWord = actionWords.includes(firstWord);
 
@@ -1649,7 +1628,9 @@ function joinEffectDescriptions(descriptions) {
     return `${parts.join(', ')}, and ${lastPart}`;
 }
 
-function describeEffectFull(effect, manager, options = {}) {
+function describeEffectFull(effect, manager, options = {}) {
+    if (effect.describe === false) return '';
+    
     const { includeTrigger = true, includeChance = true, displayMode = false } = options;
 
     let desc = describeEffect(effect, manager, displayMode);
@@ -1672,7 +1653,6 @@ function describeEffectFull(effect, manager, options = {}) {
         desc = `${desc} (${chance}% chance)`;
     }
 
-
     const typesWithBuiltInCondition = ['skip', 'miss', 'confuse', 'dodge'];
     if(effect.condition && !typesWithBuiltInCondition.includes(effect.type)) {
         const conditionDesc = describeCondition(effect.condition, manager);
@@ -1693,7 +1673,6 @@ function describeEffectFull(effect, manager, options = {}) {
         desc = `[Party] ${desc}`;
     }
 
-
     const trigger = effect.trigger || options.trigger;
     const descLower = desc.toLowerCase();
     const hasWhenClause = descLower.includes('when below') || descLower.includes('when above');
@@ -1711,9 +1690,9 @@ function formatTriggerSuffix(trigger) {
     if(!trigger || trigger === 'passive' || trigger === 'on_use') return '';
 
     const suffixes = {
-        'turn_start': 'each turn',
+        'turn_start': 'at the start of the turn',
         'turn_end': 'at the end of the turn',
-        'round_start': 'each round',
+        'round_start': 'at the start of the round',
         'round_end': 'at the end of the round',
 
         'before_damage_delivered': 'before dealing damage',
@@ -1768,18 +1747,10 @@ function formatTriggerSuffix(trigger) {
 }
 
 function describeEffects(effects, manager, options = {}) {
-    if (!effects || effects.length === 0) return '';
-
-    const { isAura = false } = options;
-
-    let mainEffects = effects;
-
-    if (isAura) {
-
-        const shouldDescribe = (e) => e.describe !== false;
-
-        mainEffects = effects.filter(e => shouldDescribe(e));
-    }
+    if (!effects || effects.length === 0) return '';
+    let mainEffects = effects.filter(e => e.describe !== false);
+    
+    if (mainEffects.length === 0) return '';
 
     const getTarget = (e) => e.target || options.target;
     const getParty = (e) => e.party || options.party;
@@ -1793,7 +1764,6 @@ function describeEffects(effects, manager, options = {}) {
         getTarget(e) === firstTarget && getParty(e) === firstParty
     );
     const allSameTrigger = mainEffects.every(e => getTrigger(e) === firstTrigger);
-
 
     const lowercaseFirst = (str) => {
         if (!str) return str;
@@ -1887,14 +1857,19 @@ function describeEffects(effects, manager, options = {}) {
 function describeEffectsInline(effects, manager, options = {}) {
     if (!effects || effects.length === 0) return '';
     const { separator = ', ' } = options;
-    return effects.map(e => describeEffect(e, manager)).join(separator);
+    return effects
+        .filter(e => e.describe !== false)
+        .map(e => describeEffect(e, manager))
+        .join(separator);
 }
 
 function getEffectDescriptionsList(effects, manager, options = {}) {
     if (!effects || effects.length === 0) return [];
     const { includeChance = true } = options;
 
-    return effects.map(effect => {
+    return effects
+        .filter(effect => effect.describe !== false)
+        .map(effect => {
 
         if (effect.description) return effect.description;
 
@@ -1941,9 +1916,6 @@ function buildHitEffectReplacements(hits, stats, displayMode = false) {
     return replacements;
 }
 
-
-
-
 class SimpleEffectInstance {
     constructor(amount, sourceName, stacks = 1) {
         this.amount = amount;
@@ -1969,36 +1941,28 @@ function getEffectAmount(effect, instance) {
     }
 
     return effect.amount || 0;
-}
-
-// XP defaults for utility effects
+}
 const UTILITY_EFFECT_XP = {
     skip: 3,
     miss: 2,
     confuse: 4,
     prevent_ability: 2,
     dodge: 2  // when granted by buff, not self-dodge
-};
-
-// Award XP to the source of an aura effect
+};
 function awardSourceXP(instance, amount, ctx) {
     if(!instance || !instance.source || !instance.source.isHero) return;
     if(amount <= 0) return;
     
     const source = instance.source;
     const difficultyXPBonus = ctx.manager.dungeon?.getBonus('xp_percent') / 100 || 0;
-    const equipmentXP = Math.floor(amount * (1 + difficultyXPBonus));
-    
-    // Award equipment XP
+    const equipmentXP = Math.floor(amount * (1 + difficultyXPBonus));
     if(source.equipment && source.equipment.slots) {
         source.equipment.slots.forEach((slot, type) => {
             if(!slot.empty && !slot.occupied && slot.item) {
                 slot.item.addXP(equipmentXP);
             }
         });
-    }
-    
-    // Award job XP (50% of equipment XP)
+    }
     if(source.combatJob && source.combatJob.isMilestoneReward) {
         source.combatJob.addXP(Math.floor(equipmentXP / 2));
     }
@@ -2094,9 +2058,7 @@ function createDefaultEffectProcessor() {
         } else if(target === 'target' && ctx.extra.target) {
             ctx.manager.log.add(`${ctx.extra.target.name} receives ${amount} ${effectLabel} from ${instance.base.name}`);
             ctx.extra.target.applyEffect(effect, builtEffect, ctx.character);
-        }
-        
-        // Award XP to source for direct damage/healing effects
+        }
         if(amount > 0 && instance.source) {
             awardSourceXP(instance, Math.floor(amount / 2), ctx);
         }
@@ -2130,9 +2092,7 @@ function createDefaultEffectProcessor() {
             }
             const characterName = (ctx.character && ctx.character.name) ? ctx.character.name : 'Effect';
             ctx.manager.log.add(`${characterName} heals for ${percentValue}%`);
-        }
-
-        // Award XP to source for healing effects
+        }
         if(totalHealing > 0 && instance.source) {
             awardSourceXP(instance, Math.floor(totalHealing / 2), ctx);
         }
@@ -2255,9 +2215,7 @@ function createDefaultEffectProcessor() {
 
     processor.register('damage_modifier_flat', (effect, instance, ctx) => {
         const amount = getEffectAmount(effect, instance);
-        ctx.extra.amount = (ctx.extra.amount || 0) + amount;
-        
-        // Track damage contribution for XP
+        ctx.extra.amount = (ctx.extra.amount || 0) + amount;
         if(amount > 0 && instance.source) {
             ctx.extra.damageContributions = ctx.extra.damageContributions || [];
             ctx.extra.damageContributions.push({ source: instance.source, amount });
@@ -2269,9 +2227,7 @@ function createDefaultEffectProcessor() {
     processor.register('damage_modifier_percent', (effect, instance, ctx) => {
         const amount = getEffectAmount(effect, instance);
         const increase = Math.ceil((ctx.extra.amount || 0) * (amount / 100));
-        ctx.extra.amount = (ctx.extra.amount || 0) + increase;
-        
-        // Track damage contribution for XP
+        ctx.extra.amount = (ctx.extra.amount || 0) + increase;
         if(increase > 0 && instance.source) {
             ctx.extra.damageContributions = ctx.extra.damageContributions || [];
             ctx.extra.damageContributions.push({ source: instance.source, amount: increase });
@@ -2306,9 +2262,7 @@ function createDefaultEffectProcessor() {
     processor.register('skip', (effect, instance, ctx) => {
         if (checkCondition(effect, instance)) {
             ctx.extra.skip = true;
-            ctx.manager.log.add(`${ctx.character.name} is overcome with ${instance.base.name}!`);
-            
-            // Award XP for utility effect
+            ctx.manager.log.add(`${ctx.character.name} is overcome with ${instance.base.name}!`);
             if(instance.source) {
                 awardSourceXP(instance, UTILITY_EFFECT_XP.skip, ctx);
             }
@@ -2320,9 +2274,7 @@ function createDefaultEffectProcessor() {
         if (checkCondition(effect, instance)) {
             ctx.extra.amount = 0;
             ctx.extra.dodged = true;
-            ctx.manager.log.add(`${ctx.character.name} dodges the attack!`);
-            
-            // Award XP for utility effect (only if from an aura buff, not self-dodge)
+            ctx.manager.log.add(`${ctx.character.name} dodges the attack!`);
             if(instance.source && instance.source !== ctx.character) {
                 awardSourceXP(instance, UTILITY_EFFECT_XP.dodge, ctx);
             }
@@ -2334,9 +2286,7 @@ function createDefaultEffectProcessor() {
         if (checkCondition(effect, instance)) {
             ctx.extra.amount = 0;
             ctx.extra.missed = true;
-            ctx.manager.log.add(`${ctx.character.name} misses due to ${instance.base.name}!`);
-            
-            // Award XP for utility effect
+            ctx.manager.log.add(`${ctx.character.name} misses due to ${instance.base.name}!`);
             if(instance.source) {
                 awardSourceXP(instance, UTILITY_EFFECT_XP.miss, ctx);
             }
@@ -2347,9 +2297,7 @@ function createDefaultEffectProcessor() {
     processor.register('confuse', (effect, instance, ctx) => {
         if (checkCondition(effect, instance)) {
             ctx.extra.hitAlly = true;
-            ctx.manager.log.add(`${ctx.character.name} is confused and attacks an ally!`);
-            
-            // Award XP for utility effect
+            ctx.manager.log.add(`${ctx.character.name} is confused and attacks an ally!`);
             if(instance.source) {
                 awardSourceXP(instance, UTILITY_EFFECT_XP.confuse, ctx);
             }
@@ -2369,9 +2317,7 @@ function createDefaultEffectProcessor() {
     });
 
     processor.register('prevent_ability', (effect, instance, ctx) => {
-        ctx.extra.prevented = true;
-        
-        // Award XP for utility effect
+        ctx.extra.prevented = true;
         if(instance.source) {
             awardSourceXP(instance, UTILITY_EFFECT_XP.prevent_ability, ctx);
         }
@@ -2586,16 +2532,10 @@ function createDefaultEffectProcessor() {
         return ctx.extra;
     });
 
-
-
-
     return processor;
 }
 
 const defaultEffectProcessor = createDefaultEffectProcessor();
-
-
-
 
 function addMasteryXPWithBonus(manager, action, baseXP, options = {}) {
     const { updateTooltip = true } = options;
@@ -2638,7 +2578,6 @@ function buildDescription(config) {
 
     else if (hits !== undefined && hits.length > 0) {
         const hitDescs = [];
-
 
         const isSelfTargetingEffect = (effectType, hitParty) => {
 
@@ -2693,7 +2632,6 @@ function buildDescription(config) {
             if (targetEffects.length > 0) {
                 let targetDesc = joinEffectDescriptions(targetEffects);
                 if (target === 'self') {
-
 
                     if (targetDesc.toLowerCase().includes('deal')) {
                         targetDesc = `${targetDesc} to self`;
@@ -2752,36 +2690,32 @@ function buildDescription(config) {
         }
     }
 
-    else if (effects !== undefined && effects.length > 0) {
-        const effectDescs = [];
-        for (let i = 0; i < effects.length; i++) {
-            const effect = effects[i];
-            const effectObj = {
-                type: effect.type,
-                trigger: effect.trigger !== undefined ? effect.trigger : 'passive',
-                amount: effect.getAmount !== undefined
-                    ? effect.getAmount(stats, displayMode)
-                    : (effect.amount !== undefined && effect.amount.base !== undefined
-                        ? effect.amount.base
-                        : (effect.amount !== undefined ? effect.amount : 0)),
-                stacks: effect.getStacks !== undefined
-                    ? effect.getStacks(stats, displayMode)
-                    : (effect.stacks !== undefined && effect.stacks.base !== undefined
-                        ? effect.stacks.base
-                        : (effect.stacks !== undefined ? effect.stacks : 0)),
-                id: effect.id,
-                stat: effect.stat,
-                target: effect.target,
-                party: effect.party,
-                condition: effect.condition,
-                chance: effect.chance,
-                random: effect.random,
-                count: effect.count,
-                threshold: effect.threshold
-            };
-            effectDescs.push(describeEffectFull(effectObj, manager, { displayMode, includeTrigger }));
-        }
-        desc = effectDescs.join('. ');
+    else if (effects !== undefined && effects.length > 0) {
+        const effectObjs = effects.map(effect => ({
+            type: effect.type,
+            trigger: effect.trigger !== undefined ? effect.trigger : 'passive',
+            amount: effect.getAmount !== undefined
+                ? effect.getAmount(stats, displayMode)
+                : (effect.amount !== undefined && effect.amount.base !== undefined
+                    ? effect.amount.base
+                    : (effect.amount !== undefined ? effect.amount : 0)),
+            stacks: effect.getStacks !== undefined
+                ? effect.getStacks(stats, displayMode)
+                : (effect.stacks !== undefined && effect.stacks.base !== undefined
+                    ? effect.stacks.base
+                    : (effect.stacks !== undefined ? effect.stacks : 0)),
+            id: effect.id,
+            stat: effect.stat,
+            target: effect.target,
+            party: effect.party,
+            condition: effect.condition,
+            chance: effect.chance,
+            random: effect.random,
+            count: effect.count,
+            threshold: effect.threshold,
+            describe: effect.describe
+        }));
+        desc = describeEffects(effectObjs, manager, { displayMode, includeTrigger });
         if (desc !== '') {
             desc = desc + '.';
         }
@@ -2852,9 +2786,6 @@ class AdventuringEquipmentRenderQueue extends AdventuringBadgeRenderQueue {
         this.equipped = true;
     }
 }
-
-
-
 
 function getFromRegistry(registry, id, context = 'object', warn = false) {
     if (!registry || !id) return undefined;

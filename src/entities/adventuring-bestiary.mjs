@@ -97,9 +97,7 @@ export class AdventuringBestiary extends AdventuringPage {
         const newKills = currentKills + 1;
         this.killCounts.set(monster, newKills);
 
-        monster.renderQueue.updateAll();
-
-        // Update icon tooltip for any active enemies with this base
+        monster.renderQueue.updateAll();
         if(this.manager.encounter && this.manager.encounter.party) {
             this.manager.encounter.party.all.forEach(enemy => {
                 if(enemy.base === monster) {

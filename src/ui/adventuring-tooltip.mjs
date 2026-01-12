@@ -130,9 +130,13 @@ export class TooltipBuilder {
     effects(effects, manager = null, addSeparator = true) {
         if(!effects || effects.length === 0) return this;
 
+        const filtered = effects.filter(e => e.describe !== false);
+        if(filtered.length === 0) return this;
+
         if(addSeparator) this.separator();
-        effects.forEach(e => {
+        filtered.forEach(e => {
             const description = describeEffectFull(e, manager);
+            if(!description) return;
 
             const isPenalty = e.value < 0 || (e.type !== undefined && (e.type.includes('enemy_') || e.type.includes('_cost')));
             if(isPenalty) {
@@ -150,7 +154,7 @@ export class TooltipBuilder {
         this.separator();
         this.subheader(`${difficulty.name} Mode`, difficulty.color);
 
-        const effects = difficulty.effects || [];
+        const effects = (difficulty.effects || []).filter(e => e.describe !== false);
         effects.forEach(e => {
             const description = describeEffectFull(e, manager);
 
@@ -382,9 +386,7 @@ export class TooltipBuilder {
 
         if(!isDropped) {
             return tooltip;
-        }
-
-        // Check if item is invalid for current job
+        }
         const isInvalidForJob = character && item.unlocked && item.upgradeLevel > 0 &&
             !item.jobs.includes(character.combatJob) && !item.jobs.includes(character.passiveJob);
 
@@ -405,7 +407,6 @@ export class TooltipBuilder {
             const stars = [...new Array(starCount).fill(solid), ...new Array(halfStarCount).fill(half), ...new Array(emptyStarCount).fill(empty)];
 
             tooltip.sections.push(`<div class="text-center">${stars.join('')}</div>`);
-
 
             if(item.upgradeLevel > 0) {
                 if(item.level < item.levelCap) {
@@ -431,7 +432,6 @@ export class TooltipBuilder {
             if(item.set) {
                 tooltip.separator();
                 tooltip.subheader(item.set.name, 'text-info');
-
 
                 let equippedCount = 0;
                 if(character) {

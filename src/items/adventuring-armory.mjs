@@ -120,9 +120,7 @@ export class AdventuringArmory extends AdventuringPage {
         if(this.activeCategory === 'recent') {
             categoryItems = this.manager.baseItems.filter(item =>
                 item.id !== 'adventuring:none' && this.isNew(item)
-            );
-
-            // Recently unlocked: render all items in a single flat list
+            );
             categoryItems.forEach(baseItem => {
                 baseItem.component.mount(this.component.items);
                 baseItem.renderQueue.tooltip = true;
@@ -403,7 +401,6 @@ export class AdventuringArmory extends AdventuringPage {
         return true;
     }
 
-
     prestigeArtifact(item) {
         if(!item.isArtifact) return false;
         if(!item.canPrestige) return false;
@@ -603,7 +600,6 @@ export class AdventuringArmory extends AdventuringPage {
             if(typeof key !== "string" && key.id !== "adventuring:none")
                 this.droppedItems.set(key, value);
         });
-
 
         try {
             reader.getComplexMap((reader) => {

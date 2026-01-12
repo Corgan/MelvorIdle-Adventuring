@@ -161,7 +161,6 @@ export class AdventuringHero extends AdventuringCharacter {
         if (!force && !this._statsDirty) return;
         this._statsDirty = false;
 
-        // Don't adjust hitpoints during combat, but always clamp to new max
         let shouldAdjust = !this.manager.isActive;
         let hitpointPct = this.hitpoints / this.maxHitpoints;
 
@@ -182,11 +181,10 @@ export class AdventuringHero extends AdventuringCharacter {
             this.equipment ? this.equipment.stats : null
         );
 
-
         if(shouldAdjust) {
             this.hitpoints = Math.min(this.maxHitpoints, Math.floor(this.maxHitpoints * hitpointPct));
         } else {
-            // Always clamp hitpoints to max even if not adjusting percentage
+
             this.hitpoints = Math.min(this.hitpoints, this.maxHitpoints);
         }
 
@@ -335,14 +333,12 @@ export class AdventuringHero extends AdventuringCharacter {
             return false;
         }
 
-
         const encounter = context.encounter;
 
         let builtEffect = {
             amount: effect.getAmount ? effect.getAmount(this) : (effect.amount || 0),
             stacks: effect.getStacks ? effect.getStacks(this) : (effect.stacks || 1)
         };
-
 
         const targetPartyType = effect.targetParty || 'ally';
         const targetParty = targetPartyType === 'enemy'
@@ -616,11 +612,23 @@ export class AdventuringHero extends AdventuringCharacter {
     }
 
     encode(writer) {
+        let mark = writer.byteOffset;
+        const log = (label) => {
+            if(this.manager.debugSaveSize) {
+                const now = writer.byteOffset;
+                console.log(`      hero.${label}: ${now - mark} bytes`);
+                mark = now;
+            }
+        };
+
         super.encode(writer);
+        log('super');
         writer.writeString(this.name);
         writer.writeNamespacedObject(this.combatJob);
         writer.writeNamespacedObject(this.passiveJob);
+        log('base');
         this.equipment.encode(writer);
+        log('equipment');
         return writer;
     }
 

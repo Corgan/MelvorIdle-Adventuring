@@ -26,7 +26,8 @@ export class AdventuringDungeonCell {
         this.game = game;
         this.floor = floor;
 
-        this.renderQueue = new AdventuringDungeonCellRenderQueue();
+        this.renderQueue = new AdventuringDungeonCellRenderQueue();
+
         this.explored = false;
         this.current = false;
 
@@ -93,10 +94,12 @@ export class AdventuringDungeonCell {
         this.renderQueue.type = false;
     }
 
-    get tooltip() {
+    get tooltip() {
+
         if(this.type === undefined || this.type === this.floor.wall) {
             return '';
-        }
+        }
+
         if(!this.explored && !this.type.alwaysShowIcon) {
             return TooltipBuilder.create()
                 .header('???')
@@ -104,7 +107,8 @@ export class AdventuringDungeonCell {
         }
 
         const tooltip = TooltipBuilder.create()
-            .header(this.type.name);
+            .header(this.type.name);
+
         if(this.type.id === 'adventuring:exit') {
             tooltip.separator();
             tooltip.text('Clear all enemies to advance to the next floor.', 'text-info');
@@ -120,22 +124,29 @@ export class AdventuringDungeonCell {
         } else if(this.type.id === 'adventuring:empty') {
             tooltip.separator();
             tooltip.text('Nothing of interest.', 'text-muted');
-        }
+        }
+
         if(this.type.effects && this.type.effects.length > 0) {
-            tooltip.separator();
-            this.type.effects.forEach(effect => {
-                const desc = describeEffect(effect, this.manager);
-                let colorClass = 'text-info';
-                if(effect.type === 'damage' || effect.type === 'damage_flat' || effect.type === 'damage_percent' || effect.type === 'debuff') {
-                    colorClass = 'text-danger';
-                } else if(effect.type === 'heal' || effect.type === 'heal_flat' || effect.type === 'heal_percent' || effect.type === 'energy') {
-                    colorClass = 'text-success';
-                } else if(effect.type === 'loot') {
-                    colorClass = 'text-warning';
-                }
-                tooltip.text(desc, colorClass);
-            });
-        }
+            const visibleEffects = this.type.effects.filter(e => e.describe !== false);
+            if(visibleEffects.length > 0) {
+                tooltip.separator();
+                visibleEffects.forEach(effect => {
+                    const desc = describeEffect(effect, this.manager);
+                    if(!desc) return;
+
+                    let colorClass = 'text-info';
+                    if(effect.type === 'damage' || effect.type === 'damage_flat' || effect.type === 'damage_percent' || effect.type === 'debuff') {
+                        colorClass = 'text-danger';
+                    } else if(effect.type === 'heal' || effect.type === 'heal_flat' || effect.type === 'heal_percent' || effect.type === 'energy') {
+                        colorClass = 'text-success';
+                    } else if(effect.type === 'loot') {
+                        colorClass = 'text-warning';
+                    }
+                    tooltip.text(desc, colorClass);
+                });
+            }
+        }
+
         if(this.type.requirements && this.type.requirements.length > 0) {
             tooltip.separator();
             this.type.requirements.forEach(req => {

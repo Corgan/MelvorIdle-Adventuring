@@ -1,7 +1,8 @@
 const { loadModule, getResourceUrl } = mod.getContext(import.meta);
 
 const { AdventuringCards } = await loadModule('src/progression/adventuring-cards.mjs');
-const { describeEffect } = await loadModule('src/core/adventuring-utils.mjs');
+const { describeEffect } = await loadModule('src/core/adventuring-utils.mjs');
+
 await loadModule('src/ui/components/adventuring-overview.mjs');
 await loadModule('src/ui/components/adventuring-overview-button.mjs');
 const { AdventuringEffectIconElement } = await loadModule('src/ui/components/adventuring-effect-icon.mjs');
@@ -101,7 +102,8 @@ export class AdventuringOverview {
 
     get activePage() {
         const current = this.manager.pages.current;
-        if(!current) return null;
+        if(!current) return null;
+
         for(const [id, page] of this.manager.pages.byId) {
             if(page === current) return id;
         }
@@ -204,14 +206,16 @@ export class AdventuringOverview {
 
     renderBuffs() {
         if(!this.renderQueue.buffs)
-            return;
+            return;
+
         while(this.component.effectsContainer.firstChild) {
             const child = this.component.effectsContainer.firstChild;
             if(child._tippy) child._tippy.destroy();
             this.component.effectsContainer.removeChild(child);
         }
 
-        const effects = [];
+        const effects = [];
+
         if(this.manager.isActive) {
             const difficulty = this.manager.dungeon.area !== undefined ? this.manager.dungeon.area.getDifficulty() : undefined;
             if(difficulty) {
@@ -222,7 +226,8 @@ export class AdventuringOverview {
                     colorClass: difficulty.color
                 });
             }
-        }
+        }
+
         const equipped = this.manager.consumables.equipped;
         equipped.forEach(({ consumable, tier }) => {
             if(consumable) {
@@ -232,7 +237,8 @@ export class AdventuringOverview {
                     tooltip: this.buildConsumableTooltip(consumable, tier)
                 });
             }
-        });
+        });
+
         const tavernDrinks = this.manager.tavern.getActiveDrinks();
         tavernDrinks.forEach(({ drink, tier, runsRemaining }) => {
             effects.push({
@@ -240,7 +246,8 @@ export class AdventuringOverview {
                 media: drink.getTierMedia(tier),
                 tooltip: this.buildTavernDrinkTooltip(drink, tier, runsRemaining)
             });
-        });
+        });
+
         this.manager.areas.allObjects.forEach(area => {
             if(area.masteryAuraUnlocked && area.masteryAura) {
                 const aura = area.masteryAura;
@@ -250,7 +257,8 @@ export class AdventuringOverview {
                     tooltip: this.buildAuraTooltip(aura, area)
                 });
             }
-        });
+        });
+
         effects.forEach(effect => {
             const icon = new AdventuringEffectIconElement();
             this.component.effectsContainer.appendChild(icon);
@@ -269,7 +277,8 @@ export class AdventuringOverview {
         if(description) {
             lines.push(`<hr class="my-1">`);
             lines.push(`<div class="text-info">${description}</div>`);
-        }
+        }
+
         lines.push(`<hr class="my-1">`);
         const charges = this.manager.consumables.getCharges(consumable, tier);
         lines.push(`<div class="text-muted">Charges: ${charges}</div>`);
@@ -280,15 +289,18 @@ export class AdventuringOverview {
     buildTavernDrinkTooltip(drink, tier, runsRemaining) {
         const lines = [];
         lines.push(`<div class="font-w700">${drink.getTierName(tier)}</div>`);
-        lines.push(`<div class="text-muted font-size-sm">Tavern Drink</div>`);
+        lines.push(`<div class="text-muted font-size-sm">Tavern Drink</div>`);
+
         const effects = drink.getTierEffects(tier);
-        if(effects && effects.length > 0) {
+        const visibleEffects = effects ? effects.filter(e => e.describe !== false) : [];
+        if(visibleEffects.length > 0) {
             lines.push(`<hr class="my-1">`);
-            effects.forEach(effect => {
+            visibleEffects.forEach(effect => {
                 const desc = describeEffect(effect, this.manager);
-                lines.push(`<div class="text-success">${desc}</div>`);
+                if(desc) lines.push(`<div class="text-success">${desc}</div>`);
             });
-        }
+        }
+
         lines.push(`<hr class="my-1">`);
         lines.push(`<div class="text-warning">${runsRemaining} run${runsRemaining !== 1 ? 's' : ''} remaining</div>`);
 

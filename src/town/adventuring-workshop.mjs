@@ -102,7 +102,6 @@ export class AdventuringWorkshop extends AdventuringPage {
             btn.classList.toggle('active', isActive);
         });
 
-
         if (this.selectedProduct && this.selectedProduct.hasTiers && this.selectedProduct.hasTier(tier)) {
             this.updateCostDisplay();
             this.updateRequirementsDisplay();
@@ -349,7 +348,6 @@ export class AdventuringWorkshop extends AdventuringPage {
 
         this.component.productList.replaceChildren();
 
-
         const filteredProducts = this.products.filter(product => {
             if(this.selectedOutputType === 'item' && product.outputType !== 'item') return false;
             if(this.selectedOutputType === 'material' && product.outputType !== 'material') return false;
@@ -422,8 +420,7 @@ export class AdventuringWorkshop extends AdventuringPage {
                 return product.getName(tier);
             }
             case 'item':
-            default: {
-                // For game items, create a simple tooltip with name and description
+            default: {
                 const tooltip = TooltipBuilder.create()
                     .header(output.name, output.media);
                 if(output.description) {
@@ -471,9 +468,7 @@ export class AdventuringWorkshop extends AdventuringPage {
                 this.itemComponents[componentCount] = component;
             }
 
-            component.mount(this.component.store);
-
-            // Use game's item description for bank items
+            component.mount(this.component.store);
             const tooltip = TooltipBuilder.create()
                 .header(item.name, item.media);
             if(item.description) {

@@ -46,6 +46,7 @@ class AdventuringAuraEffect extends AdventuringScalableEffect {
             this.condition = data.condition;
         if(data.chance !== undefined)
             this.chance = data.chance;
+        this.describe = data.describe !== undefined ? data.describe : true;
     }
 
     postDataRegistration() {
@@ -117,10 +118,6 @@ export class AdventuringAura extends NamespacedObject {
         this.flavorText = data.flavorText; // Optional flavor text
         this.effects = data.effects.map(effect => new AdventuringAuraEffect(this.manager, this.game, this, effect));
 
-
-
-
-
         this.combineMode = data.combineMode || (data.stackable ? 'stack' : 'separate');
 
         this.stackable = data.stackable === true; // Whether this aura can have multiple stacks
@@ -154,7 +151,6 @@ export class AdventuringAura extends NamespacedObject {
             }
             return desc;
         }
-
 
         const shouldDescribe = (e) => e.describe !== false;
 

@@ -51,8 +51,10 @@ export class AdventuringSlayerTaskType extends NamespacedObject {
         this._name = data.name;
         this.descriptionTemplate = data.descriptionTemplate;
         this.progressVerb = data.progressVerb;
-        this.targetType = data.targetType; // 'monster', 'material', 'area', 'monster_tag'
-        this.targetTag = (data.targetTag !== undefined) ? data.targetTag : null;
+        this.targetType = data.targetType; // 'monster', 'material', 'area', 'monster_tag'
+
+        this.targetTag = (data.targetTag !== undefined) ? data.targetTag : null;
+
         this.baseRequirements = data.baseRequirements;
         this.requirementVariance = data.requirementVariance;
         this.baseRewards = data.baseRewards;
@@ -76,14 +78,16 @@ export class AdventuringSlayerTaskType extends NamespacedObject {
         const idx = Math.min(tier - 1, 4);
 
         const materialType = manager.rewardTypes.getObjectByID('adventuring:material');
-        const slayerCoins = manager.cached.slayerCoins;
+        const slayerCoins = manager.cached.slayerCoins;
+
         const baseCurrency = this.baseRewards.currency[idx];
         const currencyVar = this.baseRewards.currencyVariance[idx];
         rewards.push({
             rewardType: materialType,
             item: slayerCoins,
             qty: baseCurrency + Math.floor(Math.random() * (currencyVar + 1))
-        });
+        });
+
         const jobXpType = manager.rewardTypes.getObjectByID('adventuring:job_xp');
         const unlockedJobs = manager.jobs.allObjects.filter(j => j.unlocked && j !== manager.cached.noneJob);
         if(unlockedJobs.length > 0) {
@@ -95,7 +99,8 @@ export class AdventuringSlayerTaskType extends NamespacedObject {
                 item: job,
                 qty: baseXP + Math.floor(Math.random() * (xpVar + 1))
             });
-        }
+        }
+
         const matChance = this.materialRewardChance[idx];
         if(Math.random() < matChance) {
             const materials = manager.materials.allObjects.filter(m => m.id !== 'adventuring:currency');
@@ -107,7 +112,8 @@ export class AdventuringSlayerTaskType extends NamespacedObject {
                     qty: Math.floor(tier * (1 + Math.random()))
                 });
             }
-        }
+        }
+
         const consumableChance = this.consumableRewardChance[idx];
         if(Math.random() < consumableChance) {
             const consumableType = manager.rewardTypes.getObjectByID('adventuring:consumable');
@@ -197,7 +203,8 @@ export class AdventuringSlayerTask {
     }
 
     claim() {
-        if(!this.completed) return false;
+        if(!this.completed) return false;
+
         this.rewards.forEach(reward => {
             if(!reward.rewardType) return;
 
@@ -220,16 +227,26 @@ export class AdventuringSlayerTask {
         return true;
     }
 
-    encode(writer) {
+    encode(writer) {
+
         writer.writeNamespacedObject(this.taskType);
-        writer.writeNamespacedObject(this.target);
+        const isTagTarget = this.target && this.target.isTagTarget;
+        writer.writeBoolean(isTagTarget);
+        if(isTagTarget) {
+            writer.writeString(this.target.tag);
+            writer.writeString(this.target.name);
+        } else {
+            writer.writeNamespacedObject(this.target);
+        }
 
         writer.writeUint16(this.required);
         writer.writeUint16(this.progress);
-        writer.writeUint8(this.tier);
+        writer.writeUint8(this.tier);
+
         writer.writeUint8(this.rewards.length);
         this.rewards.forEach(reward => {
-            writer.writeNamespacedObject(reward.rewardType);
+            writer.writeNamespacedObject(reward.rewardType);
+
             const hasItem = reward.rewardType && reward.rewardType.hasItemReference;
             writer.writeBoolean(hasItem);
             if(hasItem) {
@@ -245,22 +262,41 @@ export class AdventuringSlayerTask {
         if(typeof taskType !== 'string' && taskType !== undefined) {
             this.taskType = taskType;
         }
-        const registry = this.getTargetRegistry() || this.manager.monsters;
-        const target = reader.getNamespacedObject(registry);
-        if(typeof target !== 'string' && target !== undefined) {
-            this.target = target;
+        const isTagTarget = reader.getBoolean();
+        if(isTagTarget) {
+            const tag = reader.getString();
+            const name = reader.getString();
+            const seenMonsters = this.manager.monsters.allObjects.filter(m =>
+                this.manager.bestiary.seen.has(m) && m.tags && m.tags.includes(tag)
+            );
+            this.target = {
+                id: `tag:${tag}`,
+                name: name,
+                media: seenMonsters.length > 0 ? seenMonsters[0].media : cdnMedia('assets/media/main/question.png'),
+                isTagTarget: true,
+                tag: tag
+            };
+        } else {
+            const registry = this.getTargetRegistry() || this.manager.monsters;
+            const target = reader.getNamespacedObject(registry);
+            if(typeof target !== 'string' && target !== undefined) {
+                this.target = target;
+            }
         }
 
         this.required = reader.getUint16();
         this.progress = reader.getUint16();
-        this.tier = reader.getUint8();
+        this.tier = reader.getUint8();
+
         const numRewards = reader.getUint8();
         this.rewards = [];
         for(let i = 0; i < numRewards; i++) {
-            const rewardType = reader.getNamespacedObject(this.manager.rewardTypes);
+            const rewardType = reader.getNamespacedObject(this.manager.rewardTypes);
+
             let item = null;
             const hasItem = reader.getBoolean();
-            if(hasItem) {
+            if(hasItem) {
+
                 let itemRegistry = this.game.items;
                 if (typeof rewardType !== 'string' && rewardType && typeof rewardType.getRegistry === 'function') {
                     itemRegistry = rewardType.getRegistry();
@@ -299,6 +335,9 @@ export class SlayerTaskGenerator {
             case 'monster':
                 target = this.pickMonsterTarget();
                 break;
+            case 'monster_tag':
+                target = this.pickMonsterTagTarget(taskType.targetTag);
+                break;
             case 'material':
                 target = this.pickMaterialTarget();
                 break;
@@ -315,7 +354,8 @@ export class SlayerTaskGenerator {
         return new AdventuringSlayerTask(this.manager, this.game, taskType, target, required, tier, rewards);
     }
 
-    pickMonsterTarget() {
+    pickMonsterTarget() {
+
         const seenMonsters = this.manager.monsters.allObjects.filter(m =>
             this.manager.bestiary.seen.has(m)
         );
@@ -324,7 +364,23 @@ export class SlayerTaskGenerator {
         return seenMonsters[Math.floor(Math.random() * seenMonsters.length)];
     }
 
-    pickMaterialTarget() {
+    pickMonsterTagTarget(tag) {
+        const seenMonsters = this.manager.monsters.allObjects.filter(m =>
+            this.manager.bestiary.seen.has(m) && m.tags && m.tags.includes(tag)
+        );
+
+        if(seenMonsters.length === 0) return null;
+        return {
+            id: `tag:${tag}`,
+            name: tag.charAt(0).toUpperCase() + tag.slice(1) + 's',
+            media: seenMonsters[0].media, // Use first matching monster's icon
+            isTagTarget: true,
+            tag: tag
+        };
+    }
+
+    pickMaterialTarget() {
+
         const seenMaterials = this.manager.materials.allObjects.filter(m =>
             m.id !== 'adventuring:currency' && this.manager.stash.seenMaterials.has(m)
         );
@@ -339,13 +395,38 @@ export class SlayerTaskGenerator {
         return unlockedAreas[Math.floor(Math.random() * unlockedAreas.length)];
     }
 
+    canGenerateTaskType(taskType) {
+        switch(taskType.targetType) {
+            case 'monster':
+                return this.manager.monsters.allObjects.some(m => this.manager.bestiary.seen.has(m));
+            case 'monster_tag':
+                return this.manager.monsters.allObjects.some(m => 
+                    this.manager.bestiary.seen.has(m) && m.tags && m.tags.includes(taskType.targetTag)
+                );
+            case 'material':
+                return this.manager.materials.allObjects.some(m => 
+                    m.id !== 'adventuring:currency' && this.manager.stash.seenMaterials.has(m)
+                );
+            case 'area':
+                return this.manager.areas.allObjects.some(a => a.unlocked);
+            default:
+                return false;
+        }
+    }
+
     generateAvailableTasks(count = 3) {
         const tasks = [];
-        const taskTypes = [...this.manager.slayerTaskTypes.allObjects];
+        const allTaskTypes = [...this.manager.slayerTaskTypes.allObjects];
 
+        if(allTaskTypes.length === 0) return tasks;
+        const taskTypes = allTaskTypes.filter(tt => this.canGenerateTaskType(tt));
+        
         if(taskTypes.length === 0) return tasks;
         const killType = this.manager.slayerTaskTypes.getObjectByID('adventuring:kill');
-        if(killType) taskTypes.push(killType); // Add extra weight
+        if(killType && taskTypes.includes(killType)) {
+            taskTypes.push(killType);
+        }
+
         const skillLevel = this.manager.level;
         let maxTier = 1;
         if(skillLevel >= 80) maxTier = 5;
