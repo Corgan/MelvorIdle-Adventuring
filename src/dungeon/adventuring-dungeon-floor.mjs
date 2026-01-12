@@ -205,10 +205,13 @@ export class AdventuringDungeonFloor {
         return 0;
     }
 
-    chooseTile(x, y) {
+    chooseTile(x, y) {
+
         const area = this.dungeon.area;
-        const tileModifiers = area ? area.getTileModifiers() : {};
-        const hasMonsters = this.dungeon.currentFloor && this.dungeon.currentFloor.monsters && this.dungeon.currentFloor.monsters.length > 0;
+        const tileModifiers = area ? area.getTileModifiers() : {};
+
+        const hasMonsters = this.dungeon.currentFloor && this.dungeon.currentFloor.monsters && this.dungeon.currentFloor.monsters.length > 0;
+
         const areaEncounterFloorMax = area?.encounterFloorMax;
         const areaEncounterWeight = area?.encounterWeight;
 
@@ -216,16 +219,19 @@ export class AdventuringDungeonFloor {
             if(tile.weight === undefined)
                 return false;
             if(!tile.spawnable)
-                return false;
+                return false;
+
             if(!hasMonsters && tile === this.encounter)
                 return false;
             if(tile.dungeon_max !== undefined && tile.dungeon_max !== -1 && this.dungeon.tileCount.get(tile) >= tile.dungeon_max)
-                return false;
+                return false;
+
             const floorMax = (tile === this.encounter && areaEncounterFloorMax !== undefined)
                 ? areaEncounterFloorMax
                 : tile.floor_max;
             if(floorMax !== undefined && floorMax !== -1 && this.tileCount.get(tile) >= floorMax)
-                return false;
+                return false;
+
             if(tile.masteryUnlock) {
                 const modifier = tileModifiers[tile.id] || 0;
                 if(modifier <= 0) return false;
@@ -233,10 +239,12 @@ export class AdventuringDungeonFloor {
 
             return true;
         }).map(tile => {
-            let weight = tile.weight;
+            let weight = tile.weight;
+
             if(tile === this.encounter && areaEncounterWeight !== undefined) {
                 weight = areaEncounterWeight;
-            }
+            }
+
             const modifier = tileModifiers[tile.id];
             if(modifier !== undefined) {
                 weight = Math.floor(weight * modifier);
@@ -246,7 +254,8 @@ export class AdventuringDungeonFloor {
                 return { ...tile, weight };
             }
             return tile;
-        }).filter(tile => tile.weight > 0); // Remove tiles with 0 weight
+        }).filter(tile => tile.weight > 0); // Remove tiles with 0 weight
+
         if(toLoad.length === 0)
             return this.empty;
 
@@ -302,7 +311,8 @@ export class AdventuringDungeonFloor {
         return false;
     }
 
-    complete() {
+    complete() {
+
         this.manager.triggerEffects('floor_end', {});
 
         this.manager.dungeon.progress++;
@@ -311,6 +321,11 @@ export class AdventuringDungeonFloor {
         if(this.manager.dungeon.progress >= this.manager.dungeon.numFloors) {
             this.manager.dungeon.complete();
         } else {
+            if(this.manager.dungeon.area) {
+                const difficultyXPBonus = this.manager.dungeon.getBonus('xp_percent') / 100;
+                const floorXP = Math.floor(41 * (1 + difficultyXPBonus));
+                this.manager.dungeon.area.addXP(floorXP);
+            }
             this.manager.dungeon.next();
         }
     }
@@ -346,8 +361,9 @@ export class AdventuringDungeonFloor {
         }
 
         cells.forEach(cell => {
-            if(cell.render !== undefined)
-                cell.render();
+            if(cell.render !== undefined) {
+                cell.renderQueue.tooltip = true;
+            }
         });
 
         this.component.floor.replaceChildren(...cells.map(cell => {
@@ -355,6 +371,11 @@ export class AdventuringDungeonFloor {
                return cell.component;
             return cell;
         }));
+
+        cells.forEach(cell => {
+            if(cell.render !== undefined)
+                cell.render();
+        });
 
         this.renderQueue.cells = false;
     }
@@ -367,7 +388,8 @@ export class AdventuringDungeonFloor {
 
         writer.writeArray(this.tileMap, (tile, writer) => {
             writer.writeNamespacedObject(tile);
-        });
+        });
+
         let expectedSize = this.height * this.width;
         let grid = this.grid.slice(0, expectedSize);
         writer.writeArray(grid, (cell, writer) => {
@@ -393,7 +415,8 @@ export class AdventuringDungeonFloor {
             let cell = new AdventuringDungeonCell(this.manager, this.game, this);
             cell.decode(reader, version, tileMap);
             return cell;
-        });
+        });
+
         const expectedSize = this.height * this.width;
         while(this.grid.length < expectedSize) {
             let cell = new AdventuringDungeonCell(this.manager, this.game, this);

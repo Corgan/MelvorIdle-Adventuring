@@ -16,7 +16,9 @@ export class AdventuringDungeonCellElement extends AdventuringTooltipElement {
     }
 
     connectedCallback() {
-        this.appendChild(this._content);
+        if (this._content.childNodes.length > 0) {
+            this.appendChild(this._content);
+        }
         super.connectedCallback();
     }
 

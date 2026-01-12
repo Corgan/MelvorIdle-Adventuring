@@ -41,13 +41,15 @@ export class AdventuringEquipmentSlot {
 
         this.renderQueue = new AdventuringEquipmentSlotRenderQueue();
 
-        this.component = createElement('adventuring-equipment-slot');
+        this.component = createElement('adventuring-equipment-slot');
+
         this.selectorPopup = createTooltip(this.component.clickable, '', {
             interactive: true,
             trigger: 'click',
             placement: 'bottom',
             maxWidth: 320,
-            onShow: (instance) => {
+            onShow: (instance) => {
+
                 if(this.manager.isActive || this.occupied) return false;
                 instance.setContent(this.buildItemSelectorContent());
             }
@@ -79,8 +81,11 @@ export class AdventuringEquipmentSlot {
         if(!item.slots.includes(this.slotType))
             return false;
         if(!item.jobs.includes(this.equipment.character.combatJob) && !item.jobs.includes(this.equipment.character.passiveJob))
-            return false;
-        if(item.isArtifact) {
+            return false;
+
+
+        if(item.isArtifact) {
+
             for(const [slotType, slot] of this.equipment.slots) {
                 if(slot === this) continue; // Skip current slot
                 if(slot.occupied) continue; // Skip occupied slots
@@ -99,7 +104,9 @@ export class AdventuringEquipmentSlot {
                 if(!equipmentSlot.empty && !equipmentSlot.occupied && !item.pairs.includes(equipmentSlot.item.type))
                     return false;
             }
-        }
+        }
+
+
         if(swapSlot !== undefined && !swapSlot.canEquip(this.item))
             return false;
         return true;
@@ -108,11 +115,13 @@ export class AdventuringEquipmentSlot {
     buildItemSelectorContent() {
         const container = document.createElement('div');
         container.className = 'adventuring-item-selector';
-        const character = this.equipment.character;
+        const character = this.equipment.character;
+
         const header = document.createElement('div');
         header.className = 'text-center font-w600 text-warning border-bottom border-dark pb-1 mb-2';
         header.textContent = this.slotType.name;
-        container.appendChild(header);
+        container.appendChild(header);
+
         const equippableItems = this.getEquippableItems();
 
         if(equippableItems.length === 0) {
@@ -120,9 +129,11 @@ export class AdventuringEquipmentSlot {
             empty.setMessage('No items available', 'p-2 font-size-sm');
             container.appendChild(empty);
             return container;
-        }
+        }
+
         const grid = document.createElement('div');
-        grid.className = 'd-flex flex-wrap justify-content-center';
+        grid.className = 'd-flex flex-wrap justify-content-center';
+
         if(!this.empty) {
             const unequipBtn = new AdventuringIconButtonElement();
             unequipBtn.setIcon({
@@ -139,7 +150,8 @@ export class AdventuringEquipmentSlot {
             });
             unequipBtn.setCustomContent('<i class="fa fa-times text-danger"></i>');
             grid.appendChild(unequipBtn);
-        }
+        }
+
         equippableItems.forEach(item => {
             const isEquipped = this.item === item;
             const otherCharacterSlot = item.currentSlot && item.currentSlot.equipment.character !== character ? item.currentSlot : null;
@@ -162,7 +174,8 @@ export class AdventuringEquipmentSlot {
                     this.equipItem(item);
                     if(this.selectorPopup) this.selectorPopup.hide();
                 }
-            });
+            });
+
             if(otherCharacterSlot) {
                 iconBtn.container.onmouseenter = () => {
                     otherCharacterSlot.component.border.classList.add('border-warning');
@@ -184,7 +197,8 @@ export class AdventuringEquipmentSlot {
     getEquippableItems() {
         const character = this.equipment.character;
         const combatJob = character.combatJob;
-        const passiveJob = character.passiveJob;
+        const passiveJob = character.passiveJob;
+
         let hasEquippedArtifact = false;
         let equippedArtifact = null;
         for(const [slotType, slot] of this.equipment.slots) {
@@ -197,14 +211,22 @@ export class AdventuringEquipmentSlot {
             }
         }
 
-        return this.manager.baseItems.filter(item => {
-            if(item.id === 'adventuring:none') return false;
-            if(!item.unlocked || item.upgradeLevel === 0) return false;
-            if(!item.slots.includes(this.slotType)) return false;
-            if(!item.jobs.includes(combatJob) && !item.jobs.includes(passiveJob)) return false;
+        return this.manager.baseItems.filter(item => {
+
+            if(item.id === 'adventuring:none') return false;
+
+            if(!item.unlocked || item.upgradeLevel === 0) return false;
+
+            if(!item.slots.includes(this.slotType)) return false;
+
+            if(!item.jobs.includes(combatJob) && !item.jobs.includes(passiveJob)) return false;
+
+
+
             if(item.isArtifact && hasEquippedArtifact && item !== equippedArtifact) {
                 return false;
-            }
+            }
+
             if(item.pairs.length > 0 && this.slotType.pair !== undefined) {
                 let pairedSlot = this.slotType.pair;
                 let equipmentSlotType = this.manager.itemSlots.getObjectByID(pairedSlot);
@@ -218,24 +240,31 @@ export class AdventuringEquipmentSlot {
         });
     }
 
-    equipItem(item) {
+    equipItem(item) {
+
         const existingSlot = item.currentSlot;
         if(existingSlot && existingSlot.equipment.character !== this.equipment.character) {
             existingSlot.setEmpty();
             if (existingSlot.equipment.character.invalidateStats) existingSlot.equipment.character.invalidateStats();
             existingSlot.equipment.character.calculateStats();
-        }
+        }
+
         const displacedItems = item.occupies.map(slot => this.equipment.slots.get(slot))
             .filter(slot => !slot.empty && !slot.occupied)
-            .map(slot => ({ slot: slot.slotType, item: slot.item }));
+            .map(slot => ({ slot: slot.slotType, item: slot.item }));
+
         displacedItems.forEach(({ slot }) => {
             let equipmentSlot = this.equipment.slots.get(slot);
             equipmentSlot.setEmpty();
-        });
-        this.setEmpty();
-        this.setEquipped(item);
+        });
+
+        this.setEmpty();
+
+        this.setEquipped(item);
+
         if (this.equipment.character.invalidateStats) this.equipment.character.invalidateStats();
-        this.equipment.character.calculateStats();
+        this.equipment.character.calculateStats();
+
         this.manager.achievementManager.markDirty();
     }
 
@@ -265,7 +294,8 @@ export class AdventuringEquipmentSlot {
         });
         this.renderQueue.icon = true;
         this.renderQueue.valid = true;
-        this.renderQueue.upgrade = true;
+        this.renderQueue.upgrade = true;
+
         this.equipment.invalidateSetCache();
         if(this.equipment.character && this.equipment.character.effectCache) {
             this.equipment.character.invalidateEffects('equipment');
@@ -283,7 +313,8 @@ export class AdventuringEquipmentSlot {
         this.occupiedBy = this.manager.cached.noneItemSlot;
         this.renderQueue.icon = true;
         this.renderQueue.valid = true;
-        this.renderQueue.upgrade = true;
+        this.renderQueue.upgrade = true;
+
         this.equipment.invalidateSetCache();
         if(this.equipment.character && this.equipment.character.effectCache) {
             this.equipment.character.invalidateEffects('equipment');
@@ -393,6 +424,20 @@ export class AdventuringEquipmentSlot {
 
         this.component.upgrade.classList.toggle('d-none', this.empty || this.occupied || this.item.upgradeLevel === 0);
         this.component.upgrade.textContent = this.item !== undefined ? this.item.level : 0;
+
+        // Reset color classes
+        this.component.upgrade.classList.remove('text-danger', 'text-warning');
+
+        if(!this.empty && !this.occupied && this.item.upgradeLevel > 0) {
+            const character = this.equipment.character;
+            const isInvalid = !this.canEquip(this.item);
+
+            if(isInvalid) {
+                this.component.upgrade.classList.add('text-danger');
+            } else if(character && this.item.isLevelCapped(character)) {
+                this.component.upgrade.classList.add('text-warning');
+            }
+        }
 
         this.renderQueue.upgrade = false;
     }

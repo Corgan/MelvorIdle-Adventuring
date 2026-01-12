@@ -48,8 +48,10 @@ class AdventuringCharacter {
         this.highlight = false;
 
         this.auras = new AdventuringAuras(this.manager, this.game, this);
-        this.auras.component.mount(this.component.auras);
-        this.effectCache = new EffectCache();
+        this.auras.component.mount(this.component.auras);
+
+        this.effectCache = new EffectCache();
+
         this.effectLimitTracker = new EffectLimitTracker();
 
         this.stats = new AdventuringStats(this.manager, this.game);
@@ -74,12 +76,15 @@ class AdventuringCharacter {
             this.setSpender(undefined);
         this.renderQueue.spender = true;
 
-        this.auras.onLoad();
+        this.auras.onLoad();
+
         this.initEffectCache();
     }
 
-    initEffectCache() {
-        this.effectCache.registerSource('auras', () => this.auras.getEffects());
+    initEffectCache() {
+
+        this.effectCache.registerSource('auras', () => this.auras.getEffects());
+
     }
 
     get maxHitpoints() {
@@ -105,7 +110,10 @@ class AdventuringCharacter {
     get energyPercent() {
         let pct = (Math.max(0, Math.min(this.maxEnergy, this.energy)) / this.maxEnergy);
         return 100 * (!isNaN(pct) ? pct : 0);
-    }
+    }
+
+
+
 
     canEffectTrigger(effect, source) {
         return this.effectLimitTracker.canTrigger(effect, source);
@@ -117,10 +125,14 @@ class AdventuringCharacter {
 
     resetEffectLimits(limitType) {
         this.effectLimitTracker.reset(limitType);
-    }
+    }
+
+
+
 
     getAllPendingEffectsForTrigger(type, context) {
-        const pending = [];
+        const pending = [];
+
         if (this.auras) {
             const auraEffects = this.auras.getEffectsForTrigger(type, context);
             pending.push(...auraEffects);
@@ -130,34 +142,42 @@ class AdventuringCharacter {
     }
 
     processPendingEffect(pending, context) {
-        const { effect, source, sourceName, sourceType } = pending;
+        const { effect, source, sourceName, sourceType } = pending;
+
         if (effect.condition) {
             if (!evaluateCondition(effect.condition, context)) {
                 return false;
             }
-        }
+        }
+
         if (!this.canEffectTrigger(effect, source)) {
             return false;
-        }
+        }
+
         const chance = effect.chance || 100;
         if (Math.random() * 100 > chance) {
             return false;
-        }
+        }
+
         let amount = effect.amount || 0;
         if (sourceType === 'equipment' && effect.scaling && source.level > 0) {
             amount += Math.floor(source.level * effect.scaling);
-        }
+        }
+
         if (sourceType === 'aura') {
             this.processAuraEffect(effect, source, sourceName, context);
-        } else {
+        } else {
+
             this.processTriggeredEffect(effect, amount, context, sourceName);
-        }
+        }
+
         this.recordEffectTrigger(effect, source);
 
         return true;
     }
 
-    processAuraEffect(effect, instance, sourceName, context) {
+    processAuraEffect(effect, instance, sourceName, context) {
+
         const processorContext = {
             character: this,
             manager: this.manager,
@@ -168,11 +188,13 @@ class AdventuringCharacter {
     }
 
     get action() {
-        if(this.spender.cost !== undefined && this.energy >= this.spender.cost) {
+        if(this.spender.cost !== undefined && this.energy >= this.spender.cost) {
+
             let silenceCheck = this.trigger('before_spender_cast', {});
             if(!silenceCheck.prevented) {
                 return this.spender;
-            }
+            }
+
         }
         return this.generator;
     }
@@ -194,12 +216,16 @@ class AdventuringCharacter {
         this.renderQueue.energy = true;
     }
 
-    trigger(type, extra={}) {
-        const context = buildEffectContext(this, extra);
-        const pending = this.getAllPendingEffectsForTrigger(type, context);
+    trigger(type, extra={}) {
+
+        const context = buildEffectContext(this, extra);
+
+        const pending = this.getAllPendingEffectsForTrigger(type, context);
+
         for (const p of pending) {
             this.processPendingEffect(p, context);
-        }
+        }
+
         return context;
     }
 
@@ -220,7 +246,8 @@ class AdventuringCharacter {
         }
     }
 
-    processTriggeredEffect(effect, amount, extra, sourceName) {
+    processTriggeredEffect(effect, amount, extra, sourceName) {
+
         const context = {
             character: this,
             manager: this.manager,
@@ -238,14 +265,16 @@ class AdventuringCharacter {
 
     debuff(id, builtEffect, character) {
         if(this.dead)
-            return;
+            return;
+
         let immunityCheck = this.trigger('before_debuff_received', {});
         if(immunityCheck.prevented) {
             return; // Debuff blocked by immunity
         }
 
         this.auras.add(id, builtEffect, character);
-    }
+    }
+
     isUntargetable() {
         let result = this.trigger('targeting', { untargetable: false });
         return result.untargetable === true;
@@ -290,14 +319,17 @@ class AdventuringCharacter {
         this.hitpoints -= amount;
 
         if(isNaN(this.hitpoints))
-            this.hitpoints = 0;
+            this.hitpoints = 0;
+
         if(character && character.isHero && !this.isHero && this.manager.achievements) {
             const stats = this.manager.achievementManager.stats;
             if(stats) {
                 stats.totalDamage = (stats.totalDamage || 0) + amount;
             }
-        }
-        if(character && character.isHero && !this.isHero && amount > 0) {
+        }
+
+        if(character && character.isHero && !this.isHero && amount > 0) {
+
             const baseXP = Math.max(1, Math.floor(amount / 2));
             const difficultyXPBonus = this.manager.dungeon?.getBonus('xp_percent') / 100 || 0;
             const equipmentXP = Math.floor(baseXP * (1 + difficultyXPBonus));
@@ -309,9 +341,16 @@ class AdventuringCharacter {
                     }
                 });
             }
-        }
+
+            if(character.combatJob && character.combatJob.isMilestoneReward) {
+                character.combatJob.addXP(Math.floor(equipmentXP / 2));
+            }
+        }
+
+
         const isCharacterEnemy = character && !character.isHero;
-        if(this.isHero && isCharacterEnemy && amount > 0 && !this.dead) {
+        if(this.isHero && isCharacterEnemy && amount > 0 && !this.dead) {
+
             const baseXP = Math.max(1, Math.floor(amount / 2));
             const difficultyXPBonus = this.manager.dungeon?.getBonus('xp_percent') / 100 || 0;
             const equipmentXP = Math.floor(baseXP * (1 + difficultyXPBonus));
@@ -322,6 +361,10 @@ class AdventuringCharacter {
                         equipmentSlot.item.addXP(equipmentXP);
                     }
                 });
+            }
+
+            if(this.combatJob && this.combatJob.isMilestoneReward) {
+                this.combatJob.addXP(Math.floor(equipmentXP / 2));
             }
         }
 
@@ -336,9 +379,11 @@ class AdventuringCharacter {
         if(this.hitpoints <= 0) {
             this.hitpoints = 0;
             this.setEnergy(0);
-            if(!this.dead) {
+            if(!this.dead) {
+
                 let preventCheck = this.trigger('before_death', { prevented: false, preventDeathHealAmount: 0 });
-                if(preventCheck.prevented) {
+                if(preventCheck.prevented) {
+
                     const healPct = preventCheck.preventDeathHealAmount || 0;
                     if(healPct > 0) {
                         this.hitpoints = Math.max(1, Math.floor(this.maxHitpoints * (healPct / 100)));
@@ -354,7 +399,8 @@ class AdventuringCharacter {
 
                 this.onDeath();
 
-                let resolvedEffects = this.trigger('death');
+                let resolvedEffects = this.trigger('death');
+
                 if(this.manager && this.manager.party) {
                     let party;
                     if(this.isHero) {
@@ -371,7 +417,9 @@ class AdventuringCharacter {
                     });
                 }
             }
-        } else {
+        } else {
+
+
         }
         this.renderQueue.hitpoints = true;
     }
@@ -384,15 +432,19 @@ class AdventuringCharacter {
         this.hitpoints += amount;
 
         if(isNaN(this.hitpoints))
-            this.hitpoints = 0;
+            this.hitpoints = 0;
+
         if(this.isHero && this.manager.achievements && actualHeal > 0) {
             const stats = this.manager.achievementManager.stats;
             if(stats) {
                 stats.totalHealing = (stats.totalHealing || 0) + actualHeal;
             }
-        }
-        if(character && character.isHero && actualHeal > 0) {
-            const equipmentXP = Math.max(1, Math.floor(actualHeal / 5));
+        }
+
+
+        if(character && character.isHero && actualHeal > 0) {
+
+            const equipmentXP = Math.max(1, Math.floor(actualHeal / 2));
 
             if (character.equipment && character.equipment.slots) {
                 character.equipment.slots.forEach((equipmentSlot, slotType) => {
@@ -401,9 +453,16 @@ class AdventuringCharacter {
                     }
                 });
             }
-        }
-        if(this.isHero && character && character.isHero && actualHeal > 0) {
-            const equipmentXP = Math.max(1, Math.floor(actualHeal / 5));
+
+            if(character.combatJob && character.combatJob.isMilestoneReward) {
+                character.combatJob.addXP(Math.floor(equipmentXP / 2));
+            }
+        }
+
+
+        if(this.isHero && character && character.isHero && actualHeal > 0) {
+
+            const equipmentXP = Math.max(1, Math.floor(actualHeal / 2));
 
             if (this.equipment && this.equipment.slots) {
                 this.equipment.slots.forEach((equipmentSlot, slotType) => {
@@ -411,6 +470,10 @@ class AdventuringCharacter {
                         equipmentSlot.item.addXP(equipmentXP);
                     }
                 });
+            }
+
+            if(this.combatJob && this.combatJob.isMilestoneReward) {
+                this.combatJob.addXP(Math.floor(equipmentXP / 2));
             }
         }
 
@@ -432,7 +495,8 @@ class AdventuringCharacter {
         if(!this.dead)
             return;
 
-        this.dead = false;
+        this.dead = false;
+
         this.hitpoints = Math.floor(this.maxHitpoints * amount / 100);
 
         if(isNaN(this.hitpoints))
@@ -516,7 +580,8 @@ class AdventuringCharacter {
 
     renderHighlight() {
         if(!this.renderQueue.highlight)
-            return;
+            return;
+
 
         this.renderQueue.highlight = false;
     }

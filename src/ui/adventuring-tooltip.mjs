@@ -115,8 +115,8 @@ export class TooltipBuilder {
 
     modifierBonuses(manager, action, modifierTypes) {
         const bonuses = modifierTypes
-            .map(type => ({ type, value: manager.modifiers.getBonus(type, { action }) }))
-            .filter(b => b.value > 0);
+            .map(type => ({ type, amount: manager.modifiers.getBonus(type, { action }) }))
+            .filter(b => b.amount > 0);
 
         if(bonuses.length === 0) return this;
 
@@ -382,6 +382,15 @@ export class TooltipBuilder {
 
         if(!isDropped) {
             return tooltip;
+        }
+
+        // Check if item is invalid for current job
+        const isInvalidForJob = character && item.unlocked && item.upgradeLevel > 0 &&
+            !item.jobs.includes(character.combatJob) && !item.jobs.includes(character.passiveJob);
+
+        if(isInvalidForJob) {
+            tooltip.separator();
+            tooltip.text('<span class="text-danger"><i class="fas fa-exclamation-circle mr-1"></i>Invalid for current job - provides no stats</span>', 'small');
         }
 
         if(item.unlocked) {

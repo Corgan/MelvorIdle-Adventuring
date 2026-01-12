@@ -22,7 +22,8 @@ export class AdventuringBestiary extends AdventuringPage {
     }
 
     onShow() {
-        this.manager.party.setAllLocked(this.manager.isActive);
+        this.manager.party.setAllLocked(this.manager.isActive);
+
         this.markAllViewed();
     }
 
@@ -76,11 +77,14 @@ export class AdventuringBestiary extends AdventuringPage {
         const wasEmpty = this.seen.size === 0;
         this.seen.set(monster, true);
 
-        monster.renderQueue.updateAll();
-        if(wasNew) {
+        monster.renderQueue.updateAll();
+
+        if(wasNew) {
+
             if(wasEmpty) {
                 this.manager.tutorialManager.checkTriggers('event', { event: 'firstMonsterSeen' });
-            }
+            }
+
             this.manager.achievementManager.recordUniqueMonster();
         }
     }
@@ -93,10 +97,21 @@ export class AdventuringBestiary extends AdventuringPage {
         const newKills = currentKills + 1;
         this.killCounts.set(monster, newKills);
 
-        monster.renderQueue.updateAll();
+        monster.renderQueue.updateAll();
+
+        // Update icon tooltip for any active enemies with this base
+        if(this.manager.encounter && this.manager.encounter.party) {
+            this.manager.encounter.party.all.forEach(enemy => {
+                if(enemy.base === monster) {
+                    enemy.renderQueue.iconTooltip = true;
+                }
+            });
+        }
+
         if(this.manager.monsterdetails && this.manager.monsterdetails.monster === monster) {
             this.manager.monsterdetails.renderQueue.mastery = true;
-        }
+        }
+
         if(this.manager.achievementManager) {
             this.manager.achievementManager.recordKill(monster);
         }

@@ -2,7 +2,8 @@ const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringPage } = await loadModule('src/ui/adventuring-page.mjs');
 const { AdventuringStats } = await loadModule('src/core/adventuring-stats.mjs');
-const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
+const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
+
 await loadModule('src/items/adventuring-equipment.mjs');
 await loadModule('src/items/components/adventuring-armory.mjs');
 await loadModule('src/items/components/adventuring-material.mjs');
@@ -43,8 +44,10 @@ export class AdventuringArmory extends AdventuringPage {
         this.materialComponents = [];
 
         this.component.upgradeButton.onclick = () => this.upgradeSelected();
-        this.component.back.onclick = () => this.back();
+        this.component.back.onclick = () => this.back();
+
         this.categoryNames = {
+            recent: '★ Recently Unlocked',
             melee: 'Melee',
             ranged: 'Ranged',
             magic: 'Magic',
@@ -54,7 +57,9 @@ export class AdventuringArmory extends AdventuringPage {
             light: 'Light Armor',
             accessories: 'Accessories',
             artifacts: 'Artifacts'
-        };
+        };
+
+        this.component.optionRecent.onclick = () => this.setCategory('recent');
         this.component.optionMelee.onclick = () => this.setCategory('melee');
         this.component.optionRanged.onclick = () => this.setCategory('ranged');
         this.component.optionMagic.onclick = () => this.setCategory('magic');
@@ -66,25 +71,34 @@ export class AdventuringArmory extends AdventuringPage {
         this.component.optionArtifacts.onclick = () => this.setCategory('artifacts');
     }
 
-    getItemCategory(baseItem) {
+    getItemCategory(baseItem) {
+
         if(baseItem.isArtifact) return 'artifacts';
 
         if(!baseItem.type) return 'melee';
-        const typeId = baseItem.type.id;
+        const typeId = baseItem.type.id;
+
         const meleeTypes = ['adventuring:dagger', 'adventuring:sword1h', 'adventuring:sword2h', 'adventuring:axe', 'adventuring:scimitar'];
-        if(meleeTypes.includes(typeId)) return 'melee';
+        if(meleeTypes.includes(typeId)) return 'melee';
+
         const rangedTypes = ['adventuring:knives', 'adventuring:javelin', 'adventuring:crossbow', 'adventuring:shortbow', 'adventuring:longbow'];
-        if(rangedTypes.includes(typeId)) return 'ranged';
+        if(rangedTypes.includes(typeId)) return 'ranged';
+
         const magicTypes = ['adventuring:wand', 'adventuring:staff'];
-        if(magicTypes.includes(typeId)) return 'magic';
+        if(magicTypes.includes(typeId)) return 'magic';
+
         const offhandTypes = ['adventuring:quiver', 'adventuring:spellbook', 'adventuring:buckler', 'adventuring:shield'];
-        if(offhandTypes.includes(typeId)) return 'offhands';
+        if(offhandTypes.includes(typeId)) return 'offhands';
+
         const heavyTypes = ['adventuring:helm', 'adventuring:platebody', 'adventuring:platelegs', 'adventuring:gauntlets', 'adventuring:sabatons'];
-        if(heavyTypes.includes(typeId)) return 'heavy';
+        if(heavyTypes.includes(typeId)) return 'heavy';
+
         const mediumTypes = ['adventuring:cowl', 'adventuring:vest', 'adventuring:chaps', 'adventuring:vambraces', 'adventuring:boots'];
-        if(mediumTypes.includes(typeId)) return 'medium';
+        if(mediumTypes.includes(typeId)) return 'medium';
+
         const lightTypes = ['adventuring:hat', 'adventuring:robes', 'adventuring:bottoms', 'adventuring:mitts', 'adventuring:slippers'];
-        if(lightTypes.includes(typeId)) return 'light';
+        if(lightTypes.includes(typeId)) return 'light';
+
         const accessoryTypes = ['adventuring:amulet', 'adventuring:ring', 'adventuring:cape'];
         if(accessoryTypes.includes(typeId)) return 'accessories';
 
@@ -92,16 +106,34 @@ export class AdventuringArmory extends AdventuringPage {
     }
 
     setCategory(category) {
-        this.activeCategory = category;
-        this.component.categoryDropdownButton.textContent = this.categoryNames[category] || category;
+        this.activeCategory = category;
+
+        this.component.categoryDropdownButton.textContent = this.categoryNames[category] || category;
+
         this.renderCategoryItems();
     }
 
     renderCategoryItems() {
-        this.component.items.replaceChildren();
-        const categoryItems = this.manager.baseItems.filter(item =>
-            item.id !== 'adventuring:none' && this.getItemCategory(item) === this.activeCategory
-        );
+        this.component.items.replaceChildren();
+
+        let categoryItems;
+        if(this.activeCategory === 'recent') {
+            categoryItems = this.manager.baseItems.filter(item =>
+                item.id !== 'adventuring:none' && this.isNew(item)
+            );
+
+            // Recently unlocked: render all items in a single flat list
+            categoryItems.forEach(baseItem => {
+                baseItem.component.mount(this.component.items);
+                baseItem.renderQueue.tooltip = true;
+            });
+            return;
+        } else {
+            categoryItems = this.manager.baseItems.filter(item =>
+                item.id !== 'adventuring:none' && this.getItemCategory(item) === this.activeCategory
+            );
+        }
+
         const typeGroups = new Map();
         categoryItems.forEach(item => {
             const typeName = item.type ? item.type.name : 'Other';
@@ -109,12 +141,14 @@ export class AdventuringArmory extends AdventuringPage {
                 typeGroups.set(typeName, []);
             }
             typeGroups.get(typeName).push(item);
-        });
+        });
+
         typeGroups.forEach((items, typeName) => {
             if(items.length > 0) {
                 this.component.items.appendChild(createElement('div', { className: 'p-1 w-100 font-w600 text-warning', text: typeName }));
                 items.forEach(baseItem => {
-                    baseItem.component.mount(this.component.items);
+                    baseItem.component.mount(this.component.items);
+
                     baseItem.renderQueue.tooltip = true;
                 });
             }
@@ -137,8 +171,17 @@ export class AdventuringArmory extends AdventuringPage {
         this.manager.party.all.forEach(member => {
             member.setLocked(false);
             member.equipment.setLocked(false);
-        });
-        this.renderCategoryItems();
+        });
+
+        const newCount = this.getNewCount();
+        this.component.optionRecent.classList.toggle('d-none', newCount === 0);
+
+        if(newCount > 0) {
+            this.setCategory('recent');
+        } else {
+            this.renderCategoryItems();
+        }
+
         this.markAllViewed();
     }
 
@@ -165,13 +208,16 @@ export class AdventuringArmory extends AdventuringPage {
                     this.itemsBySlot.set(slot, existingItems);
                 }
             }
-        });
+        });
+
         this.renderCategoryItems();
     }
 
     checkUnlocked() {
-        this.upgradeLevels.forEach((level, baseItem) => {
-            if(this.unlocked.get(baseItem) === true) return;
+        this.upgradeLevels.forEach((level, baseItem) => {
+
+            if(this.unlocked.get(baseItem) === true) return;
+
             if(baseItem.requirementsMet) {
                 this.unlock(baseItem);
                 baseItem.renderQueue.updateAll();
@@ -180,7 +226,9 @@ export class AdventuringArmory extends AdventuringPage {
     }
 
     unlock(item) {
-        this.unlocked.set(item, true);
+        this.unlocked.set(item, true);
+        this.droppedItems.set(item, true); // Also mark as discovered
+
         if (this.upgradeLevels.get(item) < 1) {
             this.upgradeLevels.set(item, 1);
         }
@@ -194,12 +242,14 @@ export class AdventuringArmory extends AdventuringPage {
         this.droppedItems.set(item, true);
         item.renderQueue.updateAll();
 
-        if (notify) {
+        if (notify) {
+
             const itemRarity = rarity || item.rarity || 'common';
             const message = this.getDropMessage(item.name, itemRarity);
             const logType = this.getLogTypeForRarity(itemRarity);
             this.manager.log.add(message, logType);
-        }
+        }
+
         this.checkUnlocked();
     }
 
@@ -236,7 +286,8 @@ export class AdventuringArmory extends AdventuringPage {
         if(!item) {
             console.warn(`[Adventuring] Could not pre-craft item: ${itemId}`);
             return null;
-        }
+        }
+
         this.unlocked.set(item, true);
         this.upgradeLevels.set(item, 1);
         this.viewed.set(item, true); // Don't show as NEW
@@ -281,10 +332,12 @@ export class AdventuringArmory extends AdventuringPage {
     }
 
     upgrade(item) {
-        if(item.upgradeable) {
+        if(item.upgradeable) {
+
             for(let material of item.materials.keys()) {
                 this.manager.stash.remove(material, item.getCost(material));
-            }
+            }
+
             const tieredMats = item.getUpgradeTierMaterials();
             for (const material of tieredMats) {
                 const cost = item.getUpgradeTierCost(material);
@@ -302,7 +355,8 @@ export class AdventuringArmory extends AdventuringPage {
     canUpgradeToMasterful(item) {
         if (this.masterfulItems.get(item)) return false; // Already masterful
         if (this.upgradeLevels.get(item) < item.maxUpgrades) return false; // Not max upgrade
-        if (item.level < 99) return false; // Not max mastery level
+        if (item.level < 99) return false; // Not max mastery level
+
         const tokenCosts = this.getMasterfulTokenCost(item);
         for (const [tokenId, cost] of Object.entries(tokenCosts)) {
             const token = this.manager.materials.getObjectByID(tokenId);
@@ -314,7 +368,8 @@ export class AdventuringArmory extends AdventuringPage {
         return true;
     }
 
-    getMasterfulTokenCost(item) {
+    getMasterfulTokenCost(item) {
+
         const tier = item.tier || 1;
         const baseCost = Math.max(1, Math.floor(tier / 3));
 
@@ -326,14 +381,16 @@ export class AdventuringArmory extends AdventuringPage {
     }
 
     upgradeToMasterful(item) {
-        if (!this.canUpgradeToMasterful(item)) return false;
+        if (!this.canUpgradeToMasterful(item)) return false;
+
         const tokenCosts = this.getMasterfulTokenCost(item);
         for (const [tokenId, cost] of Object.entries(tokenCosts)) {
             const token = this.manager.materials.getObjectByID(tokenId);
             if (token) {
                 this.manager.stash.remove(token, cost);
             }
-        }
+        }
+
         this.masterfulItems.set(item, true);
         item.calculateStats();
         item.renderQueue.updateAll();
@@ -344,7 +401,8 @@ export class AdventuringArmory extends AdventuringPage {
 
         this.renderQueue.details = true;
         return true;
-    }
+    }
+
 
     prestigeArtifact(item) {
         if(!item.isArtifact) return false;
@@ -353,26 +411,33 @@ export class AdventuringArmory extends AdventuringPage {
         const currentTier = this.artifactTiers.get(item) || 0;
         const nextTier = currentTier + 1;
 
-        if(nextTier >= item.tiers.length) return false;
+        if(nextTier >= item.tiers.length) return false;
+
         const nextTierData = item.tiers[nextTier];
         if(nextTierData && nextTierData.materials) {
             for(const [material, cost] of nextTierData.materials) {
                 this.manager.stash.remove(material, cost);
             }
-        }
-        this.artifactTiers.set(item, nextTier);
-        this.manager.setMasteryXP(item, this.manager.getMasteryXPForLevel(1));
-        item.applyArtifactTier(nextTier);
+        }
+
+        this.artifactTiers.set(item, nextTier);
+
+        this.manager.setMasteryXP(item, this.manager.getMasteryXPForLevel(1));
+
+        item.applyArtifactTier(nextTier);
+
         item.renderQueue.updateAll();
         if(item.currentSlot !== undefined) {
-            item.currentSlot.renderQueue.updateAll();
+            item.currentSlot.renderQueue.updateAll();
+
             if(item.currentSlot.equipment.character) {
                 item.currentSlot.equipment.character.invalidateStats();
                 item.currentSlot.equipment.character.calculateStats();
             }
         }
 
-        this.renderQueue.details = true;
+        this.renderQueue.details = true;
+
         this.manager.log.add(`${item.name} has been unlocked!`, 'legendary');
 
         return true;
@@ -461,7 +526,8 @@ export class AdventuringArmory extends AdventuringPage {
                 component.setTooltipContent(TooltipBuilder.forMaterial(material, this.manager).build());
 
                 component.icon.src = material.media;
-                component.count.textContent = cost;
+                component.count.textContent = cost;
+
                 if(owned >= cost) {
                     component.border.classList.remove('border-danger');
                     component.border.classList.add('border-success');
@@ -496,7 +562,8 @@ export class AdventuringArmory extends AdventuringPage {
         writer.writeComplexMap(this.droppedItems, (key, value, writer) => {
             writer.writeNamespacedObject(key);
             writer.writeBoolean(value);
-        });
+        });
+
         writer.writeComplexMap(this.artifactTiers, (key, value, writer) => {
             writer.writeNamespacedObject(key);
             writer.writeUint8(value);
@@ -535,17 +602,21 @@ export class AdventuringArmory extends AdventuringPage {
             let value = reader.getBoolean();
             if(typeof key !== "string" && key.id !== "adventuring:none")
                 this.droppedItems.set(key, value);
-        });
+        });
+
+
         try {
             reader.getComplexMap((reader) => {
                 let key = reader.getNamespacedObject(this.manager.baseItems);
                 let value = reader.getUint8();
                 if(typeof key !== "string" && key.id !== "adventuring:none" && key.isArtifact) {
-                    this.artifactTiers.set(key, value);
+                    this.artifactTiers.set(key, value);
+
                     key.applyArtifactTier(value);
                 }
             });
-        } catch(e) {
+        } catch(e) {
+
             console.log('[Adventuring] No artifact tier data in save, using defaults');
         }
     }

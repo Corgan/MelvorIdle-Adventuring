@@ -1,10 +1,11 @@
 
 
 export function createTooltip(target, content = '', options = {}) {
+    const isTriggerClick = options.trigger === 'click';
     return tippy(target, {
         content,
         allowHTML: true,
-        hideOnClick: false,
+        hideOnClick: isTriggerClick ? true : false,
         ...options
     });
 }
@@ -19,7 +20,8 @@ export class AdventuringTooltipElement extends HTMLElement {
 
     connectedCallback() {
         if (this._tooltipTarget) {
-            this.tooltip = createTooltip(this._tooltipTarget, '', this._tooltipOptions);
+            this.tooltip = createTooltip(this._tooltipTarget, '', this._tooltipOptions);
+
             if (this._pendingTooltipContent !== null) {
                 this.tooltip.setContent(this._pendingTooltipContent);
                 this._pendingTooltipContent = null;
@@ -37,7 +39,8 @@ export class AdventuringTooltipElement extends HTMLElement {
     setTooltipContent(content) {
         if (this.tooltip) {
             this.tooltip.setContent(content);
-        } else {
+        } else {
+
             this._pendingTooltipContent = content;
         }
     }

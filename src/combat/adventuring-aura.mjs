@@ -22,7 +22,8 @@ class AdventuringAuraRenderQueue {
 }
 
 class AdventuringAuraEffect extends AdventuringScalableEffect {
-    constructor(manager, game, aura, data) {
+    constructor(manager, game, aura, data) {
+
         const normalizedData = { ...data };
         if (data.amount !== undefined && typeof data.amount === 'number') {
             normalizedData.amount = { base: data.amount };
@@ -57,25 +58,33 @@ class AdventuringAuraEffect extends AdventuringScalableEffect {
         const scaleFrom = this.scaleFrom || 'source';
 
         switch (scaleFrom) {
-            case 'source':
+            case 'source':
+
                 return instance.source;
-            case 'target':
+            case 'target':
+
                 return instance.auras && instance.auras.character ? instance.auras.character : undefined;
-            case 'snapshot':
+            case 'snapshot':
+
                 return instance.snapshotStats;
             default:
                 return instance.source;
         }
     }
 
-    getAmount(instance, displayMode) {
-        const statsSource = this._resolveStatsSource(instance);
-        let amount = super.getAmount(statsSource, displayMode);
-        if (!displayMode) {
+    getAmount(instance, displayMode) {
+
+        const statsSource = this._resolveStatsSource(instance);
+
+        let amount = super.getAmount(statsSource, displayMode);
+
+        if (!displayMode) {
+
             if (this.perStack && instance) {
                 const stackCount = this.getStacks(instance);
                 amount = Math.ceil(amount * stackCount);
-            }
+            }
+
             if (this.modifier) {
                 amount = Math.ceil(amount * this.modifier);
             }
@@ -87,7 +96,8 @@ class AdventuringAuraEffect extends AdventuringScalableEffect {
     getStacks(instance, displayMode) {
         if (!instance) return 0;
 
-        let stacks = instance.stacks || 0;
+        let stacks = instance.stacks || 0;
+
         if (this.count) {
             stacks = Math.ceil(stacks * this.count);
         }
@@ -105,7 +115,12 @@ export class AdventuringAura extends NamespacedObject {
         this.name = data.name;
         this._descriptionTemplate = data.description; // Template with placeholders
         this.flavorText = data.flavorText; // Optional flavor text
-        this.effects = data.effects.map(effect => new AdventuringAuraEffect(this.manager, this.game, this, effect));
+        this.effects = data.effects.map(effect => new AdventuringAuraEffect(this.manager, this.game, this, effect));
+
+
+
+
+
         this.combineMode = data.combineMode || (data.stackable ? 'stack' : 'separate');
 
         this.stackable = data.stackable === true; // Whether this aura can have multiple stacks
@@ -129,7 +144,8 @@ export class AdventuringAura extends NamespacedObject {
         this.effects.forEach(effect => effect.postDataRegistration());
     }
 
-    getDescription(instance) {
+    getDescription(instance) {
+
         if(this._descriptionTemplate) {
             const replacements = buildEffectReplacements(this.effects, instance, true);
             let desc = parseDescription(this._descriptionTemplate, replacements);
@@ -137,15 +153,13 @@ export class AdventuringAura extends NamespacedObject {
                 desc = `${desc}\n\n${this.flavorText}`;
             }
             return desc;
-        }
-        const isStandardCleanup = (e) => {
-            if (e.type !== 'remove') return false;
-            if (e.trigger !== 'encounter_end' && e.trigger !== 'death') return false;
-            const keys = Object.keys(e).filter(k => k !== 'trigger' && k !== 'type');
-            return keys.length === 0;
-        };
+        }
 
-        const mainEffects = this.effects.filter(e => !isStandardCleanup(e));
+
+        const shouldDescribe = (e) => e.describe !== false;
+
+        const mainEffects = this.effects.filter(e => shouldDescribe(e));
+
         const effectDescs = mainEffects.map(effect => {
             const effectObj = {
                 type: effect.type,

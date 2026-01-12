@@ -1,4 +1,7 @@
-const { loadModule } = mod.getContext(import.meta);
+const { loadModule } = mod.getContext(import.meta);
+
+const { createTooltip } = await loadModule('src/core/adventuring-tooltip-element.mjs');
+
 await loadModule('src/combat/components/adventuring-abilities.mjs');
 await loadModule('src/combat/components/adventuring-ability-small.mjs');
 await loadModule('src/progression/components/adventuring-jobs.mjs');
@@ -25,7 +28,8 @@ export class AdventuringCharacterElement extends HTMLElement {
         this.energyProgress = getElementFromFragment(this._content, 'energy-progress', 'progress-bar');
 
         this.auras = getElementFromFragment(this._content, 'auras', 'div');
-        this.stats = getElementFromFragment(this._content, 'stats', 'div');
+        this.stats = getElementFromFragment(this._content, 'stats', 'div');
+
         this.passiveAbilitiesContainer = getElementFromFragment(this._content, 'passive-abilities', 'div');
         this.passiveAbilitiesList = getElementFromFragment(this._content, 'passive-abilities-list', 'div');
 
@@ -52,9 +56,12 @@ export class AdventuringCharacterElement extends HTMLElement {
         this.appendChild(this._content);
         this.splash = new SplashManager(this.hitpointsSplash);
 
+        this.iconTooltip = createTooltip(this.icon, '', { placement: 'top' });
+
         this.abilitiesContainer.appendChild(this.abilities);
         this.abilities.container.appendChild(this.generator);
-        this.abilities.container.appendChild(this.spender);
+        this.abilities.container.appendChild(this.spender);
+
         this.abilitiesContainer.appendChild(this.passiveAbilitiesContainer);
 
         this.jobsContainer.appendChild(this.jobs);
@@ -87,6 +94,12 @@ export class AdventuringCharacterElement extends HTMLElement {
     setCharacter(character) {
         this.generator.setCharacter(character);
         this.spender.setCharacter(character);
+    }
+
+    setIconTooltipContent(content) {
+        if(this.iconTooltip) {
+            this.iconTooltip.setContent(content);
+        }
     }
 }
 window.customElements.define('adventuring-character', AdventuringCharacterElement);

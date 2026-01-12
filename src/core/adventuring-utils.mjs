@@ -1,4 +1,7 @@
-const { loadModule } = mod.getContext(import.meta);
+const { loadModule } = mod.getContext(import.meta);
+
+
+
 
 class StatCalculator {
 
@@ -26,11 +29,14 @@ class StatCalculator {
     }
 
     static calculateWithScaling(target, base, scaling, level, bonusPercent = 0) {
-        target.reset();
-        base.forEach((value, stat) => target.set(stat, value));
+        target.reset();
+
+        base.forEach((value, stat) => target.set(stat, value));
+
         scaling.forEach((value, stat) => {
             target.set(stat, (target.get(stat) || 0) + Math.floor(level * value));
-        });
+        });
+
         if (bonusPercent > 0) {
             target.forEach((value, stat) => {
                 const bonus = Math.floor(value * bonusPercent / 100);
@@ -46,7 +52,10 @@ class StatCalculator {
             target.set(stat, Math.floor(value * multiplier));
         });
     }
-}
+}
+
+
+
 
 class EffectLimitTracker {
     constructor() {
@@ -114,7 +123,11 @@ class EffectLimitTracker {
         this.counts.round.clear();
         this.counts.turn.clear();
     }
-}
+}
+
+
+
+
 const BASE_CRIT_MULTIPLIER = 1.5;
 
 class PassiveEffectProcessor {
@@ -123,43 +136,61 @@ class PassiveEffectProcessor {
         this.manager = encounter.manager;
     }
 
-    processDamage(attacker, target, baseAmount, context = {}) {
+    processDamage(attacker, target, baseAmount, context = {}) {
+
         if (target.dead || baseAmount <= 0) {
             return { amount: 0, isCrit: false, negated: target.dead ? 'dead' : 'zero' };
         }
 
-        let amount = baseAmount;
+        let amount = baseAmount;
+        let damageContributions = [];
+
         const missCheck = attacker.trigger('before_damage_delivered', { target, amount, ...context });
         if (missCheck.missed) {
             return { negated: 'miss', amount: 0 };
         }
-        amount = (missCheck.amount !== undefined && missCheck.amount !== null) ? missCheck.amount : amount;
+        amount = (missCheck.amount !== undefined && missCheck.amount !== null) ? missCheck.amount : amount;
+        if (missCheck.damageContributions) {
+            damageContributions = damageContributions.concat(missCheck.damageContributions);
+        }
+
         const dodgeCheck = target.trigger('before_damage_received', { attacker, amount, ...context });
         if (dodgeCheck.dodged) {
             target.trigger('dodge', { attacker, ...context });
             return { negated: 'dodge', amount: 0 };
         }
-        amount = (dodgeCheck.amount !== undefined && dodgeCheck.amount !== null) ? dodgeCheck.amount : amount;
+        amount = (dodgeCheck.amount !== undefined && dodgeCheck.amount !== null) ? dodgeCheck.amount : amount;
+        if (dodgeCheck.damageContributions) {
+            damageContributions = damageContributions.concat(dodgeCheck.damageContributions);
+        }
+
         const dodgeChance = target.getConditionalBonus('dodge', { target: attacker });
         if (dodgeChance > 0 && Math.random() * 100 < dodgeChance) {
             target.trigger('dodge', { attacker, ...context });
             return { negated: 'dodge', amount: 0 };
-        }
-        amount = this._applyPercentBonus(amount, attacker, 'damage_bonus');
-        amount = this._applyPercentReduction(amount, target, 'damage_reduction');
+        }
+
+        amount = this._applyPercentBonus(amount, attacker, 'damage_bonus');
+
+        amount = this._applyPercentReduction(amount, target, 'damage_reduction');
+
         const critResult = this._processCritical(amount, attacker);
 
         return {
             amount: critResult.amount,
             isCrit: critResult.isCrit,
-            negated: false
+            negated: false,
+            damageContributions
         };
     }
 
     processHealing(caster, target, baseAmount, context = {}) {
-        let amount = baseAmount;
-        amount = this._applyPercentBonus(amount, caster, 'healing_bonus');
-        amount = this._applyPercentBonus(amount, target, 'healing_received');
+        let amount = baseAmount;
+
+        amount = this._applyPercentBonus(amount, caster, 'healing_bonus');
+
+        amount = this._applyPercentBonus(amount, target, 'healing_received');
+
         const deliverResult = caster.trigger('before_heal_delivered', { target, amount, ...context });
         amount = (deliverResult.amount !== undefined && deliverResult.amount !== null) ? deliverResult.amount : amount;
 
@@ -202,7 +233,8 @@ class PassiveEffectProcessor {
             return Math.ceil(damageDealt * (reflectPercent / 100));
         }
         return 0;
-    }
+    }
+
 
     _processCritical(amount, attacker) {
         const critChance = attacker.getPassiveBonus('crit_chance');
@@ -231,7 +263,10 @@ class PassiveEffectProcessor {
         }
         return amount;
     }
-}
+}
+
+
+
 
 function randomElement(array) {
     if(!array || array.length === 0) return undefined;
@@ -268,14 +303,16 @@ function resolveTargets(targetType, party, exclude = null) {
         case "none":
             return [];
 
-        case "front": {
+        case "front": {
+
             if(!party.front.dead && party.front !== exclude) return [party.front];
             if(!party.center.dead && party.center !== exclude) return [party.center];
             if(!party.back.dead && party.back !== exclude) return [party.back];
             return [];
         }
 
-        case "back": {
+        case "back": {
+
             if(!party.back.dead && party.back !== exclude) return [party.back];
             if(!party.center.dead && party.center !== exclude) return [party.center];
             if(!party.front.dead && party.front !== exclude) return [party.front];
@@ -351,7 +388,8 @@ class AdventuringWeightedTable {
             itemWeight += weight;
             return dropRoll < itemWeight;
         });
-        const drop = this.table[lootIndex];
+        const drop = this.table[lootIndex];
+
         if (drop && drop.qty === undefined && drop.minQty !== undefined && drop.maxQty !== undefined) {
             drop.qty = drop.minQty + Math.floor(Math.random() * (drop.maxQty - drop.minQty + 1));
         }
@@ -361,8 +399,10 @@ class AdventuringWeightedTable {
 }
 
 function createEffect(effectData, source, sourceName) {
-    return {
-        ...effectData,
+    return {
+
+        ...effectData,
+
         trigger: effectData.trigger || 'passive',
         type: effectData.type,
         stat: effectData.stat || effectData.id,  // stat effects use 'stat', auras use 'id'
@@ -385,7 +425,8 @@ function getPooledContext() {
 }
 
 function releaseContext(ctx) {
-    if (!ctx || contextPool.length >= MAX_POOL_SIZE) return;
+    if (!ctx || contextPool.length >= MAX_POOL_SIZE) return;
+
     for (const key in ctx) {
         if (Object.prototype.hasOwnProperty.call(ctx, key)) {
             ctx[key] = undefined;
@@ -394,7 +435,8 @@ function releaseContext(ctx) {
     contextPool.push(ctx);
 }
 
-function buildEffectContext(character, extra = {}, pooledCtx = null) {
+function buildEffectContext(character, extra = {}, pooledCtx = null) {
+
     let manager = null;
     if (character && character.manager) {
         manager = character.manager;
@@ -409,7 +451,8 @@ function buildEffectContext(character, extra = {}, pooledCtx = null) {
         } else if (manager.party.all) {
             partyMembers = manager.party.all;
         }
-    }
+    }
+
     const ctx = pooledCtx || {};
 
     ctx.character = character;
@@ -419,7 +462,8 @@ function buildEffectContext(character, extra = {}, pooledCtx = null) {
     ctx.manager = manager;
     ctx.hpPercentBefore = extra.hpPercentBefore;
     ctx.damageDealt = extra.damageDealt;
-    ctx.damageReceived = extra.damageReceived;
+    ctx.damageReceived = extra.damageReceived;
+
     for (const key in extra) {
         if (Object.prototype.hasOwnProperty.call(extra, key) && ctx[key] === undefined) {
             ctx[key] = extra[key];
@@ -522,17 +566,20 @@ class EffectCache {
 
         if(trigger === null) {
             return this.allEffectsCache || [];
-        }
+        }
+
         if(this.cachedByTrigger.has(trigger)) {
             return this.cachedByTrigger.get(trigger);
-        }
+        }
+
         const filtered = (this.allEffectsCache || []).filter(e => e.trigger === trigger);
         this.cachedByTrigger.set(trigger, filtered);
         return filtered;
     }
 
     getBonus(effectType, filter = {}) {
-        this.rebuild();
+        this.rebuild();
+
         const filterKey = Object.keys(filter).length > 0
             ? ':' + Object.entries(filter).sort().map(([k,v]) => `${k}=${v}`).join(',')
             : '';
@@ -545,7 +592,8 @@ class EffectCache {
         const passiveEffects = this.getEffects('passive');
         const total = passiveEffects
             .filter(e => {
-                if(e.type !== effectType) return false;
+                if(e.type !== effectType) return false;
+
                 for(const [key, value] of Object.entries(filter)) {
                     if(e[key] !== value) return false;
                 }
@@ -600,7 +648,8 @@ class EffectCache {
         const passiveEffects = this.getEffects('passive');
         return passiveEffects
             .filter(e => {
-                if (e.type !== effectType) return false;
+                if (e.type !== effectType) return false;
+
                 if (e.condition) {
                     return evaluateCondition(e.condition, context);
                 }
@@ -611,7 +660,10 @@ class EffectCache {
                 return sum + val;
             }, 0);
     }
-}
+}
+
+
+
 
 class RequirementsChecker {
 
@@ -625,7 +677,8 @@ class RequirementsChecker {
         return this.requirements.every(req => this.checkSingle(req, context));
     }
 
-    checkSingle(req, context = {}) {
+    checkSingle(req, context = {}) {
+
         if(!req || !req.type) {
             console.warn(`Malformed requirement:`, req);
             return true;
@@ -637,7 +690,8 @@ class RequirementsChecker {
             case 'skill_level':
                 return this.manager.level >= req.level;
 
-            case 'melvor_skill_level': {
+            case 'melvor_skill_level': {
+
                 const skill = this.manager.game.skills.getObjectByID(req.skill);
                 if (!skill) {
                     console.warn(`[Adventuring] Unknown Melvor skill: ${req.skill}`);
@@ -676,13 +730,15 @@ class RequirementsChecker {
                 return item ? item.upgradeLevel >= req.level : false;
             }
 
-            case 'achievement_completion': {
+            case 'achievement_completion': {
+
                 if (this.manager.achievements === undefined) return false;
                 const achievement = this.manager.achievements.getObjectByID(req.id);
                 return achievement ? achievement.isComplete : false;
             }
 
-            case 'area_cleared': {
+            case 'area_cleared': {
+
                 const area = this.manager.areas.getObjectByID(req.area);
                 if (!area) return false;
                 let xp = 0;
@@ -695,10 +751,12 @@ class RequirementsChecker {
                 return xp > 0;
             }
 
-            case 'dropped':
+            case 'dropped':
+
                 return context.item && context.item.dropped === true;
 
-            case 'always_false':
+            case 'always_false':
+
                 return false;
 
             default:
@@ -714,11 +772,13 @@ class RequirementsChecker {
     }
 
     _checkCurrentJobLevel(jobId, level, character) {
-        if(!character) return this._checkJobLevel(jobId, level);
+        if(!character) return this._checkJobLevel(jobId, level);
+
         const hasCombatJob = character.combatJob !== undefined && character.combatJob.id === jobId;
         const hasPassiveJob = character.passiveJob !== undefined && character.passiveJob.id === jobId;
 
-        if(!hasCombatJob && !hasPassiveJob) return false;
+        if(!hasCombatJob && !hasPassiveJob) return false;
+
         const job = this.manager.jobs.getObjectByID(jobId);
         if(!job) return false;
         return this.manager.getMasteryLevel(job) >= level;
@@ -861,9 +921,11 @@ function formatRequirement(req, manager, context = {}) {
             break;
         }
 
-        case 'dropped': {
+        case 'dropped': {
+
             const monsters = manager?.equipmentSources?.get(context?.item);
-            if (monsters && monsters.length > 0) {
+            if (monsters && monsters.length > 0) {
+
                 const monsterSources = manager?.monsterSources;
                 const areaSet = new Set();
 
@@ -872,12 +934,14 @@ function formatRequirement(req, manager, context = {}) {
                     for (const area of areas) {
                         areaSet.add(area);
                     }
-                }
+                }
+
                 const allAreas = [...areaSet];
                 const unlockedAreas = allAreas.filter(a => a.unlocked);
                 const hasLockedAreas = unlockedAreas.length < allAreas.length;
 
-                if (unlockedAreas.length === 0) {
+                if (unlockedAreas.length === 0) {
+
                     text = 'Explore to discover drop sources';
                 } else if (unlockedAreas.length <= 3) {
                     text = `Drops in: ${unlockedAreas.map(a => a.name).join(', ')}`;
@@ -910,7 +974,10 @@ function formatRequirement(req, manager, context = {}) {
 function formatRequirements(requirements, manager, context = {}) {
     if(!requirements || requirements.length === 0) return [];
     return requirements.map(req => formatRequirement(req, manager, context));
-}
+}
+
+
+
 
 function evaluateCondition(condition, context) {
     if(!condition) return true; // No condition = always true
@@ -989,7 +1056,8 @@ function evaluateCondition(condition, context) {
         case 'all_allies_alive': {
             if(!context.party) return false;
             return context.party.every(member => !member.dead);
-        }
+        }
+
         case 'hp_crossed_below': {
             if(!character) return false;
             const hpPercent = (character.hitpoints / character.maxHitpoints) * 100;
@@ -1076,7 +1144,10 @@ function describeLimitSuffix(limitType, times) {
         default:
             return `(${timesText} per ${limitType})`;
     }
-}
+}
+
+
+
 
 function parseDescription(template, replacements) {
     if(!template) return '';
@@ -1089,7 +1160,8 @@ function parseDescription(template, replacements) {
 }
 
 function getAuraName(manager, auraId) {
-    if (!auraId) return 'Unknown';
+    if (!auraId) return 'Unknown';
+
     const idPart = auraId.split(':').pop();
     const prettified = idPart ? idPart.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) : 'Unknown';
     if (manager === undefined || manager.auras === undefined) {
@@ -1106,7 +1178,8 @@ function firstDefined(...values) {
     return values[values.length - 1];
 }
 
-const effectDescriptionRegistry = new Map([
+const effectDescriptionRegistry = new Map([
+
     ['stat_flat', (effect, value, stacks, amount, manager, helpers) => {
         const v = firstDefined(value, amount, 1);
         const absV = Math.abs(v);
@@ -1120,7 +1193,8 @@ const effectDescriptionRegistry = new Map([
         return effect.perStack
             ? `${helpers.sign(v)}${absV}% ${helpers.stat(effect.stat)} per stack`
             : `${helpers.sign(v)}${absV}% ${helpers.stat(effect.stat)}`;
-    }],
+    }],
+
     ['damage_flat', (effect, value, stacks, amount, manager, helpers) =>
         effect.perStack ? `Deal ${firstDefined(value, amount, 1)} damage per stack` : `Deal ${firstDefined(value, amount, '?')} damage`],
     ['heal_flat', (effect, value, stacks, amount, manager, helpers) =>
@@ -1130,7 +1204,8 @@ const effectDescriptionRegistry = new Map([
     ['lifesteal', (effect, value, stacks, amount, manager, helpers) =>
         effect.perStack
             ? `Heal ${helpers.percent(firstDefined(value, amount, 0))}% of damage per stack`
-            : `Heal for ${helpers.percent(firstDefined(value, amount, 0))}% of damage dealt`],
+            : `Heal for ${helpers.percent(firstDefined(value, amount, 0))}% of damage dealt`],
+
     ['damage_modifier_flat', (effect, value, stacks, amount, manager, helpers) => {
         const v = firstDefined(value, amount, 1);
         const absV = Math.abs(v);
@@ -1140,7 +1215,8 @@ const effectDescriptionRegistry = new Map([
         const v = firstDefined(value, amount, 1);
         const absV = Math.abs(v);
         return effect.perStack ? `${helpers.sign(v)}${absV}% Damage per stack` : `${helpers.sign(v)}${absV}% Damage`;
-    }],
+    }],
+
     ['buff', (effect, value, stacks, amount, manager, helpers) => {
         if (effect.random) {
             const count = firstDefined(effect.count, 1);
@@ -1162,17 +1238,20 @@ const effectDescriptionRegistry = new Map([
         return `Apply ${firstDefined(stacks, 1)} ${helpers.aura(effect.id)}`;
     }],
     ['cleanse', (effect, value, stacks, amount, manager, helpers) =>
-        effect.id ? `Remove ${helpers.aura(effect.id)}` : 'Cleanse debuffs'],
+        effect.id ? `Remove ${helpers.aura(effect.id)}` : 'Cleanse debuffs'],
+
     ['energy', (effect, value, stacks, amount, manager, helpers) => {
         const v = firstDefined(value, amount, 0);
         const absV = Math.abs(v);
         return `${helpers.sign(v)}${absV} Energy`;
-    }],
+    }],
+
     ['xp_percent', (effect, value, stacks, amount, manager, helpers) => {
         const v = firstDefined(value, amount, 0);
         const absV = Math.abs(v);
         if (effect.category) {
-            const catId = effect.category;
+            const catId = effect.category;
+
             const catName = catId.includes(':') ? catId.split(':').pop() : catId;
             const label = catName.charAt(0).toUpperCase() + catName.slice(1);
             return `${helpers.sign(v)}${absV}% ${label} XP`;
@@ -1183,51 +1262,65 @@ const effectDescriptionRegistry = new Map([
         const v = firstDefined(value, amount, 0);
         const absV = Math.abs(v);
         return `${helpers.sign(v)}${absV}% Loot`;
-    }],
+    }],
+
     ['revive', (effect, value, stacks, amount) =>
-        `Revive with ${amount || 100}% HP`],
-    ['work', () => 'Work in town job building'],
+        `Revive with ${amount || 100}% HP`],
+
+    ['work', () => 'Work in town job building'],
+
     ['teleport', () => 'Teleport to a random tile'],
     ['loot', () => 'Contains random loot'],
-    ['xp', (effect, value, stacks, amount, manager, helpers) => `Grant ${firstDefined(amount, value)} Job XP`],
+    ['xp', (effect, value, stacks, amount, manager, helpers) => `Grant ${firstDefined(amount, value)} Job XP`],
+
     ['damage_percent', (effect, value, stacks, amount, manager, helpers) =>
         `Deal ${firstDefined(amount, value)}% HP damage`],
     ['damage_bonus', (effect, value, stacks, amount, manager, helpers) =>
         `+${helpers.percent(value)}% damage`],
     ['damage_reduction', (effect, value, stacks, amount, manager, helpers) =>
-        `${helpers.percent(value)}% damage reduction`],
+        `${helpers.percent(value)}% damage reduction`],
+
     ['immune', (effect, value, stacks, amount, manager, helpers) => {
         return effect.id ? `Immune to ${helpers.aura(effect.id)}` : 'Immune to debuffs';
-    }],
+    }],
+
     ['crit_chance', (effect, value, stacks, amount, manager, helpers) =>
         `+${helpers.percent(value)}% critical chance`],
     ['crit_damage', (effect, value, stacks, amount, manager, helpers) =>
-        `+${helpers.percent(value)}% critical damage`],
+        `+${helpers.percent(value)}% critical damage`],
+
     ['cost_reduction', (effect, value, stacks, amount, manager, helpers) =>
-        `-${helpers.percent(value)}% ability cost`],
+        `-${helpers.percent(value)}% ability cost`],
+
     ['healing_bonus', (effect, value, stacks, amount, manager, helpers) =>
         `+${helpers.percent(value)}% healing done`],
     ['healing_received', (effect, value, stacks, amount, manager, helpers) =>
-        `+${helpers.percent(value)}% healing received`],
+        `+${helpers.percent(value)}% healing received`],
+
     ['reflect', (effect, value, stacks, amount, manager, helpers) =>
         effect.perStack
             ? `Reflect ${helpers.percent(firstDefined(amount, value))}% damage per stack`
-            : `Reflect ${helpers.percent(firstDefined(value, amount))}% damage taken`],
+            : `Reflect ${helpers.percent(firstDefined(value, amount))}% damage taken`],
+
     ['execute', (effect, value, stacks, amount, manager, helpers) => {
-        let threshold = firstDefined(effect.threshold, value, 0.2);
+        let threshold = firstDefined(effect.threshold, value, 0.2);
+
         if (threshold > 0 && threshold < 1) threshold = Math.round(threshold * 100);
         return `Execute enemies below ${threshold}% HP`;
-    }],
+    }],
+
     ['all_stat_percent', (effect, value, stacks, amount, manager, helpers) => {
         if (effect.party === 'enemy') return `+${value}% enemy stats`;
         if (effect.party === 'hero') return `+${value}% party stats`;
         return `+${value}% all stats`;
-    }],
+    }],
+
     ['dispel', (effect, value, stacks, amount, manager, helpers) => {
         if (effect.id) return `Remove ${helpers.aura(effect.id)} from target`;
         const dispelCount = effect.count || 1;
         return dispelCount === 'all' ? 'Remove all buffs from target' : `Remove ${dispelCount} buff${dispelCount !== 1 ? 's' : ''} from target`;
-    }],
+    }],
+
     ['unlock', (effect) => {
         const unlockType = effect.unlockType || 'unknown';
         switch (unlockType) {
@@ -1242,7 +1335,8 @@ const effectDescriptionRegistry = new Map([
             case 'mastered_variant': return 'Unlock Mastered Variant';
             default: return `Unlock ${unlockType.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}`;
         }
-    }],
+    }],
+
     ['job_stats_percent', (effect, value) => `+${value}% Job Stats`],
     ['drop_rate_percent', (effect, value) => `+${value}% Drop Rate`],
     ['drop_quantity_percent', (effect, value) => `+${value}% Drop Quantity`],
@@ -1255,18 +1349,24 @@ const effectDescriptionRegistry = new Map([
     ['ability_learn_chance_percent', (effect, value) => `+${value}% Ability Learn Chance`],
     ['equipment_xp_percent', (effect, value) => `+${value}% Equipment XP`],
     ['upgrade_cost_percent', (effect, value) => `${value > 0 ? '+' : ''}${value}% Upgrade Cost`],
-    ['equipment_stats_percent', (effect, value) => `+${value}% Equipment Stats`],
+    ['equipment_stats_percent', (effect, value) => `+${value}% Equipment Stats`],
+
     ['remove', () => ''],
-    ['remove_stacks', (effect, value, stacks, amount) => `Remove ${firstDefined(effect.count, amount, 1)} stack(s)`],
+    ['remove_stacks', (effect, value, stacks, amount) => {
+        const count = Math.max(1, Math.ceil(firstDefined(effect.count, amount, 1)));
+        return `Remove ${count} stack${count !== 1 ? 's' : ''}`;
+    }],
     ['consume_charge', (effect) => `Consume ${firstDefined(effect.count, 1)} charge(s)`],
     ['absorb', (effect, value, stacks, amount) => `Absorb ${firstDefined(amount, 1)} damage per stack`],
     ['skip', (effect, value, stacks, amount) => {
         if (effect.condition && effect.condition.type === 'chance') return `${effect.condition.value}% chance to skip turn`;
         return 'Skip turn';
     }],
-    ['dodge', (effect, value, stacks, amount) => {
+    ['dodge', (effect, value, stacks, amount) => {
+
         const dodgeAmount = firstDefined(amount, effect.amount);
-        if (dodgeAmount !== undefined) return `+${dodgeAmount}% dodge chance`;
+        if (dodgeAmount !== undefined) return `+${dodgeAmount}% dodge chance`;
+
         if (effect.condition && effect.condition.type === 'chance') return `${effect.condition.value}% chance to dodge`;
         if (effect.condition && effect.condition.type === 'hp_below') return `Dodge attacks when HP below ${effect.condition.threshold}%`;
         return 'Dodge attack';
@@ -1294,7 +1394,8 @@ const effectDescriptionRegistry = new Map([
     ['reduce_damage_percent', (effect, value, stacks, amount) =>
         `${firstDefined(amount, 0)}% damage reduction${effect.perStack ? ' per stack' : ''}`],
     ['reduce_heal_percent', (effect, value, stacks, amount) =>
-        `-${firstDefined(amount, 0)}% healing received${effect.perStack ? ' per stack' : ''}`],
+        `-${firstDefined(amount, 0)}% healing received${effect.perStack ? ' per stack' : ''}`],
+
     ['double_cast', (effect, value, stacks, amount, manager, helpers) => {
         if (effect.condition && effect.condition.type === 'chance') return `${effect.condition.value}% chance to cast spells twice`;
         return `${firstDefined(effect.chance, amount, value)}% chance to cast spells twice`;
@@ -1302,61 +1403,80 @@ const effectDescriptionRegistry = new Map([
 ]);
 
 function describeEffect(effect, manager, displayMode = false) {
-    if(!effect) return '';
+    if(!effect) return '';
+
     if(effect.description) return effect.description;
 
-    const sign = (val) => val >= 0 ? '+' : '-';
+    const sign = (val) => val >= 0 ? '+' : '-';
+
     const toPercent = (val) => {
         if (val === undefined || val === null) return 0;
         return Math.abs(val) < 1 && val !== 0 ? Math.round(val * 100) : val;
-    };
+    };
+
+
     const getVal = (key) => {
         const raw = effect[key];
-        if (raw === undefined || raw === null) return undefined;
-        if (typeof raw !== 'object') return raw;
+        if (raw === undefined || raw === null) return undefined;
+
+        if (typeof raw !== 'object') return raw;
+
         const methodName = key === 'amount' ? 'getAmount' : key === 'stacks' ? 'getStacks' : null;
-        if (methodName && typeof effect[methodName] === 'function') {
+        if (methodName && typeof effect[methodName] === 'function') {
+
             return effect[methodName](null, displayMode !== false ? displayMode : 'multiplier');
-        }
-        if (raw.base !== undefined) return raw.base;
+        }
+
+        if (raw.base !== undefined) return raw.base;
+
         return raw;
-    };
+    };
+
     const amount = getVal('amount');
     const stacks = getVal('stacks');
     const value = amount; // 'amount' is the canonical property
 
     const statName = (statId) => {
         if (!manager || !manager.stats) return null;
-        const stat = manager.stats.getObjectByID(statId);
+        const stat = manager.stats.getObjectByID(statId);
+
         return (stat && stat.name) ? stat.name : null;
-    };
-    const prettifyStatId = (statId) => {
+    };
+
+    const prettifyStatId = (statId) => {
+
         if (statId === 'all') return 'All Stats';
         if (!statId) return 'Unknown';
         const parts = statId.split(':');
         const lastPart = parts.length > 0 ? parts[parts.length - 1] : '';
         return lastPart ? lastPart.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) : 'Unknown';
-    };
+    };
+
     const getStatDisplay = (statId) => statName(statId) || prettifyStatId(statId);
     const auraName = (auraId) => {
-        if (!manager || !manager.auras) return prettifyStatId(auraId);
-        let aura = manager.auras.getObjectByID(auraId);
+        if (!manager || !manager.auras) return prettifyStatId(auraId);
+
+        let aura = manager.auras.getObjectByID(auraId);
+
         if (!aura && auraId && !auraId.includes(':')) {
             aura = manager.auras.getObjectByID(`adventuring:${auraId}`);
         }
         return (aura && aura.name) ? aura.name : prettifyStatId(auraId);
-    };
+    };
+
     const helpers = {
         sign,
         percent: toPercent,
         stat: getStatDisplay,
         aura: auraName,
         prettify: prettifyStatId
-    };
+    };
+
     const describer = effectDescriptionRegistry.get(effect.type);
     if (describer) {
         return describer(effect, value, stacks, amount, manager, helpers);
-    }
+    }
+
     if (amount !== undefined) {
         return `${effect.type}: ${amount}`;
     }
@@ -1415,25 +1535,32 @@ function formatTrigger(trigger) {
 }
 
 function formatTarget(target, party) {
-    if(!target || target === 'self') return '';
-    const targetNames = {
+    if(!target || target === 'self') return '';
+
+    const targetNames = {
+
         'self': 'self',
         'attacker': 'attacker',
         'target': 'target',
         'hit_target': 'target',
         'heal_target': 'target',
-        'dead': 'dead',
+        'dead': 'dead',
+
         'front': 'front',
-        'back': 'back',
+        'back': 'back',
+
         'all': 'all',
         'random': 'random',
         'lowest': 'lowest HP'
-    };
+    };
+
     if(targetNames[target]) {
-        const baseName = targetNames[target];
+        const baseName = targetNames[target];
+
         if(baseName === 'attacker' || baseName === 'target') {
             return baseName;
-        }
+        }
+
         const effectiveParty = party || 'enemy';
         if(effectiveParty === 'enemy') {
             if(baseName === 'all') return 'all enemies';
@@ -1443,7 +1570,8 @@ function formatTarget(target, party) {
             if(baseName === 'lowest HP') return 'lowest HP enemy';
             if(baseName === 'dead') return 'dead enemy';
             return `${baseName} enemy`;
-        }
+        }
+
         if(effectiveParty === 'hero' || effectiveParty === 'ally' || effectiveParty === 'player') {
             if(baseName === 'all') return 'all allies';
             if(baseName === 'front') return 'front ally';
@@ -1454,13 +1582,15 @@ function formatTarget(target, party) {
             return `${baseName} ally`;
         }
         return baseName;
-    }
+    }
+
     return target.replace(/_/g, ' ');
 }
 
 function joinEffectDescriptions(descriptions) {
     if (descriptions.length === 0) return '';
-    if (descriptions.length === 1) return descriptions[0];
+    if (descriptions.length === 1) return descriptions[0];
+
     const lowercaseFirst = (str) => {
         if (!str) return str;
         const firstWord = str.split(/[\s,]/)[0];
@@ -1468,8 +1598,10 @@ function joinEffectDescriptions(descriptions) {
             return str;  // Keep as-is for acronyms like "XP", "HP", etc.
         }
         return str.charAt(0).toLowerCase() + str.slice(1);
-    };
-    const actionWords = ['Apply', 'Deal', 'Heal', 'Remove', 'Grant'];
+    };
+
+    const actionWords = ['Apply', 'Deal', 'Heal', 'Remove', 'Grant'];
+
     const groups = [];
     let currentGroup = null;
 
@@ -1477,32 +1609,39 @@ function joinEffectDescriptions(descriptions) {
         const firstWord = desc.split(' ')[0];
         const isActionWord = actionWords.includes(firstWord);
 
-        if (isActionWord && currentGroup && currentGroup.action === firstWord) {
+        if (isActionWord && currentGroup && currentGroup.action === firstWord) {
+
             currentGroup.items.push(desc);
-        } else {
+        } else {
+
             currentGroup = {
                 action: isActionWord ? firstWord : null,
                 items: [desc]
             };
             groups.push(currentGroup);
         }
-    }
+    }
+
     const processedParts = [];
     for (const group of groups) {
-        if (group.action && group.items.length > 1) {
+        if (group.action && group.items.length > 1) {
+
             const first = group.items[0];
             const rest = group.items.slice(1).map(d => d.substring(group.action.length + 1));
             processedParts.push(first);
             processedParts.push(...rest);
-        } else {
+        } else {
+
             processedParts.push(...group.items);
         }
-    }
+    }
+
     if (processedParts.length === 1) {
         return processedParts[0];
     } else if (processedParts.length === 2) {
         return `${processedParts[0]} and ${lowercaseFirst(processedParts[1])}`;
-    }
+    }
+
     const parts = processedParts.map((d, idx) =>
         idx > 0 ? lowercaseFirst(d) : d
     );
@@ -1513,38 +1652,48 @@ function joinEffectDescriptions(descriptions) {
 function describeEffectFull(effect, manager, options = {}) {
     const { includeTrigger = true, includeChance = true, displayMode = false } = options;
 
-    let desc = describeEffect(effect, manager, displayMode);
+    let desc = describeEffect(effect, manager, displayMode);
+
     const target = effect.target || options.target;
-    const party = effect.party || options.party;
+    const party = effect.party || options.party;
+
     if (target === 'self' && (effect.type === 'damage' || effect.type === 'damage_flat')) {
         desc = `${desc} to self`;
     } else if(target && target !== 'self') {
-        const targetName = formatTarget(target, party);
+        const targetName = formatTarget(target, party);
+
         if(targetName && !desc.toLowerCase().includes(targetName.toLowerCase())) {
             desc = `${desc} to ${targetName}`;
         }
-    }
+    }
+
     const chance = effect.chance || options.chance;
     if(includeChance && chance && chance < 100 && !desc.includes('% chance')) {
         desc = `${desc} (${chance}% chance)`;
-    }
+    }
+
+
     const typesWithBuiltInCondition = ['skip', 'miss', 'confuse', 'dodge'];
     if(effect.condition && !typesWithBuiltInCondition.includes(effect.type)) {
         const conditionDesc = describeCondition(effect.condition, manager);
         if(conditionDesc) {
             desc = `${desc} ${conditionDesc}`;
         }
-    }
+    }
+
     if(effect.limit) {
         const times = effect.times || 1;
         const limitDesc = describeLimitSuffix(effect.limit, times);
         if(limitDesc) {
             desc = `${desc} ${limitDesc}`;
         }
-    }
+    }
+
     if(effect.scope === 'party') {
         desc = `[Party] ${desc}`;
-    }
+    }
+
+
     const trigger = effect.trigger || options.trigger;
     const descLower = desc.toLowerCase();
     const hasWhenClause = descLower.includes('when below') || descLower.includes('when above');
@@ -1621,22 +1770,21 @@ function formatTriggerSuffix(trigger) {
 function describeEffects(effects, manager, options = {}) {
     if (!effects || effects.length === 0) return '';
 
-    const { isAura = false } = options;
+    const { isAura = false } = options;
+
     let mainEffects = effects;
 
-    if (isAura) {
-        const isStandardCleanup = (e) => {
-            if (e.type !== 'remove') return false;
-            if (e.trigger !== 'encounter_end' && e.trigger !== 'death') return false;
-            const keys = Object.keys(e).filter(k => k !== 'trigger' && k !== 'type');
-            return keys.length === 0;
-        };
+    if (isAura) {
 
-        mainEffects = effects.filter(e => !isStandardCleanup(e));
-    }
+        const shouldDescribe = (e) => e.describe !== false;
+
+        mainEffects = effects.filter(e => shouldDescribe(e));
+    }
+
     const getTarget = (e) => e.target || options.target;
     const getParty = (e) => e.party || options.party;
-    const getTrigger = (e) => e.trigger || options.trigger;
+    const getTrigger = (e) => e.trigger || options.trigger;
+
     const firstTarget = getTarget(mainEffects[0]);
     const firstParty = getParty(mainEffects[0]);
     const firstTrigger = getTrigger(mainEffects[0]);
@@ -1644,9 +1792,12 @@ function describeEffects(effects, manager, options = {}) {
     const allSameTarget = mainEffects.every(e =>
         getTarget(e) === firstTarget && getParty(e) === firstParty
     );
-    const allSameTrigger = mainEffects.every(e => getTrigger(e) === firstTrigger);
+    const allSameTrigger = mainEffects.every(e => getTrigger(e) === firstTrigger);
+
+
     const lowercaseFirst = (str) => {
-        if (!str) return str;
+        if (!str) return str;
+
         const firstWord = str.split(/[\s,]/)[0];
         if (firstWord.length >= 2 && firstWord === firstWord.toUpperCase()) {
             return str;  // Keep as-is for acronyms like "XP", "HP", etc.
@@ -1656,29 +1807,35 @@ function describeEffects(effects, manager, options = {}) {
 
     let combined;
 
-    if (allSameTarget && allSameTrigger) {
+    if (allSameTarget && allSameTrigger) {
+
         const descriptions = mainEffects.map(e =>
             describeEffectFull(e, manager, {
                 ...options,
-                includeTrigger: false,
+                includeTrigger: false,
+
                 target: null,
                 party: null
             })
-        );
-        combined = joinEffectDescriptions(descriptions);
+        );
+
+        combined = joinEffectDescriptions(descriptions);
+
         if (firstTarget && firstTarget !== 'self') {
             const targetName = formatTarget(firstTarget, firstParty);
             if (targetName && !combined.toLowerCase().includes(targetName.toLowerCase())) {
                 combined = `${combined} to ${targetName}`;
             }
-        }
+        }
+
         if (firstTrigger && firstTrigger !== 'passive' && firstTrigger !== 'on_use') {
             const triggerSuffix = formatTriggerSuffix(firstTrigger);
             if (triggerSuffix && !combined.toLowerCase().includes('when below') && !combined.toLowerCase().includes('when above')) {
                 combined = `${combined} ${triggerSuffix}`;
             }
         }
-    } else {
+    } else {
+
         const triggerGroups = new Map();
 
         for (const e of mainEffects) {
@@ -1687,17 +1844,21 @@ function describeEffects(effects, manager, options = {}) {
                 triggerGroups.set(trigger, []);
             }
             triggerGroups.get(trigger).push(e);
-        }
+        }
+
         const groupDescriptions = [];
 
-        for (const [trigger, groupEffects] of triggerGroups) {
+        for (const [trigger, groupEffects] of triggerGroups) {
+
             const descriptions = groupEffects.map(e =>
                 describeEffectFull(e, manager, {
                     ...options,
                     includeTrigger: false
                 })
-            );
-            let groupCombined = joinEffectDescriptions(descriptions);
+            );
+
+            let groupCombined = joinEffectDescriptions(descriptions);
+
             if (trigger && trigger !== 'passive' && trigger !== 'on_use') {
                 const triggerSuffix = formatTriggerSuffix(trigger);
                 if (triggerSuffix && !groupCombined.toLowerCase().includes('when below') && !groupCombined.toLowerCase().includes('when above')) {
@@ -1706,7 +1867,8 @@ function describeEffects(effects, manager, options = {}) {
             }
 
             groupDescriptions.push(groupCombined);
-        }
+        }
+
         if (groupDescriptions.length === 1) {
             combined = groupDescriptions[0];
         } else if (groupDescriptions.length === 2) {
@@ -1732,13 +1894,17 @@ function getEffectDescriptionsList(effects, manager, options = {}) {
     if (!effects || effects.length === 0) return [];
     const { includeChance = true } = options;
 
-    return effects.map(effect => {
-        if (effect.description) return effect.description;
+    return effects.map(effect => {
+
+        if (effect.description) return effect.description;
+
         const trigger = formatTrigger(effect.trigger);
-        let desc = describeEffect(effect, manager);
+        let desc = describeEffect(effect, manager);
+
         if (includeChance && effect.chance !== undefined && effect.chance < 100) {
             desc = `${effect.chance}% chance: ${desc}`;
-        }
+        }
+
         if (trigger && effect.trigger !== 'passive') {
             return `${trigger}: ${desc}`;
         }
@@ -1773,7 +1939,10 @@ function buildHitEffectReplacements(hits, stats, displayMode = false) {
         });
     });
     return replacements;
-}
+}
+
+
+
 
 class SimpleEffectInstance {
     constructor(amount, sourceName, stacks = 1) {
@@ -1783,19 +1952,56 @@ class SimpleEffectInstance {
         this.source = null;
         this.age = 0;
         this._isSimple = true; // Flag to identify simple instances
-    }
+    }
+
     remove_stacks(count) { }
     remove() { }
 }
 
-function getEffectAmount(effect, instance) {
+function getEffectAmount(effect, instance) {
+
     if(instance._isSimple) {
         return instance.amount;
-    }
+    }
+
     if(effect.getAmount) {
         return effect.getAmount(instance);
-    }
+    }
+
     return effect.amount || 0;
+}
+
+// XP defaults for utility effects
+const UTILITY_EFFECT_XP = {
+    skip: 3,
+    miss: 2,
+    confuse: 4,
+    prevent_ability: 2,
+    dodge: 2  // when granted by buff, not self-dodge
+};
+
+// Award XP to the source of an aura effect
+function awardSourceXP(instance, amount, ctx) {
+    if(!instance || !instance.source || !instance.source.isHero) return;
+    if(amount <= 0) return;
+    
+    const source = instance.source;
+    const difficultyXPBonus = ctx.manager.dungeon?.getBonus('xp_percent') / 100 || 0;
+    const equipmentXP = Math.floor(amount * (1 + difficultyXPBonus));
+    
+    // Award equipment XP
+    if(source.equipment && source.equipment.slots) {
+        source.equipment.slots.forEach((slot, type) => {
+            if(!slot.empty && !slot.occupied && slot.item) {
+                slot.item.addXP(equipmentXP);
+            }
+        });
+    }
+    
+    // Award job XP (50% of equipment XP)
+    if(source.combatJob && source.combatJob.isMilestoneReward) {
+        source.combatJob.addXP(Math.floor(equipmentXP / 2));
+    }
 }
 
 class EffectProcessor {
@@ -1814,14 +2020,16 @@ class EffectProcessor {
 
         if(handler) {
             return handler(effect, instance, context);
-        }
+        }
+
         return context.extra;
     }
 
     processSimple(effect, amount, sourceName, context) {
         const handler = this.handlers.get(effect.type);
 
-        if(handler) {
+        if(handler) {
+
             const instance = new SimpleEffectInstance(amount, sourceName, effect.stacks || 1);
             return handler(effect, instance, context);
         }
@@ -1831,13 +2039,16 @@ class EffectProcessor {
 
     processAll(resolvedEffects, context) {
         resolvedEffects.forEach(resolved => {
-            const { effect, instance } = resolved;
-            if (effect.condition) {
+            const { effect, instance } = resolved;
+
+            if (effect.condition) {
+
                 const evalContext = buildEffectContext(context.character, context.extra);
                 if (!evaluateCondition(effect.condition, evalContext)) {
                     return; // Skip this effect
                 }
-            }
+            }
+
             const chance = effect.chance || 100;
             if (Math.random() * 100 > chance) {
                 return; // Skip this effect
@@ -1850,11 +2061,13 @@ class EffectProcessor {
 }
 
 function createDefaultEffectProcessor() {
-    const processor = new EffectProcessor();
+    const processor = new EffectProcessor();
+
     processor.register('skip', (effect, instance, ctx) => {
         ctx.extra.skip = true;
         return ctx.extra;
-    });
+    });
+
     processor.register('reduce_amount', (effect, instance, ctx) => {
         const amount = getEffectAmount(effect, instance);
         const reduce = Math.min(ctx.extra.amount || 0, amount);
@@ -1863,7 +2076,8 @@ function createDefaultEffectProcessor() {
             instance.remove_stacks(reduce);
         }
         return ctx.extra;
-    });
+    });
+
     const damageOrHeal = (effect, instance, ctx) => {
         const amount = getEffectAmount(effect, instance);
         const builtEffect = { amount };
@@ -1881,49 +2095,72 @@ function createDefaultEffectProcessor() {
             ctx.manager.log.add(`${ctx.extra.target.name} receives ${amount} ${effectLabel} from ${instance.base.name}`);
             ctx.extra.target.applyEffect(effect, builtEffect, ctx.character);
         }
+        
+        // Award XP to source for direct damage/healing effects
+        if(amount > 0 && instance.source) {
+            awardSourceXP(instance, Math.floor(amount / 2), ctx);
+        }
+        
         return ctx.extra;
     };
     processor.register('damage_flat', damageOrHeal);
-    processor.register('heal_flat', damageOrHeal);
+    processor.register('heal_flat', damageOrHeal);
+
     processor.register('heal_percent', (effect, instance, ctx) => {
         const percentValue = (effect.amount !== undefined) ? effect.amount : ((instance.amount !== undefined) ? instance.amount : 0);
-        if(percentValue <= 0) return ctx.extra;
+        if(percentValue <= 0) return ctx.extra;
+
+        let totalHealing = 0;
         const party = effect.party || 'ally';
-        const target = effect.target || 'all';
+        const target = effect.target || 'all';
+
         if((party === 'hero' || party === 'ally') && ctx.manager.party) {
             if(target === 'all') {
                 ctx.manager.party.all.forEach(hero => {
                     if(!hero.dead) {
                         const healAmount = Math.ceil(hero.maxHitpoints * (percentValue / 100));
                         hero.heal({ amount: healAmount }, ctx.character);
+                        totalHealing += healAmount;
                     }
                 });
             } else if(target === 'self') {
                 const healAmount = Math.ceil(ctx.character.maxHitpoints * (percentValue / 100));
                 ctx.character.heal({ amount: healAmount }, ctx.character);
+                totalHealing += healAmount;
             }
             const characterName = (ctx.character && ctx.character.name) ? ctx.character.name : 'Effect';
             ctx.manager.log.add(`${characterName} heals for ${percentValue}%`);
-        }
+        }
+
+        // Award XP to source for healing effects
+        if(totalHealing > 0 && instance.source) {
+            awardSourceXP(instance, Math.floor(totalHealing / 2), ctx);
+        }
+
         return ctx.extra;
-    });
+    });
+
     const BUFF_POOL = [
         'adventuring:might', 'adventuring:fortify', 'adventuring:haste',
         'adventuring:regeneration', 'adventuring:barrier', 'adventuring:focus',
         'adventuring:arcane_power', 'adventuring:stealth'
-    ];
+    ];
+
     const DEBUFF_POOL = [
         'adventuring:weaken', 'adventuring:slow', 'adventuring:blind',
         'adventuring:poison', 'adventuring:burn', 'adventuring:decay',
         'adventuring:vulnerability', 'adventuring:chill'
-    ];
+    ];
+
     processor.register('buff', (effect, instance, ctx) => {
         const stacks = instance.stacks || effect.stacks || 1;
         const builtEffect = { stacks };
         const target = effect.target || 'self';
-        const count = effect.count || 1;
+        const count = effect.count || 1;
+
         let auraIds = [];
-        if (effect.random) {
+        if (effect.random) {
+
             const pool = effect.pool || BUFF_POOL;
             for (let i = 0; i < count; i++) {
                 auraIds.push(pool[Math.floor(Math.random() * pool.length)]);
@@ -1934,7 +2171,8 @@ function createDefaultEffectProcessor() {
                 return ctx.extra;
             }
             auraIds.push(effect.id);
-        }
+        }
+
         for (const auraId of auraIds) {
             if (target === 'self' || target === undefined) {
                 ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} applies ${auraId}`);
@@ -1945,14 +2183,17 @@ function createDefaultEffectProcessor() {
             }
         }
         return ctx.extra;
-    });
+    });
+
     processor.register('debuff', (effect, instance, ctx) => {
         const stacks = instance.stacks || effect.stacks || 1;
         const builtEffect = { stacks };
         const target = effect.target || 'target';
-        const count = effect.count || 1;
+        const count = effect.count || 1;
+
         let auraIds = [];
-        if (effect.random) {
+        if (effect.random) {
+
             const pool = effect.pool || DEBUFF_POOL;
             for (let i = 0; i < count; i++) {
                 auraIds.push(pool[Math.floor(Math.random() * pool.length)]);
@@ -1963,7 +2204,8 @@ function createDefaultEffectProcessor() {
                 return ctx.extra;
             }
             auraIds.push(effect.id);
-        }
+        }
+
         let targetChar = null;
         if (target === 'self') {
             targetChar = ctx.character;
@@ -1971,7 +2213,8 @@ function createDefaultEffectProcessor() {
             targetChar = ctx.extra.attacker;
         } else if (target === 'target' && ctx.extra.target) {
             targetChar = ctx.extra.target;
-        }
+        }
+
         if (targetChar && !targetChar.dead) {
             for (const auraId of auraIds) {
                 ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} applies ${auraId} to ${targetChar.name}`);
@@ -1979,13 +2222,15 @@ function createDefaultEffectProcessor() {
             }
         }
         return ctx.extra;
-    });
+    });
+
     processor.register('energy', (effect, instance, ctx) => {
         const amount = getEffectAmount(effect, instance);
         ctx.character.energy = Math.min(ctx.character.maxEnergy, ctx.character.energy + amount);
         ctx.character.renderQueue.energy = true;
         return ctx.extra;
-    });
+    });
+
     processor.register('remove_stacks', (effect, instance, ctx) => {
         let count = 1;
         if(effect.count !== undefined) {
@@ -2006,10 +2251,18 @@ function createDefaultEffectProcessor() {
             instance.remove();
         }
         return ctx.extra;
-    });
+    });
+
     processor.register('damage_modifier_flat', (effect, instance, ctx) => {
         const amount = getEffectAmount(effect, instance);
         ctx.extra.amount = (ctx.extra.amount || 0) + amount;
+        
+        // Track damage contribution for XP
+        if(amount > 0 && instance.source) {
+            ctx.extra.damageContributions = ctx.extra.damageContributions || [];
+            ctx.extra.damageContributions.push({ source: instance.source, amount });
+        }
+        
         return ctx.extra;
     });
 
@@ -2017,6 +2270,13 @@ function createDefaultEffectProcessor() {
         const amount = getEffectAmount(effect, instance);
         const increase = Math.ceil((ctx.extra.amount || 0) * (amount / 100));
         ctx.extra.amount = (ctx.extra.amount || 0) + increase;
+        
+        // Track damage contribution for XP
+        if(increase > 0 && instance.source) {
+            ctx.extra.damageContributions = ctx.extra.damageContributions || [];
+            ctx.extra.damageContributions.push({ source: instance.source, amount: increase });
+        }
+        
         return ctx.extra;
     });
 
@@ -2032,7 +2292,8 @@ function createDefaultEffectProcessor() {
         const reduction = Math.ceil((ctx.extra.amount || 0) * (amount / 100));
         ctx.extra.amount = Math.max(0, (ctx.extra.amount || 0) - reduction);
         return ctx.extra;
-    });
+    });
+
     const checkCondition = (effect, instance) => {
         if (!effect.condition) return true;
         if (effect.condition.type === 'chance') {
@@ -2046,6 +2307,11 @@ function createDefaultEffectProcessor() {
         if (checkCondition(effect, instance)) {
             ctx.extra.skip = true;
             ctx.manager.log.add(`${ctx.character.name} is overcome with ${instance.base.name}!`);
+            
+            // Award XP for utility effect
+            if(instance.source) {
+                awardSourceXP(instance, UTILITY_EFFECT_XP.skip, ctx);
+            }
         }
         return ctx.extra;
     });
@@ -2055,6 +2321,11 @@ function createDefaultEffectProcessor() {
             ctx.extra.amount = 0;
             ctx.extra.dodged = true;
             ctx.manager.log.add(`${ctx.character.name} dodges the attack!`);
+            
+            // Award XP for utility effect (only if from an aura buff, not self-dodge)
+            if(instance.source && instance.source !== ctx.character) {
+                awardSourceXP(instance, UTILITY_EFFECT_XP.dodge, ctx);
+            }
         }
         return ctx.extra;
     });
@@ -2064,6 +2335,11 @@ function createDefaultEffectProcessor() {
             ctx.extra.amount = 0;
             ctx.extra.missed = true;
             ctx.manager.log.add(`${ctx.character.name} misses due to ${instance.base.name}!`);
+            
+            // Award XP for utility effect
+            if(instance.source) {
+                awardSourceXP(instance, UTILITY_EFFECT_XP.miss, ctx);
+            }
         }
         return ctx.extra;
     });
@@ -2072,9 +2348,15 @@ function createDefaultEffectProcessor() {
         if (checkCondition(effect, instance)) {
             ctx.extra.hitAlly = true;
             ctx.manager.log.add(`${ctx.character.name} is confused and attacks an ally!`);
+            
+            // Award XP for utility effect
+            if(instance.source) {
+                awardSourceXP(instance, UTILITY_EFFECT_XP.confuse, ctx);
+            }
         }
         return ctx.extra;
-    });
+    });
+
     processor.register('untargetable', (effect, instance, ctx) => {
         ctx.extra.untargetable = true;
         return ctx.extra;
@@ -2088,11 +2370,18 @@ function createDefaultEffectProcessor() {
 
     processor.register('prevent_ability', (effect, instance, ctx) => {
         ctx.extra.prevented = true;
+        
+        // Award XP for utility effect
+        if(instance.source) {
+            awardSourceXP(instance, UTILITY_EFFECT_XP.prevent_ability, ctx);
+        }
+        
         return ctx.extra;
     });
 
     processor.register('prevent_death', (effect, instance, ctx) => {
-        ctx.extra.prevented = true;
+        ctx.extra.prevented = true;
+
         ctx.extra.preventDeathHealAmount = getEffectAmount(effect, instance) || 0;
         ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} prevents death!`);
         return ctx.extra;
@@ -2103,27 +2392,34 @@ function createDefaultEffectProcessor() {
             ctx.extra.forcedTarget = instance.source;
         }
         return ctx.extra;
-    });
-    processor.register('immune', (effect, instance, ctx) => {
+    });
+
+    processor.register('immune', (effect, instance, ctx) => {
+
         if (effect.id && ctx.extra.auraId === effect.id) {
             ctx.extra.prevented = true;
             ctx.manager.log.add(`${ctx.character.name} is immune to ${effect.id}!`);
-        } else if (!effect.id) {
+        } else if (!effect.id) {
+
             ctx.extra.prevented = true;
             ctx.manager.log.add(`${ctx.character.name} is immune to debuffs!`);
         }
         return ctx.extra;
-    });
+    });
+
     processor.register('revive', (effect, instance, ctx) => {
-        const amount = getEffectAmount(effect, instance) || 100;
+        const amount = getEffectAmount(effect, instance) || 100;
+
         const target = effect.target === 'target' ? ctx.extra.target : ctx.character;
 
         if (target && target.dead) {
             target.revive({ amount }, ctx.character);
-            ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} revives ${target.name} with ${amount}% HP!`);
+            const sourceName = instance?.base?.name || 'effect';
+            ctx.manager.log.add(`${ctx.character.name}'s ${sourceName} revives ${target.name} with ${amount}% HP!`);
         }
         return ctx.extra;
-    });
+    });
+
     processor.register('lifesteal', (effect, instance, ctx) => {
         const amount = getEffectAmount(effect, instance);
         const healAmount = Math.ceil((ctx.extra.damageDealt || 0) * (amount / 100));
@@ -2132,7 +2428,8 @@ function createDefaultEffectProcessor() {
             ctx.manager.log.add(`${ctx.character.name} heals for ${healAmount} from ${instance.base.name}`);
         }
         return ctx.extra;
-    });
+    });
+
     processor.register('reflect', (effect, instance, ctx) => {
         const amount = getEffectAmount(effect, instance);
         if(ctx.extra.damageReceived && ctx.extra.attacker) {
@@ -2141,7 +2438,8 @@ function createDefaultEffectProcessor() {
             ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} reflects ${reflectAmount} damage`);
         }
         return ctx.extra;
-    });
+    });
+
     processor.register('cleanse', (effect, instance, ctx) => {
         const amount = getEffectAmount(effect, instance) || effect.count || 999;
         const target = effect.target === 'self' || effect.target === undefined ? ctx.character :
@@ -2164,9 +2462,11 @@ function createDefaultEffectProcessor() {
             }
         }
         return ctx.extra;
-    });
+    });
+
     processor.register('damage_percent', (effect, instance, ctx) => {
-        const percent = getEffectAmount(effect, instance);
+        const percent = getEffectAmount(effect, instance);
+
         let target;
         const targetType = effect.target || 'target';
         if (targetType === 'self') {
@@ -2183,7 +2483,8 @@ function createDefaultEffectProcessor() {
             ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} deals ${amount} damage (${percent}% HP)`);
         }
         return ctx.extra;
-    });
+    });
+
     processor.register('xp_percent', (effect, instance, ctx) => {
         const amount = getEffectAmount(effect, instance);
         const increase = Math.ceil((ctx.extra.amount || 0) * (amount / 100));
@@ -2196,17 +2497,20 @@ function createDefaultEffectProcessor() {
         const increase = Math.ceil((ctx.extra.amount || 0) * (amount / 100));
         ctx.extra.amount = (ctx.extra.amount || 0) + increase;
         return ctx.extra;
-    });
+    });
+
     processor.register('prevent_lethal', (effect, instance, ctx) => {
         const currentHP = ctx.character.hitpoints;
-        const incomingDamage = ctx.extra.amount || 0;
+        const incomingDamage = ctx.extra.amount || 0;
+
         if(currentHP - incomingDamage <= 0 && currentHP > 0) {
             ctx.extra.amount = currentHP - 1;
             ctx.extra.preventedLethal = true;
             ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} prevents lethal damage!`);
         }
         return ctx.extra;
-    });
+    });
+
     processor.register('evade', (effect, instance, ctx) => {
         ctx.extra.amount = 0;
         ctx.extra.evaded = true;
@@ -2215,14 +2519,16 @@ function createDefaultEffectProcessor() {
         }
         ctx.manager.log.add(`${ctx.character.name} evades the attack with ${instance.base.name}!`);
         return ctx.extra;
-    });
+    });
+
     processor.register('absorb', (effect, instance, ctx) => {
         const amountPerStack = firstDefined(effect.amount, 1);
         const totalAbsorb = amountPerStack * instance.stacks;
         const damage = ctx.extra.amount || 0;
 
         const absorbed = Math.min(damage, totalAbsorb);
-        ctx.extra.amount = damage - absorbed;
+        ctx.extra.amount = damage - absorbed;
+
         if(effect.consume !== false && absorbed > 0) {
             const stacksToRemove = Math.ceil(absorbed / amountPerStack);
             instance.remove_stacks(stacksToRemove);
@@ -2232,14 +2538,16 @@ function createDefaultEffectProcessor() {
             ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} absorbs ${absorbed} damage`);
         }
         return ctx.extra;
-    });
+    });
+
     processor.register('dispel', (effect, instance, ctx) => {
         const count = effect.count || 1;
         const target = effect.target === 'self' ? ctx.character :
                       (effect.target === 'attacker' ? ctx.extra.attacker : ctx.extra.target);
 
         if(target && !target.dead && target.auras) {
-            let removed = 0;
+            let removed = 0;
+
             for(const auraInstance of [...target.auras.auras.values()]) {
                 if(auraInstance.base && !auraInstance.base.isDebuff && removed < count) {
                     auraInstance.stacks = 0;
@@ -2256,7 +2564,8 @@ function createDefaultEffectProcessor() {
             }
         }
         return ctx.extra;
-    });
+    });
+
     processor.register('double_cast', (effect, instance, ctx) => {
         let chance;
         if (effect.condition && effect.condition.type === 'chance') {
@@ -2268,20 +2577,29 @@ function createDefaultEffectProcessor() {
             ctx.extra.doubleCast = true;
         }
         return ctx.extra;
-    });
+    });
+
     processor.register('work', (effect, instance, ctx) => {
         if(ctx.extra.building && ctx.extra.building.page && ctx.extra.building.page.doWork) {
             ctx.extra.building.page.doWork(ctx.character);
         }
         return ctx.extra;
-    });
+    });
+
+
+
 
     return processor;
-}
-const defaultEffectProcessor = createDefaultEffectProcessor();
+}
+
+const defaultEffectProcessor = createDefaultEffectProcessor();
+
+
+
 
 function addMasteryXPWithBonus(manager, action, baseXP, options = {}) {
-    const { updateTooltip = true } = options;
+    const { updateTooltip = true } = options;
+
     const xpBonus = manager.modifiers.getMasteryXPBonus(action);
     const modifiedXP = Math.floor(baseXP * (1 + xpBonus));
 
@@ -2308,25 +2626,32 @@ function buildDescription(config) {
         buildReplacements
     } = config;
 
-    let desc = '';
+    let desc = '';
+
     if (template !== undefined && template !== null) {
         const source = hits !== undefined ? hits : effects;
         const replacements = buildReplacements
             ? buildReplacements(source, stats, displayMode)
             : buildEffectReplacements(effects, stats, true);
         desc = parseDescription(template, replacements);
-    }
+    }
+
     else if (hits !== undefined && hits.length > 0) {
-        const hitDescs = [];
-        const isSelfTargetingEffect = (effectType, hitParty) => {
-            if (hitParty === 'ally') return false;
+        const hitDescs = [];
+
+
+        const isSelfTargetingEffect = (effectType, hitParty) => {
+
+            if (hitParty === 'ally') return false;
+
             const selfTypes = ['heal_flat', 'heal_percent', 'buff', 'energy', 'shield'];
             return selfTypes.includes(effectType);
         };
 
         for (let i = 0; i < hits.length; i++) {
             const hit = hits[i];
-            if (hit.effects === undefined || hit.effects.length === 0) continue;
+            if (hit.effects === undefined || hit.effects.length === 0) continue;
+
             const selfEffects = [];
             const targetEffects = [];
 
@@ -2352,19 +2677,24 @@ function buildDescription(config) {
                     count: effect.count,
                     threshold: effect.threshold
                 };
-                let effectDesc = describeEffectFull(effectObj, manager, { displayMode, includeTrigger: false });
+                let effectDesc = describeEffectFull(effectObj, manager, { displayMode, includeTrigger: false });
+
                 if (isSelfTargetingEffect(effect.type, hit.party)) {
                     selfEffects.push(effectDesc);
                 } else {
                     targetEffects.push(effectDesc);
                 }
-            }
+            }
+
             const target = hit.target;
             const party = hit.party;
-            const hitParts = [];
+            const hitParts = [];
+
             if (targetEffects.length > 0) {
                 let targetDesc = joinEffectDescriptions(targetEffects);
-                if (target === 'self') {
+                if (target === 'self') {
+
+
                     if (targetDesc.toLowerCase().includes('deal')) {
                         targetDesc = `${targetDesc} to self`;
                     }
@@ -2375,9 +2705,11 @@ function buildDescription(config) {
                     }
                 }
                 hitParts.push(targetDesc);
-            }
+            }
+
             if (selfEffects.length > 0) {
-                let selfDesc = joinEffectDescriptions(selfEffects);
+                let selfDesc = joinEffectDescriptions(selfEffects);
+
                 if (hitParts.length > 0) {
                     selfDesc = selfDesc.charAt(0).toLowerCase() + selfDesc.slice(1);
                 }
@@ -2387,21 +2719,26 @@ function buildDescription(config) {
             if (hitParts.length > 0) {
                 hitDescs.push(hitParts.join(' and '));
             }
-        }
+        }
+
         if (hitDescs.length === 1) {
             desc = hitDescs[0];
-        } else if (hitDescs.length === 2) {
+        } else if (hitDescs.length === 2) {
+
             if (hitDescs[0] === hitDescs[1]) {
                 desc = `${hitDescs[0]} (hits twice)`;
-            } else {
+            } else {
+
                 const second = hitDescs[1].charAt(0).toLowerCase() + hitDescs[1].slice(1);
                 desc = `${hitDescs[0]}, then ${second}`;
             }
-        } else if (hitDescs.length > 2) {
+        } else if (hitDescs.length > 2) {
+
             const allSame = hitDescs.every(h => h === hitDescs[0]);
             if (allSame) {
                 desc = `${hitDescs[0]} (hits ${hitDescs.length} times)`;
-            } else {
+            } else {
+
                 const parts = hitDescs.map((h, i) => {
                     if (i === 0) return h;
                     return h.charAt(0).toLowerCase() + h.slice(1);
@@ -2413,7 +2750,8 @@ function buildDescription(config) {
         if (desc !== '') {
             desc = desc + '.';
         }
-    }
+    }
+
     else if (effects !== undefined && effects.length > 0) {
         const effectDescs = [];
         for (let i = 0; i < effects.length; i++) {
@@ -2447,7 +2785,8 @@ function buildDescription(config) {
         if (desc !== '') {
             desc = desc + '.';
         }
-    }
+    }
+
     if (flavorText !== undefined && flavorText !== null && flavorText !== '') {
         desc = desc !== '' ? `${desc}<br><br><em>${flavorText}</em>` : `<em>${flavorText}</em>`;
     }
@@ -2491,7 +2830,8 @@ class AdventuringBadgeRenderQueue extends AdventuringMasteryRenderQueue {
 
 class AdventuringEquipmentRenderQueue extends AdventuringBadgeRenderQueue {
     constructor() {
-        super();
+        super();
+
         this.name = undefined;
         this.clickable = undefined;
         this.mastery = undefined;
@@ -2511,7 +2851,10 @@ class AdventuringEquipmentRenderQueue extends AdventuringBadgeRenderQueue {
         this.highlight = true;
         this.equipped = true;
     }
-}
+}
+
+
+
 
 function getFromRegistry(registry, id, context = 'object', warn = false) {
     if (!registry || !id) return undefined;
@@ -2549,7 +2892,8 @@ export {
     filterEffectsByTrigger,
     filterEffectsByType,
     getStatEffects,
-    EffectCache,
+    EffectCache,
+
     RequirementsChecker,
     formatRequirement,
     formatRequirements,
@@ -2564,25 +2908,33 @@ export {
     formatTarget,
     buildEffectReplacements,
     buildHitEffectReplacements,
-    buildDescription,
+    buildDescription,
+
     SimpleEffectInstance,
     getEffectAmount,
     EffectProcessor,
     defaultEffectProcessor,
-    addMasteryXPWithBonus,
+    addMasteryXPWithBonus,
+
     evaluateCondition,
     describeCondition,
     buildEffectContext,
     getPooledContext,
-    releaseContext,
+    releaseContext,
+
     AdventuringMasteryRenderQueue,
     AdventuringBadgeRenderQueue,
-    AdventuringEquipmentRenderQueue,
+    AdventuringEquipmentRenderQueue,
+
     UNKNOWN_MEDIA,
-    getLockedMedia,
-    StatCalculator,
-    PassiveEffectProcessor,
-    EffectLimitTracker,
+    getLockedMedia,
+
+    StatCalculator,
+
+    PassiveEffectProcessor,
+
+    EffectLimitTracker,
+
     getFromRegistry,
     requireFromRegistry
 }

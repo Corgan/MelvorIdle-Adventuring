@@ -2,7 +2,9 @@ const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringPage } = await loadModule('src/ui/adventuring-page.mjs');
 const { AdventuringWorkOrder } = await loadModule('src/town/adventuring-work-order.mjs');
-const { formatRequirements } = await loadModule('src/core/adventuring-utils.mjs');
+const { formatRequirements } = await loadModule('src/core/adventuring-utils.mjs');
+const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
+
 await loadModule('src/town/components/adventuring-workshop.mjs');
 await loadModule('src/items/components/adventuring-stored-item.mjs');
 await loadModule('src/town/components/adventuring-workshop-product.mjs');
@@ -44,7 +46,8 @@ export class AdventuringWorkshop extends AdventuringPage {
         }
         this.storedItems = new Map();
         this.itemComponents = [];
-        this.productElements = new Map();
+        this.productElements = new Map();
+
         this.selectedOutputType = 'item'; // 'item', 'material', 'consumable', 'conversion'
         this.selectedTier = 1;
         this.selectedProduct = undefined;
@@ -52,11 +55,13 @@ export class AdventuringWorkshop extends AdventuringPage {
         this.renderQueue = new AdventuringWorkshopRenderQueue();
 
         this.component.back.onclick = () => this.back();
-        this.component.submit.onclick = () => this.submitWorkOrder();
+        this.component.submit.onclick = () => this.submitWorkOrder();
+
         this.component.tabItem.onclick = () => this.setOutputType('item');
         this.component.tabMaterial.onclick = () => this.setOutputType('material');
         this.component.tabConsumable.onclick = () => this.setOutputType('consumable');
-        this.component.tabConversion.onclick = () => this.setOutputType('conversion');
+        this.component.tabConversion.onclick = () => this.setOutputType('conversion');
+
         this.component.tierButtons.forEach((btn, i) => {
             btn.onclick = () => this.setTier(i + 1);
         });
@@ -64,7 +69,8 @@ export class AdventuringWorkshop extends AdventuringPage {
 
     setOutputType(type) {
         this.selectedOutputType = type;
-        this.selectedProduct = undefined;
+        this.selectedProduct = undefined;
+
         this.component.tabItem.classList.toggle('btn-info', type === 'item');
         this.component.tabItem.classList.toggle('btn-outline-info', type !== 'item');
         this.component.tabItem.classList.toggle('active', type === 'item');
@@ -87,16 +93,20 @@ export class AdventuringWorkshop extends AdventuringPage {
 
     setTier(tier) {
         const previousTier = this.selectedTier;
-        this.selectedTier = tier;
+        this.selectedTier = tier;
+
         this.component.tierButtons.forEach((btn, i) => {
             const isActive = (i + 1) === tier;
             btn.classList.toggle('btn-info', isActive);
             btn.classList.toggle('btn-outline-info', !isActive);
             btn.classList.toggle('active', isActive);
-        });
+        });
+
+
         if (this.selectedProduct && this.selectedProduct.hasTiers && this.selectedProduct.hasTier(tier)) {
             this.updateCostDisplay();
-            this.updateRequirementsDisplay();
+            this.updateRequirementsDisplay();
+
             this.component.selectedProductIcon.src = this.selectedProduct.getMedia(tier);
             this.component.selectedProductName.textContent = this.selectedProduct.getName(tier);
         }
@@ -111,7 +121,8 @@ export class AdventuringWorkshop extends AdventuringPage {
         }
     }
 
-    store(output, count, outputType = 'item') {
+    store(output, count, outputType = 'item') {
+
         if (outputType !== 'item') {
             return;
         }
@@ -126,7 +137,8 @@ export class AdventuringWorkshop extends AdventuringPage {
 
     shipToBank(output) {
         let count = this.storedItems.get(output);
-        if(count !== undefined) {
+        if(count !== undefined) {
+
             const success = this.game.bank.addItem(output, count, false, true);
 
             if(success) {
@@ -134,15 +146,18 @@ export class AdventuringWorkshop extends AdventuringPage {
                 this.renderQueue.storedItems = true;
             }
         }
-    }
+    }
+
     collect(output) {
         this.shipToBank(output);
     }
 
     selectProduct(product) {
-        this.selectedProduct = product;
+        this.selectedProduct = product;
+
         this.component.selectedProductDisplay.classList.remove('d-none');
-        this.component.noProductSelected.classList.add('d-none');
+        this.component.noProductSelected.classList.add('d-none');
+
         const tier = this.selectedTier;
         if (product.hasTiers) {
             this.component.selectedProductIcon.src = product.getMedia(tier);
@@ -150,7 +165,8 @@ export class AdventuringWorkshop extends AdventuringPage {
         } else {
             this.component.selectedProductIcon.src = product.media;
             this.component.selectedProductName.textContent = product.name;
-        }
+        }
+
         this.component.count.value = 1;
 
         this.renderQueue.products = true;
@@ -175,7 +191,8 @@ export class AdventuringWorkshop extends AdventuringPage {
             placeholder.textContent = 'Select a product';
             this.component.costDisplay.appendChild(placeholder);
             return;
-        }
+        }
+
         const tier = this.selectedTier;
         const materials = this.selectedProduct.getMaterials(tier);
 
@@ -197,7 +214,9 @@ export class AdventuringWorkshop extends AdventuringPage {
             const component = document.createElement('adventuring-material');
             this.component.costDisplay.appendChild(component);
             component.icon.src = material.media;
-            component.count.textContent = need;
+            component.count.textContent = need;
+            component.setTooltipContent(TooltipBuilder.forMaterial(material, this.manager).build());
+
             if (have >= need) {
                 component.border.classList.remove('border-danger');
                 component.border.classList.add('border-success');
@@ -245,7 +264,8 @@ export class AdventuringWorkshop extends AdventuringPage {
             return;
         let count = parseInt(this.component.count.value);
         if(count === 0 || count < 1)
-            return;
+            return;
+
         const tier = this.selectedTier;
 
         let orders = [...this.workOrders.values()];
@@ -263,7 +283,8 @@ export class AdventuringWorkshop extends AdventuringPage {
         this.render();
     }
 
-    hasWorkOrders(character) {
+    hasWorkOrders(character) {
+
         for(const order of this.workOrders) {
             if(order.active && order.product.canMake(character, order.tier))
                 return true;
@@ -271,7 +292,8 @@ export class AdventuringWorkshop extends AdventuringPage {
         return false;
     }
 
-    doWork(character) {
+    doWork(character) {
+
         for(const order of this.workOrders) {
             if(order.active && order.product.canMake(character, order.tier)) {
                 order.progress();
@@ -287,7 +309,8 @@ export class AdventuringWorkshop extends AdventuringPage {
         this.renderQueue.storedItems = true;
         this.workOrders.forEach(order => {
             order.renderQueue.update = true;
-        });
+        });
+
         this.setOutputType('item');
         this.setTier(1);
         this.clearSelectedProduct();
@@ -322,46 +345,56 @@ export class AdventuringWorkshop extends AdventuringPage {
 
     renderProducts() {
         if(!this.renderQueue.products)
-            return;
-        this.component.productList.replaceChildren();
+            return;
+
+        this.component.productList.replaceChildren();
+
+
         const filteredProducts = this.products.filter(product => {
             if(this.selectedOutputType === 'item' && product.outputType !== 'item') return false;
             if(this.selectedOutputType === 'material' && product.outputType !== 'material') return false;
             if(this.selectedOutputType === 'consumable' && product.outputType !== 'consumable') return false;
             if(this.selectedOutputType === 'conversion' && product.outputType !== 'conversion') return false;
             return true;
-        });
-        const activeProducts = [...this.workOrders].filter(order => order.active).map(order => order.product);
+        });
+
+        const activeProducts = [...this.workOrders].filter(order => order.active).map(order => order.product);
+
         filteredProducts.forEach(product => {
             let productEl = this.productElements.get(product);
             if(productEl === undefined) {
                 productEl = createElement('adventuring-workshop-product');
                 this.productElements.set(product, productEl);
-            }
+            }
+
             const tier = this.selectedTier;
             const isSelected = this.selectedProduct === product;
             const isActive = activeProducts.includes(product);
+            const tooltip = this.getProductTooltip(product, tier);
 
             if (product.hasTiers) {
                 productEl.setProduct({
                     iconSrc: product.getMedia(tier),
                     name: product.getName(tier),
                     selected: isSelected,
-                    active: isActive
+                    active: isActive,
+                    tooltip: tooltip
                 });
             } else {
                 productEl.setProduct({
                     iconSrc: product.media,
                     name: product.name,
                     selected: isSelected,
-                    active: isActive
+                    active: isActive,
+                    tooltip: tooltip
                 });
             }
 
             productEl.clickable.onclick = () => this.selectProduct(product);
 
             this.component.productList.appendChild(productEl);
-        });
+        });
+
         if(filteredProducts.length === 0) {
             const emptyMsg = document.createElement('div');
             emptyMsg.className = 'text-muted text-center w-100 py-3';
@@ -370,6 +403,35 @@ export class AdventuringWorkshop extends AdventuringPage {
         }
 
         this.renderQueue.products = false;
+    }
+
+    getProductTooltip(product, tier) {
+        const output = product.output;
+        if(!output) return product.getName(tier);
+
+        switch(product.outputType) {
+            case 'consumable':
+                return TooltipBuilder.forConsumableTier(output, tier).build();
+            case 'material':
+                return TooltipBuilder.forMaterial(output, this.manager).build();
+            case 'conversion': {
+                const tierData = product.getTierData(tier);
+                if(tierData && tierData.outputMaterial) {
+                    return TooltipBuilder.forMaterial(tierData.outputMaterial, this.manager).build();
+                }
+                return product.getName(tier);
+            }
+            case 'item':
+            default: {
+                // For game items, create a simple tooltip with name and description
+                const tooltip = TooltipBuilder.create()
+                    .header(output.name, output.media);
+                if(output.description) {
+                    tooltip.hint(output.description);
+                }
+                return tooltip.build();
+            }
+        }
     }
 
     renderWorkOrders() {
@@ -410,21 +472,30 @@ export class AdventuringWorkshop extends AdventuringPage {
             }
 
             component.mount(this.component.store);
-            component.setTooltipContent(item.name);
+
+            // Use game's item description for bank items
+            const tooltip = TooltipBuilder.create()
+                .header(item.name, item.media);
+            if(item.description) {
+                tooltip.hint(item.description);
+            }
+            component.setTooltipContent(tooltip.build());
 
             component.icon.src = item.media;
             component.clickable.onclick = () => this.shipToBank(item);
 
             component.count.textContent = this.storedItems.get(item);
             componentCount++;
-        }
+        }
+
         const hasItems = this.storedItems.size > 0;
         this.component.storeEmpty.classList.toggle('d-none', hasItems);
 
         this.renderQueue.storedItems = false;
     }
 
-    encode(writer) {
+    encode(writer) {
+
         writer.writeUint32(this.storedItems.size);
         this.storedItems.forEach((count, item) => {
             writer.writeNamespacedObject(item);
@@ -436,7 +507,8 @@ export class AdventuringWorkshop extends AdventuringPage {
         });
     }
 
-    decode(reader, version) {
+    decode(reader, version) {
+
         const itemCount = reader.getUint32();
         for(let i = 0; i < itemCount; i++) {
             let key = reader.getNamespacedObject(this.game.items);

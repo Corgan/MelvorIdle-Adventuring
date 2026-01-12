@@ -45,7 +45,8 @@ export class AdventuringHero extends AdventuringCharacter {
         super(manager, game, party);
 
         this.locked = false;
-        this.equipment = new AdventuringEquipment(this.manager, this.game, this);
+        this.equipment = new AdventuringEquipment(this.manager, this.game, this);
+
         this._statsDirty = true;
 
         this.component.equipment.classList.remove('d-none');
@@ -81,8 +82,10 @@ export class AdventuringHero extends AdventuringCharacter {
     }
 
     onLoad() {
-        super.onLoad();
-        this.component.setNameClickHandler(() => this.promptRename());
+        super.onLoad();
+
+        this.component.setNameClickHandler(() => this.promptRename());
+
         const isNewPlayer = this.name === undefined || this.name === "";
 
         if(this.combatJob === undefined) // Default to None
@@ -101,9 +104,11 @@ export class AdventuringHero extends AdventuringCharacter {
 
         this.calculateStats();
 
-        if(isNewPlayer) {
+        if(isNewPlayer) {
+
             this.name = this.getRandomName(this.manager.party.all.map(member => member.name));
-            this.renderQueue.name = true;
+            this.renderQueue.name = true;
+
             this._applyStarterLoadout();
 
             this.hitpoints = this.maxHitpoints;
@@ -124,23 +129,27 @@ export class AdventuringHero extends AdventuringCharacter {
     _applyStarterLoadout() {
         const position = this._getPartyPosition();
         const loadout = STARTER_LOADOUTS[position];
-        if(!loadout) return;
+        if(!loadout) return;
+
         const job = this.manager.jobs.getObjectByID(loadout.job);
         if(job) {
             this.setCombatJob(job);
-        }
+        }
+
         if(loadout.generator) {
             const generator = this.manager.generators.getObjectByID(loadout.generator);
             if(generator) {
                 this.setGenerator(generator);
             }
-        }
+        }
+
         if(loadout.spender) {
             const spender = this.manager.spenders.getObjectByID(loadout.spender);
             if(spender) {
                 this.setSpender(spender);
             }
-        }
+        }
+
         this.calculateStats();
     }
 
@@ -152,27 +161,34 @@ export class AdventuringHero extends AdventuringCharacter {
         if (!force && !this._statsDirty) return;
         this._statsDirty = false;
 
-        let shouldAdjust = true;
-        if(this.manager.isActive || this.hitpoints > this.maxHitpoints) // Loading Shenanigans
-            shouldAdjust = false;
+        // Don't adjust hitpoints during combat, but always clamp to new max
+        let shouldAdjust = !this.manager.isActive;
         let hitpointPct = this.hitpoints / this.maxHitpoints;
 
-        this.stats.reset();
+        this.stats.reset();
+
         this.manager.stats.forEach(stat => {
             if(stat.base !== undefined)
                 this.stats.set(stat, stat.base);
-        });
+        });
+
         if(this.combatJob !== undefined) this.combatJob.calculateStats();
         if(this.passiveJob !== undefined) this.passiveJob.calculateStats();
-        if(this.equipment !== undefined) this.equipment.calculateStats();
+        if(this.equipment !== undefined) this.equipment.calculateStats();
+
         StatCalculator.aggregate(this.stats,
             this.combatJob ? this.combatJob.stats : null,
             this.passiveJob ? this.passiveJob.stats : null,
             this.equipment ? this.equipment.stats : null
-        );
+        );
 
-        if(shouldAdjust)
+
+        if(shouldAdjust) {
             this.hitpoints = Math.min(this.maxHitpoints, Math.floor(this.maxHitpoints * hitpointPct));
+        } else {
+            // Always clamp hitpoints to max even if not adjusting percentage
+            this.hitpoints = Math.min(this.hitpoints, this.maxHitpoints);
+        }
 
         this.stats.renderQueue.stats = true;
         this.renderQueue.hitpoints = true;
@@ -182,14 +198,18 @@ export class AdventuringHero extends AdventuringCharacter {
     }
 
     initEffectCache() {
-        super.initEffectCache();
-        this.effectCache.registerSource('equipment', () => this.equipment.getEffects());
+        super.initEffectCache();
+
+        this.effectCache.registerSource('equipment', () => this.equipment.getEffects());
+
         this.effectCache.registerSource('tavern', () =>
             this.manager.tavern ? this.manager.tavern.getEffects() : []
-        );
+        );
+
         this.effectCache.registerSource('consumables', () =>
             this.manager.consumables ? this.manager.consumables.getEffects() : []
-        );
+        );
+
         this.effectCache.registerSource('modifiers', () =>
             this.manager.modifiers ? this.manager.modifiers.getEffects() : []
         );
@@ -202,8 +222,10 @@ export class AdventuringHero extends AdventuringCharacter {
         this.renderQueue.spender = true;
     }
 
-    getAllPendingEffectsForTrigger(type, context) {
-        const pending = super.getAllPendingEffectsForTrigger(type, context);
+    getAllPendingEffectsForTrigger(type, context) {
+
+        const pending = super.getAllPendingEffectsForTrigger(type, context);
+
         if (this.equipment) {
             const equipmentEffects = this.equipment.getEffectsForTrigger(type, context);
             for (const { item, effect } of equipmentEffects) {
@@ -215,7 +237,8 @@ export class AdventuringHero extends AdventuringCharacter {
                     sourceType: 'equipment'
                 });
             }
-        }
+        }
+
         if (this.manager.consumables) {
             const consumableEffects = this.manager.consumables.getEffectsForTrigger(type, context);
             for (const { consumable, tier, effect } of consumableEffects) {
@@ -228,7 +251,8 @@ export class AdventuringHero extends AdventuringCharacter {
                     sourceType: 'consumable'
                 });
             }
-        }
+        }
+
         if (this.combatJob && this.combatJob.getPassivesForTrigger) {
             const passiveEffects = this.combatJob.getPassivesForTrigger(this, type);
             for (const { passive, effect } of passiveEffects) {
@@ -239,7 +263,8 @@ export class AdventuringHero extends AdventuringCharacter {
                     sourceType: 'jobPassive'
                 });
             }
-        }
+        }
+
         if (this.passiveJob && this.passiveJob !== this.combatJob && this.passiveJob.getPassivesForTrigger) {
             const passiveEffects = this.passiveJob.getPassivesForTrigger(this, type);
             for (const { passive, effect } of passiveEffects) {
@@ -250,7 +275,8 @@ export class AdventuringHero extends AdventuringCharacter {
                     sourceType: 'jobPassive'
                 });
             }
-        }
+        }
+
         if (this.manager.tavern) {
             const drinkEffects = this.manager.tavern.getEffectsForTrigger(type, context);
             for (const { drink, effect } of drinkEffects) {
@@ -268,17 +294,21 @@ export class AdventuringHero extends AdventuringCharacter {
     }
 
     processPendingEffect(pending, context) {
-        const { effect, source, sourceTier, sourceName, sourceType } = pending;
+        const { effect, source, sourceTier, sourceName, sourceType } = pending;
+
         if (sourceType === 'jobPassive') {
             return this.processJobPassiveEffect(pending, context);
-        }
+        }
+
         if (effect.type === 'consume_charge' && sourceType === 'consumable') {
             const count = effect.count || 1;
             this.manager.consumables.removeCharges(source, sourceTier, count);
             this.manager.log.add(`${sourceName} consumed ${count} charge(s).`);
             return true;
-        }
-        const applied = super.processPendingEffect(pending, context);
+        }
+
+        const applied = super.processPendingEffect(pending, context);
+
         if (applied && sourceType === 'consumable' && effect.trigger !== 'passive') {
             this.manager.consumables.removeCharges(source, sourceTier, 1);
             this.manager.log.add(`${sourceName} consumed a charge.`);
@@ -288,25 +318,32 @@ export class AdventuringHero extends AdventuringCharacter {
     }
 
     processJobPassiveEffect(pending, context) {
-        const { effect, source: passive, sourceName } = pending;
+        const { effect, source: passive, sourceName } = pending;
+
         if (effect.condition) {
             if (!evaluateCondition(effect.condition, context)) {
                 return false;
             }
-        }
+        }
+
         if (!this.canEffectTrigger(effect, passive)) {
             return false;
-        }
+        }
+
         const chance = effect.chance || 100;
         if (Math.random() * 100 > chance) {
             return false;
-        }
+        }
+
+
         const encounter = context.encounter;
 
         let builtEffect = {
             amount: effect.getAmount ? effect.getAmount(this) : (effect.amount || 0),
             stacks: effect.getStacks ? effect.getStacks(this) : (effect.stacks || 1)
-        };
+        };
+
+
         const targetPartyType = effect.targetParty || 'ally';
         const targetParty = targetPartyType === 'enemy'
             ? encounter?.party
@@ -347,7 +384,8 @@ export class AdventuringHero extends AdventuringCharacter {
                 this.manager.log.add(`${this.name}'s ${passive.name} deals ${builtEffect.amount} damage to ${target.name}`);
                 anyApplied = true;
             }
-        }
+        }
+
         if (anyApplied) {
             this.recordEffectTrigger(effect, passive);
         }
@@ -400,7 +438,10 @@ export class AdventuringHero extends AdventuringCharacter {
         this.renderQueue.passiveAbilities = true;
         this.stats.renderQueue.stats = true;
 
-        this.equipment.slots.forEach(slot => slot.renderQueue.valid = true);
+        this.equipment.slots.forEach(slot => {
+            slot.renderQueue.valid = true;
+            slot.renderQueue.icon = true;
+        });
 
         this.manager.party.forEach(member => member.renderQueue.jobs = true);
     }
@@ -465,7 +506,8 @@ export class AdventuringHero extends AdventuringCharacter {
         this.component.passiveJob.icon.src = this.passiveJob.media;
         this.component.passiveJob.setTooltipContent(this.passiveJob.tooltip);
         this.component.passiveJob.styling.classList.toggle('pointer-enabled', !this.locked);
-        this.component.passiveJob.styling.classList.toggle('bg-combat-inner-dark', this.locked);
+        this.component.passiveJob.styling.classList.toggle('bg-combat-inner-dark', this.locked);
+
         this.renderQueue.passiveAbilities = true;
 
         this.renderQueue.jobs = false;
@@ -473,29 +515,35 @@ export class AdventuringHero extends AdventuringCharacter {
 
     renderPassiveAbilities() {
         if(!this.renderQueue.passiveAbilities)
-            return;
-        const activePassives = [];
+            return;
+
+        const activePassives = [];
+
         if(this.combatJob && this.combatJob.id !== 'adventuring:none') {
             const combatPassives = this.manager.getPassivesForJob(this.combatJob)
                 .filter(p => p.canEquip(this));
             activePassives.push(...combatPassives);
-        }
+        }
+
         if(this.passiveJob && this.passiveJob !== this.combatJob && this.passiveJob.id !== 'adventuring:none') {
             const passiveJobPassives = this.manager.getPassivesForJob(this.passiveJob)
                 .filter(p => p.canEquip(this) && !activePassives.includes(p));
             activePassives.push(...passiveJobPassives);
-        }
+        }
+
         if(activePassives.length === 0) {
             this.component.passiveAbilitiesContainer.classList.add('d-none');
         } else {
             this.component.passiveAbilitiesContainer.classList.remove('d-none');
             this.component.passiveAbilitiesList.replaceChildren();
 
-            activePassives.forEach(passive => {
+            activePassives.forEach(passive => {
+
                 const tooltip = new TooltipBuilder();
                 tooltip.header(passive.name, passive.media);
                 tooltip.separator();
-                tooltip.info(passive.getDescription(this));
+                tooltip.info(passive.getDescription(this));
+
                 const sourceJob = passive.requirements.find(r => r.type === 'current_job_level');
                 if(sourceJob) {
                     const job = this.manager.jobs.getObjectByID(sourceJob.job);

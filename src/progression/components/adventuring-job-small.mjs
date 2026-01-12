@@ -1,6 +1,6 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { AdventuringTooltipElement } = await loadModule('src/core/adventuring-tooltip-element.mjs');
+const { AdventuringTooltipElement, createTooltip } = await loadModule('src/core/adventuring-tooltip-element.mjs');
 const { AdventuringJobSelectorBtnElement } = await loadModule('src/progression/components/adventuring-job-selector-btn.mjs');
 
 export class AdventuringJobSmallElement extends AdventuringTooltipElement {
@@ -35,10 +35,9 @@ export class AdventuringJobSmallElement extends AdventuringTooltipElement {
 
     attachSelector(character, type) {
         this.selectorType = type;
-        this.selectorCharacter = character;
-        this.selectorPopup = tippy(this.styling, {
-            content: '',
-            allowHTML: true,
+        this.selectorCharacter = character;
+
+        this.selectorPopup = createTooltip(this.styling, '', {
             interactive: true,
             trigger: 'click',
             placement: 'bottom',
@@ -51,7 +50,8 @@ export class AdventuringJobSmallElement extends AdventuringTooltipElement {
                 }
                 instance.setContent(this.buildSelectorContent());
             },
-            onHide: () => {
+            onHide: () => {
+
                 if(this.selectorCharacter.renderQueue) {
                     this.selectorCharacter.renderQueue.jobs = true;
                 }
@@ -61,16 +61,19 @@ export class AdventuringJobSmallElement extends AdventuringTooltipElement {
 
     buildSelectorContent() {
         const container = document.createElement('div');
-        container.className = 'p-2';
+        container.className = 'p-2';
+
         const header = document.createElement('div');
         header.className = 'text-center mb-2 pb-2 border-bottom border-dark';
         const headerText = document.createElement('strong');
         headerText.className = 'text-white';
         headerText.textContent = this.selectorType === 'combatJob' ? 'Select Combat Job' : 'Select Passive Job';
         header.appendChild(headerText);
-        container.appendChild(header);
+        container.appendChild(header);
+
         const grid = document.createElement('div');
-        grid.className = 'd-flex flex-wrap justify-content-center';
+        grid.className = 'd-flex flex-wrap justify-content-center';
+
         const isPassiveSelector = this.selectorType === 'passiveJob';
         const jobProp = isPassiveSelector ? 'passiveJob' : 'combatJob';
 
@@ -113,13 +116,15 @@ export class AdventuringJobSmallElement extends AdventuringTooltipElement {
             this.selectorCharacter.setCombatJob(job);
         } else if(this.selectorType === 'passiveJob') {
             this.selectorCharacter.setPassiveJob(job);
-        }
+        }
+
         if(this.selectorPopup) {
             this.selectorPopup.hide();
         }
     }
 
-    showSelector() {
+    showSelector() {
+
         if(this.selectorPopup && !this.selectorCharacter.locked) {
             this.selectorPopup.show();
         }

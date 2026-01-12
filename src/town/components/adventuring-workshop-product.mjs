@@ -24,9 +24,10 @@ export class AdventuringWorkshopProductElement extends AdventuringTooltipElement
         super.disconnectedCallback();
     }
 
-    setProduct({ iconSrc, name, selected = false, active = false }) {
+    setProduct({ iconSrc, name, selected = false, active = false, tooltip = null }) {
         this.icon.src = iconSrc;
-        this.setTooltipContent(name);
+        this.setTooltipContent(tooltip || name);
+
         this.border.classList.remove('border-secondary', 'border-info', 'border-warning');
         if (selected) {
             this.border.classList.add('border-info');

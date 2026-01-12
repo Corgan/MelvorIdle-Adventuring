@@ -40,7 +40,8 @@ export class AdventuringAuraInstance {
         if (!character || !character.stats) {
             this.snapshotStats = null;
             return;
-        }
+        }
+
         this.snapshotStats = new Map();
         character.stats.forEach((value, key) => {
             this.snapshotStats.set(key, value);
@@ -56,21 +57,17 @@ export class AdventuringAuraInstance {
         try {
             if(this.base !== undefined && typeof this.base !== 'string' && this.base.name) {
                 const tooltip = TooltipBuilder.create()
-                    .header(this.base.name, this.base.media);
+                    .header(this.base.name, this.base.media);
+
                 const isBuff = this.base.isBuff !== undefined ? this.base.isBuff : false;
                 const typeText = isBuff ? 'Buff' : 'Debuff';
-                tooltip.subheader(typeText);
+                tooltip.subheader(typeText);
+
                 const desc = this.base.getDescription(this);
                 if(desc) {
                     tooltip.separator().info(desc);
-                }
-                const triggers = this.getUniqueTriggers();
-                if(triggers.length > 0) {
-                    tooltip.separator().hint('Triggers:');
-                    triggers.forEach(trigger => {
-                        tooltip.hint(`• ${formatTrigger(trigger)}`);
-                    });
-                }
+                }
+
                 tooltip.separator();
                 if(this.stacks > 1) {
                     tooltip.hint(`Stacks: ${this.stacks}`);
@@ -101,17 +98,11 @@ export class AdventuringAuraInstance {
     }
 
     getUniqueTriggers() {
-        if(!this.base || !this.base.effects) return [];
-        const isStandardCleanup = (e) => {
-            if (e.type !== 'remove') return false;
-            if (e.trigger !== 'encounter_end' && e.trigger !== 'death') return false;
-            const keys = Object.keys(e).filter(k => k !== 'trigger' && k !== 'type');
-            return keys.length === 0;
-        };
+        if(!this.base || !this.base.effects) return [];
 
         const triggers = new Set();
         this.base.effects.forEach(effect => {
-            if(effect.trigger && !isStandardCleanup(effect)) {
+            if(effect.trigger && effect.describe !== false) {
                 triggers.add(effect.trigger);
             }
         });
@@ -120,27 +111,32 @@ export class AdventuringAuraInstance {
 
     setAura(aura, stacks=1, snapshot=null) {
         this.base = aura;
-        this.stacks = stacks;
+        this.stacks = stacks;
+
         if (snapshot) {
             this.snapshotStats = snapshot;
-        }
+        }
+
         if(aura.maxStacks !== undefined) {
             this.stacks = Math.min(this.stacks, aura.maxStacks);
-        }
+        }
+
         this.age = 0;
 
         this.auras.buildEffects();
         this.renderQueue.icon = true;
         this.renderQueue.stacks = true;
         this.renderQueue.tooltip = true;
-        this.auras.renderQueue.auras = true;
+        this.auras.renderQueue.auras = true;
+
         if (this.auras.character !== undefined && this.auras.character.invalidateEffects !== undefined) {
             this.auras.character.invalidateEffects('auras');
         }
     }
 
     setStacks(stacks) {
-        this.stacks = stacks;
+        this.stacks = stacks;
+
         if(this.base !== undefined && this.base.maxStacks !== undefined) {
             this.stacks = Math.min(this.stacks, this.base.maxStacks);
         }
@@ -149,7 +145,8 @@ export class AdventuringAuraInstance {
         this.renderQueue.icon = true;
         this.renderQueue.stacks = true;
         this.renderQueue.tooltip = true;
-        this.auras.renderQueue.auras = true;
+        this.auras.renderQueue.auras = true;
+
         if (this.auras.character !== undefined && this.auras.character.invalidateEffects !== undefined) {
             this.auras.character.invalidateEffects('auras');
         }
@@ -162,7 +159,8 @@ export class AdventuringAuraInstance {
         this.renderQueue.icon = true;
         this.renderQueue.stacks = true;
         this.renderQueue.tooltip = true;
-        this.auras.renderQueue.auras = true;
+        this.auras.renderQueue.auras = true;
+
         if (this.auras.character !== undefined && this.auras.character.invalidateEffects !== undefined) {
             this.auras.character.invalidateEffects('auras');
         }
@@ -170,8 +168,10 @@ export class AdventuringAuraInstance {
 
     remove_stacks(count) {
         const previousStacks = this.stacks;
-        this.stacks = Math.max(this.stacks - count, 0);
-        if (previousStacks > 0 && this.stacks === 0 && this.auras.character) {
+        this.stacks = Math.max(this.stacks - count, 0);
+
+        if (previousStacks > 0 && this.stacks === 0 && this.auras.character) {
+
             const depletedEffects = this.base.effects.filter(e => e.trigger === 'stacks_depleted');
             if (depletedEffects.length > 0) {
                 const ctx = {
@@ -189,7 +189,8 @@ export class AdventuringAuraInstance {
         this.renderQueue.icon = true;
         this.renderQueue.stacks = true;
         this.renderQueue.tooltip = true;
-        this.auras.renderQueue.auras = true;
+        this.auras.renderQueue.auras = true;
+
         if (this.auras.character !== undefined && this.auras.character.invalidateEffects !== undefined) {
             this.auras.character.invalidateEffects('auras');
         }
@@ -242,7 +243,8 @@ export class AdventuringAuraInstance {
         writer.writeNamespacedObject(this.base);
         writer.writeUint32(this.stacks);
         writer.writeUint8(this.manager.encounter.all.indexOf(this.source));
-        writer.writeUint16(this.age || 0);
+        writer.writeUint16(this.age || 0);
+
         const hasSnapshot = this.snapshotStats !== null && this.snapshotStats.size > 0;
         writer.writeBoolean(hasSnapshot);
         if (hasSnapshot) {
@@ -257,14 +259,16 @@ export class AdventuringAuraInstance {
     }
 
     decode(reader, version) {
-        const base = reader.getNamespacedObject(this.manager.auras);
+        const base = reader.getNamespacedObject(this.manager.auras);
+
         if(typeof base !== 'string') {
             this.base = base;
         }
         this.stacks = reader.getUint32();
         let sourceIdx = reader.getUint8();
         this.source = this.manager.encounter.all[sourceIdx];
-        this.age = reader.getUint16();
+        this.age = reader.getUint16();
+
         try {
             const hasSnapshot = reader.getBoolean();
             if (hasSnapshot) {
@@ -276,7 +280,8 @@ export class AdventuringAuraInstance {
                     this.snapshotStats.set(key, value);
                 }
             }
-        } catch (e) {
+        } catch (e) {
+
             this.snapshotStats = null;
         }
     }
