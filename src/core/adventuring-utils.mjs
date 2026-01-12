@@ -2643,6 +2643,7 @@ function buildDescription(config) {
 
             const target = hit.target;
             const party = hit.party;
+            const repeat = hit.repeat !== undefined ? hit.repeat : 1;
             const hitParts = [];
 
             if (targetEffects.length > 0) {
@@ -2671,31 +2672,39 @@ function buildDescription(config) {
             }
 
             if (hitParts.length > 0) {
-                hitDescs.push(hitParts.join(' and '));
+                hitDescs.push({ text: hitParts.join(' and '), repeat });
             }
         }
 
         if (hitDescs.length === 1) {
-            desc = hitDescs[0];
+            const h = hitDescs[0];
+            if (h.repeat > 1) {
+                desc = `${h.text} (x${h.repeat})`;
+            } else {
+                desc = h.text;
+            }
         } else if (hitDescs.length === 2) {
 
-            if (hitDescs[0] === hitDescs[1]) {
-                desc = `${hitDescs[0]} (hits twice)`;
+            if (hitDescs[0].text === hitDescs[1].text && hitDescs[0].repeat === 1 && hitDescs[1].repeat === 1) {
+                desc = `${hitDescs[0].text} (hits twice)`;
             } else {
-
-                const second = hitDescs[1].charAt(0).toLowerCase() + hitDescs[1].slice(1);
-                desc = `${hitDescs[0]}, then ${second}`;
+                const parts = hitDescs.map((h, i) => {
+                    let text = i === 0 ? h.text : h.text.charAt(0).toLowerCase() + h.text.slice(1);
+                    if (h.repeat > 1) text = `${text} (x${h.repeat})`;
+                    return text;
+                });
+                desc = parts.join(', then ');
             }
         } else if (hitDescs.length > 2) {
 
-            const allSame = hitDescs.every(h => h === hitDescs[0]);
-            if (allSame) {
-                desc = `${hitDescs[0]} (hits ${hitDescs.length} times)`;
+            const allSame = hitDescs.every(h => h.text === hitDescs[0].text && h.repeat === hitDescs[0].repeat);
+            if (allSame && hitDescs[0].repeat === 1) {
+                desc = `${hitDescs[0].text} (hits ${hitDescs.length} times)`;
             } else {
-
                 const parts = hitDescs.map((h, i) => {
-                    if (i === 0) return h;
-                    return h.charAt(0).toLowerCase() + h.slice(1);
+                    let text = i === 0 ? h.text : h.text.charAt(0).toLowerCase() + h.text.slice(1);
+                    if (h.repeat > 1) text = `${text} (x${h.repeat})`;
+                    return text;
                 });
                 desc = parts.join(', then ');
             }
