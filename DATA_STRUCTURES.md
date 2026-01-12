@@ -41,6 +41,7 @@ All data files are located in `adventuring/data/`. The structure is:
 data/
 ├── base.json              # Core definitions (stats, buffs, debuffs, tiles, slots)
 ├── achievements.json      # Achievement definitions
+├── data-aod.json          # Age of Darkness expansion integration
 ├── difficulties.json      # Difficulty mode definitions
 ├── mastery.json          # Mastery category milestones
 ├── slayer-tasks.json     # Slayer task type definitions
@@ -167,10 +168,7 @@ Materials are resources collected during adventures, used for crafting and upgra
     "name": "Dragon Scale",
     "media": "melvor:assets/media/bank/dragonhide_green.png",
     "category": "adventuring:monster_drops",
-    "tier": 2,
-    "requirements": [
-        { "type": "skill_level", "level": 40 }
-    ]
+    "tier": 2
 }
 ```
 
@@ -2266,6 +2264,7 @@ Effects are the core mechanic for abilities, buffs, debuffs, equipment, and more
 | `force_target` | Must target this entity |
 | `confuse` | May target wrong party |
 | `untargetable` | Cannot be targeted |
+| `double_cast` | Chance to cast ability twice |
 
 **Progression:**
 | Type | Description |
@@ -2289,6 +2288,9 @@ Effects are the core mechanic for abilities, buffs, debuffs, equipment, and more
 | `energy` | Add/remove energy |
 | `revive` | Revive dead hero |
 | `work` | Perform work action |
+| `cleanse` | Remove debuffs from target |
+| `dispel` | Remove buffs from target |
+| `reduce_amount` | Reduce incoming amount (damage/healing) |
 
 ### Target Values
 
