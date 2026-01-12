@@ -247,6 +247,14 @@ Areas (dungeons) define explorable locations with floors, monsters, and loot.
 | `height` | number | ✓ | Floor grid height |
 | `width` | number | ✓ | Floor grid width |
 | `floors` | array | ✓ | Array of floor definitions |
+| `description` | string | ✗ | Area description text |
+| `masteryXP` | number | ✗ | Base mastery XP per clear (default: 100) |
+| `passives` | array | ✗ | Passive effect IDs active in this area |
+| `masteryAuraId` | string | ✗ | Buff ID for mastery level 99 |
+| `isGauntlet` | boolean | ✗ | If true, area is a gauntlet mode |
+| `gauntletTier` | number | ✗ | Gauntlet difficulty tier |
+| `encounterFloorMax` | number | ✗ | Max encounter tiles per floor |
+| `encounterWeight` | number | ✗ | Encounter spawn weight override |
 
 ### Floor Definition
 
@@ -328,6 +336,7 @@ Monsters are enemies encountered in dungeons.
 | `spender` | string | ✓ | Spender ability ID |
 | `passives` | array | ✗ | Array of passive ability IDs |
 | `loot` | array | ✓ | Loot table entries |
+| `masteryXP` | number | ✗ | Base mastery XP (default: 100) |
 
 ### Boss Properties
 
@@ -671,6 +680,9 @@ Equipment (Base Items) define weapons, armor, and accessories.
 | `upgradeMaterials` | array | ✓ | Cost per upgrade level |
 | `requirements` | array | ✗ | Requirements to unlock |
 | `effects` | array | ✗ | Special effects (see Effects section) |
+| `tier` | number | ✗ | Item tier level (affects salvage) |
+| `flavorText` | string | ✗ | Italic flavor text in tooltip |
+| `customDescription` | string | ✗ | Override auto-generated description |
 
 ### Equipment with Effects
 
@@ -891,6 +903,21 @@ Buffs provide positive effects, debuffs provide negative effects. Both use the s
 }
 ```
 
+### Aura Effect Properties
+
+Effects within buffs/debuffs have additional properties:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `consume` | boolean | Remove 1 stack after triggering |
+| `age` | number | Required age (turns) before effect activates |
+| `modifier` | number | Multiplier applied to effect |
+| `count` | number | Fractional execution (0.5 = every other trigger) |
+| `condition` | object | Condition that must be met |
+| `chance` | number | Percent chance to trigger (0-100) |
+| `perStack` | boolean | Multiply effect by stack count |
+```
+
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
 | `id` | string | ✓ | Unique identifier |
@@ -899,6 +926,8 @@ Buffs provide positive effects, debuffs provide negative effects. Both use the s
 | `effects` | array | ✓ | Effect definitions |
 | `stackable` | boolean | ✗ | Can accumulate stacks |
 | `combineMode` | string | ✗ | How stacks combine |
+| `maxStacks` | number | ✗ | Maximum stack limit |
+| `hidden` | boolean | ✗ | If true, not shown in UI |
 
 ### Combine Modes
 
@@ -995,9 +1024,9 @@ Tiles are dungeon floor elements with various effects.
 | `weight` | number | ✗ | Spawn weight (higher = more common) |
 | `floor_max` | number | ✗ | Max per floor (-1 = unlimited) |
 | `dungeon_max` | number | ✗ | Max per dungeon run (-1 = unlimited) |
-| `masteryUnlock` | boolean | ✗ | Requires area mastery to spawn |
-| `alwaysShowIcon` | boolean | ✗ | Always visible on map |
-| `effects` | array | ✗ | Effects when stepped on |
+| `masteryUnlock` | boolean | ✗ | If true, only spawns when area is mastered |
+| `alwaysShowIcon` | boolean | ✗ | If true, icon always visible on map |
+| `effects` | array | ✗ | Effects when tile is activated |
 
 ### Built-in Tiles
 
@@ -1090,7 +1119,26 @@ Difficulties modify dungeon runs with different challenges and rewards.
 | `isEndless` | boolean | ✗ | If true, infinite waves |
 | `description` | string | ✗ | Description text |
 | `effects` | array | ✓ | Modifier effects |
-| `waveScaling` | object | ✗ | For endless mode |
+| `waveScaling` | object | ✗ | For endless mode stat scaling |
+| `waveGeneration` | object | ✗ | Wave generation settings |
+
+### Wave Generation
+
+```json
+{
+    "waveGeneration": {
+        "type": "infinite",
+        "floorsPerWave": 1,
+        "floorSelection": "first"
+    }
+}
+```
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `type` | string | `infinite` for endless mode |
+| `floorsPerWave` | number | Floors per wave (default: 1) |
+| `floorSelection` | string | `first` or `random` |
 
 ### Built-in Difficulties
 
@@ -1203,6 +1251,48 @@ Achievements provide goals with rewards.
 { "type": "total_job_levels", "count": 100 }
 ```
 
+**Total Kills:**
+```json
+{ "type": "total_kills", "target": 1000 }
+```
+
+**Kills by Tag:**
+```json
+{ "type": "kills_by_tag", "tag": "dragon", "target": 100 }
+```
+
+**Heroic/Mythic Clears:**
+```json
+{ "type": "heroic_clears", "target": 10 }
+{ "type": "mythic_clears", "target": 5 }
+```
+
+**Endless Wave:**
+```json
+{ "type": "endless_wave", "target": 50 }
+```
+
+**Total Endless Waves:**
+```json
+{ "type": "total_endless_waves", "target": 100 }
+```
+
+**Slayer Tasks:**
+```json
+{ "type": "slayer_tasks", "target": 50 }
+```
+
+**Set Bonus Active:**
+```json
+{ "type": "set_bonus_active", "pieces": 3 }
+```
+
+**Monster Mastery:**
+```json
+{ "type": "monster_mastery", "target": 50 }
+{ "type": "total_monster_mastery", "target": 500 }
+```
+
 **Equipment Upgrades:**
 ```json
 { "type": "equipment_upgrades", "count": 50 }
@@ -1258,20 +1348,38 @@ Slayer task types define bounty objectives.
 | `name` | string | ✓ | Display name |
 | `descriptionTemplate` | string | ✓ | Template with `{target}`, `{count}` |
 | `targetType` | string | ✓ | What the task targets |
+| `targetStat` | string | ✗ | Stat name for stat-based tasks |
+| `targetDifficulty` | string | ✗ | Difficulty for difficulty-based tasks |
 | `baseRequirements` | array | ✓ | Base count per tier [1-6] |
 | `requirementVariance` | array | ✓ | Random variance per tier |
-| `baseRewards` | array | ✓ | Slayer coin reward per tier |
-| `materialRewardChance` | array | ✗ | Chance for material bonus |
-| `consumableRewardChance` | array | ✗ | Chance for consumable bonus |
+| `baseRewards` | object | ✓ | Reward config (see below) |
+| `materialRewardChance` | array | ✗ | Chance for material bonus per tier |
+| `consumableRewardChance` | array | ✗ | Chance for consumable bonus per tier |
+
+### Base Rewards Object
+
+```json
+{
+    "baseRewards": {
+        "currency": [10, 20, 35, 50, 75, 100],
+        "currencyVariance": [5, 10, 15, 25, 35, 50],
+        "xp": [50, 100, 200, 350, 500, 750],
+        "xpVariance": [10, 25, 50, 100, 150, 200]
+    }
+}
+```
 
 ### Target Types
 
 | Type | Description |
 |------|-------------|
 | `monster` | Specific monster |
-| `tag` | Monsters with specific tag |
+| `monster_tag` | Monsters with specific tag |
+| `material` | Collect materials |
 | `area` | Clear specific area |
-| `any` | General objective |
+| `stat` | Track cumulative stat (uses `targetStat`) |
+| `difficulty` | Clear at specific difficulty |
+| `endless_wave` | Reach wave in endless mode |
 
 ### Built-in Task Types
 
@@ -1355,7 +1463,9 @@ Drinks provide temporary party buffs.
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
 | `tier` | number | ✓ | Tier number (1-4) |
-| `duration` | number | ✓ | Dungeon runs duration |
+| `nameSuffix` | string | ✗ | Appended to name |
+| `media` | string | ✗ | Override icon for this tier |
+| `flavorText` | string | ✗ | Description/flavor text |
 | `materials` | array | ✓ | Purchase cost |
 | `effects` | array | ✓ | Effects while active |
 
@@ -1424,6 +1534,7 @@ Consumables are single-use items crafted and equipped for dungeon runs.
 | `type` | string | ✗ | Category (`tool`, `potion`, etc.) |
 | `sourceJob` | string | ✗ | Job that crafts this |
 | `maxCharges` | number | ✗ | Max uses per dungeon |
+| `target` | string | ✗ | Default target for effects (`self`, `ally`, `enemy`) |
 | `tiers` | array | ✓ | Tier definitions |
 
 ### Consumable Tier Properties
@@ -1480,6 +1591,7 @@ Buildings are town locations with functionality. Products are craftable items.
 | `idle` | array | ✗ | Idle status messages |
 | `actions` | array | ✗ | Town action IDs |
 | `products` | array | ✗ | Product IDs available |
+| `itemSlotOrder` | array | ✗ | Equipment slot display order |
 
 ### Product Definition
 
@@ -1818,6 +1930,42 @@ Hero must be dead.
 ```
 Compare property against value. Operators: `<`, `<=`, `==`, `>=`, `>`
 
+**Slayer Tasks Completed:**
+```json
+{ "type": "slayer_tasks_completed", "count": 50 }
+```
+Requires total slayer tasks completed.
+
+**Achievement Completion:**
+```json
+{ "type": "achievement_completion", "id": "adventuring:first_blood" }
+```
+Requires specific achievement completed.
+
+**Area Cleared:**
+```json
+{ "type": "area_cleared", "area": "adventuring:dragons_lair" }
+```
+Requires area to have been cleared at least once.
+
+**Item Upgrade:**
+```json
+{ "type": "item_upgrade", "item": "adventuring:dragon_sword", "level": 10 }
+```
+Requires equipment upgrade level.
+
+**Dropped (special):**
+```json
+{ "type": "dropped" }
+```
+Item must be found as a drop (not craftable).
+
+**Always False:**
+```json
+{ "type": "always_false", "hint": "Unlock through special event" }
+```
+Cannot be met normally; used for special unlocks.
+
 **Multiple Requirements:**
 ```json
 "requirements": [
@@ -1865,6 +2013,8 @@ Effects are the core mechanic for abilities, buffs, debuffs, equipment, and more
 | `perStack` | boolean | Multiply by stacks |
 | `describe` | boolean | Show in descriptions |
 | `count` | number | Fractional execution (0.5 = every other) |
+| `limit` | string | Limit type: `combat`, `round`, or `turn` |
+| `times` | number | Max triggers per limit period (default: 1) |
 
 ### Triggers
 
@@ -2036,6 +2186,28 @@ Many effects use scaling values that combine a base amount with stat scaling.
 ```
 
 **Formula:** `final = base + (stat1 * amount1) + (stat2 * amount2) + ...`
+
+### Scale From Property
+
+For effects that need to scale from the target's stats instead of the caster's:
+
+```json
+{
+    "type": "damage_flat",
+    "amount": {
+        "base": 0,
+        "scaling": [
+            { "id": "adventuring:hitpoints", "amount": 0.1 }
+        ]
+    },
+    "scaleFrom": "target"
+}
+```
+
+| Value | Description |
+|-------|-------------|
+| `caster` | Scale from ability user's stats (default) |
+| `target` | Scale from target's stats |
 
 ### Usage Examples
 
