@@ -43,7 +43,6 @@ data/
 ├── achievements.json      # Achievement definitions
 ├── difficulties.json      # Difficulty mode definitions
 ├── mastery.json          # Mastery category milestones
-├── materials.json        # Additional material definitions
 ├── slayer-tasks.json     # Slayer task type definitions
 ├── tags.json             # Monster tag definitions
 ├── tavern-drinks.json    # Drink definitions
@@ -53,7 +52,10 @@ data/
 │   ├── tier1.json        # Tier 1 equipment
 │   ├── tier2.json        # Tier 2 equipment
 │   ├── ...
+│   ├── tier9.json        # Tier 9 equipment
+│   ├── tier_boss.json    # Boss drop equipment
 │   ├── artifacts.json    # Special tiered artifacts
+│   ├── materials.json    # Material definitions
 │   ├── uniques.json      # Unique items with special effects
 │   └── types.json        # Item type definitions
 └── jobs/
@@ -180,7 +182,6 @@ Materials are resources collected during adventures, used for crafting and upgra
 | `category` | string | ✓ | Material category ID |
 | `tier` | number | ✗ | Tier level (1-4, default: 1) |
 | `isCurrency` | boolean | ✗ | If true, treated as currency |
-| `requirements` | array | ✗ | Requirements to unlock/use |
 
 ### Material Categories
 
@@ -253,9 +254,11 @@ Areas (dungeons) define explorable locations with floors, monsters, and loot.
 | `description` | string | ✗ | Area description text |
 | `masteryXP` | number | ✗ | Base mastery XP per clear (default: 2000) |
 | `passives` | array | ✗ | Passive effect IDs active in this area |
-| `masteryAuraId` | string | ✗ | Buff ID for mastery level 99 |
+| `masteryAuraId` | string | ✗ | Reference to existing buff ID for mastery level 99 |
+| `masteryAura` | object | ✗ | Inline buff definition for mastery level 99 (alternative to masteryAuraId) |
 | `isGauntlet` | boolean | ✗ | If true, area is a gauntlet mode |
 | `gauntletTier` | number | ✗ | Gauntlet difficulty tier |
+| `gauntletRewardMultiplier` | number | ✗ | Loot multiplier for gauntlet (default: 1.0) |
 | `encounterFloorMax` | number | ✗ | Max encounter tiles per floor |
 | `encounterWeight` | number | ✗ | Encounter spawn weight override |
 
@@ -372,20 +375,27 @@ Bosses can have additional properties:
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `enrageThreshold` | number | HP% that triggers enrage |
-| `enrageBuff.damage` | number | Damage multiplier when enraged |
-| `enrageBuff.speed` | number | Speed multiplier when enraged |
+| `enrageThreshold` | number | HP% that triggers enrage (e.g., 30 = enrage at 30% HP) |
+| `enrageBuff` | object | ⚠️ **Currently unused** - Data exists but enrage always uses fixed +50% damage and +25% agility from the base aura definition |
 | `phases` | array | Boss phase definitions |
 
 **Phase Properties:**
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
-| `name` | string | ✓ | Phase name |
+| `name` | string | ✓ | Phase name displayed when entering phase |
 | `hpThreshold` | number | ✗ | HP% to trigger phase (first phase has none) |
-| `generator` | string | ✗ | New generator for this phase |
-| `spender` | string | ✗ | New spender for this phase |
-| `statBuffs` | array | ✗ | Stat multipliers for this phase |
+| `generator` | string | ✗ | New generator ability ID for this phase |
+| `spender` | string | ✗ | New spender ability ID for this phase |
+| `statBuffs` | array | ✗ | Array of stat buff objects (⚠️ **Bugged**: code reads `value` but data uses `amount`) |
+| `amount` | number | ✗ | Heal percentage on phase transition (e.g., 25 = heal 25% max HP) |
+
+**StatBuff Object Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `id` | string | Stat ID to buff. Special values: `"all"` buffs all stats, `"adventuring:strength/ranged/magic"` applies Might buff, `"adventuring:agility"` applies Haste, `"adventuring:defence"` applies Fortify |
+| `amount` | number | Multiplier as decimal (0.35 = +35%). ⚠️ Currently broken - code reads `value` not `amount` |
 
 ### Loot Entry Types
 
@@ -393,11 +403,13 @@ Bosses can have additional properties:
 ```json
 { "id": "adventuring:currency", "qty": 50, "type": "currency" }
 ```
+Currency drops have 80-120% variance on quantity.
 
 **Salvage:**
 ```json
 { "id": "adventuring:parts", "qty": 12, "type": "salvage" }
 ```
+Salvage drops random quantity from 1 to `qty`.
 
 **Materials (with chance):**
 ```json
@@ -414,13 +426,28 @@ Bosses can have additional properties:
 { "type": "equipment", "id": "adventuring:dragon_sword", "chance": 0.05 }
 ```
 
+**Loot Table Reference:**
+```json
+{ "type": "table", "table": "adventuring:common_materials" }
+```
+
+**Variable Quantity:**
+```json
+{ "id": "adventuring:currency", "minQty": 150, "maxQty": 200, "type": "currency" }
+```
+
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
-| `type` | string | ✓ | `currency`, `salvage`, `materials`, `equipment_pool`, `equipment` |
-| `id` | string | ✓* | Material/item ID (*not for equipment_pool) |
+| `type` | string | ✓ | `currency`, `salvage`, `materials`, `equipment_pool`, `equipment`, `table` |
+| `id` | string | ✓* | Material/item ID (*not for equipment_pool or table) |
 | `pool` | string | ✓* | Equipment pool ID (*only for equipment_pool) |
-| `qty` | number | ✗ | Quantity (default: 1) |
-| `chance` | number | ✗ | Drop chance 0-1 (default: 1 = guaranteed) |
+| `table` | string | ✓* | Loot table ID (*only for table type) |
+| `qty` | number | ✗ | Fixed quantity (default: 1) |
+| `minQty` | number | ✗ | Minimum quantity (use with maxQty for range) |
+| `maxQty` | number | ✗ | Maximum quantity (use with minQty for range) |
+| `chance` | number | ✗ | Drop chance 0-1 (default varies by type) |
+| `rarity` | string | ✗ | Override rarity for equipment drops |
+| `conditions` | array | ✗ | Requirements that must be met for drop |
 
 ---
 
@@ -475,12 +502,11 @@ Abilities are combat actions divided into **Generators** (build energy) and **Sp
 | `requirements` | array | ✗ | Requirements to unlock |
 | `energy` | number | ✓ | Energy generated per use |
 | `hits` | array | ✓ | Array of hit definitions |
-| `isEnemy` | boolean | ✗ | If true, only for monsters |
-| `description` | string | ✗ | Template description with {effect.N.amount} placeholders |
-| `flavorText` | string | ✗ | Italic flavor text in tooltip |
-| `learnType` | string | ✗ | How ability is learned: `normal`, `blue_mage` |
-| `learnBonus` | number | ✗ | XP bonus multiplier when learning |
-| `isAchievementAbility` | boolean | ✗ | If true, unlocked via achievement |
+| `isEnemy` | boolean | ✗ | If true, this is a monster ability (can be learned by Slayer heroes) |
+| `description` | string | ✗ | Custom description template (auto-generated if omitted) |
+| `flavorText` | string | ✗ | Italic flavor text shown in tooltip |
+| `learnType` | string | ✗ | Type of enemy ability this can teach: `generator` or `spender` (Slayer job only) |
+| `learnBonus` | number | ✗ | Percentage bonus to ability learning chance (e.g., 25 = +25%) |
 
 ### Spender Definition
 
@@ -510,11 +536,7 @@ Abilities are combat actions divided into **Generators** (build energy) and **Sp
                 }
             ]
         }
-    ],
-    "masteryAura": {
-        "id": "adventuring:might",
-        "stacks": 2
-    }
+    ]
 }
 ```
 
@@ -525,13 +547,11 @@ Abilities are combat actions divided into **Generators** (build energy) and **Sp
 | `requirements` | array | ✗ | Requirements to unlock |
 | `cost` | number | ✓ | Energy cost to use |
 | `hits` | array | ✓ | Array of hit definitions |
-| `isEnemy` | boolean | ✗ | If true, only for monsters |
-| `description` | string | ✗ | Template description with {effect.N.amount} placeholders |
-| `flavorText` | string | ✗ | Italic flavor text in tooltip |
-| `learnType` | string | ✗ | How ability is learned: `normal`, `blue_mage` |
-| `learnBonus` | number | ✗ | XP bonus multiplier when learning |
-| `isAchievementAbility` | boolean | ✗ | If true, unlocked via achievement |
-| `masteryAura` | object | ✗ | Buff applied at area mastery 99 |
+| `isEnemy` | boolean | ✗ | If true, this is a monster ability (can be learned by Slayer heroes) |
+| `description` | string | ✗ | Custom description template (auto-generated if omitted) |
+| `flavorText` | string | ✗ | Italic flavor text shown in tooltip |
+| `learnType` | string | ✗ | Type of enemy ability this can teach: `generator` or `spender` (Slayer job only) |
+| `learnBonus` | number | ✗ | Percentage bonus to ability learning chance (e.g., 25 = +25%) |
 
 ### Hit Definition
 
@@ -602,7 +622,9 @@ Passives are permanent effects that apply during combat.
 |----------|------|----------|-------------|
 | `id` | string | ✓ | Unique identifier |
 | `name` | string | ✓ | Display name |
-| `requirements` | array | ✗ | Requirements to unlock |
+| `description` | string | ✗ | Description template with placeholders like `{effect.0.amount}` |
+| `flavorText` | string | ✗ | Optional flavor text shown in tooltips |
+| `requirements` | array | ✗ | Requirements to unlock/equip |
 | `effects` | array | ✓ | Array of effect definitions |
 
 ### Passive Examples
@@ -672,9 +694,11 @@ Equipment (Base Items) define weapons, armor, and accessories.
         { "id": "adventuring:hitpoints", "amount": 0.4 },
         { "id": "adventuring:strength", "amount": 0.7 }
     ],
-    "upgradeMaterials": [
-        { "id": "adventuring:parts", "qty": 2 }
-    ],
+    "upgradeMaterials": {
+        "1": ["adventuring:feather"],
+        "4": ["adventuring:hay_bundle"],
+        "7": ["adventuring:golbin_ear"]
+    },
     "requirements": [
         { "type": "skill_level", "level": 1 }
     ]
@@ -687,10 +711,10 @@ Equipment (Base Items) define weapons, armor, and accessories.
 | `name` | string | ✓ | Display name |
 | `media` | string | ✓ | Icon path |
 | `type` | string | ✓ | Item type ID (determines slots) |
-| `materials` | array | ✓ | Cost to acquire |
-| `base` | array | ✓ | Base stats at level 1 |
-| `scaling` | array | ✓ | Stat increase per level |
-| `upgradeMaterials` | array | ✓ | Cost per upgrade level |
+| `materials` | array | ✓* | Cost to acquire (*not required for artifacts using tiers) |
+| `base` | array | ✓* | Base stats at level 1 (*not required for artifacts using tiers) |
+| `scaling` | array | ✓* | Stat increase per level (*not required for artifacts using tiers) |
+| `upgradeMaterials` | object | ✓* | Material IDs by upgrade threshold (*not required for artifacts) |
 | `requirements` | array | ✗ | Requirements to unlock |
 | `effects` | array | ✗ | Special effects (see Effects section) |
 | `tier` | number | ✗ | Item tier level (affects salvage) |
@@ -698,6 +722,26 @@ Equipment (Base Items) define weapons, armor, and accessories.
 | `customDescription` | string | ✗ | Override auto-generated description |
 | `maxUpgrades` | number | ✗ | Maximum upgrade level (default: 10) |
 | `set` | string | ✗ | Equipment set ID (auto-assigned) |
+| `isArtifact` | boolean | ✗ | If true, uses `tiers` for progression instead of upgrades |
+| `tiers` | array | ✗ | Array of tier definitions for artifacts (see Tiered Equipment) |
+
+### Upgrade Materials Format
+
+The `upgradeMaterials` property is an object where keys are upgrade thresholds and values are arrays of material IDs. Materials at each threshold are required for upgrades from that level onward:
+
+```json
+{
+    "upgradeMaterials": {
+        "1": ["adventuring:feather"],
+        "4": ["adventuring:hay_bundle"],
+        "7": ["adventuring:golbin_ear"]
+    }
+}
+```
+
+- Upgrades 1-3: Requires `adventuring:feather`
+- Upgrades 4-6: Requires `adventuring:feather` + `adventuring:hay_bundle`
+- Upgrades 7+: Requires all three materials
 
 ### Equipment with Effects
 
@@ -710,7 +754,7 @@ Equipment (Base Items) define weapons, armor, and accessories.
     "materials": [...],
     "base": [...],
     "scaling": [...],
-    "upgradeMaterials": [...],
+    "upgradeMaterials": {...},
     "effects": [
         {
             "id": "adventuring:vampirism",
@@ -1155,7 +1199,7 @@ Difficulties modify dungeon runs with different challenges and rewards.
 |----------|------|-------------|
 | `type` | string | `infinite` for endless mode |
 | `floorsPerWave` | number | Floors per wave (default: 1) |
-| `floorSelection` | string | `first` or `random` |
+| `floorSelection` | string | `first`, `random`, or `cycle` |
 
 ### Built-in Difficulties
 
@@ -1189,6 +1233,7 @@ Difficulties modify dungeon runs with different challenges and rewards.
 | Property | Type | Description |
 |----------|------|-------------|
 | `statPercentPerWave` | number | % stat increase per wave (default: 5) |
+| `rewardPercentPerWave` | number | % XP/loot increase per wave |
 | `effects` | array | Effects applied at wave intervals |
 | `effects[].waveInterval` | number | Apply every N waves |
 
@@ -1382,14 +1427,20 @@ Slayer task types define bounty objectives.
 ```json
 {
     "id": "kill",
-    "name": "Kill Task",
-    "descriptionTemplate": "Kill {target} {count} times.",
+    "name": "Slay Monsters",
+    "descriptionTemplate": "Slay ${required} ${targetName}",
+    "progressVerb": "slain",
     "targetType": "monster",
-    "baseRequirements": [0, 0, 0, 0, 0, 0],
-    "requirementVariance": [0, 0, 0, 0, 0, 0],
-    "baseRewards": [10, 20, 35, 50, 75, 100],
-    "materialRewardChance": [0.1, 0.15, 0.2, 0.25, 0.3, 0.4],
-    "consumableRewardChance": [0.05, 0.1, 0.15, 0.2, 0.25, 0.3]
+    "baseRequirements": [5, 10, 20, 35, 50],
+    "requirementVariance": [2, 5, 10, 15, 20],
+    "baseRewards": {
+        "currency": [50, 150, 350, 600, 1000],
+        "currencyVariance": [20, 50, 100, 150, 250],
+        "xp": [25, 75, 175, 350, 600],
+        "xpVariance": [10, 25, 50, 100, 150]
+    },
+    "materialRewardChance": [0, 0.4, 0.5, 0.6, 0.7],
+    "consumableRewardChance": [0, 0.1, 0.2, 0.3, 0.4]
 }
 ```
 
@@ -1397,12 +1448,12 @@ Slayer task types define bounty objectives.
 |----------|------|----------|-------------|
 | `id` | string | ✓ | Unique identifier |
 | `name` | string | ✓ | Display name |
-| `descriptionTemplate` | string | ✓ | Template with `{target}`, `{count}` |
+| `descriptionTemplate` | string | ✓ | Template with `${required}`, `${targetName}` |
 | `progressVerb` | string | ✗ | Verb for progress display (e.g., "Kill", "Collect") |
 | `targetType` | string | ✓ | What the task targets |
 | `targetStat` | string | ✗ | Stat name for stat-based tasks |
 | `targetDifficulty` | string | ✗ | Difficulty for difficulty-based tasks |
-| `baseRequirements` | array | ✓ | Base count per tier [1-6] |
+| `baseRequirements` | array | ✓ | Base count per tier [1-5] |
 | `requirementVariance` | array | ✓ | Random variance per tier |
 | `baseRewards` | object | ✓ | Reward config (see below) |
 | `materialRewardChance` | array | ✗ | Chance for material bonus per tier |
@@ -1413,10 +1464,10 @@ Slayer task types define bounty objectives.
 ```json
 {
     "baseRewards": {
-        "currency": [10, 20, 35, 50, 75, 100],
-        "currencyVariance": [5, 10, 15, 25, 35, 50],
-        "xp": [50, 100, 200, 350, 500, 750],
-        "xpVariance": [10, 25, 50, 100, 150, 200]
+        "currency": [50, 150, 350, 600, 1000],
+        "currencyVariance": [20, 50, 100, 150, 250],
+        "xp": [25, 75, 175, 350, 600],
+        "xpVariance": [10, 25, 50, 100, 150]
     }
 }
 ```
@@ -1585,6 +1636,7 @@ Consumables are single-use items crafted and equipped for dungeon runs.
 | `sourceJob` | string | ✗ | Job that crafts this |
 | `maxCharges` | number | ✗ | Max uses per dungeon |
 | `target` | string | ✗ | Default target for effects (`self`, `ally`, `enemy`) |
+| `customDescription` | string | ✗ | Override auto-generated description |
 | `tiers` | array | ✓ | Tier definitions |
 
 ### Consumable Tier Properties
@@ -2052,6 +2104,12 @@ Requires area to have been cleared at least once.
 { "type": "item_upgrade", "item": "adventuring:dragon_sword", "level": 10 }
 ```
 Requires equipment upgrade level.
+
+**Current Job (for context-specific):**
+```json
+{ "type": "current_job", "job": "adventuring:fighter" }
+```
+Requires hero's current job to be the specified job (any level).
 
 **Dropped (special):**
 ```json
@@ -2537,9 +2595,10 @@ Create or add to an items file:
             { "id": "adventuring:hitpoints", "amount": 1.2 },
             { "id": "adventuring:strength", "amount": 2.0 }
         ],
-        "upgradeMaterials": [
-            { "id": "adventuring:big_parts", "qty": 5 }
-        ],
+        "upgradeMaterials": {
+            "1": ["adventuring:big_parts"],
+            "5": ["adventuring:superior_salvage"]
+        },
         "effects": [
             {
                 "id": "adventuring:might",
@@ -2550,18 +2609,6 @@ Create or add to an items file:
     }]
 }
 ```
-
----
-
-## Tips & Best Practices
-
-1. **Test incrementally** - Add one thing at a time and verify it works
-2. **Check the console** - Errors appear in browser developer console
-3. **Use existing examples** - Copy similar content as a template
-4. **Balance carefully** - Compare stats to similar tier content
-5. **Namespace everything** - Always use `adventuring:` prefix for references
-6. **Validate JSON** - Use a JSON validator before testing
-7. **Document changes** - Note what you add for future reference
 
 ---
 
