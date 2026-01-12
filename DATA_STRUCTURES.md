@@ -26,9 +26,10 @@ This document provides comprehensive documentation for developers who want to ad
 20. [Tutorials](#tutorials)
 21. [Tags](#tags)
 22. [Item Types & Slots](#item-types--slots)
-23. [Requirements](#requirements)
-24. [Effects System](#effects-system)
-25. [Scaling Values](#scaling-values)
+23. [Equipment Sets](#equipment-sets)
+24. [Requirements](#requirements)
+25. [Effects System](#effects-system)
+26. [Scaling Values](#scaling-values)
 
 ---
 
@@ -247,8 +248,10 @@ Areas (dungeons) define explorable locations with floors, monsters, and loot.
 | `height` | number | ✓ | Floor grid height |
 | `width` | number | ✓ | Floor grid width |
 | `floors` | array | ✓ | Array of floor definitions |
+| `tiles` | array | ✗ | Custom tile pool for this area |
+| `loot` | array | ✗ | Global loot table for area drops |
 | `description` | string | ✗ | Area description text |
-| `masteryXP` | number | ✗ | Base mastery XP per clear (default: 100) |
+| `masteryXP` | number | ✗ | Base mastery XP per clear (default: 2000) |
 | `passives` | array | ✗ | Passive effect IDs active in this area |
 | `masteryAuraId` | string | ✗ | Buff ID for mastery level 99 |
 | `isGauntlet` | boolean | ✗ | If true, area is a gauntlet mode |
@@ -473,6 +476,11 @@ Abilities are combat actions divided into **Generators** (build energy) and **Sp
 | `energy` | number | ✓ | Energy generated per use |
 | `hits` | array | ✓ | Array of hit definitions |
 | `isEnemy` | boolean | ✗ | If true, only for monsters |
+| `description` | string | ✗ | Template description with {effect.N.amount} placeholders |
+| `flavorText` | string | ✗ | Italic flavor text in tooltip |
+| `learnType` | string | ✗ | How ability is learned: `normal`, `blue_mage` |
+| `learnBonus` | number | ✗ | XP bonus multiplier when learning |
+| `isAchievementAbility` | boolean | ✗ | If true, unlocked via achievement |
 
 ### Spender Definition
 
@@ -518,6 +526,11 @@ Abilities are combat actions divided into **Generators** (build energy) and **Sp
 | `cost` | number | ✓ | Energy cost to use |
 | `hits` | array | ✓ | Array of hit definitions |
 | `isEnemy` | boolean | ✗ | If true, only for monsters |
+| `description` | string | ✗ | Template description with {effect.N.amount} placeholders |
+| `flavorText` | string | ✗ | Italic flavor text in tooltip |
+| `learnType` | string | ✗ | How ability is learned: `normal`, `blue_mage` |
+| `learnBonus` | number | ✗ | XP bonus multiplier when learning |
+| `isAchievementAbility` | boolean | ✗ | If true, unlocked via achievement |
 | `masteryAura` | object | ✗ | Buff applied at area mastery 99 |
 
 ### Hit Definition
@@ -683,6 +696,8 @@ Equipment (Base Items) define weapons, armor, and accessories.
 | `tier` | number | ✗ | Item tier level (affects salvage) |
 | `flavorText` | string | ✗ | Italic flavor text in tooltip |
 | `customDescription` | string | ✗ | Override auto-generated description |
+| `maxUpgrades` | number | ✗ | Maximum upgrade level (default: 10) |
+| `set` | string | ✗ | Equipment set ID (auto-assigned) |
 
 ### Equipment with Effects
 
@@ -916,7 +931,7 @@ Effects within buffs/debuffs have additional properties:
 | `condition` | object | Condition that must be met |
 | `chance` | number | Percent chance to trigger (0-100) |
 | `perStack` | boolean | Multiply effect by stack count |
-```
+| `scaleFrom` | string | Stat source: `source`, `target`, or `snapshot` |
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
@@ -924,6 +939,8 @@ Effects within buffs/debuffs have additional properties:
 | `name` | string | ✓ | Display name |
 | `media` | string | ✓ | Icon path |
 | `effects` | array | ✓ | Effect definitions |
+| `description` | string | ✗ | Template description with {effect.N.amount} placeholders |
+| `flavorText` | string | ✗ | Italic flavor text in tooltip |
 | `stackable` | boolean | ✗ | Can accumulate stacks |
 | `combineMode` | string | ✗ | How stacks combine |
 | `maxStacks` | number | ✗ | Maximum stack limit |
@@ -1154,7 +1171,7 @@ Difficulties modify dungeon runs with different challenges and rewards.
 ```json
 {
     "waveScaling": {
-        "stat_percent": 10,
+        "statPercentPerWave": 5,
         "effects": [
             {
                 "waveInterval": 5,
@@ -1171,7 +1188,7 @@ Difficulties modify dungeon runs with different challenges and rewards.
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `stat_percent` | number | % stat increase per wave |
+| `statPercentPerWave` | number | % stat increase per wave (default: 5) |
 | `effects` | array | Effects applied at wave intervals |
 | `effects[].waveInterval` | number | Apply every N waves |
 
@@ -1190,8 +1207,8 @@ Achievements provide goals with rewards.
     "category": "combat",
     "media": "melvor:assets/media/skills/combat/combat.svg",
     "requirement": {
-        "type": "monsters_killed",
-        "count": 1
+        "type": "total_kills",
+        "target": 1
     },
     "rewards": [
         { "type": "currency", "id": "adventuring:currency", "qty": 100 }
@@ -1221,14 +1238,14 @@ Achievements provide goals with rewards.
 
 ### Requirement Types
 
-**Monster Count:**
+**Total Kills:**
 ```json
-{ "type": "monsters_killed", "count": 100 }
+{ "type": "total_kills", "target": 100 }
 ```
 
-**Boss Count:**
+**Total Clears:**
 ```json
-{ "type": "bosses_killed", "count": 10 }
+{ "type": "total_clears", "target": 10 }
 ```
 
 **Area Clear:**
@@ -1238,7 +1255,7 @@ Achievements provide goals with rewards.
 
 **Area Mastery:**
 ```json
-{ "type": "area_mastery", "area": "adventuring:chicken_coop", "level": 50 }
+{ "type": "area_mastery", "target": 50 }
 ```
 
 **Job Level:**
@@ -1246,14 +1263,9 @@ Achievements provide goals with rewards.
 { "type": "job_level", "job": "adventuring:fighter", "level": 50 }
 ```
 
-**Total Job Levels:**
+**Jobs At Level:**
 ```json
-{ "type": "total_job_levels", "count": 100 }
-```
-
-**Total Kills:**
-```json
-{ "type": "total_kills", "target": 1000 }
+{ "type": "jobs_at_level", "level": 50, "target": 5 }
 ```
 
 **Kills by Tag:**
@@ -1293,14 +1305,48 @@ Achievements provide goals with rewards.
 { "type": "total_monster_mastery", "target": 500 }
 ```
 
-**Equipment Upgrades:**
+**Learned Abilities:**
 ```json
-{ "type": "equipment_upgrades", "count": 50 }
+{ "type": "learned_abilities", "target": 10 }
 ```
 
-**Difficulty Clear:**
+**Total Materials/Currency:**
 ```json
-{ "type": "difficulty_clear", "difficulty": "adventuring:mythic", "count": 10 }
+{ "type": "total_materials", "target": 1000 }
+{ "type": "total_currency", "target": 5000 }
+```
+
+**Unique Monsters:**
+```json
+{ "type": "unique_monsters", "target": 50 }
+```
+
+**Flawless/Last Stand Wins:**
+```json
+{ "type": "flawless_wins", "target": 10 }
+{ "type": "last_stand_wins", "target": 5 }
+```
+
+**Fast Wins:**
+```json
+{ "type": "fast_wins", "rounds": 3, "target": 10 }
+```
+
+**Total Damage/Healing:**
+```json
+{ "type": "total_damage", "target": 100000 }
+{ "type": "total_healing", "target": 50000 }
+```
+
+**Job Unlocked:**
+```json
+{ "type": "job_unlocked", "job": "adventuring:knight" }
+```
+
+**Passive Job Levels:**
+```json
+{ "type": "any_passive_job_level", "target": 50 }
+{ "type": "all_passive_jobs_level", "level": 25 }
 ```
 
 ### Reward Types
@@ -1310,9 +1356,14 @@ Achievements provide goals with rewards.
 { "type": "currency", "id": "adventuring:currency", "qty": 1000 }
 ```
 
+**Material:**
+```json
+{ "type": "material", "id": "adventuring:pristine_salvage", "qty": 5 }
+```
+
 **Effect (permanent buff):**
 ```json
-{ "type": "effect", "effect": { "type": "xp_percent", "amount": 5 } }
+{ "type": "effect", "effects": [{ "type": "xp_percent", "amount": 5 }] }
 ```
 
 **Ability Unlock:**
@@ -1347,6 +1398,7 @@ Slayer task types define bounty objectives.
 | `id` | string | ✓ | Unique identifier |
 | `name` | string | ✓ | Display name |
 | `descriptionTemplate` | string | ✓ | Template with `{target}`, `{count}` |
+| `progressVerb` | string | ✗ | Verb for progress display (e.g., "Kill", "Collect") |
 | `targetType` | string | ✓ | What the task targets |
 | `targetStat` | string | ✗ | Stat name for stat-based tasks |
 | `targetDifficulty` | string | ✗ | Difficulty for difficulty-based tasks |
@@ -1413,11 +1465,10 @@ Drinks provide temporary party buffs.
     "id": "warriors_brew",
     "name": "Warrior's Brew",
     "media": "melvor:assets/media/bank/potion_melee_i.png",
-    "type": "combat",
     "tiers": [
         {
             "tier": 1,
-            "duration": 3,
+            "flavorText": "A hearty brew for warriors.",
             "materials": [
                 { "id": "adventuring:currency", "qty": 50 }
             ],
@@ -1432,7 +1483,7 @@ Drinks provide temporary party buffs.
         },
         {
             "tier": 2,
-            "duration": 5,
+            "flavorText": "An even heartier brew.",
             "materials": [
                 { "id": "adventuring:currency", "qty": 150 },
                 { "id": "adventuring:parts", "qty": 10 }
@@ -1455,7 +1506,6 @@ Drinks provide temporary party buffs.
 | `id` | string | ✓ | Unique identifier |
 | `name` | string | ✓ | Display name |
 | `media` | string | ✓ | Icon path |
-| `type` | string | ✗ | Drink category |
 | `tiers` | array | ✓ | Tier definitions |
 
 ### Tier Properties
@@ -1882,6 +1932,55 @@ Item types define equipment categories and slot assignments.
 
 ---
 
+## Equipment Sets
+
+Equipment sets provide bonuses when multiple pieces from the same set are equipped.
+
+### Equipment Set Definition
+
+```json
+{
+    "id": "dragon_set",
+    "name": "Dragon Set",
+    "items": [
+        "adventuring:dragon_helm",
+        "adventuring:dragon_platebody",
+        "adventuring:dragon_platelegs"
+    ],
+    "bonuses": [
+        {
+            "pieces": 2,
+            "effects": [
+                { "trigger": "passive", "type": "stat_percent", "stat": "adventuring:strength", "amount": 10 }
+            ]
+        },
+        {
+            "pieces": 3,
+            "effects": [
+                { "trigger": "passive", "type": "stat_percent", "stat": "adventuring:strength", "amount": 20 },
+                { "trigger": "encounter_start", "type": "buff", "id": "adventuring:might", "stacks": 1 }
+            ]
+        }
+    ]
+}
+```
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| `id` | string | ✓ | Unique identifier |
+| `name` | string | ✓ | Display name |
+| `items` | array | ✓ | Array of base item IDs in the set |
+| `bonuses` | array | ✓ | Tier bonus definitions |
+
+### Set Bonus Properties
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| `pieces` | number | ✓ | Number of pieces required |
+| `effects` | array | ✓ | Effects applied at this tier |
+
+---
+
 ## Requirements
 
 Requirements gate content behind various conditions.
@@ -2189,7 +2288,7 @@ Many effects use scaling values that combine a base amount with stat scaling.
 
 ### Scale From Property
 
-For effects that need to scale from the target's stats instead of the caster's:
+For effects that need to scale from the target's stats instead of the source's:
 
 ```json
 {
@@ -2206,8 +2305,9 @@ For effects that need to scale from the target's stats instead of the caster's:
 
 | Value | Description |
 |-------|-------------|
-| `caster` | Scale from ability user's stats (default) |
+| `source` | Scale from ability user's stats (default) |
 | `target` | Scale from target's stats |
+| `snapshot` | Use stats captured when effect was applied |
 
 ### Usage Examples
 
