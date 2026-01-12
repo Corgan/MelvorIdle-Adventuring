@@ -165,6 +165,9 @@ export class AdventuringSlayers extends AdventuringPage {
         const index = this.availableTasks.indexOf(task);
         if(index === -1) return false;
 
+        // Initialize starting value for stat-based tasks
+        task.initializeStatTask();
+
         this.availableTasks.splice(index, 1);
         this.activeTasks.push(task);
 
@@ -235,9 +238,10 @@ export class AdventuringSlayers extends AdventuringPage {
                 this.renderQueue.activeTasks = true;
             }
 
-            if(task.taskType && task.taskType.targetType === 'monster_tag') {
-                const tag = task.taskType.targetTag;
-                const tagId = tag ? (tag.localID || tag.id || tag) : null;
+            // Handle kill_tag tasks - the tag is stored on task.target.tag
+            if(task.taskType && task.taskType.targetType === 'monster_tag' && task.target && task.target.isTagTarget) {
+                const tag = task.target.tag;
+                const tagId = tag ? tag.localID : null;
                 if(tagId && monster.tags && monster.tags.includes(tagId)) {
                     task.addProgress(1);
                     this.renderQueue.activeTasks = true;
@@ -662,16 +666,12 @@ export class AdventuringSlayers extends AdventuringPage {
 
         writer.writeUint8(this.activeTasks.length);
         this.activeTasks.forEach((task, i) => {
-            writer.pushPath?.(`activeTask[${i}]`);
             task.encode(writer);
-            writer.popPath?.();
         });
 
         writer.writeUint8(this.availableTasks.length);
         this.availableTasks.forEach((task, i) => {
-            writer.pushPath?.(`availableTask[${i}]`);
             task.encode(writer);
-            writer.popPath?.();
         });
     }
 

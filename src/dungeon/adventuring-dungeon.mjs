@@ -234,6 +234,9 @@ export class AdventuringDungeon extends AdventuringPage {
         }
 
         if(tile.type.effects !== undefined) {
+            if (this.manager.achievementManager) {
+                this.manager.achievementManager.recordSpecialTile();
+            }
             for(let effect of tile.type.effects) {
                 this.processTileEffect(effect, tile.type.name);
             }
@@ -529,13 +532,9 @@ export class AdventuringDungeon extends AdventuringPage {
     }
 
     encode(writer) {
-        writer.pushPath?.('exploreTimer');
         this.exploreTimer.encode(writer);
-        writer.popPath?.();
 
-        writer.pushPath?.('floor');
         this.floor.encode(writer);
-        writer.popPath?.();
 
         writer.writeUint32(this.progress);
         writer.writeBoolean(this.area !== undefined);

@@ -258,17 +258,11 @@ class AdventuringParty {
     }
 
     encode(writer) {
-        writer.pushPath?.('back');
         this.back.encode(writer);
-        writer.popPath?.();
 
-        writer.pushPath?.('center');
         this.center.encode(writer);
-        writer.popPath?.();
 
-        writer.pushPath?.('front');
         this.front.encode(writer);
-        writer.popPath?.();
 
         return writer;
     }

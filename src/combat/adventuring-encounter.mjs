@@ -650,17 +650,11 @@ export class AdventuringEncounter extends AdventuringPage {
     encode(writer) {
         writer.writeBoolean(this.isFighting);
 
-        writer.pushPath?.('party');
         this.party.encode(writer);
-        writer.popPath?.();
 
-        writer.pushPath?.('turnTimer');
         this.turnTimer.encode(writer);
-        writer.popPath?.();
 
-        writer.pushPath?.('hitTimer');
         this.hitTimer.encode(writer);
-        writer.popPath?.();
 
         writer.writeUint8(this.all.indexOf(this.currentTurn));
         writer.writeBoolean(this.currentTurn !== undefined && this.currentAction === this.currentTurn.spender);

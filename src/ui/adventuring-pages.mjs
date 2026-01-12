@@ -61,9 +61,7 @@ export class AdventuringPages {
     encode(writer) {
         writer.writeComplexMap(this.byId, (key, value, writer) => {
             writer.writeString(key);
-            writer.pushPath?.(key);
             value.encode(writer);
-            writer.popPath?.();
         });
         return writer;
     }

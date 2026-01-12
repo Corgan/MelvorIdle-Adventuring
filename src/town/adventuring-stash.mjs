@@ -188,14 +188,18 @@ export class AdventuringStash extends AdventuringPage {
     }
 
     encode(writer) {
-        writer.writeComplexMap(this.materialCounts, (key, value, writer) => {
-            writer.writeNamespacedObject(key);
-            writer.writeUint32(value);
-        });
-        writer.writeComplexMap(this.unlocked, (key, value, writer) => {
-            writer.writeNamespacedObject(key);
-            writer.writeBoolean(value);
-        });
+        const nonZeroCounts = [...this.materialCounts.entries()].filter(([_, count]) => count > 0);
+        writer.writeUint32(nonZeroCounts.length);
+        for (const [material, count] of nonZeroCounts) {
+            writer.writeNamespacedObject(material);
+            writer.writeUint32(count);
+        }
+
+        const unlockedItems = [...this.unlocked.entries()].filter(([_, v]) => v).map(([k]) => k);
+        writer.writeUint32(unlockedItems.length);
+        for (const material of unlockedItems) {
+            writer.writeNamespacedObject(material);
+        }
 
         writer.writeUint32(this.seenMaterials.size);
         this.seenMaterials.forEach(materialId => {
@@ -207,19 +211,22 @@ export class AdventuringStash extends AdventuringPage {
     }
 
     decode(reader, version) {
-        reader.getComplexMap((reader) => {
-            let key = reader.getNamespacedObject(this.manager.materials);
-            let value = reader.getUint32();
-            if(typeof key !== "string") {
+        const numMaterials = reader.getUint32();
+        for (let i = 0; i < numMaterials; i++) {
+            const key = reader.getNamespacedObject(this.manager.materials);
+            const value = reader.getUint32();
+            if (typeof key !== "string") {
                 this.materialCounts.set(key, value);
             }
-        });
-        reader.getComplexMap((reader) => {
-            let key = reader.getNamespacedObject(this.manager.materials);
-            let value = reader.getBoolean();
-            if(typeof key !== "string" && key.id !== "adventuring:none")
-                this.unlocked.set(key, value);
-        });
+        }
+
+        const numUnlocked = reader.getUint32();
+        for (let i = 0; i < numUnlocked; i++) {
+            const key = reader.getNamespacedObject(this.manager.materials);
+            if (typeof key !== "string" && key.id !== "adventuring:none") {
+                this.unlocked.set(key, true);
+            }
+        }
 
         const numSeen = reader.getUint32();
         for(let i = 0; i < numSeen; i++) {

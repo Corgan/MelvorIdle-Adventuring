@@ -120,7 +120,8 @@ export class AdventuringArmory extends AdventuringPage {
         if(this.activeCategory === 'recent') {
             categoryItems = this.manager.baseItems.filter(item =>
                 item.id !== 'adventuring:none' && this.isNew(item)
-            );
+            );
+
             categoryItems.forEach(baseItem => {
                 baseItem.component.mount(this.component.items);
                 baseItem.renderQueue.tooltip = true;
@@ -540,79 +541,100 @@ export class AdventuringArmory extends AdventuringPage {
     }
 
     encode(writer) {
-        writer.writeComplexMap(this.upgradeLevels, (key, value, writer) => {
-            writer.writeNamespacedObject(key);
-            writer.writeUint8(value);
-        });
-        writer.writeComplexMap(this.unlocked, (key, value, writer) => {
-            writer.writeNamespacedObject(key);
-            writer.writeBoolean(value);
-        });
-        writer.writeComplexMap(this.viewed, (key, value, writer) => {
-            writer.writeNamespacedObject(key);
-            writer.writeBoolean(value);
-        });
-        writer.writeComplexMap(this.masterfulItems, (key, value, writer) => {
-            writer.writeNamespacedObject(key);
-            writer.writeBoolean(value);
-        });
-        writer.writeComplexMap(this.droppedItems, (key, value, writer) => {
-            writer.writeNamespacedObject(key);
-            writer.writeBoolean(value);
-        });
+        const nonZeroUpgrades = [...this.upgradeLevels.entries()].filter(([_, level]) => level > 0);
+        writer.writeUint32(nonZeroUpgrades.length);
+        for (const [item, level] of nonZeroUpgrades) {
+            writer.writeNamespacedObject(item);
+            writer.writeUint8(level);
+        }
 
-        writer.writeComplexMap(this.artifactTiers, (key, value, writer) => {
-            writer.writeNamespacedObject(key);
-            writer.writeUint8(value);
-        });
+        const unlockedItems = [...this.unlocked.entries()].filter(([_, v]) => v).map(([k]) => k);
+        writer.writeUint32(unlockedItems.length);
+        for (const item of unlockedItems) {
+            writer.writeNamespacedObject(item);
+        }
+
+        const viewedItems = [...this.viewed.entries()].filter(([_, v]) => v).map(([k]) => k);
+        writer.writeUint32(viewedItems.length);
+        for (const item of viewedItems) {
+            writer.writeNamespacedObject(item);
+        }
+
+        const masterfulList = [...this.masterfulItems.entries()].filter(([_, v]) => v).map(([k]) => k);
+        writer.writeUint32(masterfulList.length);
+        for (const item of masterfulList) {
+            writer.writeNamespacedObject(item);
+        }
+
+        const droppedList = [...this.droppedItems.entries()].filter(([_, v]) => v).map(([k]) => k);
+        writer.writeUint32(droppedList.length);
+        for (const item of droppedList) {
+            writer.writeNamespacedObject(item);
+        }
+
+        const nonZeroTiers = [...this.artifactTiers.entries()].filter(([_, tier]) => tier > 0);
+        writer.writeUint32(nonZeroTiers.length);
+        for (const [item, tier] of nonZeroTiers) {
+            writer.writeNamespacedObject(item);
+            writer.writeUint8(tier);
+        }
 
         return writer;
     }
 
     decode(reader, version) {
-        reader.getComplexMap((reader) => {
-            let key = reader.getNamespacedObject(this.manager.baseItems);
-            let value = reader.getUint8();
-            if(typeof key !== "string" && key.id !== "adventuring:none")
+        const numUpgrades = reader.getUint32();
+        for (let i = 0; i < numUpgrades; i++) {
+            const key = reader.getNamespacedObject(this.manager.baseItems);
+            const value = reader.getUint8();
+            if (typeof key !== "string" && key.id !== "adventuring:none") {
                 this.upgradeLevels.set(key, value);
-        });
-        reader.getComplexMap((reader) => {
-            let key = reader.getNamespacedObject(this.manager.baseItems);
-            let value = reader.getBoolean();
-            if(typeof key !== "string" && key.id !== "adventuring:none")
-                this.unlocked.set(key, value);
-        });
-        reader.getComplexMap((reader) => {
-            let key = reader.getNamespacedObject(this.manager.baseItems);
-            let value = reader.getBoolean();
-            if(typeof key !== "string" && key.id !== "adventuring:none")
-                this.viewed.set(key, value);
-        });
-        reader.getComplexMap((reader) => {
-            let key = reader.getNamespacedObject(this.manager.baseItems);
-            let value = reader.getBoolean();
-            if(typeof key !== "string" && key.id !== "adventuring:none")
-                this.masterfulItems.set(key, value);
-        });
-        reader.getComplexMap((reader) => {
-            let key = reader.getNamespacedObject(this.manager.baseItems);
-            let value = reader.getBoolean();
-            if(typeof key !== "string" && key.id !== "adventuring:none")
-                this.droppedItems.set(key, value);
-        });
+            }
+        }
+
+        const numUnlocked = reader.getUint32();
+        for (let i = 0; i < numUnlocked; i++) {
+            const key = reader.getNamespacedObject(this.manager.baseItems);
+            if (typeof key !== "string" && key.id !== "adventuring:none") {
+                this.unlocked.set(key, true);
+            }
+        }
+
+        const numViewed = reader.getUint32();
+        for (let i = 0; i < numViewed; i++) {
+            const key = reader.getNamespacedObject(this.manager.baseItems);
+            if (typeof key !== "string" && key.id !== "adventuring:none") {
+                this.viewed.set(key, true);
+            }
+        }
+
+        const numMasterful = reader.getUint32();
+        for (let i = 0; i < numMasterful; i++) {
+            const key = reader.getNamespacedObject(this.manager.baseItems);
+            if (typeof key !== "string" && key.id !== "adventuring:none") {
+                this.masterfulItems.set(key, true);
+            }
+        }
+
+        const numDropped = reader.getUint32();
+        for (let i = 0; i < numDropped; i++) {
+            const key = reader.getNamespacedObject(this.manager.baseItems);
+            if (typeof key !== "string" && key.id !== "adventuring:none") {
+                this.droppedItems.set(key, true);
+            }
+        }
 
         try {
-            reader.getComplexMap((reader) => {
-                let key = reader.getNamespacedObject(this.manager.baseItems);
-                let value = reader.getUint8();
-                if(typeof key !== "string" && key.id !== "adventuring:none" && key.isArtifact) {
+            const numTiers = reader.getUint32();
+            for (let i = 0; i < numTiers; i++) {
+                const key = reader.getNamespacedObject(this.manager.baseItems);
+                const value = reader.getUint8();
+                if (typeof key !== "string" && key.id !== "adventuring:none" && key.isArtifact) {
                     this.artifactTiers.set(key, value);
-
                     key.applyArtifactTier(value);
                 }
-            });
+            }
         } catch(e) {
-
             console.log('[Adventuring] No artifact tier data in save, using defaults');
         }
     }

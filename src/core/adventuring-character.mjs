@@ -255,6 +255,10 @@ class AdventuringCharacter {
         if(this.dead)
             return;
         this.auras.add(id, builtEffect, character);
+        // Track buff application for slayer tasks (only track for heroes, not enemies)
+        if (this.isHero && this.manager.achievementManager) {
+            this.manager.achievementManager.recordBuffApplied();
+        }
     }
 
     debuff(id, builtEffect, character) {
@@ -267,6 +271,10 @@ class AdventuringCharacter {
         }
 
         this.auras.add(id, builtEffect, character);
+        // Track debuff application for slayer tasks (only track debuffs on enemies)
+        if (!this.isHero && this.manager.achievementManager) {
+            this.manager.achievementManager.recordDebuffApplied();
+        }
     }
 
     isUntargetable() {
@@ -647,9 +655,7 @@ class AdventuringCharacter {
         writer.writeNamespacedObject(this.generator);
         writer.writeNamespacedObject(this.spender);
 
-        writer.pushPath?.('auras');
         this.auras.encode(writer);
-        writer.popPath?.();
 
         return writer;
     }

@@ -323,9 +323,7 @@ export class AdventuringAuras {
 
     encode(writer) {
         writer.writeSet(this.auras, (aura, writer) => {
-            writer.pushPath?.('aura');
             aura.encode(writer);
-            writer.popPath?.();
         });
         return writer;
     }

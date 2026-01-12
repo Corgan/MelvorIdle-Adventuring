@@ -1,43 +1,5 @@
 const { loadModule } = mod.getContext(import.meta);
 
-function createLoggingWriter(manager, writer) {
-    if (!manager.debugSaveSize) return writer;
-
-    const path = [];
-    const startOffsets = [];
-
-    return new Proxy(writer, {
-        get(target, prop) {
-            if (prop === 'pushPath') {
-                return (name) => {
-                    path.push(name);
-                    startOffsets.push(target.byteOffset);
-                };
-            }
-            if (prop === 'popPath') {
-                return () => {
-                    const name = path.pop();
-                    const start = startOffsets.pop();
-                    const bytes = target.byteOffset - start;
-                    const indent = '  '.repeat(path.length + 1);
-                    console.log(`${indent}${name}: ${bytes} bytes`);
-                };
-            }
-            if (prop === 'unwrap') {
-                return () => target;
-            }
-            if (prop === 'byteOffset') {
-                return target.byteOffset;
-            }
-            const value = target[prop];
-            if (typeof value === 'function') {
-                return value.bind(target);
-            }
-            return value;
-        }
-    });
-}
-
 class StatCalculator {
 
     static calculate(baseValue, bonuses = { flat: 0, percent: 0 }, globalPercent = 0) {
@@ -2923,8 +2885,6 @@ export {
     EffectLimitTracker,
 
     getFromRegistry,
-    requireFromRegistry,
-
-    createLoggingWriter
+    requireFromRegistry
 }
 

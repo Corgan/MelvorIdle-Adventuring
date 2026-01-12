@@ -59,7 +59,6 @@ const { AdventuringLootTable } = await loadModule('src/items/adventuring-loot-ta
 const { AdventuringModifiers } = await loadModule('src/core/adventuring-modifiers.mjs');
 const { AdventuringGrimoire } = await loadModule('src/slayer/adventuring-grimoire.mjs');
 const { AdventuringTag } = await loadModule('src/core/adventuring-tag.mjs');
-const { createLoggingWriter } = await loadModule('src/core/adventuring-utils.mjs');
 
 const { AdventuringPageElement } = await loadModule('src/core/components/adventuring.mjs');
 
@@ -72,13 +71,12 @@ class AdventuringRenderQueue extends MasterySkillRenderQueue {
 export class Adventuring extends SkillWithMastery {
     constructor(namespace, game) {
         super(namespace, 'Adventuring', game);
-        this.version = 6;
+        this.version = 8; // Optimized stash/armory encode format
         this.saveVersion = -1;
         this._media = 'melvor:assets/media/main/adventure.svg';
         this.renderQueue = new AdventuringRenderQueue();
         this.isActive = false;
         this.timersPaused = false;
-        this.debugSaveSize = false;
 
         this.learnedAbilities = new Set();
 
@@ -442,10 +440,22 @@ export class Adventuring extends SkillWithMastery {
             try {
                 this.resetSkill();
                 this.log.add('Save data was corrupted. Skill has been reset.');
+                SwalLocale.fire({
+                    title: 'Adventuring Reset',
+                    html: `<p>Your Adventuring save data was from an older version and could not be loaded.</p>
+                           <p>The skill has been reset to ensure proper functionality.</p>
+                           <p><strong>Please refresh the page</strong> to complete the reset process.</p>`,
+                    icon: 'warning',
+                    confirmButtonText: 'Refresh Now',
+                    showCancelButton: true,
+                    cancelButtonText: 'Later'
+                }).then((result) => {
+                    if(result.isConfirmed) {
+                        location.reload();
+                    }
+                });
             } catch(e) {
                 console.warn('Adventuring resetSkill failed after decode error:', e);
-
-
             }
         }
 
@@ -1255,65 +1265,44 @@ export class Adventuring extends SkillWithMastery {
 
     encode(writer) {
         const start = writer.byteOffset;
-        const w = createLoggingWriter(this, writer);
 
-        w.pushPath?.('super');
-        super.encode(w);
-        w.popPath?.();
+        super.encode(writer);
 
-        w.writeUint32(this.version);
+        writer.writeUint32(this.version);
 
-        w.pushPath?.('party');
-        this.party.encode(w);
-        w.popPath?.();
+        this.party.encode(writer);
 
-        w.pushPath?.('pages');
-        this.pages.encode(w);
-        w.popPath?.();
+        this.pages.encode(writer);
 
-        w.writeBoolean(this.isActive);
+        writer.writeBoolean(this.isActive);
 
-        w.writeUint32(this.learnedAbilities.size);
+        writer.writeUint32(this.learnedAbilities.size);
         this.learnedAbilities.forEach(abilityId => {
             const ability = this.getAbilityByID(abilityId);
-            w.writeNamespacedObject(ability);
+            writer.writeNamespacedObject(ability);
         });
 
-        w.pushPath?.('slayers');
-        this.slayers.encode(w);
-        w.popPath?.();
+        this.slayers.encode(writer);
 
-        w.pushPath?.('tavern');
-        this.tavern.encode(w);
-        w.popPath?.();
+        this.tavern.encode(writer);
 
-        w.pushPath?.('lemons');
-        this.lemons.encode(w);
-        w.popPath?.();
+        this.lemons.encode(writer);
 
-        w.pushPath?.('consumables');
-        this.consumables.encode(w);
-        w.popPath?.();
+        this.consumables.encode(writer);
 
         const validSeenAbilities = [...this.seenAbilities]
             .map(id => this.getAbilityByID(id))
             .filter(ability => ability !== undefined);
-        w.writeUint32(validSeenAbilities.length);
+        writer.writeUint32(validSeenAbilities.length);
         validSeenAbilities.forEach(ability => {
-            w.writeNamespacedObject(ability);
+            writer.writeNamespacedObject(ability);
         });
 
-        w.pushPath?.('tutorialManager');
-        this.tutorialManager.encode(w);
-        w.popPath?.();
+        this.tutorialManager.encode(writer);
 
-        w.pushPath?.('achievementManager');
-        this.achievementManager.encode(w);
-        w.popPath?.();
+        this.achievementManager.encode(writer);
 
-        w.pushPath?.('grimoire');
-        this.grimoire.encode(w);
-        w.popPath?.();
+        this.grimoire.encode(writer);
 
         console.log(`Wrote ${writer.byteOffset - start} bytes for Adventuring save`);
 

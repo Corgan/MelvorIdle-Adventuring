@@ -318,6 +318,10 @@ export class AdventuringDungeonFloor {
         this.manager.dungeon.progress++;
         this.manager.overview.renderQueue.status = true;
 
+        if (this.manager.achievementManager) {
+            this.manager.achievementManager.recordFloorExplored();
+        }
+
         if(this.manager.dungeon.progress >= this.manager.dungeon.numFloors) {
             this.manager.dungeon.complete();
         } else {

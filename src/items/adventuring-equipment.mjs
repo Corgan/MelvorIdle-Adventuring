@@ -223,18 +223,30 @@ export class AdventuringEquipment {
     }
 
     encode(writer) {
-        writer.writeComplexMap(this.slots, (key, value, writer) => {
-            writer.writeNamespacedObject(key);
-            writer.pushPath?.(key.id);
-            value.encode(writer);
-            writer.popPath?.();
-        });
+        const noneItem = this.manager.cached.noneItem;
+        const noneSlot = this.manager.itemSlots.getObjectByID('adventuring:none');
+        const equippedSlots = [...this.slots.entries()].filter(([_, slot]) => 
+            slot.item && slot.item !== noneItem
+        );
+        
+        writer.writeUint8(equippedSlots.length);
+        for (const [slotType, slot] of equippedSlots) {
+            writer.writeNamespacedObject(slotType);
+            slot.encode(writer);
+        }
     }
 
     decode(reader, version) {
-        reader.getComplexMap((reader) => {
-            let slot = reader.getNamespacedObject(this.manager.itemSlots);
-            this.slots.get(slot).decode(reader, version);
-        });
+        const numSlots = reader.getUint8();
+        for (let i = 0; i < numSlots; i++) {
+            const slotType = reader.getNamespacedObject(this.manager.itemSlots);
+            const slot = this.slots.get(slotType);
+            if (slot) {
+                slot.decode(reader, version);
+            } else {
+                reader.getNamespacedObject(this.manager.baseItems);
+                reader.getNamespacedObject(this.manager.itemSlots);
+            }
+        }
     }
 }

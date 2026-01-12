@@ -97,7 +97,8 @@ export class AdventuringBestiary extends AdventuringPage {
         const newKills = currentKills + 1;
         this.killCounts.set(monster, newKills);
 
-        monster.renderQueue.updateAll();
+        monster.renderQueue.updateAll();
+
         if(this.manager.encounter && this.manager.encounter.party) {
             this.manager.encounter.party.all.forEach(enemy => {
                 if(enemy.base === monster) {
@@ -137,39 +138,51 @@ export class AdventuringBestiary extends AdventuringPage {
     }
 
     encode(writer) {
-        writer.writeComplexMap(this.seen, (key, value, writer) => {
-            writer.writeNamespacedObject(key);
-            writer.writeBoolean(value);
-        });
-        writer.writeComplexMap(this.killCounts, (key, value, writer) => {
-            writer.writeNamespacedObject(key);
-            writer.writeUint32(value);
-        });
-        writer.writeComplexMap(this.viewed, (key, value, writer) => {
-            writer.writeNamespacedObject(key);
-            writer.writeBoolean(value);
-        });
+        const seenMonsters = [...this.seen.entries()].filter(([_, v]) => v).map(([k]) => k);
+        writer.writeUint32(seenMonsters.length);
+        for (const monster of seenMonsters) {
+            writer.writeNamespacedObject(monster);
+        }
+
+        const nonZeroKills = [...this.killCounts.entries()].filter(([_, count]) => count > 0);
+        writer.writeUint32(nonZeroKills.length);
+        for (const [monster, count] of nonZeroKills) {
+            writer.writeNamespacedObject(monster);
+            writer.writeUint32(count);
+        }
+
+        const viewedMonsters = [...this.viewed.entries()].filter(([_, v]) => v).map(([k]) => k);
+        writer.writeUint32(viewedMonsters.length);
+        for (const monster of viewedMonsters) {
+            writer.writeNamespacedObject(monster);
+        }
         return writer;
     }
 
     decode(reader, version) {
-        reader.getComplexMap((reader) => {
-            let key = reader.getNamespacedObject(this.manager.monsters);
-            let value = reader.getBoolean();
-            if(typeof key !== "string")
-                this.seen.set(key, value);
-        });
-        reader.getComplexMap((reader) => {
-            let key = reader.getNamespacedObject(this.manager.monsters);
-            let value = reader.getUint32();
-            if(typeof key !== "string")
+        const numSeen = reader.getUint32();
+        for (let i = 0; i < numSeen; i++) {
+            const key = reader.getNamespacedObject(this.manager.monsters);
+            if (typeof key !== "string") {
+                this.seen.set(key, true);
+            }
+        }
+
+        const numKills = reader.getUint32();
+        for (let i = 0; i < numKills; i++) {
+            const key = reader.getNamespacedObject(this.manager.monsters);
+            const value = reader.getUint32();
+            if (typeof key !== "string") {
                 this.killCounts.set(key, value);
-        });
-        reader.getComplexMap((reader) => {
-            let key = reader.getNamespacedObject(this.manager.monsters);
-            let value = reader.getBoolean();
-            if(typeof key !== "string")
-                this.viewed.set(key, value);
-        });
+            }
+        }
+
+        const numViewed = reader.getUint32();
+        for (let i = 0; i < numViewed; i++) {
+            const key = reader.getNamespacedObject(this.manager.monsters);
+            if (typeof key !== "string") {
+                this.viewed.set(key, true);
+            }
+        }
     }
 }

@@ -612,17 +612,13 @@ export class AdventuringHero extends AdventuringCharacter {
     }
 
     encode(writer) {
-        writer.pushPath?.('character');
         super.encode(writer);
-        writer.popPath?.();
 
         writer.writeString(this.name);
         writer.writeNamespacedObject(this.combatJob);
         writer.writeNamespacedObject(this.passiveJob);
 
-        writer.pushPath?.('equipment');
         this.equipment.encode(writer);
-        writer.popPath?.();
 
         return writer;
     }

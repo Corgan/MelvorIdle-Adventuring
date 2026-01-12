@@ -15,9 +15,10 @@ class AdventuringAchievementRenderQueue {
 }
 
 export class AchievementStats {
-    constructor() {
+    constructor(manager) {
+        this.manager = manager;
         this.totalKills = 0;
-        this.killsByTag = {};
+        this.killsByTag = new Map();
         this.totalClears = 0;
         this.heroicClears = 0;
         this.mythicClears = 0;
@@ -32,6 +33,11 @@ export class AchievementStats {
         this.totalHealing = 0;
         this.slayerTasksCompleted = 0;
         this.totalEndlessWaves = 0;
+        // Slayer task tracking stats
+        this.buffsApplied = 0;
+        this.debuffsApplied = 0;
+        this.floorsExplored = 0;
+        this.specialTilesFound = 0;
     }
 
     encode(writer) {
@@ -49,11 +55,14 @@ export class AchievementStats {
         writer.writeFloat64(this.totalHealing);
         writer.writeUint32(this.slayerTasksCompleted);
         writer.writeUint32(this.totalEndlessWaves);
+        writer.writeUint32(this.buffsApplied);
+        writer.writeUint32(this.debuffsApplied);
+        writer.writeUint32(this.floorsExplored);
+        writer.writeUint32(this.specialTilesFound);
 
-        const tagEntries = Object.entries(this.killsByTag);
-        writer.writeUint16(tagEntries.length);
-        for(const [tag, count] of tagEntries) {
-            writer.writeString(tag);
+        writer.writeUint16(this.killsByTag.size);
+        for(const [tag, count] of this.killsByTag) {
+            writer.writeNamespacedObject(tag);
             writer.writeUint32(count);
         }
 
@@ -80,13 +89,19 @@ export class AchievementStats {
         this.totalHealing = reader.getFloat64();
         this.slayerTasksCompleted = reader.getUint32();
         this.totalEndlessWaves = reader.getUint32();
+        this.buffsApplied = reader.getUint32();
+        this.debuffsApplied = reader.getUint32();
+        this.floorsExplored = reader.getUint32();
+        this.specialTilesFound = reader.getUint32();
 
-        this.killsByTag = {};
+        this.killsByTag = new Map();
         const tagCount = reader.getUint16();
         for(let i = 0; i < tagCount; i++) {
-            const tag = reader.getString();
+            const tag = reader.getNamespacedObject(this.manager.tags);
             const count = reader.getUint32();
-            this.killsByTag[tag] = count;
+            if (tag && typeof tag !== 'string') {
+                this.killsByTag.set(tag, count);
+            }
         }
 
         this.fastWins = {};
@@ -157,8 +172,11 @@ export class AdventuringAchievement extends NamespacedObject {
         switch(req.type) {
             case 'total_kills':
                 return stats.totalKills;
-            case 'kills_by_tag':
-                return stats.killsByTag[req.tag] || 0;
+            case 'kills_by_tag': {
+                const fullTagId = req.tag.includes(':') ? req.tag : `adventuring:${req.tag}`;
+                const tag = this.manager.tags.getObjectByID(fullTagId);
+                return tag ? (stats.killsByTag.get(tag) || 0) : 0;
+            }
             case 'total_clears':
                 return stats.totalClears;
             case 'heroic_clears':
@@ -500,7 +518,7 @@ export class AchievementManager {
         this.game = game;
         this.renderQueue = new AdventuringAchievementRenderQueue();
 
-        this.stats = new AchievementStats();
+        this.stats = new AchievementStats(manager);
 
         this.completedAchievements = new Set();
 
@@ -587,10 +605,12 @@ export class AchievementManager {
         this.stats.totalKills++;
 
         if(monster.tags) {
-            for(const tag of monster.tags) {
-                const tagId = typeof tag === 'string' ? tag : tag.id;
-                const tagName = tagId.replace('adventuring:', '');
-                this.stats.killsByTag[tagName] = (this.stats.killsByTag[tagName] || 0) + 1;
+            for(const tagName of monster.tags) {
+                const fullTagId = tagName.includes(':') ? tagName : `adventuring:${tagName}`;
+                const tag = this.manager.tags.getObjectByID(fullTagId);
+                if (tag) {
+                    this.stats.killsByTag.set(tag, (this.stats.killsByTag.get(tag) || 0) + 1);
+                }
             }
         }
 
@@ -654,6 +674,26 @@ export class AchievementManager {
 
     recordSlayerTask() {
         this.stats.slayerTasksCompleted++;
+        this.markDirty();
+    }
+
+    recordBuffApplied(count = 1) {
+        this.stats.buffsApplied += count;
+        this.markDirty();
+    }
+
+    recordDebuffApplied(count = 1) {
+        this.stats.debuffsApplied += count;
+        this.markDirty();
+    }
+
+    recordFloorExplored() {
+        this.stats.floorsExplored++;
+        this.markDirty();
+    }
+
+    recordSpecialTile() {
+        this.stats.specialTilesFound++;
         this.markDirty();
     }
 
@@ -737,7 +777,7 @@ export class AchievementManager {
 
     resetAll() {
 
-        this.stats = new AchievementStats();
+        this.stats = new AchievementStats(this.manager);
 
         this.completedAchievements.clear();
 
@@ -747,9 +787,7 @@ export class AchievementManager {
     }
 
     encode(writer) {
-        writer.pushPath?.('stats');
         this.stats.encode(writer);
-        writer.popPath?.();
 
         writer.writeSet(this.completedAchievements, (achievement, w) => {
             w.writeNamespacedObject(achievement);

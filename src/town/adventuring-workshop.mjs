@@ -492,16 +492,15 @@ export class AdventuringWorkshop extends AdventuringPage {
     }
 
     encode(writer) {
-        writer.writeUint32(this.storedItems.size);
-        this.storedItems.forEach((count, item) => {
+        const nonZeroItems = [...this.storedItems.entries()].filter(([_, count]) => count > 0);
+        writer.writeUint32(nonZeroItems.length);
+        for (const [item, count] of nonZeroItems) {
             writer.writeNamespacedObject(item);
             writer.writeUint32(count);
-        });
+        }
 
         writer.writeSet(this.workOrders, (order, writer) => {
-            writer.pushPath?.('workOrder');
             order.encode(writer);
-            writer.popPath?.();
         });
     }
 

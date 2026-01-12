@@ -52,8 +52,8 @@ export class AdventuringSlayerTaskType extends NamespacedObject {
         this.descriptionTemplate = data.descriptionTemplate;
         this.progressVerb = data.progressVerb;
         this.targetType = data.targetType;
-
-        this._targetTagId = data.targetTag || null;
+        this.targetStat = data.targetStat || null; // For stat-based tasks
+        this.targetDifficulty = data.targetDifficulty || null; // For difficulty-based tasks
 
         this.baseRequirements = data.baseRequirements;
         this.requirementVariance = data.requirementVariance;
@@ -62,13 +62,15 @@ export class AdventuringSlayerTaskType extends NamespacedObject {
         this.consumableRewardChance = data.consumableRewardChance || [0, 0, 0, 0, 0];
     }
 
-    get targetTag() {
-        if (!this._targetTagId) return null;
-        const fullId = this._targetTagId.includes(':') ? this._targetTagId : `adventuring:${this._targetTagId}`;
-        return this.manager.tags.getObjectByID(fullId);
+    get name() {
+        return this._name;
     }
 
-    get name() {
+    // Get display name, optionally with tag substitution
+    getDisplayName(tag = null) {
+        if (tag && this._name.includes('${tagName}')) {
+            return this._name.replace('${tagName}', tag.name);
+        }
         return this._name;
     }
 
@@ -156,10 +158,23 @@ export class AdventuringSlayerTask {
         this.tier = tier;
         this.rewards = rewards;
         this.progress = 0;
+        this.startingValue = 0; // For stat-based tasks, stores the stat value when task was accepted
+    }
+
+    get isStatTask() {
+        return this.target && this.target.isStatTarget;
+    }
+
+    get currentProgress() {
+        if (this.isStatTask && this.target.statName) {
+            const currentValue = this.getStatValue(this.target.statName);
+            return Math.max(0, currentValue - this.startingValue);
+        }
+        return this.progress;
     }
 
     get completed() {
-        return this.progress >= this.required;
+        return this.currentProgress >= this.required;
     }
 
     get targetName() {
@@ -184,17 +199,28 @@ export class AdventuringSlayerTask {
         }
     }
 
+    getStatValue(statName) {
+        if (!this.manager.achievementManager) return 0;
+        const stats = this.manager.achievementManager.stats;
+        if (stats.hasOwnProperty(statName)) {
+            return stats[statName];
+        }
+        return 0;
+    }
+
     get description() {
         if(!this.taskType) return 'Complete task';
         return this.taskType.formatDescription(this.required, this.targetName);
     }
 
     get progressText() {
-        return `${Math.min(this.progress, this.required)} / ${this.required}`;
+        const progress = this.currentProgress;
+        return `${Math.min(progress, this.required)} / ${this.required}`;
     }
 
     get progressPercent() {
-        return Math.min(100, (this.progress / this.required) * 100);
+        const progress = this.currentProgress;
+        return Math.min(100, (progress / this.required) * 100);
     }
 
     addProgress(amount = 1) {
@@ -205,6 +231,12 @@ export class AdventuringSlayerTask {
 
         if(this.completed) {
             this.manager.log.add(`Task complete: ${this.description}`);
+        }
+    }
+
+    initializeStatTask() {
+        if (this.isStatTask && this.target.statName) {
+            this.startingValue = this.getStatValue(this.target.statName);
         }
     }
 
@@ -236,11 +268,19 @@ export class AdventuringSlayerTask {
     encode(writer) {
         writer.writeNamespacedObject(this.taskType);
 
+        // Write target type: 0 = regular, 1 = tag, 2 = stat
         const isTagTarget = this.target && this.target.isTagTarget;
-        writer.writeBoolean(isTagTarget);
-        if(isTagTarget) {
+        const isStatTarget = this.target && this.target.isStatTarget;
+        
+        if (isStatTarget) {
+            writer.writeUint8(2);
+            writer.writeString(this.target.statName || '');
+            writer.writeFloat64(this.startingValue); // Save starting value for stat tasks
+        } else if (isTagTarget) {
+            writer.writeUint8(1);
             writer.writeNamespacedObject(this.target.tag);
         } else {
+            writer.writeUint8(0);
             writer.writeNamespacedObject(this.target);
         }
 
@@ -268,8 +308,21 @@ export class AdventuringSlayerTask {
             this.taskType = taskType;
         }
 
-        const isTagTarget = reader.getBoolean();
-        if(isTagTarget) {
+        const targetType = reader.getUint8();
+        
+        if (targetType === 2) {
+            // Stat target
+            const statName = reader.getString();
+            this.startingValue = reader.getFloat64(); // Load starting value for stat tasks
+            this.target = {
+                id: `stat:${statName}`,
+                name: this.taskType ? this.taskType.name : 'Task',
+                media: cdnMedia('assets/media/main/statistics_header.png'),
+                isStatTarget: true,
+                statName: statName
+            };
+        } else if (targetType === 1) {
+            // Tag target
             const tag = reader.getNamespacedObject(this.manager.tags);
             if (tag && typeof tag !== 'string') {
                 const seenMonsters = this.manager.monsters.allObjects.filter(m =>
@@ -284,6 +337,7 @@ export class AdventuringSlayerTask {
                 };
             }
         } else {
+            // Regular target
             const registry = this.getTargetRegistry() || this.manager.monsters;
             const target = reader.getNamespacedObject(registry);
             if(typeof target !== 'string' && target !== undefined) {
@@ -343,13 +397,19 @@ export class SlayerTaskGenerator {
                 target = this.pickMonsterTarget();
                 break;
             case 'monster_tag':
-                target = this.pickMonsterTagTarget(taskType.targetTag);
+                target = this.pickRandomTagTarget();
                 break;
             case 'material':
                 target = this.pickMaterialTarget();
                 break;
             case 'area':
                 target = this.pickAreaTarget();
+                break;
+            case 'stat':
+            case 'difficulty':
+            case 'endless_wave':
+                // These don't need a specific target - create a placeholder
+                target = this.createStatTarget(taskType);
                 break;
         }
 
@@ -361,6 +421,17 @@ export class SlayerTaskGenerator {
         return new AdventuringSlayerTask(this.manager, this.game, taskType, target, required, tier, rewards);
     }
 
+    // Create a placeholder target for stat-based tasks
+    createStatTarget(taskType) {
+        return {
+            id: `stat:${taskType.targetStat || taskType.targetType}`,
+            name: taskType.name,
+            media: cdnMedia('assets/media/main/statistics_header.png'),
+            isStatTarget: true,
+            statName: taskType.targetStat
+        };
+    }
+
     pickMonsterTarget() {
 
         const seenMonsters = this.manager.monsters.allObjects.filter(m =>
@@ -369,6 +440,25 @@ export class SlayerTaskGenerator {
 
         if(seenMonsters.length === 0) return null;
         return seenMonsters[Math.floor(Math.random() * seenMonsters.length)];
+    }
+
+    // Get all tags that have at least one seen monster
+    getAvailableTags() {
+        return this.manager.tags.allObjects.filter(tag => {
+            const tagId = tag.localID;
+            return this.manager.monsters.allObjects.some(m =>
+                this.manager.bestiary.seen.has(m) && m.tags && m.tags.includes(tagId)
+            );
+        });
+    }
+
+    // Pick a random tag that has seen monsters, then create the target
+    pickRandomTagTarget() {
+        const availableTags = this.getAvailableTags();
+        if (availableTags.length === 0) return null;
+
+        const tag = availableTags[Math.floor(Math.random() * availableTags.length)];
+        return this.pickMonsterTagTarget(tag);
     }
 
     pickMonsterTagTarget(tag) {
@@ -411,20 +501,20 @@ export class SlayerTaskGenerator {
         switch(taskType.targetType) {
             case 'monster':
                 return this.manager.monsters.allObjects.some(m => this.manager.bestiary.seen.has(m));
-            case 'monster_tag': {
-                const tag = taskType.targetTag;
-                if (!tag) return false;
-                const tagId = tag.localID || tag.id || tag;
-                return this.manager.monsters.allObjects.some(m => 
-                    this.manager.bestiary.seen.has(m) && m.tags && m.tags.includes(tagId)
-                );
-            }
+            case 'monster_tag':
+                // Can generate if any tag has seen monsters
+                return this.getAvailableTags().length > 0;
             case 'material':
                 return this.manager.materials.allObjects.some(m => 
                     m.id !== 'adventuring:currency' && this.manager.stash.seenMaterials.has(m)
                 );
             case 'area':
                 return this.manager.areas.allObjects.some(a => a.unlocked);
+            case 'stat':
+            case 'difficulty':
+            case 'endless_wave':
+                // Always available - these track cumulative stats
+                return true;
             default:
                 return false;
         }
