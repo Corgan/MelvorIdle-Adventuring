@@ -340,7 +340,7 @@ export class AdventuringHero extends AdventuringCharacter {
             stacks: effect.getStacks ? effect.getStacks(this) : (effect.stacks || 1)
         };
 
-        const targetPartyType = effect.targetParty || 'ally';
+        const targetPartyType = effect.party || effect.targetParty || 'ally';
         const targetParty = targetPartyType === 'enemy'
             ? encounter?.party
             : this.manager.party;
