@@ -1,0 +1,281 @@
+{
+    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+    "namespace": "adventuring",
+    "data": {
+        "skillData": [
+            {
+                "skillID": "adventuring:Adventuring",
+                "data": {
+                    "baseItems": [
+                        {
+                            "id": "paladin_amulet",
+                            "name": "Crusader's Medallion",
+                            "media": "melvor:assets/media/bank/holy_symbol.png#shade=silver",
+                            "type": "adventuring:amulet",
+                            "isArtifact": true,
+                            "requirements": [
+                                { "type": "job_level", "job": "adventuring:paladin", "level": 75 },
+                                { "type": "job_level", "job": "adventuring:crusader", "level": 75 },
+                                { "type": "job_level", "job": "adventuring:templar", "level": 75 }
+                            ],
+                            "tiers": [
+                                {
+                                    "name": "Crusader's Medallion",
+                                    "base": [
+                                        { "id": "adventuring:strength", "amount": 30 },
+                                        { "id": "adventuring:prayer", "amount": 30 },
+                                        { "id": "adventuring:hitpoints", "amount": 20 }
+                                    ],
+                                    "scaling": [
+                                        { "id": "adventuring:strength", "amount": 2.5 },
+                                        { "id": "adventuring:prayer", "amount": 2.5 },
+                                        { "id": "adventuring:hitpoints", "amount": 1.7 }
+                                    ],
+                                    "materials": [
+                                        { "id": "adventuring:currency", "qty": 15000 },
+                                        { "id": "adventuring:pristine_salvage", "qty": 25 }
+                                    ]
+                                },
+                                {
+                                    "name": "Empowered Crusader's Medallion",
+                                    "base": [
+                                        { "id": "adventuring:strength", "amount": 52 },
+                                        { "id": "adventuring:prayer", "amount": 52 },
+                                        { "id": "adventuring:hitpoints", "amount": 35 }
+                                    ],
+                                    "scaling": [
+                                        { "id": "adventuring:strength", "amount": 4.4 },
+                                        { "id": "adventuring:prayer", "amount": 4.4 },
+                                        { "id": "adventuring:hitpoints", "amount": 3 }
+                                    ],
+                                    "effects": [
+                                        {
+                                            "trigger": "encounter_start",
+                                            "type": "buff",
+                                            "id": "adventuring:holy_might",
+                                            "target": "self",
+                                            "stacks": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        { "id": "adventuring:currency", "qty": 50000 },
+                                        { "id": "adventuring:mythic_salvage", "qty": 20 }
+                                    ]
+                                },
+                                {
+                                    "name": "Ascended Crusader's Medallion",
+                                    "base": [
+                                        { "id": "adventuring:strength", "amount": 85 },
+                                        { "id": "adventuring:prayer", "amount": 85 },
+                                        { "id": "adventuring:hitpoints", "amount": 55 }
+                                    ],
+                                    "scaling": [
+                                        { "id": "adventuring:strength", "amount": 7.2 },
+                                        { "id": "adventuring:prayer", "amount": 7.2 },
+                                        { "id": "adventuring:hitpoints", "amount": 4.6 }
+                                    ],
+                                    "effects": [
+                                        {
+                                            "trigger": "encounter_start",
+                                            "type": "buff",
+                                            "id": "adventuring:holy_might",
+                                            "target": "self",
+                                            "stacks": 2
+                                        },
+                                        {
+                                            "trigger": "passive",
+                                            "type": "damage_bonus",
+                                            "condition": "target_undead",
+                                            "amount": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        { "id": "adventuring:currency", "qty": 150000 },
+                                        { "id": "adventuring:mythic_salvage", "qty": 50 },
+                                        { "id": "adventuring:chaos_core", "qty": 1 }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "paladin_ring",
+                            "name": "Righteous Band",
+                            "media": "melvor:assets/media/bank/ring_of_power.png#shade=silver",
+                            "type": "adventuring:ring",
+                            "isArtifact": true,
+                            "requirements": [
+                                { "type": "job_level", "job": "adventuring:crusader", "level": 75 },
+                                { "type": "job_level", "job": "adventuring:templar", "level": 75 }
+                            ],
+                            "tiers": [
+                                {
+                                    "name": "Righteous Band",
+                                    "base": [
+                                        { "id": "adventuring:strength", "amount": 25 },
+                                        { "id": "adventuring:defence", "amount": 25 },
+                                        { "id": "adventuring:prayer", "amount": 20 }
+                                    ],
+                                    "scaling": [
+                                        { "id": "adventuring:strength", "amount": 2.1 },
+                                        { "id": "adventuring:defence", "amount": 2.1 },
+                                        { "id": "adventuring:prayer", "amount": 1.7 }
+                                    ],
+                                    "materials": [
+                                        { "id": "adventuring:currency", "qty": 15000 },
+                                        { "id": "adventuring:pristine_salvage", "qty": 25 }
+                                    ]
+                                },
+                                {
+                                    "name": "Empowered Righteous Band",
+                                    "base": [
+                                        { "id": "adventuring:strength", "amount": 44 },
+                                        { "id": "adventuring:defence", "amount": 44 },
+                                        { "id": "adventuring:prayer", "amount": 35 }
+                                    ],
+                                    "scaling": [
+                                        { "id": "adventuring:strength", "amount": 3.7 },
+                                        { "id": "adventuring:defence", "amount": 3.7 },
+                                        { "id": "adventuring:prayer", "amount": 3 }
+                                    ],
+                                    "effects": [
+                                        {
+                                            "trigger": "after_damage_received",
+                                            "type": "heal_percent",
+                                            "target": "self",
+                                            "amount": 3
+                                        }
+                                    ],
+                                    "materials": [
+                                        { "id": "adventuring:currency", "qty": 50000 },
+                                        { "id": "adventuring:mythic_salvage", "qty": 20 }
+                                    ]
+                                },
+                                {
+                                    "name": "Ascended Righteous Band",
+                                    "base": [
+                                        { "id": "adventuring:strength", "amount": 72 },
+                                        { "id": "adventuring:defence", "amount": 72 },
+                                        { "id": "adventuring:prayer", "amount": 55 }
+                                    ],
+                                    "scaling": [
+                                        { "id": "adventuring:strength", "amount": 6 },
+                                        { "id": "adventuring:defence", "amount": 6 },
+                                        { "id": "adventuring:prayer", "amount": 4.6 }
+                                    ],
+                                    "effects": [
+                                        {
+                                            "trigger": "after_damage_received",
+                                            "type": "heal_percent",
+                                            "target": "self",
+                                            "amount": 5
+                                        },
+                                        {
+                                            "trigger": "passive",
+                                            "type": "damage_reduction",
+                                            "amount": 8
+                                        }
+                                    ],
+                                    "materials": [
+                                        { "id": "adventuring:currency", "qty": 150000 },
+                                        { "id": "adventuring:mythic_salvage", "qty": 50 },
+                                        { "id": "adventuring:chaos_core", "qty": 1 }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "paladin_cape",
+                            "name": "Templar's Surcoat",
+                            "media": "melvor:assets/media/bank/cape_of_completion.png#shade=silver",
+                            "type": "adventuring:cape",
+                            "isArtifact": true,
+                            "requirements": [
+                                { "type": "job_level", "job": "adventuring:paladin", "level": 75 },
+                                { "type": "job_level", "job": "adventuring:crusader", "level": 75 },
+                                { "type": "job_level", "job": "adventuring:templar", "level": 75 },
+                                { "type": "job_level", "job": "adventuring:paragon", "level": 75 }
+                            ],
+                            "tiers": [
+                                {
+                                    "name": "Templar's Surcoat",
+                                    "base": [
+                                        { "id": "adventuring:hitpoints", "amount": 35 },
+                                        { "id": "adventuring:strength", "amount": 20 },
+                                        { "id": "adventuring:prayer", "amount": 20 }
+                                    ],
+                                    "scaling": [
+                                        { "id": "adventuring:hitpoints", "amount": 2.9 },
+                                        { "id": "adventuring:strength", "amount": 1.7 },
+                                        { "id": "adventuring:prayer", "amount": 1.7 }
+                                    ],
+                                    "materials": [
+                                        { "id": "adventuring:currency", "qty": 15000 },
+                                        { "id": "adventuring:pristine_salvage", "qty": 25 }
+                                    ]
+                                },
+                                {
+                                    "name": "Empowered Templar's Surcoat",
+                                    "base": [
+                                        { "id": "adventuring:hitpoints", "amount": 60 },
+                                        { "id": "adventuring:strength", "amount": 35 },
+                                        { "id": "adventuring:prayer", "amount": 35 }
+                                    ],
+                                    "scaling": [
+                                        { "id": "adventuring:hitpoints", "amount": 5 },
+                                        { "id": "adventuring:strength", "amount": 3 },
+                                        { "id": "adventuring:prayer", "amount": 3 }
+                                    ],
+                                    "effects": [
+                                        {
+                                            "trigger": "encounter_start",
+                                            "type": "buff",
+                                            "id": "adventuring:divine_shield",
+                                            "target": "self",
+                                            "stacks": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        { "id": "adventuring:currency", "qty": 50000 },
+                                        { "id": "adventuring:mythic_salvage", "qty": 20 }
+                                    ]
+                                },
+                                {
+                                    "name": "Ascended Templar's Surcoat",
+                                    "base": [
+                                        { "id": "adventuring:hitpoints", "amount": 100 },
+                                        { "id": "adventuring:strength", "amount": 55 },
+                                        { "id": "adventuring:prayer", "amount": 55 }
+                                    ],
+                                    "scaling": [
+                                        { "id": "adventuring:hitpoints", "amount": 8.5 },
+                                        { "id": "adventuring:strength", "amount": 4.6 },
+                                        { "id": "adventuring:prayer", "amount": 4.6 }
+                                    ],
+                                    "effects": [
+                                        {
+                                            "trigger": "encounter_start",
+                                            "type": "buff",
+                                            "id": "adventuring:divine_shield",
+                                            "target": "self",
+                                            "stacks": 2
+                                        },
+                                        {
+                                            "trigger": "passive",
+                                            "type": "healing_power",
+                                            "amount": 15
+                                        }
+                                    ],
+                                    "materials": [
+                                        { "id": "adventuring:currency", "qty": 150000 },
+                                        { "id": "adventuring:mythic_salvage", "qty": 50 },
+                                        { "id": "adventuring:chaos_core", "qty": 1 }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

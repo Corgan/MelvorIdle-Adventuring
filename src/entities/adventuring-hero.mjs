@@ -211,6 +211,12 @@ export class AdventuringHero extends AdventuringCharacter {
         this.effectCache.registerSource('modifiers', () =>
             this.manager.modifiers ? this.manager.modifiers.getEffects() : []
         );
+
+        this.effectCache.registerSource('achievements', () =>
+            this.manager.achievementManager && this.manager.achievementManager.bonusEffects
+                ? this.manager.achievementManager.bonusEffects.getAllEffects()
+                : []
+        );
     }
 
     setLocked(locked) {
@@ -270,6 +276,19 @@ export class AdventuringHero extends AdventuringCharacter {
                     effect,
                     source: passive,
                     sourceName: `${this.passiveJob.name} (${passive.name})`,
+                    sourceType: 'jobPassive'
+                });
+            }
+        }
+
+        // Include global passives (achievement-unlocked passives)
+        if (this.manager.getGlobalPassivesForTrigger) {
+            const globalPassiveEffects = this.manager.getGlobalPassivesForTrigger(this, type);
+            for (const { passive, effect } of globalPassiveEffects) {
+                pending.push({
+                    effect,
+                    source: passive,
+                    sourceName: `Achievement (${passive.name})`,
                     sourceType: 'jobPassive'
                 });
             }
@@ -527,6 +546,13 @@ export class AdventuringHero extends AdventuringCharacter {
             activePassives.push(...passiveJobPassives);
         }
 
+        // Add global passives (achievement-unlocked passives)
+        if(this.manager.getGlobalPassives) {
+            const globalPassives = this.manager.getGlobalPassives()
+                .filter(p => p.canEquip(this) && !activePassives.includes(p));
+            activePassives.push(...globalPassives);
+        }
+
         if(activePassives.length === 0) {
             this.component.passiveAbilitiesContainer.classList.add('d-none');
         } else {
@@ -541,11 +567,18 @@ export class AdventuringHero extends AdventuringCharacter {
                 tooltip.info(passive.getDescription(this));
 
                 const sourceJob = passive.requirements.find(r => r.type === 'current_job_level');
+                const sourceAchievement = passive.requirements.find(r => r.type === 'achievement_completion');
                 if(sourceJob) {
                     const job = this.manager.jobs.getObjectByID(sourceJob.job);
                     if(job) {
                         tooltip.separator();
                         tooltip.text(`From: <img class="skill-icon-xxs mx-1" src="${job.media}">${job.name} Lv.${sourceJob.level}`, 'text-muted text-center');
+                    }
+                } else if(sourceAchievement) {
+                    const achievement = this.manager.achievements.getObjectByID(sourceAchievement.id);
+                    if(achievement) {
+                        tooltip.separator();
+                        tooltip.text(`From: <img class="skill-icon-xxs mx-1" src="${achievement.media}">Achievement: ${achievement.name}`, 'text-muted text-center');
                     }
                 }
 

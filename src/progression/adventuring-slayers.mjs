@@ -2,6 +2,8 @@ const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringPage } = await loadModule('src/ui/adventuring-page.mjs');
 const { AdventuringSlayerTask, SlayerTaskGenerator } = await loadModule('src/progression/adventuring-slayer-task.mjs');
+const { getEffectDescriptionsList } = await loadModule('src/core/adventuring-utils.mjs');
+const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
 
 await loadModule('src/progression/components/adventuring-slayers.mjs');
 const { AdventuringTaskRewardElement } = await loadModule('src/progression/components/adventuring-task-reward.mjs');
@@ -350,7 +352,7 @@ export class AdventuringSlayers extends AdventuringPage {
         this.component.achievementCategoryFilter.replaceChildren();
 
         const allBtn = document.createElement('button');
-        allBtn.className = `btn btn-sm btn-outline-info ${this.selectedCategory === 'all' ? 'active' : ''}`;
+        allBtn.className = `btn btn-sm btn-outline-info m-1 ${this.selectedCategory === 'all' ? 'active' : ''}`;
         allBtn.textContent = 'All';
         allBtn.onclick = () => {
             this.selectedCategory = 'all';
@@ -361,7 +363,7 @@ export class AdventuringSlayers extends AdventuringPage {
 
         for(const category of this.manager.achievementCategories.allObjects) {
             const btn = document.createElement('button');
-            btn.className = `btn btn-sm btn-outline-info ${this.selectedCategory === category.id ? 'active' : ''}`;
+            btn.className = `btn btn-sm btn-outline-info m-1 ${this.selectedCategory === category.id ? 'active' : ''}`;
             btn.textContent = category.name;
             btn.onclick = () => {
                 this.selectedCategory = category.id;
@@ -404,6 +406,7 @@ export class AdventuringSlayers extends AdventuringPage {
         const template = document.getElementById('adventuring-achievement-card-template');
         const frag = template.content.cloneNode(true);
 
+        const row = frag.firstElementChild;
         const card = frag.querySelector('#card');
         const icon = frag.querySelector('#icon');
         const name = frag.querySelector('#name');
@@ -426,7 +429,7 @@ export class AdventuringSlayers extends AdventuringPage {
 
         if(achievement.category) {
             categoryBadge.textContent = achievement.category.name;
-            categoryBadge.className = `badge badge-${this.getCategoryColor(achievement.category.id)}`;
+            categoryBadge.className = `badge badge-${this.getCategoryColor(achievement.category.id)} font-size-xs`;
         }
 
         progressBar.style.width = `${percent}%`;
@@ -435,36 +438,72 @@ export class AdventuringSlayers extends AdventuringPage {
 
         if(isComplete) {
             card.classList.add('border', 'border-success');
-            card.style.opacity = '0.7';
+            card.style.opacity = '0.6';
         } else if(isMet) {
             card.classList.add('border', 'border-warning');
+            claimBtn.classList.remove('d-none');
+            claimBtn.onclick = () => this.claimAchievement(achievement);
         }
 
+        // Show compact reward icons for row layout
         for(const reward of achievement.rewards) {
             const rewardEl = new AdventuringAchievementRewardElement();
+            rewardEl.classList.add('mr-1');
 
             if(reward.type === 'currency') {
                 rewardEl.setCurrency(reward.qty, this.manager.stash.currencyMedia, 'Adventuring Coins');
             } else if(reward.type === 'stat') {
                 const stat = this.manager.stats.getObjectByID(reward.stat);
                 const statName = stat ? stat.name : reward.stat.replace('adventuring:', '');
-                const shortName = statName.toUpperCase().slice(0, 3);
-                rewardEl.setStat(reward.value, shortName, statName);
+                const statIcon = stat ? stat.media : null;
+                rewardEl.setStat(reward.value, statIcon, statName);
             } else if(reward.type === 'material') {
                 const mat = this.manager.materials.getObjectByID(reward.id);
                 if(mat) {
-                    rewardEl.setMaterial(reward.qty, mat.media, mat.name);
+                    const tooltipContent = TooltipBuilder.forMaterial(mat, this.manager).build();
+                    rewardEl.setMaterial(reward.qty, mat.media, tooltipContent);
                 }
+            } else if(reward.type === 'ability') {
+                const ability = this.manager.getAbilityByID(reward.id);
+                if(ability) {
+                    const tooltipContent = TooltipBuilder.forAbility(ability, {
+                        manager: this.manager,
+                        showUnlockLevel: false,
+                        displayMode: 'scale'
+                    }).build();
+                    rewardEl.setAbility(ability.name, null, tooltipContent);
+                }
+            } else if(reward.type === 'effect') {
+                // Handle stat effects with icons instead of text
+                let hasStatEffect = false;
+                for(const effect of reward.effects) {
+                    if(effect.type === 'stat_flat' || effect.type === 'stat_percent') {
+                        hasStatEffect = true;
+                        const statRewardEl = new AdventuringAchievementRewardElement();
+                        statRewardEl.classList.add('mr-1');
+                        const stat = this.manager.stats.getObjectByID(effect.stat);
+                        const statName = stat ? stat.name : effect.stat.replace('adventuring:', '');
+                        const statIcon = stat ? stat.media : null;
+                        const prefix = effect.type === 'stat_percent' ? '+' + effect.amount + '%' : '+' + effect.amount;
+                        statRewardEl.setStat(effect.amount, statIcon, statName);
+                        rewards.appendChild(statRewardEl);
+                    }
+                }
+                // For non-stat effects, show as text
+                if(!hasStatEffect) {
+                    const descs = getEffectDescriptionsList(reward.effects, this.manager);
+                    if(descs.length > 0) {
+                        rewardEl.setEffect(descs.join(', '), 'Permanent bonus');
+                        rewards.appendChild(rewardEl);
+                    }
+                }
+                continue; // Skip the default appendChild since we handle it above
             }
 
             rewards.appendChild(rewardEl);
         }
 
-        const col = document.createElement('div');
-        col.className = 'col-12 col-md-6 col-lg-4 p-2';
-        col.appendChild(card);
-
-        return col;
+        return row;
     }
 
     claimAchievement(achievement) {
@@ -482,8 +521,13 @@ export class AdventuringSlayers extends AdventuringPage {
             'adventuring:combat': 'danger',
             'adventuring:dungeons': 'info',
             'adventuring:collection': 'warning',
-            'adventuring:mastery': 'success',
-            'adventuring:challenges': 'primary'
+            'adventuring:challenges': 'primary',
+            'adventuring:town_jobs': 'secondary',
+            'adventuring:solo': 'dark',
+            'adventuring:job_mastery': 'success',
+            'adventuring:area_mastery': 'info',
+            'adventuring:monster_mastery': 'danger',
+            'adventuring:equipment_mastery': 'warning'
         };
         return colors[categoryId] || 'secondary';
     }

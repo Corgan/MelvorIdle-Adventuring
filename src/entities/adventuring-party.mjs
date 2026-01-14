@@ -295,6 +295,25 @@ class AdventuringHeroParty extends AdventuringParty {
         this.front.component.mount(this.component.party);
     }
 
+    /** Heroes that participate in combat (combatJob is not "none") */
+    get combatParty() {
+        return this.all.filter(member => 
+            member.combatJob && member.combatJob.id !== 'adventuring:none'
+        );
+    }
+
+    /** Heroes staying in town (combatJob is "none") */
+    get townParty() {
+        return this.all.filter(member => 
+            !member.combatJob || member.combatJob.id === 'adventuring:none'
+        );
+    }
+
+    /** Living members of the combat party */
+    get combatAlive() {
+        return this.combatParty.filter(member => !member.dead);
+    }
+
     postDataRegistration() {
         super.postDataRegistration();
         this.all.forEach(member => member.postDataRegistration());

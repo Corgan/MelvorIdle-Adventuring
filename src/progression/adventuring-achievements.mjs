@@ -38,6 +38,9 @@ export class AchievementStats {
         this.debuffsApplied = 0;
         this.floorsExplored = 0;
         this.specialTilesFound = 0;
+        // Solo challenge stats
+        this.soloWins = 0;
+        this.soloDungeonClears = 0;
     }
 
     encode(writer) {
@@ -59,6 +62,8 @@ export class AchievementStats {
         writer.writeUint32(this.debuffsApplied);
         writer.writeUint32(this.floorsExplored);
         writer.writeUint32(this.specialTilesFound);
+        writer.writeUint32(this.soloWins);
+        writer.writeUint32(this.soloDungeonClears);
 
         writer.writeUint16(this.killsByTag.size);
         for(const [tag, count] of this.killsByTag) {
@@ -93,6 +98,8 @@ export class AchievementStats {
         this.debuffsApplied = reader.getUint32();
         this.floorsExplored = reader.getUint32();
         this.specialTilesFound = reader.getUint32();
+        this.soloWins = reader.getUint32();
+        this.soloDungeonClears = reader.getUint32();
 
         this.killsByTag = new Map();
         const tagCount = reader.getUint16();
@@ -241,6 +248,13 @@ export class AdventuringAchievement extends NamespacedObject {
 
             case 'total_monster_mastery':
                 return this._getTotalMonsterMastery();
+
+            case 'solo_wins':
+                return stats.soloWins;
+
+            case 'solo_dungeon_clears':
+                return stats.soloDungeonClears;
+
             default:
                 return 0;
         }
@@ -562,6 +576,14 @@ export class AchievementManager {
         if(this.bonusEffects) {
             this.bonusEffects.invalidate('achievements');
         }
+        // Also invalidate all heroes' effect caches so they pick up the new achievement bonuses
+        if(this.manager.party) {
+            this.manager.party.all.forEach(hero => {
+                if(hero.effectCache) {
+                    hero.effectCache.invalidate('achievements');
+                }
+            });
+        }
     }
 
     getStatBonus(statId) {
@@ -601,6 +623,17 @@ export class AchievementManager {
         return false;
     }
 
+    getAbilitySource(abilityId) {
+        // Check all achievements (not just completed) to find which one grants this ability
+        for(const achievement of this.manager.achievements.allObjects) {
+            const ability = achievement.getAbilityReward();
+            if(ability && ability.id === abilityId) {
+                return achievement;
+            }
+        }
+        return null;
+    }
+
     recordKill(monster) {
         this.stats.totalKills++;
 
@@ -635,6 +668,13 @@ export class AchievementManager {
             this.stats.totalEndlessWaves += endlessWave;
         }
 
+        // Check for solo dungeon clear
+        const noneJob = this.manager.cached.noneJob;
+        const activeHeroes = this.manager.party.all.filter(h => h.combatJob && h.combatJob !== noneJob);
+        if(activeHeroes.length === 1) {
+            this.stats.soloDungeonClears++;
+        }
+
         this.markDirty();
     }
 
@@ -653,7 +693,11 @@ export class AchievementManager {
         this.markDirty();
     }
 
-    recordCombatEnd(flawless, rounds, lastStand, totalDamage, totalHealing) {
+    recordCombatEnd(options) {
+        const { flawless, rounds, lastStand, heroes } = options;
+        const totalDamage = options.totalDamage || 0;
+        const totalHealing = options.totalHealing || 0;
+
         if(flawless) {
             this.stats.flawlessWins++;
         }
@@ -664,6 +708,15 @@ export class AchievementManager {
 
         if(lastStand) {
             this.stats.lastStandWins++;
+        }
+
+        // Check for solo win (only 1 hero has a real combat job)
+        if(heroes) {
+            const noneJob = this.manager.cached.noneJob;
+            const activeHeroes = heroes.filter(h => h.combatJob && h.combatJob !== noneJob);
+            if(activeHeroes.length === 1) {
+                this.stats.soloWins++;
+            }
         }
 
         this.stats.totalDamage += totalDamage;

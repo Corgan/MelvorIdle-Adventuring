@@ -46,8 +46,24 @@ export class AdventuringEncounter extends AdventuringPage {
         this.passiveEffects = new PassiveEffectProcessor(this);
     }
 
+    /** Get all combatants - only heroes with combat jobs + all enemies */
     get all() {
-        return [...this.manager.party.all, ...this.party.all];
+        return [...this.manager.party.combatParty, ...this.party.all];
+    }
+
+    /** Get all living combatants */
+    get allAlive() {
+        return this.all.filter(c => !c.dead);
+    }
+
+    /** Get heroes currently in combat */
+    get heroes() {
+        return this.manager.party.combatParty;
+    }
+
+    /** Get living heroes in combat */
+    get heroesAlive() {
+        return this.manager.party.combatAlive;
     }
 
     get currentTimer() {
@@ -87,7 +103,7 @@ export class AdventuringEncounter extends AdventuringPage {
 
         const bonusEnergy = this.manager.modifiers.getBonusEnergy();
         if(bonusEnergy > 0) {
-            this.manager.party.forEachLiving(member => {
+            this.heroesAlive.forEach(member => {
                 if(member.maxEnergy > 0) {
                     member.addEnergy(bonusEnergy);
                 }
@@ -147,6 +163,9 @@ export class AdventuringEncounter extends AdventuringPage {
         this.all.forEach(member => {
             let resolvedEffects = member.trigger('round_end', { encounter: this });
         });
+
+        // Tick town heroes (those with combatJob = none) during combat
+        this.manager.town.tickTownHeroes();
 
         this.currentRoundOrder = this.nextRoundOrder;
         this.nextRoundOrder = [];

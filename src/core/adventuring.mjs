@@ -40,6 +40,7 @@ const { AdventuringStash } = await loadModule('src/town/adventuring-stash.mjs');
 const { AdventuringBestiary } = await loadModule('src/entities/adventuring-bestiary.mjs');
 const { AdventuringMonsterDetails } = await loadModule('src/entities/adventuring-monster-details.mjs');
 const { AdventuringCrossroads } = await loadModule('src/dungeon/adventuring-crossroads.mjs');
+const { AdventuringAreaDetails } = await loadModule('src/dungeon/adventuring-area-details.mjs');
 const { AdventuringDungeon } = await loadModule('src/dungeon/adventuring-dungeon.mjs');
 const { AdventuringEncounter } = await loadModule('src/combat/adventuring-encounter.mjs');
 
@@ -152,6 +153,7 @@ export class Adventuring extends SkillWithMastery {
         this.monsterdetails = new AdventuringMonsterDetails(this, this.game);
         this.grimoire = new AdventuringGrimoire(this, this.game);
         this.crossroads = new AdventuringCrossroads(this, this.game);
+        this.areadetails = new AdventuringAreaDetails(this, this.game);
         this.dungeon = new AdventuringDungeon(this, this.game);
         this.encounter = new AdventuringEncounter(this, this.game);
 
@@ -174,6 +176,7 @@ export class Adventuring extends SkillWithMastery {
         this.pages.register('bestiary', this.bestiary);
         this.pages.register('monsterdetails', this.monsterdetails);
         this.pages.register('crossroads', this.crossroads);
+        this.pages.register('areadetails', this.areadetails);
         this.pages.register('dungeon', this.dungeon);
         this.pages.register('encounter', this.encounter);
 
@@ -555,7 +558,12 @@ export class Adventuring extends SkillWithMastery {
     }
 
     selectArea(area) {
-        if(this.party.all.some(member => !member.dead)) {
+        // Need at least one hero with a combat job to go adventuring
+        if(this.party.combatParty.length === 0) {
+            this.log.add('Cannot start - no heroes have combat jobs!');
+            return;
+        }
+        if(this.party.combatParty.some(member => !member.dead)) {
             this.dungeon.setArea(area);
             this.dungeon.start();
             this.dungeon.go();
@@ -1255,6 +1263,35 @@ export class Adventuring extends SkillWithMastery {
         if (this.passivesByJob === undefined) return [];
         const passives = this.passivesByJob.get(job.id);
         return passives !== undefined ? passives : [];
+    }
+
+    getGlobalPassives() {
+        // Return passives that are not tied to any job (e.g., achievement passives)
+        // These have achievement_completion requirements instead of job_level requirements
+        if (this.passives === undefined) return [];
+        return this.passives.allObjects.filter(p => {
+            // Has achievement requirement and no job requirements
+            const hasAchievementReq = p.requirements.some(r => r.type === 'achievement_completion');
+            const hasJobReq = p.requirements.some(r => r.type === 'job_level' || r.type === 'current_job_level');
+            return hasAchievementReq && !hasJobReq;
+        });
+    }
+
+    getGlobalPassivesForTrigger(character, triggerType) {
+        const results = [];
+        const passives = this.getGlobalPassives();
+
+        for (const passive of passives) {
+            if (!passive.canEquip(character)) continue;
+            if (!passive.effects) continue;
+            for (const effect of passive.effects) {
+                if (effect.trigger === triggerType) {
+                    results.push({ passive, effect });
+                }
+            }
+        }
+
+        return results;
     }
 
     getAbilityByID(id) {

@@ -429,7 +429,7 @@ class AdventuringCharacter {
             return;
 
         const actualHeal = Math.min(amount, this.maxHitpoints - this.hitpoints);
-        this.hitpoints += amount;
+        this.hitpoints += actualHeal;
 
         if(isNaN(this.hitpoints))
             this.hitpoints = 0;

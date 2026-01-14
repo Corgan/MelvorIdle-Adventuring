@@ -241,7 +241,7 @@ export class AdventuringDungeon extends AdventuringPage {
                 this.processTileEffect(effect, tile.type.name);
             }
 
-            if(this.manager.party.all.every(member => member.dead)) {
+            if(this.manager.party.combatParty.every(member => member.dead)) {
                 this.abandon();
             }
         }
@@ -270,7 +270,7 @@ export class AdventuringDungeon extends AdventuringPage {
 
     processTileDamage(effect, sourceName) {
         let damagePercent = effect.amount;
-        this.manager.party.all.forEach(member => {
+        this.manager.party.combatParty.forEach(member => {
             let amount = Math.floor(member.maxHitpoints * damagePercent / 100);
             member.damage({ amount: amount });
             this.manager.log.add(`${sourceName} did ${amount} damage to ${member.name}`);
@@ -279,7 +279,7 @@ export class AdventuringDungeon extends AdventuringPage {
 
     processTileHeal(effect, sourceName) {
         let healPercent = effect.amount;
-        this.manager.party.all.forEach(member => {
+        this.manager.party.combatParty.forEach(member => {
             let amount = Math.floor(member.maxHitpoints * healPercent / 100);
             if(member.dead) {
 
@@ -302,7 +302,7 @@ export class AdventuringDungeon extends AdventuringPage {
     processTileXP(effect, sourceName) {
         if(effect.job === "adventuring:any") {
 
-            this.manager.party.all.filter(member => !member.dead).forEach(member => {
+            this.manager.party.combatParty.filter(member => !member.dead).forEach(member => {
                 if(member.combatJob && member.combatJob.isMilestoneReward) {
                     member.combatJob.addXP(effect.amount);
                 }
@@ -426,7 +426,7 @@ export class AdventuringDungeon extends AdventuringPage {
         this.manager.areas.allObjects.forEach(area => {
             if(area.masteryAuraUnlocked && area.masteryAura) {
 
-                this.manager.party.all.forEach(member => {
+                this.manager.party.combatParty.forEach(member => {
                     if(!member.dead) {
                         member.auras.add(area.masteryAura, { stacks: 1 }, area);
                         member.auras.buildEffects();
@@ -493,7 +493,7 @@ export class AdventuringDungeon extends AdventuringPage {
         this.manager.consumables.onDungeonEnd();
         this.manager.tavern.consumeCharges();
 
-        if(!this.manager.party.all.every(hero => hero.dead)) {
+        if(!this.manager.party.combatParty.every(hero => hero.dead)) {
 
             if(this.isEndless) {
                 this.endlessWave++;

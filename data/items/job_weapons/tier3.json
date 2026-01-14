@@ -1,0 +1,525 @@
+{
+    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+    "namespace": "adventuring",
+    "data": {
+        "skillData": [
+            {
+                "skillID": "adventuring:Adventuring",
+                "data": {
+                    "baseItems": [
+                        {
+                            "id": "warlords_greatsword",
+                            "name": "Warlord's Greatsword",
+                            "media": "melvor:assets/media/bank/weapon_2h_ancient.png#shade=blood",
+                            "type": "adventuring:sword2h",
+                            "isJobWeapon": true,
+                            "allowedJobs": ["adventuring:warlord"],
+                            "requirements": [
+                                { "type": "achievement_completion", "id": "adventuring:warlord_weapon_mastery" }
+                            ],
+                            "tiers": [
+                                {
+                                    "name": "Warlord's Greatsword",
+                                    "base": [
+                                        { "id": "adventuring:hitpoints", "amount": 35 },
+                                        { "id": "adventuring:strength", "amount": 65 }
+                                    ],
+                                    "scaling": [
+                                        { "id": "adventuring:hitpoints", "amount": 3.2 },
+                                        { "id": "adventuring:strength", "amount": 5.8 }
+                                    ],
+                                    "materials": [
+                                        { "id": "adventuring:currency", "qty": 15000 },
+                                        { "id": "adventuring:pristine_salvage", "qty": 30 }
+                                    ]
+                                },
+                                {
+                                    "name": "Conqueror's Blade",
+                                    "base": [
+                                        { "id": "adventuring:hitpoints", "amount": 58 },
+                                        { "id": "adventuring:strength", "amount": 108 }
+                                    ],
+                                    "scaling": [
+                                        { "id": "adventuring:hitpoints", "amount": 5.3 },
+                                        { "id": "adventuring:strength", "amount": 9.7 }
+                                    ],
+                                    "effects": [
+                                        {
+                                            "trigger": "kill",
+                                            "type": "buff",
+                                            "id": "adventuring:might",
+                                            "target": "self",
+                                            "stacks": 2
+                                        }
+                                    ],
+                                    "materials": [
+                                        { "id": "adventuring:currency", "qty": 75000 },
+                                        { "id": "adventuring:mythic_salvage", "qty": 22 }
+                                    ]
+                                },
+                                {
+                                    "name": "Worldender",
+                                    "base": [
+                                        { "id": "adventuring:hitpoints", "amount": 95 },
+                                        { "id": "adventuring:strength", "amount": 180 }
+                                    ],
+                                    "scaling": [
+                                        { "id": "adventuring:hitpoints", "amount": 8.5 },
+                                        { "id": "adventuring:strength", "amount": 16 }
+                                    ],
+                                    "effects": [
+                                        {
+                                            "trigger": "kill",
+                                            "type": "buff",
+                                            "id": "adventuring:might",
+                                            "target": "self",
+                                            "stacks": 3
+                                        },
+                                        {
+                                            "trigger": "kill",
+                                            "type": "buff",
+                                            "id": "adventuring:berserk",
+                                            "target": "self",
+                                            "stacks": 2
+                                        }
+                                    ],
+                                    "materials": [
+                                        { "id": "adventuring:currency", "qty": 200000 },
+                                        { "id": "adventuring:mythic_salvage", "qty": 60 },
+                                        { "id": "adventuring:chaos_core", "qty": 2 }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "shadowblades_edge",
+                            "name": "Shadowblade's Edge",
+                            "media": "melvor:assets/media/bank/weapon_sword_ancient.png#shade=purple",
+                            "type": "adventuring:scimitar",
+                            "isJobWeapon": true,
+                            "allowedJobs": ["adventuring:shadowblade"],
+                            "requirements": [
+                                { "type": "achievement_completion", "id": "adventuring:shadowblade_weapon_mastery" }
+                            ],
+                            "tiers": [
+                                {
+                                    "name": "Shadowblade's Edge",
+                                    "base": [
+                                        { "id": "adventuring:strength", "amount": 45 },
+                                        { "id": "adventuring:magic", "amount": 35 },
+                                        { "id": "adventuring:agility", "amount": 30 }
+                                    ],
+                                    "scaling": [
+                                        { "id": "adventuring:strength", "amount": 4 },
+                                        { "id": "adventuring:magic", "amount": 3.2 },
+                                        { "id": "adventuring:agility", "amount": 2.7 }
+                                    ],
+                                    "materials": [
+                                        { "id": "adventuring:currency", "qty": 15000 },
+                                        { "id": "adventuring:pristine_salvage", "qty": 30 }
+                                    ]
+                                },
+                                {
+                                    "name": "Umbral Edge",
+                                    "base": [
+                                        { "id": "adventuring:strength", "amount": 75 },
+                                        { "id": "adventuring:magic", "amount": 58 },
+                                        { "id": "adventuring:agility", "amount": 50 }
+                                    ],
+                                    "scaling": [
+                                        { "id": "adventuring:strength", "amount": 6.7 },
+                                        { "id": "adventuring:magic", "amount": 5.3 },
+                                        { "id": "adventuring:agility", "amount": 4.5 }
+                                    ],
+                                    "effects": [
+                                        {
+                                            "trigger": "after_damage_delivered",
+                                            "type": "debuff",
+                                            "id": "adventuring:weaken",
+                                            "target": "target",
+                                            "stacks": 1,
+                                            "chance": 25
+                                        }
+                                    ],
+                                    "materials": [
+                                        { "id": "adventuring:currency", "qty": 75000 },
+                                        { "id": "adventuring:mythic_salvage", "qty": 22 }
+                                    ]
+                                },
+                                {
+                                    "name": "Voidreaver",
+                                    "base": [
+                                        { "id": "adventuring:strength", "amount": 123 },
+                                        { "id": "adventuring:magic", "amount": 95 },
+                                        { "id": "adventuring:agility", "amount": 82 }
+                                    ],
+                                    "scaling": [
+                                        { "id": "adventuring:strength", "amount": 11 },
+                                        { "id": "adventuring:magic", "amount": 8.5 },
+                                        { "id": "adventuring:agility", "amount": 7.2 }
+                                    ],
+                                    "effects": [
+                                        {
+                                            "trigger": "after_damage_delivered",
+                                            "type": "debuff",
+                                            "id": "adventuring:weaken",
+                                            "target": "target",
+                                            "stacks": 2,
+                                            "chance": 35
+                                        },
+                                        {
+                                            "trigger": "passive",
+                                            "type": "lifesteal",
+                                            "amount": 8
+                                        }
+                                    ],
+                                    "materials": [
+                                        { "id": "adventuring:currency", "qty": 200000 },
+                                        { "id": "adventuring:mythic_salvage", "qty": 60 },
+                                        { "id": "adventuring:chaos_core", "qty": 2 }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "battlemages_spellblade",
+                            "name": "Battlemage's Spellblade",
+                            "media": "melvor:assets/media/bank/weapon_sword_divine.png#shade=blue",
+                            "type": "adventuring:sword1h",
+                            "isJobWeapon": true,
+                            "allowedJobs": ["adventuring:battlemage"],
+                            "requirements": [
+                                { "type": "achievement_completion", "id": "adventuring:battlemage_weapon_mastery" }
+                            ],
+                            "tiers": [
+                                {
+                                    "name": "Battlemage's Spellblade",
+                                    "base": [
+                                        { "id": "adventuring:strength", "amount": 40 },
+                                        { "id": "adventuring:magic", "amount": 50 }
+                                    ],
+                                    "scaling": [
+                                        { "id": "adventuring:strength", "amount": 3.6 },
+                                        { "id": "adventuring:magic", "amount": 4.5 }
+                                    ],
+                                    "materials": [
+                                        { "id": "adventuring:currency", "qty": 15000 },
+                                        { "id": "adventuring:pristine_salvage", "qty": 30 }
+                                    ]
+                                },
+                                {
+                                    "name": "Arcane Spellblade",
+                                    "base": [
+                                        { "id": "adventuring:strength", "amount": 67 },
+                                        { "id": "adventuring:magic", "amount": 83 }
+                                    ],
+                                    "scaling": [
+                                        { "id": "adventuring:strength", "amount": 6 },
+                                        { "id": "adventuring:magic", "amount": 7.5 }
+                                    ],
+                                    "effects": [
+                                        {
+                                            "trigger": "after_damage_delivered",
+                                            "type": "damage_flat",
+                                            "target": "target",
+                                            "amount": 15,
+                                            "scaling": 1.5,
+                                            "element": "magic"
+                                        }
+                                    ],
+                                    "materials": [
+                                        { "id": "adventuring:currency", "qty": 75000 },
+                                        { "id": "adventuring:mythic_salvage", "qty": 22 }
+                                    ]
+                                },
+                                {
+                                    "name": "Runeforged Spellblade",
+                                    "base": [
+                                        { "id": "adventuring:strength", "amount": 110 },
+                                        { "id": "adventuring:magic", "amount": 137 }
+                                    ],
+                                    "scaling": [
+                                        { "id": "adventuring:strength", "amount": 9.5 },
+                                        { "id": "adventuring:magic", "amount": 12 }
+                                    ],
+                                    "effects": [
+                                        {
+                                            "trigger": "after_damage_delivered",
+                                            "type": "damage_flat",
+                                            "target": "target",
+                                            "amount": 30,
+                                            "scaling": 3,
+                                            "element": "magic"
+                                        },
+                                        {
+                                            "trigger": "spender",
+                                            "type": "energy",
+                                            "amount": 8,
+                                            "chance": 30
+                                        }
+                                    ],
+                                    "materials": [
+                                        { "id": "adventuring:currency", "qty": 200000 },
+                                        { "id": "adventuring:mythic_salvage", "qty": 60 },
+                                        { "id": "adventuring:chaos_core", "qty": 2 }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "templars_blessed_blade",
+                            "name": "Templar's Blessed Blade",
+                            "media": "melvor:assets/media/bank/weapon_sword_divine.png#shade=gold",
+                            "type": "adventuring:sword1h",
+                            "isJobWeapon": true,
+                            "allowedJobs": ["adventuring:templar"],
+                            "requirements": [
+                                { "type": "achievement_completion", "id": "adventuring:templar_weapon_mastery" }
+                            ],
+                            "tiers": [
+                                {
+                                    "name": "Templar's Blessed Blade",
+                                    "base": [
+                                        { "id": "adventuring:hitpoints", "amount": 40 },
+                                        { "id": "adventuring:prayer", "amount": 55 },
+                                        { "id": "adventuring:defence", "amount": 25 }
+                                    ],
+                                    "scaling": [
+                                        { "id": "adventuring:hitpoints", "amount": 3.6 },
+                                        { "id": "adventuring:prayer", "amount": 5 },
+                                        { "id": "adventuring:defence", "amount": 2.2 }
+                                    ],
+                                    "materials": [
+                                        { "id": "adventuring:currency", "qty": 15000 },
+                                        { "id": "adventuring:pristine_salvage", "qty": 30 }
+                                    ]
+                                },
+                                {
+                                    "name": "Sacred Blade",
+                                    "base": [
+                                        { "id": "adventuring:hitpoints", "amount": 67 },
+                                        { "id": "adventuring:prayer", "amount": 92 },
+                                        { "id": "adventuring:defence", "amount": 42 }
+                                    ],
+                                    "scaling": [
+                                        { "id": "adventuring:hitpoints", "amount": 6 },
+                                        { "id": "adventuring:prayer", "amount": 8.2 },
+                                        { "id": "adventuring:defence", "amount": 3.7 }
+                                    ],
+                                    "effects": [
+                                        {
+                                            "trigger": "passive",
+                                            "type": "healing_power",
+                                            "amount": 0.2
+                                        }
+                                    ],
+                                    "materials": [
+                                        { "id": "adventuring:currency", "qty": 75000 },
+                                        { "id": "adventuring:mythic_salvage", "qty": 22 }
+                                    ]
+                                },
+                                {
+                                    "name": "Blade of Divine Light",
+                                    "base": [
+                                        { "id": "adventuring:hitpoints", "amount": 110 },
+                                        { "id": "adventuring:prayer", "amount": 150 },
+                                        { "id": "adventuring:defence", "amount": 68 }
+                                    ],
+                                    "scaling": [
+                                        { "id": "adventuring:hitpoints", "amount": 9.5 },
+                                        { "id": "adventuring:prayer", "amount": 13.5 },
+                                        { "id": "adventuring:defence", "amount": 6 }
+                                    ],
+                                    "effects": [
+                                        {
+                                            "trigger": "passive",
+                                            "type": "healing_power",
+                                            "amount": 0.35
+                                        },
+                                        {
+                                            "trigger": "round_start",
+                                            "type": "buff",
+                                            "id": "adventuring:protection",
+                                            "target": "all",
+                                            "party": "ally",
+                                            "stacks": 1,
+                                            "chance": 40
+                                        }
+                                    ],
+                                    "materials": [
+                                        { "id": "adventuring:currency", "qty": 200000 },
+                                        { "id": "adventuring:mythic_salvage", "qty": 60 },
+                                        { "id": "adventuring:chaos_core", "qty": 2 }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "reapers_scythe",
+                            "name": "Reaper's Scythe",
+                            "media": "melvor:assets/media/bank/weapon_halberd_dragon.png#shade=black",
+                            "type": "adventuring:polearm",
+                            "isJobWeapon": true,
+                            "allowedJobs": ["adventuring:reaper"],
+                            "requirements": [
+                                { "type": "achievement_completion", "id": "adventuring:reaper_weapon_mastery" }
+                            ],
+                            "tiers": [
+                                {
+                                    "name": "Reaper's Scythe",
+                                    "base": [
+                                        { "id": "adventuring:strength", "amount": 50 },
+                                        { "id": "adventuring:magic", "amount": 40 }
+                                    ],
+                                    "scaling": [
+                                        { "id": "adventuring:strength", "amount": 4.5 },
+                                        { "id": "adventuring:magic", "amount": 3.6 }
+                                    ],
+                                    "materials": [
+                                        { "id": "adventuring:currency", "qty": 15000 },
+                                        { "id": "adventuring:pristine_salvage", "qty": 30 }
+                                    ]
+                                },
+                                {
+                                    "name": "Soul Harvester",
+                                    "base": [
+                                        { "id": "adventuring:strength", "amount": 83 },
+                                        { "id": "adventuring:magic", "amount": 67 }
+                                    ],
+                                    "scaling": [
+                                        { "id": "adventuring:strength", "amount": 7.5 },
+                                        { "id": "adventuring:magic", "amount": 6 }
+                                    ],
+                                    "effects": [
+                                        {
+                                            "trigger": "kill",
+                                            "type": "heal_percent",
+                                            "target": "self",
+                                            "amount": 8
+                                        }
+                                    ],
+                                    "materials": [
+                                        { "id": "adventuring:currency", "qty": 75000 },
+                                        { "id": "adventuring:mythic_salvage", "qty": 22 }
+                                    ]
+                                },
+                                {
+                                    "name": "Death's Embrace",
+                                    "base": [
+                                        { "id": "adventuring:strength", "amount": 137 },
+                                        { "id": "adventuring:magic", "amount": 110 }
+                                    ],
+                                    "scaling": [
+                                        { "id": "adventuring:strength", "amount": 12 },
+                                        { "id": "adventuring:magic", "amount": 9.5 }
+                                    ],
+                                    "effects": [
+                                        {
+                                            "trigger": "kill",
+                                            "type": "heal_percent",
+                                            "target": "self",
+                                            "amount": 15
+                                        },
+                                        {
+                                            "trigger": "kill",
+                                            "type": "buff",
+                                            "id": "adventuring:might",
+                                            "target": "self",
+                                            "stacks": 3
+                                        }
+                                    ],
+                                    "materials": [
+                                        { "id": "adventuring:currency", "qty": 200000 },
+                                        { "id": "adventuring:mythic_salvage", "qty": 60 },
+                                        { "id": "adventuring:chaos_core", "qty": 2 }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "inquisitors_seal",
+                            "name": "Inquisitor's Seal",
+                            "media": "melvor:assets/media/bank/alt_magic_book.png#shade=gold",
+                            "type": "adventuring:spellbook",
+                            "isJobWeapon": true,
+                            "allowedJobs": ["adventuring:inquisitor"],
+                            "requirements": [
+                                { "type": "achievement_completion", "id": "adventuring:inquisitor_weapon_mastery" }
+                            ],
+                            "tiers": [
+                                {
+                                    "name": "Inquisitor's Seal",
+                                    "base": [
+                                        { "id": "adventuring:magic", "amount": 45 },
+                                        { "id": "adventuring:prayer", "amount": 45 }
+                                    ],
+                                    "scaling": [
+                                        { "id": "adventuring:magic", "amount": 4 },
+                                        { "id": "adventuring:prayer", "amount": 4 }
+                                    ],
+                                    "materials": [
+                                        { "id": "adventuring:currency", "qty": 15000 },
+                                        { "id": "adventuring:pristine_salvage", "qty": 30 }
+                                    ]
+                                },
+                                {
+                                    "name": "Tome of Judgment",
+                                    "base": [
+                                        { "id": "adventuring:magic", "amount": 75 },
+                                        { "id": "adventuring:prayer", "amount": 75 }
+                                    ],
+                                    "scaling": [
+                                        { "id": "adventuring:magic", "amount": 6.7 },
+                                        { "id": "adventuring:prayer", "amount": 6.7 }
+                                    ],
+                                    "effects": [
+                                        {
+                                            "trigger": "after_damage_delivered",
+                                            "type": "dispel",
+                                            "count": 1,
+                                            "chance": 20
+                                        }
+                                    ],
+                                    "materials": [
+                                        { "id": "adventuring:currency", "qty": 75000 },
+                                        { "id": "adventuring:mythic_salvage", "qty": 22 }
+                                    ]
+                                },
+                                {
+                                    "name": "Codex of Divine Wrath",
+                                    "base": [
+                                        { "id": "adventuring:magic", "amount": 123 },
+                                        { "id": "adventuring:prayer", "amount": 123 }
+                                    ],
+                                    "scaling": [
+                                        { "id": "adventuring:magic", "amount": 11 },
+                                        { "id": "adventuring:prayer", "amount": 11 }
+                                    ],
+                                    "effects": [
+                                        {
+                                            "trigger": "after_damage_delivered",
+                                            "type": "dispel",
+                                            "count": 2,
+                                            "chance": 30
+                                        },
+                                        {
+                                            "trigger": "passive",
+                                            "type": "damage_bonus",
+                                            "condition": "target_has_buff",
+                                            "amount": 0.25
+                                        }
+                                    ],
+                                    "materials": [
+                                        { "id": "adventuring:currency", "qty": 200000 },
+                                        { "id": "adventuring:mythic_salvage", "qty": 60 },
+                                        { "id": "adventuring:chaos_core", "qty": 2 }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

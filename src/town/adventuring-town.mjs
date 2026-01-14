@@ -30,7 +30,9 @@ export class AdventuringTown extends AdventuringPage {
         return super.active;
     }
 
-    performActions() {
+    performActions() {
+
+
         if(this.manager.autoRepeatArea && this.checkAutoRunReady()) {
             this.manager.log.add(`Auto-run: Starting ${this.manager.autoRepeatArea.name}...`);
             this.manager.selectArea(this.manager.autoRepeatArea);
@@ -40,8 +42,16 @@ export class AdventuringTown extends AdventuringPage {
         this.manager.party.forEach(character => this.runAction(character));
     }
 
+    /** Tick only heroes staying in town (combatJob = none) during dungeon runs */
+    tickTownHeroes() {
+        this.manager.party.townParty.forEach(character => this.runAction(character));
+    }
+
     checkAutoRunReady() {
-        return this.manager.party.every(member =>
+        // Only check combat party members - need at least one and all must be alive/full health
+        const combatParty = this.manager.party.combatParty;
+        if (combatParty.length === 0) return false;
+        return combatParty.every(member =>
             !member.dead && member.hitpoints >= member.maxHitpoints
         );
     }
@@ -116,7 +126,8 @@ export class AdventuringTown extends AdventuringPage {
         this.manager.overview.cards.renderQueue.update = true;
     }
 
-    go() {
+    go() {
+
         this.building = undefined;
         super.go();
     }
@@ -126,7 +137,8 @@ export class AdventuringTown extends AdventuringPage {
             building = this.manager.buildings.getObjectByID(building);
         if(building === undefined || building.page !== undefined)
             this.building = building;
-        if(building && building.page !== undefined) {
+        if(building && building.page !== undefined) {
+
             building.go();
         } else if(this.active) {
             this.go();

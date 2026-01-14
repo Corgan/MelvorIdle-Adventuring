@@ -1,0 +1,474 @@
+{
+    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+    "namespace": "adventuring",
+    "data": {
+        "skillData": [
+            {
+                "skillID": "adventuring:Adventuring",
+                "data": {
+                    "baseItems": [
+                        {
+                            "id": "shadow_monks_fist",
+                            "name": "Shadow Monk's Fist",
+                            "media": "melvor:assets/media/bank/armour_gloves_ancient.png#shade=black",
+                            "type": "adventuring:fists",
+                            "isJobWeapon": true,
+                            "allowedJobs": ["adventuring:shadowmonk"],
+                            "requirements": [
+                                { "type": "achievement_completion", "id": "adventuring:shadowmonk_weapon_mastery" }
+                            ],
+                            "tiers": [
+                                {
+                                    "name": "Shadow Monk's Fist",
+                                    "base": [
+                                        { "id": "adventuring:hitpoints", "amount": 45 },
+                                        { "id": "adventuring:strength", "amount": 55 },
+                                        { "id": "adventuring:agility", "amount": 50 }
+                                    ],
+                                    "scaling": [
+                                        { "id": "adventuring:hitpoints", "amount": 4 },
+                                        { "id": "adventuring:strength", "amount": 5 },
+                                        { "id": "adventuring:agility", "amount": 4.5 }
+                                    ],
+                                    "materials": [
+                                        { "id": "adventuring:currency", "qty": 25000 },
+                                        { "id": "adventuring:pristine_salvage", "qty": 50 }
+                                    ]
+                                },
+                                {
+                                    "name": "Void Fist",
+                                    "base": [
+                                        { "id": "adventuring:hitpoints", "amount": 75 },
+                                        { "id": "adventuring:strength", "amount": 92 },
+                                        { "id": "adventuring:agility", "amount": 83 }
+                                    ],
+                                    "scaling": [
+                                        { "id": "adventuring:hitpoints", "amount": 6.7 },
+                                        { "id": "adventuring:strength", "amount": 8.2 },
+                                        { "id": "adventuring:agility", "amount": 7.5 }
+                                    ],
+                                    "effects": [
+                                        {
+                                            "trigger": "on_hit",
+                                            "type": "buff",
+                                            "id": "adventuring:shadow_step",
+                                            "target": "self",
+                                            "stacks": 1,
+                                            "chance": 30
+                                        }
+                                    ],
+                                    "materials": [
+                                        { "id": "adventuring:currency", "qty": 125000 },
+                                        { "id": "adventuring:mythic_salvage", "qty": 40 }
+                                    ]
+                                },
+                                {
+                                    "name": "Abyssal Fist",
+                                    "base": [
+                                        { "id": "adventuring:hitpoints", "amount": 123 },
+                                        { "id": "adventuring:strength", "amount": 150 },
+                                        { "id": "adventuring:agility", "amount": 137 }
+                                    ],
+                                    "scaling": [
+                                        { "id": "adventuring:hitpoints", "amount": 11 },
+                                        { "id": "adventuring:strength", "amount": 13.5 },
+                                        { "id": "adventuring:agility", "amount": 12 }
+                                    ],
+                                    "effects": [
+                                        {
+                                            "trigger": "on_hit",
+                                            "type": "buff",
+                                            "id": "adventuring:shadow_step",
+                                            "target": "self",
+                                            "stacks": 1,
+                                            "chance": 50
+                                        },
+                                        {
+                                            "trigger": "passive",
+                                            "type": "dodge",
+                                            "amount": 0.15
+                                        }
+                                    ],
+                                    "materials": [
+                                        { "id": "adventuring:currency", "qty": 300000 },
+                                        { "id": "adventuring:mythic_salvage", "qty": 100 },
+                                        { "id": "adventuring:chaos_core", "qty": 5 }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "shadowdancers_fans",
+                            "name": "Shadowdancer's Fans",
+                            "media": "melvor:assets/media/bank/weapon_sword_ancient.png#shade=purple",
+                            "type": "adventuring:dagger",
+                            "isJobWeapon": true,
+                            "allowedJobs": ["adventuring:shadowdancer"],
+                            "requirements": [
+                                { "type": "achievement_completion", "id": "adventuring:shadowdancer_weapon_mastery" }
+                            ],
+                            "tiers": [
+                                {
+                                    "name": "Shadowdancer's Fans",
+                                    "base": [
+                                        { "id": "adventuring:hitpoints", "amount": 40 },
+                                        { "id": "adventuring:strength", "amount": 45 },
+                                        { "id": "adventuring:agility", "amount": 65 }
+                                    ],
+                                    "scaling": [
+                                        { "id": "adventuring:hitpoints", "amount": 3.6 },
+                                        { "id": "adventuring:strength", "amount": 4 },
+                                        { "id": "adventuring:agility", "amount": 5.8 }
+                                    ],
+                                    "materials": [
+                                        { "id": "adventuring:currency", "qty": 25000 },
+                                        { "id": "adventuring:pristine_salvage", "qty": 50 }
+                                    ]
+                                },
+                                {
+                                    "name": "Phantom Fans",
+                                    "base": [
+                                        { "id": "adventuring:hitpoints", "amount": 67 },
+                                        { "id": "adventuring:strength", "amount": 75 },
+                                        { "id": "adventuring:agility", "amount": 108 }
+                                    ],
+                                    "scaling": [
+                                        { "id": "adventuring:hitpoints", "amount": 6 },
+                                        { "id": "adventuring:strength", "amount": 6.7 },
+                                        { "id": "adventuring:agility", "amount": 9.7 }
+                                    ],
+                                    "effects": [
+                                        {
+                                            "trigger": "on_dodge",
+                                            "type": "damage_flat",
+                                            "target": "random",
+                                            "party": "enemy",
+                                            "amount": 25,
+                                            "scaling": 2.5
+                                        }
+                                    ],
+                                    "materials": [
+                                        { "id": "adventuring:currency", "qty": 125000 },
+                                        { "id": "adventuring:mythic_salvage", "qty": 40 }
+                                    ]
+                                },
+                                {
+                                    "name": "Ethereal Fans",
+                                    "base": [
+                                        { "id": "adventuring:hitpoints", "amount": 110 },
+                                        { "id": "adventuring:strength", "amount": 123 },
+                                        { "id": "adventuring:agility", "amount": 178 }
+                                    ],
+                                    "scaling": [
+                                        { "id": "adventuring:hitpoints", "amount": 9.5 },
+                                        { "id": "adventuring:strength", "amount": 11 },
+                                        { "id": "adventuring:agility", "amount": 16 }
+                                    ],
+                                    "effects": [
+                                        {
+                                            "trigger": "on_dodge",
+                                            "type": "damage_flat",
+                                            "target": "random",
+                                            "party": "enemy",
+                                            "amount": 50,
+                                            "scaling": 5
+                                        },
+                                        {
+                                            "trigger": "passive",
+                                            "type": "dodge",
+                                            "amount": 0.2
+                                        }
+                                    ],
+                                    "materials": [
+                                        { "id": "adventuring:currency", "qty": 300000 },
+                                        { "id": "adventuring:mythic_salvage", "qty": 100 },
+                                        { "id": "adventuring:chaos_core", "qty": 5 }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "shamans_totem",
+                            "name": "Shaman's Totem",
+                            "media": "melvor:assets/media/bank/staff_of_fire.png#shade=green",
+                            "type": "adventuring:staff",
+                            "isJobWeapon": true,
+                            "allowedJobs": ["adventuring:shaman"],
+                            "requirements": [
+                                { "type": "achievement_completion", "id": "adventuring:shaman_weapon_mastery" }
+                            ],
+                            "tiers": [
+                                {
+                                    "name": "Shaman's Totem",
+                                    "base": [
+                                        { "id": "adventuring:hitpoints", "amount": 50 },
+                                        { "id": "adventuring:magic", "amount": 50 },
+                                        { "id": "adventuring:prayer", "amount": 50 }
+                                    ],
+                                    "scaling": [
+                                        { "id": "adventuring:hitpoints", "amount": 4.5 },
+                                        { "id": "adventuring:magic", "amount": 4.5 },
+                                        { "id": "adventuring:prayer", "amount": 4.5 }
+                                    ],
+                                    "materials": [
+                                        { "id": "adventuring:currency", "qty": 25000 },
+                                        { "id": "adventuring:pristine_salvage", "qty": 50 }
+                                    ]
+                                },
+                                {
+                                    "name": "Spirit Totem",
+                                    "base": [
+                                        { "id": "adventuring:hitpoints", "amount": 83 },
+                                        { "id": "adventuring:magic", "amount": 83 },
+                                        { "id": "adventuring:prayer", "amount": 83 }
+                                    ],
+                                    "scaling": [
+                                        { "id": "adventuring:hitpoints", "amount": 7.5 },
+                                        { "id": "adventuring:magic", "amount": 7.5 },
+                                        { "id": "adventuring:prayer", "amount": 7.5 }
+                                    ],
+                                    "effects": [
+                                        {
+                                            "trigger": "encounter_start",
+                                            "type": "buff",
+                                            "id": "adventuring:spirit_link",
+                                            "target": "all",
+                                            "party": "ally",
+                                            "stacks": 1
+                                        }
+                                    ],
+                                    "materials": [
+                                        { "id": "adventuring:currency", "qty": 125000 },
+                                        { "id": "adventuring:mythic_salvage", "qty": 40 }
+                                    ]
+                                },
+                                {
+                                    "name": "Ancestral Totem",
+                                    "base": [
+                                        { "id": "adventuring:hitpoints", "amount": 137 },
+                                        { "id": "adventuring:magic", "amount": 137 },
+                                        { "id": "adventuring:prayer", "amount": 137 }
+                                    ],
+                                    "scaling": [
+                                        { "id": "adventuring:hitpoints", "amount": 12 },
+                                        { "id": "adventuring:magic", "amount": 12 },
+                                        { "id": "adventuring:prayer", "amount": 12 }
+                                    ],
+                                    "effects": [
+                                        {
+                                            "trigger": "encounter_start",
+                                            "type": "buff",
+                                            "id": "adventuring:spirit_link",
+                                            "target": "all",
+                                            "party": "ally",
+                                            "stacks": 2
+                                        },
+                                        {
+                                            "trigger": "passive",
+                                            "type": "healing_power",
+                                            "amount": 0.2
+                                        },
+                                        {
+                                            "trigger": "passive",
+                                            "type": "damage_bonus",
+                                            "ability_type": "magic",
+                                            "amount": 0.15
+                                        }
+                                    ],
+                                    "materials": [
+                                        { "id": "adventuring:currency", "qty": 300000 },
+                                        { "id": "adventuring:mythic_salvage", "qty": 100 },
+                                        { "id": "adventuring:chaos_core", "qty": 5 }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "spellblades_saber",
+                            "name": "Spellblade's Saber",
+                            "media": "melvor:assets/media/bank/weapon_sword_ancient.png#shade=cyan",
+                            "type": "adventuring:sword1h",
+                            "isJobWeapon": true,
+                            "allowedJobs": ["adventuring:spellblade"],
+                            "requirements": [
+                                { "type": "achievement_completion", "id": "adventuring:spellblade_weapon_mastery" }
+                            ],
+                            "tiers": [
+                                {
+                                    "name": "Spellblade's Saber",
+                                    "base": [
+                                        { "id": "adventuring:hitpoints", "amount": 40 },
+                                        { "id": "adventuring:strength", "amount": 55 },
+                                        { "id": "adventuring:magic", "amount": 55 }
+                                    ],
+                                    "scaling": [
+                                        { "id": "adventuring:hitpoints", "amount": 3.6 },
+                                        { "id": "adventuring:strength", "amount": 5 },
+                                        { "id": "adventuring:magic", "amount": 5 }
+                                    ],
+                                    "materials": [
+                                        { "id": "adventuring:currency", "qty": 25000 },
+                                        { "id": "adventuring:pristine_salvage", "qty": 50 }
+                                    ]
+                                },
+                                {
+                                    "name": "Arcane Saber",
+                                    "base": [
+                                        { "id": "adventuring:hitpoints", "amount": 67 },
+                                        { "id": "adventuring:strength", "amount": 92 },
+                                        { "id": "adventuring:magic", "amount": 92 }
+                                    ],
+                                    "scaling": [
+                                        { "id": "adventuring:hitpoints", "amount": 6 },
+                                        { "id": "adventuring:strength", "amount": 8.2 },
+                                        { "id": "adventuring:magic", "amount": 8.2 }
+                                    ],
+                                    "effects": [
+                                        {
+                                            "trigger": "on_hit",
+                                            "type": "damage_flat",
+                                            "element": "arcane",
+                                            "amount": 15,
+                                            "scaling": 1.5
+                                        }
+                                    ],
+                                    "materials": [
+                                        { "id": "adventuring:currency", "qty": 125000 },
+                                        { "id": "adventuring:mythic_salvage", "qty": 40 }
+                                    ]
+                                },
+                                {
+                                    "name": "Runic Saber",
+                                    "base": [
+                                        { "id": "adventuring:hitpoints", "amount": 110 },
+                                        { "id": "adventuring:strength", "amount": 150 },
+                                        { "id": "adventuring:magic", "amount": 150 }
+                                    ],
+                                    "scaling": [
+                                        { "id": "adventuring:hitpoints", "amount": 9.5 },
+                                        { "id": "adventuring:strength", "amount": 13.5 },
+                                        { "id": "adventuring:magic", "amount": 13.5 }
+                                    ],
+                                    "effects": [
+                                        {
+                                            "trigger": "on_hit",
+                                            "type": "damage_flat",
+                                            "element": "arcane",
+                                            "amount": 30,
+                                            "scaling": 3
+                                        },
+                                        {
+                                            "trigger": "passive",
+                                            "type": "damage_bonus",
+                                            "amount": 0.15
+                                        }
+                                    ],
+                                    "materials": [
+                                        { "id": "adventuring:currency", "qty": 300000 },
+                                        { "id": "adventuring:mythic_salvage", "qty": 100 },
+                                        { "id": "adventuring:chaos_core", "qty": 5 }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "wardens_hammer",
+                            "name": "Warden's Hammer",
+                            "media": "melvor:assets/media/bank/weapon_2h_ancient.png#shade=silver",
+                            "type": "adventuring:hammer2h",
+                            "isJobWeapon": true,
+                            "allowedJobs": ["adventuring:warden"],
+                            "requirements": [
+                                { "type": "achievement_completion", "id": "adventuring:warden_weapon_mastery" }
+                            ],
+                            "tiers": [
+                                {
+                                    "name": "Warden's Hammer",
+                                    "base": [
+                                        { "id": "adventuring:hitpoints", "amount": 60 },
+                                        { "id": "adventuring:strength", "amount": 50 },
+                                        { "id": "adventuring:defence", "amount": 60 }
+                                    ],
+                                    "scaling": [
+                                        { "id": "adventuring:hitpoints", "amount": 5.4 },
+                                        { "id": "adventuring:strength", "amount": 4.5 },
+                                        { "id": "adventuring:defence", "amount": 5.4 }
+                                    ],
+                                    "materials": [
+                                        { "id": "adventuring:currency", "qty": 25000 },
+                                        { "id": "adventuring:pristine_salvage", "qty": 50 }
+                                    ]
+                                },
+                                {
+                                    "name": "Guardian's Hammer",
+                                    "base": [
+                                        { "id": "adventuring:hitpoints", "amount": 100 },
+                                        { "id": "adventuring:strength", "amount": 83 },
+                                        { "id": "adventuring:defence", "amount": 100 }
+                                    ],
+                                    "scaling": [
+                                        { "id": "adventuring:hitpoints", "amount": 9 },
+                                        { "id": "adventuring:strength", "amount": 7.5 },
+                                        { "id": "adventuring:defence", "amount": 9 }
+                                    ],
+                                    "effects": [
+                                        {
+                                            "trigger": "after_damage_received",
+                                            "type": "buff",
+                                            "id": "adventuring:fortified",
+                                            "target": "self",
+                                            "stacks": 1,
+                                            "chance": 30
+                                        }
+                                    ],
+                                    "materials": [
+                                        { "id": "adventuring:currency", "qty": 125000 },
+                                        { "id": "adventuring:mythic_salvage", "qty": 40 }
+                                    ]
+                                },
+                                {
+                                    "name": "Sentinel's Hammer",
+                                    "base": [
+                                        { "id": "adventuring:hitpoints", "amount": 165 },
+                                        { "id": "adventuring:strength", "amount": 137 },
+                                        { "id": "adventuring:defence", "amount": 165 }
+                                    ],
+                                    "scaling": [
+                                        { "id": "adventuring:hitpoints", "amount": 14.5 },
+                                        { "id": "adventuring:strength", "amount": 12 },
+                                        { "id": "adventuring:defence", "amount": 14.5 }
+                                    ],
+                                    "effects": [
+                                        {
+                                            "trigger": "after_damage_received",
+                                            "type": "buff",
+                                            "id": "adventuring:fortified",
+                                            "target": "self",
+                                            "stacks": 1,
+                                            "chance": 50
+                                        },
+                                        {
+                                            "trigger": "passive",
+                                            "type": "damage_reduction",
+                                            "amount": 0.15
+                                        },
+                                        {
+                                            "trigger": "passive",
+                                            "type": "threat_bonus",
+                                            "amount": 0.25
+                                        }
+                                    ],
+                                    "materials": [
+                                        { "id": "adventuring:currency", "qty": 300000 },
+                                        { "id": "adventuring:mythic_salvage", "qty": 100 },
+                                        { "id": "adventuring:chaos_core", "qty": 5 }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

@@ -38,31 +38,52 @@ export class AdventuringArea extends AdventuringMasteryAction {
 
         this.tiles = data.tiles;
 
-        this.loot = data.loot;
+        this.loot = data.loot;
+
+
         this.masteryXP = data.masteryXP || 2000;
 
-        this.lootPoolGenerator = new AdventuringWeightedTable(this.manager, this.game);
-        this.component.adventureButton.onclick = () => {
+        this.lootPoolGenerator = new AdventuringWeightedTable(this.manager, this.game);
+
+
+        this.component.adventureButton.onclick = (e) => {
+            e.stopPropagation();
             if(this.unlocked)
                 this.manager.selectArea(this);
-        };
+        };
+
+        this.component.difficultyButton.onclick = (e) => {
+            e.stopPropagation();
+        };
+
+        this.component.card.onclick = () => {
+            this.openDetails();
+        };
+
         this.component.autoRepeat.onchange = () => {
             if(this.component.autoRepeat.checked) {
                 this.manager.setAutoRepeatArea(this);
             } else {
                 this.manager.setAutoRepeatArea(null);
             }
-        };
+        };
+
         this.selectedDifficulty = null; // Set in postDataRegistration
-        this.difficultyOptionElements = [];
-        this.bestEndlessStreak = 0;
+        this.difficultyOptionElements = [];
+
+        this.bestEndlessStreak = 0;
+
         this.isGauntlet = (data.isGauntlet !== undefined) ? data.isGauntlet : false;
         this.gauntletTier = (data.gauntletTier !== undefined) ? data.gauntletTier : 0;
-        this.gauntletRewardMultiplier = (data.gauntletRewardMultiplier !== undefined) ? data.gauntletRewardMultiplier : 1.0;
+        this.gauntletRewardMultiplier = (data.gauntletRewardMultiplier !== undefined) ? data.gauntletRewardMultiplier : 1.0;
+
         this.encounterFloorMax = data.encounterFloorMax; // undefined = use tile default
-        this.encounterWeight = data.encounterWeight; // undefined = use tile default
-        this.description = (data.description !== undefined) ? data.description : '';
-        this._passives = data.passives || [];
+        this.encounterWeight = data.encounterWeight; // undefined = use tile default
+
+        this.description = (data.description !== undefined) ? data.description : '';
+
+        this._passives = data.passives || [];
+
         this._masteryAuraId = data.masteryAuraId;
         this.masteryAura = null;
     }
@@ -87,14 +108,16 @@ export class AdventuringArea extends AdventuringMasteryAction {
             option.onclick = () => this.setDifficulty(difficulty);
             this.component.difficultyOptions.appendChild(option);
             this.difficultyOptionElements.push(option);
-        });
+        });
+
         if(!this.selectedDifficulty && this.getAllDifficulties().length > 0) {
             this.selectedDifficulty = this.getAllDifficulties()[0];
         }
     }
 
     setDifficulty(difficulty) {
-        if(!difficulty) return;
+        if(!difficulty) return;
+
         if(!difficulty.isUnlocked(this)) {
             this.manager.log.add(`${difficulty.name} mode requires Mastery Level ${difficulty.unlockLevel}!`);
             return;
@@ -196,7 +219,8 @@ export class AdventuringArea extends AdventuringMasteryAction {
         }
     }
 
-    getMasteryBonuses() {
+    getMasteryBonuses() {
+
         const xpBonus = this.manager.modifiers.getDungeonXPBonus(this);
         const exploreSpeedBonus = this.manager.modifiers.getExploreSpeedBonus(this);
 
@@ -217,13 +241,16 @@ export class AdventuringArea extends AdventuringMasteryAction {
         return effects;
     }
 
-    getTileModifiers() {
+    getTileModifiers() {
+
         const trapMod = this.manager.modifiers.getTrapSpawnRateMod();
         const fountainMod = this.manager.modifiers.getFountainSpawnRateMod();
         const treasureMod = this.manager.modifiers.getTreasureSpawnRateMod();
         const shrineMod = this.manager.modifiers.getShrineSpawnRateMod();
 
-        const modifiers = {};
+        const modifiers = {};
+
+
         if(trapMod !== 0) modifiers['adventuring:trap'] = Math.max(0, 1 + trapMod / 100);
         if(fountainMod !== 0) modifiers['adventuring:fountain'] = 1 + fountainMod / 100;
         if(treasureMod > 0) modifiers['adventuring:treasure'] = treasureMod / 100;  // Treasure only spawns when unlocked
@@ -256,7 +283,8 @@ export class AdventuringArea extends AdventuringMasteryAction {
 
     postDataRegistration() {
         this._reqChecker = new RequirementsChecker(this.manager, this.requirements);
-        this.initDifficultyDropdown();
+        this.initDifficultyDropdown();
+
         if(this._masteryAuraId) {
             this.masteryAura = this.manager.dungeonAuras.getObjectByID(this._masteryAuraId);
         }
@@ -264,6 +292,13 @@ export class AdventuringArea extends AdventuringMasteryAction {
 
     addXP(xp) {
         addMasteryXPWithBonus(this.manager, this, xp);
+    }
+
+    openDetails() {
+        if(!this.unlocked) return;
+        this.manager.areadetails.setArea(this);
+        this.manager.areadetails.render();
+        this.manager.areadetails.go();
     }
 
     render() {
@@ -283,9 +318,11 @@ export class AdventuringArea extends AdventuringMasteryAction {
             const difficulty = this.getDifficulty();
             this.component.nameText.textContent = this.name;
             this.component.level.textContent = ` (${this.level})`;
-            this.component.level.className = difficulty.color;
+            this.component.level.className = difficulty.color;
+
             this.component.difficultyButton.textContent = difficulty.name;
-            this.component.difficultyButton.className = `btn btn-sm dropdown-toggle ${difficulty.color.replace('text-', 'btn-')}`;
+            this.component.difficultyButton.className = `btn btn-sm dropdown-toggle ${difficulty.color.replace('text-', 'btn-')}`;
+
             this.getAllDifficulties().forEach((mode, index) => {
                 const option = this.difficultyOptionElements[index];
                 if(option) {
@@ -332,9 +369,11 @@ export class AdventuringArea extends AdventuringMasteryAction {
 
     renderClickable() {
         if(!this.renderQueue.clickable)
-            return;
+            return;
+
         this.component.controls.classList.toggle('d-none', !this.unlocked);
-        this.component.adventureButton.disabled = !this.unlocked;
+        this.component.adventureButton.disabled = !this.unlocked;
+
         this.component.autoRepeatContainer.classList.toggle('d-none', !this.autoRunUnlocked);
 
         this.renderQueue.clickable = false;
@@ -342,7 +381,8 @@ export class AdventuringArea extends AdventuringMasteryAction {
 
     renderAutoRepeat() {
         if(!this.renderQueue.autoRepeat)
-            return;
+            return;
+
         const isAutoRepeatArea = this.manager.autoRepeatArea === this;
         this.component.autoRepeat.checked = isAutoRepeatArea;
 

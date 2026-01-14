@@ -1,0 +1,179 @@
+{
+    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+    "namespace": "adventuring",
+    "data": {
+        "skillData": [{
+            "skillID": "adventuring:Adventuring",
+            "data": {
+                "passives": [
+                    {
+                        "id": "lone_warrior",
+                        "name": "Lone Warrior",
+                        "description": "While adventuring solo, gain bonus stats.",
+                        "flavorText": "One against many, yet never truly alone.",
+                        "requirements": [
+                            { "type": "achievement_completion", "id": "adventuring:solo_champion_50" }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "passive",
+                                "type": "stat_flat",
+                                "stat": "adventuring:strength",
+                                "amount": 10,
+                                "condition": { "type": "is_solo" }
+                            },
+                            {
+                                "trigger": "passive",
+                                "type": "stat_flat",
+                                "stat": "adventuring:defence",
+                                "amount": 10,
+                                "condition": { "type": "is_solo" }
+                            },
+                            {
+                                "trigger": "passive",
+                                "type": "stat_flat",
+                                "stat": "adventuring:hitpoints",
+                                "amount": 25,
+                                "condition": { "type": "is_solo" }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "solo_survivalist",
+                        "name": "Solo Survivalist",
+                        "description": "While adventuring solo, regenerate HP each turn and gain defensive bonuses.",
+                        "flavorText": "Self-reliance is the greatest strength.",
+                        "requirements": [
+                            { "type": "achievement_completion", "id": "adventuring:solo_dungeon_50" }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "turn_start",
+                                "type": "heal_flat",
+                                "target": "self",
+                                "amount": 5,
+                                "condition": { "type": "is_solo" }
+                            },
+                            {
+                                "trigger": "passive",
+                                "type": "stat_flat",
+                                "stat": "adventuring:agility",
+                                "amount": 10,
+                                "condition": { "type": "is_solo" }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "one_man_army",
+                        "name": "One-Man Army",
+                        "description": "While adventuring solo, gain massive combat bonuses at encounter start.",
+                        "flavorText": "An army of one is still an army.",
+                        "requirements": [
+                            { "type": "achievement_completion", "id": "adventuring:solo_legend_100" }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "encounter_start",
+                                "type": "buff",
+                                "target": "self",
+                                "id": "adventuring:might",
+                                "stacks": {
+                                    "base": 5,
+                                    "scaling": [
+                                        { "id": "adventuring:strength", "amount": 0.05 }
+                                    ]
+                                },
+                                "condition": { "type": "is_solo" }
+                            },
+                            {
+                                "trigger": "encounter_start",
+                                "type": "buff",
+                                "target": "self",
+                                "id": "adventuring:block",
+                                "stacks": {
+                                    "base": 15,
+                                    "scaling": [
+                                        { "id": "adventuring:defence", "amount": 0.15 }
+                                    ]
+                                },
+                                "condition": { "type": "is_solo" }
+                            },
+                            {
+                                "trigger": "encounter_start",
+                                "type": "buff",
+                                "target": "self",
+                                "id": "adventuring:regen",
+                                "stacks": {
+                                    "base": 3,
+                                    "scaling": [
+                                        { "id": "adventuring:prayer", "amount": 0.03 }
+                                    ]
+                                },
+                                "condition": { "type": "is_solo" }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "true_solo_master",
+                        "name": "True Solo Master",
+                        "description": "While adventuring solo, gain all-around stat bonuses and enhanced survivability.",
+                        "flavorText": "The ultimate test of skill - needing no one else.",
+                        "requirements": [
+                            { "type": "achievement_completion", "id": "adventuring:solo_master_500" }
+                        ],
+                        "effects": [
+                            {
+                                "trigger": "passive",
+                                "type": "stat_flat",
+                                "stat": "adventuring:strength",
+                                "amount": 20,
+                                "condition": { "type": "is_solo" }
+                            },
+                            {
+                                "trigger": "passive",
+                                "type": "stat_flat",
+                                "stat": "adventuring:magic",
+                                "amount": 15,
+                                "condition": { "type": "is_solo" }
+                            },
+                            {
+                                "trigger": "passive",
+                                "type": "stat_flat",
+                                "stat": "adventuring:ranged",
+                                "amount": 15,
+                                "condition": { "type": "is_solo" }
+                            },
+                            {
+                                "trigger": "passive",
+                                "type": "stat_flat",
+                                "stat": "adventuring:defence",
+                                "amount": 20,
+                                "condition": { "type": "is_solo" }
+                            },
+                            {
+                                "trigger": "passive",
+                                "type": "stat_flat",
+                                "stat": "adventuring:hitpoints",
+                                "amount": 50,
+                                "condition": { "type": "is_solo" }
+                            },
+                            {
+                                "trigger": "round_start",
+                                "type": "buff",
+                                "target": "self",
+                                "id": "adventuring:regen",
+                                "stacks": {
+                                    "base": 2,
+                                    "scaling": [
+                                        { "id": "adventuring:prayer", "amount": 0.02 }
+                                    ]
+                                },
+                                "condition": { "type": "is_solo" }
+                            }
+                        ]
+                    }
+                ]
+            }
+        }]
+    }
+}

@@ -5,8 +5,10 @@ const { createEffect, EffectCache } = await loadModule('src/core/adventuring-uti
 export class AdventuringModifiers {
     constructor(manager, game) {
         this.manager = manager;
-        this.game = game;
-        this.effectCache = new EffectCache();
+        this.game = game;
+
+        this.effectCache = new EffectCache();
+
         this.effectCache.registerSource('consumables', () => this.getConsumableEffects());
         this.effectCache.registerSource('tavern', () => this.getTavernEffects());
         this.effectCache.registerSource('achievements', () => this.getAchievementEffects());
@@ -18,7 +20,7 @@ export class AdventuringModifiers {
     }
 
     onMasteryMaxed() {
-        this.effectCache.invalidateSource('mastery_completion');
+        this.effectCache.invalidate('mastery_completion');
     }
 
     getEffects() {
@@ -26,7 +28,8 @@ export class AdventuringModifiers {
     }
 
     getBonus(effectType, context = {}) {
-        let total = this.effectCache.getBonus(effectType);
+        let total = this.effectCache.getBonus(effectType);
+
         if (context.action && typeof context.action.getMasteryEffectValue === 'function') {
             total += context.action.getMasteryEffectValue(effectType);
         }
@@ -35,7 +38,8 @@ export class AdventuringModifiers {
     }
 
     getCategoryBonus(effectType, categoryId) {
-        let total = 0;
+        let total = 0;
+
         const passiveEffects = this.effectCache.getEffects('passive');
         for (const effect of passiveEffects) {
             if (effect.type === effectType && effect.category === categoryId) {
@@ -44,7 +48,10 @@ export class AdventuringModifiers {
         }
 
         return total;
-    }
+    }
+
+
+
 
     getConsumableEffects() {
         const effects = [];
@@ -57,7 +64,8 @@ export class AdventuringModifiers {
             if (charges <= 0) return;
 
             const tierEffects = consumable.getTierEffects(tier);
-            tierEffects.forEach(effectData => {
+            tierEffects.forEach(effectData => {
+
                 if (effectData.trigger === 'passive') {
                     effects.push(createEffect(effectData, consumable, consumable.getTierName(tier)));
                 }
@@ -68,14 +76,17 @@ export class AdventuringModifiers {
     }
 
     getTavernEffects() {
-        if (!this.manager.tavern) return [];
+        if (!this.manager.tavern) return [];
+
         return this.manager.tavern.getEffects();
     }
 
     getAchievementEffects() {
         const effects = [];
 
-        if (!this.manager.achievementManager) return effects;
+        if (!this.manager.achievementManager) return effects;
+
+
         for (const stat of this.manager.stats.allObjects) {
             const value = this.manager.achievementManager.getStatBonus(stat.id);
             if (value !== 0) {
@@ -91,7 +102,8 @@ export class AdventuringModifiers {
     }
 
     getMasteryCompletionEffects() {
-        const effects = [];
+        const effects = [];
+
         const registries = [
             this.manager.areas,
             this.manager.monsters,
@@ -105,11 +117,14 @@ export class AdventuringModifiers {
             registry.forEach(action => {
                 if (this.manager.getMasteryLevel(action) >= 99) {
                     const masteryCategory = action.masteryCategory;
-                    if (!masteryCategory) return;
-                    const categoryId = masteryCategory.id || `adventuring:${masteryCategory.localID}`;
+                    if (!masteryCategory) return;
+
+                    const categoryId = masteryCategory.id || `adventuring:${masteryCategory.localID}`;
+
                     const milestoneEffects = masteryCategory.getEffectsAtLevel(99) || [];
                     for (const effectData of milestoneEffects) {
-                        if (effectData.type === 'category_xp_percent') {
+                        if (effectData.type === 'category_xp_percent') {
+
                             effects.push(createEffect(
                                 { ...effectData, category: categoryId },
                                 action,
@@ -122,10 +137,14 @@ export class AdventuringModifiers {
         }
 
         return effects;
-    }
+    }
+
+
+
 
     getMasteryXPBonus(action) {
-        let bonus = this.getBonus('xp_percent', { action });
+        let bonus = this.getBonus('xp_percent', { action });
+
         if (action && action.masteryCategory) {
             const categoryId = action.masteryCategory.id || `adventuring:${action.masteryCategory.localID}`;
             bonus += this.getCategoryBonus('category_xp_percent', categoryId);
@@ -175,14 +194,16 @@ export class AdventuringModifiers {
     }
 
     getSpawnRateMod(spawnType, context = {}) {
-        let total = 0;
+        let total = 0;
+
         const passiveEffects = this.effectCache.getEffects('passive');
         for (const effect of passiveEffects) {
             if (effect.type === 'spawn_rate_percent' && effect.spawnType === spawnType) {
                 const val = (effect.value !== undefined) ? effect.value : ((effect.amount !== undefined) ? effect.amount : 0);
                 total += val;
             }
-        }
+        }
+
         if (context.action && typeof context.action.getMasteryEffectValue === 'function') {
             total += context.action.getMasteryEffectValue('spawn_rate_percent', { spawnType });
         }
@@ -204,21 +225,28 @@ export class AdventuringModifiers {
 
     getShrineSpawnRateMod(context = {}) {
         return this.getSpawnRateMod('shrine', context);
-    }
+    }
 
-    getMilestoneDamageBonusVsType(tags) {
+
+
+
+    getMilestoneDamageBonusVsType(tags) {
+
         return 0;
     }
 
-    getMilestoneDamageReductionVsType(tags) {
+    getMilestoneDamageReductionVsType(tags) {
+
         return 0;
     }
 
-    getMilestoneXPBonusVsType(tags) {
+    getMilestoneXPBonusVsType(tags) {
+
         return 0;
     }
 
-    getMilestoneMaterialBonus(tags) {
+    getMilestoneMaterialBonus(tags) {
+
         return 0;
     }
 

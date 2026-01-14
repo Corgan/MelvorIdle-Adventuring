@@ -32,10 +32,15 @@ export class AdventuringAchievementRewardElement extends HTMLElement {
         if(tooltipContent) this.setTooltip(tooltipContent);
     }
 
-    setStat(value, statName, tooltipContent) {
-        this.text.textContent = `+${value} ${statName}`;
+    setStat(value, statIcon, tooltipContent) {
+        this.text.textContent = `+${value}`;
         this.text.className = 'text-success';
-        this.icon.classList.add('d-none');
+        if(statIcon) {
+            this.icon.src = statIcon;
+            this.icon.classList.remove('d-none');
+        } else {
+            this.icon.classList.add('d-none');
+        }
         if(tooltipContent) this.setTooltip(tooltipContent);
     }
 
@@ -44,6 +49,20 @@ export class AdventuringAchievementRewardElement extends HTMLElement {
         this.text.className = '';
         this.icon.src = iconSrc;
         this.icon.classList.remove('d-none');
+        if(tooltipContent) this.setTooltip(tooltipContent);
+    }
+
+    setAbility(name, iconSrc, tooltipContent) {
+        this.text.textContent = name;
+        this.text.className = 'text-info';
+        this.icon.classList.add('d-none');
+        if(tooltipContent) this.setTooltip(tooltipContent);
+    }
+
+    setEffect(description, tooltipContent) {
+        this.text.textContent = description;
+        this.text.className = 'text-warning';
+        this.icon.classList.add('d-none');
         if(tooltipContent) this.setTooltip(tooltipContent);
     }
 }

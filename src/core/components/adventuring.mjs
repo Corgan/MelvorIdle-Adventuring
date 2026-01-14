@@ -4,7 +4,7 @@ export class AdventuringPageElement extends HTMLElement {
         this._content = new DocumentFragment();
         this._content.append(getTemplateNode('adventuring-page-template'));
 
-        this.container = getElementFromFragment(this._content, 'adventuring-container', 'div');
+        this.container = getElementFromFragment(this._content, 'adventuring-content', 'div');
         this.party = getElementFromFragment(this._content, 'party', 'div');
         this.overview = getElementFromFragment(this._content, 'overview', 'div');
         this.subpages = getElementFromFragment(this._content, 'subpages', 'div');
@@ -15,6 +15,8 @@ export class AdventuringPageElement extends HTMLElement {
     }
 
     connectedCallback() {
+        this.id = 'adventuring-container';
+        this.classList.add('d-none');
         this.appendChild(this._content);
     }
 

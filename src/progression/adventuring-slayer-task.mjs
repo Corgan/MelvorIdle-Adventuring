@@ -168,7 +168,8 @@ export class AdventuringSlayerTask {
     get currentProgress() {
         if (this.isStatTask && this.target.statName) {
             const currentValue = this.getStatValue(this.target.statName);
-            return Math.max(0, currentValue - this.startingValue);
+            const starting = isNaN(this.startingValue) ? 0 : this.startingValue;
+            return Math.max(0, currentValue - starting);
         }
         return this.progress;
     }
@@ -202,10 +203,11 @@ export class AdventuringSlayerTask {
     getStatValue(statName) {
         if (!this.manager.achievementManager) return 0;
         const stats = this.manager.achievementManager.stats;
-        if (stats.hasOwnProperty(statName)) {
-            return stats[statName];
+        const value = stats[statName];
+        if (value === undefined || value === null || isNaN(value)) {
+            return 0;
         }
-        return 0;
+        return value;
     }
 
     get description() {

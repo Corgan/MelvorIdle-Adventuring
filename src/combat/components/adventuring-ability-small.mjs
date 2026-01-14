@@ -94,7 +94,8 @@ export class AdventuringAbilitySmallElement extends AdventuringTooltipElement {
         this.selectorType = type;
         this.selectorCharacter = character;
         this.grimoireSelectedArea = null; // Track drill-down state
-        this.character = character;
+        this.character = character;
+
         this.selectorPopup = tippy(this.styling, {
             content: '',
             allowHTML: true,
@@ -104,7 +105,8 @@ export class AdventuringAbilitySmallElement extends AdventuringTooltipElement {
             maxWidth: 400,
             onShow: (instance) => {
                 if(this.selectorCharacter.locked) return false;
-                this.grimoireSelectedArea = null; // Reset drill-down on open
+                this.grimoireSelectedArea = null; // Reset drill-down on open
+
                 if(this.isSlayerActive()) {
                     instance.setContent(this.buildGrimoireSelectorContent());
                 } else {
@@ -125,10 +127,12 @@ export class AdventuringAbilitySmallElement extends AdventuringTooltipElement {
     buildGrimoireSelectorContent() {
         if (this.skill === undefined) return this.buildSelectorContent();
         const grimoire = this.skill.grimoire;
-        if(!grimoire) return this.buildSelectorContent();
+        if(!grimoire) return this.buildSelectorContent();
+
         if(this.grimoireSelectedArea) {
             return this.buildGrimoireDetailView(this.grimoireSelectedArea);
-        }
+        }
+
         return this.buildGrimoireAreaListView();
     }
 
@@ -138,11 +142,13 @@ export class AdventuringAbilitySmallElement extends AdventuringTooltipElement {
         container.className = 'p-2 adventuring-scrollbar';
         container.style.maxHeight = '400px';
         container.style.overflowY = 'auto';
-        container.style.minWidth = '280px';
+        container.style.minWidth = '280px';
+
         const header = document.createElement('h6');
         header.className = 'font-w600 text-center mb-2 text-info';
         header.textContent = this.selectorType === 'generator' ? 'Grimoire: Generators' : 'Grimoire: Spenders';
-        container.appendChild(header);
+        container.appendChild(header);
+
         const jobAbilities = this.selectorType === 'generator'
             ? this.skill.generators.allObjects.filter(g => g.canEquip(this.selectorCharacter) && !g.isEnemy)
             : this.skill.spenders.allObjects.filter(s => s.canEquip(this.selectorCharacter) && !s.isEnemy);
@@ -161,7 +167,8 @@ export class AdventuringAbilitySmallElement extends AdventuringTooltipElement {
             const divider = document.createElement('hr');
             divider.className = 'my-2';
             container.appendChild(divider);
-        }
+        }
+
         const areaLabel = document.createElement('div');
         areaLabel.className = 'font-size-sm text-muted mb-1';
         areaLabel.textContent = 'Learned by Area:';
@@ -212,7 +219,8 @@ export class AdventuringAbilitySmallElement extends AdventuringTooltipElement {
         container.className = 'p-2 adventuring-scrollbar';
         container.style.maxHeight = '400px';
         container.style.overflowY = 'auto';
-        container.style.minWidth = '280px';
+        container.style.minWidth = '280px';
+
         const headerRow = document.createElement('div');
         headerRow.className = 'd-flex align-items-center mb-2';
 
@@ -237,7 +245,8 @@ export class AdventuringAbilitySmallElement extends AdventuringTooltipElement {
         areaName.textContent = area.name;
         headerRow.appendChild(areaName);
 
-        container.appendChild(headerRow);
+        container.appendChild(headerRow);
+
         const monsters = area.monsters || [];
         const abilityKey = this.selectorType === 'generator' ? 'generator' : 'spender';
         const registry = this.selectorType === 'generator' ? this.skill.generators : this.skill.spenders;
@@ -247,14 +256,16 @@ export class AdventuringAbilitySmallElement extends AdventuringTooltipElement {
             emptyMsg.setMessage('No monsters in this area.', 'p-2');
             container.appendChild(emptyMsg);
             return container;
-        }
+        }
+
         const abilityMonsterMap = new Map();
         for(const monster of monsters) {
             const abilityId = monster[abilityKey];
             if(!abilityId) continue;
 
             const ability = registry.getObjectByID(abilityId);
-            if(!ability) continue;
+            if(!ability) continue;
+
             if(ability.id === 'adventuring:none') continue;
 
             if(!abilityMonsterMap.has(ability)) {
@@ -268,9 +279,11 @@ export class AdventuringAbilitySmallElement extends AdventuringTooltipElement {
             emptyMsg.setMessage('No abilities of this type in this area.', 'p-2');
             container.appendChild(emptyMsg);
             return container;
-        }
+        }
+
         for(const [ability, sourceMonsters] of abilityMonsterMap) {
-            const learned = grimoire.learnedAbilities.has(ability.id);
+            const learned = grimoire.learnedAbilities.has(ability.id);
+
             const anySeen = sourceMonsters.some(m => bestiary && bestiary.seen.get(m) === true);
 
             const row = this.buildSlayerAbilityRow(ability, sourceMonsters, anySeen, learned);
@@ -306,20 +319,24 @@ export class AdventuringAbilitySmallElement extends AdventuringTooltipElement {
     }
 
     buildSlayerAbilityTooltip(ability, sourceMonsters) {
-        const bestiary = this.skill.bestiary;
+        const bestiary = this.skill.bestiary;
+
         const tooltip = TooltipBuilder.forAbility(ability, {
             character: this.selectorCharacter,
             manager: this.skill,
             showUnlockLevel: false
-        });
+        });
+
         tooltip.separator();
         tooltip.text('Learned from:', 'text-muted font-size-sm');
 
         const seenMonsters = sourceMonsters.filter(m => bestiary && bestiary.seen.get(m) === true);
-        const unseenCount = sourceMonsters.length - seenMonsters.length;
+        const unseenCount = sourceMonsters.length - seenMonsters.length;
+
         for(const monster of seenMonsters) {
             tooltip.text(`<img class="skill-icon-xxs mr-1" src="${monster.media}">${monster.name}`, 'font-size-sm');
-        }
+        }
+
         if(unseenCount > 0) {
             tooltip.text(`<i class="fa fa-question mr-1 text-muted"></i>??? (${unseenCount} more)`, 'text-muted font-size-sm');
         }
@@ -349,7 +366,8 @@ export class AdventuringAbilitySmallElement extends AdventuringTooltipElement {
     }
 
     buildAbilityTooltip(ability, character) {
-        const char = character || this.character || this.selectorCharacter;
+        const char = character || this.character || this.selectorCharacter;
+
         const forceShow = char && char.isHero === false;
         return TooltipBuilder.forAbility(ability, {
             character: char,
@@ -370,8 +388,49 @@ export class AdventuringAbilitySmallElement extends AdventuringTooltipElement {
         if(this.selectorType === 'generator')
             abilities = this.skill.generators.allObjects.filter(g => g.canEquip(this.selectorCharacter));
         if(this.selectorType === 'spender')
-            abilities = this.skill.spenders.allObjects.filter(s => s.canEquip(this.selectorCharacter));
-        abilities.sort((a, b) => this.getUnlockLevel(a) - this.getUnlockLevel(b));
+            abilities = this.skill.spenders.allObjects.filter(s => s.canEquip(this.selectorCharacter));
+
+        // Sort by source priority: current job > other jobs > slayer > achievement
+        const character = this.selectorCharacter;
+        const currentCombatJob = character ? character.combatJob : null;
+        const currentPassiveJob = character ? character.passiveJob : null;
+
+        const getAbilitySourcePriority = (ability) => {
+            // Check if ability is from current job
+            if (currentCombatJob && ability.unlockedBy && ability.unlockedBy(currentCombatJob)) {
+                return 0; // Highest priority - current combat job
+            }
+            if (currentPassiveJob && ability.unlockedBy && ability.unlockedBy(currentPassiveJob)) {
+                return 1; // Current passive job
+            }
+            // Check if ability is from any job (but not current)
+            if (ability.requirements) {
+                const jobReq = ability.requirements.find(r => r.type === 'job_level' || r.type === 'current_job_level');
+                if (jobReq) {
+                    return 2; // Other job abilities
+                }
+            }
+            // Slayer abilities (isEnemy)
+            if (ability.isEnemy) {
+                return 3;
+            }
+            // Achievement abilities
+            if (ability.isAchievementAbility) {
+                return 4;
+            }
+            // Fallback
+            return 5;
+        };
+
+        abilities.sort((a, b) => {
+            const priorityA = getAbilitySourcePriority(a);
+            const priorityB = getAbilitySourcePriority(b);
+            if (priorityA !== priorityB) {
+                return priorityA - priorityB;
+            }
+            // Within same priority, sort by unlock level
+            return this.getUnlockLevel(a) - this.getUnlockLevel(b);
+        });
 
         const container = document.createElement('div');
         container.className = 'p-2 adventuring-scrollbar';
@@ -391,7 +450,8 @@ export class AdventuringAbilitySmallElement extends AdventuringTooltipElement {
                 }
                 if(this.selectorType === 'spender') {
                     this.selectorCharacter.setSpender(selectedAbility);
-                }
+                }
+
                 if(selectedAbility.unlocked) {
                     this.skill.seenAbilities.add(selectedAbility.id);
                 }

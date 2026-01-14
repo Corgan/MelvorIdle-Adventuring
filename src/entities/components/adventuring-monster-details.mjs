@@ -9,7 +9,8 @@ export class AdventuringMonsterDetailsElement extends AdventuringSubpageElement 
         this.back = getElementFromFragment(this._content, 'back', 'button');
         this.icon = getElementFromFragment(this._content, 'icon', 'img');
         this.nameText = getElementFromFragment(this._content, 'name', 'h3');
-        this.tags = getElementFromFragment(this._content, 'tags', 'p');
+        this.tags = getElementFromFragment(this._content, 'tags', 'p');
+
         this.locationRow = getElementFromFragment(this._content, 'locationRow', 'div');
         this.locationIcon = getElementFromFragment(this._content, 'locationIcon', 'img');
         this.locationName = getElementFromFragment(this._content, 'locationName', 'small');
@@ -17,6 +18,7 @@ export class AdventuringMonsterDetailsElement extends AdventuringSubpageElement 
         this.killCount = getElementFromFragment(this._content, 'killCount', 'span');
         this.masteryLevel = getElementFromFragment(this._content, 'masteryLevel', 'span');
         this.masteryProgress = getElementFromFragment(this._content, 'mastery-progress', 'progress-bar');
+        this.milestones = getElementFromFragment(this._content, 'milestones', 'div');
 
         this.stats = getElementFromFragment(this._content, 'stats', 'div');
         this.abilities = getElementFromFragment(this._content, 'abilities', 'div');

@@ -283,26 +283,34 @@ function toPercent(value, max) {
     return clamp((value / max) * 100, 0, 100);
 }
 
+/** Check if a character is participating in combat (has a combat job that isn't "none") */
+function isInCombat(character) {
+    // Enemies are always in combat
+    if (!character.combatJob) return true;
+    return character.combatJob.id !== 'adventuring:none';
+}
+
 function resolveTargets(targetType, party, exclude = null) {
-    const alive = party.all.filter(t => !t.dead && t !== exclude);
+    // Filter to only include combatants (not "none" combat job heroes)
+    const alive = party.all.filter(t => !t.dead && t !== exclude && isInCombat(t));
 
     switch(targetType) {
         case "none":
             return [];
 
         case "front": {
-
-            if(!party.front.dead && party.front !== exclude) return [party.front];
-            if(!party.center.dead && party.center !== exclude) return [party.center];
-            if(!party.back.dead && party.back !== exclude) return [party.back];
+            // Check front, then center, then back - but only if they're in combat
+            if(!party.front.dead && party.front !== exclude && isInCombat(party.front)) return [party.front];
+            if(!party.center.dead && party.center !== exclude && isInCombat(party.center)) return [party.center];
+            if(!party.back.dead && party.back !== exclude && isInCombat(party.back)) return [party.back];
             return [];
         }
 
         case "back": {
-
-            if(!party.back.dead && party.back !== exclude) return [party.back];
-            if(!party.center.dead && party.center !== exclude) return [party.center];
-            if(!party.front.dead && party.front !== exclude) return [party.front];
+            // Check back, then center, then front - but only if they're in combat
+            if(!party.back.dead && party.back !== exclude && isInCombat(party.back)) return [party.back];
+            if(!party.center.dead && party.center !== exclude && isInCombat(party.center)) return [party.center];
+            if(!party.front.dead && party.front !== exclude && isInCombat(party.front)) return [party.front];
             return [];
         }
 
@@ -318,10 +326,12 @@ function resolveTargets(targetType, party, exclude = null) {
         }
 
         case "aoe":
+        case "all":
             return alive;
 
         case "dead":
-            return party.all.filter(t => t.dead && t !== exclude);
+            // Dead targeting still only considers combatants
+            return party.all.filter(t => t.dead && t !== exclude && isInCombat(t));
 
         default:
             return [];
@@ -718,7 +728,7 @@ class RequirementsChecker {
 
                 if (this.manager.achievements === undefined) return false;
                 const achievement = this.manager.achievements.getObjectByID(req.id);
-                return achievement ? achievement.isComplete : false;
+                return achievement ? achievement.isComplete() : false;
             }
 
             case 'area_cleared': {
@@ -1055,6 +1065,18 @@ function evaluateCondition(condition, context) {
             return hpBefore < threshold && hpPercent >= threshold;
         }
 
+        case 'is_solo': {
+            // Check if character is the only active combatant in the party
+            if(!context.party && !manager) return false;
+            const party = context.party || (manager && manager.party ? manager.party.all : []);
+            if(!party || party.length === 0) return false;
+            const noneJobId = 'adventuring:none';
+            const activeCombatants = party.filter(h => 
+                h.combatJob && h.combatJob.id !== noneJobId
+            );
+            return activeCombatants.length === 1;
+        }
+
         default:
             console.warn(`Unknown condition type: ${condition.type}`);
             return true;
@@ -1104,6 +1126,8 @@ function describeCondition(condition, manager) {
             return `when dropping below ${condition.threshold}% HP`;
         case 'hp_crossed_above':
             return `when rising above ${condition.threshold}% HP`;
+        case 'is_solo':
+            return `while adventuring solo`;
         default:
             return condition.type;
     }
@@ -1303,6 +1327,8 @@ const effectDescriptionRegistry = new Map([
         const unlockType = effect.unlockType || 'unknown';
         switch (unlockType) {
             case 'auto_run': return 'Unlock Auto-Run';
+            case 'area_drops_reveal': return 'Reveal Area Drops';
+            case 'drop_table_reveal': return 'Reveal Monster Drops';
             case 'difficulty': {
                 const diffParts = effect.difficultyID ? effect.difficultyID.split(':') : [];
                 const diffId = diffParts.length > 0 ? diffParts[diffParts.length - 1] : 'Unknown';
@@ -1328,6 +1354,7 @@ const effectDescriptionRegistry = new Map([
     ['equipment_xp_percent', (effect, value) => `+${value}% Equipment XP`],
     ['upgrade_cost_percent', (effect, value) => `${value > 0 ? '+' : ''}${value}% Upgrade Cost`],
     ['equipment_stats_percent', (effect, value) => `+${value}% Equipment Stats`],
+    ['category_xp_percent', (effect, value) => `+${value}% Category Mastery XP`],
 
     ['remove', () => 'Remove aura'],
     ['remove_stacks', (effect, value, stacks, amount) => {
@@ -2554,10 +2581,23 @@ function createDefaultEffectProcessor() {
 const defaultEffectProcessor = createDefaultEffectProcessor();
 
 function addMasteryXPWithBonus(manager, action, baseXP, options = {}) {
-    const { updateTooltip = true } = options;
+    const { updateTooltip = true, levelCap = 99 } = options;
 
     const xpBonus = manager.modifiers.getMasteryXPBonus(action);
-    const modifiedXP = Math.floor(baseXP * (1 + xpBonus));
+    let modifiedXP = Math.floor(baseXP * (1 + xpBonus));
+
+    // Cap XP to prevent exceeding level cap
+    const currentLevel = manager.getMasteryLevel(action);
+    if (currentLevel >= levelCap) {
+        modifiedXP = 0;
+    } else {
+        const currentXP = manager.getMasteryXP(action);
+        const xpForCap = exp.levelToXP(levelCap + 1) - 1;
+        const maxXPToAdd = Math.max(0, xpForCap - currentXP);
+        modifiedXP = Math.min(modifiedXP, maxXPToAdd);
+    }
+
+    if (modifiedXP <= 0) return 0;
 
     manager.addMasteryXP(action, modifiedXP);
     manager.addMasteryPoolXP(modifiedXP);

@@ -112,6 +112,7 @@ export async function setup({ gameData, patch, loadTemplates, loadModule, loadSt
 
     // Tier 5+ combat jobs
     await load('data/jobs/combat/achievement-abilities.json');
+    await load('data/jobs/combat/achievement-passives.json');
     await load('data/jobs/combat/arcane_archer.json');
     await load('data/jobs/combat/avatar.json');
     await load('data/jobs/combat/beastmaster.json');
@@ -161,7 +162,28 @@ export async function setup({ gameData, patch, loadTemplates, loadModule, loadSt
 
     // Items - Uniques and Accessories
     await load('data/items/uniques.json');
-    await load('data/items/artifacts.json');
+    await load('data/items/uniques_armor.json');
+
+    // Items - Job Weapons (one per combat job, organized by tier)
+    await load('data/items/job_weapons/tier0.json');
+    await load('data/items/job_weapons/tier1.json');
+    await load('data/items/job_weapons/tier2.json');
+    await load('data/items/job_weapons/tier3.json');
+    await load('data/items/job_weapons/tier4.json');
+    await load('data/items/job_weapons/tier5a.json');
+    await load('data/items/job_weapons/tier5b.json');
+    await load('data/items/job_weapons/tier5c.json');
+
+    // Items - Archetype Artifacts (9 archetypes × 3 slots each)
+    await load('data/items/archetype_artifacts/berserker.json');
+    await load('data/items/archetype_artifacts/guardian.json');
+    await load('data/items/archetype_artifacts/assassin.json');
+    await load('data/items/archetype_artifacts/ranger.json');
+    await load('data/items/archetype_artifacts/elementalist.json');
+    await load('data/items/archetype_artifacts/priest.json');
+    await load('data/items/archetype_artifacts/paladin.json');
+    await load('data/items/archetype_artifacts/sage.json');
+    await load('data/items/archetype_artifacts/shadow.json');
 
     // Items - Boss Material Items
     await load('data/items/tier_boss.json');
@@ -224,6 +246,7 @@ export async function setup({ gameData, patch, loadTemplates, loadModule, loadSt
 
     // Achievement system
     await load('data/achievements.json');
+    await load('data/achievements/job_weapons.json');
     
     if(cloudManager.hasAoDEntitlementAndIsEnabled)
         await load('data/data-aod.json');

@@ -373,6 +373,15 @@ export class TooltipBuilder {
             }
         }
 
+        // Show achievement source for achievement-granted abilities
+        if(manager && ability.isAchievementAbility) {
+            const sourceAchievement = manager.achievementManager.getAbilitySource(ability.id);
+            if(sourceAchievement) {
+                tooltip.separator();
+                tooltip.hint(`<i class="fa fa-trophy text-warning mr-1"></i>From: ${sourceAchievement.name}`);
+            }
+        }
+
         return tooltip;
     }
 
@@ -386,7 +395,8 @@ export class TooltipBuilder {
 
         if(!isDropped) {
             return tooltip;
-        }
+        }
+
         const isInvalidForJob = character && item.unlocked && item.upgradeLevel > 0 &&
             !item.jobs.includes(character.combatJob) && !item.jobs.includes(character.passiveJob);
 
@@ -427,7 +437,17 @@ export class TooltipBuilder {
 
             tooltip.stats(item.stats);
 
-            tooltip.usableByJobs(item.jobs, manager);
+            // Show job weapon indicator
+            if(item.isJobWeapon && item.allowedJobs && item.allowedJobs.length > 0) {
+                tooltip.separator();
+                tooltip.subheader('Job Weapon', 'text-warning');
+                const jobIcons = item.allowedJobs.map(job =>
+                    `<img class="skill-icon-xxs mr-1" src="${job.media}" title="${job.name}">${job.name}`
+                ).join(', ');
+                tooltip.hint(`Exclusive to: ${jobIcons}`);
+            } else {
+                tooltip.usableByJobs(item.jobs, manager);
+            }
 
             if(item.set) {
                 tooltip.separator();
@@ -656,7 +676,11 @@ export class TooltipBuilder {
     usableByJobs(jobs, manager, addSeparator = true) {
         if(!jobs || jobs.length === 0) return this;
         const validJobs = jobs.filter(job => job !== manager.cached.noneJob);
-        if(validJobs.length === 0 || validJobs.length >= manager.jobs.size) return this;
+        if(validJobs.length === 0) return this;
+        
+        // If almost all jobs can use it (90%+), don't show anything - it's essentially universal
+        const totalJobs = manager.jobs.size;
+        if(validJobs.length >= totalJobs * 0.9) return this;
 
         if(addSeparator) this.separator();
         this.hint('Usable By:');

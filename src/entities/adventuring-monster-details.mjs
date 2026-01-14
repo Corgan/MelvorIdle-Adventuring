@@ -2,15 +2,47 @@ const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringDetailsPage } = await loadModule('src/ui/adventuring-details-page.mjs');
 const { ComponentPool } = await loadModule('src/core/component-pool.mjs');
-const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
+const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
+const { getEffectDescriptionsList } = await loadModule('src/core/adventuring-utils.mjs');
+
 await loadModule('src/entities/components/adventuring-monster-details.mjs');
 const { AdventuringLootRowElement } = await loadModule('src/entities/components/adventuring-loot-row.mjs');
 const { AdventuringStatRowElement } = await loadModule('src/ui/components/adventuring-stat-row.mjs');
 const { AdventuringStatBadgeElement } = await loadModule('src/progression/components/adventuring-stat-badge.mjs');
-const { AdventuringMonsterAbilityRowElement } = await loadModule('src/entities/components/adventuring-monster-ability-row.mjs');
+const { AdventuringMonsterAbilityRowElement } = await loadModule('src/entities/components/adventuring-monster-ability-row.mjs');
+
+class MilestoneRowElement extends HTMLElement {
+    constructor() {
+        super();
+        this.innerHTML = `
+            <div class="d-flex align-items-center p-1 mb-1">
+                <span class="badge mr-2" id="level" style="min-width: 40px;"></span>
+                <small id="description"></small>
+            </div>
+        `;
+        this.levelEl = this.querySelector('#level');
+        this.descriptionEl = this.querySelector('#description');
+    }
+
+    setMilestone({ level, description, achieved }) {
+        this.levelEl.textContent = `Lv ${level}`;
+        this.levelEl.className = achieved ? 'badge badge-success mr-2' : 'badge badge-secondary mr-2';
+        this.levelEl.style.minWidth = '40px';
+        this.descriptionEl.textContent = description;
+        this.descriptionEl.className = achieved ? 'small' : 'small text-muted';
+    }
+
+    reset() {}
+}
+
+if (!customElements.get('adventuring-monster-milestone-row')) {
+    customElements.define('adventuring-monster-milestone-row', MilestoneRowElement);
+}
+
 const statBadgePool = new ComponentPool(() => new AdventuringStatBadgeElement(), 0, 50);
 const abilityRowPool = new ComponentPool(() => new AdventuringMonsterAbilityRowElement(), 0, 20);
 const lootRowPool = new ComponentPool(() => new AdventuringLootRowElement(), 0, 30);
+const milestoneRowPool = new ComponentPool(() => new MilestoneRowElement(), 0, 20);
 
 export class AdventuringMonsterDetails extends AdventuringDetailsPage {
     constructor(manager, game) {
@@ -23,6 +55,7 @@ export class AdventuringMonsterDetails extends AdventuringDetailsPage {
             icon: false,
             tags: false,
             mastery: false,
+            milestones: false,
             stats: false,
             abilities: false,
             drops: false,
@@ -32,6 +65,7 @@ export class AdventuringMonsterDetails extends AdventuringDetailsPage {
                 this.icon = true;
                 this.tags = true;
                 this.mastery = true;
+                this.milestones = true;
                 this.stats = true;
                 this.abilities = true;
                 this.drops = true;
@@ -55,6 +89,7 @@ export class AdventuringMonsterDetails extends AdventuringDetailsPage {
         this.renderIcon();
         this.renderTags();
         this.renderMastery();
+        this.renderMilestones();
         this.renderStats();
         this.renderAbilities();
         this.renderDrops();
@@ -103,8 +138,52 @@ export class AdventuringMonsterDetails extends AdventuringDetailsPage {
         this.renderQueue.mastery = false;
     }
 
+    renderMilestones() {
+        if(!this.renderQueue.milestones) return;
+
+        // Release old elements
+        for (const child of [...this.component.milestones.children]) {
+            if (child.reset) child.reset();
+        }
+        milestoneRowPool.releaseAll(this.component.milestones);
+        this.component.milestones.innerHTML = '';
+        
+        const category = this.monster.masteryCategory;
+        if(!category || !category.milestones) {
+            this.renderQueue.milestones = false;
+            return;
+        }
+
+        const currentLevel = this.monster.level;
+
+        for (const milestone of category.milestones) {
+            const achieved = currentLevel >= milestone.level;
+            const descriptions = milestone.effects 
+                ? getEffectDescriptionsList(milestone.effects, this.manager)
+                : [];
+
+            if (descriptions.length === 0) continue;
+
+            // For scaling milestones, append "/level" to indicate per-level bonus
+            const description = milestone.scaling 
+                ? descriptions.map(d => `${d}/level`).join(', ')
+                : descriptions.join(', ');
+
+            const row = milestoneRowPool.acquire();
+            row.setMilestone({
+                level: milestone.level,
+                description,
+                achieved
+            });
+            this.component.milestones.appendChild(row);
+        }
+
+        this.renderQueue.milestones = false;
+    }
+
     renderStats() {
-        if(!this.renderQueue.stats) return;
+        if(!this.renderQueue.stats) return;
+
         statBadgePool.releaseAll(this.component.stats);
         this.component.stats.innerHTML = '';
 
@@ -137,11 +216,14 @@ export class AdventuringMonsterDetails extends AdventuringDetailsPage {
     }
 
     renderAbilities() {
-        if(!this.renderQueue.abilities) return;
+        if(!this.renderQueue.abilities) return;
+
         abilityRowPool.releaseAll(this.component.abilities);
         this.component.abilities.innerHTML = '';
-        let hasAbilities = false;
-        const monsterStats = this.getMonsterStats();
+        let hasAbilities = false;
+
+        const monsterStats = this.getMonsterStats();
+
         if(this.monster.generator) {
             const gen = this.manager.generators.getObjectByID(this.monster.generator);
             if(gen) {
@@ -158,7 +240,8 @@ export class AdventuringMonsterDetails extends AdventuringDetailsPage {
                 this.component.abilities.appendChild(row);
                 hasAbilities = true;
             }
-        }
+        }
+
         if(this.monster.spender) {
             const spend = this.manager.spenders.getObjectByID(this.monster.spender);
             if(spend && spend.id !== 'adventuring:none') {
@@ -175,7 +258,8 @@ export class AdventuringMonsterDetails extends AdventuringDetailsPage {
                 this.component.abilities.appendChild(row);
                 hasAbilities = true;
             }
-        }
+        }
+
         if(this.monster.passives && this.monster.passives.length > 0) {
             this.monster.passives.forEach(passiveId => {
                 const passive = this.manager.auras.getObjectByID(passiveId);
@@ -204,26 +288,33 @@ export class AdventuringMonsterDetails extends AdventuringDetailsPage {
     }
 
     renderDrops() {
-        if(!this.renderQueue.drops) return;
-        const revealed = this.monster.hasUnlock('drop_table_reveal');
+        if(!this.renderQueue.drops) return;
+
+        const revealed = this.monster.hasUnlock('drop_table_reveal');
+
         if(!revealed) {
             const requiredLevel = this.getUnlockLevel('drop_table_reveal');
             this.component.dropLock.textContent = `(Reach mastery level ${requiredLevel} to reveal)`;
-        }
-        this.component.dropLock.classList.toggle('d-none', revealed);
+        }
+
+        this.component.dropLock.classList.toggle('d-none', revealed);
+
         lootRowPool.releaseAll(this.component.dropRows);
         this.component.dropRows.innerHTML = '';
 
-        if(!revealed) {
+        if(!revealed) {
+
             const placeholder = document.createElement('div');
             placeholder.className = 'text-muted text-center p-3';
             placeholder.textContent = '???';
             this.component.dropRows.appendChild(placeholder);
-        } else {
+        } else {
+
             const entries = this.expandLootEntries(this.monster.lootGenerator.table);
 
             entries.forEach(entry => {
-                if(entry.type === 'equipment_pool') {
+                if(entry.type === 'equipment_pool') {
+
                     const rows = this.createPoolRows(entry);
                     rows.forEach(row => this.component.dropRows.appendChild(row));
                 } else {
@@ -242,7 +333,8 @@ export class AdventuringMonsterDetails extends AdventuringDetailsPage {
         for(const entry of entries) {
             if(entry.type === 'table') {
                 const table = this.manager.lootTables.getObjectByID(entry.table);
-                if(table) {
+                if(table) {
+
                     expanded.push(...this.expandLootEntries(table.getEntries()));
                 }
             } else {
@@ -253,7 +345,8 @@ export class AdventuringMonsterDetails extends AdventuringDetailsPage {
         return expanded;
     }
 
-    createLootRow(entry, nested = false) {
+    createLootRow(entry, nested = false) {
+
         let icon = '';
         let name = '???';
         let type = entry.type || 'unknown';
@@ -293,7 +386,8 @@ export class AdventuringMonsterDetails extends AdventuringDetailsPage {
         const rows = [];
         const pool = this.manager.equipmentPools.getObjectByID(entry.pool);
 
-        if(!pool) return rows;
+        if(!pool) return rows;
+
         const headerRow = lootRowPool.acquire();
         headerRow.setLoot({
             icon: '',
@@ -303,14 +397,20 @@ export class AdventuringMonsterDetails extends AdventuringDetailsPage {
             chance: this.formatChance(entry),
             isHeader: true
         });
-        rows.push(headerRow);
-        const totalWeight = pool.items.reduce((sum, e) => sum + e.weight, 0);
+        rows.push(headerRow);
+
+        const totalWeight = pool.items.reduce((sum, e) => sum + e.weight, 0);
+
+
         pool.items.forEach(poolEntry => {
             const item = poolEntry.item;
-            if(!item) return;
+            if(!item) return;
+
             const itemChance = totalWeight > 0 ? (poolEntry.weight / totalWeight) : 0;
-            const chanceText = `${(itemChance * 100).toFixed(1)}%`;
-            const isDropped = item.dropped;
+            const chanceText = `${(itemChance * 100).toFixed(1)}%`;
+
+            const isDropped = item.dropped;
+
             const displayName = isDropped ? `✓ ${item.name}` : '???';
             const tooltipContent = TooltipBuilder.forEquipment(item, this.manager).build();
             const itemRow = lootRowPool.acquire();
@@ -350,11 +450,22 @@ export class AdventuringMonsterDetails extends AdventuringDetailsPage {
 
         if(sources.length === 0) {
             this.component.locationRow.classList.add('d-none');
+            this.component.locationRow.onclick = null;
         } else {
-            this.component.locationRow.classList.remove('d-none');
+            this.component.locationRow.classList.remove('d-none');
+
             const area = sources[0];
             this.component.locationIcon.src = area.media;
             this.component.locationName.textContent = area.name;
+            
+            // Make location clickable to navigate to area details
+            this.component.locationRow.onclick = () => {
+                if(this.manager.areadetails) {
+                    this.manager.areadetails.setArea(area);
+                    this.manager.areadetails.render();
+                    this.manager.areadetails.go();
+                }
+            };
         }
 
         this.renderQueue.locations = false;

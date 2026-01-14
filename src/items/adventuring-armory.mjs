@@ -51,44 +51,42 @@ export class AdventuringArmory extends AdventuringPage {
             melee: 'Melee',
             ranged: 'Ranged',
             magic: 'Magic',
-            offhands: 'Offhands',
             heavy: 'Heavy Armor',
             medium: 'Medium Armor',
             light: 'Light Armor',
             accessories: 'Accessories',
-            artifacts: 'Artifacts'
+            artifacts: 'Artifacts',
+            jobweapons: 'Job Weapons'
         };
 
         this.component.optionRecent.onclick = () => this.setCategory('recent');
         this.component.optionMelee.onclick = () => this.setCategory('melee');
         this.component.optionRanged.onclick = () => this.setCategory('ranged');
         this.component.optionMagic.onclick = () => this.setCategory('magic');
-        this.component.optionOffhands.onclick = () => this.setCategory('offhands');
         this.component.optionHeavy.onclick = () => this.setCategory('heavy');
         this.component.optionMedium.onclick = () => this.setCategory('medium');
         this.component.optionLight.onclick = () => this.setCategory('light');
         this.component.optionAccessories.onclick = () => this.setCategory('accessories');
         this.component.optionArtifacts.onclick = () => this.setCategory('artifacts');
+        this.component.optionJobWeapons.onclick = () => this.setCategory('jobweapons');
     }
 
     getItemCategory(baseItem) {
 
+        if(baseItem.isJobWeapon) return 'jobweapons';
         if(baseItem.isArtifact) return 'artifacts';
 
         if(!baseItem.type) return 'melee';
         const typeId = baseItem.type.id;
 
-        const meleeTypes = ['adventuring:dagger', 'adventuring:sword1h', 'adventuring:sword2h', 'adventuring:axe', 'adventuring:scimitar'];
+        const meleeTypes = ['adventuring:dagger', 'adventuring:sword1h', 'adventuring:sword2h', 'adventuring:axe', 'adventuring:scimitar', 'adventuring:fists', 'adventuring:polearm', 'adventuring:hammer2h', 'adventuring:mace', 'adventuring:shield'];
         if(meleeTypes.includes(typeId)) return 'melee';
 
-        const rangedTypes = ['adventuring:knives', 'adventuring:javelin', 'adventuring:crossbow', 'adventuring:shortbow', 'adventuring:longbow'];
+        const rangedTypes = ['adventuring:knives', 'adventuring:javelin', 'adventuring:crossbow', 'adventuring:shortbow', 'adventuring:longbow', 'adventuring:buckler', 'adventuring:quiver'];
         if(rangedTypes.includes(typeId)) return 'ranged';
 
-        const magicTypes = ['adventuring:wand', 'adventuring:staff'];
+        const magicTypes = ['adventuring:wand', 'adventuring:staff', 'adventuring:orb', 'adventuring:spellbook'];
         if(magicTypes.includes(typeId)) return 'magic';
-
-        const offhandTypes = ['adventuring:quiver', 'adventuring:spellbook', 'adventuring:buckler', 'adventuring:shield'];
-        if(offhandTypes.includes(typeId)) return 'offhands';
 
         const heavyTypes = ['adventuring:helm', 'adventuring:platebody', 'adventuring:platelegs', 'adventuring:gauntlets', 'adventuring:sabatons'];
         if(heavyTypes.includes(typeId)) return 'heavy';
@@ -133,25 +131,60 @@ export class AdventuringArmory extends AdventuringPage {
             );
         }
 
-        const typeGroups = new Map();
-        categoryItems.forEach(item => {
-            const typeName = item.type ? item.type.name : 'Other';
-            if(!typeGroups.has(typeName)) {
-                typeGroups.set(typeName, []);
-            }
-            typeGroups.get(typeName).push(item);
-        });
+        // For armor categories (heavy, medium, light), group by equipment set
+        const armorCategories = ['heavy', 'medium', 'light'];
+        if(armorCategories.includes(this.activeCategory)) {
+            const setGroups = new Map();
+            categoryItems.forEach(item => {
+                const setName = item.set ? item.set.name : 'Uniques';
+                if(!setGroups.has(setName)) {
+                    setGroups.set(setName, []);
+                }
+                setGroups.get(setName).push(item);
+            });
 
-        typeGroups.forEach((items, typeName) => {
-            if(items.length > 0) {
-                this.component.items.appendChild(createElement('div', { className: 'p-1 w-100 font-w600 text-warning', text: typeName }));
-                items.forEach(baseItem => {
-                    baseItem.component.mount(this.component.items);
+            // Sort sets by first item's tier/order, then render
+            const sortedSets = [...setGroups.entries()].sort((a, b) => {
+                // "Uniques" always last
+                if(a[0] === 'Uniques') return 1;
+                if(b[0] === 'Uniques') return -1;
+                // Sort by first item's id (which includes tier info)
+                const aFirst = a[1][0];
+                const bFirst = b[1][0];
+                return (aFirst?.id || '').localeCompare(bFirst?.id || '');
+            });
 
-                    baseItem.renderQueue.tooltip = true;
-                });
-            }
-        });
+            sortedSets.forEach(([setName, items]) => {
+                if(items.length > 0) {
+                    this.component.items.appendChild(createElement('div', { className: 'p-1 w-100 font-w600 text-warning', text: setName }));
+                    items.forEach(baseItem => {
+                        baseItem.component.mount(this.component.items);
+                        baseItem.renderQueue.tooltip = true;
+                    });
+                }
+            });
+        } else {
+            // For other categories, group by type
+            const typeGroups = new Map();
+            categoryItems.forEach(item => {
+                const typeName = item.type ? item.type.name : 'Other';
+                if(!typeGroups.has(typeName)) {
+                    typeGroups.set(typeName, []);
+                }
+                typeGroups.get(typeName).push(item);
+            });
+
+            typeGroups.forEach((items, typeName) => {
+                if(items.length > 0) {
+                    this.component.items.appendChild(createElement('div', { className: 'p-1 w-100 font-w600 text-warning', text: typeName }));
+                    items.forEach(baseItem => {
+                        baseItem.component.mount(this.component.items);
+
+                        baseItem.renderQueue.tooltip = true;
+                    });
+                }
+            });
+        }
     }
 
     back() {
@@ -332,6 +365,11 @@ export class AdventuringArmory extends AdventuringPage {
 
     upgrade(item) {
         if(item.upgradeable) {
+            // Double-check we're not exceeding max upgrades
+            if (this.upgradeLevels.get(item) >= item.maxUpgrades) {
+                console.warn(`[Adventuring] Attempted to upgrade ${item.name} beyond max level`);
+                return;
+            }
 
             for(let material of item.materials.keys()) {
                 this.manager.stash.remove(material, item.getCost(material));
@@ -519,6 +557,34 @@ export class AdventuringArmory extends AdventuringPage {
 
                 component.mount(this.component.materials);
                 const cost = this.selectedItem.getCost(material);
+                const owned = material.count;
+
+                component.setTooltipContent(TooltipBuilder.forMaterial(material, this.manager).build());
+
+                component.icon.src = material.media;
+                component.count.textContent = cost;
+
+                if(owned >= cost) {
+                    component.border.classList.remove('border-danger');
+                    component.border.classList.add('border-success');
+                } else {
+                    component.border.classList.remove('border-success');
+                    component.border.classList.add('border-danger');
+                }
+                componentCount++;
+            }
+
+            // Show upgrade tier materials
+            const upgradeMaterials = this.selectedItem.getUpgradeTierMaterials();
+            for(let material of upgradeMaterials) {
+                let component = this.materialComponents[componentCount];
+                if(component === undefined) {
+                    component = createElement('adventuring-material');
+                    this.materialComponents[componentCount] = component;
+                }
+
+                component.mount(this.component.materials);
+                const cost = this.selectedItem.getUpgradeTierCost(material);
                 const owned = material.count;
 
                 component.setTooltipContent(TooltipBuilder.forMaterial(material, this.manager).build());
