@@ -753,6 +753,18 @@ class RequirementsChecker {
 
                 return false;
 
+            case 'is_solo': {
+                // Requirement is met if party has only one active combatant
+                if (!this.manager.party) return false;
+                const party = this.manager.party.all || [];
+                if (party.length === 0) return false;
+                const noneJobId = 'adventuring:none';
+                const activeCombatants = party.filter(h => 
+                    h.combatJob && h.combatJob.id !== noneJobId
+                );
+                return activeCombatants.length === 1;
+            }
+
             default:
                 console.warn(`Unknown requirement type: ${req.type}`);
                 return false; // Fail safe: unknown requirements should block, not pass
@@ -956,6 +968,17 @@ function formatRequirement(req, manager, context = {}) {
 
         case 'always_false':
             text = req.hint || 'Special unlock required';
+            break;
+
+        case 'achievement_completion': {
+            const achievement = manager.achievements?.getObjectByID(req.id);
+            const achievementName = achievement !== undefined ? achievement.name : req.id;
+            text = `Complete: ${achievementName}`;
+            break;
+        }
+
+        case 'is_solo':
+            text = 'Solo adventurer only';
             break;
 
         default:

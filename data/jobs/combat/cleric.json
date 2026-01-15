@@ -2,387 +2,564 @@
     "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
     "namespace": "adventuring",
     "data": {
-        "skillData": [{
-            "skillID": "adventuring:Adventuring",
-            "data": {
-                "jobs": [
-                    {
-                        "id": "cleric",
-                        "tier": 0,
-                        "name": "Cleric",
-                        "media": "melvor:assets/media/skills/prayer/prayer.svg#tint=red",
-                        "requirements": [
-                            { "type": "skill_level", "level": 1 }
-                        ],
-                        "isMilestoneReward": true,
-                        "allowedItems": [
-                            "adventuring:hat",
-                            "adventuring:robes",
-                            "adventuring:bottoms",
-                            "adventuring:mitts",
-                            "adventuring:slippers",
-
-                            "adventuring:amulet",
-                            "adventuring:ring",
-                            "adventuring:cape",
-                            
-                            "adventuring:wand", 
-                            "adventuring:staff",
-                            "adventuring:spellbook"
-                        ],
-                        "scaling": [
-                            { "id": "adventuring:hitpoints", "amount": 1 },
-                            { "id": "adventuring:defence", "amount": 0.5 },
-                            { "id": "adventuring:agility", "amount": 0.75 },
-                            { "id": "adventuring:prayer", "amount": 2.25 }
-                        ]
-                    }
-                ],
-                "generators": [
-                    {
-                        "id": "holy_fire",
-                        "name": "Holy Fire",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:cleric", "level": 1 }
-                        ],
-                        "energy": 20,
-                        "hits": [
-                            {
-                                "target": "random",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 10,
-                                            "scaling": [
-                                                { "id": "adventuring:prayer", "amount": 0.25 }
-                                            ]
+        "skillData": [
+            {
+                "skillID": "adventuring:Adventuring",
+                "data": {
+                    "jobs": [
+                        {
+                            "id": "cleric",
+                            "tier": 0,
+                            "name": "Cleric",
+                            "media": "melvor:assets/media/skills/prayer/prayer.svg#tint=red",
+                            "requirements": [
+                                {
+                                    "type": "skill_level",
+                                    "level": 1
+                                }
+                            ],
+                            "isMilestoneReward": true,
+                            "allowedItems": [
+                                "adventuring:hat",
+                                "adventuring:robes",
+                                "adventuring:bottoms",
+                                "adventuring:mitts",
+                                "adventuring:slippers",
+                                "adventuring:amulet",
+                                "adventuring:ring",
+                                "adventuring:cape",
+                                "adventuring:wand",
+                                "adventuring:staff",
+                                "adventuring:spellbook"
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "amount": 1
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "amount": 0.5
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "amount": 0.75
+                                },
+                                {
+                                    "id": "adventuring:prayer",
+                                    "amount": 2.25
+                                }
+                            ]
+                        }
+                    ],
+                    "generators": [
+                        {
+                            "id": "holy_fire",
+                            "name": "Holy Fire",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:cleric",
+                                    "level": 1
+                                }
+                            ],
+                            "energy": 20,
+                            "hits": [
+                                {
+                                    "target": "random",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 10,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:prayer",
+                                                        "amount": 0.25
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:burn",
+                                            "stacks": {
+                                                "base": 1,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:prayer",
+                                                        "amount": 0.025
+                                                    }
+                                                ]
+                                            }
                                         }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:burn",
-                                        "stacks": {
-                                            "base": 1,
-                                            "scaling": [
-                                                { "id": "adventuring:prayer", "amount": 0.025 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "pray",
-                        "name": "Pray",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:cleric", "level": 10 }
-                        ],
-                        "energy": 20,
-                        "hits": [
-                            {
-                                "target": "lowest",
-                                "party": "ally",
-                                "effects": [
-                                    {
-                                        "type": "heal_flat",
-                                        "amount": {
-                                            "base": 10,
-                                            "scaling": [
-                                                { "id": "adventuring:prayer", "amount": 0.2 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:regen",
-                                        "stacks": {
-                                            "base": 1,
-                                            "scaling": [
-                                                { "id": "adventuring:prayer", "amount": 0.05 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "smite",
-                        "name": "Smite",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:cleric", "level": 15 }
-                        ],
-                        "energy": 25,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 12,
-                                            "scaling": [
-                                                { "id": "adventuring:prayer", "amount": 0.3 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            },
-                            {
-                                "target": "self",
-                                "party": "ally",
-                                "effects": [
-                                    {
-                                        "type": "heal_flat",
-                                        "amount": {
-                                            "base": 5,
-                                            "scaling": [
-                                                { "id": "adventuring:prayer", "amount": 0.1 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ],
-                "spenders": [
-                    {
-                        "id": "divine_heal",
-                        "name": "Divine Heal",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:cleric", "level": 1 }
-                        ],
-                        "cost": 100,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "ally",
-                                "effects": [
-                                    {
-                                        "type": "heal_flat",
-                                        "amount": {
-                                            "base": 15,
-                                            "scaling": [
-                                                { "id": "adventuring:prayer", "amount": 0.35 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "consecrate",
-                        "name": "Consecrate",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:cleric", "level": 20 }
-                        ],
-                        "cost": 100,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 15,
-                                            "scaling": [
-                                                { "id": "adventuring:prayer", "amount": 0.25 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:atonement",
-                                        "stacks": {
-                                            "base": 1,
-                                            "scaling": [
-                                                { "id": "adventuring:prayer", "amount": 0.05 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "sanctuary",
-                        "name": "Sanctuary",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:cleric", "level": 25 }
-                        ],
-                        "cost": 120,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "ally",
-                                "effects": [
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:block",
-                                        "stacks": {
-                                            "base": 3,
-                                            "scaling": [
-                                                { "id": "adventuring:prayer", "amount": 0.15 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "resurrect",
-                        "name": "Resurrect",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:cleric", "level": 30 }
-                        ],
-                        "cost": 200,
-                        "hits": [
-                            {
-                                "target": "dead",
-                                "party": "ally",
-                                "effects": [
-                                    {
-                                        "type": "revive",
-                                        "amount": {
-                                            "base": 20,
-                                            "scaling": [
-                                                { "id": "adventuring:prayer", "amount": 1.0 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "divine_intervention",
-                        "name": "Divine Intervention",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:cleric", "level": 40 }
-                        ],
-                        "cost": 180,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "ally",
-                                "effects": [
-                                    {
-                                        "type": "heal_flat",
-                                        "amount": {
-                                            "base": 25,
-                                            "scaling": [
-                                                { "id": "adventuring:prayer", "amount": 0.5 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:divine_favor",
-                                        "stacks": { "base": 2 }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "miracle",
-                        "name": "Miracle",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:cleric", "level": 50 }
-                        ],
-                        "cost": 250,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "ally",
-                                "effects": [
-                                    {
-                                        "type": "heal_flat",
-                                        "amount": {
-                                            "base": 40,
-                                            "scaling": [
-                                                { "id": "adventuring:prayer", "amount": 0.8 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:regen",
-                                        "stacks": {
-                                            "base": 3,
-                                            "scaling": [
-                                                { "id": "adventuring:prayer", "amount": 0.1 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            },
-                            {
-                                "target": "dead",
-                                "party": "ally",
-                                "effects": [
-                                    {
-                                        "type": "revive",
-                                        "amount": {
-                                            "base": 30,
-                                            "scaling": [
-                                                { "id": "adventuring:prayer", "amount": 0.5 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ],
-                "passives": [
-                    {
-                        "id": "divine_shield",
-                        "name": "Divine Shield",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:cleric", "level": 35 }
-                        ],
-                        "effects": [
-                            {
-                                "trigger": "encounter_start",
-                                "type": "buff",
-                                "target": "all", "party": "ally",
-                                "id": "adventuring:regen",
-                                "stacks": {
-                                    "base": 2,
-                                    "scaling": [
-                                        { "id": "adventuring:prayer", "amount": 0.1 }
                                     ]
                                 }
-                            }
-                        ]
-                    },
-                    {
-                        "id": "holy_aura",
-                        "name": "Holy Aura",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:cleric", "level": 45 }
-                        ],
-                        "effects": [
-                            {
-                                "trigger": "encounter_start",
-                                "type": "buff",
-                                "target": "all", "party": "ally",
-                                "id": "adventuring:divine_favor",
-                                "stacks": { "base": 2 }
-                            }
-                        ]
-                    }
-                ]
+                            ]
+                        },
+                        {
+                            "id": "pray",
+                            "name": "Pray",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:cleric",
+                                    "level": 10
+                                }
+                            ],
+                            "energy": 20,
+                            "hits": [
+                                {
+                                    "target": "lowest",
+                                    "party": "ally",
+                                    "effects": [
+                                        {
+                                            "type": "heal_flat",
+                                            "amount": {
+                                                "base": 10,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:prayer",
+                                                        "amount": 0.2
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "buff",
+                                            "id": "adventuring:regen",
+                                            "stacks": {
+                                                "base": 1,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:prayer",
+                                                        "amount": 0.05
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "smite",
+                            "name": "Smite",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:cleric",
+                                    "level": 15
+                                }
+                            ],
+                            "energy": 25,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 12,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:prayer",
+                                                        "amount": 0.3
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                },
+                                {
+                                    "target": "self",
+                                    "party": "ally",
+                                    "effects": [
+                                        {
+                                            "type": "heal_flat",
+                                            "amount": {
+                                                "base": 5,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:prayer",
+                                                        "amount": 0.1
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "minor_blessing",
+                            "name": "Minor Blessing",
+                            "requirements": [
+                                {
+                                    "type": "job_level",
+                                    "job": "adventuring:cleric",
+                                    "level": 20
+                                }
+                            ],
+                            "energy": 20,
+                            "hits": [
+                                {
+                                    "target": "lowest",
+                                    "party": "ally",
+                                    "effects": [
+                                        {
+                                            "type": "heal_flat",
+                                            "amount": {
+                                                "base": 15,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:prayer",
+                                                        "amount": 0.2
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "spenders": [
+                        {
+                            "id": "divine_heal",
+                            "name": "Divine Heal",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:cleric",
+                                    "level": 1
+                                }
+                            ],
+                            "cost": 100,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "ally",
+                                    "effects": [
+                                        {
+                                            "type": "heal_flat",
+                                            "amount": {
+                                                "base": 15,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:prayer",
+                                                        "amount": 0.35
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "consecrate",
+                            "name": "Consecrate",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:cleric",
+                                    "level": 20
+                                }
+                            ],
+                            "cost": 100,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 15,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:prayer",
+                                                        "amount": 0.25
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:atonement",
+                                            "stacks": {
+                                                "base": 1,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:prayer",
+                                                        "amount": 0.05
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "sanctuary",
+                            "name": "Sanctuary",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:cleric",
+                                    "level": 25
+                                }
+                            ],
+                            "cost": 120,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "ally",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "id": "adventuring:block",
+                                            "stacks": {
+                                                "base": 3,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:prayer",
+                                                        "amount": 0.15
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "resurrect",
+                            "name": "Resurrect",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:cleric",
+                                    "level": 30
+                                }
+                            ],
+                            "cost": 200,
+                            "hits": [
+                                {
+                                    "target": "dead",
+                                    "party": "ally",
+                                    "effects": [
+                                        {
+                                            "type": "revive",
+                                            "amount": {
+                                                "base": 20,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:prayer",
+                                                        "amount": 1
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "divine_intervention",
+                            "name": "Divine Intervention",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:cleric",
+                                    "level": 40
+                                }
+                            ],
+                            "cost": 180,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "ally",
+                                    "effects": [
+                                        {
+                                            "type": "heal_flat",
+                                            "amount": {
+                                                "base": 25,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:prayer",
+                                                        "amount": 0.5
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "buff",
+                                            "id": "adventuring:divine_favor",
+                                            "stacks": {
+                                                "base": 2
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "miracle",
+                            "name": "Miracle",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:cleric",
+                                    "level": 50
+                                }
+                            ],
+                            "cost": 250,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "ally",
+                                    "effects": [
+                                        {
+                                            "type": "heal_flat",
+                                            "amount": {
+                                                "base": 40,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:prayer",
+                                                        "amount": 0.8
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "buff",
+                                            "id": "adventuring:regen",
+                                            "stacks": {
+                                                "base": 3,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:prayer",
+                                                        "amount": 0.1
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                },
+                                {
+                                    "target": "dead",
+                                    "party": "ally",
+                                    "effects": [
+                                        {
+                                            "type": "revive",
+                                            "amount": {
+                                                "base": 30,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:prayer",
+                                                        "amount": 0.5
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "healing_wave",
+                            "name": "Healing Wave",
+                            "requirements": [
+                                {
+                                    "type": "job_level",
+                                    "job": "adventuring:cleric",
+                                    "level": 30
+                                }
+                            ],
+                            "cost": 130,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "ally",
+                                    "effects": [
+                                        {
+                                            "type": "heal_flat",
+                                            "amount": {
+                                                "base": 20,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:prayer",
+                                                        "amount": 0.3
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "passives": [
+                        {
+                            "id": "divine_shield",
+                            "name": "Divine Shield",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:cleric",
+                                    "level": 35
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "encounter_start",
+                                    "type": "buff",
+                                    "target": "all",
+                                    "party": "ally",
+                                    "id": "adventuring:regen",
+                                    "stacks": {
+                                        "base": 2,
+                                        "scaling": [
+                                            {
+                                                "id": "adventuring:prayer",
+                                                "amount": 0.1
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "id": "holy_aura",
+                            "name": "Holy Aura",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:cleric",
+                                    "level": 45
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "encounter_start",
+                                    "type": "buff",
+                                    "target": "all",
+                                    "party": "ally",
+                                    "id": "adventuring:divine_favor",
+                                    "stacks": {
+                                        "base": 2
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
             }
-        }]
+        ]
     }
 }

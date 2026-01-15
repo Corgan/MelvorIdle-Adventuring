@@ -107,12 +107,7 @@ export async function setup({ gameData, patch, loadTemplates, loadModule, loadSt
     await load('data/jobs/combat/dreadnought.json');
     await load('data/jobs/combat/sage.json');
 
-    // Cross-class abilities
-    await load('data/jobs/combat/shared-abilities.json');
-
     // Tier 5+ combat jobs
-    await load('data/jobs/combat/achievement-abilities.json');
-    await load('data/jobs/combat/achievement-passives.json');
     await load('data/jobs/combat/arcane_archer.json');
     await load('data/jobs/combat/avatar.json');
     await load('data/jobs/combat/beastmaster.json');
@@ -245,8 +240,16 @@ export async function setup({ gameData, patch, loadTemplates, loadModule, loadSt
     await load('data/tutorials.json');
 
     // Achievement system
-    await load('data/achievements.json');
-    await load('data/achievements/job_weapons.json');
+    await load('data/achievements/area_mastery.json');
+    await load('data/achievements/challenges.json');
+    await load('data/achievements/collection.json');
+    await load('data/achievements/combat.json');
+    await load('data/achievements/dungeons.json');
+    await load('data/achievements/equipment_mastery.json');
+    await load('data/achievements/job_mastery.json');
+    await load('data/achievements/monster_mastery.json');
+    await load('data/achievements/solo.json');
+    await load('data/achievements/town_jobs.json');
     
     if(cloudManager.hasAoDEntitlementAndIsEnabled)
         await load('data/data-aod.json');

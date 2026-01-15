@@ -2,395 +2,583 @@
     "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
     "namespace": "adventuring",
     "data": {
-        "skillData": [{
-            "skillID": "adventuring:Adventuring",
-            "data": {
-                "jobs": [
-                    {
-                        "id": "fighter",
-                        "tier": 0,
-                        "name": "Fighter",
-                        "media": "melvor:assets/media/skills/combat/attack.svg#tint=yellow",
-                        "requirements": [
-                            { "type": "skill_level", "level": 1 }
-                        ],
-                        "isMilestoneReward": true,
-                        "allowedItems": [
-                            "adventuring:helm",
-                            "adventuring:platebody",
-                            "adventuring:platelegs",
-                            "adventuring:gauntlets",
-                            "adventuring:sabatons",
-
-                            "adventuring:cowl",
-                            "adventuring:vest",
-                            "adventuring:chaps",
-                            "adventuring:vambraces",
-                            "adventuring:boots",
-
-                            "adventuring:amulet",
-                            "adventuring:ring",
-                            "adventuring:cape",
-                            
-                            "adventuring:shield",
-                            "adventuring:dagger", 
-                            "adventuring:sword1h", 
-                            "adventuring:sword2h", 
-                            "adventuring:axe", 
-                            "adventuring:scimitar", 
-                            "adventuring:fists",
-                            "adventuring:knives", 
-                            "adventuring:javelin"
-                        ],
-                        "scaling": [
-                            { "id": "adventuring:hitpoints", "amount": 1.5 },
-                            { "id": "adventuring:defence", "amount": 0.5 },
-                            { "id": "adventuring:agility", "amount": 0.5 },
-                            { "id": "adventuring:strength", "amount": 1.5 }
-                        ]
-                    }
-                ],
-                "generators": [
-                    {
-                        "id": "slash",
-                        "name": "Slash",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:fighter", "level": 1 }
-                        ],
-                        "energy": 20,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 10,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "amount": 0.25 }
-                                            ]
+        "skillData": [
+            {
+                "skillID": "adventuring:Adventuring",
+                "data": {
+                    "jobs": [
+                        {
+                            "id": "fighter",
+                            "tier": 0,
+                            "name": "Fighter",
+                            "media": "melvor:assets/media/skills/combat/attack.svg#tint=yellow",
+                            "requirements": [
+                                {
+                                    "type": "skill_level",
+                                    "level": 1
+                                }
+                            ],
+                            "isMilestoneReward": true,
+                            "allowedItems": [
+                                "adventuring:helm",
+                                "adventuring:platebody",
+                                "adventuring:platelegs",
+                                "adventuring:gauntlets",
+                                "adventuring:sabatons",
+                                "adventuring:cowl",
+                                "adventuring:vest",
+                                "adventuring:chaps",
+                                "adventuring:vambraces",
+                                "adventuring:boots",
+                                "adventuring:amulet",
+                                "adventuring:ring",
+                                "adventuring:cape",
+                                "adventuring:shield",
+                                "adventuring:dagger",
+                                "adventuring:sword1h",
+                                "adventuring:sword2h",
+                                "adventuring:axe",
+                                "adventuring:scimitar",
+                                "adventuring:fists",
+                                "adventuring:knives",
+                                "adventuring:javelin"
+                            ],
+                            "scaling": [
+                                {
+                                    "id": "adventuring:hitpoints",
+                                    "amount": 1.5
+                                },
+                                {
+                                    "id": "adventuring:defence",
+                                    "amount": 0.5
+                                },
+                                {
+                                    "id": "adventuring:agility",
+                                    "amount": 0.5
+                                },
+                                {
+                                    "id": "adventuring:strength",
+                                    "amount": 1.5
+                                }
+                            ]
+                        }
+                    ],
+                    "generators": [
+                        {
+                            "id": "slash",
+                            "name": "Slash",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:fighter",
+                                    "level": 1
+                                }
+                            ],
+                            "energy": 20,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 10,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "amount": 0.25
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:bleed",
+                                            "stacks": {
+                                                "base": 1,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "amount": 0.025
+                                                    }
+                                                ]
+                                            }
                                         }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:bleed",
-                                        "stacks": {
-                                            "base": 1,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "amount": 0.025 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "rend",
-                        "name": "Rend",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:fighter", "level": 10 }
-                        ],
-                        "energy": 25,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 15,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "amount": 0.35 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:bleed",
-                                        "stacks": {
-                                            "base": 2,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "amount": 0.05 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ],
-                "spenders": [
-                    {
-                        "id": "whirlwind",
-                        "name": "Whirlwind",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:fighter", "level": 1 }
-                        ],
-                        "cost": 100,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "enemy",
-                                "delay": 200,
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 5,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "amount": 0.15 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:bleed",
-                                        "stacks": {
-                                            "base": 1,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "amount": 0.025 }
-                                            ]
-                                        }
-                                    }
-                                ],
-                                "repeat": 2
-                            }
-                        ]
-                    },
-                    {
-                        "id": "execute",
-                        "name": "Execute",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:fighter", "level": 15 }
-                        ],
-                        "cost": 150,
-                        "hits": [
-                            {
-                                "target": "lowest",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 25,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "amount": 1.5 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "battle_cry",
-                        "name": "Battle Cry",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:fighter", "level": 20 }
-                        ],
-                        "cost": 80,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "ally",
-                                "effects": [
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:thorns",
-                                        "stacks": {
-                                            "base": 2,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "amount": 0.1 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "devastating_blow",
-                        "name": "Devastating Blow",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:fighter", "level": 30 }
-                        ],
-                        "cost": 120,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 30,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "amount": 0.8 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:vulnerability",
-                                        "stacks": {
-                                            "base": 2,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "amount": 0.05 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "blade_storm",
-                        "name": "Blade Storm",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:fighter", "level": 40 }
-                        ],
-                        "cost": 180,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "enemy",
-                                "delay": 100,
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 12,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "amount": 0.3 }
-                                            ]
-                                        }
-                                    }
-                                ],
-                                "repeat": 3
-                            }
-                        ]
-                    },
-                    {
-                        "id": "champions_challenge",
-                        "name": "Champion's Challenge",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:fighter", "level": 50 }
-                        ],
-                        "cost": 200,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 40,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "amount": 1.0 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:bleed",
-                                        "stacks": {
-                                            "base": 5,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "amount": 0.15 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            },
-                            {
-                                "target": "self",
-                                "party": "ally",
-                                "effects": [
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:block",
-                                        "stacks": {
-                                            "base": 5,
-                                            "scaling": [
-                                                { "id": "adventuring:defence", "amount": 0.2 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ],
-                "passives": [
-                    {
-                        "id": "taunt",
-                        "name": "Taunt",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:fighter", "level": 25 }
-                        ],
-                        "effects": [
-                            {
-                                "trigger": "encounter_start",
-                                "type": "buff",
-                                "target": "self",
-                                "id": "adventuring:block",
-                                "stacks": {
-                                    "base": 5,
-                                    "scaling": [
-                                        { "id": "adventuring:defence", "amount": 0.5 }
                                     ]
                                 }
-                            }
-                        ]
-                    },
-                    {
-                        "id": "battle_hardened",
-                        "name": "Battle Hardened",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:fighter", "level": 35 }
-                        ],
-                        "effects": [
-                            {
-                                "trigger": "round_start",
-                                "type": "buff",
-                                "target": "self",
-                                "id": "adventuring:might",
-                                "stacks": {
-                                    "base": 1,
-                                    "scaling": [
-                                        { "id": "adventuring:strength", "amount": 0.05 }
+                            ]
+                        },
+                        {
+                            "id": "rend",
+                            "name": "Rend",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:fighter",
+                                    "level": 10
+                                }
+                            ],
+                            "energy": 25,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 15,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "amount": 0.35
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:bleed",
+                                            "stacks": {
+                                                "base": 2,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "amount": 0.05
+                                                    }
+                                                ]
+                                            }
+                                        }
                                     ]
                                 }
-                            }
-                        ]
-                    },
-                    {
-                        "id": "veteran_instincts",
-                        "name": "Veteran Instincts",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:fighter", "level": 45 }
-                        ],
-                        "effects": [
-                            {
-                                "trigger": "encounter_start",
-                                "type": "debuff",
-                                "target": "all", "party": "enemy",
-                                "id": "adventuring:weaken",
-                                "stacks": {
-                                    "base": 2,
-                                    "scaling": [
-                                        { "id": "adventuring:strength", "amount": 0.05 }
+                            ]
+                        },
+                        {
+                            "id": "fighters_instinct",
+                            "name": "Fighter's Instinct",
+                            "requirements": [
+                                {
+                                    "type": "job_level",
+                                    "job": "adventuring:fighter",
+                                    "level": 20
+                                }
+                            ],
+                            "energy": 20,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 12,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "amount": 0.2
+                                                    }
+                                                ]
+                                            }
+                                        }
                                     ]
                                 }
-                            }
-                        ]
-                    }
-                ]
+                            ]
+                        }
+                    ],
+                    "spenders": [
+                        {
+                            "id": "whirlwind",
+                            "name": "Whirlwind",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:fighter",
+                                    "level": 1
+                                }
+                            ],
+                            "cost": 100,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "enemy",
+                                    "delay": 200,
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 5,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "amount": 0.15
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:bleed",
+                                            "stacks": {
+                                                "base": 1,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "amount": 0.025
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ],
+                                    "repeat": 2
+                                }
+                            ]
+                        },
+                        {
+                            "id": "execute",
+                            "name": "Execute",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:fighter",
+                                    "level": 15
+                                }
+                            ],
+                            "cost": 150,
+                            "hits": [
+                                {
+                                    "target": "lowest",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 25,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "amount": 1.5
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "battle_cry",
+                            "name": "Battle Cry",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:fighter",
+                                    "level": 20
+                                }
+                            ],
+                            "cost": 80,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "ally",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "id": "adventuring:thorns",
+                                            "stacks": {
+                                                "base": 2,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "amount": 0.1
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "devastating_blow",
+                            "name": "Devastating Blow",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:fighter",
+                                    "level": 30
+                                }
+                            ],
+                            "cost": 120,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 30,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "amount": 0.8
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:vulnerability",
+                                            "stacks": {
+                                                "base": 2,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "amount": 0.05
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "blade_storm",
+                            "name": "Blade Storm",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:fighter",
+                                    "level": 40
+                                }
+                            ],
+                            "cost": 180,
+                            "hits": [
+                                {
+                                    "target": "all",
+                                    "party": "enemy",
+                                    "delay": 100,
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 12,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "amount": 0.3
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ],
+                                    "repeat": 3
+                                }
+                            ]
+                        },
+                        {
+                            "id": "champions_challenge",
+                            "name": "Champion's Challenge",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:fighter",
+                                    "level": 50
+                                }
+                            ],
+                            "cost": 200,
+                            "hits": [
+                                {
+                                    "target": "front",
+                                    "party": "enemy",
+                                    "effects": [
+                                        {
+                                            "type": "damage_flat",
+                                            "amount": {
+                                                "base": 40,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "amount": 1
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "debuff",
+                                            "id": "adventuring:bleed",
+                                            "stacks": {
+                                                "base": 5,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "amount": 0.15
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                },
+                                {
+                                    "target": "self",
+                                    "party": "ally",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "id": "adventuring:block",
+                                            "stacks": {
+                                                "base": 5,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:defence",
+                                                        "amount": 0.2
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "warriors_resolve",
+                            "name": "Warrior's Resolve",
+                            "requirements": [
+                                {
+                                    "type": "job_level",
+                                    "job": "adventuring:fighter",
+                                    "level": 30
+                                }
+                            ],
+                            "cost": 80,
+                            "hits": [
+                                {
+                                    "target": "self",
+                                    "party": "ally",
+                                    "effects": [
+                                        {
+                                            "type": "buff",
+                                            "id": "adventuring:block",
+                                            "stacks": {
+                                                "base": 3,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:defence",
+                                                        "amount": 0.15
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "type": "buff",
+                                            "id": "adventuring:might",
+                                            "stacks": {
+                                                "base": 2,
+                                                "scaling": [
+                                                    {
+                                                        "id": "adventuring:strength",
+                                                        "amount": 0.1
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "passives": [
+                        {
+                            "id": "taunt",
+                            "name": "Taunt",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:fighter",
+                                    "level": 25
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "encounter_start",
+                                    "type": "buff",
+                                    "target": "self",
+                                    "id": "adventuring:block",
+                                    "stacks": {
+                                        "base": 5,
+                                        "scaling": [
+                                            {
+                                                "id": "adventuring:defence",
+                                                "amount": 0.5
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "id": "battle_hardened",
+                            "name": "Battle Hardened",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:fighter",
+                                    "level": 35
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "round_start",
+                                    "type": "buff",
+                                    "target": "self",
+                                    "id": "adventuring:might",
+                                    "stacks": {
+                                        "base": 1,
+                                        "scaling": [
+                                            {
+                                                "id": "adventuring:strength",
+                                                "amount": 0.05
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "id": "veteran_instincts",
+                            "name": "Veteran Instincts",
+                            "requirements": [
+                                {
+                                    "type": "current_job_level",
+                                    "job": "adventuring:fighter",
+                                    "level": 45
+                                }
+                            ],
+                            "effects": [
+                                {
+                                    "trigger": "encounter_start",
+                                    "type": "debuff",
+                                    "target": "all",
+                                    "party": "enemy",
+                                    "id": "adventuring:weaken",
+                                    "stacks": {
+                                        "base": 2,
+                                        "scaling": [
+                                            {
+                                                "id": "adventuring:strength",
+                                                "amount": 0.05
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
             }
-        }]
+        ]
     }
 }
