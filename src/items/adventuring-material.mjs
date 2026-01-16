@@ -37,6 +37,7 @@ export class AdventuringMaterial extends NamespacedObject {
         this._name = data.name;
         this._media = data.media;
         this.isCurrency = data.isCurrency === true;
+        this.alwaysUnlocked = data.alwaysUnlocked === true;
         this._categoryID = data.category; // Store raw ID for postDataRegistration lookup
         this.tier = data.tier; // Optional tier (1=crude, 2=refined, 3=immaculate, 4=transcendent)
     }
@@ -54,7 +55,7 @@ export class AdventuringMaterial extends NamespacedObject {
     }
 
     get unlocked() {
-        return this.manager.stash.unlocked.get(this) === true;
+        return this.alwaysUnlocked || this.manager.stash.unlocked.get(this) === true;
     }
 
     add(qty) {
@@ -71,7 +72,8 @@ export class AdventuringMaterial extends NamespacedObject {
             if (!this.category) {
                 console.warn(`Material ${this.id} has unknown category: ${this._categoryID}`);
             }
-        }
+        }
+
         this.manager.stash.registerMaterial(this);
     }
 

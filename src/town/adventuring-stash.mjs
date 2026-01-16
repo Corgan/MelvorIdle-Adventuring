@@ -139,7 +139,7 @@ export class AdventuringStash extends AdventuringPage {
         this.manager.armory.checkUnlocked();
     }
 
-    add(material, qty) {
+    add(material, qty, options = {}) {
         if(typeof material === "string")
             material = this.manager.materials.getObjectByID(material);
         let count = this.materialCounts.get(material);
@@ -150,13 +150,23 @@ export class AdventuringStash extends AdventuringPage {
             material.renderQueue.name = true;
             material.renderQueue.icon = true;
             material.renderQueue.count = true;
-            this.manager.log.add(`Found ${qty} ${material.name}`);
+            this.manager.log.add(`Found ${qty} ${material.name}`, {
+                category: 'loot_materials'
+            });
 
             if(material.isCurrency) {
                 this.manager.achievementManager.recordCurrency(qty);
+                // Track combat-specific currency for achievements
+                if(options.fromCombat) {
+                    this.manager.achievementManager.recordCombatCurrency(qty);
+                }
                 this.manager.tutorialManager.checkTriggers('currency');
             } else {
                 this.manager.achievementManager.recordMaterials(qty);
+                // Track combat-specific materials for achievements
+                if(options.fromCombat) {
+                    this.manager.achievementManager.recordCombatMaterials(qty);
+                }
                 this.manager.tutorialManager.checkTriggers('material');
                 this.manager.slayers.onMaterialCollected(material, qty);
             }

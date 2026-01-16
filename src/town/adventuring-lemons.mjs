@@ -3,7 +3,8 @@ const { loadModule } = mod.getContext(import.meta);
 const { AdventuringPage } = await loadModule('src/ui/adventuring-page.mjs');
 
 const { AdventuringLemonsElement } = await loadModule('src/town/components/adventuring-lemons.mjs');
-const { AdventuringStatCardElement } = await loadModule('src/ui/components/adventuring-stat-card.mjs');
+const { AdventuringStatCardElement } = await loadModule('src/ui/components/adventuring-stat-card.mjs');
+
 const LEMON_QUOTES = [
     "When life gives you lemons, make lemonade!",
     "You're the zest!",
@@ -20,7 +21,8 @@ const LEMON_QUOTES = [
     "You look like you could use some vitamin C-ombat stats!",
     "Our lemonade is totally natural - no artificial flavorings or magic!",
     "This is where the cool adventurers hang out. Very refreshing.",
-];
+];
+
 const LEMON_SECRETS = [
     "Psst! Did you know lemons were first grown in Assam, India?",
     "Fun fact: The average lemon contains about 3 tablespoons of juice!",
@@ -50,11 +52,13 @@ export class AdventuringLemons extends AdventuringPage {
         this.manager = manager;
         this.game = game;
         this.component = createElement('adventuring-lemons');
-        this.renderQueue = new AdventuringLemonRenderQueue();
+        this.renderQueue = new AdventuringLemonRenderQueue();
+
         this.lemonadesConsumed = 0;
         this.lemonsSquashed = 0;
         this.timesVisited = 0;
-        this.secretsFound = new Set();
+        this.secretsFound = new Set();
+
         this.currentQuote = this.getRandomQuote();
 
         this.component.back.onclick = () => this.back();
@@ -75,7 +79,8 @@ export class AdventuringLemons extends AdventuringPage {
         this.manager.party.setAllLocked(false);
         this.timesVisited++;
         this.currentQuote = this.getRandomQuote();
-        this.renderQueue.all = true;
+        this.renderQueue.all = true;
+
         if(Math.random() < 0.1) {
             this.discoverSecret();
         }
@@ -85,7 +90,8 @@ export class AdventuringLemons extends AdventuringPage {
         this.manager.party.setAllLocked(true);
     }
 
-    postDataRegistration() {
+    postDataRegistration() {
+
     }
 
     getRandomQuote() {
@@ -97,7 +103,9 @@ export class AdventuringLemons extends AdventuringPage {
         if(undiscovered.length > 0) {
             const idx = LEMON_SECRETS.indexOf(undiscovered[Math.floor(Math.random() * undiscovered.length)]);
             this.secretsFound.add(idx);
-            this.manager.log.add(`🍋 Secret discovered: "${LEMON_SECRETS[idx]}"`);
+            this.manager.log.add(`🍋 Secret discovered: "${LEMON_SECRETS[idx]}"`, {
+                category: 'town'
+            });
             this.renderQueue.all = true;
         }
     }
@@ -105,7 +113,9 @@ export class AdventuringLemons extends AdventuringPage {
     buyLemonade() {
         const cost = 5;
         if(this.manager.stash.currency < cost) {
-            this.manager.log.add("You can't afford lemonade! How sad.");
+            this.manager.log.add("You can't afford lemonade! How sad.", {
+                category: 'town'
+            });
             return;
         }
 
@@ -121,10 +131,15 @@ export class AdventuringLemons extends AdventuringPage {
             "The tartness awakens your senses!",
         ];
 
-        this.manager.log.add(`🍋 ${messages[Math.floor(Math.random() * messages.length)]}`);
+        this.manager.log.add(`🍋 ${messages[Math.floor(Math.random() * messages.length)]}`, {
+            category: 'town'
+        });
+
         if(this.lemonadesConsumed % 10 === 0) {
             const bonus = Math.floor(this.lemonadesConsumed / 10);
-            this.manager.log.add(`🍋 Loyalty reward! You've had ${this.lemonadesConsumed} lemonades!`);
+            this.manager.log.add(`🍋 Loyalty reward! You've had ${this.lemonadesConsumed} lemonades!`, {
+                category: 'town'
+            });
             this.manager.stash.addCurrency(bonus * 5);
         }
 
@@ -151,7 +166,9 @@ export class AdventuringLemons extends AdventuringPage {
         for(const outcome of outcomes) {
             roll -= outcome.weight;
             if(roll <= 0) {
-                this.manager.log.add(`🍋 ${outcome.msg}`);
+                this.manager.log.add(`🍋 ${outcome.msg}`, {
+                    category: 'town'
+                });
                 if(outcome.coins) {
                     this.manager.stash.addCurrency(outcome.coins);
                 }
@@ -165,10 +182,12 @@ export class AdventuringLemons extends AdventuringPage {
 
     render() {
         if(!this.renderQueue.all && !this.renderQueue.quote && !this.renderQueue.stats)
-            return;
+            return;
+
         if(this.component.quote) {
             this.component.quote.textContent = `"${this.currentQuote}"`;
-        }
+        }
+
         if(this.component.stats) {
             this.component.stats.replaceChildren();
             const row = document.createElement('div');
@@ -188,7 +207,8 @@ export class AdventuringLemons extends AdventuringPage {
             });
 
             this.component.stats.appendChild(row);
-        }
+        }
+
         if(this.component.secrets) {
             if(this.secretsFound.size > 0) {
                 let html = '<ul class="list-unstyled mb-0">';
@@ -200,7 +220,8 @@ export class AdventuringLemons extends AdventuringPage {
             } else {
                 this.component.secrets.innerHTML = '<small class="text-muted">No secrets discovered yet. Keep visiting!</small>';
             }
-        }
+        }
+
         if(this.component.buyBtn) {
             this.component.buyBtn.onclick = () => this.buyLemonade();
         }

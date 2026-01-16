@@ -58,9 +58,9 @@ export class AdventuringDungeon extends AdventuringPage {
             const source = `Endless Wave ${this.endlessWave + 1}`;
 
             return [
-                createEffect({ trigger: 'passive', type: 'all_stat_percent', target: 'all', party: 'enemy', value: statPercent }, this, source),
-                createEffect({ trigger: 'passive', type: 'xp_percent', value: rewardPercent }, this, source),
-                createEffect({ trigger: 'passive', type: 'loot_percent', value: rewardPercent }, this, source)
+                createEffect({ trigger: 'passive', type: 'all_stat_percent', target: 'all', party: 'enemy', value: statPercent }, this, source, 'endless'),
+                createEffect({ trigger: 'passive', type: 'xp_percent', value: rewardPercent }, this, source, 'endless'),
+                createEffect({ trigger: 'passive', type: 'loot_percent', value: rewardPercent }, this, source, 'endless')
             ];
         });
 
@@ -82,11 +82,17 @@ export class AdventuringDungeon extends AdventuringPage {
             }
         }
 
+        // Get consumable effects that target enemies
         if(this.manager.consumables) {
-            for(const effect of this.manager.consumables.getEffects()) {
-                if(effect.party === 'enemy') {
-                    effects.push(effect);
-                }
+            for(const effect of this.manager.consumables.getEffects({ party: 'enemy' })) {
+                effects.push(effect);
+            }
+        }
+
+        // Get tavern effects that target enemies  
+        if(this.manager.tavern) {
+            for(const effect of this.manager.tavern.getEffects({ party: 'enemy' })) {
+                effects.push(effect);
             }
         }
 
@@ -97,8 +103,12 @@ export class AdventuringDungeon extends AdventuringPage {
         return this.effectCache.getBonus(effectType, filter);
     }
 
-    getEffectsForTrigger(trigger) {
-        return this.effectCache.getEffects(trigger);
+    getEffects(filters) {
+        return this.effectCache.getEffects(filters);
+    }
+
+    getDifficultyXPMultiplier() {
+        return 1 + (this.getBonus('xp_percent') / 100);
     }
 
     get active() {
@@ -196,17 +206,15 @@ export class AdventuringDungeon extends AdventuringPage {
 
     triggerTile(tile) {
         if(tile.type.id === 'adventuring:start') {
-            this.manager.log.add(`Starting ${this.area.name} floor ${this.progress+1}`);
+            this.manager.log.add(`Starting ${this.area.name} floor ${this.progress+1}`, { category: 'dungeon_progress' });
             return;
         }
 
         if(tile.type.id === 'adventuring:exit' || tile.type.id === 'adventuring:boss') {
             if(this.area) {
-                const difficultyXPBonus = this.getBonus('xp_percent') / 100;
-                const tileXP = Math.floor(1 * (1 + difficultyXPBonus));
-                this.area.addXP(tileXP);
+                this.area.addXP(Math.floor(this.getDifficultyXPMultiplier()));
             }
-            this.manager.log.add(`Starting floor exit encounter`);
+            this.manager.log.add(`Starting floor exit encounter`, { category: 'dungeon_events' });
             this.manager.encounter.generateEncounter(true);
             this.manager.encounter.startEncounter();
             return;
@@ -214,11 +222,9 @@ export class AdventuringDungeon extends AdventuringPage {
 
         if(tile.type.id === 'adventuring:encounter') {
             if(this.area) {
-                const difficultyXPBonus = this.getBonus('xp_percent') / 100;
-                const tileXP = Math.floor(1 * (1 + difficultyXPBonus));
-                this.area.addXP(tileXP);
+                this.area.addXP(Math.floor(this.getDifficultyXPMultiplier()));
             }
-            this.manager.log.add(`Starting random encounter`);
+            this.manager.log.add(`Starting random encounter`, { category: 'dungeon_events' });
             this.manager.encounter.generateEncounter();
             this.manager.encounter.startEncounter();
             return;
@@ -228,9 +234,7 @@ export class AdventuringDungeon extends AdventuringPage {
             return;
 
         if(this.area) {
-            const difficultyXPBonus = this.getBonus('xp_percent') / 100;
-            const tileXP = Math.floor(1 * (1 + difficultyXPBonus));
-            this.area.addXP(tileXP);
+            this.area.addXP(Math.floor(this.getDifficultyXPMultiplier()));
         }
 
         if(tile.type.effects !== undefined) {
@@ -273,7 +277,10 @@ export class AdventuringDungeon extends AdventuringPage {
         this.manager.party.combatParty.forEach(member => {
             let amount = Math.floor(member.maxHitpoints * damagePercent / 100);
             member.damage({ amount: amount });
-            this.manager.log.add(`${sourceName} did ${amount} damage to ${member.name}`);
+            this.manager.log.add(`${sourceName} did ${amount} damage to ${member.name}`, {
+                category: 'dungeon_events',
+                target: member
+            });
         });
     }
 
@@ -284,10 +291,16 @@ export class AdventuringDungeon extends AdventuringPage {
             if(member.dead) {
 
                 member.revive({ amount: healPercent });
-                this.manager.log.add(`${sourceName} revived ${member.name} to ${amount} health.`);
+                this.manager.log.add(`${sourceName} revived ${member.name} to ${amount} health.`, {
+                    category: 'dungeon_events',
+                    target: member
+                });
             } else {
                 member.heal({ amount: amount });
-                this.manager.log.add(`${sourceName} healed ${member.name} for ${amount} health.`);
+                this.manager.log.add(`${sourceName} healed ${member.name} for ${amount} health.`, {
+                    category: 'dungeon_events',
+                    target: member
+                });
             }
         });
     }
@@ -296,23 +309,18 @@ export class AdventuringDungeon extends AdventuringPage {
         this.tileLootGenerator.loadTable(effect.pool);
         let { id, qty } = this.tileLootGenerator.getEntry();
         this.manager.stash.add(id, qty);
-        this.manager.log.add(`${sourceName} gave ${qty}x loot!`);
+        this.manager.log.add(`${sourceName} gave ${qty}x loot!`, { category: 'loot_materials' });
     }
 
     processTileXP(effect, sourceName) {
         if(effect.job === "adventuring:any") {
-
-            this.manager.party.combatParty.filter(member => !member.dead).forEach(member => {
-                if(member.combatJob && member.combatJob.isMilestoneReward) {
-                    member.combatJob.addXP(effect.amount);
-                }
-            });
-            this.manager.log.add(`${sourceName} granted ${effect.amount} XP to party!`);
+            this.manager.party.awardJobXP(effect.amount, { aliveOnly: true });
+            this.manager.log.add(`${sourceName} granted ${effect.amount} XP to party!`, { category: 'loot_xp' });
         } else {
             let job = this.manager.jobs.getObjectByID(effect.job);
             if(job !== undefined) {
                 job.addXP(effect.amount);
-                this.manager.log.add(`${sourceName} granted ${effect.amount} XP!`);
+                this.manager.log.add(`${sourceName} granted ${effect.amount} XP!`, { category: 'loot_xp' });
             }
         }
     }
@@ -404,6 +412,13 @@ export class AdventuringDungeon extends AdventuringPage {
             this.tileCount.set(tile, 0);
         });
 
+        // Initialize CombatTracker for this run
+        this.manager.combatTracker.startRun({
+            area: this.area,
+            difficulty: this.difficulty,
+            party: this.manager.party.all
+        });
+
         this.manager.consumables.onDungeonStart();
 
         this.applyMasteryAuras();
@@ -432,7 +447,7 @@ export class AdventuringDungeon extends AdventuringPage {
                         member.auras.buildEffects();
                     }
                 });
-                this.manager.log.add(`${area.name} Mastery Aura activated!`);
+                this.manager.log.add(`${area.name} Mastery Aura activated!`, { category: 'dungeon_progress' });
             }
         });
     }
@@ -456,13 +471,16 @@ export class AdventuringDungeon extends AdventuringPage {
     abandon() {
         if(this.manager.encounter.isFighting) {
             this.manager.encounter.all.forEach(member => {
-                let resolvedEffects = member.trigger('encounter_end');
+                member.trigger('encounter_end');
             });
             this.manager.encounter.reset();
         }
 
+        // End the run tracking (abandoned)
+        this.manager.combatTracker.endRun(false);
+
         if(this.area !== undefined)
-            this.manager.log.add(`Abandoned ${this.area.name} on floor ${this.progress+1}`);
+            this.manager.log.add(`Abandoned ${this.area.name} on floor ${this.progress+1}`, { category: 'dungeon_progress' });
 
         this.manager.overview.renderQueue.buffs = true;
         this.manager.consumables.onDungeonEnd();
@@ -476,17 +494,13 @@ export class AdventuringDungeon extends AdventuringPage {
     }
 
     complete() {
-        this.manager.log.add(`Completed ${this.area.name}`);
+        this.manager.log.add(`Completed ${this.area.name}`, { category: 'dungeon_progress' });
 
         if (this.area) {
-            const difficultyXPBonus = this.getBonus('xp_percent') / 100;
-            const completionXP = 250;
-            const areaXP = Math.floor(completionXP * (1 + difficultyXPBonus));
-            this.area.addXP(areaXP);
+            this.area.addXP(Math.floor(250 * this.getDifficultyXPMultiplier()));
         }
 
-        const difficulty = this.difficulty ? this.difficulty.id.replace('adventuring:', '') : 'normal';
-        this.manager.achievementManager.recordDungeonClear(this.area, difficulty, this.isEndless, this.endlessWave);
+        this.manager.achievementManager.recordDungeonClear(this.area, this.difficulty, this.isEndless, this.endlessWave);
         this.manager.slayers.onDungeonCleared(this.area);
 
         this.manager.overview.renderQueue.buffs = true;
@@ -497,28 +511,64 @@ export class AdventuringDungeon extends AdventuringPage {
 
             if(this.isEndless) {
                 this.endlessWave++;
-                this.manager.log.add(`Endless Wave ${this.endlessWave + 1} starting...`);
+                this.manager.log.add(`Endless Wave ${this.endlessWave + 1} starting...`, { category: 'dungeon_progress' });
 
                 this.effectCache.invalidateAll();
 
                 this.area.updateBestEndlessStreak(this.endlessWave);
+
+                // Continue endless wave (don't reset run stats)
+                const waveStats = this.manager.combatTracker.run;
+                this.manager.combatTracker.continueEndlessWave();
+
+                // Fire achievement trigger for endless wave completion
+                this.manager.achievementManager.trigger('endless_wave', {
+                    area: this.area,
+                    difficulty: this.difficulty,
+                    wave: this.endlessWave,
+                    runStats: waveStats,
+                    wasFlawless: waveStats.wasFlawless,
+                    isSolo: waveStats.isSolo
+                });
 
                 this.progress = 0;
                 this.next();
                 return;
             }
 
+            // End the run tracking (completed successfully)
+            const runStats = this.manager.combatTracker.run;
+            this.manager.combatTracker.endRun(true);
+
+            // Fire achievement triggers for dungeon completion
+            this.manager.achievementManager.trigger('dungeon_end', {
+                area: this.area,
+                difficulty: this.difficulty,
+                runStats: runStats,
+                wasFlawless: runStats.wasFlawless,
+                isSolo: runStats.isSolo,
+                partySize: runStats.partySize,
+                isEndless: this.isEndless,
+                endlessWave: this.endlessWave,
+                turnsElapsed: runStats.turnsElapsed,
+                damageDealt: runStats.damageDealt,
+                damageTaken: runStats.damageTaken
+            });
+
             this.manager.triggerEffects('dungeon_end', {});
 
-            this.manager.log.add(`Auto-repeating ${this.area.name}...`);
+            this.manager.log.add(`Auto-repeating ${this.area.name}...`, { category: 'dungeon_progress' });
             this._beginRun();
 
         } else {
 
             if(this.isEndless && this.endlessWave > 0) {
-                this.manager.log.add(`Endless run ended at Wave ${this.endlessWave + 1}!`);
+                this.manager.log.add(`Endless run ended at Wave ${this.endlessWave + 1}!`, { category: 'dungeon_progress' });
                 this.area.updateBestEndlessStreak(this.endlessWave);
             }
+
+            // End the run tracking (party wiped)
+            this.manager.combatTracker.endRun(false);
 
             this.reset();
             this.manager.stop();

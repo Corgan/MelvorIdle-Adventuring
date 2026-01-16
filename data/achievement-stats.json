@@ -1,0 +1,369 @@
+{
+    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+    "namespace": "adventuring",
+    "data": {
+        "skillData": [
+            {
+                "skillID": "adventuring:Adventuring",
+                "data": {
+                    "achievementStats": [
+                        {
+                            "id": "total_kills",
+                            "name": "Total Kills",
+                            "description": "Total monsters killed",
+                            "media": "melvor:assets/media/skills/combat/combat.png",
+                            "category": "combat",
+                            "triggers": [
+                                "monster_killed"
+                            ],
+                            "aggregation": "count"
+                        },
+                        {
+                            "id": "kills_by_tag",
+                            "name": "Kills by Type",
+                            "description": "Monster kills grouped by tag",
+                            "media": "melvor:assets/media/skills/combat/combat.png",
+                            "category": "combat",
+                            "triggers": [
+                                "monster_killed"
+                            ],
+                            "aggregation": "map_count",
+                            "keyPath": "monster.tags",
+                            "keyRegistry": "tags",
+                            "expandKeys": true,
+                            "showInGlobalStats": false
+                        },
+                        {
+                            "id": "total_damage",
+                            "name": "Total Damage",
+                            "description": "Total damage dealt in combat",
+                            "media": "melvor:assets/media/skills/strength/strength.png",
+                            "category": "combat",
+                            "triggers": [
+                                "combat_end"
+                            ],
+                            "aggregation": "sum",
+                            "valuePath": "totalDamage",
+                            "valueType": "float64"
+                        },
+                        {
+                            "id": "total_healing",
+                            "name": "Total Healing",
+                            "description": "Total HP healed in combat",
+                            "media": "melvor:assets/media/skills/hitpoints/hitpoints.png",
+                            "category": "combat",
+                            "triggers": [
+                                "combat_end"
+                            ],
+                            "aggregation": "sum",
+                            "valuePath": "totalHealing",
+                            "valueType": "float64"
+                        },
+                        {
+                            "id": "flawless_wins",
+                            "name": "Flawless Victories",
+                            "description": "Area completions without taking damage",
+                            "media": "melvor:assets/media/bank/Golden_Star.png",
+                            "category": "combat",
+                            "triggers": [
+                                "dungeon_end"
+                            ],
+                            "aggregation": "count",
+                            "conditions": {
+                                "wasFlawless": true
+                            }
+                        },
+                        {
+                            "id": "last_stand_wins",
+                            "name": "Last Stand Victories",
+                            "description": "Area completions with only one hero surviving",
+                            "media": "melvor:assets/media/skills/combat/combat.png",
+                            "category": "combat",
+                            "triggers": [
+                                "dungeon_end"
+                            ],
+                            "aggregation": "count",
+                            "conditions": {
+                                "wasLastStand": true
+                            }
+                        },
+                        {
+                            "id": "solo_wins",
+                            "name": "Solo Victories",
+                            "description": "Area completions with a single hero",
+                            "media": "melvor:assets/media/skills/combat/combat.png",
+                            "category": "combat",
+                            "triggers": [
+                                "dungeon_end"
+                            ],
+                            "aggregation": "count",
+                            "conditions": {
+                                "isSolo": true
+                            }
+                        },
+                        {
+                            "id": "clears_by_difficulty",
+                            "name": "Clears by Difficulty",
+                            "description": "Area completions grouped by difficulty",
+                            "media": "melvor:assets/media/main/statistics_header.png",
+                            "category": "dungeon",
+                            "triggers": [
+                                "dungeon_end"
+                            ],
+                            "aggregation": "map_count",
+                            "keyPath": "difficulty",
+                            "keyRegistry": "difficulties"
+                        },
+                        {
+                            "id": "solo_clears",
+                            "name": "Solo Clears",
+                            "description": "Solo area completions by area and difficulty",
+                            "media": "melvor:assets/media/skills/combat/combat.png",
+                            "category": "dungeon",
+                            "triggers": [
+                                "dungeon_end"
+                            ],
+                            "aggregation": "nested_map_count",
+                            "keyPath": [
+                                "area",
+                                "difficulty"
+                            ],
+                            "keyRegistries": [
+                                "areas",
+                                "difficulties"
+                            ],
+                            "conditions": {
+                                "isSolo": true
+                            },
+                            "showInGlobalStats": false
+                        },
+                        {
+                            "id": "best_endless_wave",
+                            "name": "Best Endless Wave",
+                            "description": "Highest wave reached in Endless mode",
+                            "media": "melvor:assets/media/main/question.png",
+                            "category": "dungeon",
+                            "triggers": [
+                                "endless_wave"
+                            ],
+                            "aggregation": "max",
+                            "valuePath": "wave"
+                        },
+                        {
+                            "id": "total_endless_waves",
+                            "name": "Total Endless Waves",
+                            "description": "Total waves completed in Endless mode",
+                            "media": "melvor:assets/media/main/question.png",
+                            "category": "dungeon",
+                            "triggers": [
+                                "endless_wave"
+                            ],
+                            "aggregation": "sum",
+                            "valuePath": "wave"
+                        },
+                        {
+                            "id": "total_materials",
+                            "name": "Materials Collected",
+                            "description": "Total crafting materials collected",
+                            "media": "melvor:assets/media/skills/crafting/crafting.png",
+                            "category": "resources",
+                            "triggers": [
+                                "materials_gained"
+                            ],
+                            "aggregation": "sum",
+                            "valuePath": "quantity"
+                        },
+                        {
+                            "id": "total_currency_earned",
+                            "name": "Currency Earned",
+                            "description": "Total currency earned from dungeons",
+                            "media": "melvor:assets/media/main/coins.png",
+                            "category": "resources",
+                            "triggers": [
+                                "currency_gained"
+                            ],
+                            "aggregation": "sum",
+                            "valuePath": "quantity"
+                        },
+                        {
+                            "id": "unique_monsters_seen",
+                            "name": "Unique Monsters",
+                            "description": "Number of unique monsters discovered",
+                            "media": "melvor:assets/media/skills/combat/combat.png",
+                            "category": "exploration",
+                            "triggers": [
+                                "monster_discovered"
+                            ],
+                            "aggregation": "count"
+                        },
+                        {
+                            "id": "slayer_tasks_completed",
+                            "name": "Slayer Tasks Completed",
+                            "description": "Total slayer tasks completed",
+                            "media": "melvor:assets/media/skills/slayer/slayer.png",
+                            "category": "progression",
+                            "triggers": [
+                                "slayer_task_completed"
+                            ],
+                            "aggregation": "count"
+                        },
+                        {
+                            "id": "buffs_applied",
+                            "name": "Buffs Applied",
+                            "description": "Total buffs applied to allies",
+                            "media": "melvor:assets/media/skills/prayer/prayer.png",
+                            "category": "combat",
+                            "triggers": [
+                                "buff_applied"
+                            ],
+                            "aggregation": "count"
+                        },
+                        {
+                            "id": "debuffs_applied",
+                            "name": "Debuffs Applied",
+                            "description": "Total debuffs applied to enemies",
+                            "media": "melvor:assets/media/skills/magic/magic.png",
+                            "category": "combat",
+                            "triggers": [
+                                "debuff_applied"
+                            ],
+                            "aggregation": "count"
+                        },
+                        {
+                            "id": "floors_explored",
+                            "name": "Floors Explored",
+                            "description": "Total dungeon floors explored",
+                            "media": "melvor:assets/media/skills/thieving/thieving.png",
+                            "category": "exploration",
+                            "triggers": [
+                                "floor_completed"
+                            ],
+                            "aggregation": "count"
+                        },
+                        {
+                            "id": "special_tiles_found",
+                            "name": "Special Tiles Found",
+                            "description": "Special tiles discovered during exploration",
+                            "media": "melvor:assets/media/bank/Treasure_Chest.png",
+                            "category": "exploration",
+                            "triggers": [
+                                "special_tile_found"
+                            ],
+                            "aggregation": "count"
+                        },
+                        {
+                            "id": "items_produced",
+                            "name": "Items Produced",
+                            "description": "Total items produced in town",
+                            "media": "melvor:assets/media/skills/crafting/crafting.png",
+                            "category": "town",
+                            "triggers": [
+                                "item_produced"
+                            ],
+                            "aggregation": "count"
+                        },
+                        {
+                            "id": "materials_produced",
+                            "name": "Materials Produced",
+                            "description": "Crafting materials produced in town",
+                            "media": "melvor:assets/media/skills/crafting/crafting.png",
+                            "category": "town",
+                            "triggers": [
+                                "item_produced"
+                            ],
+                            "aggregation": "count",
+                            "conditions": {
+                                "itemType": "material"
+                            }
+                        },
+                        {
+                            "id": "consumables_produced",
+                            "name": "Consumables Produced",
+                            "description": "Consumable items produced in town",
+                            "media": "melvor:assets/media/skills/herblore/herblore.png",
+                            "category": "town",
+                            "triggers": [
+                                "item_produced"
+                            ],
+                            "aggregation": "count",
+                            "conditions": {
+                                "itemType": "consumable"
+                            }
+                        },
+                        {
+                            "id": "conversions_completed",
+                            "name": "Conversions Completed",
+                            "description": "Item conversions completed in town",
+                            "media": "melvor:assets/media/skills/smithing/smithing.png",
+                            "category": "town",
+                            "triggers": [
+                                "conversion_completed"
+                            ],
+                            "aggregation": "count"
+                        },
+                        {
+                            "id": "production_by_job",
+                            "name": "Production by Job",
+                            "description": "Items produced grouped by job",
+                            "media": "melvor:assets/media/skills/crafting/crafting.png",
+                            "category": "town",
+                            "triggers": [
+                                "item_produced"
+                            ],
+                            "aggregation": "map_count",
+                            "keyPath": "job",
+                            "keyRegistry": "jobs",
+                            "showInGlobalStats": false
+                        },
+                        {
+                            "id": "equipment_upgrades",
+                            "name": "Equipment Upgrades",
+                            "description": "Total equipment upgrades performed",
+                            "media": "melvor:assets/media/skills/smithing/smithing.png",
+                            "category": "equipment",
+                            "triggers": [
+                                "equipment_upgraded"
+                            ],
+                            "aggregation": "count"
+                        },
+                        {
+                            "id": "equipment_crafted",
+                            "name": "Equipment Crafted",
+                            "description": "Total equipment pieces crafted",
+                            "media": "melvor:assets/media/skills/crafting/crafting.png",
+                            "category": "equipment",
+                            "triggers": [
+                                "equipment_crafted"
+                            ],
+                            "aggregation": "count"
+                        },
+                        {
+                            "id": "combat_materials_collected",
+                            "name": "Combat Materials",
+                            "description": "Materials collected from combat drops",
+                            "media": "melvor:assets/media/skills/crafting/crafting.png",
+                            "category": "resources",
+                            "triggers": [
+                                "combat_materials_gained"
+                            ],
+                            "aggregation": "sum",
+                            "valuePath": "quantity"
+                        },
+                        {
+                            "id": "combat_currency_earned",
+                            "name": "Combat Currency",
+                            "description": "Currency earned from combat drops",
+                            "media": "melvor:assets/media/main/coins.png",
+                            "category": "resources",
+                            "triggers": [
+                                "combat_currency_gained"
+                            ],
+                            "aggregation": "sum",
+                            "valuePath": "quantity"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

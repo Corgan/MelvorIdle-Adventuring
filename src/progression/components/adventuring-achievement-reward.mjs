@@ -65,5 +65,17 @@ export class AdventuringAchievementRewardElement extends HTMLElement {
         this.icon.classList.add('d-none');
         if(tooltipContent) this.setTooltip(tooltipContent);
     }
+
+    setJob(jobName, iconSrc, tooltipContent) {
+        this.text.textContent = jobName;
+        this.text.className = 'text-info';
+        if(iconSrc) {
+            this.icon.src = iconSrc;
+            this.icon.classList.remove('d-none');
+        } else {
+            this.icon.classList.add('d-none');
+        }
+        if(tooltipContent) this.setTooltip(tooltipContent);
+    }
 }
 window.customElements.define('adventuring-achievement-reward', AdventuringAchievementRewardElement);

@@ -409,9 +409,9 @@ export class AdventuringMonsterDetails extends AdventuringDetailsPage {
             const itemChance = totalWeight > 0 ? (poolEntry.weight / totalWeight) : 0;
             const chanceText = `${(itemChance * 100).toFixed(1)}%`;
 
-            const isDropped = item.dropped;
+            const isUnlocked = item.unlocked;
 
-            const displayName = isDropped ? `✓ ${item.name}` : '???';
+            const displayName = isUnlocked ? `✓ ${item.name}` : '???';
             const tooltipContent = TooltipBuilder.forEquipment(item, this.manager).build();
             const itemRow = lootRowPool.acquire();
             itemRow.setLoot({
@@ -422,7 +422,7 @@ export class AdventuringMonsterDetails extends AdventuringDetailsPage {
                 chance: chanceText,
                 nested: true,
                 tooltipContent,
-                collected: isDropped
+                collected: isUnlocked
             });
             rows.push(itemRow);
         });

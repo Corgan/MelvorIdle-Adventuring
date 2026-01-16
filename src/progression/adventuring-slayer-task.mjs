@@ -166,8 +166,8 @@ export class AdventuringSlayerTask {
     }
 
     get currentProgress() {
-        if (this.isStatTask && this.target.statName) {
-            const currentValue = this.getStatValue(this.target.statName);
+        if (this.isStatTask && this.target.stat) {
+            const currentValue = this.getStatValue(this.target.stat);
             const starting = isNaN(this.startingValue) ? 0 : this.startingValue;
             return Math.max(0, currentValue - starting);
         }
@@ -200,14 +200,10 @@ export class AdventuringSlayerTask {
         }
     }
 
-    getStatValue(statName) {
+    getStatValue(stat) {
         if (!this.manager.achievementManager) return 0;
         const stats = this.manager.achievementManager.stats;
-        const value = stats[statName];
-        if (value === undefined || value === null || isNaN(value)) {
-            return 0;
-        }
-        return value;
+        return stats.get(stat);
     }
 
     get description() {
@@ -232,13 +228,15 @@ export class AdventuringSlayerTask {
         this.renderQueue.progress = true;
 
         if(this.completed) {
-            this.manager.log.add(`Task complete: ${this.description}`);
+            this.manager.log.add(`Task complete: ${this.description}`, {
+                category: 'slayer'
+            });
         }
     }
 
     initializeStatTask() {
-        if (this.isStatTask && this.target.statName) {
-            this.startingValue = this.getStatValue(this.target.statName);
+        if (this.isStatTask && this.target.stat) {
+            this.startingValue = this.getStatValue(this.target.stat);
         }
     }
 
@@ -270,14 +268,22 @@ export class AdventuringSlayerTask {
     encode(writer) {
         writer.writeNamespacedObject(this.taskType);
 
-        // Write target type: 0 = regular, 1 = tag, 2 = stat
+        // Write target type: 0 = regular, 1 = tag, 2 = stat, 3 = difficulty, 4 = endless
         const isTagTarget = this.target && this.target.isTagTarget;
-        const isStatTarget = this.target && this.target.isStatTarget;
+        const isStatTarget = this.target && this.target.isStatTarget && this.target.stat;
+        const isDifficultyTarget = this.target && this.target.isDifficultyTarget;
+        const isEndlessTarget = this.target && this.target.isEndlessTarget;
         
         if (isStatTarget) {
             writer.writeUint8(2);
-            writer.writeString(this.target.statName || '');
+            writer.writeNamespacedObject(this.target.stat);
             writer.writeFloat64(this.startingValue); // Save starting value for stat tasks
+        } else if (isDifficultyTarget) {
+            writer.writeUint8(3);
+            writer.writeNamespacedObject(this.target.difficulty);
+        } else if (isEndlessTarget) {
+            writer.writeUint8(4);
+            // No additional data needed for endless
         } else if (isTagTarget) {
             writer.writeUint8(1);
             writer.writeNamespacedObject(this.target.tag);
@@ -314,14 +320,36 @@ export class AdventuringSlayerTask {
         
         if (targetType === 2) {
             // Stat target
-            const statName = reader.getString();
+            const stat = reader.getNamespacedObject(this.manager.achievementStats);
             this.startingValue = reader.getFloat64(); // Load starting value for stat tasks
+            if (stat && typeof stat !== 'string') {
+                this.target = {
+                    id: `stat:${stat.localID}`,
+                    name: this.taskType ? this.taskType.name : 'Task',
+                    media: stat.media || cdnMedia('assets/media/main/statistics_header.png'),
+                    isStatTarget: true,
+                    stat: stat
+                };
+            }
+        } else if (targetType === 3) {
+            // Difficulty target
+            const difficulty = reader.getNamespacedObject(this.manager.difficulties);
+            if (difficulty && typeof difficulty !== 'string') {
+                this.target = {
+                    id: `difficulty:${difficulty.localID}`,
+                    name: difficulty.name,
+                    media: difficulty.media || cdnMedia('assets/media/main/statistics_header.png'),
+                    isDifficultyTarget: true,
+                    difficulty: difficulty
+                };
+            }
+        } else if (targetType === 4) {
+            // Endless target - no data to read
             this.target = {
-                id: `stat:${statName}`,
-                name: this.taskType ? this.taskType.name : 'Task',
+                id: 'endless:waves',
+                name: 'Endless Mode',
                 media: cdnMedia('assets/media/main/statistics_header.png'),
-                isStatTarget: true,
-                statName: statName
+                isEndlessTarget: true
             };
         } else if (targetType === 1) {
             // Tag target
@@ -339,7 +367,7 @@ export class AdventuringSlayerTask {
                 };
             }
         } else {
-            // Regular target
+            // Regular target (type 0)
             const registry = this.getTargetRegistry() || this.manager.monsters;
             const target = reader.getNamespacedObject(registry);
             if(typeof target !== 'string' && target !== undefined) {
@@ -408,10 +436,16 @@ export class SlayerTaskGenerator {
                 target = this.pickAreaTarget();
                 break;
             case 'stat':
-            case 'difficulty':
-            case 'endless_wave':
-                // These don't need a specific target - create a placeholder
+                // Stat-based tasks use achievement stats
                 target = this.createStatTarget(taskType);
+                break;
+            case 'difficulty':
+                // Difficulty tasks don't need a stat - create a simple target
+                target = this.createDifficultyTarget(taskType);
+                break;
+            case 'endless_wave':
+                // Endless wave tasks don't need a stat - create a simple target
+                target = this.createEndlessTarget(taskType);
                 break;
         }
 
@@ -425,12 +459,52 @@ export class SlayerTaskGenerator {
 
     // Create a placeholder target for stat-based tasks
     createStatTarget(taskType) {
+        // Map task targetStat to achievement stat ID
+        const statIdMap = {
+            'totalDamage': 'total_damage',
+            'totalHealing': 'total_healing',
+            'debuffsApplied': 'debuffs_applied',
+            'buffsApplied': 'buffs_applied',
+            'totalCurrencyEarned': 'total_currency_earned',
+            'floorsExplored': 'floors_explored',
+            'specialTilesFound': 'special_tiles_found'
+        };
+        const statLocalId = statIdMap[taskType.targetStat] || taskType.targetStat;
+        const stat = this.manager.achievementStats.getObjectByID(`adventuring:${statLocalId}`);
+        
+        if (!stat) {
+            console.warn(`[Adventuring] Stat not found for slayer task: adventuring:${statLocalId} (from targetStat: ${taskType.targetStat})`);
+            return null; // Return null so task generation fails gracefully
+        }
+        
         return {
             id: `stat:${taskType.targetStat || taskType.targetType}`,
             name: taskType.name,
-            media: cdnMedia('assets/media/main/statistics_header.png'),
+            media: stat.media || cdnMedia('assets/media/main/statistics_header.png'),
             isStatTarget: true,
-            statName: taskType.targetStat
+            stat: stat
+        };
+    }
+
+    // Create target for difficulty-based tasks (Heroic, Mythic clears)
+    createDifficultyTarget(taskType) {
+        const difficulty = this.manager.difficulties.getObjectByID(`adventuring:${taskType.targetDifficulty}`);
+        return {
+            id: `difficulty:${taskType.targetDifficulty}`,
+            name: difficulty?.name || taskType.targetDifficulty,
+            media: difficulty?.media || cdnMedia('assets/media/main/statistics_header.png'),
+            isDifficultyTarget: true,
+            difficulty: difficulty
+        };
+    }
+
+    // Create target for endless wave tasks
+    createEndlessTarget(taskType) {
+        return {
+            id: 'endless:waves',
+            name: 'Endless Mode',
+            media: cdnMedia('assets/media/main/statistics_header.png'),
+            isEndlessTarget: true
         };
     }
 

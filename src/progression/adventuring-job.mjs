@@ -26,7 +26,9 @@ export class AdventuringJob extends AdventuringMasteryAction {
 
         this.stats = new AdventuringStats(this.manager, this.game);
 
-        this.isPassive = data.isPassive === true;
+        this.isPassive = data.isPassive === true;
+
+
         let tier = this.isPassive ? 0 : this.detectTierFromRequirements(data.requirements);
         if (data.tier !== undefined) {
             tier = data.tier;
@@ -97,8 +99,9 @@ export class AdventuringJob extends AdventuringMasteryAction {
     }
 
     calculateStats() {
-        this.stats.reset();
-        const statBonus = this.manager.modifiers.getJobStatBonus(this);
+        this.stats.reset();
+
+        const statBonus = this.manager.party.getJobStatBonus(this);
 
         this.scaling.forEach((value, stat) => {
             const baseValue = Math.floor(this.level * value);
@@ -106,21 +109,40 @@ export class AdventuringJob extends AdventuringMasteryAction {
         });
     }
 
-    getPassivesForTrigger(character, triggerType) {
-        const results = [];
+    /**
+     * Get all passive effects for this job that the character can use.
+     * @param {Object} character - The character using this job
+     * @returns {Array} Array of flat effects with source metadata
+     */
+    getPassiveEffects(character) {
+        const results = [];
         const passives = this.manager.getPassivesForJob(this);
 
-        for (const passive of passives) {
-            if (!passive.canEquip(character)) continue;
+        for (const passive of passives) {
+            if (!passive.canEquip(character)) continue;
             if (!passive.effects) continue;
+            
             for (const effect of passive.effects) {
-                if (effect.trigger === triggerType) {
-                    results.push({ passive, effect });
-                }
+                results.push({
+                    ...effect,
+                    source: passive,
+                    sourceName: `${this.name} (${passive.name})`,
+                    sourceType: 'jobPassive'
+                });
             }
         }
 
         return results;
+    }
+
+    /**
+     * Get job passive effects for a trigger type.
+     * @param {Object} character - The character using this job
+     * @param {string} triggerType - The trigger type to filter by
+     * @returns {Array} Array of flat effects with source metadata
+     */
+    getPassivesForTrigger(character, triggerType) {
+        return this.getPassiveEffects(character).filter(e => e.trigger === triggerType);
     }
 
     postDataRegistration() {

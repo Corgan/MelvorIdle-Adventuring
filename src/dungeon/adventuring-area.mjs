@@ -52,7 +52,8 @@ export class AdventuringArea extends AdventuringMasteryAction {
                 this.manager.selectArea(this);
         };
 
-        this.component.difficultyButton.onclick = (e) => {
+        // Prevent card click when clicking on controls area (buttons, dropdown, etc)
+        this.component.controls.onclick = (e) => {
             e.stopPropagation();
         };
 
@@ -119,7 +120,9 @@ export class AdventuringArea extends AdventuringMasteryAction {
         if(!difficulty) return;
 
         if(!difficulty.isUnlocked(this)) {
-            this.manager.log.add(`${difficulty.name} mode requires Mastery Level ${difficulty.unlockLevel}!`);
+            this.manager.log.add(`${difficulty.name} mode requires Mastery Level ${difficulty.unlockLevel}!`, {
+                category: 'dungeon_events'
+            });
             return;
         }
 
@@ -214,15 +217,17 @@ export class AdventuringArea extends AdventuringMasteryAction {
     updateBestEndlessStreak(waves) {
         if(waves > this.bestEndlessStreak) {
             this.bestEndlessStreak = waves;
-            this.manager.log.add(`New endless record: ${waves} waves!`);
+            this.manager.log.add(`New endless record: ${waves} waves!`, {
+                category: 'achievements'
+            });
             this.renderQueue.tooltip = true;
         }
     }
 
     getMasteryBonuses() {
 
-        const xpBonus = this.manager.modifiers.getDungeonXPBonus(this);
-        const exploreSpeedBonus = this.manager.modifiers.getExploreSpeedBonus(this);
+        const xpBonus = this.manager.party.getDungeonXPBonus(this);
+        const exploreSpeedBonus = this.manager.party.getExploreSpeedBonus(this);
 
         return { xpBonus, exploreSpeedBonus };
     }
@@ -243,10 +248,10 @@ export class AdventuringArea extends AdventuringMasteryAction {
 
     getTileModifiers() {
 
-        const trapMod = this.manager.modifiers.getTrapSpawnRateMod();
-        const fountainMod = this.manager.modifiers.getFountainSpawnRateMod();
-        const treasureMod = this.manager.modifiers.getTreasureSpawnRateMod();
-        const shrineMod = this.manager.modifiers.getShrineSpawnRateMod();
+        const trapMod = this.manager.party.getTrapSpawnRateMod();
+        const fountainMod = this.manager.party.getFountainSpawnRateMod();
+        const treasureMod = this.manager.party.getTreasureSpawnRateMod();
+        const shrineMod = this.manager.party.getShrineSpawnRateMod();
 
         const modifiers = {};
 

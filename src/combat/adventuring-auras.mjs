@@ -1,7 +1,7 @@
 const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringAuraInstance } = await loadModule('src/combat/adventuring-aura-instance.mjs');
-const { createEffect, evaluateCondition, buildEffectContext } = await loadModule('src/core/adventuring-utils.mjs');
+const { createEffect, evaluateCondition, buildEffectContext, defaultEffectProcessor } = await loadModule('src/core/adventuring-utils.mjs');
 
 const { AdventuringAurasElement } = await loadModule('src/combat/components/adventuring-auras.mjs');
 
@@ -19,11 +19,7 @@ export class AdventuringAuras {
 
         this.auras = new Set();
 
-
-
         this.aurasByBase = new Map();
-
-        this.effectByType = new Map();
 
         this.component = createElement('adventuring-auras');
 
@@ -34,46 +30,6 @@ export class AdventuringAuras {
         this.renderQueue.auras = true;
     }
 
-    getEffectsForTrigger(type, context = {}) {
-        const results = [];
-        const resolved = this.effectByType.get(type) || [];
-
-        if (type === 'round_end') {
-            this.incrementAges();
-        }
-
-        for (const { effect, instance } of resolved) {
-            if (instance.base === undefined || instance.stacks <= 0) continue;
-
-            const amount = effect.getAmount ? effect.getAmount(instance) : (effect.amount || 0);
-            const stacks = instance.stacks;
-
-            results.push({
-                effect: {
-                    ...effect,
-                    amount,
-                    stacks,
-
-                    type: effect.type,
-                    trigger: effect.trigger,
-                    target: effect.target,
-                    party: effect.party,
-                    condition: effect.condition,
-                    chance: effect.chance,
-                    limit: effect.limit,
-                    times: effect.times,
-                    id: effect.id,
-                    consume: effect.consume
-                },
-                source: instance,  // Keep instance reference for self-modifying effects
-                sourceName: instance.base.name,
-                sourceType: 'aura'
-            });
-        }
-
-        return results;
-    }
-
     incrementAges() {
         for (const auraInstance of this.auras.values()) {
             if (auraInstance.base === undefined || auraInstance.stacks <= 0) continue;
@@ -81,8 +37,18 @@ export class AdventuringAuras {
         }
     }
 
-    getEffects() {
-        const effects = [];
+    /**
+     * Get effects from active auras
+     * @param {Object} filters - Optional filters (trigger, party, type, etc.)
+     * @returns {Array} Filtered effects with source metadata
+     */
+    getEffects(filters = {}) {
+        // Handle legacy string trigger parameter
+        if (typeof filters === 'string') {
+            filters = { trigger: filters };
+        }
+        
+        let effects = [];
 
         for(const auraInstance of this.auras.values()) {
             if(auraInstance.base === undefined || auraInstance.stacks <= 0) continue;
@@ -98,11 +64,23 @@ export class AdventuringAuras {
                         trigger: trigger,
                         type: type,
                         stat: effectData.id,
-                        value: value
+                        value: value,
+                        party: effectData.party
                     },
                     auraInstance,
-                    auraInstance.base.name
+                    auraInstance.base.name,
+                    'aura'
                 ));
+            });
+        }
+
+        // Apply filters
+        if (filters && Object.keys(filters).length > 0) {
+            effects = effects.filter(effect => {
+                if (filters.trigger !== undefined && effect.trigger !== filters.trigger) return false;
+                if (filters.party !== undefined && effect.party !== filters.party) return false;
+                if (filters.type !== undefined && effect.type !== filters.type) return false;
+                return true;
             });
         }
 
@@ -123,13 +101,20 @@ export class AdventuringAuras {
                             extra: { source: aura.source, aura: aura.base }
                         };
                         for (const effect of removedEffects) {
-                            this.character.processEffect(effect, aura, ctx);
+                            defaultEffectProcessor.processEffect(
+                                effect,
+                                effect.amount || 0,
+                                effect.stacks || 1,
+                                aura.base?.name || 'Aura',
+                                ctx
+                            );
                         }
                     }
                 }
 
                 this._removeFromCache(aura.base, aura.source);
                 this.auras.delete(aura);
+                this.renderQueue.auras = true;
             }
         }
     }
@@ -141,7 +126,6 @@ export class AdventuringAuras {
         }
         this.auras.clear();
         this.aurasByBase.clear();
-        this.effectByType.clear();
         this.renderQueue.auras = true;
 
         if(this.character && this.character.effectCache) {
@@ -151,24 +135,6 @@ export class AdventuringAuras {
 
     buildEffects() {
         this.cleanAuras();
-        this.effectByType.clear();
-
-        let auras = this.auras.values();
-
-        for(let auraInstance of auras) {
-            if(auraInstance.base !== undefined && auraInstance.stacks > 0) {
-                auraInstance.base.effects.forEach(effect => {
-                    let existing = this.effectByType.get(effect.trigger);
-                    if(existing === undefined)
-                        existing = [];
-                    existing.push({
-                        instance: auraInstance,
-                        effect: effect
-                    });
-                    this.effectByType.set(effect.trigger, existing);
-                });
-            }
-        }
     }
 
     _captureSnapshot(source) {

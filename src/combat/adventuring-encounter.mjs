@@ -1,15 +1,12 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { sortByAgility, resolveTargets, PassiveEffectProcessor } = await loadModule('src/core/adventuring-utils.mjs');
+const { sortByAgility, resolveTargets, PassiveEffectProcessor, awardCombatXP } = await loadModule('src/core/adventuring-utils.mjs');
 const { AdventuringPage } = await loadModule('src/ui/adventuring-page.mjs');
 
 const { AdventuringGenerator } = await loadModule('src/dungeon/adventuring-generator.mjs');
 const { AdventuringSpender } = await loadModule('src/town/adventuring-spender.mjs');
 const { AdventuringCard } = await loadModule('src/progression/adventuring-card.mjs');
 const { AdventuringDungeonFloor } = await loadModule('src/dungeon/adventuring-dungeon-floor.mjs');
-
-const { AdventuringEnemy } = await loadModule('src/entities/adventuring-enemy.mjs');
-const { AdventuringHero } = await loadModule('src/entities/adventuring-hero.mjs');
 
 const { AdventuringHeroParty, AdventuringEnemyParty } = await loadModule('src/entities/adventuring-party.mjs');
 
@@ -72,6 +69,17 @@ export class AdventuringEncounter extends AdventuringPage {
         return this.turnTimer;
     }
 
+    /**
+     * Trigger an event on the hero party, enemy party, and all individual combatants.
+     * @param {string} triggerName - The trigger name
+     * @param {Object} context - Context to pass to handlers
+     */
+    _triggerAll(triggerName, context = {}) {
+        this.manager.party.trigger(triggerName, context);
+        this.party.trigger(triggerName, context);
+        this.all.forEach(member => member.trigger(triggerName, context));
+    }
+
     onLoad() {
         super.onLoad();
         this.party.onLoad();
@@ -96,12 +104,15 @@ export class AdventuringEncounter extends AdventuringPage {
     }
 
     startEncounter() {
+        // Initialize encounter stats tracking
+        this.manager.combatTracker.startEncounter();
+
         this.currentRoundOrder = sortByAgility([...this.all].filter(c => !c.dead), this.manager.stats);
         this.nextRoundOrder = [];
         this.roundCounter = 1;
         this.isFighting = true;
 
-        const bonusEnergy = this.manager.modifiers.getBonusEnergy();
+        const bonusEnergy = this.manager.party.getBonusEnergy();
         if(bonusEnergy > 0) {
             this.heroesAlive.forEach(member => {
                 if(member.maxEnergy > 0) {
@@ -111,25 +122,15 @@ export class AdventuringEncounter extends AdventuringPage {
         }
 
         this.all.forEach(member => {
-            member.resetEffectLimits('combat');
-            member.resetEffectLimits('round');
-            member.resetEffectLimits('turn');
+            member.resetEffectLimits('combat', 'round', 'turn');
         });
-        this.manager.party.resetEffectLimits('combat');
-        this.manager.party.resetEffectLimits('round');
-        this.manager.party.resetEffectLimits('turn');
+        this.manager.party.resetEffectLimits('combat', 'round', 'turn');
 
-        this.manager.party.trigger('encounter_start', { encounter: this });
-
-        this.all.forEach(member => {
-            let resolvedEffects = member.trigger('encounter_start', { encounter: this });
-        });
+        this._triggerAll('encounter_start', { encounter: this });
 
         this.manager.tutorialManager.checkTriggers('event', { event: 'combatStart' });
 
-        this.all.forEach(member => {
-            let resolvedEffects = member.trigger('round_start', { encounter: this });
-        });
+        this._triggerAll('round_start', { encounter: this });
 
         this.nextTurn();
 
@@ -160,9 +161,7 @@ export class AdventuringEncounter extends AdventuringPage {
     }
 
     nextRound() {
-        this.all.forEach(member => {
-            let resolvedEffects = member.trigger('round_end', { encounter: this });
-        });
+        this._triggerAll('round_end', { encounter: this });
 
         // Tick town heroes (those with combatJob = none) during combat
         this.manager.town.tickTownHeroes();
@@ -173,17 +172,11 @@ export class AdventuringEncounter extends AdventuringPage {
         this.manager.overview.renderQueue.status = true;
 
         this.all.forEach(member => {
-            member.resetEffectLimits('round');
-            member.resetEffectLimits('turn');
+            member.resetEffectLimits('round', 'turn');
         });
-        this.manager.party.resetEffectLimits('round');
-        this.manager.party.resetEffectLimits('turn');
+        this.manager.party.resetEffectLimits('round', 'turn');
 
-        this.manager.party.trigger('round_start', { encounter: this });
-
-        this.all.forEach(member => {
-            let resolvedEffects = member.trigger('round_start', { encounter: this });
-        });
+        this._triggerAll('round_start', { encounter: this });
     }
 
     nextTurn() {
@@ -209,7 +202,11 @@ export class AdventuringEncounter extends AdventuringPage {
         );
 
         if (result.negated === 'miss') {
-            this.manager.log.add(`${this.currentTurn.name}'s attack misses ${target.name}!`);
+            this.manager.log.add(`${this.currentTurn.name}'s attack misses ${target.name}!`, {
+                category: 'combat_miss',
+                source: this.currentTurn,
+                target: target
+            });
             return null;
         }
         if (result.negated === 'dodge') {
@@ -253,7 +250,11 @@ export class AdventuringEncounter extends AdventuringPage {
         });
 
         if(this.passiveEffects.checkExecute(this.currentTurn, target)) {
-            this.manager.log.add(`${this.currentTurn.name} executes ${target.name}!`);
+            this.manager.log.add(`${this.currentTurn.name} executes ${target.name}!`, {
+                category: 'combat_death',
+                source: this.currentTurn,
+                target: target
+            });
             target.hitpoints = 0;
             target.damage({ amount: 0 }, this.currentTurn);
         }
@@ -261,7 +262,11 @@ export class AdventuringEncounter extends AdventuringPage {
         const reflectAmount = this.passiveEffects.calculateReflect(this.currentTurn, target, damageDealt);
         if(reflectAmount > 0) {
             this.currentTurn.damage({ amount: reflectAmount }, target);
-            this.manager.log.add(`${target.name} reflects ${reflectAmount} damage to ${this.currentTurn.name}!`);
+            this.manager.log.add(`${target.name} reflects ${reflectAmount} damage to ${this.currentTurn.name}!`, {
+                category: 'combat_damage',
+                source: target,
+                target: this.currentTurn
+            });
         }
 
         this.currentTurn.trigger('after_damage_delivered', { target, damageDealt, encounter: this, ...builtEffect });
@@ -276,26 +281,10 @@ export class AdventuringEncounter extends AdventuringPage {
     }
     
     _processDamageContributions(contributions) {
-        const difficultyXPBonus = this.manager.dungeon?.getBonus('xp_percent') / 100 || 0;
-        
         for(const contribution of contributions) {
             if(!contribution.source || !contribution.source.isHero) continue;
             if(contribution.amount <= 0) continue;
-            
-            const source = contribution.source;
-            const equipmentXP = Math.floor((contribution.amount / 2) * (1 + difficultyXPBonus));
-
-            if(source.equipment && source.equipment.slots) {
-                source.equipment.slots.forEach((slot, type) => {
-                    if(!slot.empty && !slot.occupied && slot.item) {
-                        slot.item.addXP(equipmentXP);
-                    }
-                });
-            }
-
-            if(source.combatJob && source.combatJob.isMilestoneReward) {
-                source.combatJob.addXP(Math.floor(equipmentXP / 2));
-            }
+            awardCombatXP(contribution.source, Math.floor(contribution.amount / 2), this.manager);
         }
     }
 
@@ -341,40 +330,29 @@ export class AdventuringEncounter extends AdventuringPage {
 
         let targetParty;
 
-        if(this.currentTurn instanceof AdventuringHero) {
-            if(effectParty === "ally") {
-                targetParty = this.manager.party;
-            } else if(effectParty === "enemy") {
-                targetParty = this.party;
-            }
-        } else if (this.currentTurn instanceof AdventuringEnemy) {
-            if(effectParty === "ally") {
-                targetParty = this.party;
-            } else if(effectParty === "enemy") {
-                targetParty = this.manager.party;
-            }
-        }
+        // Use polymorphic getParty() instead of instanceof checks
+        targetParty = this.currentTurn.getParty(effectParty);
 
-        let targets = [];
-        if(targetType === "self") {
-            targets = [this.currentTurn];
-        } else {
-            targets = resolveTargets(targetType, targetParty);
-        }
+        const resolveContext = {
+            party: targetParty,
+            self: this.currentTurn,
+            exclude: null
+        };
+        let targets = resolveTargets(targetType, resolveContext);
 
+        // Apply targeting modifiers (taunt/confuse) with single trigger call
         if(effectParty === "enemy" && targets.length > 0) {
-            let tauntCheck = this.currentTurn.trigger('targeting', {});
-            if(tauntCheck.forcedTarget && !tauntCheck.forcedTarget.dead) {
-                targets = [tauntCheck.forcedTarget];
-                this.manager.log.add(`${this.currentTurn.name} is forced to attack ${tauntCheck.forcedTarget.name}!`);
-            }
-        }
-
-        if(effectParty === "enemy" && targets.length > 0) {
-            let confuseCheck = this.currentTurn.trigger('targeting', {});
-            if(confuseCheck.hitAlly) {
-
-                let allyParty = this.currentTurn instanceof AdventuringHero ? this.manager.party : this.party;
+            let targetingMods = this.currentTurn.trigger('targeting', {});
+            
+            if(targetingMods.forcedTarget && !targetingMods.forcedTarget.dead) {
+                targets = [targetingMods.forcedTarget];
+                this.manager.log.add(`${this.currentTurn.name} is forced to attack ${targetingMods.forcedTarget.name}!`, {
+                    category: 'combat_mechanics',
+                    source: this.currentTurn,
+                    target: targetingMods.forcedTarget
+                });
+            } else if(targetingMods.hitAlly) {
+                let allyParty = this.currentTurn.getParty('ally');
                 let potentialAllies = allyParty.all.filter(ally => !ally.dead && ally !== this.currentTurn);
                 if(potentialAllies.length > 0) {
                     targets = [potentialAllies[Math.floor(Math.random() * potentialAllies.length)]];
@@ -413,7 +391,12 @@ export class AdventuringEncounter extends AdventuringPage {
                         if(effect.type === "damage" || effect.type === "damage_flat" || effect.type === "heal" || effect.type === "heal_flat") {
                             const critText = isCrit ? ' (CRIT!)' : '';
                             const effectVerb = (effect.type === "damage" || effect.type === "damage_flat") ? 'damages' : 'heals';
-                            this.manager.log.add(`${this.currentTurn.name} ${effectVerb} ${target.name} with ${this.currentAction.name} for ${builtEffect.amount}${critText}`);
+                            const category = (effect.type === "damage" || effect.type === "damage_flat") ? 'combat_damage' : 'combat_heal';
+                            this.manager.log.add(`${this.currentTurn.name} ${effectVerb} ${target.name} with ${this.currentAction.name} for ${builtEffect.amount}${critText}`, {
+                                category,
+                                source: this.currentTurn,
+                                target: target
+                            });
                         }
 
                         const hpPercentBefore = target.hitpointsPercent;
@@ -470,7 +453,10 @@ export class AdventuringEncounter extends AdventuringPage {
         if(isSpender && !this.isEchoAction) {
             if(this.passiveEffects.checkSpellEcho(this.currentTurn)) {
                 shouldEcho = true;
-                this.manager.log.add(`${this.currentTurn.name}'s spell echoes!`);
+                this.manager.log.add(`${this.currentTurn.name}'s spell echoes!`, {
+                    category: 'combat_mechanics',
+                    source: this.currentTurn
+                });
             }
         }
 
@@ -493,6 +479,12 @@ export class AdventuringEncounter extends AdventuringPage {
             this.currentTurn.trigger('generator', { ability: this.currentAction, encounter: this });
         }
 
+        // Track ability usage and turn in CombatTracker (only for heroes)
+        if(this.manager.combatTracker && this.currentTurn.isHero) {
+            this.manager.combatTracker.encounter.recordAbilityUsed(this.currentAction);
+            this.manager.combatTracker.encounter.recordTurn();
+        }
+
         if(shouldEcho) {
             this.isEchoAction = true;
             this.currentHit = 0;
@@ -511,7 +503,7 @@ export class AdventuringEncounter extends AdventuringPage {
 
         this.tryLearnAbility();
 
-        let resolvedEffects = this.currentTurn.trigger('turn_end');
+        this.currentTurn.trigger('turn_end');
 
         this.nextRoundOrder.push(this.currentTurn);
         this.nextRoundOrder = sortByAgility(this.nextRoundOrder, this.manager.stats);
@@ -523,11 +515,11 @@ export class AdventuringEncounter extends AdventuringPage {
             return;
         }
 
-        if(this.manager.party.all.every(hero => hero.dead)) {
+        if(this.manager.party.combatParty.every(hero => hero.dead)) {
 
             this.manager.party.trigger('party_wipe', { encounter: this });
 
-            if(this.manager.party.all.some(hero => !hero.dead)) {
+            if(this.manager.party.combatParty.some(hero => !hero.dead)) {
 
                 this.nextTurn();
                 return;
@@ -543,18 +535,35 @@ export class AdventuringEncounter extends AdventuringPage {
     }
 
     complete() {
-        this.all.forEach(member => {
-            let resolvedEffects = member.trigger('encounter_end');
-        });
+        this._triggerAll('encounter_end');
+
+        // Finalize encounter stats and aggregate into run stats
+        this.manager.combatTracker.endEncounter();
 
         this.party.all.forEach(enemy => {
             if(enemy.dead && enemy.base) {
                 this.manager.bestiary.registerKill(enemy.base);
                 this.manager.slayers.onMonsterKilled(enemy.base);
+
+                // Fire boss_killed trigger if this was a boss
+                if(enemy.isBoss) {
+                    const encounterStats = this.manager.combatTracker.encounter;
+                    this.manager.achievementManager.trigger('boss_killed', {
+                        boss: enemy.base,
+                        bossName: enemy.base.name,
+                        area: this.manager.dungeon.area,
+                        difficulty: this.manager.dungeon.difficulty,
+                        encounterStats: encounterStats,
+                        wasFlawless: encounterStats.wasFlawless,
+                        turnsElapsed: encounterStats.turnsElapsed,
+                        highestSingleHit: encounterStats.highestSingleHit,
+                        damageDealt: encounterStats.damageDealt
+                    });
+                }
             }
         });
 
-        const heroes = this.manager.party.all;
+        const heroes = this.manager.party.combatParty;
         const aliveHeroes = heroes.filter(h => !h.dead);
         const flawless = heroes.every(h => !h.dead && h.hitpoints >= h.maxHitpoints);
         const lastStand = aliveHeroes.length === 1;
@@ -616,7 +625,7 @@ export class AdventuringEncounter extends AdventuringPage {
 
     tryLearnAbility() {
 
-        if(!(this.currentTurn instanceof AdventuringHero))
+        if(!this.currentTurn.isHero)
             return;
 
         if(!this.currentAction.learnType)
@@ -635,7 +644,7 @@ export class AdventuringEncounter extends AdventuringPage {
         let targetEnemy = null;
         for(const targets of this.hitHistory) {
             for(const target of targets) {
-                if(target instanceof AdventuringEnemy) {
+                if(!target.isHero) {
                     targetEnemy = target;
                     break;
                 }

@@ -4,6 +4,7 @@ const { AdventuringPage } = await loadModule('src/ui/adventuring-page.mjs');
 const { AdventuringSlayerTask, SlayerTaskGenerator } = await loadModule('src/progression/adventuring-slayer-task.mjs');
 const { getEffectDescriptionsList } = await loadModule('src/core/adventuring-utils.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
+const { AdventuringIconButtonElement } = await loadModule('src/ui/components/adventuring-icon-button.mjs');
 
 await loadModule('src/progression/components/adventuring-slayers.mjs');
 const { AdventuringTaskRewardElement } = await loadModule('src/progression/components/adventuring-task-reward.mjs');
@@ -17,12 +18,14 @@ class SlayersRenderQueue {
         this.availableTasks = false;
         this.activeTasks = false;
         this.achievements = false;
+        this.runs = false;
         this.all = false;
     }
     queueAll() {
         this.availableTasks = true;
         this.activeTasks = true;
         this.achievements = true;
+        this.runs = true;
         this.all = true;
     }
 }
@@ -45,7 +48,8 @@ export class AdventuringSlayers extends AdventuringPage {
         this.refreshCost = 250;          // Cost to refresh available tasks
 
         this.currentTab = 'tasks';
-        this.selectedCategory = 'all';
+        this.selectedCategory = null;  // null means show first category
+        this.selectedRun = null;  // Currently selected run for details view
 
         this.taskGenerator = new SlayerTaskGenerator(manager, game);
 
@@ -54,6 +58,8 @@ export class AdventuringSlayers extends AdventuringPage {
 
         this.component.tabTasks.onclick = () => this.switchTab('tasks');
         this.component.tabAchievements.onclick = () => this.switchTab('achievements');
+        this.component.tabRuns.onclick = () => this.switchTab('runs');
+        this.component.runsBackBtn.onclick = () => this.showRunsList();
     }
 
     switchTab(tab) {
@@ -61,14 +67,35 @@ export class AdventuringSlayers extends AdventuringPage {
 
         this.component.tabTasks.classList.toggle('active', tab === 'tasks');
         this.component.tabAchievements.classList.toggle('active', tab === 'achievements');
+        this.component.tabRuns.classList.toggle('active', tab === 'runs');
 
         this.component.tasksContent.classList.toggle('d-none', tab !== 'tasks');
         this.component.achievementsContent.classList.toggle('d-none', tab !== 'achievements');
+        this.component.runsContent.classList.toggle('d-none', tab !== 'runs');
 
         if(tab === 'achievements') {
             this.renderQueue.achievements = true;
             this.render();
+        } else if(tab === 'runs') {
+            this.showRunsList();
+            this.renderQueue.runs = true;
+            this.render();
         }
+    }
+
+    showRunsList() {
+        this.selectedRun = null;
+        this.component.runsListView.classList.remove('d-none');
+        this.component.runsDetailsView.classList.add('d-none');
+        this.renderQueue.runs = true;
+        this.render();
+    }
+
+    showRunDetails(run, index) {
+        this.selectedRun = { run, index };
+        this.component.runsListView.classList.add('d-none');
+        this.component.runsDetailsView.classList.remove('d-none');
+        this.renderRunDetails();
     }
 
     back() {
@@ -86,8 +113,6 @@ export class AdventuringSlayers extends AdventuringPage {
 
     onLoad() {
         super.onLoad();
-
-        this.fillAvailableTasks();
     }
 
     onShow() {
@@ -103,7 +128,6 @@ export class AdventuringSlayers extends AdventuringPage {
     }
 
     postDataRegistration() {
-
     }
 
     getTaskKey(task) {
@@ -145,12 +169,16 @@ export class AdventuringSlayers extends AdventuringPage {
         const currentCoins = this.manager.stash.materialCounts.get(slayerCoins) || 0;
 
         if(currentCoins < this.refreshCost) {
-            this.manager.log.add(`Not enough Slayer Coins to refresh tasks! Need ${this.refreshCost}.`);
+            this.manager.log.add(`Not enough Slayer Coins to refresh tasks! Need ${this.refreshCost}.`, {
+                category: 'slayer'
+            });
             return false;
         }
 
         this.manager.stash.remove(slayerCoins, this.refreshCost);
-        this.manager.log.add(`Spent ${this.refreshCost} Slayer Coins to refresh tasks.`);
+        this.manager.log.add(`Spent ${this.refreshCost} Slayer Coins to refresh tasks.`, {
+            category: 'slayer'
+        });
 
         this.availableTasks = [];
         this.fillAvailableTasks();
@@ -160,7 +188,9 @@ export class AdventuringSlayers extends AdventuringPage {
 
     acceptTask(task) {
         if(this.activeTasks.length >= this.maxActiveTasks) {
-            this.manager.log.add("You have too many active tasks!");
+            this.manager.log.add("You have too many active tasks!", {
+                category: 'slayer'
+            });
             return false;
         }
 
@@ -173,7 +203,9 @@ export class AdventuringSlayers extends AdventuringPage {
         this.availableTasks.splice(index, 1);
         this.activeTasks.push(task);
 
-        this.manager.log.add(`Accepted task: ${task.description}`);
+        this.manager.log.add(`Accepted task: ${task.description}`, {
+            category: 'slayer'
+        });
 
         this.fillAvailableTasks();
 
@@ -190,14 +222,18 @@ export class AdventuringSlayers extends AdventuringPage {
         const currentCoins = this.manager.stash.materialCounts.get(slayerCoins) || 0;
 
         if(currentCoins < this.abandonCost) {
-            this.manager.log.add(`Not enough Slayer Coins to abandon task! Need ${this.abandonCost}.`);
+            this.manager.log.add(`Not enough Slayer Coins to abandon task! Need ${this.abandonCost}.`, {
+                category: 'slayer'
+            });
             return false;
         }
 
         this.manager.stash.remove(slayerCoins, this.abandonCost);
 
         this.activeTasks.splice(index, 1);
-        this.manager.log.add(`Abandoned task: ${task.description} (-${this.abandonCost} Slayer Coins)`);
+        this.manager.log.add(`Abandoned task: ${task.description} (-${this.abandonCost} Slayer Coins)`, {
+            category: 'slayer'
+        });
 
         this.renderQueue.activeTasks = true;
         return true;
@@ -215,6 +251,16 @@ export class AdventuringSlayers extends AdventuringPage {
 
             this.manager.achievementManager.recordSlayerTask();
 
+            // Fire slayer_task_complete trigger for achievements
+            this.manager.achievementManager.trigger('slayer_task_complete', {
+                task: task,
+                taskType: task.taskType,
+                tier: task.tier,
+                targetId: task.targetId,
+                totalCompleted: this.totalTasksCompleted,
+                rewards: task.rewards
+            });
+
             const rewardStrings = task.rewards.map(r => {
                 if(r.type === 'currency') return `${r.qty} Slayer Coins`;
                 if(r.type === 'xp') return `${r.qty} XP`;
@@ -225,7 +271,9 @@ export class AdventuringSlayers extends AdventuringPage {
                 return '';
             }).filter(s => s);
 
-            this.manager.log.add(`Claimed rewards: ${rewardStrings.join(', ')}`);
+            this.manager.log.add(`Claimed rewards: ${rewardStrings.join(', ')}`, {
+                category: 'slayer'
+            });
             this.renderQueue.activeTasks = true;
             return true;
         }
@@ -274,6 +322,7 @@ export class AdventuringSlayers extends AdventuringPage {
         this.renderAvailableTasks();
         this.renderActiveTasks();
         this.renderAchievements();
+        this.renderRuns();
         this.updateAchievementBadge();
     }
 
@@ -351,17 +400,16 @@ export class AdventuringSlayers extends AdventuringPage {
     renderAchievementCategoryFilter() {
         this.component.achievementCategoryFilter.replaceChildren();
 
-        const allBtn = document.createElement('button');
-        allBtn.className = `btn btn-sm btn-outline-info m-1 ${this.selectedCategory === 'all' ? 'active' : ''}`;
-        allBtn.textContent = 'All';
-        allBtn.onclick = () => {
-            this.selectedCategory = 'all';
-            this.renderQueue.achievements = true;
-            this.render();
-        };
-        this.component.achievementCategoryFilter.appendChild(allBtn);
+        // Sort categories by ID for consistent display order
+        const sortedCategories = [...this.manager.achievementCategories.allObjects]
+            .sort((a, b) => a.id.localeCompare(b.id));
 
-        for(const category of this.manager.achievementCategories.allObjects) {
+        // Default to first category if none selected
+        if (!this.selectedCategory && sortedCategories.length > 0) {
+            this.selectedCategory = sortedCategories[0].id;
+        }
+
+        for(const category of sortedCategories) {
             const btn = document.createElement('button');
             btn.className = `btn btn-sm btn-outline-info m-1 ${this.selectedCategory === category.id ? 'active' : ''}`;
             btn.textContent = category.name;
@@ -379,7 +427,8 @@ export class AdventuringSlayers extends AdventuringPage {
 
         let achievements = [...this.manager.achievements.allObjects];
 
-        if(this.selectedCategory !== 'all') {
+        // Always filter by selected category
+        if(this.selectedCategory) {
             achievements = achievements.filter(a => a.category && a.category.id === this.selectedCategory);
         }
 
@@ -417,36 +466,100 @@ export class AdventuringSlayers extends AdventuringPage {
         const rewards = frag.querySelector('#rewards');
         const claimBtn = frag.querySelector('#claim-btn');
 
-        const isComplete = achievement.isComplete();
-        const isMet = achievement.isMet();
-        const progress = achievement.getProgress();
-        const target = achievement.getTarget();
-        const percent = achievement.getProgressPercent();
+        // Store card element refs for milestone selection updates
+        const cardRefs = { card, icon, name, description, progressBar, progressText, rewards };
 
         icon.src = achievement.media;
-        name.textContent = achievement.name;
-        description.textContent = achievement.description;
 
         if(achievement.category) {
             categoryBadge.textContent = achievement.category.name;
             categoryBadge.className = `badge badge-${this.getCategoryColor(achievement.category.id)} font-size-xs`;
         }
 
+        // For milestone chains, show milestone chain progress bar
+        let milestoneProgress = null;
+        let selectedMilestoneIndex = null;
+        
+        if(achievement.isMilestoneChain) {
+            milestoneProgress = achievement.getMilestoneProgress();
+            if(milestoneProgress && milestoneProgress.milestones.length > 1) {
+                const chainRow = frag.querySelector('#milestone-chain');
+                const iconsContainer = frag.querySelector('#milestone-icons');
+                chainRow.classList.remove('d-none');
+                
+                // Find current milestone index for initial selection
+                selectedMilestoneIndex = milestoneProgress.milestones.findIndex(m => m.isCurrent);
+                if(selectedMilestoneIndex === -1) {
+                    // All complete - select last one
+                    selectedMilestoneIndex = milestoneProgress.milestones.length - 1;
+                }
+                
+                this.renderMilestoneChain(iconsContainer, milestoneProgress, achievement, cardRefs, selectedMilestoneIndex);
+            }
+        }
+
+        // Update card with current/selected milestone data
+        this.updateCardForMilestone(cardRefs, achievement, milestoneProgress, selectedMilestoneIndex);
+
+        // Hide claim button - achievements auto-complete
+        claimBtn.classList.add('d-none');
+
+        return row;
+    }
+
+    /**
+     * Update achievement card display for a specific milestone (or the achievement itself)
+     */
+    updateCardForMilestone(cardRefs, achievement, milestoneProgress, milestoneIndex) {
+        const { card, icon, name, description, progressBar, progressText, rewards } = cardRefs;
+
+        let displayName, displayDesc, displayRewards, progress, target, isComplete;
+
+        if(milestoneProgress && milestoneIndex !== null && milestoneIndex >= 0) {
+            const milestone = milestoneProgress.milestones[milestoneIndex];
+            displayName = milestone.name;
+            displayDesc = milestone.description;
+            displayRewards = milestone.rewards || [];
+            isComplete = milestone.isComplete;
+            
+            // Get progress for this specific milestone
+            progress = achievement.getProgress(milestone.requirement);
+            target = achievement.getTarget(milestone.requirement);
+        } else {
+            displayName = achievement.name;
+            displayDesc = achievement.description;
+            displayRewards = achievement.rewards || [];
+            isComplete = achievement.isComplete();
+            progress = achievement.getProgress();
+            target = achievement.getTarget();
+        }
+
+        const percent = Math.min(100, Math.floor((progress / target) * 100));
+
+        name.textContent = displayName;
+        description.textContent = displayDesc;
         progressBar.style.width = `${percent}%`;
-        progressBar.className = `progress-bar ${isComplete ? 'bg-success' : isMet ? 'bg-warning' : 'bg-info'}`;
+        progressBar.className = `progress-bar ${isComplete ? 'bg-success' : 'bg-info'}`;
         progressText.textContent = `${progress} / ${target}`;
 
+        // Update card border based on complete state
+        card.classList.remove('border', 'border-success');
+        card.style.opacity = '';
         if(isComplete) {
             card.classList.add('border', 'border-success');
             card.style.opacity = '0.6';
-        } else if(isMet) {
-            card.classList.add('border', 'border-warning');
-            claimBtn.classList.remove('d-none');
-            claimBtn.onclick = () => this.claimAchievement(achievement);
         }
 
-        // Show compact reward icons for row layout
-        for(const reward of achievement.rewards) {
+        // Clear and re-render rewards
+        rewards.replaceChildren();
+        this.renderRewards(rewards, displayRewards);
+    }
+
+    /**
+     * Render reward icons into a container
+     */
+    renderRewards(container, rewardList) {
+        for(const reward of rewardList) {
             const rewardEl = new AdventuringAchievementRewardElement();
             rewardEl.classList.add('mr-1');
 
@@ -473,6 +586,17 @@ export class AdventuringSlayers extends AdventuringPage {
                     }).build();
                     rewardEl.setAbility(ability.name, null, tooltipContent);
                 }
+            } else if(reward.type === 'equipment') {
+                const equip = this.manager.equipment.getObjectByID(reward.id);
+                if(equip) {
+                    const tooltipContent = TooltipBuilder.forEquipment(equip, this.manager).build();
+                    rewardEl.setMaterial(1, equip.media, tooltipContent);
+                }
+            } else if(reward.type === 'job') {
+                const job = this.manager.jobs.getObjectByID(reward.id);
+                if(job) {
+                    rewardEl.setJob(job.name, job.media, `Unlock the ${job.name} job`);
+                }
             } else if(reward.type === 'effect') {
                 // Handle stat effects with icons instead of text
                 let hasStatEffect = false;
@@ -484,9 +608,8 @@ export class AdventuringSlayers extends AdventuringPage {
                         const stat = this.manager.stats.getObjectByID(effect.stat);
                         const statName = stat ? stat.name : effect.stat.replace('adventuring:', '');
                         const statIcon = stat ? stat.media : null;
-                        const prefix = effect.type === 'stat_percent' ? '+' + effect.amount + '%' : '+' + effect.amount;
                         statRewardEl.setStat(effect.amount, statIcon, statName);
-                        rewards.appendChild(statRewardEl);
+                        container.appendChild(statRewardEl);
                     }
                 }
                 // For non-stat effects, show as text
@@ -494,16 +617,149 @@ export class AdventuringSlayers extends AdventuringPage {
                     const descs = getEffectDescriptionsList(reward.effects, this.manager);
                     if(descs.length > 0) {
                         rewardEl.setEffect(descs.join(', '), 'Permanent bonus');
-                        rewards.appendChild(rewardEl);
+                        container.appendChild(rewardEl);
                     }
                 }
                 continue; // Skip the default appendChild since we handle it above
             }
 
-            rewards.appendChild(rewardEl);
+            container.appendChild(rewardEl);
         }
+    }
 
-        return row;
+    /**
+     * Render the milestone chain progress bar with icons
+     * Format: [icon]──[icon]──[icon]──[icon]──[icon]
+     */
+    renderMilestoneChain(container, milestoneProgress, achievement, cardRefs, initialSelectedIndex) {
+        const { milestones } = milestoneProgress;
+        const iconButtons = [];
+        
+        for(let i = 0; i < milestones.length; i++) {
+            const m = milestones[i];
+            
+            // Add connector line before icon (except for first)
+            if(i > 0) {
+                const connector = document.createElement('div');
+                connector.className = 'milestone-connector';
+                connector.style.cssText = `
+                    width: 12px;
+                    height: 2px;
+                    background: ${m.isComplete ? '#28a745' : 'rgba(255,255,255,0.2)'};
+                    flex-shrink: 0;
+                    align-self: center;
+                `;
+                container.appendChild(connector);
+            }
+            
+            // Create milestone icon using standard icon button
+            const iconBtn = new AdventuringIconButtonElement();
+            iconBtn.classList.add('milestone-icon');
+            iconBtn.style.cssText = 'margin: 0; --icon-size: 28px; cursor: pointer;';
+            
+            // Determine border and badge based on milestone state
+            let borderClass = 'border-secondary';
+            let cornerBadgeText;
+            let cornerBadgeClass;
+            
+            if(m.isComplete) {
+                borderClass = 'border-success';
+                cornerBadgeText = '✓';
+                cornerBadgeClass = 'badge-success';
+            } else if(m.isCurrent) {
+                borderClass = 'border-warning';
+            } else {
+                // Locked - dim it
+                iconBtn.style.opacity = '0.4';
+                iconBtn.style.filter = 'grayscale(100%)';
+            }
+            
+            // Build tooltip using TooltipBuilder
+            const tooltipContent = TooltipBuilder.forMilestone(m, achievement, this.manager).build();
+            
+            iconBtn.setIcon({
+                icon: achievement.media,
+                borderClass,
+                cornerBadgeText,
+                cornerBadgeClass,
+                tooltipContent
+            });
+            
+            iconButtons.push(iconBtn);
+            
+            // Add click handler to select this milestone
+            iconBtn.addEventListener('click', () => {
+                this.selectMilestone(i, iconButtons, milestoneProgress, achievement, cardRefs);
+            });
+            
+            container.appendChild(iconBtn);
+        }
+        
+        // Apply initial selection styling
+        if(initialSelectedIndex !== null && initialSelectedIndex >= 0) {
+            this.updateMilestoneIcons(iconButtons, milestoneProgress, initialSelectedIndex);
+        }
+    }
+
+    /**
+     * Handle milestone selection - update card and icon styling
+     */
+    selectMilestone(index, iconButtons, milestoneProgress, achievement, cardRefs) {
+        // Update icon styling
+        this.updateMilestoneIcons(iconButtons, milestoneProgress, index);
+        
+        // Update card display
+        this.updateCardForMilestone(cardRefs, achievement, milestoneProgress, index);
+    }
+
+    /**
+     * Update milestone icon styling based on selection
+     */
+    updateMilestoneIcons(iconButtons, milestoneProgress, selectedIndex) {
+        const { milestones } = milestoneProgress;
+        
+        for(let i = 0; i < iconButtons.length; i++) {
+            const iconBtn = iconButtons[i];
+            const m = milestones[i];
+            
+            // Determine border class based on state
+            // Priority: selected (yellow) > complete (green) > incomplete (grey)
+            let borderClass;
+            if(i === selectedIndex) {
+                borderClass = 'border-warning'; // Yellow for selected
+            } else if(m.isComplete) {
+                borderClass = 'border-success'; // Green for complete
+            } else {
+                borderClass = 'border-secondary'; // Grey for incomplete
+            }
+            
+            // Reset opacity/filter
+            iconBtn.style.opacity = '';
+            iconBtn.style.filter = '';
+            
+            // Locked (not complete, not current, not selected) - dim it
+            if(!m.isComplete && !m.isCurrent && i !== selectedIndex) {
+                iconBtn.style.opacity = '0.4';
+                iconBtn.style.filter = 'grayscale(100%)';
+            }
+            
+            // Update border class using the component's border element
+            if(iconBtn.border) {
+                iconBtn.border.className = `border-2x border-rounded-equip combat-equip-img fishing-img m-0 ${borderClass}`;
+            }
+            
+            // Update corner badge for complete milestones
+            if(iconBtn.cornerBadge) {
+                if(m.isComplete) {
+                    iconBtn.cornerBadge.textContent = '✓';
+                    iconBtn.cornerBadge.className = 'badge badge-success';
+                    iconBtn.cornerBadge.style.cssText = 'position: absolute; top: 2px; right: 2px; font-size: 0.5rem; z-index: 10;';
+                    iconBtn.cornerBadge.classList.remove('d-none');
+                } else {
+                    iconBtn.cornerBadge.classList.add('d-none');
+                }
+            }
+        }
     }
 
     claimAchievement(achievement) {
@@ -511,7 +767,9 @@ export class AdventuringSlayers extends AdventuringPage {
 
         this.manager.achievementManager.completeAchievement(achievement);
 
-        this.manager.log.add(`Achievement unlocked: ${achievement.name}!`);
+        this.manager.log.add(`Achievement unlocked: ${achievement.name}!`, {
+            category: 'achievements'
+        });
         this.renderQueue.achievements = true;
         this.render();
     }
@@ -523,14 +781,260 @@ export class AdventuringSlayers extends AdventuringPage {
             'adventuring:collection': 'warning',
             'adventuring:challenges': 'primary',
             'adventuring:town_jobs': 'secondary',
-            'adventuring:solo': 'dark',
             'adventuring:job_mastery': 'success',
             'adventuring:area_mastery': 'info',
             'adventuring:monster_mastery': 'danger',
-            'adventuring:equipment_mastery': 'warning'
+            'adventuring:equipment_mastery': 'warning',
+            'adventuring:town': 'success',
+            'adventuring:slayer': 'primary',
+            'adventuring:gauntlets': 'warning',
+            'adventuring:combat_jobs': 'danger'
         };
         return colors[categoryId] || 'secondary';
     }
+
+    // ======== RUN HISTORY METHODS ========
+
+    renderRuns() {
+        if(!this.renderQueue.runs && !this.renderQueue.all)
+            return;
+
+        this.destroyTippyIn(this.component.runsList);
+        this.component.runsList.replaceChildren();
+
+        const history = this.manager.combatTracker.history;
+
+        if(history.length === 0) {
+            const empty = new AdventuringEmptyStateElement();
+            empty.setFullWidthMessage('No run history yet. Complete some dungeon runs to see your stats!');
+            this.component.runsList.appendChild(empty);
+        } else {
+            // Show runs in reverse chronological order (most recent first)
+            for(let i = history.length - 1; i >= 0; i--) {
+                const run = history[i];
+                const card = this.createRunListItem(run, i);
+                this.component.runsList.appendChild(card);
+            }
+        }
+
+        this.renderQueue.runs = false;
+    }
+
+    createRunListItem(run, index) {
+        const frag = getTemplateNode('adventuring-run-list-item-template');
+
+        const card = getElementFromFragment(frag, 'card', 'div');
+        const areaIcon = getElementFromFragment(frag, 'area-icon', 'img');
+        const areaName = getElementFromFragment(frag, 'area-name', 'span');
+        const badges = getElementFromFragment(frag, 'badges', 'div');
+        const damageDealt = getElementFromFragment(frag, 'damage-dealt', 'span');
+        const damageTaken = getElementFromFragment(frag, 'damage-taken', 'span');
+        const turns = getElementFromFragment(frag, 'turns', 'span');
+        const encountersCount = getElementFromFragment(frag, 'encounters-count', 'small');
+
+        // Area info
+        if(run.area) {
+            areaIcon.src = run.area.media;
+            areaName.textContent = run.area.name;
+        } else {
+            areaIcon.src = this.manager.getResourceUrl('assets/media/empty.png');
+            areaName.textContent = 'Unknown Area';
+        }
+
+        // Stats
+        damageDealt.textContent = this.formatNumber(run.damageDealt);
+        damageTaken.textContent = this.formatNumber(run.damageTaken);
+        turns.textContent = run.turnsElapsed;
+        encountersCount.textContent = `${run.encounters.length} encounters`;
+
+        // Badges
+        if(run.difficulty) {
+            const diffBadge = document.createElement('span');
+            diffBadge.className = `badge badge-${this.getDifficultyColor(run.difficulty)} mr-1`;
+            diffBadge.textContent = run.difficulty.name;
+            badges.appendChild(diffBadge);
+        }
+
+        if(run.wasFlawless) {
+            const flawlessBadge = document.createElement('span');
+            flawlessBadge.className = 'badge badge-success mr-1';
+            flawlessBadge.textContent = 'Flawless';
+            badges.appendChild(flawlessBadge);
+        }
+
+        if(run.isSolo) {
+            const soloBadge = document.createElement('span');
+            soloBadge.className = 'badge badge-dark';
+            soloBadge.textContent = 'Solo';
+            badges.appendChild(soloBadge);
+        }
+
+        card.onclick = () => this.showRunDetails(run, index);
+
+        return frag.firstElementChild;
+    }
+
+    renderRunDetails() {
+        if(!this.selectedRun) return;
+
+        const { run, index } = this.selectedRun;
+
+        // Title and subtitle
+        if(run.area) {
+            this.component.runDetailTitle.textContent = run.area.name;
+        } else {
+            this.component.runDetailTitle.textContent = 'Unknown Area';
+        }
+        this.component.runDetailSubtitle.textContent = `Run #${index + 1} • ${run.encounters.length} encounters • ${run.partySize} hero${run.partySize !== 1 ? 'es' : ''}`;
+
+        // Badges
+        this.component.runDetailBadges.replaceChildren();
+        if(run.difficulty) {
+            const diffBadge = document.createElement('span');
+            diffBadge.className = `badge badge-${this.getDifficultyColor(run.difficulty)} mr-1`;
+            diffBadge.textContent = run.difficulty.name;
+            this.component.runDetailBadges.appendChild(diffBadge);
+        }
+        if(run.wasFlawless) {
+            const flawlessBadge = document.createElement('span');
+            flawlessBadge.className = 'badge badge-success mr-1';
+            flawlessBadge.textContent = 'Flawless';
+            this.component.runDetailBadges.appendChild(flawlessBadge);
+        }
+        if(run.isSolo) {
+            const soloBadge = document.createElement('span');
+            soloBadge.className = 'badge badge-dark';
+            soloBadge.textContent = 'Solo';
+            this.component.runDetailBadges.appendChild(soloBadge);
+        }
+
+        // Stats
+        this.component.runStatDamageDealt.textContent = this.formatNumber(run.damageDealt);
+        this.component.runStatDamageTaken.textContent = this.formatNumber(run.damageTaken);
+        this.component.runStatHealing.textContent = this.formatNumber(run.healingReceived);
+        this.component.runStatTurns.textContent = run.turnsElapsed;
+
+        // Abilities used
+        this.component.runDetailAbilities.replaceChildren();
+        if(run.abilitiesUsed.size === 0) {
+            const noAbilities = document.createElement('small');
+            noAbilities.className = 'text-muted';
+            noAbilities.textContent = 'No abilities recorded';
+            this.component.runDetailAbilities.appendChild(noAbilities);
+        } else {
+            for(const ability of run.abilitiesUsed) {
+                const abilityIcon = document.createElement('img');
+                abilityIcon.className = 'skill-icon-sm mr-1 mb-1';
+                abilityIcon.src = ability.media;
+                abilityIcon.title = ability.name;
+                this.component.runDetailAbilities.appendChild(abilityIcon);
+            }
+        }
+
+        // Monsters fought
+        this.component.runDetailMonsters.replaceChildren();
+        const allMonsters = new Map();
+        
+        // Merge damage dealt and taken by monster
+        for(const [monster, damage] of run.damageDealtByMonster) {
+            if(!allMonsters.has(monster)) {
+                allMonsters.set(monster, { dealt: 0, taken: 0 });
+            }
+            allMonsters.get(monster).dealt = damage;
+        }
+        for(const [monster, damage] of run.damageTakenByMonster) {
+            if(!allMonsters.has(monster)) {
+                allMonsters.set(monster, { dealt: 0, taken: 0 });
+            }
+            allMonsters.get(monster).taken = damage;
+        }
+
+        if(allMonsters.size === 0) {
+            const noMonsters = document.createElement('div');
+            noMonsters.className = 'col-12';
+            noMonsters.innerHTML = '<small class="text-muted">No monster data recorded</small>';
+            this.component.runDetailMonsters.appendChild(noMonsters);
+        } else {
+            for(const [monster, data] of allMonsters) {
+                const card = this.createMonsterDamageCard(monster, data.dealt, data.taken);
+                this.component.runDetailMonsters.appendChild(card);
+            }
+        }
+
+        // Encounter breakdown
+        this.component.runDetailEncounters.replaceChildren();
+        if(run.encounters.length === 0) {
+            const noEnc = document.createElement('div');
+            noEnc.className = 'col-12';
+            noEnc.innerHTML = '<small class="text-muted">No encounter data recorded</small>';
+            this.component.runDetailEncounters.appendChild(noEnc);
+        } else {
+            run.encounters.forEach((enc, i) => {
+                const card = this.createEncounterCard(enc, i);
+                this.component.runDetailEncounters.appendChild(card);
+            });
+        }
+    }
+
+    createMonsterDamageCard(monster, damageDealt, damageTaken) {
+        const frag = getTemplateNode('adventuring-run-monster-template');
+
+        const monsterIcon = getElementFromFragment(frag, 'monster-icon', 'img');
+        const monsterName = getElementFromFragment(frag, 'monster-name', 'div');
+        const damageTo = getElementFromFragment(frag, 'damage-to', 'span');
+        const damageFrom = getElementFromFragment(frag, 'damage-from', 'span');
+
+        monsterIcon.src = monster.media;
+        monsterName.textContent = monster.name;
+        damageTo.textContent = this.formatNumber(damageDealt);
+        damageFrom.textContent = this.formatNumber(damageTaken);
+
+        return frag.firstElementChild;
+    }
+
+    createEncounterCard(encounter, index) {
+        const frag = getTemplateNode('adventuring-run-encounter-template');
+
+        const encounterNum = getElementFromFragment(frag, 'encounter-num', 'span');
+        const flawlessBadge = getElementFromFragment(frag, 'flawless-badge', 'span');
+        const encDamageDealt = getElementFromFragment(frag, 'enc-damage-dealt', 'span');
+        const encDamageTaken = getElementFromFragment(frag, 'enc-damage-taken', 'span');
+        const encTurns = getElementFromFragment(frag, 'enc-turns', 'span');
+
+        encounterNum.textContent = `Encounter ${index + 1}`;
+        encDamageDealt.textContent = this.formatNumber(encounter.damageDealt);
+        encDamageTaken.textContent = this.formatNumber(encounter.damageTaken);
+        encTurns.textContent = encounter.turnsElapsed;
+
+        if(encounter.wasFlawless) {
+            flawlessBadge.classList.remove('d-none');
+        }
+
+        return frag.firstElementChild;
+    }
+
+    getDifficultyColor(difficulty) {
+        if(!difficulty) return 'secondary';
+        const id = difficulty.localID || difficulty.id.replace('adventuring:', '');
+        const colors = {
+            'normal': 'secondary',
+            'heroic': 'warning',
+            'mythic': 'danger',
+            'endless': 'info'
+        };
+        return colors[id] || 'secondary';
+    }
+
+    formatNumber(num) {
+        if(num >= 1000000) {
+            return (num / 1000000).toFixed(1) + 'M';
+        } else if(num >= 1000) {
+            return (num / 1000).toFixed(1) + 'K';
+        }
+        return Math.floor(num).toString();
+    }
+
+    // ======== END RUN HISTORY METHODS ========
 
     hasSeenMonsters() {
         return this.manager.bestiary.seen.size > 0;

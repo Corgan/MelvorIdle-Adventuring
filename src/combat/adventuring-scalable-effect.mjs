@@ -19,6 +19,9 @@ export class AdventuringScalableEffect {
         if(data.party !== undefined)
             this.party = data.party;
 
+        if(data.stat !== undefined)
+            this.stat = data.stat;
+
         if(data.perStack !== undefined)
             this.perStack = data.perStack === true;
 

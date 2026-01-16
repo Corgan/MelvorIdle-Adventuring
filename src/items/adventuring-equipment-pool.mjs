@@ -4,13 +4,15 @@ export class AdventuringEquipmentPool extends NamespacedObject {
         super(namespace, data.id);
         this.manager = manager;
         this.game = game;
-        this.name = data.name || 'Equipment Pool';
+        this.name = data.name || 'Equipment Pool';
+
         this._itemData = data.items || [];
         this.items = []; // Array of { item: AdventuringBaseItem, weight: number }
     }
 
     postDataRegistration() {
-        this.items = this._itemData.map(entry => {
+        this.items = this._itemData.map(entry => {
+
             const id = typeof entry === 'string' ? entry : entry.id;
             const weight = typeof entry === 'string' ? 1 : (entry.weight !== undefined ? entry.weight : 1);
             const item = this.manager.baseItems.getObjectByID(id);
@@ -25,11 +27,11 @@ export class AdventuringEquipmentPool extends NamespacedObject {
     }
 
     getAvailable() {
-        return this.items.filter(entry => !entry.item.dropped);
+        return this.items.filter(entry => !entry.item.unlocked);
     }
 
     hasAvailable() {
-        return this.items.some(entry => !entry.item.dropped);
+        return this.items.some(entry => !entry.item.unlocked);
     }
 
     roll() {
@@ -44,17 +46,8 @@ export class AdventuringEquipmentPool extends NamespacedObject {
             if (roll <= 0) {
                 return entry.item;
             }
-        }
-        return available[available.length - 1].item;
-    }
+        }
 
-    getProgress() {
-        const dropped = this.items.filter(e => e.item.dropped).length;
-        const total = this.items.length;
-        return {
-            dropped,
-            total,
-            percent: total > 0 ? Math.round((dropped / total) * 100) : 0
-        };
+        return available[available.length - 1].item;
     }
 }

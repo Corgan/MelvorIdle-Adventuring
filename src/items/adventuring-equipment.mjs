@@ -3,7 +3,7 @@ const { loadModule } = mod.getContext(import.meta);
 const { AdventuringStats } = await loadModule('src/core/adventuring-stats.mjs');
 const { AdventuringEquipmentSlot } = await loadModule('src/items/adventuring-equipment-slot.mjs');
 const { AdventuringEquipmentElement } = await loadModule('src/items/components/adventuring-equipment.mjs');
-const { createEffect } = await loadModule('src/core/adventuring-utils.mjs');
+const { createEffect, filterEffects } = await loadModule('src/core/adventuring-utils.mjs');
 
 export class AdventuringEquipment {
     constructor(manager, game, character) {
@@ -78,32 +78,28 @@ export class AdventuringEquipment {
         });
     }
 
-    getEffects(trigger = null) {
-        const effects = [];
+    /**
+     * Get effects from equipped items
+     * @param {Object} filters - Optional filters (trigger, party, type, etc.)
+     * @returns {Array} Filtered effects with source metadata
+     */
+    getEffects(filters = {}) {
+        // Handle legacy string trigger parameter
+        if (typeof filters === 'string') {
+            filters = { trigger: filters };
+        }
+        const trigger = filters.trigger;
+        
+        let effects = [];
 
         this.forEachEquipped((item, slot) => {
-
-            if(trigger === null || trigger === 'passive') {
-                item.stats.forEach((value, stat) => {
-                    if(value !== 0) {
-                        effects.push(createEffect(
-                            {
-                                trigger: 'passive',
-                                type: 'stat_flat',
-                                stat: stat.id,
-                                value: value
-                            },
-                            item,
-                            item.name
-                        ));
-                    }
-                });
-            }
+            // Note: Base equipment stats flow through calculateStats() → StatCalculator.aggregate()
+            // Only item.effects (buffs, triggers, etc.) are returned here
 
             if(item.effects && item.effects.length > 0) {
                 item.effects.forEach(effect => {
 
-                    if(trigger !== null && effect.trigger !== trigger) return;
+                    if(trigger !== undefined && effect.trigger !== trigger) return;
 
                     let amount = effect.amount || 0;
                     if(effect.scaling && item.level > 0) {
@@ -117,10 +113,12 @@ export class AdventuringEquipment {
                             stat: effect.stat || effect.id,
                             value: amount,
                             target: effect.target,
-                            chance: effect.chance
+                            chance: effect.chance,
+                            party: effect.party
                         },
                         item,
-                        item.name
+                        item.name,
+                        'equipment'
                     ));
                 });
             }
@@ -133,7 +131,7 @@ export class AdventuringEquipment {
                 const setEffects = set.getActiveEffects(this.character);
                 setEffects.forEach(effect => {
 
-                    if(trigger !== null && effect.trigger !== trigger) return;
+                    if(trigger !== undefined && effect.trigger !== trigger) return;
 
                     effects.push(createEffect(
                         {
@@ -145,55 +143,18 @@ export class AdventuringEquipment {
                             stacks: effect.stacks,
                             chance: effect.chance,
                             count: effect.count,
-                            threshold: effect.threshold
+                            threshold: effect.threshold,
+                            party: effect.party
                         },
                         { name: effect.sourceName },
-                        effect.sourceName
+                        effect.sourceName,
+                        'equipmentSet'
                     ));
                 });
             });
         }
 
-        return effects;
-    }
-
-    getEffectsForTrigger(triggerType, context = {}) {
-        const results = [];
-
-        this.forEachEquipped((item, slot) => {
-            if (!item.effects || item.effects.length === 0) return;
-
-            item.effects.forEach(effect => {
-                if (effect.trigger !== triggerType) return;
-
-                results.push({
-                    item: item,
-                    effect: effect
-                });
-            });
-        });
-
-        if (this.character && this.manager && this.manager.equipmentSets) {
-            const setCounts = this.getSetPieceCounts();
-            setCounts.forEach((count, set) => {
-                if(count <= 0) return;
-                const setEffects = set.getActiveEffects(this.character);
-                setEffects.forEach(effect => {
-                    if (effect.trigger !== triggerType) return;
-
-                    results.push({
-                        item: {
-                            name: effect.sourceName,
-                            level: 0,
-                            isSetBonus: true
-                        },
-                        effect: effect
-                    });
-                });
-            });
-        }
-
-        return results;
+        return filterEffects(effects, filters);
     }
 
     onLoad() {

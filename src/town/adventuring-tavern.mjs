@@ -1,6 +1,7 @@
 const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringPage } = await loadModule('src/ui/adventuring-page.mjs');
+const { createEffect, filterEffects } = await loadModule('src/core/adventuring-utils.mjs');
 
 await loadModule('src/town/components/adventuring-tavern.mjs');
 
@@ -90,6 +91,7 @@ export class AdventuringTavern extends AdventuringPage {
         this.renderQueue.equipped = true;
         this.renderQueue.details = true;
         this.manager.party.invalidateAllEffects('tavern');
+        this.manager.overview.renderQueue.buffs = true;
     }
 
     removeCharges(drink, tier, amount) {
@@ -104,6 +106,7 @@ export class AdventuringTavern extends AdventuringPage {
         this.renderQueue.equipped = true;
         this.renderQueue.details = true;
         this.manager.party.invalidateAllEffects('tavern');
+        this.manager.overview.renderQueue.buffs = true;
 
         const equippedTier = this.getEquippedTier(drink);
         if (newCharges <= 0 && equippedTier === tier) {
@@ -140,11 +143,15 @@ export class AdventuringTavern extends AdventuringPage {
 
     equip(drink, tier) {
         if (this.equipped.size >= MAX_EQUIPPED_DRINKS && !this.isEquipped(drink)) {
-            this.manager.log.add(`Cannot equip more than ${MAX_EQUIPPED_DRINKS} drinks.`);
+            this.manager.log.add(`Cannot equip more than ${MAX_EQUIPPED_DRINKS} drinks.`, {
+                category: 'town'
+            });
             return false;
         }
         if (this.getCharges(drink, tier) <= 0) {
-            this.manager.log.add(`${drink.getTierName(tier)} has no charges. Craft some first.`);
+            this.manager.log.add(`${drink.getTierName(tier)} has no charges. Craft some first.`, {
+                category: 'town'
+            });
             return false;
         }
 
@@ -153,7 +160,10 @@ export class AdventuringTavern extends AdventuringPage {
         this.renderQueue.equipped = true;
         this.renderQueue.details = true;
         this.manager.party.invalidateAllEffects('tavern');
-        this.manager.log.add(`Equipped ${drink.getTierName(tier)}`);
+        this.manager.overview.renderQueue.buffs = true;
+        this.manager.log.add(`Equipped ${drink.getTierName(tier)}`, {
+            category: 'town'
+        });
 
         return true;
     }
@@ -167,7 +177,9 @@ export class AdventuringTavern extends AdventuringPage {
         this.renderQueue.equipped = true;
         this.renderQueue.details = true;
         this.manager.party.invalidateAllEffects('tavern');
-        this.manager.log.add(`Unequipped ${drink.getTierName(tier)}`);
+        this.manager.log.add(`Unequipped ${drink.getTierName(tier)}`, {
+            category: 'town'
+        });
         this.manager.overview.renderQueue.buffs = true;
 
         return true;
@@ -199,36 +211,29 @@ export class AdventuringTavern extends AdventuringPage {
         return active;
     }
 
-    getEffects() {
-        const effects = [];
+    /**
+     * Get effects from equipped drinks
+     * @param {Object} filters - Optional filters (trigger, party, type, etc.)
+     * @returns {Array} Filtered effects with source metadata
+     */
+    getEffects(filters = { trigger: 'passive' }) {
+        let effects = [];
 
         for (const [drink, tier] of this.equipped.entries()) {
             if (this.getCharges(drink, tier) > 0) {
-                effects.push(...drink.getTierEffects(tier));
+                const tierEffects = drink.getTierEffects(tier);
+                for (const effectData of tierEffects) {
+                    effects.push(createEffect(
+                        effectData,
+                        drink,
+                        drink.getTierName(tier),
+                        'tavern'
+                    ));
+                }
             }
         }
 
-        return effects;
-    }
-
-    getEffectsForTrigger(triggerType, context = {}) {
-        const results = [];
-
-        for (const [drink, tier] of this.equipped.entries()) {
-            if (this.getCharges(drink, tier) <= 0) continue;
-
-            const tierEffects = drink.getTierEffects(tier);
-            for (const effect of tierEffects) {
-                if (effect.trigger !== triggerType) continue;
-
-                results.push({
-                    drink: drink,
-                    effect: effect
-                });
-            }
-        }
-
-        return results;
+        return filterEffects(effects, filters);
     }
 
 

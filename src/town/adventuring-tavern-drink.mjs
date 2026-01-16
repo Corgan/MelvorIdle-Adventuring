@@ -29,12 +29,14 @@ export class AdventuringTavernDrink extends NamespacedObject {
         this.game = game;
 
         this._name = data.name;
-        this._media = data.media;
+        this._media = data.media;
+
         this._tiers = data.tiers || [];
         this.tiers = new Map(); // Map<tierNumber, tierData>
 
         this.component = createElement('adventuring-tavern-drink');
-        this.renderQueue = new AdventuringTavernDrinkRenderQueue();
+        this.renderQueue = new AdventuringTavernDrinkRenderQueue();
+
         if (typeof this.component.setOnClick === 'function') {
             this.component.setOnClick(() => this.onClick());
         } else if (this.component.clickable) {
@@ -153,15 +155,20 @@ export class AdventuringTavernDrink extends NamespacedObject {
 
     craftTier(tier) {
         const materials = this.getTierMaterials(tier);
-        if (!materials || materials.size === 0) return false;
+        if (!materials || materials.size === 0) return false;
+
         for (const [mat, qty] of materials) {
             if (this.manager.stash.getCount(mat) < qty) return false;
-        }
+        }
+
         for (const [mat, qty] of materials) {
             this.manager.stash.remove(mat, qty);
-        }
+        }
+
         this.manager.tavern.addCharges(this, tier, 1);
-        this.manager.log.add(`Crafted ${this.getTierName(tier)}`);
+        this.manager.log.add(`Crafted ${this.getTierName(tier)}`, {
+            category: 'town'
+        });
         this.renderQueue.updateAll();
         return true;
     }
@@ -202,16 +209,20 @@ export class AdventuringTavernDrink extends NamespacedObject {
         }
     }
 
-    postDataRegistration() {
+    postDataRegistration() {
+
         for (const tierData of this._tiers) {
-            const tier = tierData.tier;
+            const tier = tierData.tier;
+
             const effects = (tierData.effects || []).map(effectData => {
                 return createEffect({
                     ...effectData,
                     trigger: 'passive'
                 }, this, this.getTierName(tier));
-            });
-            const materials = new Map();
+            });
+
+            const materials = new Map();
+
             const currency = this.manager.materials.getObjectByID('adventuring:currency');
             if (currency) {
                 const tierCosts = [50, 100, 200, 400];
@@ -246,11 +257,13 @@ export class AdventuringTavernDrink extends NamespacedObject {
         this.renderQueue.updateAll();
     }
 
-    encode(writer) {
+    encode(writer) {
+
         return writer;
     }
 
-    decode(reader, version) {
+    decode(reader, version) {
+
         return reader;
     }
 }

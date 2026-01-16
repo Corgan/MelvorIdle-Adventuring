@@ -3,7 +3,7 @@ const { loadModule } = mod.getContext(import.meta);
 const { AdventuringPage } = await loadModule('src/ui/adventuring-page.mjs');
 const { AdventuringConsumablesElement } = await loadModule('src/items/components/adventuring-consumables.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
-const { evaluateCondition } = await loadModule('src/core/adventuring-utils.mjs');
+const { evaluateCondition, createEffect, filterEffects } = await loadModule('src/core/adventuring-utils.mjs');
 const { AdventuringCategorySectionElement } = await loadModule('src/ui/components/adventuring-category-section.mjs');
 
 const MAX_EQUIPPED_CONSUMABLES = 3;
@@ -31,9 +31,12 @@ export class AdventuringConsumables extends AdventuringPage {
         this.game = game;
 
         this.component = createElement('adventuring-consumables');
-        this.renderQueue = new AdventuringConsumablesRenderQueue();
-        this.charges = new Map();
-        this.equipped = [];
+        this.renderQueue = new AdventuringConsumablesRenderQueue();
+
+        this.charges = new Map();
+
+        this.equipped = [];
+
         this.usedThisRun = new Set();
 
         this.consumables = [];
@@ -41,7 +44,8 @@ export class AdventuringConsumables extends AdventuringPage {
         this.selectedTier = 1; // Currently selected tier for viewing/equipping
 
         this.component.back.onclick = () => this.back();
-        this.component.equipButton.onclick = () => this.toggleEquipSelected();
+        this.component.equipButton.onclick = () => this.toggleEquipSelected();
+
         for (let i = 0; i < 4; i++) {
             const tier = i + 1;
             this.component.tierButtonElements[i].onclick = () => this.selectTier(tier);
@@ -63,7 +67,8 @@ export class AdventuringConsumables extends AdventuringPage {
         this.renderQueue.list = true;
     }
 
-    onShow() {
+    onShow() {
+
     }
 
     onHide() {
@@ -71,7 +76,8 @@ export class AdventuringConsumables extends AdventuringPage {
     }
 
     postDataRegistration() {
-        this.consumables = this.manager.consumableTypes.allObjects;
+        this.consumables = this.manager.consumableTypes.allObjects;
+
         const consumablesByJob = new Map();
         this.consumables.forEach(consumable => {
             const job = consumable.sourceJob;
@@ -80,19 +86,24 @@ export class AdventuringConsumables extends AdventuringPage {
                 consumablesByJob.set(job, []);
             }
             consumablesByJob.get(job).push(consumable);
-        });
-        consumablesByJob.forEach((jobConsumables, job) => {
+        });
+
+        consumablesByJob.forEach((jobConsumables, job) => {
+
             const section = new AdventuringCategorySectionElement();
-            section.setSection({ title: job.name });
+            section.setSection({ title: job.name });
+
             const content = section.getContent();
-            content.className = 'row no-gutters';
+            content.className = 'row no-gutters';
+
             jobConsumables.forEach(consumable => {
                 consumable.component.mount(content);
                 consumable.component.clickable.onclick = () => this.selectConsumable(consumable);
             });
 
             this.component.jobSections.appendChild(section);
-        });
+        });
+
         for (let i = 0; i < MAX_EQUIPPED_CONSUMABLES; i++) {
             const slot = this.component.slots[i];
             if (slot) {
@@ -103,7 +114,10 @@ export class AdventuringConsumables extends AdventuringPage {
                 };
             }
         }
-    }
+    }
+
+
+
 
     selectConsumable(consumable, tier = 1) {
         this.selectedConsumable = consumable;
@@ -143,7 +157,10 @@ export class AdventuringConsumables extends AdventuringPage {
         }
         this.renderQueue.details = true;
         this.render();
-    }
+    }
+
+
+
 
     getCharges(consumable, tier) {
         const tierMap = this.charges.get(consumable);
@@ -171,7 +188,8 @@ export class AdventuringConsumables extends AdventuringPage {
         const current = tierMap.get(tier) || 0;
         tierMap.set(tier, current + amount);
 
-        consumable.renderQueue.updateAll();
+        consumable.renderQueue.updateAll();
+
         const equipped = this.getEquippedEntry(consumable);
         if (equipped && equipped.tier === tier) {
             this.manager.party.invalidateAllEffects('consumables');
@@ -197,16 +215,21 @@ export class AdventuringConsumables extends AdventuringPage {
         const newCharges = Math.max(current - amount, 0);
         tierMap.set(tier, newCharges);
 
-        consumable.renderQueue.updateAll();
+        consumable.renderQueue.updateAll();
+
         const equipped = this.getEquippedEntry(consumable);
         if (newCharges <= 0 && equipped && equipped.tier === tier) {
             this.unequip(consumable);
-        } else if (equipped && equipped.tier === tier) {
+        } else if (equipped && equipped.tier === tier) {
             this.manager.party.invalidateAllEffects('consumables');
+            this.manager.overview.renderQueue.buffs = true;
         }
 
         this.renderQueue.slots = true;
-    }
+    }
+
+
+
 
     getEquippedEntry(consumable) {
         return this.equipped.find(e => e.consumable === consumable);
@@ -223,26 +246,36 @@ export class AdventuringConsumables extends AdventuringPage {
 
     equip(consumable, tier) {
         if (this.equipped.length >= MAX_EQUIPPED_CONSUMABLES) {
-            this.manager.log.add(`Cannot equip more than ${MAX_EQUIPPED_CONSUMABLES} consumables.`);
+            this.manager.log.add(`Cannot equip more than ${MAX_EQUIPPED_CONSUMABLES} consumables.`, {
+                category: 'town'
+            });
             return false;
-        }
-        if (this.isEquipped(consumable)) {
+        }
+
+        if (this.isEquipped(consumable)) {
+
             const entry = this.getEquippedEntry(consumable);
             if (entry.tier !== tier) {
                 this.unequip(consumable);
             } else {
                 return false; // Already equipped at this tier
             }
-        }
+        }
+
         if (this.getCharges(consumable, tier) <= 0) {
-            this.manager.log.add(`${consumable.getTierName(tier)} has no charges.`);
+            this.manager.log.add(`${consumable.getTierName(tier)} has no charges.`, {
+                category: 'town'
+            });
             return false;
         }
 
         this.equipped.push({ consumable, tier });
         consumable.renderQueue.equipped = true;
         this.renderQueue.slots = true;
-        this.manager.log.add(`Equipped ${consumable.getTierName(tier)}`);
+        this.manager.log.add(`Equipped ${consumable.getTierName(tier)}`, {
+            category: 'town'
+        });
+
         this.manager.party.invalidateAllEffects('consumables');
         this.manager.overview.renderQueue.buffs = true;
 
@@ -256,61 +289,63 @@ export class AdventuringConsumables extends AdventuringPage {
         const entry = this.equipped[index];
         this.equipped.splice(index, 1);
         consumable.renderQueue.equipped = true;
-        this.renderQueue.slots = true;
+        this.renderQueue.slots = true;
+
         this.manager.party.invalidateAllEffects('consumables');
         this.manager.overview.renderQueue.buffs = true;
 
         return true;
-    }
+    }
 
-    getEffects() {
-        const effects = [];
+
+
+
+    /**
+     * Get effects from equipped consumables
+     * @param {Object} filters - Optional filters (trigger, party, type, etc.)
+     * @returns {Array} Filtered effects with source metadata
+     */
+    getEffects(filters = { trigger: 'passive' }) {
+        let effects = [];
 
         for (const { consumable, tier } of this.equipped) {
             if (this.getCharges(consumable, tier) > 0) {
                 const tierEffects = consumable.getTierEffects(tier);
-                const passiveEffects = tierEffects.filter(e => e.trigger === 'passive');
-                effects.push(...passiveEffects);
+                for (const effectData of tierEffects) {
+                    const effect = createEffect(
+                        effectData,
+                        consumable,
+                        consumable.getTierName(tier),
+                        'consumable'
+                    );
+                    effect.sourceTier = tier;  // Include tier for charge consumption
+                    effects.push(effect);
+                }
             }
         }
 
-        return effects;
+        return filterEffects(effects, filters);
     }
 
-    getEffectsForTrigger(triggerType, context = {}) {
-        const results = [];
 
-        for (const { consumable, tier } of this.equipped) {
-            if (this.getCharges(consumable, tier) <= 0) continue;
 
-            const tierEffects = consumable.getTierEffects(tier);
-            for (const effect of tierEffects) {
-                if (effect.trigger !== triggerType) continue;
-
-                results.push({
-                    consumable: consumable,
-                    tier: tier,
-                    effect: effect
-                });
-            }
-        }
-
-        return results;
-    }
 
     onDungeonStart() {
         this.usedThisRun.clear();
     }
 
     onDungeonEnd() {
-        const preserveChance = this.manager.modifiers.getConsumablePreservationChance();
+        const preserveChance = this.manager.party.getConsumablePreservationChance();
+
         for (const { consumable, tier } of [...this.equipped]) {
             const tierEffects = consumable.getTierEffects(tier);
             const hasRunEndConsumption = tierEffects.some(e => e.consume_at_run_end);
 
             if (hasRunEndConsumption) {
                 if (preserveChance > 0 && Math.random() < preserveChance) {
-                    this.manager.log.add(`${consumable.getTierName(tier)} preserved!`);
+                    this.manager.log.add(`${consumable.getTierName(tier)} preserved!`, {
+                        category: 'loot_items'
+                    });
                 } else {
                     consumable.useCharge();
                 }
@@ -319,7 +354,10 @@ export class AdventuringConsumables extends AdventuringPage {
 
         this.manager.tavern.consumeCharges();
         this.usedThisRun.clear();
-    }
+    }
+
+
+
 
     render() {
         this.consumables.forEach(c => c.render());
@@ -362,17 +400,21 @@ export class AdventuringConsumables extends AdventuringPage {
         }
 
         this.component.showDetails();
-        this.updateTierButtonStates();
+        this.updateTierButtonStates();
+
         this.component.detailIcon.src = consumable.getTierMedia(tier);
         this.component.detailName.textContent = consumable.getTierName(tier);
-        this.component.detailDescription.innerHTML = consumable.getTierDescription(tier);
-        this.component.detailCharges.textContent = `${this.getCharges(consumable, tier)}`;
+        this.component.detailDescription.innerHTML = consumable.getTierDescription(tier);
+
+        this.component.detailCharges.textContent = `${this.getCharges(consumable, tier)}`;
+
         const equippedTier = this.getEquippedTier(consumable);
         if (equippedTier === tier) {
             this.component.equipButton.textContent = 'Unequip';
             this.component.equipButton.className = 'btn btn-warning';
             this.component.equipButton.disabled = false;
-        } else if (equippedTier > 0) {
+        } else if (equippedTier > 0) {
+
             this.component.equipButton.textContent = `Switch to Tier ${tier}`;
             this.component.equipButton.className = 'btn btn-info';
             this.component.equipButton.disabled = this.getCharges(consumable, tier) <= 0;
@@ -391,7 +433,10 @@ export class AdventuringConsumables extends AdventuringPage {
         }
 
         this.renderQueue.details = false;
-    }
+    }
+
+
+
 
     reset() {
         this.charges.clear();
@@ -403,7 +448,8 @@ export class AdventuringConsumables extends AdventuringPage {
         this.renderQueue.updateAll();
     }
 
-    encode(writer) {
+    encode(writer) {
+
         writer.writeUint16(this.charges.size);
         for (const [consumable, tierMap] of this.charges) {
             writer.writeNamespacedObject(consumable);
@@ -412,7 +458,8 @@ export class AdventuringConsumables extends AdventuringPage {
                 writer.writeUint8(tier);
                 writer.writeUint16(count);
             }
-        }
+        }
+
         writer.writeArray(this.equipped, (entry, writer) => {
             writer.writeNamespacedObject(entry.consumable);
             writer.writeUint8(entry.tier);
@@ -421,7 +468,8 @@ export class AdventuringConsumables extends AdventuringPage {
         return writer;
     }
 
-    decode(reader, version) {
+    decode(reader, version) {
+
         this.charges.clear();
         const numConsumables = reader.getUint16();
         for (let i = 0; i < numConsumables; i++) {
@@ -436,13 +484,15 @@ export class AdventuringConsumables extends AdventuringPage {
                     tierMap.set(tier, count);
                 }
                 this.charges.set(consumable, tierMap);
-            } else {
+            } else {
+
                 for (let j = 0; j < numTiers; j++) {
                     reader.getUint8();
                     reader.getUint16();
                 }
             }
-        }
+        }
+
         this.equipped = reader.getArray((reader) => {
             const consumable = reader.getNamespacedObject(this.manager.consumableTypes);
             const tier = reader.getUint8();

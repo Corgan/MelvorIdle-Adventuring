@@ -250,7 +250,7 @@ export class AdventuringArmory extends AdventuringPage {
 
             if(this.unlocked.get(baseItem) === true) return;
 
-            if(baseItem.requirementsMet) {
+            if(baseItem.unlocked) {
                 this.unlock(baseItem);
                 baseItem.renderQueue.updateAll();
             }
@@ -258,12 +258,19 @@ export class AdventuringArmory extends AdventuringPage {
     }
 
     unlock(item) {
+        const wasLocked = this.unlocked.get(item) !== true;
         this.unlocked.set(item, true);
         this.droppedItems.set(item, true); // Also mark as discovered
 
         if (this.upgradeLevels.get(item) < 1) {
             this.upgradeLevels.set(item, 1);
         }
+        
+        // Record equipment crafted/unlocked for achievements
+        if (wasLocked) {
+            this.manager.achievementManager.recordEquipmentCrafted();
+        }
+        
         item.renderQueue.updateAll();
         this.renderQueue.details = true;
     }
@@ -274,12 +281,27 @@ export class AdventuringArmory extends AdventuringPage {
         this.droppedItems.set(item, true);
         item.renderQueue.updateAll();
 
+        // Fire equipment_collected trigger for achievements
+        const totalCollected = [...this.droppedItems.values()].filter(v => v).length;
+        this.manager.achievementManager.trigger('equipment_collected', {
+            item: item,
+            itemId: item.id,
+            itemName: item.name,
+            slot: item.slot,
+            rarity: rarity || item.rarity || 'common',
+            tier: item.tier,
+            totalCollected: totalCollected
+        });
+
         if (notify) {
 
             const itemRarity = rarity || item.rarity || 'common';
             const message = this.getDropMessage(item.name, itemRarity);
             const logType = this.getLogTypeForRarity(itemRarity);
-            this.manager.log.add(message, logType);
+            this.manager.log.add(message, {
+                type: logType,
+                category: 'loot_items'
+            });
         }
 
         this.checkUnlocked();
@@ -382,9 +404,27 @@ export class AdventuringArmory extends AdventuringPage {
             }
 
             this.upgradeLevels.set(item, this.upgradeLevels.get(item) + 1);
+            
+            // Record achievement stat
+            this.manager.achievementManager.recordEquipmentUpgrade();
+            
             item.renderQueue.updateAll();
-            if(item.currentSlot !== undefined)
+            if(item.currentSlot !== undefined) {
                 item.currentSlot.renderQueue.updateAll();
+                // Invalidate effect caches since item stats changed
+                const character = item.currentSlot.equipment?.character;
+                if(character?.effectCache) {
+                    character.invalidateEffects('equipment');
+                }
+                if(this.manager.party?.effectCache) {
+                    this.manager.party.invalidateEffects('heroEquipment');
+                }
+                // Recalculate character stats since item stats changed
+                if(character) {
+                    character.invalidateStats();
+                    character.calculateStats();
+                }
+            }
         }
         this.renderQueue.details = true;
     }
@@ -474,7 +514,10 @@ export class AdventuringArmory extends AdventuringPage {
 
         this.renderQueue.details = true;
 
-        this.manager.log.add(`${item.name} has been unlocked!`, 'legendary');
+        this.manager.log.add(`${item.name} has been unlocked!`, {
+            type: 'legendary',
+            category: 'loot_items'
+        });
 
         return true;
     }

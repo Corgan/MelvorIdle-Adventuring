@@ -33,7 +33,40 @@ export class AdventuringEnemy extends AdventuringCharacter {
         this.phaseTransitioned = false;
     }
 
+    initEffectCache() {
+        super.initEffectCache();
+
+        // Monster passive effects - queried dynamically based on current monster
+        this.effectCache.registerSource('monsterPassives', () => {
+            if (!this.base || !this.base.passives) return [];
+
+            const effects = [];
+            for (const passiveId of this.base.passives) {
+                const passive = this.manager.passives.getObjectByID(passiveId);
+                if (!passive || !passive.effects) continue;
+
+                for (const effect of passive.effects) {
+                    effects.push({
+                        ...effect,
+                        source: passive,
+                        sourceName: `${this.base.name} (${passive.name})`,
+                        sourceType: 'monsterPassive'
+                    });
+                }
+            }
+            return effects;
+        });
+
+        // Dungeon effects that target enemies (difficulty modifiers, etc.)
+        this.effectCache.registerSource('dungeonEffects', () => 
+            this.manager.dungeon?.getEffects({ party: 'enemy' }) || []
+        );
+    }
+
     setMonster(monster, spawned=true) {
+
+        // Invalidate monster passives cache when monster changes
+        this.effectCache.invalidate('monsterPassives');
 
         if(monster === null || monster === undefined || monster === "") {
             this.base = undefined;
@@ -98,29 +131,8 @@ export class AdventuringEnemy extends AdventuringCharacter {
 
             this.component.splash.queue = [];
 
-            this.applySpawnEffects();
-        }
-    }
-
-    applySpawnEffects() {
-        const spawnEffects = this.manager.dungeon.getEffectsForTrigger('enemy_spawn');
-
-        for(const effect of spawnEffects) {
-            const auraId = effect.id;
-            if(!auraId) continue; // Skip effects without valid aura ID
-
-            if(effect.type === 'debuff') {
-                this.debuff(auraId, {
-                    stacks: effect.stacks,
-                    amount: effect.amount
-                }, null);
-            } else if(effect.type === 'buff' && effect.party === 'enemy') {
-
-                this.buff(auraId, {
-                    stacks: effect.stacks,
-                    amount: effect.amount
-                }, null);
-            }
+            // Trigger spawn effects via unified effect system
+            this.trigger('enemy_spawn', {});
         }
     }
 
@@ -137,6 +149,12 @@ export class AdventuringEnemy extends AdventuringCharacter {
 
     get media() {
         return this.base !== undefined ? this.base.media : this.getMediaURL(UNKNOWN_MEDIA);
+    }
+
+    getParty(type) {
+        if (type === 'ally') return this.party;
+        if (type === 'enemy') return this.manager.party;
+        return null;
     }
 
     checkPhaseTransition() {
@@ -158,7 +176,10 @@ export class AdventuringEnemy extends AdventuringCharacter {
         this.currentPhase = phaseIndex;
         this.phaseTransitioned = true;
 
-        this.manager.log.add(`${this.base.name} enters Phase ${phaseIndex + 1}!`);
+        this.manager.log.add(`${this.base.name} enters Phase ${phaseIndex + 1}!`, {
+            category: 'combat_mechanics',
+            target: this
+        });
 
         if(phase.generator) {
             this.setGenerator(this.manager.generators.getObjectByID(phase.generator));
@@ -190,7 +211,10 @@ export class AdventuringEnemy extends AdventuringCharacter {
         if(phase.amount) {
             const healAmount = Math.floor(this.maxHitpoints * (phase.amount / 100));
             this.heal({ amount: healAmount });
-            this.manager.log.add(`${this.base.name} heals for ${healAmount}!`);
+            this.manager.log.add(`${this.base.name} heals for ${healAmount}!`, {
+                category: 'combat_heal',
+                target: this
+            });
         }
 
         if(phase.aura) {
@@ -212,7 +236,10 @@ export class AdventuringEnemy extends AdventuringCharacter {
 
     triggerEnrage() {
         this.isEnraged = true;
-        this.manager.log.add(`${this.base.name} becomes ENRAGED!`);
+        this.manager.log.add(`${this.base.name} becomes ENRAGED!`, {
+            category: 'combat_mechanics',
+            target: this
+        });
 
         const enrageBuff = this.enrageBuff || { damage: 50, speed: 25 };
 
@@ -233,31 +260,6 @@ export class AdventuringEnemy extends AdventuringCharacter {
         }
     }
 
-    getAllPendingEffectsForTrigger(type, context) {
-
-        const pending = super.getAllPendingEffectsForTrigger(type, context);
-
-        if (this.base && this.base.passives) {
-            for (const passiveId of this.base.passives) {
-                const passive = this.manager.passives.getObjectByID(passiveId);
-                if (!passive || !passive.effects) continue;
-
-                for (const effect of passive.effects) {
-                    if (effect.trigger === type) {
-                        pending.push({
-                            effect,
-                            source: passive,
-                            sourceName: `${this.base.name} (${passive.name})`,
-                            sourceType: 'monsterPassive'
-                        });
-                    }
-                }
-            }
-        }
-
-        return pending;
-    }
-
     onDeath() {
         super.onDeath();
         if(this.xp) {
@@ -270,10 +272,7 @@ export class AdventuringEnemy extends AdventuringCharacter {
 
             this.manager.addXP(bonusXP, area || this.base);
 
-            this.manager.party.all.forEach(member => {
-                if(member.combatJob.isMilestoneReward)
-                    member.combatJob.addXP(bonusXP);
-            });
+            this.manager.party.awardJobXP(bonusXP);
 
             const masteryXP = this.base.masteryXP || 25;
             const bonusMasteryXP = Math.ceil(masteryXP * xpMultiplier);
@@ -287,16 +286,24 @@ export class AdventuringEnemy extends AdventuringCharacter {
 
             const lootTable = this.base.lootGenerator.table;
 
-            const processLoot = (id, qty) => {
+            const processLoot = (id, qty, isCurrency = false) => {
 
-                const dropQtyBonus = this.manager.modifiers.getMonsterDropQtyBonus(this.base);
+                const dropQtyBonus = this.manager.party.getMonsterDropQtyBonus(this.base);
                 if(dropQtyBonus > 0) {
                     qty = Math.ceil(qty * (1 + dropQtyBonus));
                 }
 
-                const materialDropBonus = this.manager.modifiers.getMaterialDropRateBonus();
+                const materialDropBonus = this.manager.party.getMaterialDropRateBonus();
                 if(materialDropBonus > 0) {
                     qty = Math.ceil(qty * (1 + materialDropBonus));
+                }
+
+                // Apply currency-specific bonus
+                if(isCurrency) {
+                    const currencyBonus = this.manager.party.getCurrencyDropBonus();
+                    if(currencyBonus > 0) {
+                        qty = Math.ceil(qty * (1 + currencyBonus));
+                    }
                 }
 
                 const lootBonus = this.manager.dungeon.getBonus('loot_percent');
@@ -304,7 +311,7 @@ export class AdventuringEnemy extends AdventuringCharacter {
                     qty = Math.ceil(qty * (1 + lootBonus / 100));
                 }
 
-                this.manager.stash.add(id, qty);
+                this.manager.stash.add(id, qty, { fromCombat: true });
             };
 
             const getQty = (entry) => {
@@ -353,7 +360,7 @@ export class AdventuringEnemy extends AdventuringCharacter {
                         const baseQty = getQty(entry);
                         const variance = 0.8 + (Math.random() * 0.4);
                         const qty = Math.max(1, Math.round(baseQty * variance));
-                        processLoot(entry.id, qty);
+                        processLoot(entry.id, qty, true);  // true = isCurrency
                         break;
                     }
 
@@ -417,7 +424,7 @@ export class AdventuringEnemy extends AdventuringCharacter {
                 }
             }
 
-            const dropRateBonus = this.manager.modifiers.getMonsterDropRateBonus(this.base);
+            const dropRateBonus = this.manager.party.getMonsterDropRateBonus(this.base);
             const materialEntries = lootTable.filter(e => ((e.type !== undefined) ? e.type : this.inferLootType(e)) === 'materials');
             if(dropRateBonus > 0 && materialEntries.length > 0 && Math.random() < dropRateBonus) {
                 const bonusMaterial = materialEntries[Math.floor(Math.random() * materialEntries.length)];

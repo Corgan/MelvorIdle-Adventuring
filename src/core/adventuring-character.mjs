@@ -3,7 +3,7 @@ const { loadModule } = mod.getContext(import.meta);
 const { AdventuringCard } = await loadModule('src/progression/adventuring-card.mjs');
 const { AdventuringStats } = await loadModule('src/core/adventuring-stats.mjs');
 const { AdventuringAuras } = await loadModule('src/combat/adventuring-auras.mjs');
-const { createEffect, EffectCache, defaultEffectProcessor, SimpleEffectInstance, evaluateCondition, buildEffectContext, StatCalculator, EffectLimitTracker } = await loadModule('src/core/adventuring-utils.mjs');
+const { createEffect, EffectCache, defaultEffectProcessor, SimpleEffectInstance, evaluateCondition, buildEffectContext, StatCalculator, EffectLimitTracker, awardCombatXP } = await loadModule('src/core/adventuring-utils.mjs');
 
 const { AdventuringCharacterElement } = await loadModule('src/core/components/adventuring-character.mjs');
 
@@ -55,6 +55,7 @@ class AdventuringCharacter {
         this.effectLimitTracker = new EffectLimitTracker();
 
         this.stats = new AdventuringStats(this.manager, this.game);
+        this.stats.setOwner(this);
         this.stats.component.mount(this.component.stats);
     }
 
@@ -96,6 +97,16 @@ class AdventuringCharacter {
         return false;
     }
 
+    /**
+     * Get a party by type relative to this character's perspective.
+     * @param {'ally'|'enemy'} type - Which party to get
+     * @returns {Party} The requested party
+     */
+    getParty(type) {
+        // Base implementation - subclasses override
+        return null;
+    }
+
     get maxEnergy() {
         if(this.spender !== undefined && this.spender.cost > 0)
             return this.spender.cost;
@@ -120,65 +131,10 @@ class AdventuringCharacter {
         this.effectLimitTracker.record(effect, source);
     }
 
-    resetEffectLimits(limitType) {
-        this.effectLimitTracker.reset(limitType);
-    }
-
-    getAllPendingEffectsForTrigger(type, context) {
-        const pending = [];
-
-        if (this.auras) {
-            const auraEffects = this.auras.getEffectsForTrigger(type, context);
-            pending.push(...auraEffects);
+    resetEffectLimits(...limitTypes) {
+        for (const limitType of limitTypes) {
+            this.effectLimitTracker.reset(limitType);
         }
-
-        return pending;
-    }
-
-    processPendingEffect(pending, context) {
-        const { effect, source, sourceName, sourceType } = pending;
-
-        if (effect.condition) {
-            if (!evaluateCondition(effect.condition, context)) {
-                return false;
-            }
-        }
-
-        if (!this.canEffectTrigger(effect, source)) {
-            return false;
-        }
-
-        const chance = effect.chance || 100;
-        if (Math.random() * 100 > chance) {
-            return false;
-        }
-
-        let amount = effect.amount || 0;
-        if (sourceType === 'equipment' && effect.scaling && source.level > 0) {
-            amount += Math.floor(source.level * effect.scaling);
-        }
-
-        if (sourceType === 'aura') {
-            this.processAuraEffect(effect, source, sourceName, context);
-        } else {
-
-            this.processTriggeredEffect(effect, amount, context, sourceName);
-        }
-
-        this.recordEffectTrigger(effect, source);
-
-        return true;
-    }
-
-    processAuraEffect(effect, instance, sourceName, context) {
-
-        const processorContext = {
-            character: this,
-            manager: this.manager,
-            extra: context
-        };
-
-        defaultEffectProcessor.process({ effect, instance }, processorContext);
     }
 
     get action() {
@@ -211,13 +167,22 @@ class AdventuringCharacter {
     }
 
     trigger(type, extra={}) {
-
         const context = buildEffectContext(this, extra);
 
-        const pending = this.getAllPendingEffectsForTrigger(type, context);
+        this.effectCache.processTrigger(type, context, {
+            host: this,
+            limitTracker: this.effectLimitTracker
+        });
 
-        for (const p of pending) {
-            this.processPendingEffect(p, context);
+        // Trigger achievements with combat context
+        if (this.manager.achievementManager && this.manager.combatTracker) {
+            const achievementContext = {
+                ...context,
+                source: this,
+                triggerType: type,
+                ...this.manager.combatTracker.getContext()
+            };
+            this.manager.achievementManager.trigger(type, achievementContext);
         }
 
         return context;
@@ -238,17 +203,6 @@ class AdventuringCharacter {
             const auraId = effect.id;
             if(auraId) this.debuff(auraId, builtEffect, character);
         }
-    }
-
-    processTriggeredEffect(effect, amount, extra, sourceName) {
-
-        const context = {
-            character: this,
-            manager: this.manager,
-            extra: extra
-        };
-
-        return defaultEffectProcessor.processSimple(effect, amount, sourceName, context);
     }
 
     buff(id, builtEffect, character) {
@@ -296,21 +250,34 @@ class AdventuringCharacter {
     }
 
     getStatBonus(statId) {
-        return this.effectCache.getStatBonus(statId);
+        let bonus = this.effectCache.getStatBonus(statId);
+        // Include party-wide effects for heroes
+        if (this.isHero && this.party?.effectCache) {
+            bonus += this.party.effectCache.getStatBonus(statId);
+        }
+        return bonus;
     }
 
     invalidateEffects(sourceId) {
         this.effectCache.invalidate(sourceId);
+        // Queue stats UI update since effect bonuses may have changed
+        this.stats.renderQueue.stats = true;
     }
 
     getEffectiveStat(stat) {
         if(typeof stat === "string")
             stat = this.manager.stats.getObjectByID(stat);
 
+        let allStatBonus = this.getPassiveBonus('all_stat_bonus');
+        // Include party-wide all_stat_bonus for heroes
+        if (this.isHero && this.party?.effectCache) {
+            allStatBonus += this.party.getPassiveBonus('all_stat_bonus');
+        }
+
         return StatCalculator.calculate(
             this.stats.get(stat),
             this.getStatBonus(stat.id),
-            this.getPassiveBonus('all_stat_bonus')
+            allStatBonus
         );
     }
 
@@ -323,6 +290,18 @@ class AdventuringCharacter {
         if(isNaN(this.hitpoints))
             this.hitpoints = 0;
 
+        // Record to CombatTracker
+        if(this.manager.combatTracker && amount > 0) {
+            // If this character is an enemy being damaged by a hero, record damage dealt
+            if(character && character.isHero && !this.isHero) {
+                this.manager.combatTracker.encounter.recordDamageDealt(amount, this);
+            }
+            // If this character is a hero taking damage, record damage taken
+            if(this.isHero && character && !character.isHero) {
+                this.manager.combatTracker.encounter.recordDamageTaken(amount, character);
+            }
+        }
+
         if(character && character.isHero && !this.isHero && this.manager.achievements) {
             const stats = this.manager.achievementManager.stats;
             if(stats) {
@@ -331,42 +310,12 @@ class AdventuringCharacter {
         }
 
         if(character && character.isHero && !this.isHero && amount > 0) {
-
-            const baseXP = Math.max(1, Math.floor(amount / 2));
-            const difficultyXPBonus = this.manager.dungeon?.getBonus('xp_percent') / 100 || 0;
-            const equipmentXP = Math.floor(baseXP * (1 + difficultyXPBonus));
-
-            if (character.equipment && character.equipment.slots) {
-                character.equipment.slots.forEach((equipmentSlot, slotType) => {
-                    if(!equipmentSlot.empty && !equipmentSlot.occupied && equipmentSlot.item) {
-                        equipmentSlot.item.addXP(equipmentXP);
-                    }
-                });
-            }
-
-            if(character.combatJob && character.combatJob.isMilestoneReward) {
-                character.combatJob.addXP(Math.floor(equipmentXP / 2));
-            }
+            awardCombatXP(character, Math.floor(amount / 2), this.manager);
         }
 
         const isCharacterEnemy = character && !character.isHero;
         if(this.isHero && isCharacterEnemy && amount > 0 && !this.dead) {
-
-            const baseXP = Math.max(1, Math.floor(amount / 2));
-            const difficultyXPBonus = this.manager.dungeon?.getBonus('xp_percent') / 100 || 0;
-            const equipmentXP = Math.floor(baseXP * (1 + difficultyXPBonus));
-
-            if (this.equipment && this.equipment.slots) {
-                this.equipment.slots.forEach((equipmentSlot, slotType) => {
-                    if(!equipmentSlot.empty && !equipmentSlot.occupied && equipmentSlot.item) {
-                        equipmentSlot.item.addXP(equipmentXP);
-                    }
-                });
-            }
-
-            if(this.combatJob && this.combatJob.isMilestoneReward) {
-                this.combatJob.addXP(Math.floor(equipmentXP / 2));
-            }
+            awardCombatXP(this, Math.floor(amount / 2), this.manager);
         }
 
         if(!loadingOfflineProgress) {
@@ -391,7 +340,10 @@ class AdventuringCharacter {
                     } else {
                         this.hitpoints = 1;
                     }
-                    this.manager.log.add(`${this.name} cheated death!`);
+                    this.manager.log.add(`${this.name} cheated death!`, {
+                        category: 'combat_mechanics',
+                        source: this
+                    });
                     this.renderQueue.hitpoints = true;
                     return;
                 }
@@ -400,7 +352,7 @@ class AdventuringCharacter {
 
                 this.onDeath();
 
-                let resolvedEffects = this.trigger('death');
+                this.trigger('death');
 
                 if(this.manager && this.manager.party) {
                     let party;
@@ -434,6 +386,11 @@ class AdventuringCharacter {
         if(isNaN(this.hitpoints))
             this.hitpoints = 0;
 
+        // Record to CombatTracker
+        if(this.manager.combatTracker && this.isHero && actualHeal > 0) {
+            this.manager.combatTracker.encounter.recordHealing(actualHeal);
+        }
+
         if(this.isHero && this.manager.achievements && actualHeal > 0) {
             const stats = this.manager.achievementManager.stats;
             if(stats) {
@@ -442,37 +399,11 @@ class AdventuringCharacter {
         }
 
         if(character && character.isHero && actualHeal > 0) {
-
-            const equipmentXP = Math.max(1, Math.floor(actualHeal / 2));
-
-            if (character.equipment && character.equipment.slots) {
-                character.equipment.slots.forEach((equipmentSlot, slotType) => {
-                    if(!equipmentSlot.empty && !equipmentSlot.occupied && equipmentSlot.item) {
-                        equipmentSlot.item.addXP(equipmentXP);
-                    }
-                });
-            }
-
-            if(character.combatJob && character.combatJob.isMilestoneReward) {
-                character.combatJob.addXP(Math.floor(equipmentXP / 2));
-            }
+            awardCombatXP(character, Math.floor(actualHeal / 2), this.manager);
         }
 
         if(this.isHero && character && character.isHero && actualHeal > 0) {
-
-            const equipmentXP = Math.max(1, Math.floor(actualHeal / 2));
-
-            if (this.equipment && this.equipment.slots) {
-                this.equipment.slots.forEach((equipmentSlot, slotType) => {
-                    if(!equipmentSlot.empty && !equipmentSlot.occupied && equipmentSlot.item) {
-                        equipmentSlot.item.addXP(equipmentXP);
-                    }
-                });
-            }
-
-            if(this.combatJob && this.combatJob.isMilestoneReward) {
-                this.combatJob.addXP(Math.floor(equipmentXP / 2));
-            }
+            awardCombatXP(this, Math.floor(actualHeal / 2), this.manager);
         }
 
         if(!loadingOfflineProgress) {
@@ -536,7 +467,10 @@ class AdventuringCharacter {
     }
 
     onDeath() {
-        this.manager.log.add(`${this.name} dies`);
+        this.manager.log.add(`${this.name} dies`, {
+            category: 'combat_death',
+            source: this
+        });
     }
 
     render() {

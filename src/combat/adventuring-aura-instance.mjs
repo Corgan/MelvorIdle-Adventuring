@@ -2,7 +2,7 @@ const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringStats } = await loadModule('src/core/adventuring-stats.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
-const { formatTrigger } = await loadModule('src/core/adventuring-utils.mjs');
+const { formatTrigger, defaultEffectProcessor } = await loadModule('src/core/adventuring-utils.mjs');
 
 const { AdventuringAuraInstanceElement } = await loadModule('src/combat/components/adventuring-aura-instance.mjs');
 
@@ -180,7 +180,13 @@ export class AdventuringAuraInstance {
                     extra: { source: this.source, aura: this.base }
                 };
                 for (const effect of depletedEffects) {
-                    this.auras.character.processEffect(effect, this, ctx);
+                    defaultEffectProcessor.processEffect(
+                        effect,
+                        effect.amount || 0,
+                        effect.stacks || 1,
+                        this.base?.name || 'Aura',
+                        ctx
+                    );
                 }
             }
         }

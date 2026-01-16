@@ -290,14 +290,44 @@ function isInCombat(character) {
     return character.combatJob.id !== 'adventuring:none';
 }
 
-function resolveTargets(targetType, party, exclude = null) {
+/**
+ * Resolve targets for an effect based on targeting type.
+ * Handles both single-target (self/attacker/target) and multi-target (all/front/back/etc).
+ * 
+ * @param {string} targetType - The targeting type (self, attacker, target, all, front, back, etc.)
+ * @param {Object} context - Resolution context
+ * @param {Object} context.party - The party to resolve multi-targets from
+ * @param {Object} context.self - The source character (for 'self' targeting)
+ * @param {Object} context.attacker - The attacker (for 'attacker' targeting)
+ * @param {Object} context.target - The target (for 'target' targeting)
+ * @param {Object} context.exclude - Character to exclude from multi-targeting
+ * @returns {Array} Array of target characters
+ */
+function resolveTargets(targetType, context) {
+    const { party, self, attacker, target, exclude } = context;
+    
+    // Handle single-target types
+    switch(targetType) {
+        case "self":
+            return self && !self.dead ? [self] : [];
+            
+        case "attacker":
+            return attacker && !attacker.dead ? [attacker] : [];
+            
+        case "target":
+            return target && !target.dead ? [target] : [];
+            
+        case "none":
+            return [];
+    }
+    
+    // Multi-target types require a party
+    if (!party) return [];
+    
     // Filter to only include combatants (not "none" combat job heroes)
     const alive = party.all.filter(t => !t.dead && t !== exclude && isInCombat(t));
 
     switch(targetType) {
-        case "none":
-            return [];
-
         case "front": {
             // Check front, then center, then back - but only if they're in combat
             if(!party.front.dead && party.front !== exclude && isInCombat(party.front)) return [party.front];
@@ -395,7 +425,7 @@ class AdventuringWeightedTable {
     }
 }
 
-function createEffect(effectData, source, sourceName) {
+function createEffect(effectData, source, sourceName, sourceType = null) {
     return {
 
         ...effectData,
@@ -410,7 +440,8 @@ function createEffect(effectData, source, sourceName) {
         stacks: effectData.stacks,  // For buff/debuff effects
         id: effectData.id || effectData.aura || effectData.buff || effectData.debuff,  // Aura ID for buff/debuff
         source: source,
-        sourceName: sourceName
+        sourceName: sourceName,
+        sourceType: sourceType
     };
 }
 
@@ -470,19 +501,39 @@ function buildEffectContext(character, extra = {}, pooledCtx = null) {
     return ctx;
 }
 
-function filterEffectsByTrigger(effects, trigger) {
-    return effects.filter(e => e.trigger === trigger);
-}
-
-function filterEffectsByType(effects, type) {
-    return effects.filter(e => e.type === type);
-}
-
-function getStatEffects(effects, statId) {
-    return effects.filter(e =>
-        (e.type === 'stat_flat' || e.type === 'stat_percent') &&
-        e.stat === statId
-    );
+/**
+ * Filters an array of effects based on provided criteria
+ * @param {Array} effects - Array of effect objects
+ * @param {Object} filters - Filter criteria
+ * @param {string} [filters.trigger] - Filter by trigger type ('passive', 'hit', 'round_end', etc.)
+ * @param {string} [filters.party] - Filter by party target ('self', 'enemy', 'ally')
+ * @param {string} [filters.type] - Filter by effect type ('stat_flat', 'heal_flat', etc.)
+ * @param {string} [filters.stat] - Filter by stat id
+ * @param {string} [filters.target] - Filter by target ('self', 'lowest', 'all', etc.)
+ * @param {string} [filters.scope] - Filter by scope ('individual', 'party'). 'individual' also matches undefined scope.
+ * @returns {Array} Filtered effects
+ */
+function filterEffects(effects, filters = {}) {
+    if (!filters || Object.keys(filters).length === 0) {
+        return effects;
+    }
+    
+    return effects.filter(effect => {
+        if (filters.trigger !== undefined && effect.trigger !== filters.trigger) return false;
+        if (filters.party !== undefined && effect.party !== filters.party) return false;
+        if (filters.type !== undefined && effect.type !== filters.type) return false;
+        if (filters.stat !== undefined && effect.stat !== filters.stat) return false;
+        if (filters.target !== undefined && effect.target !== filters.target) return false;
+        // Scope filter: 'individual' matches both 'individual' and undefined (default to individual)
+        if (filters.scope !== undefined) {
+            if (filters.scope === 'individual') {
+                if (effect.scope === 'party') return false;
+            } else {
+                if (effect.scope !== filters.scope) return false;
+            }
+        }
+        return true;
+    });
 }
 
 class EffectCache {
@@ -501,8 +552,26 @@ class EffectCache {
         this.globalDirty = true;
     }
 
-    registerSource(sourceId, getEffectsFn) {
-        this.sources.set(sourceId, getEffectsFn);
+    /**
+     * Register an effect source with optional callbacks.
+     * @param {string} sourceId - Unique identifier for this source
+     * @param {Function|Object} source - Either:
+     *   - A function: () => Effect[]
+     *   - An object: { getEffects, filters?, onTrigger? }
+     */
+    registerSource(sourceId, source) {
+        if (!source) {
+            console.warn(`EffectCache: Invalid source registered for ${sourceId}`);
+            return;
+        }
+        
+        const isFunction = typeof source === 'function';
+        const filters = source.filters || {};
+        
+        this.sources.set(sourceId, {
+            getEffects: isFunction ? source : () => source.getEffects(filters),
+            onTrigger: source.onTrigger || null
+        });
         this.dirtyFlags.set(sourceId, true);
         this.globalDirty = true;
     }
@@ -540,9 +609,9 @@ class EffectCache {
 
         const allEffects = [];
 
-        this.sources.forEach((getEffectsFn, sourceId) => {
+        this.sources.forEach((source, sourceId) => {
             try {
-                const effects = getEffectsFn();
+                const effects = source.getEffects();
                 if(Array.isArray(effects)) {
                     allEffects.push(...effects);
                 }
@@ -558,20 +627,27 @@ class EffectCache {
         this.bonusCache.clear();
     }
 
-    getEffects(trigger = null) {
+    getEffects(filters = null) {
         this.rebuild();
 
-        if(trigger === null) {
+        if (filters === null || Object.keys(filters).length === 0) {
             return this.allEffectsCache || [];
         }
 
-        if(this.cachedByTrigger.has(trigger)) {
-            return this.cachedByTrigger.get(trigger);
+        // For simple trigger-only filter, use cached version
+        if (Object.keys(filters).length === 1 && filters.trigger !== undefined) {
+            const trigger = filters.trigger;
+            if (this.cachedByTrigger.has(trigger)) {
+                return this.cachedByTrigger.get(trigger);
+            }
+
+            const filtered = filterEffects(this.allEffectsCache || [], { trigger });
+            this.cachedByTrigger.set(trigger, filtered);
+            return filtered;
         }
 
-        const filtered = (this.allEffectsCache || []).filter(e => e.trigger === trigger);
-        this.cachedByTrigger.set(trigger, filtered);
-        return filtered;
+        // For complex filters, compute on demand (could add caching later if needed)
+        return filterEffects(this.allEffectsCache || [], filters);
     }
 
     getBonus(effectType, filter = {}) {
@@ -657,6 +733,117 @@ class EffectCache {
                 return sum + val;
             }, 0);
     }
+
+    /**
+     * Validates an effect before processing (condition, limit, chance checks)
+     * @param {Object} effect - The effect to validate
+     * @param {Object} context - The effect context
+     * @param {Object} limitTracker - EffectLimitTracker instance
+     * @returns {boolean} Whether the effect should be processed
+     */
+    validateEffect(effect, context, limitTracker = null) {
+        // Check condition
+        if (effect.condition) {
+            if (!evaluateCondition(effect.condition, context)) {
+                return false;
+            }
+        }
+
+        // Check limit tracker
+        if (limitTracker && !limitTracker.canTrigger(effect, effect.source)) {
+            return false;
+        }
+
+        // Check chance
+        const chance = effect.chance || 100;
+        if (Math.random() * 100 > chance) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Process all effects for a trigger type with unified application.
+     * @param {string} trigger - The trigger type
+     * @param {Object} context - The effect context  
+     * @param {Object} options - Processing options
+     * @param {Object} [options.host] - The entity that owns this cache (for applyEffect)
+     * @param {Object} [options.limitTracker] - EffectLimitTracker instance
+     * @param {Function} [options.effectModifier] - Transform effect before apply: (effect) => effect
+     * @param {Object} [options.filters] - Additional filters beyond trigger
+     * @returns {Array} Array of applied effects
+     */
+    processTrigger(trigger, context, options = {}) {
+        const { host, limitTracker, effectModifier, filters = {} } = options;
+        
+        const effects = this.getEffects({ trigger, ...filters });
+        const applied = [];
+
+        for (const effect of effects) {
+            if (!this.validateEffect(effect, context, limitTracker)) {
+                continue;
+            }
+
+            // Allow caller to modify effect before application
+            const finalEffect = effectModifier ? effectModifier(effect) : effect;
+            
+            // Apply the effect - returns true if handler was invoked with valid targets
+            const triggered = this.applyEffect(finalEffect, host, context);
+            
+            if (!triggered) {
+                continue;
+            }
+            
+            applied.push(effect);
+            
+            if (limitTracker) {
+                limitTracker.record(effect, effect.source);
+            }
+            
+            // Call source's onTrigger callback if registered and effect actually triggered
+            const sourceConfig = this.sources.get(effect.sourceType);
+            if (sourceConfig?.onTrigger) {
+                sourceConfig.onTrigger(finalEffect, context, host);
+            }
+        }
+
+        return applied;
+    }
+    
+    /**
+     * Apply a single effect to a host entity.
+     * Handles dynamic amounts and delegates to defaultEffectProcessor.
+     * @param {Object} effect - The effect to apply
+     * @param {Object} host - The entity receiving the effect
+     * @param {Object} context - The effect context
+     * @returns {boolean} True if handler was invoked with valid targets (effect triggered)
+     */
+    applyEffect(effect, host, context) {
+        const { source, sourceName, sourceType } = effect;
+
+        // Compute amount - handle both static and dynamic
+        let amount = effect.amount || 0;
+        if (typeof effect.getAmount === 'function') {
+            amount = effect.getAmount(host);
+        }
+
+        // Compute stacks - handle both static and dynamic
+        let stacks = effect.stacks || 1;
+        if (typeof effect.getStacks === 'function') {
+            stacks = effect.getStacks(host);
+        }
+
+        // Build processor context and apply
+        const processorContext = {
+            character: host,
+            caster: host,
+            manager: host?.manager || context?.manager,
+            extra: context
+        };
+        
+        return defaultEffectProcessor.processEffect(effect, amount, stacks, sourceName, processorContext);
+    }
 }
 
 class RequirementsChecker {
@@ -729,6 +916,19 @@ class RequirementsChecker {
                 if (this.manager.achievements === undefined) return false;
                 const achievement = this.manager.achievements.getObjectByID(req.id);
                 return achievement ? achievement.isComplete() : false;
+            }
+
+            case 'achievement_milestone': {
+                // Check if a specific milestone in a milestone chain achievement is complete
+                if (this.manager.achievements === undefined) return false;
+                const achievement = this.manager.achievements.getObjectByID(req.achievement);
+                if (!achievement) return false;
+                // If the achievement has milestones, check the specific milestone
+                if (achievement.isMilestoneChain) {
+                    return achievement.isMilestoneComplete(req.milestone);
+                }
+                // Fallback: if not a milestone chain, check if achievement is complete
+                return achievement.isComplete();
             }
 
             case 'area_cleared': {
@@ -974,6 +1174,18 @@ function formatRequirement(req, manager, context = {}) {
             const achievement = manager.achievements?.getObjectByID(req.id);
             const achievementName = achievement !== undefined ? achievement.name : req.id;
             text = `Complete: ${achievementName}`;
+            break;
+        }
+
+        case 'achievement_milestone': {
+            const achievement = manager.achievements?.getObjectByID(req.achievement);
+            if (achievement && achievement.isMilestoneChain) {
+                const milestone = achievement.getMilestone(req.milestone);
+                const milestoneName = milestone ? milestone.name : req.milestone;
+                text = `Complete: ${milestoneName}`;
+            } else {
+                text = `Complete: ${req.achievement} (${req.milestone})`;
+            }
             break;
         }
 
@@ -1367,6 +1579,7 @@ const effectDescriptionRegistry = new Map([
     ['job_stats_percent', (effect, value) => `+${value}% Job Stats`],
     ['drop_rate_percent', (effect, value) => `+${value}% Drop Rate`],
     ['drop_quantity_percent', (effect, value) => `+${value}% Drop Quantity`],
+    ['currency_drop_percent', (effect, value) => `+${value}% Currency Drops`],
     ['explore_speed_percent', (effect, value) => `+${value}% Explore Speed`],
     ['spawn_rate_percent', (effect, value) => {
         const spawnType = effect.spawnType || 'unknown';
@@ -1524,7 +1737,7 @@ function formatTrigger(trigger) {
         'before_damage_received': 'Before receiving damage',
         'after_damage_received': 'After receiving damage',
         'before_damage_delivered': 'Before dealing damage',
-        'after_damage_dealt': 'After dealing damage',
+        'after_damage_delivered': 'After dealing damage',
         'miss': 'On miss',
         'crit': 'On critical hit',
         'kill': 'On kill',
@@ -1751,8 +1964,6 @@ function formatTriggerSuffix(trigger) {
         'after_damage_delivered': 'after dealing damage',
         'before_damage_received': 'before taking damage',
         'after_damage_received': 'after taking damage',
-        'before_damage_delivered': 'before dealing damage',
-        'after_damage_dealt': 'after dealing damage',
         'miss': 'on miss',
         'crit': 'on critical hit',
         'kill': 'on kill',
@@ -2004,25 +2215,31 @@ const UTILITY_EFFECT_XP = {
     dodge: 2  // when granted by buff, not self-dodge
 };
 
-function awardSourceXP(instance, amount, ctx) {
-    if(!instance || !instance.source || !instance.source.isHero) return;
-    if(amount <= 0) return;
+/**
+ * Award combat XP to a hero's equipment and combat job.
+ * @param {AdventuringHero} character - The hero to award XP to
+ * @param {number} baseXP - Base XP before difficulty multiplier
+ * @param {Adventuring} manager - The manager instance
+ */
+function awardCombatXP(character, baseXP, manager) {
+    if (!character?.isHero || baseXP <= 0) return;
     
-    const source = instance.source;
-    const difficultyXPBonus = ctx.manager.dungeon?.getBonus('xp_percent') / 100 || 0;
-    const equipmentXP = Math.floor(amount * (1 + difficultyXPBonus));
-
-    if(source.equipment && source.equipment.slots) {
-        source.equipment.slots.forEach((slot, type) => {
-            if(!slot.empty && !slot.occupied && slot.item) {
-                slot.item.addXP(equipmentXP);
-            }
-        });
+    const xp = Math.floor(baseXP * (manager.dungeon?.getDifficultyXPMultiplier() || 1));
+    
+    character.equipment?.forEachEquipped(item => item.addXP(xp));
+    
+    if (character.combatJob?.isMilestoneReward) {
+        character.combatJob.addXP(Math.floor(xp / 2));
     }
+}
 
-    if(source.combatJob && source.combatJob.isMilestoneReward) {
-        source.combatJob.addXP(Math.floor(equipmentXP / 2));
-    }
+/**
+ * Award XP from an effect instance to its source character.
+ * Wrapper around awardCombatXP for effect processor context.
+ */
+function awardSourceXP(instance, baseXP, ctx) {
+    if (!instance?.source) return;
+    awardCombatXP(instance.source, baseXP, ctx.manager);
 }
 
 class EffectProcessor {
@@ -2056,6 +2273,72 @@ class EffectProcessor {
         }
 
         return context.extra;
+    }
+
+    /**
+     * Process an effect: resolve targets, invoke handler, award XP.
+     * Unified processing path for all effect types and targeting modes.
+     * 
+     * @param {Object} effect - The effect to process
+     * @param {number} amount - Pre-computed amount
+     * @param {number} stacks - Pre-computed stacks
+     * @param {string} sourceName - Name of the effect source for logging
+     * @param {Object} context - Processor context { character, caster, manager, extra }
+     * @returns {boolean} True if effect was processed (had valid targets)
+     */
+    processEffect(effect, amount, stacks, sourceName, context) {
+        const targetType = effect.target || 'self';
+        const partyType = effect.party || effect.targetParty || 'ally';
+        
+        // Determine which party to resolve targets from
+        const encounter = context.extra?.encounter;
+        const targetParty = partyType === 'enemy' 
+            ? encounter?.party 
+            : context.manager.party;
+        
+        // Build resolution context
+        const resolveContext = {
+            party: targetParty,
+            self: context.character,
+            attacker: context.extra?.attacker,
+            target: context.extra?.target,
+            exclude: null
+        };
+        
+        // Resolve targets
+        const targets = resolveTargets(targetType, resolveContext);
+        
+        if (targets.length === 0) {
+            return false;
+        }
+        
+        // Create instance and get handler
+        const instance = new SimpleEffectInstance(amount, sourceName, stacks);
+        const handler = this.handlers.get(effect.type);
+        
+        if (!handler) {
+            console.warn(`[applyEffect] No handler for effect type: ${effect.type}`);
+            return false;
+        }
+        
+        // Track original caster for effects applied to other targets
+        const caster = context.caster || context.character;
+        
+        // Apply to each target
+        for (const target of targets) {
+            if (target.dead) continue;
+            
+            // Create per-target context with target as character
+            const targetContext = {
+                ...context,
+                character: target,
+                caster: caster
+            };
+            
+            handler(effect, instance, targetContext);
+        }
+        
+        return true;
     }
 
     processAll(resolvedEffects, context) {
@@ -2102,20 +2385,20 @@ function createDefaultEffectProcessor() {
     const damageOrHeal = (effect, instance, ctx) => {
         const amount = getEffectAmount(effect, instance);
         const builtEffect = { amount };
-        const target = effect.target || 'self';
         const isDamage = effect.type.includes('damage');
         const effectLabel = isDamage ? 'damage' : 'healing';
+        
+        // ctx.character is the target (set by applyEffect)
+        // ctx.caster is the original source character
+        const target = ctx.character;
+        const caster = ctx.caster || ctx.character;
 
-        if(target === 'self' || target === undefined) {
-            ctx.manager.log.add(`${ctx.character.name} receives ${amount} ${effectLabel} from ${instance.base.name}`);
-            ctx.character.applyEffect(effect, builtEffect, ctx.character);
-        } else if(target === 'attacker' && ctx.extra.attacker) {
-            ctx.manager.log.add(`${ctx.extra.attacker.name} receives ${amount} ${effectLabel} from ${instance.base.name}`);
-            ctx.extra.attacker.applyEffect(effect, builtEffect, ctx.character);
-        } else if(target === 'target' && ctx.extra.target) {
-            ctx.manager.log.add(`${ctx.extra.target.name} receives ${amount} ${effectLabel} from ${instance.base.name}`);
-            ctx.extra.target.applyEffect(effect, builtEffect, ctx.character);
-        }
+        ctx.manager.log.add(`${target.name} receives ${amount} ${effectLabel} from ${instance.base.name}`, {
+            category: isDamage ? 'combat_damage' : 'combat_heal',
+            source: caster,
+            target: target
+        });
+        target.applyEffect(effect, builtEffect, caster);
 
         if(amount > 0 && instance.source) {
             awardSourceXP(instance, Math.floor(amount / 2), ctx);
@@ -2130,30 +2413,23 @@ function createDefaultEffectProcessor() {
         const percentValue = (effect.amount !== undefined) ? effect.amount : ((instance.amount !== undefined) ? instance.amount : 0);
         if(percentValue <= 0) return ctx.extra;
 
-        let totalHealing = 0;
-        const party = effect.party || 'ally';
-        const target = effect.target || 'all';
+        // ctx.character is the target (set by applyEffect)
+        // ctx.caster is the original source character
+        const target = ctx.character;
+        const caster = ctx.caster || ctx.character;
+        
+        const healAmount = Math.ceil(target.maxHitpoints * (percentValue / 100));
+        target.heal({ amount: healAmount }, caster);
+        
+        const casterName = caster?.name || 'Effect';
+        ctx.manager.log.add(`${casterName}'s ${instance.base.name} heals ${target.name} for ${healAmount} (${percentValue}%)`, {
+            category: 'combat_heal',
+            source: caster,
+            target: target
+        });
 
-        if((party === 'hero' || party === 'ally') && ctx.manager.party) {
-            if(target === 'all') {
-                ctx.manager.party.all.forEach(hero => {
-                    if(!hero.dead) {
-                        const healAmount = Math.ceil(hero.maxHitpoints * (percentValue / 100));
-                        hero.heal({ amount: healAmount }, ctx.character);
-                        totalHealing += healAmount;
-                    }
-                });
-            } else if(target === 'self') {
-                const healAmount = Math.ceil(ctx.character.maxHitpoints * (percentValue / 100));
-                ctx.character.heal({ amount: healAmount }, ctx.character);
-                totalHealing += healAmount;
-            }
-            const characterName = (ctx.character && ctx.character.name) ? ctx.character.name : 'Effect';
-            ctx.manager.log.add(`${characterName} heals for ${percentValue}%`);
-        }
-
-        if(totalHealing > 0 && instance.source) {
-            awardSourceXP(instance, Math.floor(totalHealing / 2), ctx);
+        if(healAmount > 0 && instance.source) {
+            awardSourceXP(instance, Math.floor(healAmount / 2), ctx);
         }
 
         return ctx.extra;
@@ -2174,8 +2450,12 @@ function createDefaultEffectProcessor() {
     processor.register('buff', (effect, instance, ctx) => {
         const stacks = instance.stacks || effect.stacks || 1;
         const builtEffect = { stacks };
-        const target = effect.target || 'self';
         const count = effect.count || 1;
+        
+        // ctx.character is the target (set by applyEffect)
+        // ctx.caster is the original source character
+        const target = ctx.character;
+        const caster = ctx.caster || ctx.character;
 
         let auraIds = [];
         if (effect.random) {
@@ -2193,13 +2473,13 @@ function createDefaultEffectProcessor() {
         }
 
         for (const auraId of auraIds) {
-            if (target === 'self' || target === undefined) {
-                ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} applies ${auraId}`);
-                ctx.character.auras.add(auraId, { ...builtEffect }, ctx.character);
-            } else if (target === 'attacker' && ctx.extra.attacker) {
-                ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} applies ${auraId} to ${ctx.extra.attacker.name}`);
-                ctx.extra.attacker.auras.add(auraId, { ...builtEffect }, ctx.character);
-            }
+            const casterName = caster?.name || 'Effect';
+            ctx.manager.log.add(`${casterName}'s ${instance.base.name} applies ${getAuraName(ctx.manager, auraId)} to ${target.name}`, {
+                category: 'status_buff',
+                source: caster,
+                target: target
+            });
+            target.auras.add(auraId, { ...builtEffect }, caster);
         }
         return ctx.extra;
     });
@@ -2207,8 +2487,12 @@ function createDefaultEffectProcessor() {
     processor.register('debuff', (effect, instance, ctx) => {
         const stacks = instance.stacks || effect.stacks || 1;
         const builtEffect = { stacks };
-        const target = effect.target || 'target';
         const count = effect.count || 1;
+        
+        // ctx.character is the target (set by applyEffect)
+        // ctx.caster is the original source character
+        const target = ctx.character;
+        const caster = ctx.caster || ctx.character;
 
         let auraIds = [];
         if (effect.random) {
@@ -2225,19 +2509,15 @@ function createDefaultEffectProcessor() {
             auraIds.push(effect.id);
         }
 
-        let targetChar = null;
-        if (target === 'self') {
-            targetChar = ctx.character;
-        } else if (target === 'attacker' && ctx.extra.attacker) {
-            targetChar = ctx.extra.attacker;
-        } else if (target === 'target' && ctx.extra.target) {
-            targetChar = ctx.extra.target;
-        }
-
-        if (targetChar && !targetChar.dead) {
+        if (!target.dead) {
             for (const auraId of auraIds) {
-                ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} applies ${auraId} to ${targetChar.name}`);
-                targetChar.auras.add(auraId, { ...builtEffect }, ctx.character);
+                const casterName = caster?.name || 'Effect';
+                ctx.manager.log.add(`${casterName}'s ${instance.base.name} applies ${getAuraName(ctx.manager, auraId)} to ${target.name}`, {
+                    category: 'status_debuff',
+                    source: caster,
+                    target: target
+                });
+                target.auras.add(auraId, { ...builtEffect }, caster);
             }
         }
         return ctx.extra;
@@ -2323,7 +2603,10 @@ function createDefaultEffectProcessor() {
     processor.register('skip', (effect, instance, ctx) => {
         if (checkCondition(effect, instance)) {
             ctx.extra.skip = true;
-            ctx.manager.log.add(`${ctx.character.name} is overcome with ${instance.base.name}!`);
+            ctx.manager.log.add(`${ctx.character.name} is overcome with ${instance.base.name}!`, {
+                category: 'combat_mechanics',
+                source: ctx.character
+            });
 
             if(instance.source) {
                 awardSourceXP(instance, UTILITY_EFFECT_XP.skip, ctx);
@@ -2336,7 +2619,10 @@ function createDefaultEffectProcessor() {
         if (checkCondition(effect, instance)) {
             ctx.extra.amount = 0;
             ctx.extra.dodged = true;
-            ctx.manager.log.add(`${ctx.character.name} dodges the attack!`);
+            ctx.manager.log.add(`${ctx.character.name} dodges the attack!`, {
+                category: 'combat_miss',
+                source: ctx.character
+            });
 
             if(instance.source && instance.source !== ctx.character) {
                 awardSourceXP(instance, UTILITY_EFFECT_XP.dodge, ctx);
@@ -2349,7 +2635,10 @@ function createDefaultEffectProcessor() {
         if (checkCondition(effect, instance)) {
             ctx.extra.amount = 0;
             ctx.extra.missed = true;
-            ctx.manager.log.add(`${ctx.character.name} misses due to ${instance.base.name}!`);
+            ctx.manager.log.add(`${ctx.character.name} misses due to ${instance.base.name}!`, {
+                category: 'combat_miss',
+                source: ctx.character
+            });
 
             if(instance.source) {
                 awardSourceXP(instance, UTILITY_EFFECT_XP.miss, ctx);
@@ -2361,7 +2650,10 @@ function createDefaultEffectProcessor() {
     processor.register('confuse', (effect, instance, ctx) => {
         if (checkCondition(effect, instance)) {
             ctx.extra.hitAlly = true;
-            ctx.manager.log.add(`${ctx.character.name} is confused and attacks an ally!`);
+            ctx.manager.log.add(`${ctx.character.name} is confused and attacks an ally!`, {
+                category: 'combat_mechanics',
+                source: ctx.character
+            });
 
             if(instance.source) {
                 awardSourceXP(instance, UTILITY_EFFECT_XP.confuse, ctx);
@@ -2377,7 +2669,10 @@ function createDefaultEffectProcessor() {
 
     processor.register('prevent_debuff', (effect, instance, ctx) => {
         ctx.extra.prevented = true;
-        ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} prevents the debuff!`);
+        ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} prevents the debuff!`, {
+            category: 'status_cleanse',
+            source: ctx.character
+        });
         return ctx.extra;
     });
 
@@ -2395,7 +2690,10 @@ function createDefaultEffectProcessor() {
         ctx.extra.prevented = true;
 
         ctx.extra.preventDeathHealAmount = getEffectAmount(effect, instance) || 0;
-        ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} prevents death!`);
+        ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} prevents death!`, {
+            category: 'combat_death',
+            source: ctx.character
+        });
         return ctx.extra;
     });
 
@@ -2410,11 +2708,17 @@ function createDefaultEffectProcessor() {
 
         if (effect.id && ctx.extra.auraId === effect.id) {
             ctx.extra.prevented = true;
-            ctx.manager.log.add(`${ctx.character.name} is immune to ${effect.id}!`);
+            ctx.manager.log.add(`${ctx.character.name} is immune to ${effect.id}!`, {
+                category: 'status_debuff',
+                source: ctx.character
+            });
         } else if (!effect.id) {
 
             ctx.extra.prevented = true;
-            ctx.manager.log.add(`${ctx.character.name} is immune to debuffs!`);
+            ctx.manager.log.add(`${ctx.character.name} is immune to debuffs!`, {
+                category: 'status_debuff',
+                source: ctx.character
+            });
         }
         return ctx.extra;
     });
@@ -2427,7 +2731,11 @@ function createDefaultEffectProcessor() {
         if (target && target.dead) {
             target.revive({ amount }, ctx.character);
             const sourceName = instance?.base?.name || 'effect';
-            ctx.manager.log.add(`${ctx.character.name}'s ${sourceName} revives ${target.name} with ${amount}% HP!`);
+            ctx.manager.log.add(`${ctx.character.name}'s ${sourceName} revives ${target.name} with ${amount}% HP!`, {
+                category: 'combat_heal',
+                source: ctx.character,
+                target: target
+            });
         }
         return ctx.extra;
     });
@@ -2437,7 +2745,10 @@ function createDefaultEffectProcessor() {
         const healAmount = Math.ceil((ctx.extra.damageDealt || 0) * (amount / 100));
         if(healAmount > 0) {
             ctx.character.heal({ amount: healAmount }, ctx.character);
-            ctx.manager.log.add(`${ctx.character.name} heals for ${healAmount} from ${instance.base.name}`);
+            ctx.manager.log.add(`${ctx.character.name} heals for ${healAmount} from ${instance.base.name}`, {
+                category: 'combat_heal',
+                source: ctx.character
+            });
         }
         return ctx.extra;
     });
@@ -2447,7 +2758,11 @@ function createDefaultEffectProcessor() {
         if(ctx.extra.damageReceived && ctx.extra.attacker) {
             const reflectAmount = Math.ceil(ctx.extra.damageReceived * (amount / 100));
             ctx.extra.attacker.damage({ amount: reflectAmount }, ctx.character);
-            ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} reflects ${reflectAmount} damage`);
+            ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} reflects ${reflectAmount} damage`, {
+                category: 'combat_damage',
+                source: ctx.character,
+                target: ctx.extra.attacker
+            });
         }
         return ctx.extra;
     });
@@ -2470,7 +2785,11 @@ function createDefaultEffectProcessor() {
                 if(target.effectCache) {
                     target.invalidateEffects('auras');
                 }
-                ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} cleanses ${removed} debuff(s) from ${target.name}`);
+                ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} cleanses ${removed} debuff(s) from ${target.name}`, {
+                    category: 'status_cleanse',
+                    source: ctx.character,
+                    target: target
+                });
             }
         }
         return ctx.extra;
@@ -2492,7 +2811,11 @@ function createDefaultEffectProcessor() {
         if (target && !target.dead) {
             const amount = Math.floor(target.maxHitpoints * (percent / 100));
             target.damage({ amount }, ctx.character);
-            ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} deals ${amount} damage (${percent}% HP)`);
+            ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} deals ${amount} damage (${percent}% HP)`, {
+                category: 'combat_damage',
+                source: ctx.character,
+                target: target
+            });
         }
         return ctx.extra;
     });
@@ -2518,7 +2841,10 @@ function createDefaultEffectProcessor() {
         if(currentHP - incomingDamage <= 0 && currentHP > 0) {
             ctx.extra.amount = currentHP - 1;
             ctx.extra.preventedLethal = true;
-            ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} prevents lethal damage!`);
+            ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} prevents lethal damage!`, {
+                category: 'combat_death',
+                source: ctx.character
+            });
         }
         return ctx.extra;
     });
@@ -2529,7 +2855,10 @@ function createDefaultEffectProcessor() {
         if(effect.consume !== false) {
             instance.remove_stacks(1);
         }
-        ctx.manager.log.add(`${ctx.character.name} evades the attack with ${instance.base.name}!`);
+        ctx.manager.log.add(`${ctx.character.name} evades the attack with ${instance.base.name}!`, {
+            category: 'combat_miss',
+            source: ctx.character
+        });
         return ctx.extra;
     });
 
@@ -2547,7 +2876,10 @@ function createDefaultEffectProcessor() {
         }
 
         if(absorbed > 0) {
-            ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} absorbs ${absorbed} damage`);
+            ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} absorbs ${absorbed} damage`, {
+                category: 'combat_mechanics',
+                source: ctx.character
+            });
         }
         return ctx.extra;
     });
@@ -2572,7 +2904,11 @@ function createDefaultEffectProcessor() {
                 if(target.effectCache) {
                     target.invalidateEffects('auras');
                 }
-                ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} dispels ${removed} buff(s) from ${target.name}`);
+                ctx.manager.log.add(`${ctx.character.name}'s ${instance.base.name} dispels ${removed} buff(s) from ${target.name}`, {
+                    category: 'status_cleanse',
+                    source: ctx.character,
+                    target: target
+                });
             }
         }
         return ctx.extra;
@@ -2606,7 +2942,7 @@ const defaultEffectProcessor = createDefaultEffectProcessor();
 function addMasteryXPWithBonus(manager, action, baseXP, options = {}) {
     const { updateTooltip = true, levelCap = 99 } = options;
 
-    const xpBonus = manager.modifiers.getMasteryXPBonus(action);
+    const xpBonus = manager.party.getMasteryXPBonus(action);
     let modifiedXP = Math.floor(baseXP * (1 + xpBonus));
 
     // Cap XP to prevent exceeding level cap
@@ -2910,10 +3246,9 @@ export {
     sortByAgility,
     getAuraName,
     createEffect,
-    filterEffectsByTrigger,
-    filterEffectsByType,
-    getStatEffects,
+    filterEffects,
     EffectCache,
+    awardCombatXP,
 
     RequirementsChecker,
     formatRequirement,

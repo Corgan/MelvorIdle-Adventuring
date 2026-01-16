@@ -239,16 +239,23 @@ export async function setup({ gameData, patch, loadTemplates, loadModule, loadSt
     // Tutorial system
     await load('data/tutorials.json');
 
+    // Achievement stats (must be before achievements)
+    await load('data/achievement-stats.json');
+
     // Achievement system
     await load('data/achievements/area_mastery.json');
     await load('data/achievements/challenges.json');
     await load('data/achievements/collection.json');
     await load('data/achievements/combat.json');
+    await load('data/achievements/combat_jobs.json');
     await load('data/achievements/dungeons.json');
-    await load('data/achievements/equipment_mastery.json');
+    await load('data/achievements/equipment.json');
+    await load('data/achievements/gauntlets.json');
     await load('data/achievements/job_mastery.json');
     await load('data/achievements/monster_mastery.json');
-    await load('data/achievements/solo.json');
+    await load('data/achievements/production.json');
+    await load('data/achievements/restrictions.json');
+    await load('data/achievements/slayer.json');
     await load('data/achievements/town_jobs.json');
     
     if(cloudManager.hasAoDEntitlementAndIsEnabled)

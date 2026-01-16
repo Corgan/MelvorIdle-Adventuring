@@ -296,6 +296,9 @@ export class AdventuringEquipmentSlot {
         if(this.equipment.character && this.equipment.character.effectCache) {
             this.equipment.character.invalidateEffects('equipment');
         }
+        if(this.equipment.character?.manager?.party?.effectCache) {
+            this.equipment.character.manager.party.invalidateEffects('heroEquipment');
+        }
     }
 
     setEmpty() {
@@ -314,6 +317,9 @@ export class AdventuringEquipmentSlot {
         this.equipment.invalidateSetCache();
         if(this.equipment.character && this.equipment.character.effectCache) {
             this.equipment.character.invalidateEffects('equipment');
+        }
+        if(this.equipment.character?.manager?.party?.effectCache) {
+            this.equipment.character.manager.party.invalidateEffects('heroEquipment');
         }
     }
 
@@ -419,7 +425,8 @@ export class AdventuringEquipmentSlot {
             return;
 
         this.component.upgrade.classList.toggle('d-none', this.empty || this.occupied || this.item.upgradeLevel === 0);
-        this.component.upgrade.textContent = this.item !== undefined ? this.item.level : 0;
+        this.component.upgrade.textContent = this.item !== undefined ? this.item.level : 0;
+
         this.component.upgrade.classList.remove('text-danger', 'text-warning');
 
         if(!this.empty && !this.occupied && this.item.upgradeLevel > 0) {

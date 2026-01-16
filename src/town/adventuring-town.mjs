@@ -34,7 +34,9 @@ export class AdventuringTown extends AdventuringPage {
 
 
         if(this.manager.autoRepeatArea && this.checkAutoRunReady()) {
-            this.manager.log.add(`Auto-run: Starting ${this.manager.autoRepeatArea.name}...`);
+            this.manager.log.add(`Auto-run: Starting ${this.manager.autoRepeatArea.name}...`, {
+                category: 'dungeon_progress'
+            });
             this.manager.selectArea(this.manager.autoRepeatArea);
             return;
         }

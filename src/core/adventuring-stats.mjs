@@ -17,6 +17,13 @@ export class AdventuringStats extends Map {
         this.component = createElement('adventuring-stats');
 
         this.renderQueue = new AdventuringStatsRenderQueue();
+        
+        // Optional reference to owner character for effective stat calculation
+        this.owner = null;
+    }
+
+    setOwner(owner) {
+        this.owner = owner;
     }
 
     get(statID) {
@@ -58,7 +65,12 @@ export class AdventuringStats extends Map {
         });
 
         super.forEach((value, stat) => {
-            this.component.update(stat, value);
+            // Use effective stat value if owner is set and can calculate it
+            let displayValue = value;
+            if(this.owner && typeof this.owner.getEffectiveStat === 'function') {
+                displayValue = this.owner.getEffectiveStat(stat);
+            }
+            this.component.update(stat, displayValue);
         });
 
         this.renderQueue.stats = false;

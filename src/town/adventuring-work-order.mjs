@@ -46,6 +46,18 @@ export class AdventuringWorkOrder {
         let { output, outputType, count } = this.product.create(this.tier);
         this.workshop.store(output, count, outputType);
 
+        // Record production for achievement tracking
+        // Find the job from the product requirements
+        const jobReq = this.product.getRequirements(this.tier).find(r => 
+            r.type === 'current_job_level' || r.type === 'job_level'
+        );
+        let job = null;
+        if (jobReq && jobReq.job) {
+            const fullJobId = jobReq.job.includes(':') ? jobReq.job : `adventuring:${jobReq.job}`;
+            job = this.manager.jobs.getObjectByID(fullJobId);
+        }
+        this.manager.achievementManager.recordProduction(outputType, count, job);
+
         this.completed += 1;
         this.renderQueue.update = true;
         if(this.completed >= this.count)
@@ -95,7 +107,8 @@ export class AdventuringWorkOrder {
 
         this.component.active.classList.toggle('d-none', !this.active)
         this.component.inactive.classList.toggle('d-none', this.active)
-        if(this.active) {
+        if(this.active) {
+
             if (this.product.outputType === 'consumable' && this.product.hasTiers) {
                 this.component.icon.src = this.product.getMedia(this.tier);
                 this.component.nameText.textContent = this.product.getName(this.tier);
@@ -103,9 +116,11 @@ export class AdventuringWorkOrder {
                 this.component.icon.src = this.product.media;
                 this.component.nameText.textContent = this.product.name;
             }
-            this.component.progressText.textContent = `${this.completed} / ${this.count} completed`;
+            this.component.progressText.textContent = `${this.completed} / ${this.count} completed`;
+
             const percent = this.count > 0 ? (this.completed / this.count) * 100 : 0;
-            this.component.progressBar.style.width = `${percent}%`;
+            this.component.progressBar.style.width = `${percent}%`;
+
             this.component.craftableBy.innerHTML = this.getCraftableByText();
         }
 

@@ -6,7 +6,7 @@ const { AdventuringStats } = await loadModule('src/core/adventuring-stats.mjs');
 const { AdventuringCard } = await loadModule('src/progression/adventuring-card.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
 const { AdventuringPassiveBadgeElement } = await loadModule('src/entities/components/adventuring-passive-badge.mjs');
-const { evaluateCondition, getAuraName, StatCalculator, resolveTargets } = await loadModule('src/core/adventuring-utils.mjs');
+const { evaluateCondition, StatCalculator } = await loadModule('src/core/adventuring-utils.mjs');
 
 const STARTER_LOADOUTS = {
     front: {
@@ -71,6 +71,12 @@ export class AdventuringHero extends AdventuringCharacter {
 
     get isHero() {
         return true;
+    }
+
+    getParty(type) {
+        if (type === 'ally') return this.manager.party;
+        if (type === 'enemy') return this.manager.encounter?.party;
+        return null;
     }
 
     postDataRegistration() {
@@ -198,25 +204,58 @@ export class AdventuringHero extends AdventuringCharacter {
     initEffectCache() {
         super.initEffectCache();
 
+        // Hero-specific sources
         this.effectCache.registerSource('equipment', () => this.equipment.getEffects());
-
-        this.effectCache.registerSource('tavern', () =>
-            this.manager.tavern ? this.manager.tavern.getEffects() : []
+        
+        // Job passives - need to check per-character requirements
+        this.effectCache.registerSource('combatJobPassives', () => 
+            this.combatJob?.getPassiveEffects ? this.combatJob.getPassiveEffects(this) : []
         );
-
-        this.effectCache.registerSource('consumables', () =>
-            this.manager.consumables ? this.manager.consumables.getEffects() : []
+        
+        this.effectCache.registerSource('passiveJobPassives', () => {
+            if (!this.passiveJob || this.passiveJob === this.combatJob) return [];
+            return this.passiveJob.getPassiveEffects ? this.passiveJob.getPassiveEffects(this) : [];
+        });
+        
+        // Global passives (achievement-unlocked)
+        this.effectCache.registerSource('globalPassives', () => 
+            this.manager.getGlobalPassiveEffects ? this.manager.getGlobalPassiveEffects(this) : []
         );
+        
+        // Shared sources filtered for individual (non-party) scope
+        this.effectCache.registerSource('consumables', {
+            getEffects: (f) => this.manager.consumables?.getEffects(f) || [],
+            filters: { scope: 'individual' },
+            onTrigger: (effect, context, host) => {
+                // Handle consume_charge effect type
+                if (effect.type === 'consume_charge') {
+                    const count = effect.count || 1;
+                    this.manager.consumables.removeCharges(effect.source, effect.sourceTier, count);
+                    this.manager.log.add(`${effect.sourceName} consumed ${count} charge(s).`, {
+                        category: 'system',
+                        source: this
+                    });
+                }
+                // Consume charges for triggered consumable effects (non-passive)
+                else if (effect.trigger !== 'passive') {
+                    this.manager.consumables.removeCharges(effect.source, effect.sourceTier, 1);
+                    this.manager.log.add(`${effect.sourceName} consumed a charge.`, {
+                        category: 'system',
+                        source: this
+                    });
+                }
+            }
+        });
+        
+        this.effectCache.registerSource('tavern', {
+            getEffects: (f) => this.manager.tavern?.getEffects(f) || [],
+            filters: { scope: 'individual' }
+        });
+    }
 
-        this.effectCache.registerSource('modifiers', () =>
-            this.manager.modifiers ? this.manager.modifiers.getEffects() : []
-        );
-
-        this.effectCache.registerSource('achievements', () =>
-            this.manager.achievementManager && this.manager.achievementManager.bonusEffects
-                ? this.manager.achievementManager.bonusEffects.getAllEffects()
-                : []
-        );
+    invalidateJobPassives() {
+        this.effectCache.invalidate('combatJobPassives');
+        this.effectCache.invalidate('passiveJobPassives');
     }
 
     setLocked(locked) {
@@ -224,188 +263,6 @@ export class AdventuringHero extends AdventuringCharacter {
         this.renderQueue.jobs = true;
         this.renderQueue.generator = true;
         this.renderQueue.spender = true;
-    }
-
-    getAllPendingEffectsForTrigger(type, context) {
-
-        const pending = super.getAllPendingEffectsForTrigger(type, context);
-
-        if (this.equipment) {
-            const equipmentEffects = this.equipment.getEffectsForTrigger(type, context);
-            for (const { item, effect } of equipmentEffects) {
-                if (effect.scope === 'party') continue; // Skip party-scoped
-                pending.push({
-                    effect,
-                    source: item,
-                    sourceName: item.name,
-                    sourceType: 'equipment'
-                });
-            }
-        }
-
-        if (this.manager.consumables) {
-            const consumableEffects = this.manager.consumables.getEffectsForTrigger(type, context);
-            for (const { consumable, tier, effect } of consumableEffects) {
-                if (effect.scope === 'party') continue; // Skip party-scoped
-                pending.push({
-                    effect,
-                    source: consumable,
-                    sourceTier: tier,
-                    sourceName: consumable.name,
-                    sourceType: 'consumable'
-                });
-            }
-        }
-
-        if (this.combatJob && this.combatJob.getPassivesForTrigger) {
-            const passiveEffects = this.combatJob.getPassivesForTrigger(this, type);
-            for (const { passive, effect } of passiveEffects) {
-                pending.push({
-                    effect,
-                    source: passive,
-                    sourceName: `${this.combatJob.name} (${passive.name})`,
-                    sourceType: 'jobPassive'
-                });
-            }
-        }
-
-        if (this.passiveJob && this.passiveJob !== this.combatJob && this.passiveJob.getPassivesForTrigger) {
-            const passiveEffects = this.passiveJob.getPassivesForTrigger(this, type);
-            for (const { passive, effect } of passiveEffects) {
-                pending.push({
-                    effect,
-                    source: passive,
-                    sourceName: `${this.passiveJob.name} (${passive.name})`,
-                    sourceType: 'jobPassive'
-                });
-            }
-        }
-
-        // Include global passives (achievement-unlocked passives)
-        if (this.manager.getGlobalPassivesForTrigger) {
-            const globalPassiveEffects = this.manager.getGlobalPassivesForTrigger(this, type);
-            for (const { passive, effect } of globalPassiveEffects) {
-                pending.push({
-                    effect,
-                    source: passive,
-                    sourceName: `Achievement (${passive.name})`,
-                    sourceType: 'jobPassive'
-                });
-            }
-        }
-
-        if (this.manager.tavern) {
-            const drinkEffects = this.manager.tavern.getEffectsForTrigger(type, context);
-            for (const { drink, effect } of drinkEffects) {
-                if (effect.scope === 'party') continue; // Skip party-scoped
-                pending.push({
-                    effect,
-                    source: drink,
-                    sourceName: drink.name,
-                    sourceType: 'tavernDrink'
-                });
-            }
-        }
-
-        return pending;
-    }
-
-    processPendingEffect(pending, context) {
-        const { effect, source, sourceTier, sourceName, sourceType } = pending;
-
-        if (sourceType === 'jobPassive') {
-            return this.processJobPassiveEffect(pending, context);
-        }
-
-        if (effect.type === 'consume_charge' && sourceType === 'consumable') {
-            const count = effect.count || 1;
-            this.manager.consumables.removeCharges(source, sourceTier, count);
-            this.manager.log.add(`${sourceName} consumed ${count} charge(s).`);
-            return true;
-        }
-
-        const applied = super.processPendingEffect(pending, context);
-
-        if (applied && sourceType === 'consumable' && effect.trigger !== 'passive') {
-            this.manager.consumables.removeCharges(source, sourceTier, 1);
-            this.manager.log.add(`${sourceName} consumed a charge.`);
-        }
-
-        return applied;
-    }
-
-    processJobPassiveEffect(pending, context) {
-        const { effect, source: passive, sourceName } = pending;
-
-        if (effect.condition) {
-            if (!evaluateCondition(effect.condition, context)) {
-                return false;
-            }
-        }
-
-        if (!this.canEffectTrigger(effect, passive)) {
-            return false;
-        }
-
-        const chance = effect.chance || 100;
-        if (Math.random() * 100 > chance) {
-            return false;
-        }
-
-        const encounter = context.encounter;
-
-        let builtEffect = {
-            amount: effect.getAmount ? effect.getAmount(this) : (effect.amount || 0),
-            stacks: effect.getStacks ? effect.getStacks(this) : (effect.stacks || 1)
-        };
-
-        const targetPartyType = effect.party || effect.targetParty || 'ally';
-        const targetParty = targetPartyType === 'enemy'
-            ? encounter?.party
-            : this.manager.party;
-        const targetType = effect.target || 'self';
-
-        let targets;
-        if(targetType === 'self') {
-            targets = [this];
-        } else if(targetParty) {
-            targets = resolveTargets(targetType, targetParty, null);
-        } else {
-            targets = [this];
-        }
-
-        let anyApplied = false;
-        for (const target of targets) {
-            if (target.dead) continue;
-
-            if (effect.type === "buff") {
-                const auraId = effect.id;
-                if (!auraId) continue;
-                target.buff(auraId, builtEffect, this);
-                this.manager.log.add(`${this.name}'s ${passive.name} applies ${getAuraName(this.manager, auraId)} to ${target.name}`);
-                anyApplied = true;
-            } else if (effect.type === "debuff") {
-                const auraId = effect.id;
-                if (!auraId) continue;
-                target.debuff(auraId, builtEffect, this);
-                this.manager.log.add(`${this.name}'s ${passive.name} applies ${getAuraName(this.manager, auraId)} to ${target.name}`);
-                anyApplied = true;
-            } else if (effect.type === "heal" || effect.type === "heal_flat") {
-                target.heal(builtEffect, this);
-                this.manager.log.add(`${this.name}'s ${passive.name} heals ${target.name} for ${builtEffect.amount}`);
-                anyApplied = true;
-            } else if (effect.type === "damage" || effect.type === "damage_flat") {
-                target.damage(builtEffect, this);
-                this.manager.log.add(`${this.name}'s ${passive.name} deals ${builtEffect.amount} damage to ${target.name}`);
-                anyApplied = true;
-            }
-        }
-
-        if (anyApplied) {
-            this.recordEffectTrigger(effect, passive);
-        }
-
-        return anyApplied;
     }
 
     setName(name) {
@@ -433,13 +290,17 @@ export class AdventuringHero extends AdventuringCharacter {
         }).then((result) => {
             if (result.isConfirmed && result.value) {
                 this.setName(result.value.trim());
-                this.manager.log.add(`Hero renamed to ${this.name}`);
+                this.manager.log.add(`Hero renamed to ${this.name}`, {
+                    category: 'system',
+                    source: this
+                });
             }
         });
     }
 
     _onJobChange() {
         this.invalidateStats();
+        this.invalidateJobPassives();
         this.calculateStats();
 
         if(!this.generator.canEquip(this))

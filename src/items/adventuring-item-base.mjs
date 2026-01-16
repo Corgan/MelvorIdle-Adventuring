@@ -420,7 +420,8 @@ export class AdventuringItemBase extends AdventuringMasteryAction {
     }
 
     get unlocked() {
-        return this.manager.armory.unlocked.get(this) === true;
+        if (!this._reqChecker) return true;
+        return this._reqChecker.check({ item: this });
     }
 
     get category() {
@@ -503,11 +504,6 @@ export class AdventuringItemBase extends AdventuringMasteryAction {
         return this._cachedPairs || [];
     }
 
-    get requirementsMet() {
-        if(!this._reqChecker) return true;
-        return this._reqChecker.check({ item: this });
-    }
-
     getEffectDescriptions() {
         return getEffectDescriptionsList(this.effects, this.manager);
     }
@@ -516,7 +512,7 @@ export class AdventuringItemBase extends AdventuringMasteryAction {
         let amount = this.materials.get(material);
         if(amount === undefined) return 0;
 
-        const costReduction = this.manager.modifiers.getUpgradeCostReduction(this);
+        const costReduction = this.manager.party.getUpgradeCostReduction(this);
 
 
         const baseCost = (this.upgradeLevel + 1) * amount;

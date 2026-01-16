@@ -3,7 +3,7 @@ const { loadModule } = mod.getContext(import.meta);
 const { AdventuringHero } = await loadModule('src/entities/adventuring-hero.mjs');
 const { AdventuringEnemy } = await loadModule('src/entities/adventuring-enemy.mjs');
 const { AdventuringPartyElement } = await loadModule('src/entities/components/adventuring-party.mjs');
-const { evaluateCondition, buildEffectContext, createEffect, EffectLimitTracker } = await loadModule('src/core/adventuring-utils.mjs');
+const { evaluateCondition, buildEffectContext, createEffect, EffectLimitTracker, EffectCache, defaultEffectProcessor } = await loadModule('src/core/adventuring-utils.mjs');
 
 class AdventuringParty {
     constructor(manager, game) {
@@ -13,14 +13,274 @@ class AdventuringParty {
         this.component = createElement('adventuring-party');
 
         this.effectLimitTracker = new EffectLimitTracker();
+        this.effectCache = new EffectCache();
+
+        // Cache for mastery completion effects (rarely changes)
+        this._masteryCompletionCache = null;
+        this._masteryCompletionDirty = true;
+    }
+
+    initEffectCache() {
+        // Party-wide effect sources filtered for party scope
+        this.effectCache.registerSource('consumables', {
+            getEffects: (f) => this.manager.consumables?.getEffects(f) || [],
+            filters: { scope: 'party' },
+            onTrigger: (effect, context, host) => {
+                const { source, sourceName, sourceTier } = effect;
+                this.manager.consumables.removeCharges(source, sourceTier, 1);
+                this.manager.log.add(`${sourceName} consumed a charge.`, {
+                    category: 'system'
+                });
+            }
+        });
+
+        this.effectCache.registerSource('tavern', {
+            getEffects: (f) => this.manager.tavern?.getEffects(f) || [],
+            filters: { scope: 'party' }
+        });
+
+        // Dungeon/difficulty effects that target the party
+        this.effectCache.registerSource('dungeon', () => 
+            this.manager.dungeon?.getEffects({ party: 'ally' }) || []
+        );
+
+        // Party-scoped equipment effects from all heroes
+        this.effectCache.registerSource('heroEquipment', () => {
+            const effects = [];
+            for (const hero of this.all) {
+                if (!hero.equipment) continue;
+                const equipmentEffects = hero.equipment.getEffects({ scope: 'party' });
+                for (const effect of equipmentEffects) {
+                    effects.push({
+                        ...effect,
+                        sourceName: `${hero.name}'s ${effect.sourceName}`
+                    });
+                }
+            }
+            return effects;
+        });
+
+        // Achievement effects (for passive bonuses - no scope filtering)
+        this.effectCache.registerSource('achievements', () =>
+            this.manager.achievementManager ? this.manager.achievementManager.getEffects() : []
+        );
+
+        // Mastery completion effects (for passive bonuses)
+        this.effectCache.registerSource('mastery', () => this.getMasteryCompletionEffects());
+    }
+
+    // ========== Mastery Completion Effects ==========
+
+    onMasteryMaxed() {
+        this._masteryCompletionDirty = true;
+        this.effectCache.invalidate('mastery');
+    }
+
+    getMasteryCompletionEffects() {
+        if (!this._masteryCompletionDirty && this._masteryCompletionCache !== null) {
+            return this._masteryCompletionCache;
+        }
+
+        const effects = [];
+        const registries = [
+            this.manager.areas,
+            this.manager.monsters,
+            this.manager.jobs,
+            this.manager.baseItems
+        ];
+
+        for (const registry of registries) {
+            if (!registry) continue;
+
+            registry.forEach(action => {
+                if (this.manager.getMasteryLevel(action) >= 99) {
+                    const masteryCategory = action.masteryCategory;
+                    if (!masteryCategory) return;
+
+                    const categoryId = masteryCategory.id || `adventuring:${masteryCategory.localID}`;
+                    const milestoneEffects = masteryCategory.getEffectsAtLevel(99) || [];
+
+                    for (const effectData of milestoneEffects) {
+                        if (effectData.type === 'category_xp_percent') {
+                            effects.push(createEffect(
+                                { ...effectData, category: categoryId },
+                                action,
+                                `${action.name} Mastery`,
+                                'mastery'
+                            ));
+                        }
+                    }
+                }
+            });
+        }
+
+        this._masteryCompletionCache = effects;
+        this._masteryCompletionDirty = false;
+        return effects;
+    }
+
+    // ========== Bonus Query Methods ==========
+
+    /**
+     * Get a passive bonus by effect type from party-wide effects.
+     */
+    getBonus(effectType, context = {}) {
+        let total = this.getPassiveBonus(effectType);
+
+        // Add action-specific mastery effects
+        if (context.action && typeof context.action.getMasteryEffectValue === 'function') {
+            total += context.action.getMasteryEffectValue(effectType);
+        }
+
+        return total;
+    }
+
+    /**
+     * Get bonus filtered by category (for category-specific XP bonuses).
+     */
+    getCategoryBonus(effectType, categoryId) {
+        let total = 0;
+        const effects = this.getEffects({ trigger: 'passive' });
+
+        for (const effect of effects) {
+            if (effect.type === effectType && effect.category === categoryId) {
+                total += effect.value ?? effect.amount ?? 0;
+            }
+        }
+
+        return total;
+    }
+
+    /**
+     * Get spawn rate modifier for a specific spawn type.
+     */
+    getSpawnRateMod(spawnType, context = {}) {
+        let total = 0;
+        const effects = this.getEffects({ trigger: 'passive' });
+
+        for (const effect of effects) {
+            if (effect.type === 'spawn_rate_percent' && effect.spawnType === spawnType) {
+                total += effect.value ?? effect.amount ?? 0;
+            }
+        }
+
+        if (context.action && typeof context.action.getMasteryEffectValue === 'function') {
+            total += context.action.getMasteryEffectValue('spawn_rate_percent', { spawnType });
+        }
+
+        return total;
+    }
+
+    // ========== Convenience Bonus Methods ==========
+
+    getMasteryXPBonus(action) {
+        let bonus = this.getBonus('xp_percent', { action });
+
+        if (action && action.masteryCategory) {
+            const categoryId = action.masteryCategory.id || `adventuring:${action.masteryCategory.localID}`;
+            bonus += this.getCategoryBonus('category_xp_percent', categoryId);
+        }
+
+        return bonus / 100;
+    }
+
+    getJobStatBonus(job) {
+        return this.getBonus('job_stats_percent', { action: job }) / 100;
+    }
+
+    getMonsterDropRateBonus(monster) {
+        return this.getBonus('drop_rate_percent', { action: monster }) / 100;
+    }
+
+    getMonsterDropQtyBonus(monster) {
+        return this.getBonus('drop_quantity_percent', { action: monster }) / 100;
+    }
+
+    getCurrencyDropBonus() {
+        return this.getBonus('currency_drop_percent') / 100;
+    }
+
+    getMaterialDropRateBonus() {
+        return this.getBonus('material_drop_percent') / 100;
+    }
+
+    getExploreSpeedBonus(area) {
+        return this.getBonus('explore_speed_percent', { action: area }) / 100;
+    }
+
+    getUpgradeCostReduction(item) {
+        return this.getBonus('upgrade_cost_percent', { action: item }) / 100;
+    }
+
+    getConsumablePreservationChance() {
+        return this.getBonus('consumable_preservation_percent') / 100;
+    }
+
+    getBonusEnergy() {
+        return this.getPassiveBonus('energy_flat');
+    }
+
+    getAbilityLearnChanceBonus() {
+        return this.getBonus('ability_learn_chance_percent') / 100;
+    }
+
+    getDungeonXPBonus(area) {
+        return this.getBonus('dungeon_xp_percent', { action: area }) / 100;
+    }
+
+    getTrapSpawnRateMod(context = {}) {
+        return this.getSpawnRateMod('trap', context);
+    }
+
+    getFountainSpawnRateMod(context = {}) {
+        return this.getSpawnRateMod('fountain', context);
+    }
+
+    getTreasureSpawnRateMod(context = {}) {
+        return this.getSpawnRateMod('treasure', context);
+    }
+
+    getShrineSpawnRateMod(context = {}) {
+        return this.getSpawnRateMod('shrine', context);
+    }
+
+    invalidateEffects(sourceId) {
+        this.effectCache.invalidate(sourceId);
+        // Also invalidate hero stats UI since party effects affect them
+        this.forEach(hero => {
+            if (hero.stats) {
+                hero.stats.renderQueue.stats = true;
+            }
+        });
     }
 
     invalidateAllEffects(source) {
+        // Invalidate party cache
+        if (source) {
+            this.effectCache.invalidate(source);
+        }
+        // Also invalidate hero caches
         this.forEach(hero => {
             if (hero.effectCache) {
                 hero.invalidateEffects(source);
             }
         });
+        // Invalidate dungeon's party_enemy_effects since it depends on consumables/tavern/equipment
+        if (this.manager.dungeon?.effectCache) {
+            this.manager.dungeon.effectCache.invalidate('party_enemy_effects');
+        }
+    }
+
+    getEffects(filters = null) {
+        return this.effectCache.getEffects(filters);
+    }
+
+    getPassiveBonus(effectType) {
+        return this.effectCache.getBonus(effectType);
+    }
+
+    getStatBonus(statId) {
+        return this.effectCache.getStatBonus(statId);
     }
 
     get all() {
@@ -74,157 +334,28 @@ class AdventuringParty {
         this.all.forEach(member => member.setLocked(locked));
     }
 
-
-
-
     trigger(type, context = {}) {
-
         const partyContext = buildEffectContext(null, {
             ...context,
             party: this.all,
             manager: this.manager
         });
 
-        const pending = this.getAllPendingEffectsForTrigger(type, partyContext);
+        this.effectCache.processTrigger(type, partyContext, {
+            host: this,
+            limitTracker: this.effectLimitTracker,
+            effectModifier: (effect) => ({ ...effect, party: 'ally' })
+        });
 
-        for (const p of pending) {
-            this.processPendingEffect(p, partyContext);
-        }
-    }
-
-    getAllPendingEffectsForTrigger(type, context) {
-        const pending = [];
-
-        for (const hero of this.all) {
-            if (!hero.equipment) continue;
-            const equipmentEffects = hero.equipment.getEffectsForTrigger(type, context);
-            for (const { item, effect } of equipmentEffects) {
-                if (effect.scope !== 'party') continue;
-                pending.push({
-                    effect,
-                    source: item,
-                    sourceName: `${hero.name}'s ${item.name}`,
-                    sourceType: 'equipment'
-                });
-            }
-        }
-
-        if (this.manager.consumables) {
-            const consumableEffects = this.manager.consumables.getEffectsForTrigger(type, context);
-            for (const { consumable, effect } of consumableEffects) {
-                if (effect.scope !== 'party') continue;
-                pending.push({
-                    effect,
-                    source: consumable,
-                    sourceName: consumable.name,
-                    sourceType: 'consumable'
-                });
-            }
-        }
-
-        if (this.manager.tavern) {
-            const drinkEffects = this.manager.tavern.getEffectsForTrigger(type, context);
-            for (const { drink, effect } of drinkEffects) {
-                if (effect.scope !== 'party') continue;
-                pending.push({
-                    effect,
-                    source: drink,
-                    sourceName: drink.name,
-                    sourceType: 'tavernDrink'
-                });
-            }
-        }
-
-        return pending;
-    }
-
-    processPendingEffect(pending, context) {
-        const { effect, source, sourceName, sourceType } = pending;
-
-        if (effect.condition) {
-            if (!evaluateCondition(effect.condition, context)) {
-                return false;
-            }
-        }
-
-        if (!this.canEffectTrigger(effect, source)) {
-            return false;
-        }
-
-        const chance = effect.chance || 100;
-        if (Math.random() * 100 > chance) {
-            return false;
-        }
-
-        this.applyPartyEffect(effect, source, sourceName, sourceType);
-
-        this.recordEffectTrigger(effect, source);
-
-        if (sourceType === 'consumable') {
-            this.manager.consumables.removeCharges(source, 1);
-            this.manager.log.add(`${sourceName} consumed a charge.`);
-        }
-
-        return true;
-    }
-
-    applyPartyEffect(effect, source, sourceName, sourceType) {
-        const target = effect.target || 'all';
-        const amount = effect.amount || 0;
-
-        let targets = [];
-        switch (target) {
-            case 'all':
-                targets = this.alive;
-                break;
-            case 'lowest':
-                targets = this.lowestHp ? [this.lowestHp] : [];
-                break;
-            case 'front':
-                targets = this.front && !this.front.dead ? [this.front] : [];
-                break;
-            case 'back':
-                targets = this.back && !this.back.dead ? [this.back] : [];
-                break;
-            case 'random':
-                targets = this.randomLiving ? [this.randomLiving] : [];
-                break;
-            default:
-                targets = this.alive;
-        }
-
-        for (const member of targets) {
-            const builtEffect = createEffect(effect, { character: member, manager: this.manager });
-
-            switch (effect.type) {
-                case 'heal_flat':
-                    member.heal({ amount: builtEffect.amount }, null);
-                    this.manager.log.add(`${sourceName} heals ${member.name} for ${builtEffect.amount}`);
-                    break;
-                case 'heal_percent':
-                    const healAmount = Math.ceil(member.maxHitpoints * (amount / 100));
-                    member.heal({ amount: healAmount }, null);
-                    this.manager.log.add(`${sourceName} heals ${member.name} for ${healAmount}`);
-                    break;
-                case 'buff':
-                    const buffId = effect.id;
-                    if (buffId) {
-                        member.buff(buffId, builtEffect, null);
-                        this.manager.log.add(`${sourceName} applies buff to ${member.name}`);
-                    }
-                    break;
-                case 'debuff':
-                    const debuffId = effect.id;
-                    if (debuffId) {
-                        member.debuff(debuffId, builtEffect, null);
-                        this.manager.log.add(`${sourceName} applies debuff to ${member.name}`);
-                    }
-                    break;
-                case 'damage_flat':
-                    member.damage({ amount: builtEffect.amount }, null);
-                    this.manager.log.add(`${sourceName} deals ${builtEffect.amount} damage to ${member.name}`);
-                    break;
-            }
+        // Trigger achievements with combat context
+        if (this.manager.achievementManager && this.manager.combatTracker) {
+            const achievementContext = {
+                ...partyContext,
+                source: this,
+                triggerType: type,
+                ...this.manager.combatTracker.getContext()
+            };
+            this.manager.achievementManager.trigger(type, achievementContext);
         }
     }
 
@@ -239,11 +370,14 @@ class AdventuringParty {
         this.effectLimitTracker.record(effect, source);
     }
 
-    resetEffectLimits(limitType) {
-        this.effectLimitTracker.reset(limitType);
+    resetEffectLimits(...limitTypes) {
+        for (const limitType of limitTypes) {
+            this.effectLimitTracker.reset(limitType);
+        }
     }
 
     onLoad() {
+        this.initEffectCache();
         this.all.forEach(member => member.onLoad());
     }
 
@@ -317,6 +451,20 @@ class AdventuringHeroParty extends AdventuringParty {
     postDataRegistration() {
         super.postDataRegistration();
         this.all.forEach(member => member.postDataRegistration());
+    }
+
+    /**
+     * Award XP to all party members' combat jobs (milestone rewards only)
+     * @param {number} xp - Amount to award
+     * @param {Object} options - { aliveOnly: false }
+     */
+    awardJobXP(xp, { aliveOnly = false } = {}) {
+        const members = aliveOnly ? this.combatAlive : this.all;
+        members.forEach(member => {
+            if (member.combatJob?.isMilestoneReward) {
+                member.combatJob.addXP(xp);
+            }
+        });
     }
 }
 

@@ -24,7 +24,22 @@ export class AdventuringGrimoire {
 
         this.manager.achievementManager.markDirty();
 
-        this.manager.log.add(`${hero.name} learned ${ability.name}!`);
+        // Fire ability_learned trigger for achievements
+        this.manager.achievementManager.trigger('ability_learned', {
+            ability: ability,
+            abilityId: ability.id,
+            abilityName: ability.name,
+            hero: hero,
+            enemy: enemy,
+            monster: enemy.base,
+            learnType: learnType,
+            totalLearned: this.learnedAbilities.size
+        });
+
+        this.manager.log.add(`${hero.name} learned ${ability.name}!`, {
+            category: 'loot_items',
+            source: hero
+        });
         if(typeof notifyPlayer === 'function' && !loadingOfflineProgress) {
             notifyPlayer(this.manager, `Learned: ${ability.name}!`, 'success');
         }

@@ -15,7 +15,8 @@ const { AdventuringDifficulty } = await loadModule('src/dungeon/adventuring-diff
 const { AdventuringMonster } = await loadModule('src/entities/adventuring-monster.mjs');
 const { AdventuringDungeonTile } = await loadModule('src/dungeon/adventuring-dungeon-tile.mjs');
 const { AdventuringSlayerTaskType, AdventuringRewardType } = await loadModule('src/progression/adventuring-slayer-task.mjs');
-const { AdventuringAchievementCategory, AdventuringAchievement, AchievementManager } = await loadModule('src/progression/adventuring-achievements.mjs');
+const { AdventuringAchievementCategory, AdventuringAchievement, AdventuringMilestone, AchievementManager } = await loadModule('src/progression/adventuring-achievements.mjs');
+const { AdventuringAchievementStat } = await loadModule('src/progression/adventuring-achievement-stat.mjs');
 
 const { AdventuringOverview } = await loadModule('src/ui/adventuring-overview.mjs');
 const { AdventuringMessageLog } = await loadModule('src/ui/adventuring-message-log.mjs');
@@ -43,6 +44,7 @@ const { AdventuringCrossroads } = await loadModule('src/dungeon/adventuring-cros
 const { AdventuringAreaDetails } = await loadModule('src/dungeon/adventuring-area-details.mjs');
 const { AdventuringDungeon } = await loadModule('src/dungeon/adventuring-dungeon.mjs');
 const { AdventuringEncounter } = await loadModule('src/combat/adventuring-encounter.mjs');
+const { CombatTracker } = await loadModule('src/combat/adventuring-combat-tracker.mjs');
 
 const { AdventuringItemSlot } = await loadModule('src/items/adventuring-item-slot.mjs');
 const { AdventuringItemType } = await loadModule('src/items/adventuring-item-type.mjs');
@@ -57,7 +59,6 @@ const { AdventuringTutorialManager } = await loadModule('src/ui/adventuring-tuto
 const { AdventuringEquipmentSet } = await loadModule('src/items/adventuring-equipment-set.mjs');
 const { AdventuringEquipmentPool } = await loadModule('src/items/adventuring-equipment-pool.mjs');
 const { AdventuringLootTable } = await loadModule('src/items/adventuring-loot-table.mjs');
-const { AdventuringModifiers } = await loadModule('src/core/adventuring-modifiers.mjs');
 const { AdventuringGrimoire } = await loadModule('src/slayer/adventuring-grimoire.mjs');
 const { AdventuringTag } = await loadModule('src/core/adventuring-tag.mjs');
 
@@ -72,7 +73,7 @@ class AdventuringRenderQueue extends MasterySkillRenderQueue {
 export class Adventuring extends SkillWithMastery {
     constructor(namespace, game) {
         super(namespace, 'Adventuring', game);
-        this.version = 8; // Optimized stash/armory encode format
+        this.version = 10; // CombatTracker
         this.saveVersion = -1;
         this._media = 'melvor:assets/media/main/adventure.svg';
         this.renderQueue = new AdventuringRenderQueue();
@@ -104,8 +105,11 @@ export class Adventuring extends SkillWithMastery {
         this.rewardTypes = new NamespaceRegistry(this.game.registeredNamespaces);
         this.achievementCategories = new NamespaceRegistry(this.game.registeredNamespaces);
         this.achievements = new NamespaceRegistry(this.game.registeredNamespaces);
+        this.achievementMilestones = new NamespaceRegistry(this.game.registeredNamespaces);
+        this.achievementStats = new NamespaceRegistry(this.game.registeredNamespaces);
 
         this.achievementManager = new AchievementManager(this, game);
+        this.combatTracker = new CombatTracker(this);
 
         this.itemSlots = new NamespaceRegistry(this.game.registeredNamespaces);
         this.itemTypes = new NamespaceRegistry(this.game.registeredNamespaces);
@@ -159,8 +163,6 @@ export class Adventuring extends SkillWithMastery {
 
         this.tutorialManager = new AdventuringTutorialManager(this, this.game);
 
-        this.modifiers = new AdventuringModifiers(this, this.game);
-
         this.pages.register('town', this.town);
 
         this.pages.register('trainer', this.trainer);
@@ -198,9 +200,13 @@ export class Adventuring extends SkillWithMastery {
         });
 
         if(area) {
-            this.log.add(`Auto-run set to ${area.name}`);
+            this.log.add(`Auto-run set to ${area.name}`, {
+                category: 'dungeon_progress'
+            });
         } else if(previousArea) {
-            this.log.add(`Auto-run disabled`);
+            this.log.add(`Auto-run disabled`, {
+                category: 'dungeon_progress'
+            });
         }
     }
 
@@ -337,84 +343,16 @@ export class Adventuring extends SkillWithMastery {
 
 
     triggerEffects(trigger, context = {}) {
-
+        // Party trigger handles dungeon effects (registered as source)
         if(this.party) {
             this.party.trigger(trigger, context);
         }
 
+        // Individual hero triggers
         if(this.party) {
             this.party.forEach(member => {
                 member.trigger(trigger, context);
             });
-        }
-
-        if(this.dungeon && this.dungeon.effectCache) {
-            const effects = this.dungeon.getEffectsForTrigger(trigger);
-            for(const effect of effects) {
-                this.applyEffect(effect, trigger, context);
-            }
-        }
-    }
-
-    applyEffect(effect, trigger, context = {}) {
-        switch(effect.type) {
-            case 'heal_percent': {
-
-                const healPercent = effect.amount || 0;
-                let healAmount = 0;
-                if (effect.amount && typeof effect.amount === 'object' && effect.amount.base !== undefined) {
-                    healAmount = effect.amount.base;
-                } else if (effect.amount !== undefined) {
-                    healAmount = effect.amount;
-                }
-
-
-
-                const targetParty = effect.party === 'enemy' ? null : this.party.all;
-                if(!targetParty) break; // heal_percent with party: 'enemy' not applicable here
-
-                targetParty.forEach(hero => {
-                    if(!hero.dead) {
-                        let heal = healAmount;
-                        if(healPercent > 0) {
-                            heal = Math.ceil(hero.maxHitpoints * (healPercent / 100));
-                        }
-                        if(heal > 0) {
-                            hero.heal({ amount: heal }, null);
-                        }
-                    }
-                });
-
-                if(healPercent > 0) {
-                    this.log.add(`Party healed for ${healPercent}% at ${trigger}`);
-                } else if(healAmount > 0) {
-                    this.log.add(`Party healed for ${healAmount} HP at ${trigger}`);
-                }
-                break;
-            }
-
-            case 'buff': {
-
-                const auraId = effect.id;
-                if(auraId && effect.party !== 'enemy') {
-
-                    this.party.forEachLiving(hero => {
-                        hero.auras.add(auraId, effect.stacks || 1, effect.sourceName);
-                    });
-                }
-
-                break;
-            }
-
-            case 'debuff': {
-
-
-                break;
-            }
-
-            default:
-
-                break;
         }
     }
 
@@ -516,6 +454,20 @@ export class Adventuring extends SkillWithMastery {
 
     onMasteryLevelUp(action, oldLevel, newLevel) {
         super.onMasteryLevelUp(action, oldLevel, newLevel);
+
+        // Fire job_level_up trigger for job mastery increases
+        if (action instanceof AdventuringJob) {
+            this.achievementManager.trigger('job_level_up', {
+                job: action,
+                jobId: action.id,
+                jobName: action.name,
+                oldLevel: oldLevel,
+                newLevel: newLevel,
+                isCombatJob: action.isCombatJob,
+                isPassiveJob: action.isPassiveJob,
+                tier: action.tier
+            });
+        }
 
         if (action.invalidateMasteryCache) {
             action.invalidateMasteryCache();
@@ -755,9 +707,15 @@ export class Adventuring extends SkillWithMastery {
     }
 
     getMasteryXP(action) {
-
-
         return super.getMasteryXP(action);
+    }
+
+    getMasteryLevel(action) {
+        // Mastery entities should be level 0 until discovered/unlocked
+        if (action && action.unlocked === false) {
+            return 0;
+        }
+        return super.getMasteryLevel(action);
     }
 
     addMasteryXP(action, xp) {
@@ -777,8 +735,8 @@ export class Adventuring extends SkillWithMastery {
             }
             this.tutorialManager.checkTriggers('mastery', { category, level: newLevel });
 
-            if(newLevel >= 99 && this.modifiers) {
-                this.modifiers.onMasteryMaxed();
+            if(newLevel >= 99 && this.party) {
+                this.party.onMasteryMaxed();
             }
         }
     }
@@ -1073,6 +1031,30 @@ export class Adventuring extends SkillWithMastery {
             data.achievements.forEach(data => {
                 let achievement = new AdventuringAchievement(namespace, data, this, this.game);
                 this.achievements.registerObject(achievement);
+
+                // Register milestone objects if this achievement has milestones
+                if (achievement._milestoneData && Array.isArray(achievement._milestoneData)) {
+                    const milestoneObjects = [];
+                    achievement._milestoneData.forEach((milestoneData, index) => {
+                        const milestone = new AdventuringMilestone(
+                            namespace,
+                            { ...milestoneData, order: index },
+                            achievement,
+                            this,
+                            this.game
+                        );
+                        this.achievementMilestones.registerObject(milestone);
+                        milestoneObjects.push(milestone);
+                    });
+                    achievement.registerMilestones(milestoneObjects);
+                }
+            });
+        }
+
+        if(data.achievementStats !== undefined) {
+            data.achievementStats.forEach(data => {
+                let stat = new AdventuringAchievementStat(namespace, data, this);
+                this.achievementStats.registerObject(stat);
             });
         }
     }
@@ -1123,17 +1105,15 @@ export class Adventuring extends SkillWithMastery {
         let jobMilestones = this.jobs.allObjects.filter(job => job.isMilestoneReward);
         let areaMilestones = this.areas.allObjects.filter(area => area.isMilestoneReward);
 
-        let milestones = [...jobMilestones, ...areaMilestones].map(milestone => {
-            if(milestone.requirements.length === 1 && milestone.requirements[0].type === "skill_level")
-                return {
+        [...jobMilestones, ...areaMilestones].forEach(milestone => {
+            if(milestone.requirements.length === 1 && milestone.requirements[0].type === "skill_level") {
+                this.milestones.push({
                     get name() { return milestone.name },
                     get media() { return milestone.media },
                     get level() { return milestone.requirements[0].level }
-                };
-            return undefined;
-        }).filter(milestone => milestone !== undefined);
-
-        this.milestones.push(...milestones);
+                });
+            }
+        });
         this.sortMilestones();
 
         this.sortedMasteryActions = [];
@@ -1277,21 +1257,40 @@ export class Adventuring extends SkillWithMastery {
         });
     }
 
-    getGlobalPassivesForTrigger(character, triggerType) {
+    /**
+     * Get all global passive effects that the character can use.
+     * @param {Object} character - The character to check requirements against
+     * @returns {Array} Array of flat effects with source metadata
+     */
+    getGlobalPassiveEffects(character) {
         const results = [];
         const passives = this.getGlobalPassives();
 
         for (const passive of passives) {
             if (!passive.canEquip(character)) continue;
             if (!passive.effects) continue;
+            
             for (const effect of passive.effects) {
-                if (effect.trigger === triggerType) {
-                    results.push({ passive, effect });
-                }
+                results.push({
+                    ...effect,
+                    source: passive,
+                    sourceName: `Achievement (${passive.name})`,
+                    sourceType: 'globalPassive'
+                });
             }
         }
 
         return results;
+    }
+
+    /**
+     * Get global passive effects (achievement-unlocked) for a trigger type.
+     * @param {Object} character - The character to check requirements against
+     * @param {string} triggerType - The trigger type to filter by
+     * @returns {Array} Array of flat effects with source metadata
+     */
+    getGlobalPassivesForTrigger(character, triggerType) {
+        return this.getGlobalPassiveEffects(character).filter(e => e.trigger === triggerType);
     }
 
     getAbilityByID(id) {
@@ -1339,7 +1338,12 @@ export class Adventuring extends SkillWithMastery {
 
         this.achievementManager.encode(writer);
 
+        this.combatTracker.encode(writer);
+
         this.grimoire.encode(writer);
+
+        // Version 6+: Log filter settings
+        this.log.encodeSettings(writer);
 
         console.log(`Wrote ${writer.byteOffset - start} bytes for Adventuring save`);
 
@@ -1398,8 +1402,18 @@ export class Adventuring extends SkillWithMastery {
 
             this.achievementManager.decode(reader, version);
 
+            // Version 10+: CombatTracker
+            if(this.saveVersion >= 10) {
+                this.combatTracker.decode(reader, version);
+            }
+
             if(this.saveVersion >= 5) {
                 this.grimoire.decode(reader, version);
+            }
+            
+            // Version 9+: Log filter settings
+            if(this.saveVersion >= 9) {
+                this.log.decodeSettings(reader, version);
             }
         } catch(e) {
 

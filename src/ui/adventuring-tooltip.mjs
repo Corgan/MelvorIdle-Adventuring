@@ -115,7 +115,7 @@ export class TooltipBuilder {
 
     modifierBonuses(manager, action, modifierTypes) {
         const bonuses = modifierTypes
-            .map(type => ({ type, amount: manager.modifiers.getBonus(type, { action }) }))
+            .map(type => ({ type, amount: manager.party.getBonus(type, { action }) }))
             .filter(b => b.amount > 0);
 
         if(bonuses.length === 0) return this;
@@ -233,6 +233,17 @@ export class TooltipBuilder {
 
     statRow(...items) {
         let html = '<div class="d-flex justify-content-center flex-wrap">';
+        items.forEach((item, i) => {
+            if(i > 0) html += '<span class="mx-1"></span>';
+            html += item;
+        });
+        html += '</div>';
+        this.sections.push(html);
+        return this;
+    }
+
+    statRowLeft(...items) {
+        let html = '<div class="d-flex flex-wrap">';
         items.forEach((item, i) => {
             if(i > 0) html += '<span class="mx-1"></span>';
             html += item;
@@ -387,13 +398,13 @@ export class TooltipBuilder {
 
     static forEquipment(item, manager, character = null) {
 
-        const isDropped = item.dropped;
-        const displayName = isDropped ? item.name : '???';
+        const isUnlocked = item.unlocked;
+        const displayName = isUnlocked ? item.name : '???';
 
         const tooltip = TooltipBuilder.create()
             .header(displayName, item.media);
 
-        if(!isDropped) {
+        if(!isUnlocked) {
             return tooltip;
         }
 
@@ -655,6 +666,104 @@ export class TooltipBuilder {
         }
 
         return tooltip;
+    }
+
+    /**
+     * Create tooltip for an achievement milestone
+     * @param {Object} milestone - Milestone data with name, description, requirement, rewards
+     * @param {Object} achievement - Parent achievement
+     * @param {Object} manager - Game manager for resolving IDs
+     */
+    static forMilestone(milestone, achievement, manager) {
+        const tooltip = TooltipBuilder.create()
+            .header(milestone.name, achievement.media);
+
+        if(milestone.description) {
+            tooltip.hint(milestone.description);
+        }
+
+        // Status
+        tooltip.separator();
+        if(milestone.isComplete) {
+            tooltip.bonus('✓ Complete');
+        } else if(milestone.isCurrent) {
+            const progress = achievement.getProgress(milestone.requirement);
+            const target = achievement.getTarget(milestone.requirement);
+            tooltip.warning(`In Progress (${progress}/${target})`);
+        } else {
+            tooltip.text('Locked', 'text-muted');
+        }
+
+        // Rewards
+        if(milestone.rewards && milestone.rewards.length > 0) {
+            tooltip.separator();
+            tooltip.sectionTitle('Rewards');
+            
+            // Collect stat rewards for row display
+            const statItems = [];
+            
+            for(const reward of milestone.rewards) {
+                if(reward.type === 'currency') {
+                    const currencyIcon = manager.stash?.currencyMedia || 'melvor:assets/media/main/coins.png';
+                    tooltip.rewardWithIcon(currencyIcon, `${reward.qty} Coins`, 'text-warning');
+                } else if(reward.type === 'ability') {
+                    const ability = manager.getAbilityByID(reward.id);
+                    if(ability) {
+                        tooltip.rewardWithIcon(ability.media, `Unlocks: ${ability.name}`, 'text-info');
+                    } else {
+                        tooltip.bonus(`Unlocks: ${reward.id.replace('adventuring:', '')}`);
+                    }
+                } else if(reward.type === 'material') {
+                    const mat = manager.materials.getObjectByID(reward.id);
+                    if(mat) {
+                        tooltip.rewardWithIcon(mat.media, `${reward.qty}x ${mat.name}`, 'text-success');
+                    }
+                } else if(reward.type === 'job') {
+                    const job = manager.jobs.getObjectByID(reward.id);
+                    if(job) {
+                        tooltip.rewardWithIcon(job.media, `Unlocks: ${job.name}`, 'text-info');
+                    }
+                } else if(reward.type === 'effect') {
+                    for(const effect of reward.effects || []) {
+                        if(effect.type === 'stat_flat' || effect.type === 'stat_percent') {
+                            const stat = manager.stats.getObjectByID(effect.stat);
+                            if(stat && stat.media) {
+                                const suffix = effect.type === 'stat_percent' ? '%' : '';
+                                statItems.push(tooltip.iconValue(stat.media, `+${effect.amount}${suffix}`, 'text-success'));
+                            } else {
+                                const statName = effect.stat.replace('adventuring:', '');
+                                const suffix = effect.type === 'stat_percent' ? '%' : '';
+                                tooltip.bonus(`+${effect.amount}${suffix} ${statName}`);
+                            }
+                        }
+                    }
+                } else if(reward.type === 'stat') {
+                    const stat = manager.stats.getObjectByID(reward.stat);
+                    if(stat && stat.media) {
+                        statItems.push(tooltip.iconValue(stat.media, `+${reward.value}`, 'text-success'));
+                    } else {
+                        const statName = reward.stat.replace('adventuring:', '');
+                        tooltip.bonus(`+${reward.value} ${statName}`);
+                    }
+                }
+            }
+            
+            // Display collected stat items in a left-aligned row
+            if(statItems.length > 0) {
+                tooltip.statRowLeft(...statItems);
+            }
+        }
+
+        return tooltip;
+    }
+
+    rewardWithIcon(iconSrc, text, color = 'text-success') {
+        let html = '<div class="d-flex align-items-center">';
+        html += `<img class="skill-icon-xxs mr-1" src="${iconSrc}">`;
+        html += `<small class="${color}">${text}</small>`;
+        html += '</div>';
+        this.sections.push(html);
+        return this;
     }
 
     stats(stats, addSeparator = true) {

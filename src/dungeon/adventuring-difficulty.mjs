@@ -20,11 +20,20 @@ export class AdventuringDifficulty extends NamespacedObject {
         this._name = data.name;
         this._description = data.description || '';
         this._media = data.media;
-        this.color = data.color || 'text-white';
-        this.unlockLevel = data.unlockLevel || 0;
-        this.isEndless = data.isEndless === true;
-        this.waveScaling = data.waveScaling || null;
-        this.waveGeneration = data.waveGeneration || null;
+        this.color = data.color || 'text-white';
+
+        this.unlockLevel = data.unlockLevel || 0;
+
+        this.isEndless = data.isEndless === true;
+
+
+        this.waveScaling = data.waveScaling || null;
+
+
+
+
+        this.waveGeneration = data.waveGeneration || null;
+
         this.effects = (data.effects || []).map(effect =>
             new DifficultyEffect(this.manager, this.game, this, effect)
         );
@@ -46,8 +55,10 @@ export class AdventuringDifficulty extends NamespacedObject {
         return this._name;
     }
 
-    get description() {
-        if (this._description) return this._description;
+    get description() {
+
+        if (this._description) return this._description;
+
         return describeEffectsInline(this.effects, this.manager) || 'No modifiers';
     }
 
@@ -125,46 +136,13 @@ export class AdventuringDifficulty extends NamespacedObject {
         this.effects.forEach(effect => effect.postDataRegistration());
     }
 
-    isUnlocked(area) {
-        if (this.unlockLevel === 0) return true;
+    isUnlocked(area) {
+
+        if (this.unlockLevel === 0) return true;
+
         return area.masteryEffects.some(e =>
             e.type === 'unlock' && e.unlockType === 'difficulty' && e.difficultyID === this.id
         );
-    }
-
-    onDungeonStart(dungeon) {
-        this.effects.forEach(effect => {
-            if(effect.trigger !== 'dungeon_start') return;
-
-            if(effect.type === 'buff') {
-                dungeon.manager.party.all.forEach(member => {
-                    if(!member.dead) {
-                        member.buff(effect.id, {
-                            stacks: effect.getStacks(),
-                            amount: effect.getAmount()
-                        }, member);
-                    }
-                });
-            }
-        });
-    }
-
-    onEnemySpawn(enemy, dungeon) {
-        this.effects.forEach(effect => {
-            if(effect.trigger !== 'enemy_spawn') return;
-
-            if(effect.type === 'debuff') {
-                enemy.debuff(effect.id, {
-                    stacks: effect.getStacks(),
-                    amount: effect.getAmount()
-                }, null);
-            } else if(effect.type === 'buff' && effect.party === 'enemy') {
-                enemy.buff(effect.id, {
-                    stacks: effect.getStacks(),
-                    amount: effect.getAmount()
-                }, null);
-            }
-        });
     }
 
     getEffectsOfType(type) {
@@ -179,7 +157,8 @@ export class AdventuringDifficulty extends NamespacedObject {
             lines.push(`<div class="text-muted">${this.description}</div>`);
         }
 
-        lines.push('<hr class="my-1">');
+        lines.push('<hr class="my-1">');
+
         const statMult = this.statMultiplier;
         const xpMult = this.xpMultiplier;
         const lootMult = this.lootMultiplier;
@@ -195,7 +174,8 @@ export class AdventuringDifficulty extends NamespacedObject {
         if(lootMult !== 1.0) {
             const pct = Math.round(lootMult * 100);
             lines.push(`<div>Loot Quantity: <span class="text-success">${pct}%</span></div>`);
-        }
+        }
+
         const dungeonStartBuffs = this.effects.filter(e => e.trigger === 'dungeon_start' && e.type === 'buff');
         if(dungeonStartBuffs.length > 0) {
             lines.push('<hr class="my-1">');
@@ -204,7 +184,8 @@ export class AdventuringDifficulty extends NamespacedObject {
                 const auraName = getAuraName(this.manager, effect.id);
                 lines.push(`<div class="text-muted">• ${auraName} x${effect.getStacks()}</div>`);
             });
-        }
+        }
+
         const enemySpawnEffects = this.effects.filter(e => e.trigger === 'enemy_spawn');
         if(enemySpawnEffects.length > 0) {
             lines.push('<hr class="my-1">');
@@ -215,7 +196,8 @@ export class AdventuringDifficulty extends NamespacedObject {
                 const typeLabel = isBuffType ? '' : '(debuff) ';
                 lines.push(`<div class="text-muted">• ${typeLabel}${auraName} x${effect.getStacks()}</div>`);
             });
-        }
+        }
+
         if(this.isEndless) {
             lines.push('<hr class="my-1">');
             lines.push('<div class="text-info">Endless Mode: Enemies get stronger each wave!</div>');

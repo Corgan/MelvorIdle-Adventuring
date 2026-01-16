@@ -8,235 +8,883 @@
                 "data": {
                     "achievements": [
                         {
-                            "id": "damage_dealer",
-                            "name": "Damage Dealer",
+                            "id": "flawless_master",
+                            "name": "Flawless Execution",
+                            "category": "adventuring:challenges",
+                            "description": "Complete areas without taking damage",
+                            "media": "melvor:assets/media/skills/combat/attack.png",
+                            "milestones": [
+                                {
+                                    "id": "flawless_1",
+                                    "name": "First Flawless",
+                                    "description": "Complete an area without taking damage",
+                                    "requirement": {
+                                        "type": "triggered",
+                                        "event": "dungeon_end",
+                                        "conditions": {
+                                            "wasFlawless": true
+                                        }
+                                    },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 200 }
+                                    ]
+                                },
+                                {
+                                    "id": "flawless_10",
+                                    "name": "Flawless Practitioner",
+                                    "description": "Complete 10 flawless area runs",
+                                    "requirement": {
+                                        "type": "flawless_wins",
+                                        "count": 10
+                                    },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 500 }
+                                    ]
+                                },
+                                {
+                                    "id": "flawless_25",
+                                    "name": "Flawless Expert",
+                                    "description": "Complete 25 flawless area runs",
+                                    "requirement": {
+                                        "type": "flawless_wins",
+                                        "count": 25
+                                    },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 1000 }
+                                    ]
+                                },
+                                {
+                                    "id": "flawless_100",
+                                    "name": "Flawless Master",
+                                    "description": "Complete 100 flawless area runs",
+                                    "requirement": {
+                                        "type": "flawless_wins",
+                                        "count": 100
+                                    },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 2500 },
+                                        { "type": "effect", "effects": [{ "trigger": "passive", "type": "stat_flat", "stat": "adventuring:agility", "amount": 5 }] }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "flawless_gauntlet",
+                            "name": "Flawless Gauntlet",
+                            "category": "adventuring:challenges",
+                            "description": "Complete Gauntlets without taking damage",
+                            "media": "melvor:assets/media/skills/combat/attack.png",
+                            "milestones": [
+                                {
+                                    "id": "flawless_trial_i",
+                                    "name": "Flawless Trial I",
+                                    "description": "Complete Gauntlet: Trial I without taking damage",
+                                    "requirement": {
+                                        "type": "triggered",
+                                        "event": "dungeon_end",
+                                        "conditions": {
+                                            "wasFlawless": true,
+                                            "areaId": "adventuring:gauntlet_trial_i"
+                                        }
+                                    },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 1000 },
+                                        { "type": "effect", "effects": [{ "trigger": "passive", "type": "stat_flat", "stat": "adventuring:agility", "amount": 3 }] }
+                                    ]
+                                },
+                                {
+                                    "id": "flawless_trial_ii",
+                                    "name": "Flawless Trial II",
+                                    "description": "Complete Gauntlet: Trial II without taking damage",
+                                    "requirement": {
+                                        "type": "triggered",
+                                        "event": "dungeon_end",
+                                        "conditions": {
+                                            "wasFlawless": true,
+                                            "areaId": "adventuring:gauntlet_trial_ii"
+                                        }
+                                    },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 2500 },
+                                        { "type": "effect", "effects": [{ "trigger": "passive", "type": "stat_flat", "stat": "adventuring:agility", "amount": 5 }] }
+                                    ]
+                                },
+                                {
+                                    "id": "flawless_trial_iii",
+                                    "name": "Flawless Trial III",
+                                    "description": "Complete Gauntlet: Trial III without taking damage",
+                                    "requirement": {
+                                        "type": "triggered",
+                                        "event": "dungeon_end",
+                                        "conditions": {
+                                            "wasFlawless": true,
+                                            "areaId": "adventuring:gauntlet_trial_iii"
+                                        }
+                                    },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 5000 },
+                                        { "type": "effect", "effects": [{ "trigger": "passive", "type": "stat_flat", "stat": "adventuring:agility", "amount": 10 }] }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "iron_will",
+                            "name": "Iron Will",
+                            "category": "adventuring:challenges",
+                            "description": "Complete dungeon runs taking minimal damage",
+                            "media": "melvor:assets/media/skills/combat/strength.png",
+                            "milestones": [
+                                {
+                                    "id": "iron_will_10",
+                                    "name": "Tough Cookie",
+                                    "description": "Complete a run taking less than 10% of max HP damage",
+                                    "requirement": {
+                                        "type": "triggered",
+                                        "event": "dungeon_end",
+                                        "conditions": {
+                                            "damagePercentTaken": { "$lte": 10 }
+                                        }
+                                    },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 300 }
+                                    ]
+                                },
+                                {
+                                    "id": "iron_will_5",
+                                    "name": "Stone Skin",
+                                    "description": "Complete a run taking less than 5% of max HP damage",
+                                    "requirement": {
+                                        "type": "triggered",
+                                        "event": "dungeon_end",
+                                        "conditions": {
+                                            "damagePercentTaken": { "$lte": 5 }
+                                        }
+                                    },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 750 },
+                                        { "type": "effect", "effects": [{ "trigger": "passive", "type": "stat_flat", "stat": "adventuring:defence", "amount": 3 }] }
+                                    ]
+                                },
+                                {
+                                    "id": "iron_will_1",
+                                    "name": "Iron Will",
+                                    "description": "Complete a run taking less than 1% of max HP damage",
+                                    "requirement": {
+                                        "type": "triggered",
+                                        "event": "dungeon_end",
+                                        "conditions": {
+                                            "damagePercentTaken": { "$lte": 1 }
+                                        }
+                                    },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 2000 },
+                                        { "type": "effect", "effects": [{ "trigger": "passive", "type": "stat_flat", "stat": "adventuring:defence", "amount": 10 }] }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "ultimate_survivor",
+                            "name": "Ultimate Survivor",
+                            "category": "adventuring:challenges",
+                            "description": "Win encounters with only one hero standing",
+                            "media": "melvor:assets/media/skills/combat/strength.png",
+                            "milestones": [
+                                {
+                                    "id": "survivor_1",
+                                    "name": "Last One Standing",
+                                    "description": "Win an encounter with only one hero alive",
+                                    "requirement": {
+                                        "type": "last_stand_wins",
+                                        "count": 1
+                                    },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 150 }
+                                    ]
+                                },
+                                {
+                                    "id": "survivor_10",
+                                    "name": "Tenacious Fighter",
+                                    "description": "Win 10 last-stand encounters",
+                                    "requirement": {
+                                        "type": "last_stand_wins",
+                                        "count": 10
+                                    },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 500 }
+                                    ]
+                                },
+                                {
+                                    "id": "survivor_50",
+                                    "name": "Ultimate Survivor",
+                                    "description": "Win 50 last-stand encounters",
+                                    "requirement": {
+                                        "type": "last_stand_wins",
+                                        "count": 50
+                                    },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 1500 },
+                                        { "type": "effect", "effects": [{ "trigger": "passive", "type": "stat_flat", "stat": "adventuring:defence", "amount": 5 }] }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "against_all_odds",
+                            "name": "Against All Odds",
+                            "category": "adventuring:challenges",
+                            "description": "Win encounters while near death",
+                            "media": "melvor:assets/media/skills/combat/hitpoints.png",
+                            "milestones": [
+                                {
+                                    "id": "odds_1",
+                                    "name": "Close Call",
+                                    "description": "Win an encounter with less than 5% HP remaining",
+                                    "requirement": {
+                                        "type": "triggered",
+                                        "event": "encounter_complete",
+                                        "conditions": {
+                                            "lowestHpPercent": { "$lte": 5 },
+                                            "wasVictory": true
+                                        }
+                                    },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 250 }
+                                    ]
+                                },
+                                {
+                                    "id": "odds_10",
+                                    "name": "Near Death Experience",
+                                    "description": "Win 10 encounters at less than 5% HP",
+                                    "requirement": {
+                                        "type": "near_death_wins",
+                                        "count": 10
+                                    },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 750 },
+                                        { "type": "effect", "effects": [{ "trigger": "passive", "type": "stat_flat", "stat": "adventuring:hitpoints", "amount": 10 }] }
+                                    ]
+                                },
+                                {
+                                    "id": "odds_50",
+                                    "name": "Against All Odds",
+                                    "description": "Win 50 encounters at less than 5% HP",
+                                    "requirement": {
+                                        "type": "near_death_wins",
+                                        "count": 50
+                                    },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 2500 },
+                                        { "type": "effect", "effects": [{ "trigger": "passive", "type": "stat_flat", "stat": "adventuring:hitpoints", "amount": 25 }] }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "boss_slayer",
+                            "name": "Boss Slayer",
+                            "category": "adventuring:challenges",
+                            "description": "Defeat bosses flawlessly",
+                            "media": "melvor:assets/media/skills/combat/combat.png",
+                            "milestones": [
+                                {
+                                    "id": "boss_flawless_1",
+                                    "name": "Perfect Boss Kill",
+                                    "description": "Defeat a boss without taking damage",
+                                    "requirement": {
+                                        "type": "triggered",
+                                        "event": "boss_killed",
+                                        "conditions": {
+                                            "wasFlawless": true
+                                        }
+                                    },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 300 }
+                                    ]
+                                },
+                                {
+                                    "id": "boss_flawless_5",
+                                    "name": "Boss Hunter",
+                                    "description": "Defeat 5 unique bosses flawlessly",
+                                    "requirement": {
+                                        "type": "triggered",
+                                        "event": "boss_killed",
+                                        "conditions": {
+                                            "wasFlawless": true
+                                        },
+                                        "trackUnique": "boss",
+                                        "targetPerUnique": 1,
+                                        "targetUniqueCount": 5
+                                    },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 750 }
+                                    ]
+                                },
+                                {
+                                    "id": "boss_flawless_15",
+                                    "name": "Boss Slayer",
+                                    "description": "Defeat 15 unique bosses flawlessly",
+                                    "requirement": {
+                                        "type": "triggered",
+                                        "event": "boss_killed",
+                                        "conditions": {
+                                            "wasFlawless": true
+                                        },
+                                        "trackUnique": "boss",
+                                        "targetPerUnique": 1,
+                                        "targetUniqueCount": 15
+                                    },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 2000 },
+                                        { "type": "effect", "effects": [{ "trigger": "passive", "type": "stat_flat", "stat": "adventuring:strength", "amount": 5 }] }
+                                    ]
+                                },
+                                {
+                                    "id": "boss_flawless_30",
+                                    "name": "Boss Executioner",
+                                    "description": "Defeat 30 unique bosses flawlessly",
+                                    "requirement": {
+                                        "type": "triggered",
+                                        "event": "boss_killed",
+                                        "conditions": {
+                                            "wasFlawless": true
+                                        },
+                                        "trackUnique": "boss",
+                                        "targetPerUnique": 1,
+                                        "targetUniqueCount": 30
+                                    },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 5000 },
+                                        { "type": "effect", "effects": [{ "trigger": "passive", "type": "stat_flat", "stat": "adventuring:strength", "amount": 10 }] }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "heroic_challenger",
+                            "name": "Heroic Challenger",
+                            "category": "adventuring:challenges",
+                            "description": "Complete areas on Heroic difficulty",
+                            "media": "melvor:assets/media/skills/agility/agility.png",
+                            "milestones": [
+                                {
+                                    "id": "heroic_1",
+                                    "name": "Heroic Victory",
+                                    "description": "Complete an area on Heroic difficulty",
+                                    "requirement": {
+                                        "type": "heroic_clears",
+                                        "count": 1
+                                    },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 250 }
+                                    ]
+                                },
+                                {
+                                    "id": "heroic_25",
+                                    "name": "Heroic Champion",
+                                    "description": "Complete 25 Heroic areas",
+                                    "requirement": {
+                                        "type": "heroic_clears",
+                                        "count": 25
+                                    },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 1000 }
+                                    ]
+                                },
+                                {
+                                    "id": "heroic_100",
+                                    "name": "Heroic Master",
+                                    "description": "Complete 100 Heroic areas",
+                                    "requirement": {
+                                        "type": "heroic_clears",
+                                        "count": 100
+                                    },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 2500 },
+                                        { "type": "effect", "effects": [{ "trigger": "passive", "type": "stat_flat", "stat": "adventuring:hitpoints", "amount": 10 }] }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "mythic_challenger",
+                            "name": "Mythic Challenger",
+                            "category": "adventuring:challenges",
+                            "description": "Complete areas on Mythic difficulty",
+                            "media": "melvor:assets/media/skills/magic/magic.png",
+                            "milestones": [
+                                {
+                                    "id": "mythic_1",
+                                    "name": "Mythic Victory",
+                                    "description": "Complete an area on Mythic difficulty",
+                                    "requirement": {
+                                        "type": "mythic_clears",
+                                        "count": 1
+                                    },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 500 }
+                                    ]
+                                },
+                                {
+                                    "id": "mythic_25",
+                                    "name": "Mythic Champion",
+                                    "description": "Complete 25 Mythic areas",
+                                    "requirement": {
+                                        "type": "mythic_clears",
+                                        "count": 25
+                                    },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 2000 }
+                                    ]
+                                },
+                                {
+                                    "id": "mythic_50",
+                                    "name": "Mythic Conqueror",
+                                    "description": "Complete 50 Mythic areas",
+                                    "requirement": {
+                                        "type": "mythic_clears",
+                                        "count": 50
+                                    },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 5000 },
+                                        { "type": "effect", "effects": [{ "trigger": "passive", "type": "stat_percent", "stat": "adventuring:hitpoints", "amount": 5 }] }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "endless_survivor",
+                            "name": "Endless Survivor",
+                            "category": "adventuring:challenges",
+                            "description": "Survive waves in Endless mode",
+                            "media": "melvor:assets/media/skills/magic/magic.png",
+                            "milestones": [
+                                {
+                                    "id": "endless_10",
+                                    "name": "Endless Initiate",
+                                    "description": "Reach wave 10 in Endless mode",
+                                    "requirement": {
+                                        "type": "endless_wave",
+                                        "count": 10
+                                    },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 500 }
+                                    ]
+                                },
+                                {
+                                    "id": "endless_25",
+                                    "name": "Endless Veteran",
+                                    "description": "Reach wave 25 in Endless mode",
+                                    "requirement": {
+                                        "type": "endless_wave",
+                                        "count": 25
+                                    },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 1000 }
+                                    ]
+                                },
+                                {
+                                    "id": "endless_50",
+                                    "name": "Endless Champion",
+                                    "description": "Reach wave 50 in Endless mode",
+                                    "requirement": {
+                                        "type": "endless_wave",
+                                        "count": 50
+                                    },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 2500 }
+                                    ]
+                                },
+                                {
+                                    "id": "endless_100",
+                                    "name": "Endless Legend",
+                                    "description": "Reach wave 100 in Endless mode",
+                                    "requirement": {
+                                        "type": "endless_wave",
+                                        "count": 100
+                                    },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 5000 },
+                                        { "type": "effect", "effects": [{ "trigger": "passive", "type": "stat_flat", "stat": "adventuring:strength", "amount": 5 }, { "trigger": "passive", "type": "stat_flat", "stat": "adventuring:defence", "amount": 5 }] }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "endless_solo",
+                            "name": "Endless Solo",
+                            "category": "adventuring:challenges",
+                            "description": "Survive waves in Endless mode with a single hero",
+                            "media": "melvor:assets/media/skills/magic/magic.png",
+                            "milestones": [
+                                {
+                                    "id": "endless_solo_25",
+                                    "name": "Solo Endless Initiate",
+                                    "description": "Reach wave 25 in Endless mode solo",
+                                    "requirement": {
+                                        "type": "endless_wave_solo",
+                                        "count": 25
+                                    },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 1000 }
+                                    ]
+                                },
+                                {
+                                    "id": "endless_solo_50",
+                                    "name": "Solo Endless Veteran",
+                                    "description": "Reach wave 50 in Endless mode solo",
+                                    "requirement": {
+                                        "type": "endless_wave_solo",
+                                        "count": 50
+                                    },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 2500 },
+                                        { "type": "effect", "effects": [{ "trigger": "passive", "type": "stat_flat", "stat": "adventuring:strength", "amount": 5 }] }
+                                    ]
+                                },
+                                {
+                                    "id": "endless_solo_100",
+                                    "name": "Solo Endless Legend",
+                                    "description": "Reach wave 100 in Endless mode solo",
+                                    "requirement": {
+                                        "type": "endless_wave_solo",
+                                        "count": 100
+                                    },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 10000 },
+                                        { "type": "effect", "effects": [{ "trigger": "passive", "type": "stat_flat", "stat": "adventuring:strength", "amount": 15 }, { "trigger": "passive", "type": "stat_flat", "stat": "adventuring:defence", "amount": 15 }] }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "big_hitter",
+                            "name": "Big Hitter",
+                            "category": "adventuring:challenges",
+                            "description": "Deal massive single-hit damage",
+                            "media": "melvor:assets/media/skills/combat/strength.png",
+                            "milestones": [
+                                {
+                                    "id": "hit_1000",
+                                    "name": "Heavy Hitter",
+                                    "description": "Deal 1,000+ damage in a single hit",
+                                    "requirement": {
+                                        "type": "highest_single_hit",
+                                        "target": 1000
+                                    },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 200 }
+                                    ]
+                                },
+                                {
+                                    "id": "hit_10000",
+                                    "name": "Power Striker",
+                                    "description": "Deal 10,000+ damage in a single hit",
+                                    "requirement": {
+                                        "type": "highest_single_hit",
+                                        "target": 10000
+                                    },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 500 }
+                                    ]
+                                },
+                                {
+                                    "id": "hit_100000",
+                                    "name": "Devastating Force",
+                                    "description": "Deal 100,000+ damage in a single hit",
+                                    "requirement": {
+                                        "type": "highest_single_hit",
+                                        "target": 100000
+                                    },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 1000 }
+                                    ]
+                                },
+                                {
+                                    "id": "hit_1000000",
+                                    "name": "Big Hitter",
+                                    "description": "Deal 1,000,000+ damage in a single hit",
+                                    "requirement": {
+                                        "type": "highest_single_hit",
+                                        "target": 1000000
+                                    },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 5000 },
+                                        { "type": "effect", "effects": [{ "trigger": "passive", "type": "stat_percent", "stat": "adventuring:strength", "amount": 3 }] }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "combo_master",
+                            "name": "Combo Master",
+                            "category": "adventuring:challenges",
+                            "description": "Reach high hit combos in dungeon runs",
+                            "media": "melvor:assets/media/skills/combat/attack.png",
+                            "milestones": [
+                                {
+                                    "id": "combo_25",
+                                    "name": "Combo Starter",
+                                    "description": "Reach a 25-hit combo in a dungeon run",
+                                    "requirement": {
+                                        "type": "highest_combo",
+                                        "target": 25
+                                    },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 200 }
+                                    ]
+                                },
+                                {
+                                    "id": "combo_50",
+                                    "name": "Combo Builder",
+                                    "description": "Reach a 50-hit combo in a dungeon run",
+                                    "requirement": {
+                                        "type": "highest_combo",
+                                        "target": 50
+                                    },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 500 }
+                                    ]
+                                },
+                                {
+                                    "id": "combo_100",
+                                    "name": "Combo Expert",
+                                    "description": "Reach a 100-hit combo in a dungeon run",
+                                    "requirement": {
+                                        "type": "highest_combo",
+                                        "target": 100
+                                    },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 1000 }
+                                    ]
+                                },
+                                {
+                                    "id": "combo_200",
+                                    "name": "Combo Master",
+                                    "description": "Reach a 200-hit combo in a dungeon run",
+                                    "requirement": {
+                                        "type": "highest_combo",
+                                        "target": 200
+                                    },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 2500 },
+                                        { "type": "effect", "effects": [{ "trigger": "passive", "type": "stat_flat", "stat": "adventuring:agility", "amount": 10 }] }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "critical_striker",
+                            "name": "Critical Striker",
+                            "category": "adventuring:challenges",
+                            "description": "Land critical hits in combat",
+                            "media": "melvor:assets/media/skills/ranged/ranged.png",
+                            "milestones": [
+                                {
+                                    "id": "crit_100",
+                                    "name": "Lucky Strike",
+                                    "description": "Land 100 critical hits",
+                                    "requirement": {
+                                        "type": "total_critical_hits",
+                                        "target": 100
+                                    },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 200 }
+                                    ]
+                                },
+                                {
+                                    "id": "crit_500",
+                                    "name": "Precision Fighter",
+                                    "description": "Land 500 critical hits",
+                                    "requirement": {
+                                        "type": "total_critical_hits",
+                                        "target": 500
+                                    },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 500 }
+                                    ]
+                                },
+                                {
+                                    "id": "crit_1000",
+                                    "name": "Critical Expert",
+                                    "description": "Land 1,000 critical hits",
+                                    "requirement": {
+                                        "type": "total_critical_hits",
+                                        "target": 1000
+                                    },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 1000 }
+                                    ]
+                                },
+                                {
+                                    "id": "crit_5000",
+                                    "name": "Critical Striker",
+                                    "description": "Land 5,000 critical hits",
+                                    "requirement": {
+                                        "type": "total_critical_hits",
+                                        "target": 5000
+                                    },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 2500 },
+                                        { "type": "effect", "effects": [{ "trigger": "passive", "type": "stat_flat", "stat": "adventuring:ranged", "amount": 10 }] }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "life_steal",
+                            "name": "Life Steal",
+                            "category": "adventuring:challenges",
+                            "description": "Heal through lifesteal effects",
+                            "media": "melvor:assets/media/skills/combat/hitpoints.png",
+                            "milestones": [
+                                {
+                                    "id": "lifesteal_1k",
+                                    "name": "Blood Drinker",
+                                    "description": "Heal 1,000 HP via lifesteal",
+                                    "requirement": {
+                                        "type": "total_lifesteal",
+                                        "target": 1000
+                                    },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 200 }
+                                    ]
+                                },
+                                {
+                                    "id": "lifesteal_10k",
+                                    "name": "Vampiric Touch",
+                                    "description": "Heal 10,000 HP via lifesteal",
+                                    "requirement": {
+                                        "type": "total_lifesteal",
+                                        "target": 10000
+                                    },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 500 }
+                                    ]
+                                },
+                                {
+                                    "id": "lifesteal_50k",
+                                    "name": "Life Steal",
+                                    "description": "Heal 50,000 HP via lifesteal",
+                                    "requirement": {
+                                        "type": "total_lifesteal",
+                                        "target": 50000
+                                    },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 1500 },
+                                        { "type": "effect", "effects": [{ "trigger": "passive", "type": "stat_flat", "stat": "adventuring:hitpoints", "amount": 15 }] }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "solo_wins",
+                            "name": "Solo Combat",
                             "category": "adventuring:challenges",
                             "media": "melvor:assets/media/skills/combat/combat.png",
-                            "requirement": {
-                                "type": "total_damage",
-                                "target": 100000
-                            },
-                            "rewards": [
+                            "description": "Win encounters with only one hero.",
+                            "milestones": [
                                 {
-                                    "type": "currency",
-                                    "id": "adventuring:currency",
-                                    "qty": 500
+                                    "id": "tier1",
+                                    "name": "Lone Wolf",
+                                    "description": "Win your first encounter with only one hero.",
+                                    "requirement": { "type": "solo_wins", "target": 1 },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 200 }
+                                    ]
                                 },
                                 {
-                                    "type": "effect",
-                                    "effects": [
-                                        {
-                                            "trigger": "passive",
-                                            "type": "stat_flat",
-                                            "stat": "adventuring:strength",
-                                            "amount": 3
-                                        }
+                                    "id": "tier2",
+                                    "name": "Solo Warrior",
+                                    "description": "Win 10 encounters with only one hero.",
+                                    "requirement": { "type": "solo_wins", "target": 10 },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 400 },
+                                        { "type": "effect", "effects": [{ "trigger": "passive", "type": "stat_flat", "stat": "adventuring:strength", "amount": 3 }] }
+                                    ]
+                                },
+                                {
+                                    "id": "tier3",
+                                    "name": "Solo Champion",
+                                    "description": "Win 50 encounters with only one hero.",
+                                    "requirement": { "type": "solo_wins", "target": 50 },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 500 },
+                                        { "type": "effect", "effects": [{ "trigger": "passive", "type": "stat_flat", "stat": "adventuring:strength", "amount": 5 }, { "trigger": "passive", "type": "stat_flat", "stat": "adventuring:hitpoints", "amount": 10 }] }
+                                    ]
+                                },
+                                {
+                                    "id": "tier4",
+                                    "name": "Solo Legend",
+                                    "description": "Win 100 encounters with only one hero.",
+                                    "requirement": { "type": "solo_wins", "target": 100 },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 600 },
+                                        { "type": "ability", "id": "adventuring:lone_wolf_stance" },
+                                        { "type": "effect", "effects": [{ "trigger": "passive", "type": "stat_flat", "stat": "adventuring:strength", "amount": 10 }, { "trigger": "passive", "type": "stat_flat", "stat": "adventuring:hitpoints", "amount": 25 }] }
+                                    ]
+                                },
+                                {
+                                    "id": "tier5",
+                                    "name": "Solo Master",
+                                    "description": "Win 500 encounters with only one hero.",
+                                    "requirement": { "type": "solo_wins", "target": 500 },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 750 },
+                                        { "type": "effect", "effects": [{ "trigger": "passive", "type": "stat_flat", "stat": "adventuring:strength", "amount": 15 }, { "trigger": "passive", "type": "stat_flat", "stat": "adventuring:defence", "amount": 10 }, { "trigger": "passive", "type": "stat_flat", "stat": "adventuring:hitpoints", "amount": 50 }] }
                                     ]
                                 }
-                            ],
-                            "description": "Deal 100,000 total damage."
+                            ]
                         },
                         {
-                            "id": "destruction",
-                            "name": "Walking Destruction",
+                            "id": "solo_dungeons",
+                            "name": "Solo Dungeons",
                             "category": "adventuring:challenges",
                             "media": "melvor:assets/media/skills/combat/combat.png",
-                            "requirement": {
-                                "type": "total_damage",
-                                "target": 1000000
-                            },
-                            "rewards": [
+                            "description": "Complete dungeons with only one hero.",
+                            "milestones": [
                                 {
-                                    "type": "currency",
-                                    "id": "adventuring:currency",
-                                    "qty": 600
+                                    "id": "tier1",
+                                    "name": "Solitary Delver",
+                                    "description": "Complete your first dungeon with only one hero.",
+                                    "requirement": { "type": "solo_dungeon_clears", "target": 1 },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 300 }
+                                    ]
                                 },
                                 {
-                                    "type": "ability",
-                                    "id": "adventuring:destroyer"
+                                    "id": "tier2",
+                                    "name": "Solo Adventurer",
+                                    "description": "Complete 10 dungeons with only one hero.",
+                                    "requirement": { "type": "solo_dungeon_clears", "target": 10 },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 500 },
+                                        { "type": "effect", "effects": [{ "trigger": "passive", "type": "stat_flat", "stat": "adventuring:agility", "amount": 5 }] }
+                                    ]
                                 },
                                 {
-                                    "type": "effect",
-                                    "effects": [
-                                        {
-                                            "trigger": "passive",
-                                            "type": "stat_flat",
-                                            "stat": "adventuring:strength",
-                                            "amount": 10
-                                        }
+                                    "id": "tier3",
+                                    "name": "Solo Explorer",
+                                    "description": "Complete 50 dungeons with only one hero.",
+                                    "requirement": { "type": "solo_dungeon_clears", "target": 50 },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 600 },
+                                        { "type": "effect", "effects": [{ "trigger": "passive", "type": "stat_flat", "stat": "adventuring:agility", "amount": 10 }, { "trigger": "passive", "type": "stat_flat", "stat": "adventuring:hitpoints", "amount": 15 }] }
+                                    ]
+                                },
+                                {
+                                    "id": "tier4",
+                                    "name": "One-Man Army",
+                                    "description": "Complete 100 dungeons with only one hero.",
+                                    "requirement": { "type": "solo_dungeon_clears", "target": 100 },
+                                    "rewards": [
+                                        { "type": "currency", "id": "adventuring:currency", "qty": 750 },
+                                        { "type": "ability", "id": "adventuring:self_reliance" },
+                                        { "type": "effect", "effects": [{ "trigger": "passive", "type": "stat_flat", "stat": "adventuring:strength", "amount": 10 }, { "trigger": "passive", "type": "stat_flat", "stat": "adventuring:agility", "amount": 15 }, { "trigger": "passive", "type": "stat_flat", "stat": "adventuring:hitpoints", "amount": 35 }] }
                                     ]
                                 }
-                            ],
-                            "description": "Deal 1,000,000 total damage."
-                        },
-                        {
-                            "id": "healer",
-                            "name": "Combat Medic",
-                            "category": "adventuring:challenges",
-                            "media": "melvor:assets/media/skills/prayer/prayer.png",
-                            "requirement": {
-                                "type": "total_healing",
-                                "target": 50000
-                            },
-                            "rewards": [
-                                {
-                                    "type": "currency",
-                                    "id": "adventuring:currency",
-                                    "qty": 400
-                                },
-                                {
-                                    "type": "effect",
-                                    "effects": [
-                                        {
-                                            "trigger": "passive",
-                                            "type": "stat_flat",
-                                            "stat": "adventuring:prayer",
-                                            "amount": 3
-                                        }
-                                    ]
-                                }
-                            ],
-                            "description": "Heal 50,000 total HP."
-                        },
-                        {
-                            "id": "master_healer",
-                            "name": "Master Healer",
-                            "category": "adventuring:challenges",
-                            "media": "melvor:assets/media/skills/prayer/prayer.png",
-                            "requirement": {
-                                "type": "total_healing",
-                                "target": 500000
-                            },
-                            "rewards": [
-                                {
-                                    "type": "currency",
-                                    "id": "adventuring:currency",
-                                    "qty": 600
-                                },
-                                {
-                                    "type": "ability",
-                                    "id": "adventuring:healers_heart"
-                                },
-                                {
-                                    "type": "effect",
-                                    "effects": [
-                                        {
-                                            "trigger": "passive",
-                                            "type": "stat_flat",
-                                            "stat": "adventuring:prayer",
-                                            "amount": 10
-                                        },
-                                        {
-                                            "trigger": "passive",
-                                            "type": "stat_flat",
-                                            "stat": "adventuring:hitpoints",
-                                            "amount": 15
-                                        }
-                                    ]
-                                }
-                            ],
-                            "description": "Heal 500,000 total HP."
-                        },
-                        {
-                            "id": "slayer_tasks_10",
-                            "name": "Task Hunter",
-                            "category": "adventuring:challenges",
-                            "media": "melvor:assets/media/skills/slayer/slayer.png",
-                            "requirement": {
-                                "type": "slayer_tasks",
-                                "target": 10
-                            },
-                            "rewards": [
-                                {
-                                    "type": "currency",
-                                    "id": "adventuring:currency",
-                                    "qty": 400
-                                },
-                                {
-                                    "type": "material",
-                                    "id": "adventuring:slayer_coins",
-                                    "qty": 500
-                                }
-                            ],
-                            "description": "Complete 10 slayer tasks."
-                        },
-                        {
-                            "id": "slayer_tasks_50",
-                            "name": "Task Master",
-                            "category": "adventuring:challenges",
-                            "media": "melvor:assets/media/skills/slayer/slayer.png",
-                            "requirement": {
-                                "type": "slayer_tasks",
-                                "target": 50
-                            },
-                            "rewards": [
-                                {
-                                    "type": "currency",
-                                    "id": "adventuring:currency",
-                                    "qty": 500
-                                },
-                                {
-                                    "type": "material",
-                                    "id": "adventuring:slayer_coins",
-                                    "qty": 2000
-                                },
-                                {
-                                    "type": "effect",
-                                    "effects": [
-                                        {
-                                            "trigger": "passive",
-                                            "type": "stat_flat",
-                                            "stat": "adventuring:strength",
-                                            "amount": 3
-                                        }
-                                    ]
-                                }
-                            ],
-                            "description": "Complete 50 slayer tasks."
-                        },
-                        {
-                            "id": "slayer_tasks_100",
-                            "name": "Task Legend",
-                            "category": "adventuring:challenges",
-                            "media": "melvor:assets/media/skills/slayer/slayer.png",
-                            "requirement": {
-                                "type": "slayer_tasks",
-                                "target": 100
-                            },
-                            "rewards": [
-                                {
-                                    "type": "currency",
-                                    "id": "adventuring:currency",
-                                    "qty": 600
-                                },
-                                {
-                                    "type": "material",
-                                    "id": "adventuring:slayer_coins",
-                                    "qty": 5000
-                                },
-                                {
-                                    "type": "ability",
-                                    "id": "adventuring:slayers_instinct"
-                                },
-                                {
-                                    "type": "effect",
-                                    "effects": [
-                                        {
-                                            "trigger": "passive",
-                                            "type": "stat_flat",
-                                            "stat": "adventuring:strength",
-                                            "amount": 5
-                                        },
-                                        {
-                                            "trigger": "passive",
-                                            "type": "stat_flat",
-                                            "stat": "adventuring:hitpoints",
-                                            "amount": 10
-                                        }
-                                    ]
-                                }
-                            ],
-                            "description": "Complete 100 slayer tasks."
+                            ]
                         }
                     ],
                     "achievementCategories": [
@@ -314,109 +962,6 @@
                                                     {
                                                         "id": "adventuring:defence",
                                                         "amount": 0.05
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "destroyer",
-                            "name": "Destroyer",
-                            "requirements": [
-                                {
-                                    "type": "achievement_completion",
-                                    "id": "adventuring:destruction"
-                                }
-                            ],
-                            "energy": 35,
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "ignoreBlock": true,
-                                            "amount": {
-                                                "base": 30,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:strength",
-                                                        "amount": 0.45
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "healers_heart",
-                            "name": "Healer's Heart",
-                            "requirements": [
-                                {
-                                    "type": "achievement_completion",
-                                    "id": "adventuring:master_healer"
-                                }
-                            ],
-                            "energy": 40,
-                            "hits": [
-                                {
-                                    "target": "all",
-                                    "party": "ally",
-                                    "effects": [
-                                        {
-                                            "type": "heal_flat",
-                                            "amount": {
-                                                "base": 30,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.35
-                                                    },
-                                                    {
-                                                        "id": "adventuring:prayer",
-                                                        "amount": 0.25
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "slayers_instinct",
-                            "name": "Slayer's Instinct",
-                            "requirements": [
-                                {
-                                    "type": "achievement_completion",
-                                    "id": "adventuring:slayer_tasks_100"
-                                }
-                            ],
-                            "energy": 25,
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "bonusVsMarked": 1.5,
-                                            "amount": {
-                                                "base": 22,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:strength",
-                                                        "amount": 0.3
-                                                    },
-                                                    {
-                                                        "id": "adventuring:ranged",
-                                                        "amount": 0.2
                                                     }
                                                 ]
                                             }
