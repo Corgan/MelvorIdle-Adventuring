@@ -223,7 +223,7 @@ export class RunStats {
             this.equipmentWorn = new Set();
             for (const hero of party) {
                 if (hero.equipment) {
-                    for (const item of hero.equipment.equipped.values()) {
+                    for (const item of hero.equipment.equippedItems) {
                         if (item) {
                             this.equipmentWorn.add(item.base || item);
                         }

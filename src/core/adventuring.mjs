@@ -1343,7 +1343,7 @@ export class Adventuring extends SkillWithMastery {
         this.grimoire.encode(writer);
 
         // Version 6+: Log filter settings
-        this.log.encodeSettings(writer);
+        this.log.encode(writer);
 
         console.log(`Wrote ${writer.byteOffset - start} bytes for Adventuring save`);
 
@@ -1413,7 +1413,7 @@ export class Adventuring extends SkillWithMastery {
             
             // Version 9+: Log filter settings
             if(this.saveVersion >= 9) {
-                this.log.decodeSettings(reader, version);
+                this.log.decode(reader, version);
             }
         } catch(e) {
 

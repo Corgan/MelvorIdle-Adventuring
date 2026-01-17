@@ -14,6 +14,11 @@ export class AdventuringJobDetailsElement extends AdventuringSubpageElement {
         this.equipable = getElementFromFragment(this._content, 'equipable', 'div');
         this.abilitiesSection = getElementFromFragment(this._content, 'abilities-section', 'div');
         this.abilitiesList = getElementFromFragment(this._content, 'abilities-list', 'div');
+
+        // Combat stats section
+        this.jobStatsSection = getElementFromFragment(this._content, 'job-stats-section', 'div');
+        this.jobBestEndless = getElementFromFragment(this._content, 'job-best-endless', 'div');
+        this.jobRunsCompleted = getElementFromFragment(this._content, 'job-runs-completed', 'div');
     }
 }
 window.customElements.define('adventuring-job-details', AdventuringJobDetailsElement);

@@ -11,7 +11,7 @@ export class AdventuringSlayersElement extends AdventuringSubpageElement {
         this.tabTasks = getElementFromFragment(this._content, 'tab-tasks', 'button');
         this.tabAchievements = getElementFromFragment(this._content, 'tab-achievements', 'button');
         this.tabRuns = getElementFromFragment(this._content, 'tab-runs', 'button');
-        this.achievementsBadge = getElementFromFragment(this._content, 'achievements-badge', 'span');
+        this.tabStats = getElementFromFragment(this._content, 'tab-stats', 'button');
 
         this.tasksContent = getElementFromFragment(this._content, 'tasks-content', 'div');
         this.activeTasks = getElementFromFragment(this._content, 'active-tasks', 'div');
@@ -42,6 +42,10 @@ export class AdventuringSlayersElement extends AdventuringSubpageElement {
         this.runDetailAbilities = getElementFromFragment(this._content, 'run-detail-abilities', 'div');
         this.runDetailMonsters = getElementFromFragment(this._content, 'run-detail-monsters', 'div');
         this.runDetailEncounters = getElementFromFragment(this._content, 'run-detail-encounters', 'div');
+
+        // Stats Tab
+        this.statsContent = getElementFromFragment(this._content, 'stats-content', 'div');
+        this.globalStatsList = getElementFromFragment(this._content, 'global-stats-list', 'div');
     }
 }
 window.customElements.define('adventuring-slayers', AdventuringSlayersElement);

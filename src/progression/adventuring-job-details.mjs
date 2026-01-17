@@ -3,7 +3,8 @@ const { loadModule } = mod.getContext(import.meta);
 const { AdventuringPage } = await loadModule('src/ui/adventuring-page.mjs');
 const { AdventuringStats } = await loadModule('src/core/adventuring-stats.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
-const { AdventuringAbilityRowElement } = await loadModule('src/progression/components/adventuring-ability-row.mjs');
+const { AdventuringAbilityRowElement } = await loadModule('src/progression/components/adventuring-ability-row.mjs');
+
 await loadModule('src/progression/components/adventuring-job-details.mjs');
 
 class AdventuringJobDetailsRenderQueue {
@@ -12,12 +13,14 @@ class AdventuringJobDetailsRenderQueue {
         this.icon = false;
         this.abilities = false;
         this.scaling = false;
+        this.jobStats = false;
     }
     queueAll() {
         this.name = true;
         this.icon = true;
         this.abilities = true;
         this.scaling = true;
+        this.jobStats = true;
     }
 }
 
@@ -68,6 +71,7 @@ export class AdventuringJobDetails extends AdventuringPage {
         this.renderQueue.icon = true;
         this.renderQueue.abilities = true;
         this.renderQueue.equipable = true;
+        this.renderQueue.jobStats = true;
     }
 
     postDataRegistration() {
@@ -79,6 +83,7 @@ export class AdventuringJobDetails extends AdventuringPage {
         this.renderIcon();
         this.renderAbilities();
         this.renderEquipable();
+        this.renderJobStats();
         this.scaling.render();
     }
 
@@ -127,7 +132,8 @@ export class AdventuringJobDetails extends AdventuringPage {
             type,
             unlockLevel,
             tooltipContent: this.buildAbilityTooltip(ability, type)
-        });
+        });
+
         if(isUnlocked && ability.id) {
             this.manager.seenAbilities.add(ability.id);
         }
@@ -142,7 +148,8 @@ export class AdventuringJobDetails extends AdventuringPage {
         if(this.job.isPassive) {
             this.component.abilitiesSection.classList.add('d-none');
         } else {
-            this.component.abilitiesSection.classList.remove('d-none');
+            this.component.abilitiesSection.classList.remove('d-none');
+
             const generators = this.manager.generators.allObjects
                 .filter(g => g.unlockedBy(this.job))
                 .map(a => ({ ability: a, type: 'generator' }));
@@ -150,9 +157,11 @@ export class AdventuringJobDetails extends AdventuringPage {
                 .filter(s => s.unlockedBy(this.job))
                 .map(a => ({ ability: a, type: 'spender' }));
             const passives = this.manager.getPassivesForJob(this.job)
-                .map(a => ({ ability: a, type: 'passive' }));
+                .map(a => ({ ability: a, type: 'passive' }));
+
             const allAbilities = [...generators, ...spenders, ...passives]
-                .sort((a, b) => this.getUnlockLevel(a.ability) - this.getUnlockLevel(b.ability));
+                .sort((a, b) => this.getUnlockLevel(a.ability) - this.getUnlockLevel(b.ability));
+
             const rows = allAbilities.map(({ ability, type }) => this.createAbilityRow(ability, type));
 
             this.component.abilitiesList.replaceChildren(...rows);
@@ -178,5 +187,29 @@ export class AdventuringJobDetails extends AdventuringPage {
         }
 
         this.renderQueue.equipable = false;
+    }
+
+    renderJobStats() {
+        if(!this.renderQueue.jobStats)
+            return;
+
+        // Hide stats section for passive jobs
+        if(this.job.isPassive) {
+            this.component.jobStatsSection.classList.add('d-none');
+            this.renderQueue.jobStats = false;
+            return;
+        }
+
+        this.component.jobStatsSection.classList.remove('d-none');
+
+        // Get best solo endless wave for this job (map_max stat, uses mapValues)
+        const bestEndless = this.manager.achievementManager.stats.getMap('adventuring:best_endless_wave_solo', this.job.id) || 0;
+        this.component.jobBestEndless.textContent = bestEndless.toLocaleString();
+
+        // Get runs completed for this job (map_count stat, uses mapValues)
+        const runsCompleted = this.manager.achievementManager.stats.getMap('adventuring:runs_by_job', this.job.id) || 0;
+        this.component.jobRunsCompleted.textContent = runsCompleted.toLocaleString();
+
+        this.renderQueue.jobStats = false;
     }
 }

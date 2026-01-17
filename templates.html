@@ -207,6 +207,24 @@
                 <div class="block block-rounded-double bg-combat-inner-dark p-3" id="abilities-list"></div>
             </div>
         </div>
+
+        <div class="col-12" id="job-stats-section">
+            <div class="block-content p-3">
+                <h5 class="font-w600 text-combat-smoke mb-2">Combat Stats</h5>
+                <div class="block block-rounded-double bg-combat-inner-dark p-3">
+                    <div class="row">
+                        <div class="col-6 text-center">
+                            <div class="text-info font-size-h4 font-w700" id="job-best-endless">0</div>
+                            <small class="text-muted">Best Solo Endless</small>
+                        </div>
+                        <div class="col-6 text-center">
+                            <div class="text-success font-size-h4 font-w700" id="job-runs-completed">0</div>
+                            <small class="text-muted">Runs Completed</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -1137,12 +1155,16 @@
                 <li class="nav-item">
                     <button id="tab-achievements" class="nav-link" data-tab="achievements">
                         <i class="fa fa-trophy mr-1"></i> Achievements
-                        <span id="achievements-badge" class="badge badge-success ml-1 d-none">0</span>
                     </button>
                 </li>
                 <li class="nav-item">
                     <button id="tab-runs" class="nav-link" data-tab="runs">
                         <i class="fa fa-history mr-1"></i> Run History
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button id="tab-stats" class="nav-link" data-tab="stats">
+                        <i class="fa fa-chart-bar mr-1"></i> Stats
                     </button>
                 </li>
             </ul>
@@ -1275,6 +1297,16 @@
                             <div id="run-detail-encounters" class="row no-gutters"></div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Tab -->
+        <div id="stats-content" class="col-12 d-none">
+            <div class="col-12 p-3">
+                <div class="block block-rounded bg-combat-dark p-3">
+                    <h5 class="font-w600 text-info mb-3"><i class="fa fa-chart-bar mr-2"></i>Adventuring Statistics</h5>
+                    <div class="row" id="global-stats-list"></div>
                 </div>
             </div>
         </div>
@@ -2166,6 +2198,10 @@
                                 </div>
                             </div>
                             <div class="mb-3"><span class="text-muted">Best Endless: </span><span id="bestEndless" class="text-warning">0</span> <small class="text-muted">waves</small></div>
+                            
+                            <h6 class="font-w600 text-combat-smoke mb-2">Clear Counts</h6>
+                            <div class="row mb-3" id="clearCounts"></div>
+                            
                             <h6 class="font-w600 text-combat-smoke mb-2">Milestones</h6>
                             <div id="milestones"></div>
                         </div>

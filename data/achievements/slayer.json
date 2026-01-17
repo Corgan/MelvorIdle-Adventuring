@@ -19,7 +19,7 @@
                                     "name": "Task Hunter",
                                     "description": "Complete 10 slayer tasks to unlock the Slayer job.",
                                     "requirement": {
-                                        "type": "slayer_tasks",
+                                        "type": "stat", "stat": "adventuring:slayer_tasks_completed",
                                         "target": 10
                                     },
                                     "rewards": [
@@ -39,7 +39,7 @@
                                     "name": "Task Pursuer",
                                     "description": "Complete 25 slayer tasks.",
                                     "requirement": {
-                                        "type": "slayer_tasks",
+                                        "type": "stat", "stat": "adventuring:slayer_tasks_completed",
                                         "target": 25
                                     },
                                     "rewards": [
@@ -66,7 +66,7 @@
                                     "name": "Task Master",
                                     "description": "Complete 50 slayer tasks.",
                                     "requirement": {
-                                        "type": "slayer_tasks",
+                                        "type": "stat", "stat": "adventuring:slayer_tasks_completed",
                                         "target": 50
                                     },
                                     "rewards": [
@@ -99,7 +99,7 @@
                                     "name": "Task Legend",
                                     "description": "Complete 100 slayer tasks.",
                                     "requirement": {
-                                        "type": "slayer_tasks",
+                                        "type": "stat", "stat": "adventuring:slayer_tasks_completed",
                                         "target": 100
                                     },
                                     "rewards": [
@@ -136,7 +136,7 @@
                                     "name": "Task Veteran",
                                     "description": "Complete 250 slayer tasks.",
                                     "requirement": {
-                                        "type": "slayer_tasks",
+                                        "type": "stat", "stat": "adventuring:slayer_tasks_completed",
                                         "target": 250
                                     },
                                     "rewards": [
@@ -169,7 +169,7 @@
                                     "name": "Eternal Slayer",
                                     "description": "Complete 500 slayer tasks.",
                                     "requirement": {
-                                        "type": "slayer_tasks",
+                                        "type": "stat", "stat": "adventuring:slayer_tasks_completed",
                                         "target": 500
                                     },
                                     "rewards": [
@@ -376,6 +376,22 @@
                             "milestones": [
                                 {
                                     "id": "tier1",
+                                    "name": "Ability Novice",
+                                    "description": "Learn 1 ability from monsters.",
+                                    "requirement": {
+                                        "type": "learned_abilities",
+                                        "target": 1
+                                    },
+                                    "rewards": [
+                                        {
+                                            "type": "currency",
+                                            "id": "adventuring:currency",
+                                            "qty": 100
+                                        }
+                                    ]
+                                },
+                                {
+                                    "id": "tier2",
                                     "name": "Ability Learner",
                                     "description": "Learn 10 abilities from monsters.",
                                     "requirement": {
@@ -402,7 +418,7 @@
                                     ]
                                 },
                                 {
-                                    "id": "tier2",
+                                    "id": "tier3",
                                     "name": "Ability Collector",
                                     "description": "Learn 25 abilities from monsters.",
                                     "requirement": {
@@ -429,8 +445,8 @@
                                     ]
                                 },
                                 {
-                                    "id": "tier3",
-                                    "name": "Ability Master",
+                                    "id": "tier4",
+                                    "name": "Ability Adept",
                                     "description": "Learn 50 abilities from monsters.",
                                     "requirement": {
                                         "type": "learned_abilities",
@@ -462,12 +478,45 @@
                                     ]
                                 },
                                 {
-                                    "id": "tier4",
-                                    "name": "Ability Legend",
+                                    "id": "tier5",
+                                    "name": "Ability Master",
                                     "description": "Learn 100 abilities from monsters.",
                                     "requirement": {
                                         "type": "learned_abilities",
                                         "target": 100
+                                    },
+                                    "rewards": [
+                                        {
+                                            "type": "currency",
+                                            "id": "adventuring:currency",
+                                            "qty": 5000
+                                        },
+                                        {
+                                            "type": "effect",
+                                            "effects": [
+                                                {
+                                                    "trigger": "passive",
+                                                    "type": "stat_flat",
+                                                    "stat": "adventuring:magic",
+                                                    "amount": 15
+                                                },
+                                                {
+                                                    "trigger": "passive",
+                                                    "type": "stat_flat",
+                                                    "stat": "adventuring:prayer",
+                                                    "amount": 10
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "id": "tier6",
+                                    "name": "Ability Expert",
+                                    "description": "Learn 250 abilities from monsters.",
+                                    "requirement": {
+                                        "type": "learned_abilities",
+                                        "target": 250
                                     },
                                     "rewards": [
                                         {
@@ -482,19 +531,109 @@
                                                     "trigger": "passive",
                                                     "type": "stat_flat",
                                                     "stat": "adventuring:magic",
-                                                    "amount": 20
+                                                    "amount": 25
                                                 },
                                                 {
                                                     "trigger": "passive",
                                                     "type": "stat_flat",
                                                     "stat": "adventuring:prayer",
-                                                    "amount": 10
+                                                    "amount": 15
                                                 },
                                                 {
                                                     "trigger": "passive",
                                                     "type": "stat_flat",
                                                     "stat": "adventuring:hitpoints",
                                                     "amount": 25
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "id": "tier7",
+                                    "name": "Ability Legend",
+                                    "description": "Learn 500 abilities from monsters.",
+                                    "requirement": {
+                                        "type": "learned_abilities",
+                                        "target": 500
+                                    },
+                                    "rewards": [
+                                        {
+                                            "type": "currency",
+                                            "id": "adventuring:currency",
+                                            "qty": 25000
+                                        },
+                                        {
+                                            "type": "effect",
+                                            "effects": [
+                                                {
+                                                    "trigger": "passive",
+                                                    "type": "stat_flat",
+                                                    "stat": "adventuring:magic",
+                                                    "amount": 40
+                                                },
+                                                {
+                                                    "trigger": "passive",
+                                                    "type": "stat_flat",
+                                                    "stat": "adventuring:prayer",
+                                                    "amount": 25
+                                                },
+                                                {
+                                                    "trigger": "passive",
+                                                    "type": "stat_flat",
+                                                    "stat": "adventuring:hitpoints",
+                                                    "amount": 50
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "id": "tier8",
+                                    "name": "Blue Mage",
+                                    "description": "Learn all 722 abilities from monsters.",
+                                    "requirement": {
+                                        "type": "learned_abilities",
+                                        "target": 722
+                                    },
+                                    "rewards": [
+                                        {
+                                            "type": "currency",
+                                            "id": "adventuring:currency",
+                                            "qty": 100000
+                                        },
+                                        {
+                                            "type": "effect",
+                                            "effects": [
+                                                {
+                                                    "trigger": "passive",
+                                                    "type": "stat_flat",
+                                                    "stat": "adventuring:magic",
+                                                    "amount": 75
+                                                },
+                                                {
+                                                    "trigger": "passive",
+                                                    "type": "stat_flat",
+                                                    "stat": "adventuring:prayer",
+                                                    "amount": 50
+                                                },
+                                                {
+                                                    "trigger": "passive",
+                                                    "type": "stat_flat",
+                                                    "stat": "adventuring:hitpoints",
+                                                    "amount": 100
+                                                },
+                                                {
+                                                    "trigger": "passive",
+                                                    "type": "stat_flat",
+                                                    "stat": "adventuring:strength",
+                                                    "amount": 50
+                                                },
+                                                {
+                                                    "trigger": "passive",
+                                                    "type": "stat_flat",
+                                                    "stat": "adventuring:defence",
+                                                    "amount": 50
                                                 }
                                             ]
                                         }

@@ -733,18 +733,14 @@ export class AdventuringArmory extends AdventuringPage {
             }
         }
 
-        try {
-            const numTiers = reader.getUint32();
-            for (let i = 0; i < numTiers; i++) {
-                const key = reader.getNamespacedObject(this.manager.baseItems);
-                const value = reader.getUint8();
-                if (typeof key !== "string" && key.id !== "adventuring:none" && key.isArtifact) {
-                    this.artifactTiers.set(key, value);
-                    key.applyArtifactTier(value);
-                }
+        const numTiers = reader.getUint32();
+        for (let i = 0; i < numTiers; i++) {
+            const key = reader.getNamespacedObject(this.manager.baseItems);
+            const value = reader.getUint8();
+            if (typeof key !== "string" && key.id !== "adventuring:none" && key.isArtifact) {
+                this.artifactTiers.set(key, value);
+                key.applyArtifactTier(value);
             }
-        } catch(e) {
-            console.log('[Adventuring] No artifact tier data in save, using defaults');
         }
     }
 }

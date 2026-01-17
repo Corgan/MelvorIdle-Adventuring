@@ -52,12 +52,18 @@ export class AdventuringArea extends AdventuringMasteryAction {
                 this.manager.selectArea(this);
         };
 
-        // Prevent card click when clicking on controls area (buttons, dropdown, etc)
+        // Prevent card click when clicking on controls area, but allow dropdown to work
         this.component.controls.onclick = (e) => {
-            e.stopPropagation();
+            // Don't stop propagation for dropdown button/menu - Bootstrap needs it
+            const isDropdown = e.target.closest('.dropdown');
+            if (!isDropdown) {
+                e.stopPropagation();
+            }
         };
 
-        this.component.card.onclick = () => {
+        this.component.card.onclick = (e) => {
+            // Don't open details if clicking in controls area (buttons, dropdown, etc)
+            if (e.target.closest('#controls')) return;
             this.openDetails();
         };
 

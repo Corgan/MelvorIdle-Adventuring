@@ -18,7 +18,7 @@ export class AdventuringAchievementStat extends NamespacedObject {
         // Triggers this stat listens to
         this.triggers = data.triggers || [];
 
-        // Aggregation type: count, sum, max, set, map_count, map_sum, nested_map_count
+        // Aggregation type: count, sum, max, set, map_count, map_sum, map_max, nested_map_count
         this.aggregation = data.aggregation || 'count';
 
         // Path to extract value from context (for sum/max)
@@ -78,7 +78,7 @@ export class AdventuringAchievementStat extends NamespacedObject {
      * Check if this stat uses a single-level map
      */
     get isMap() {
-        return ['map_count', 'map_sum', 'set'].includes(this.aggregation);
+        return ['map_count', 'map_sum', 'map_max', 'set'].includes(this.aggregation);
     }
 
     /**

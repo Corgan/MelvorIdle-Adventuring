@@ -102,6 +102,7 @@ export class AdventuringAreaDetails extends AdventuringDetailsPage {
             description: false,
             dimensions: false,
             mastery: false,
+            clearCounts: false,
             milestones: false,
             monsters: false,
             drops: false,
@@ -111,6 +112,7 @@ export class AdventuringAreaDetails extends AdventuringDetailsPage {
                 this.description = true;
                 this.dimensions = true;
                 this.mastery = true;
+                this.clearCounts = true;
                 this.milestones = true;
                 this.monsters = true;
                 this.drops = true;
@@ -134,6 +136,7 @@ export class AdventuringAreaDetails extends AdventuringDetailsPage {
         this.renderDescription();
         this.renderDimensions();
         this.renderMastery();
+        this.renderClearCounts();
         this.renderMilestones();
         this.renderMonsters();
         this.renderDrops();
@@ -189,6 +192,44 @@ export class AdventuringAreaDetails extends AdventuringDetailsPage {
         this.component.bestEndless.textContent = this.area.bestEndlessStreak || 0;
 
         this.renderQueue.mastery = false;
+    }
+
+    renderClearCounts() {
+        if (!this.renderQueue.clearCounts) return;
+
+        this.component.clearCounts.innerHTML = '';
+
+        // Get clear counts for this area by difficulty from the nested map stat
+        const areaId = this.area.id;
+        const stats = this.manager.achievementManager.stats;
+
+        // Get difficulty colors and names
+        const difficulties = [
+            { id: 'adventuring:normal', name: 'Normal', color: 'secondary' },
+            { id: 'adventuring:heroic', name: 'Heroic', color: 'warning' },
+            { id: 'adventuring:mythic', name: 'Mythic', color: 'danger' }
+        ];
+
+        for (const diff of difficulties) {
+            const count = stats.getNested('adventuring:clears_by_area_difficulty', areaId, diff.id) || 0;
+
+            const col = document.createElement('div');
+            col.className = 'col-4 text-center';
+
+            const countEl = document.createElement('div');
+            countEl.className = `font-w700 text-${diff.color}`;
+            countEl.textContent = count.toLocaleString();
+
+            const label = document.createElement('small');
+            label.className = 'text-muted d-block';
+            label.textContent = diff.name;
+
+            col.appendChild(countEl);
+            col.appendChild(label);
+            this.component.clearCounts.appendChild(col);
+        }
+
+        this.renderQueue.clearCounts = false;
     }
 
     renderMilestones() {

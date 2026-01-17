@@ -253,7 +253,7 @@ export class AdventuringMessageLog {
     /**
      * Encode filter settings for save
      */
-    encodeSettings(writer) {
+    encode(writer) {
         // Encode enabled categories as bitmask (17 categories)
         const categoryIds = Object.keys(LOG_CATEGORIES);
         let bitmask = 0n;
@@ -281,32 +281,27 @@ export class AdventuringMessageLog {
     /**
      * Decode filter settings from save
      */
-    decodeSettings(reader, version) {
-        try {
-            const categoryIds = Object.keys(LOG_CATEGORIES);
-            const bitmask = BigInt(reader.getUint32());
-            
-            this.filterSettings.enabledCategories.clear();
-            for (let i = 0; i < categoryIds.length; i++) {
-                if (bitmask & (1n << BigInt(i))) {
-                    this.filterSettings.enabledCategories.add(categoryIds[i]);
-                }
+    decode(reader, version) {
+        const categoryIds = Object.keys(LOG_CATEGORIES);
+        const bitmask = BigInt(reader.getUint32());
+        
+        this.filterSettings.enabledCategories.clear();
+        for (let i = 0; i < categoryIds.length; i++) {
+            if (bitmask & (1n << BigInt(i))) {
+                this.filterSettings.enabledCategories.add(categoryIds[i]);
             }
-            
-            this.filterSettings.messageLimit = reader.getUint16();
-            
-            // Decode slot settings
-            const slotBits = reader.getUint8();
-            this.filterSettings.showAllSlots = (slotBits & 0b1000) !== 0;
-            this.filterSettings.enabledSlots.clear();
-            if (slotBits & 0b0001) this.filterSettings.enabledSlots.add(0);
-            if (slotBits & 0b0010) this.filterSettings.enabledSlots.add(1);
-            if (slotBits & 0b0100) this.filterSettings.enabledSlots.add(2);
-        } catch (e) {
-            console.warn('[Adventuring] Failed to decode log settings, using defaults');
-            this.filterSettings = new LogFilterSettings();
         }
         
+        this.filterSettings.messageLimit = reader.getUint16();
+        
+        // Decode slot settings
+        const slotBits = reader.getUint8();
+        this.filterSettings.showAllSlots = (slotBits & 0b1000) !== 0;
+        this.filterSettings.enabledSlots.clear();
+        if (slotBits & 0b0001) this.filterSettings.enabledSlots.add(0);
+        if (slotBits & 0b0010) this.filterSettings.enabledSlots.add(1);
+        if (slotBits & 0b0100) this.filterSettings.enabledSlots.add(2);
+
         return reader;
     }
 }

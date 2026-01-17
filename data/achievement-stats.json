@@ -115,6 +115,26 @@
                             "keyRegistry": "difficulties"
                         },
                         {
+                            "id": "clears_by_area_difficulty",
+                            "name": "Clears by Area",
+                            "description": "Area completions by area and difficulty",
+                            "media": "melvor:assets/media/main/statistics_header.png",
+                            "category": "dungeon",
+                            "triggers": [
+                                "dungeon_end"
+                            ],
+                            "aggregation": "nested_map_count",
+                            "keyPath": [
+                                "area",
+                                "difficulty"
+                            ],
+                            "keyRegistries": [
+                                "areas",
+                                "difficulties"
+                            ],
+                            "showInGlobalStats": false
+                        },
+                        {
                             "id": "solo_clears",
                             "name": "Solo Clears",
                             "description": "Solo area completions by area and difficulty",
@@ -148,6 +168,23 @@
                             ],
                             "aggregation": "max",
                             "valuePath": "wave"
+                        },
+                        {
+                            "id": "best_endless_wave_solo",
+                            "name": "Best Solo Endless Wave",
+                            "description": "Highest wave reached solo in Endless mode by job",
+                            "media": "melvor:assets/media/main/question.png",
+                            "category": "dungeon",
+                            "triggers": [
+                                "endless_wave"
+                            ],
+                            "aggregation": "map_max",
+                            "valuePath": "wave",
+                            "keyPath": "primaryJob",
+                            "keyRegistry": "jobs",
+                            "conditions": {
+                                "isSolo": true
+                            }
                         },
                         {
                             "id": "total_endless_waves",
@@ -206,6 +243,21 @@
                                 "slayer_task_completed"
                             ],
                             "aggregation": "count"
+                        },
+                        {
+                            "id": "runs_by_job",
+                            "name": "Runs by Job",
+                            "description": "Dungeon runs completed by job",
+                            "media": "melvor:assets/media/skills/combat/combat.png",
+                            "category": "progression",
+                            "triggers": [
+                                "dungeon_end"
+                            ],
+                            "aggregation": "map_count",
+                            "keyPath": "jobsUsed",
+                            "keyRegistry": "jobs",
+                            "expandKeys": true,
+                            "showInGlobalStats": false
                         },
                         {
                             "id": "buffs_applied",

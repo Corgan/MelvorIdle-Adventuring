@@ -17,6 +17,7 @@ export class AdventuringAreaDetailsElement extends AdventuringSubpageElement {
         this.masteryLevel = getElementFromFragment(this._content, 'masteryLevel', 'span');
         this.masteryProgress = getElementFromFragment(this._content, 'mastery-progress', 'progress-bar');
         this.bestEndless = getElementFromFragment(this._content, 'bestEndless', 'span');
+        this.clearCounts = getElementFromFragment(this._content, 'clearCounts', 'div');
         this.milestones = getElementFromFragment(this._content, 'milestones', 'div');
 
         this.monsters = getElementFromFragment(this._content, 'monsters', 'div');

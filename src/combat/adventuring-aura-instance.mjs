@@ -275,21 +275,17 @@ export class AdventuringAuraInstance {
         this.source = this.manager.encounter.all[sourceIdx];
         this.age = reader.getUint16();
 
-        try {
-            const hasSnapshot = reader.getBoolean();
-            if (hasSnapshot) {
-                this.snapshotStats = new Map();
-                const count = reader.getUint16();
-                for (let i = 0; i < count; i++) {
-                    const stat = reader.getNamespacedObject(this.manager.stats);
-                    const value = reader.getFloat64();
-                    if (stat && typeof stat !== 'string') {
-                        this.snapshotStats.set(stat, value);
-                    }
+        const hasSnapshot = reader.getBoolean();
+        if (hasSnapshot) {
+            this.snapshotStats = new Map();
+            const count = reader.getUint16();
+            for (let i = 0; i < count; i++) {
+                const stat = reader.getNamespacedObject(this.manager.stats);
+                const value = reader.getFloat64();
+                if (stat && typeof stat !== 'string') {
+                    this.snapshotStats.set(stat, value);
                 }
             }
-        } catch (e) {
-            this.snapshotStats = null;
         }
     }
 }

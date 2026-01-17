@@ -19,6 +19,7 @@ class SlayersRenderQueue {
         this.activeTasks = false;
         this.achievements = false;
         this.runs = false;
+        this.stats = false;
         this.all = false;
     }
     queueAll() {
@@ -26,6 +27,7 @@ class SlayersRenderQueue {
         this.activeTasks = true;
         this.achievements = true;
         this.runs = true;
+        this.stats = true;
         this.all = true;
     }
 }
@@ -59,6 +61,7 @@ export class AdventuringSlayers extends AdventuringPage {
         this.component.tabTasks.onclick = () => this.switchTab('tasks');
         this.component.tabAchievements.onclick = () => this.switchTab('achievements');
         this.component.tabRuns.onclick = () => this.switchTab('runs');
+        this.component.tabStats.onclick = () => this.switchTab('stats');
         this.component.runsBackBtn.onclick = () => this.showRunsList();
     }
 
@@ -68,10 +71,12 @@ export class AdventuringSlayers extends AdventuringPage {
         this.component.tabTasks.classList.toggle('active', tab === 'tasks');
         this.component.tabAchievements.classList.toggle('active', tab === 'achievements');
         this.component.tabRuns.classList.toggle('active', tab === 'runs');
+        this.component.tabStats.classList.toggle('active', tab === 'stats');
 
         this.component.tasksContent.classList.toggle('d-none', tab !== 'tasks');
         this.component.achievementsContent.classList.toggle('d-none', tab !== 'achievements');
         this.component.runsContent.classList.toggle('d-none', tab !== 'runs');
+        this.component.statsContent.classList.toggle('d-none', tab !== 'stats');
 
         if(tab === 'achievements') {
             this.renderQueue.achievements = true;
@@ -79,6 +84,9 @@ export class AdventuringSlayers extends AdventuringPage {
         } else if(tab === 'runs') {
             this.showRunsList();
             this.renderQueue.runs = true;
+            this.render();
+        } else if(tab === 'stats') {
+            this.renderQueue.stats = true;
             this.render();
         }
     }
@@ -323,27 +331,8 @@ export class AdventuringSlayers extends AdventuringPage {
         this.renderActiveTasks();
         this.renderAchievements();
         this.renderRuns();
-        this.updateAchievementBadge();
-    }
-
-    updateAchievementBadge() {
-        const claimable = this.getClaimableAchievementCount();
-        if(claimable > 0) {
-            this.component.achievementsBadge.textContent = claimable;
-            this.component.achievementsBadge.classList.remove('d-none');
-        } else {
-            this.component.achievementsBadge.classList.add('d-none');
-        }
-    }
-
-    getClaimableAchievementCount() {
-        let count = 0;
-        for(const achievement of this.manager.achievements.allObjects) {
-            if(!achievement.isComplete() && achievement.isMet()) {
-                count++;
-            }
-        }
-        return count;
+        this.renderStats();
+        this.renderQueue.all = false;
     }
 
     renderAchievements() {
@@ -432,17 +421,15 @@ export class AdventuringSlayers extends AdventuringPage {
             achievements = achievements.filter(a => a.category && a.category.id === this.selectedCategory);
         }
 
+        // Sort: incomplete first (by progress %), then complete
         achievements.sort((a, b) => {
-            const aClaimable = !a.isComplete() && a.isMet();
-            const bClaimable = !b.isComplete() && b.isMet();
             const aComplete = a.isComplete();
             const bComplete = b.isComplete();
 
-            if(aClaimable && !bClaimable) return -1;
-            if(!aClaimable && bClaimable) return 1;
             if(!aComplete && bComplete) return -1;
             if(aComplete && !bComplete) return 1;
-            return a.getProgressPercent() > b.getProgressPercent() ? -1 : 1;
+            // Both same status - sort by progress (higher first for incomplete, doesn't matter for complete)
+            return b.getProgressPercent() - a.getProgressPercent();
         });
 
         for(const achievement of achievements) {
@@ -566,7 +553,7 @@ export class AdventuringSlayers extends AdventuringPage {
             if(reward.type === 'currency') {
                 rewardEl.setCurrency(reward.qty, this.manager.stash.currencyMedia, 'Adventuring Coins');
             } else if(reward.type === 'stat') {
-                const stat = this.manager.stats.getObjectByID(reward.stat);
+                const stat = this.manager.achievementStats?.getObjectByID(reward.stat);
                 const statName = stat ? stat.name : reward.stat.replace('adventuring:', '');
                 const statIcon = stat ? stat.media : null;
                 rewardEl.setStat(reward.value, statIcon, statName);
@@ -605,7 +592,7 @@ export class AdventuringSlayers extends AdventuringPage {
                         hasStatEffect = true;
                         const statRewardEl = new AdventuringAchievementRewardElement();
                         statRewardEl.classList.add('mr-1');
-                        const stat = this.manager.stats.getObjectByID(effect.stat);
+                        const stat = this.manager.achievementStats?.getObjectByID(effect.stat);
                         const statName = stat ? stat.name : effect.stat.replace('adventuring:', '');
                         const statIcon = stat ? stat.media : null;
                         statRewardEl.setStat(effect.amount, statIcon, statName);
@@ -762,18 +749,6 @@ export class AdventuringSlayers extends AdventuringPage {
         }
     }
 
-    claimAchievement(achievement) {
-        if(achievement.isComplete() || !achievement.isMet()) return;
-
-        this.manager.achievementManager.completeAchievement(achievement);
-
-        this.manager.log.add(`Achievement unlocked: ${achievement.name}!`, {
-            category: 'achievements'
-        });
-        this.renderQueue.achievements = true;
-        this.render();
-    }
-
     getCategoryColor(categoryId) {
         const colors = {
             'adventuring:combat': 'danger',
@@ -818,6 +793,71 @@ export class AdventuringSlayers extends AdventuringPage {
         }
 
         this.renderQueue.runs = false;
+    }
+
+    renderStats() {
+        if(!this.renderQueue.stats && !this.renderQueue.all)
+            return;
+
+        this.component.globalStatsList.replaceChildren();
+
+        // Define which stats to show and their display configuration
+        const statsToShow = [
+            { id: 'adventuring:total_kills', icon: 'fa-skull', color: 'danger', label: 'Monsters Slain' },
+            { id: 'adventuring:slayer_tasks_completed', icon: 'fa-scroll', color: 'warning', label: 'Slayer Tasks' },
+            { id: 'adventuring:total_damage', icon: 'fa-bolt', color: 'danger', label: 'Total Damage' },
+            { id: 'adventuring:total_healing', icon: 'fa-heart', color: 'success', label: 'Total Healing' },
+            { id: 'adventuring:flawless_wins', icon: 'fa-star', color: 'warning', label: 'Flawless Wins' },
+            { id: 'adventuring:solo_wins', icon: 'fa-user', color: 'info', label: 'Solo Wins' },
+            { id: 'adventuring:last_stand_wins', icon: 'fa-fist-raised', color: 'danger', label: 'Last Stand Wins' },
+            { id: 'adventuring:floors_explored', icon: 'fa-map', color: 'info', label: 'Floors Explored' },
+            { id: 'adventuring:special_tiles_found', icon: 'fa-gem', color: 'warning', label: 'Special Tiles Found' },
+            { id: 'adventuring:unique_monsters_seen', icon: 'fa-book', color: 'primary', label: 'Bestiary Entries' },
+            { id: 'adventuring:combat_currency_earned', icon: 'fa-coins', color: 'warning', label: 'Currency Earned' },
+            { id: 'adventuring:combat_materials_collected', icon: 'fa-box', color: 'info', label: 'Materials Collected' },
+            { id: 'adventuring:equipment_upgrades', icon: 'fa-arrow-up', color: 'success', label: 'Equipment Upgrades' },
+            { id: 'adventuring:equipment_crafted', icon: 'fa-hammer', color: 'primary', label: 'Equipment Crafted' },
+            { id: 'adventuring:buffs_applied', icon: 'fa-plus-circle', color: 'success', label: 'Buffs Applied' },
+            { id: 'adventuring:debuffs_applied', icon: 'fa-minus-circle', color: 'danger', label: 'Debuffs Applied' }
+        ];
+
+        for(const statConfig of statsToShow) {
+            const value = this.manager.achievementManager.stats.get(statConfig.id) || 0;
+
+            const col = document.createElement('div');
+            col.className = 'col-6 col-md-4 col-lg-3 mb-3';
+
+            const block = document.createElement('div');
+            block.className = 'block block-rounded-double bg-combat-inner-dark p-3 text-center h-100';
+
+            const icon = document.createElement('i');
+            icon.className = `fa ${statConfig.icon} fa-2x text-${statConfig.color} mb-2`;
+
+            const valueEl = document.createElement('div');
+            valueEl.className = 'font-w700 font-size-h4';
+            valueEl.textContent = this.formatStatValue(value);
+
+            const label = document.createElement('small');
+            label.className = 'text-muted';
+            label.textContent = statConfig.label;
+
+            block.appendChild(icon);
+            block.appendChild(valueEl);
+            block.appendChild(label);
+            col.appendChild(block);
+            this.component.globalStatsList.appendChild(col);
+        }
+
+        this.renderQueue.stats = false;
+    }
+
+    formatStatValue(value) {
+        if(value >= 1000000) {
+            return (value / 1000000).toFixed(1) + 'M';
+        } else if(value >= 1000) {
+            return (value / 1000).toFixed(1) + 'K';
+        }
+        return Math.floor(value).toLocaleString();
     }
 
     createRunListItem(run, index) {
@@ -1090,7 +1130,6 @@ export class AdventuringSlayers extends AdventuringPage {
         }
 
         this.renderQueue.activeTasks = false;
-        this.renderQueue.all = false;
     }
 
     createTaskCard(task, mode) {

@@ -108,6 +108,16 @@ export class AchievementStats {
                         }
                     }
                     break;
+
+                case 'map_max':
+                    const mapMaxKeys = this._getKeys(stat, context);
+                    const mapMaxValue = this._getValue(context, stat.valuePath);
+                    if (typeof mapMaxValue === 'number') {
+                        for (const key of mapMaxKeys) {
+                            this._setMapMax(stat, key, mapMaxValue);
+                        }
+                    }
+                    break;
                     
                 case 'nested_map_count':
                     const [key1, key2] = this._getNestedKeys(stat, context);
@@ -244,6 +254,18 @@ export class AchievementStats {
         map.set(key, (map.get(key) || 0) + amount);
     }
 
+    _setMapMax(stat, key, value) {
+        let map = this.mapValues.get(stat);
+        if (!map) {
+            map = new Map();
+            this.mapValues.set(stat, map);
+        }
+        const current = map.get(key) || 0;
+        if (value > current) {
+            map.set(key, value);
+        }
+    }
+
     _incrementNestedMap(stat, key1, key2, amount) {
         let outerMap = this.nestedMapValues.get(stat);
         if (!outerMap) {
@@ -310,6 +332,23 @@ export class AchievementStats {
             total += count;
         }
         return total;
+    }
+
+    /**
+     * Get max value across all keys in a map stat
+     */
+    getMapMax(stat) {
+        if (typeof stat === 'string') {
+            stat = this.manager.achievementStats.getObjectByID(stat);
+        }
+        if (!stat) return 0;
+        const map = this.mapValues.get(stat);
+        if (!map) return 0;
+        let max = 0;
+        for (const value of map.values()) {
+            if (value > max) max = value;
+        }
+        return max;
     }
 
     /**
@@ -725,52 +764,22 @@ export class AdventuringAchievement extends NamespacedObject {
         
         const stats = this.manager.achievementManager.stats;
 
-        // Try to look up stat by type (treating type as stat ID)
+        // Explicit stat type - direct lookup with full namespaced ID
+        if (req.type === 'stat') {
+            const stat = this.manager.achievementStats.getObjectByID(req.stat);
+            if (!stat) {
+                console.warn(`Achievement ${this.id}: stat not found: ${req.stat}`);
+                return 0;
+            }
+            return this._getStatProgress(stat, stats, req);
+        }
+
+        // Legacy: Try to look up stat by type name (treating type as stat ID)
         const statId = `adventuring:${req.type}`;
         const stat = this.manager.achievementStats.getObjectByID(statId);
         
         if (stat) {
-            // Data-driven stat found
-            if (stat.isSimple) {
-                return stats.get(stat);
-            }
-            if (stat.isMap) {
-                // Map stat - need a key from the requirement
-                if (req.tag) {
-                    const fullTagId = req.tag.includes(':') ? req.tag : `adventuring:${req.tag}`;
-                    const tag = this.manager.tags.getObjectByID(fullTagId);
-                    return tag ? stats.getMap(stat, tag) : 0;
-                }
-                if (req.difficulty) {
-                    const fullDiffId = req.difficulty.includes(':') ? req.difficulty : `adventuring:${req.difficulty}`;
-                    const difficulty = this.manager.difficulties.getObjectByID(fullDiffId);
-                    return difficulty ? stats.getMap(stat, difficulty) : 0;
-                }
-                if (req.job) {
-                    const fullJobId = req.job.includes(':') ? req.job : `adventuring:${req.job}`;
-                    const job = this.manager.jobs.getObjectByID(fullJobId);
-                    return job ? stats.getMap(stat, job) : 0;
-                }
-                // Return total if no specific key
-                return stats.getMapTotal(stat);
-            }
-            if (stat.isNestedMap) {
-                // Nested map stat
-                if (req.area && req.difficulty) {
-                    const fullAreaId = req.area.includes(':') ? req.area : `adventuring:${req.area}`;
-                    const fullDiffId = req.difficulty.includes(':') ? req.difficulty : `adventuring:${req.difficulty}`;
-                    const area = this.manager.areas.getObjectByID(fullAreaId);
-                    const difficulty = this.manager.difficulties.getObjectByID(fullDiffId);
-                    return (area && difficulty) ? stats.getNested(stat, area, difficulty) : 0;
-                }
-                if (req.area) {
-                    const fullAreaId = req.area.includes(':') ? req.area : `adventuring:${req.area}`;
-                    const area = this.manager.areas.getObjectByID(fullAreaId);
-                    return area ? stats.getNestedTotal(stat, area) : 0;
-                }
-                // Return grand total
-                return stats.getNestedGrandTotal(stat);
-            }
+            return this._getStatProgress(stat, stats, req);
         }
 
         // Fallback to special case handling for non-stat requirements
@@ -838,16 +847,16 @@ export class AdventuringAchievement extends NamespacedObject {
                 return this._getHighestJobLevel();
             
             case 'jobs_at_level':
-                return this._getJobsAtLevel(req.level);
+                return this._countEntitiesAtLevel('jobs', 'all', req.level);
             
             case 'area_mastery':
-                return this._getHighestAreaMastery();
+                return this._getMasteryAggregate('areas', 'all', 'max');
             
             case 'job_unlocked':
                 return this._isJobUnlocked(req.job) ? 1 : 0;
             
             case 'any_passive_job_level':
-                return this._getHighestPassiveJobLevel();
+                return this._getMasteryAggregate('jobs', 'passive', 'max');
             
             case 'all_passive_jobs_level':
                 return this._getAllPassiveJobsAtLevel(req.level) ? 1 : 0;
@@ -881,10 +890,56 @@ export class AdventuringAchievement extends NamespacedObject {
                 return this._getHighestEquipmentLevel();
 
             case 'monster_mastery':
-                return this._getHighestMonsterMastery();
+                return this._getMasteryAggregate('monsters', 'all', 'max');
 
             case 'total_monster_mastery':
-                return this._getTotalMonsterMastery();
+                return this._getMasteryAggregate('monsters', 'all', 'total');
+
+            case 'boss_mastery':
+                return this._getMasteryAggregate('monsters', 'boss', 'max');
+
+            case 'total_boss_mastery':
+                return this._getMasteryAggregate('monsters', 'boss', 'total');
+
+            case 'total_area_mastery':
+                return this._getMasteryAggregate('areas', 'all', 'total');
+
+            case 'gauntlet_mastery':
+                return this._getMasteryAggregate('gauntlets', 'all', 'max');
+
+            case 'total_gauntlet_mastery':
+                return this._getMasteryAggregate('gauntlets', 'all', 'total');
+
+            case 'any_combat_job_level':
+                return this._getMasteryAggregate('jobs', 'combat', 'max');
+
+            case 'total_combat_job_mastery':
+                return this._getMasteryAggregate('jobs', 'combat', 'total');
+
+            case 'total_passive_job_mastery':
+                return this._getMasteryAggregate('jobs', 'passive', 'total');
+
+            case 'combat_jobs_at_level':
+                return this._countEntitiesAtLevel('jobs', 'combat', req.level);
+
+            case 'passive_jobs_at_level':
+                return this._countEntitiesAtLevel('jobs', 'passive', req.level);
+
+            case 'areas_at_level':
+                return this._countEntitiesAtLevel('areas', 'all', req.level);
+
+            case 'unique_combat_jobs_used': {
+                // Count unique jobs from runs_by_job stat (only combat jobs)
+                const runsByJobStat = this.manager.achievementStats.getObjectByID('adventuring:runs_by_job');
+                if (!runsByJobStat) return 0;
+                const noneJob = this.manager.cached?.noneJob;
+                let count = 0;
+                for (const job of this.manager.jobs.allObjects) {
+                    if (job === noneJob || job.isPassive) continue;
+                    if (stats.getMap(runsByJobStat, job) > 0) count++;
+                }
+                return count;
+            }
 
             case 'triggered':
                 // Triggered achievements don't have progress - they're complete or not
@@ -900,8 +955,127 @@ export class AdventuringAchievement extends NamespacedObject {
                 }
 
             default:
+                console.warn(`Achievement ${this.id}: unknown requirement type: ${req.type}`);
                 return 0;
         }
+    }
+
+    /**
+     * Get progress for a data-driven stat
+     * @param {Object} stat - The stat definition
+     * @param {AchievementStats} stats - The stats tracker
+     * @param {Object} req - The requirement with optional keys
+     * @returns {number}
+     */
+    _getStatProgress(stat, stats, req) {
+        if (stat.isSimple) {
+            return stats.get(stat);
+        }
+        if (stat.isMap) {
+            // Map stat - need a key from the requirement
+            if (req.tag) {
+                const tag = this.manager.tags.getObjectByID(req.tag);
+                return tag ? stats.getMap(stat, tag) : 0;
+            }
+            if (req.difficulty) {
+                const difficulty = this.manager.difficulties.getObjectByID(req.difficulty);
+                return difficulty ? stats.getMap(stat, difficulty) : 0;
+            }
+            if (req.job) {
+                const job = this.manager.jobs.getObjectByID(req.job);
+                return job ? stats.getMap(stat, job) : 0;
+            }
+            // Return aggregate if no specific key - use max for map_max, sum for others
+            if (stat.aggregation === 'map_max') {
+                return stats.getMapMax(stat);
+            }
+            return stats.getMapTotal(stat);
+        }
+        if (stat.isNestedMap) {
+            // Nested map stat
+            if (req.area && req.difficulty) {
+                const area = this.manager.areas.getObjectByID(req.area);
+                const difficulty = this.manager.difficulties.getObjectByID(req.difficulty);
+                return (area && difficulty) ? stats.getNested(stat, area, difficulty) : 0;
+            }
+            if (req.area) {
+                const area = this.manager.areas.getObjectByID(req.area);
+                return area ? stats.getNestedTotal(stat, area) : 0;
+            }
+            // Return grand total
+            return stats.getNestedGrandTotal(stat);
+        }
+        return 0;
+    }
+
+    /**
+     * Generic mastery aggregate function - consolidates all mastery helpers
+     * @param {string} registry - Registry name: 'areas', 'monsters', 'jobs', 'gauntlets'
+     * @param {string} filter - Filter type: 'all', 'boss', 'combat', 'passive'
+     * @param {string} aggregate - 'max' or 'total'
+     * @returns {number}
+     */
+    _getMasteryAggregate(registry, filter, aggregate = 'total') {
+        const cacheKey = `mastery_${registry}_${filter}_${aggregate}`;
+        const cache = this.manager.achievementManager._checkCache;
+        if (cache && cache[cacheKey] !== undefined) {
+            return cache[cacheKey];
+        }
+
+        let result = 0;
+        const collection = this.manager[registry]?.allObjects || [];
+        const noneJob = this.manager.cached?.noneJob;
+
+        for (const entity of collection) {
+            // Always exclude noneJob placeholder
+            if (entity === noneJob) continue;
+            // Apply filter
+            if (filter === 'boss' && !entity.isBoss) continue;
+            if (filter === 'combat' && entity.isPassive) continue;
+            if (filter === 'passive' && !entity.isPassive) continue;
+            
+            const mastery = this.manager.getMasteryLevel(entity) || 0;
+            if (aggregate === 'max') {
+                if (mastery > result) result = mastery;
+            } else {
+                result += mastery;
+            }
+        }
+
+        if (cache) cache[cacheKey] = result;
+        return result;
+    }
+
+    /**
+     * Count entities at or above a target level
+     * @param {string} registry - Registry name: 'jobs'
+     * @param {string} filter - Filter type: 'all', 'combat', 'passive'
+     * @param {number} targetLevel - Minimum level
+     * @returns {number}
+     */
+    _countEntitiesAtLevel(registry, filter, targetLevel) {
+        const cacheKey = `atLevel_${registry}_${filter}_${targetLevel}`;
+        const cache = this.manager.achievementManager._checkCache;
+        if (cache && cache[cacheKey] !== undefined) {
+            return cache[cacheKey];
+        }
+
+        let count = 0;
+        const collection = this.manager[registry]?.allObjects || [];
+        const noneJob = this.manager.cached?.noneJob;
+
+        for (const entity of collection) {
+            if (entity === noneJob) continue;
+            if (filter === 'combat' && entity.isPassive) continue;
+            if (filter === 'passive' && !entity.isPassive) continue;
+            if (!entity.unlocked) continue;
+            
+            const level = this.manager.getMasteryLevel(entity) || 0;
+            if (level >= targetLevel) count++;
+        }
+
+        if (cache) cache[cacheKey] = count;
+        return count;
     }
 
     _getMaxSetBonusPieces() {
@@ -917,37 +1091,6 @@ export class AdventuringAchievement extends NamespacedObject {
         return maxPieces;
     }
 
-    _getHighestMonsterMastery() {
-        const cache = this.manager.achievementManager._checkCache;
-        if(cache && cache.highestMonsterMastery !== undefined) {
-            return cache.highestMonsterMastery;
-        }
-
-        let highest = 0;
-        for (const monster of this.manager.monsters.allObjects) {
-            const mastery = this.manager.getMasteryLevel(monster) || 0;
-            if (mastery > highest) highest = mastery;
-        }
-
-        if(cache) cache.highestMonsterMastery = highest;
-        return highest;
-    }
-
-    _getTotalMonsterMastery() {
-        const cache = this.manager.achievementManager._checkCache;
-        if(cache && cache.totalMonsterMastery !== undefined) {
-            return cache.totalMonsterMastery;
-        }
-
-        let total = 0;
-        for (const monster of this.manager.monsters.allObjects) {
-            total += this.manager.getMasteryLevel(monster) || 0;
-        }
-
-        if(cache) cache.totalMonsterMastery = total;
-        return total;
-    }
-
     _getUniqueEquipmentCount() {
         const cache = this.manager.achievementManager._checkCache;
         if(cache && cache.uniqueEquipmentCount !== undefined) {
@@ -956,7 +1099,7 @@ export class AdventuringAchievement extends NamespacedObject {
 
         let count = 0;
         for (const item of this.manager.baseItems.allObjects) {
-            if (item.unlocked) count++;
+            if (item.id !== 'adventuring:none' && item.unlocked) count++;
         }
 
         if(cache) cache.uniqueEquipmentCount = count;
@@ -991,7 +1134,7 @@ export class AdventuringAchievement extends NamespacedObject {
 
         let count = 0;
         for (const item of this.manager.baseItems.allObjects) {
-            if (item.unlocked && item.upgradeLevel >= item.maxUpgrades) {
+            if (item.id !== 'adventuring:none' && item.unlocked && item.upgradeLevel >= item.maxUpgrades) {
                 count++;
             }
         }
@@ -1008,7 +1151,7 @@ export class AdventuringAchievement extends NamespacedObject {
 
         let total = 0;
         for (const item of this.manager.baseItems.allObjects) {
-            if (item.unlocked) {
+            if (item.id !== 'adventuring:none' && item.unlocked) {
                 total += item.upgradeLevel || 0;
             }
         }
@@ -1025,7 +1168,7 @@ export class AdventuringAchievement extends NamespacedObject {
 
         let highest = 0;
         for (const item of this.manager.baseItems.allObjects) {
-            if (item.unlocked && item.upgradeLevel > highest) {
+            if (item.id !== 'adventuring:none' && item.unlocked && item.upgradeLevel > highest) {
                 highest = item.upgradeLevel;
             }
         }
@@ -1163,25 +1306,6 @@ export class AdventuringAchievement extends NamespacedObject {
         return highest;
     }
 
-    _getJobsAtLevel(targetLevel) {
-        const cache = this.manager.achievementManager._checkCache;
-        const cacheKey = `jobsAtLevel_${targetLevel}`;
-        if(cache && cache[cacheKey] !== undefined) {
-            return cache[cacheKey];
-        }
-
-        let count = 0;
-        const noneJob = this.manager.cached.noneJob;
-        for(const job of this.manager.jobs.allObjects) {
-            if(job === noneJob || !job.unlocked) continue;
-            const level = job.level || 0;
-            if(level >= targetLevel) count++;
-        }
-
-        if(cache) cache[cacheKey] = count;
-        return count;
-    }
-
     _isJobUnlocked(jobId) {
         const cache = this.manager.achievementManager._checkCache;
         const cacheKey = `jobUnlocked_${jobId}`;
@@ -1244,24 +1368,6 @@ export class AdventuringAchievement extends NamespacedObject {
         return result;
     }
 
-    _getHighestPassiveJobLevel() {
-        const cache = this.manager.achievementManager._checkCache;
-        if(cache && cache.highestPassiveJobLevel !== undefined) {
-            return cache.highestPassiveJobLevel;
-        }
-
-        let highest = 0;
-        const noneJob = this.manager.cached.noneJob;
-        for(const job of this.manager.jobs.allObjects) {
-            if(job === noneJob || !job.isPassive || !job.unlocked) continue;
-            const level = this.manager.getMasteryLevel(job) || 0;
-            if(level > highest) highest = level;
-        }
-
-        if(cache) cache.highestPassiveJobLevel = highest;
-        return highest;
-    }
-
     _getAllPassiveJobsAtLevel(targetLevel) {
         const cache = this.manager.achievementManager._checkCache;
         const cacheKey = `allPassiveJobsAtLevel_${targetLevel}`;
@@ -1290,24 +1396,6 @@ export class AdventuringAchievement extends NamespacedObject {
         const job = this.manager.jobs.getObjectByID(jobId);
         if(!job || !job.unlocked) return 0;
         return this.manager.getMasteryLevel(job) || 0;
-    }
-
-    _getHighestAreaMastery() {
-        const cache = this.manager.achievementManager._checkCache;
-        if(cache && cache.highestAreaMastery !== undefined) {
-            return cache.highestAreaMastery;
-        }
-
-        let highest = 0;
-        for(const area of this.manager.areas.allObjects) {
-            // Only count areas that have been cleared (have mastery XP)
-            if(this.manager.getMasteryXP(area) <= 0) continue;
-            const level = this.manager.getMasteryLevel(area) || 0;
-            if(level > highest) highest = level;
-        }
-
-        if(cache) cache.highestAreaMastery = highest;
-        return highest;
     }
 
     getRewardsText() {
@@ -1764,10 +1852,14 @@ export class AchievementManager {
         });
         
         if (isEndless) {
+            // Get the primary job (first active hero's combat job)
+            const primaryJob = activeHeroes.length > 0 ? activeHeroes[0].combatJob : null;
             this.stats.processTrigger('endless_wave', {
                 wave: endlessWave,
                 area,
-                difficulty
+                difficulty,
+                isSolo,
+                primaryJob
             });
         }
         
@@ -2122,68 +2214,62 @@ export class AchievementManager {
             }
         });
 
-        // Decode tracked progress (if present in this save version)
-        try {
-            const trackedCount = reader.getUint16();
-            for (let i = 0; i < trackedCount; i++) {
-                const achievement = reader.getNamespacedObject(this.manager.achievements);
-                const isSet = reader.getBoolean();
+        const trackedCount = reader.getUint16();
+        for (let i = 0; i < trackedCount; i++) {
+            const achievement = reader.getNamespacedObject(this.manager.achievements);
+            const isSet = reader.getBoolean();
 
-                // Use achievement.id as key if valid, otherwise skip
-                const achievementId = (achievement && typeof achievement !== 'string') ? achievement.id : null;
+            // Use achievement.id as key if valid, otherwise skip
+            const achievementId = (achievement && typeof achievement !== 'string') ? achievement.id : null;
 
-                if (isSet) {
-                    const values = [];
-                    reader.getArray((r) => {
-                        const obj = r.getNamespacedObject(game.monsters);
-                        if (obj && typeof obj !== 'string') {
-                            values.push(obj);
-                        }
-                    });
-                    if (achievementId) {
-                        this._trackedProgress.set(achievementId, {
-                            type: 'set',
-                            values: new Set(values)
-                        });
-                    }
-                } else {
-                    const targetPerUnique = reader.getUint8();
-                    const entries = [];
-                    reader.getArray((r) => {
-                        const k = r.getNamespacedObject(game.monsters);
-                        const v = r.getUint32();
-                        if (k && typeof k !== 'string') {
-                            entries.push([k, v]);
-                        }
-                    });
-                    if (achievementId) {
-                        this._trackedProgress.set(achievementId, {
-                            type: 'map',
-                            values: new Map(entries),
-                            targetPerUnique
-                        });
-                    }
-                }
-            }
-
-            // Decode milestone progress for milestone chain achievements
-            const milestoneCount = reader.getUint16();
-            for (let i = 0; i < milestoneCount; i++) {
-                const achievement = reader.getNamespacedObject(this.manager.achievements);
-                const milestones = [];
+            if (isSet) {
+                const values = [];
                 reader.getArray((r) => {
-                    const milestone = r.getNamespacedObject(this.manager.achievementMilestones);
-                    if (milestone && typeof milestone !== 'string') {
-                        milestones.push(milestone);
+                    const obj = r.getNamespacedObject(game.monsters);
+                    if (obj && typeof obj !== 'string') {
+                        values.push(obj);
                     }
                 });
-                if (achievement && typeof achievement !== 'string') {
-                    achievement.setCompletedMilestones(milestones);
+                if (achievementId) {
+                    this._trackedProgress.set(achievementId, {
+                        type: 'set',
+                        values: new Set(values)
+                    });
+                }
+            } else {
+                const targetPerUnique = reader.getUint8();
+                const entries = [];
+                reader.getArray((r) => {
+                    const k = r.getNamespacedObject(game.monsters);
+                    const v = r.getUint32();
+                    if (k && typeof k !== 'string') {
+                        entries.push([k, v]);
+                    }
+                });
+                if (achievementId) {
+                    this._trackedProgress.set(achievementId, {
+                        type: 'map',
+                        values: new Map(entries),
+                        targetPerUnique
+                    });
                 }
             }
-        } catch (e) {
-            // Old save without tracked/milestone progress - that's fine
-            console.log('No tracked achievement progress in save');
+        }
+
+        // Decode milestone progress for milestone chain achievements
+        const milestoneCount = reader.getUint16();
+        for (let i = 0; i < milestoneCount; i++) {
+            const achievement = reader.getNamespacedObject(this.manager.achievements);
+            const milestones = [];
+            reader.getArray((r) => {
+                const milestone = r.getNamespacedObject(this.manager.achievementMilestones);
+                if (milestone && typeof milestone !== 'string') {
+                    milestones.push(milestone);
+                }
+            });
+            if (achievement && typeof achievement !== 'string') {
+                achievement.setCompletedMilestones(milestones);
+            }
         }
 
         this.rebuildBonuses();
