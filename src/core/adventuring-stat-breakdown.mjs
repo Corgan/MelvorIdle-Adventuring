@@ -354,8 +354,8 @@ export class StatBreakdownCache {
         // Create a parent contribution for all equipment
         const equipmentContribs = new Map(); // stat.id → StatContribution (parent)
 
-        // Individual items
-        equipment.forEachEquipped((item, slot) => {
+        // Only iterate valid equipped items (invalid items provide no stats)
+        equipment.forEachValidEquipped((item, slot) => {
             if (!item || item === this.manager.cached?.noneItem) return;
 
             // Item stats (base + scaling)
@@ -368,51 +368,17 @@ export class StatBreakdownCache {
                     equipmentContribs.set(stat.id, parentContrib);
                 }
 
+                // Check if item is level-capped (effective level < actual level)
+                const isLevelCapped = item.isLevelCapped && item.isLevelCapped(this.character);
                 const itemContrib = new StatContribution(item.name, 'equipmentItem', item);
                 itemContrib.flat = value;
+                itemContrib.isLevelCapped = isLevelCapped;
                 parentContrib.addSub(itemContrib);
             });
         });
 
-        // Equipment set bonuses
-        if (this.manager.equipmentSets) {
-            const setCounts = equipment.getSetPieceCounts();
-            setCounts.forEach((count, set) => {
-                if (count <= 0) return;
-                
-                // Get active set bonuses
-                const setEffects = set.getActiveEffects(this.character);
-                for (const effect of setEffects) {
-                    if (effect.trigger !== 'passive') continue;
-                    if (effect.type !== 'stat_flat' && effect.type !== 'stat_percent') continue;
-
-                    const statId = effect.stat;
-                    if (!statId) continue;
-
-                    let parentContrib = equipmentContribs.get(statId);
-                    if (!parentContrib) {
-                        parentContrib = new StatContribution('Equipment', 'equipment', null);
-                        equipmentContribs.set(statId, parentContrib);
-                    }
-
-                    const setContrib = new StatContribution(
-                        `${set.name} (${count}/${set.pieces?.length || '?'})`,
-                        'equipmentSet',
-                        set
-                    );
-                    
-                    if (effect.type === 'stat_flat') {
-                        setContrib.flat = effect.amount || effect.value || 0;
-                    } else if (effect.type === 'stat_percent') {
-                        setContrib.percent = effect.amount || effect.value || 0;
-                    }
-                    
-                    if (setContrib.hasValue) {
-                        parentContrib.addSub(setContrib);
-                    }
-                }
-            });
-        }
+        // Note: Equipment set bonuses are handled via effectCache 'equipment' source
+        // to avoid duplication - they show under "Equipment Effects"
 
         // Add equipment contributions to breakdowns
         equipmentContribs.forEach((contrib, statId) => {
@@ -429,27 +395,30 @@ export class StatBreakdownCache {
     _collectEffectBonuses() {
         if (!this.character.effectCache) return;
 
-        // Get stat bonuses by source from character's effectCache
-        const bySource = this._getStatBonusesBySource(this.character.effectCache);
+        // Collect effects with individual source tracking for achievements
+        const collected = this._collectEffectsWithDetails(this.character.effectCache);
 
         // Also get party-wide bonuses
         if (this.character.party?.effectCache) {
-            const partyBonuses = this._getStatBonusesBySource(this.character.party.effectCache);
-            // Merge party bonuses
-            partyBonuses.forEach((statMap, sourceId) => {
-                if (!bySource.has(sourceId)) {
-                    bySource.set(sourceId, statMap);
+            const partyCollected = this._collectEffectsWithDetails(this.character.party.effectCache);
+            // Merge party effects
+            partyCollected.forEach((data, sourceId) => {
+                if (!collected.has(sourceId)) {
+                    collected.set(sourceId, data);
                 } else {
-                    const existing = bySource.get(sourceId);
-                    statMap.forEach((bonus, statId) => {
-                        if (!existing.has(statId)) {
-                            existing.set(statId, bonus);
+                    const existing = collected.get(sourceId);
+                    // Merge aggregated stats
+                    data.stats.forEach((bonus, statId) => {
+                        if (!existing.stats.has(statId)) {
+                            existing.stats.set(statId, bonus);
                         } else {
-                            const e = existing.get(statId);
+                            const e = existing.stats.get(statId);
                             e.flat += bonus.flat;
                             e.percent += bonus.percent;
                         }
                     });
+                    // Merge individual effects
+                    data.effects.forEach(eff => existing.effects.push(eff));
                 }
             });
         }
@@ -457,16 +426,40 @@ export class StatBreakdownCache {
         // Map source IDs to display names and categories
         const sourceInfo = this._getSourceInfo();
 
-        bySource.forEach((statMap, sourceId) => {
+        collected.forEach((data, sourceId) => {
             const info = sourceInfo[sourceId] || { name: sourceId, type: 'other' };
+            const isAchievements = sourceId === 'achievements' || sourceId === 'party_achievements';
             
-            statMap.forEach((bonus, statId) => {
+            data.stats.forEach((bonus, statId) => {
                 const breakdown = this.breakdowns.get(statId);
                 if (!breakdown) return;
 
                 const contrib = new StatContribution(info.name, info.type, info.ref);
-                contrib.flat = bonus.flat;
-                contrib.percent = bonus.percent;
+
+                // For achievements, build sub-contributions and let total come from subs
+                if (isAchievements) {
+                    const statEffects = data.effects.filter(e => e.stat === statId);
+                    for (const eff of statEffects) {
+                        const subContrib = new StatContribution(
+                            eff.sourceName || 'Unknown',
+                            eff.sourceType || 'achievement',
+                            eff.source
+                        );
+                        if (eff.type === 'stat_flat') {
+                            subContrib.flat = eff.value ?? eff.amount ?? 0;
+                        } else if (eff.type === 'stat_percent') {
+                            subContrib.percent = eff.value ?? eff.amount ?? 0;
+                        }
+                        if (subContrib.hasValue) {
+                            contrib.addSub(subContrib);
+                        }
+                    }
+                    // Don't set contrib.flat/percent - let totalFlat/totalPercent calculate from subs
+                } else {
+                    // For non-achievement sources, use the aggregated bonus directly
+                    contrib.flat = bonus.flat;
+                    contrib.percent = bonus.percent;
+                }
 
                 // Categorize as positive or negative
                 if (contrib.flat >= 0 && contrib.percent >= 0) {
@@ -493,11 +486,11 @@ export class StatBreakdownCache {
     }
 
     /**
-     * Get stat bonuses organized by source ID
+     * Collect effects with both aggregated stats and individual effect details
      * @param {EffectCache} effectCache
-     * @returns {Map<string, Map<string, {flat, percent}>>} sourceId → statId → {flat, percent}
+     * @returns {Map<string, {stats: Map, effects: Array}>} sourceId → { stats, effects }
      */
-    _getStatBonusesBySource(effectCache) {
+    _collectEffectsWithDetails(effectCache) {
         effectCache.rebuild();
         
         const bySource = new Map();
@@ -512,6 +505,7 @@ export class StatBreakdownCache {
                 if (!Array.isArray(effects)) return;
 
                 const statMap = new Map();
+                const effectList = [];
 
                 for (const effect of effects) {
                     if (effect.trigger !== 'passive') continue;
@@ -533,6 +527,9 @@ export class StatBreakdownCache {
                         } else {
                             bonus.percent += value;
                         }
+
+                        // Store individual effect for sub-contribution display
+                        effectList.push(effect);
                     }
                     
                     // Handle all_stat_bonus (applies to every stat)
@@ -544,11 +541,13 @@ export class StatBreakdownCache {
                             }
                             statMap.get(stat.id).flat += value;
                         });
+                        // Store for each stat it affects
+                        effectList.push(effect);
                     }
                 }
 
                 if (statMap.size > 0) {
-                    bySource.set(sourceId, statMap);
+                    bySource.set(sourceId, { stats: statMap, effects: effectList });
                 }
             } catch (e) {
                 console.warn(`StatBreakdownCache: Error processing source ${sourceId}:`, e);

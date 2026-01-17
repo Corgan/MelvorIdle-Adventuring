@@ -1,30 +1,16 @@
 const { loadModule } = mod.getContext(import.meta);
 
 /**
- * Interactive stat breakdown tooltip with collapsible sections
+ * Stat breakdown tooltip using game-native styling
+ * Builds HTML content for tippy tooltips matching base game appearance
  */
 export class AdventuringStatBreakdownTooltipElement extends HTMLElement {
     constructor() {
         super();
-        this._content = new DocumentFragment();
-        this._content.append(getTemplateNode('adventuring-stat-breakdown-tooltip-template'));
-
-        this.container = getElementFromFragment(this._content, 'container', 'div');
-        this.header = getElementFromFragment(this._content, 'header', 'div');
-        this.headerIcon = getElementFromFragment(this._content, 'header-icon', 'img');
-        this.headerName = getElementFromFragment(this._content, 'header-name', 'span');
-        this.headerValue = getElementFromFragment(this._content, 'header-value', 'span');
-        this.body = getElementFromFragment(this._content, 'body', 'div');
-
-        // Track collapsed state
-        this.collapsedSections = new Set();
-        
-        // Default collapsed sections
-        this.defaultCollapsed = new Set(['combatJob', 'passiveJob', 'achievements', 'globalPassives', 'mastery']);
-    }
-
-    connectedCallback() {
-        this.appendChild(this._content);
+        this._container = document.createElement('div');
+        this._container.className = 'text-left';
+        this.appendChild(this._container);
+        this._collapseIdCounter = 0;
     }
 
     /**
@@ -33,298 +19,188 @@ export class AdventuringStatBreakdownTooltipElement extends HTMLElement {
      */
     setBreakdown(breakdown) {
         if (!breakdown || !breakdown.stat) return;
-
-        // Header
-        this.headerIcon.src = breakdown.stat.media;
-        this.headerName.textContent = breakdown.stat.name;
-        this.headerValue.textContent = breakdown.finalValue;
-
-        // Clear body
-        this.body.replaceChildren();
-
-        // Base section
-        this._addBaseSection(breakdown);
-
-        // Positive bonuses
-        if (breakdown.positive.length > 0) {
-            this._addBonusSection('Positive Bonuses', breakdown.positive, 'positive', breakdown.positiveTotal);
-        }
-
-        // Negative modifiers
-        if (breakdown.negative.length > 0) {
-            this._addBonusSection('Negative Modifiers', breakdown.negative, 'negative', breakdown.negativeTotal);
-        }
-
-        // Combat effects
-        if (breakdown.combat.buffs.length > 0 || breakdown.combat.debuffs.length > 0) {
-            this._addCombatSection(breakdown);
-        }
-
-        // Calculation footer
-        this._addCalculationFooter(breakdown);
+        this._collapseIdCounter = 0;
+        this._container.innerHTML = this._buildContent(breakdown);
+        this._attachCollapseHandlers();
     }
 
     /**
-     * Add base stat section
+     * Attach click handlers for collapsible sections
      */
-    _addBaseSection(breakdown) {
-        const section = document.createElement('div');
-        section.className = 'stat-breakdown-section';
-        
-        const row = document.createElement('div');
-        row.className = 'stat-breakdown-row stat-breakdown-base';
-        row.innerHTML = `
-            <span class="stat-breakdown-label">Base</span>
-            <span class="stat-breakdown-value">${breakdown.base}</span>
-        `;
-        section.appendChild(row);
-        
-        this.body.appendChild(section);
+    _attachCollapseHandlers() {
+        const toggles = this._container.querySelectorAll('[data-collapse-toggle]');
+        toggles.forEach(toggle => {
+            toggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = toggle.getAttribute('data-collapse-toggle');
+                const target = this._container.querySelector(`[data-collapse-id="${targetId}"]`);
+                const icon = toggle.querySelector('i.fa');
+                
+                if (target) {
+                    const isHidden = target.style.display === 'none';
+                    target.style.display = isHidden ? 'block' : 'none';
+                    if (icon) {
+                        icon.classList.toggle('fa-chevron-right', !isHidden);
+                        icon.classList.toggle('fa-chevron-down', isHidden);
+                    }
+                }
+            });
+        });
     }
 
     /**
-     * Add a collapsible bonus section
+     * Build the tooltip HTML content using game-native styles
      */
-    _addBonusSection(title, contributions, type, total) {
-        const section = document.createElement('div');
-        section.className = 'stat-breakdown-section';
+    _buildContent(breakdown) {
+        const sections = [];
 
-        // Section header (collapsible)
-        const header = document.createElement('div');
-        header.className = `stat-breakdown-section-header stat-breakdown-${type}`;
-        
-        const totalDisplay = this._formatTotal(total, type === 'negative');
-        header.innerHTML = `
-            <span class="stat-breakdown-toggle">▼</span>
-            <span class="stat-breakdown-section-title">${title}</span>
-            <span class="stat-breakdown-section-total">${totalDisplay}</span>
-        `;
-        
-        const content = document.createElement('div');
-        content.className = 'stat-breakdown-section-content';
+        // Header with icon and stat name
+        sections.push(`
+            <div class="text-center mb-3">
+                <img class="skill-icon-xs mr-1" src="${breakdown.stat.media}">
+                <span class="font-w600 text-warning">${breakdown.stat.name}</span>
+                <span class="font-w700 text-info ml-2">${breakdown.finalValue}</span>
+            </div>
+        `);
 
-        // Add contributions
-        for (const contrib of contributions) {
-            this._addContribution(content, contrib, 1);
-        }
+        // Base stat row
+        sections.push(`
+            <div class="d-flex justify-content-between mb-2 pb-2" style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                <span class="text-muted">Base</span>
+                <span>${breakdown.base}</span>
+            </div>
+        `);
 
-        // Toggle handler
-        header.onclick = (e) => {
-            e.stopPropagation();
-            const isCollapsed = content.classList.toggle('collapsed');
-            header.querySelector('.stat-breakdown-toggle').textContent = isCollapsed ? '▶' : '▼';
-        };
+        // Calculate pre-percent value for showing actual percent contributions
+        const prePercentValue = breakdown.base + breakdown.totalFlat;
 
-        section.appendChild(header);
-        section.appendChild(content);
-        this.body.appendChild(section);
-    }
-
-    /**
-     * Add combat effects section (buffs and debuffs)
-     */
-    _addCombatSection(breakdown) {
-        const section = document.createElement('div');
-        section.className = 'stat-breakdown-section';
-
-        const header = document.createElement('div');
-        header.className = 'stat-breakdown-section-header stat-breakdown-combat';
-        
-        const total = breakdown.combatTotal;
-        const totalDisplay = this._formatTotal(total, false);
-        header.innerHTML = `
-            <span class="stat-breakdown-toggle">▼</span>
-            <span class="stat-breakdown-section-title">Combat Effects</span>
-            <span class="stat-breakdown-section-total">${totalDisplay}</span>
-        `;
-
-        const content = document.createElement('div');
-        content.className = 'stat-breakdown-section-content';
-
-        // Buffs
-        if (breakdown.combat.buffs.length > 0) {
-            const buffsDiv = document.createElement('div');
-            buffsDiv.className = 'stat-breakdown-subsection';
-            
-            const buffsHeader = document.createElement('div');
-            buffsHeader.className = 'stat-breakdown-subsection-header stat-breakdown-buff';
-            buffsHeader.innerHTML = `<span class="stat-breakdown-toggle">▼</span> Buffs`;
-            
-            const buffsContent = document.createElement('div');
-            buffsContent.className = 'stat-breakdown-subsection-content';
-            
-            for (const buff of breakdown.combat.buffs) {
-                this._addContribution(buffsContent, buff, 2);
+        // All bonuses - each source gets its own row with spacing
+        const allContribs = [...breakdown.positive, ...breakdown.negative];
+        if (allContribs.length > 0) {
+            for (let i = 0; i < allContribs.length; i++) {
+                const contrib = allContribs[i];
+                const isPositive = breakdown.positive.includes(contrib);
+                const colorClass = isPositive ? 'text-success' : 'text-danger';
+                const isLast = i === allContribs.length - 1 && breakdown.combat.buffs.length === 0 && breakdown.combat.debuffs.length === 0;
+                sections.push(this._buildSourceRow(contrib, colorClass, !isLast, prePercentValue));
             }
-
-            buffsHeader.onclick = (e) => {
-                e.stopPropagation();
-                const isCollapsed = buffsContent.classList.toggle('collapsed');
-                buffsHeader.querySelector('.stat-breakdown-toggle').textContent = isCollapsed ? '▶' : '▼';
-            };
-
-            buffsDiv.appendChild(buffsHeader);
-            buffsDiv.appendChild(buffsContent);
-            content.appendChild(buffsDiv);
         }
 
-        // Debuffs
-        if (breakdown.combat.debuffs.length > 0) {
-            const debuffsDiv = document.createElement('div');
-            debuffsDiv.className = 'stat-breakdown-subsection';
-            
-            const debuffsHeader = document.createElement('div');
-            debuffsHeader.className = 'stat-breakdown-subsection-header stat-breakdown-debuff';
-            debuffsHeader.innerHTML = `<span class="stat-breakdown-toggle">▼</span> Debuffs`;
-            
-            const debuffsContent = document.createElement('div');
-            debuffsContent.className = 'stat-breakdown-subsection-content';
-            
-            for (const debuff of breakdown.combat.debuffs) {
-                this._addContribution(debuffsContent, debuff, 2);
+        // Combat effects - each gets its own row with spacing
+        const allCombat = [...breakdown.combat.buffs, ...breakdown.combat.debuffs];
+        if (allCombat.length > 0) {
+            for (let i = 0; i < allCombat.length; i++) {
+                const effect = allCombat[i];
+                const isBuff = breakdown.combat.buffs.includes(effect);
+                const colorClass = isBuff ? 'text-success' : 'text-danger';
+                const isLast = i === allCombat.length - 1;
+                sections.push(this._buildSourceRow(effect, colorClass, !isLast, prePercentValue));
             }
-
-            debuffsHeader.onclick = (e) => {
-                e.stopPropagation();
-                const isCollapsed = debuffsContent.classList.toggle('collapsed');
-                debuffsHeader.querySelector('.stat-breakdown-toggle').textContent = isCollapsed ? '▶' : '▼';
-            };
-
-            debuffsDiv.appendChild(debuffsHeader);
-            debuffsDiv.appendChild(debuffsContent);
-            content.appendChild(debuffsDiv);
         }
 
-        // Toggle handler
-        header.onclick = (e) => {
-            e.stopPropagation();
-            const isCollapsed = content.classList.toggle('collapsed');
-            header.querySelector('.stat-breakdown-toggle').textContent = isCollapsed ? '▶' : '▼';
-        };
-
-        section.appendChild(header);
-        section.appendChild(content);
-        this.body.appendChild(section);
+        return sections.join('');
     }
 
     /**
-     * Add a single contribution row with optional sub-contributions
+     * Build a source row with icon, name, and value - with clear visual separation
+     * @param {StatContribution} contrib - The contribution to display
+     * @param {string} colorClass - CSS class for coloring (text-success/text-danger)
+     * @param {boolean} showBorder - Whether to show bottom border
+     * @param {number} prePercentValue - The stat value before percent bonuses (for calculating actual percent contribution)
      */
-    _addContribution(container, contrib, depth) {
-        const row = document.createElement('div');
-        row.className = `stat-breakdown-row stat-breakdown-depth-${depth}`;
-        
-        // Icon (if available)
+    _buildSourceRow(contrib, colorClass = '', showBorder = true, prePercentValue = 0) {
         let iconHtml = '';
         if (contrib.icon) {
-            iconHtml = `<img src="${contrib.icon}" class="stat-breakdown-icon" />`;
+            iconHtml = `<img class="skill-icon-xxs mr-2" src="${contrib.icon}">`;
         }
 
-        // Value display
-        const valueDisplay = this._formatContribution(contrib);
+        const valueDisplay = this._formatContribution(contrib, prePercentValue);
+        const hasSubs = contrib.subContributions && contrib.subContributions.length > 0;
         
-        row.innerHTML = `
-            ${iconHtml}
-            <span class="stat-breakdown-label">${contrib.source}</span>
-            <span class="stat-breakdown-value">${valueDisplay}</span>
-        `;
-
-        container.appendChild(row);
-
-        // Sub-contributions
-        if (contrib.subContributions && contrib.subContributions.length > 0) {
-            // Make this row collapsible if it has subs
-            if (depth === 1) {
-                const toggle = document.createElement('span');
-                toggle.className = 'stat-breakdown-toggle';
-                toggle.textContent = '▼';
-                row.insertBefore(toggle, row.firstChild);
-                row.classList.add('stat-breakdown-collapsible');
-
-                const subContainer = document.createElement('div');
-                subContainer.className = 'stat-breakdown-sub-content';
-
-                for (const sub of contrib.subContributions) {
-                    this._addContribution(subContainer, sub, depth + 1);
+        // Wrap entire group in container with border at bottom
+        const borderStyle = showBorder ? 'border-bottom: 1px solid rgba(255,255,255,0.1);' : '';
+        
+        let html = `<div class="py-1 mb-1" style="${borderStyle}">`;
+        
+        // Parent row - if it has subs, make it clickable to collapse/expand
+        if (hasSubs) {
+            const collapseId = `collapse-${this._collapseIdCounter++}`;
+            html += `
+                <div class="d-flex justify-content-between align-items-center" style="cursor: pointer;" data-collapse-toggle="${collapseId}">
+                    <span class="text-muted">
+                        <i class="fa fa-chevron-down fa-fw mr-1" style="font-size: 0.7em;"></i>${iconHtml}${contrib.source}
+                    </span>
+                    <span class="${colorClass} font-w600 ml-3">${valueDisplay}</span>
+                </div>
+            `;
+            
+            // Sub-contributions container (collapsible)
+            html += `<div data-collapse-id="${collapseId}">`;
+            for (const sub of contrib.subContributions) {
+                let subIcon = '';
+                if (sub.icon) {
+                    subIcon = `<img class="skill-icon-xxs mr-1" src="${sub.icon}">`;
                 }
-
-                // Check if should be default collapsed
-                if (this.defaultCollapsed.has(contrib.sourceType)) {
-                    subContainer.classList.add('collapsed');
-                    toggle.textContent = '▶';
-                }
-
-                row.onclick = (e) => {
-                    e.stopPropagation();
-                    const isCollapsed = subContainer.classList.toggle('collapsed');
-                    toggle.textContent = isCollapsed ? '▶' : '▼';
-                };
-
-                container.appendChild(subContainer);
-            } else {
-                // Just add inline for deeper levels
-                for (const sub of contrib.subContributions) {
-                    this._addContribution(container, sub, depth + 1);
-                }
+                const subValue = this._formatContribution(sub, prePercentValue);
+                // Level-capped items show with gold/warning text
+                const nameClass = sub.isLevelCapped ? 'text-warning' : 'text-muted';
+                html += `
+                    <div class="d-flex justify-content-between align-items-center pl-3 pt-1" style="opacity: 0.8; font-size: 0.9em;">
+                        <span class="${nameClass}">${subIcon}${sub.source}</span>
+                        <span class="${colorClass} ml-3">${subValue}</span>
+                    </div>
+                `;
             }
+            html += `</div>`;
+        } else {
+            // No subs - simple row
+            html += `
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="text-muted">${iconHtml}${contrib.source}</span>
+                    <span class="${colorClass} font-w600 ml-3">${valueDisplay}</span>
+                </div>
+            `;
         }
-    }
 
-    /**
-     * Add calculation footer
-     */
-    _addCalculationFooter(breakdown) {
-        const footer = document.createElement('div');
-        footer.className = 'stat-breakdown-footer';
-        
-        const base = breakdown.base;
-        const flat = breakdown.totalFlat;
-        const percent = breakdown.totalPercent;
-        const final = breakdown.finalValue;
-
-        let formula = `(${base}`;
-        if (flat > 0) formula += ` + ${flat}`;
-        else if (flat < 0) formula += ` - ${Math.abs(flat)}`;
-        formula += ')';
-        
-        if (percent !== 0) {
-            const multiplier = (1 + percent / 100).toFixed(2);
-            formula += ` × ${multiplier}`;
-        }
-        
-        footer.innerHTML = `
-            <div class="stat-breakdown-calc">
-                <span class="stat-breakdown-formula">${formula}</span>
-                <span class="stat-breakdown-equals">=</span>
-                <span class="stat-breakdown-final">${final}</span>
-            </div>
-        `;
-
-        this.body.appendChild(footer);
+        html += `</div>`;
+        return html;
     }
 
     /**
      * Format a contribution's value for display
+     * For parent contributions with sub-contributions, shows total flat only
+     * For percent-only contributions, calculates and shows actual value
+     * @param {StatContribution} contrib - The contribution
+     * @param {number} prePercentValue - Value before percent bonuses for calculating actual contribution
      */
-    _formatContribution(contrib) {
+    _formatContribution(contrib, prePercentValue = 0) {
         const parts = [];
         
-        if (contrib.flat !== 0) {
-            const sign = contrib.flat > 0 ? '+' : '';
-            parts.push(`${sign}${contrib.flat}`);
-        }
-        
-        if (contrib.percent !== 0) {
-            const sign = contrib.percent > 0 ? '+' : '';
-            parts.push(`(${sign}${contrib.percent}%)`);
-        }
-
-        if (parts.length === 0) {
-            // Check sub-contributions for totals
+        // If this has sub-contributions, show the sum of sub flat values
+        if (contrib.subContributions && contrib.subContributions.length > 0) {
             const totalFlat = contrib.totalFlat;
-            const totalPercent = contrib.totalPercent;
-            if (totalFlat !== 0) parts.push(`+${totalFlat}`);
-            if (totalPercent !== 0) parts.push(`(+${totalPercent}%)`);
+            if (totalFlat !== 0) {
+                const sign = totalFlat > 0 ? '+' : '';
+                parts.push(`${sign}${totalFlat}`);
+            }
+            // Don't show percent for parent - percent effects are handled by effectCache separately
+        } else {
+            // Direct contribution (no subs)
+            if (contrib.flat !== 0) {
+                const sign = contrib.flat > 0 ? '+' : '';
+                parts.push(`${sign}${contrib.flat}`);
+            }
+            
+            if (contrib.percent !== 0) {
+                // Calculate the actual value this percent contributes (not floored - stat calc floors at end)
+                const actualValue = prePercentValue * contrib.percent / 100;
+                const sign = actualValue >= 0 ? '+' : '';
+                // Show to 1 decimal place, or as integer if whole number
+                const displayValue = Number.isInteger(actualValue) ? actualValue : actualValue.toFixed(1);
+                // Show as "+X (+Y%)" where X is actual contribution, Y is the percent
+                const percentSign = contrib.percent > 0 ? '+' : '';
+                parts.push(`${sign}${displayValue} (${percentSign}${contrib.percent}%)`);
+            }
         }
 
         return parts.join(' ') || '—';
@@ -333,7 +209,7 @@ export class AdventuringStatBreakdownTooltipElement extends HTMLElement {
     /**
      * Format total for section header
      */
-    _formatTotal(total, isNegative) {
+    _formatTotal(total) {
         const parts = [];
         
         if (total.flat !== 0) {
@@ -346,7 +222,7 @@ export class AdventuringStatBreakdownTooltipElement extends HTMLElement {
             parts.push(`${sign}${total.percent}%`);
         }
 
-        return parts.join(' ') || (isNegative ? '—' : '+0');
+        return parts.join(' ') || '+0';
     }
 }
 

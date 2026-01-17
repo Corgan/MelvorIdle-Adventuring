@@ -36,6 +36,18 @@ export class AdventuringEquipment {
         });
     }
 
+    /**
+     * Iterate only valid equipped items (items that match current job)
+     * Invalid items provide no stats/effects
+     */
+    forEachValidEquipped(callback) {
+        this.forEachEquipped((item, slot, slotType) => {
+            if (slot.canEquip(item)) {
+                callback(item, slot, slotType);
+            }
+        });
+    }
+
     hasItemEquipped(item) {
         let found = false;
         this.slots.forEach((slot) => {
@@ -53,7 +65,7 @@ export class AdventuringEquipment {
         }
 
         const counts = new Map();
-        this.forEachEquipped((item) => {
+        this.forEachValidEquipped((item) => {
             if(item.set) {
                 counts.set(item.set, (counts.get(item.set) || 0) + 1);
             }
@@ -68,10 +80,10 @@ export class AdventuringEquipment {
 
     calculateStats() {
         this.stats.reset();
-        this.forEachEquipped((item, slot) => {
+        this.forEachValidEquipped((item, slot) => {
 
             item.calculateStats(this.character);
-            slot.stats.forEach((value, stat) => {
+            item.stats.forEach((value, stat) => {
                 let old = this.stats.get(stat);
                 this.stats.set(stat, old + value);
             });
@@ -92,7 +104,7 @@ export class AdventuringEquipment {
         
         let effects = [];
 
-        this.forEachEquipped((item, slot) => {
+        this.forEachValidEquipped((item, slot) => {
             // Note: Base equipment stats flow through calculateStats() → StatCalculator.aggregate()
             // Only item.effects (buffs, triggers, etc.) are returned here
 

@@ -412,6 +412,7 @@ export class Adventuring extends SkillWithMastery {
     onLevelUp(oldLevel, newLevel) {
         super.onLevelUp(oldLevel, newLevel);
         this.party.forEach(member => {
+            member.invalidateStats();
             member.calculateStats();
             member.renderQueue.jobs = true;
         });
@@ -474,6 +475,7 @@ export class Adventuring extends SkillWithMastery {
         }
 
         this.party.forEach(member => {
+            member.invalidateStats();
             member.calculateStats();
             member.renderQueue.jobs = true;
         });

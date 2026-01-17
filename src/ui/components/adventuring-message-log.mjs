@@ -9,7 +9,6 @@ export class AdventuringMessageLogElement extends HTMLElement {
         this._content = new DocumentFragment();
         this._content.append(getTemplateNode('adventuring-message-log-template'));
 
-        this.header = getElementFromFragment(this._content, 'header', 'div');
         this.settingsBtn = getElementFromFragment(this._content, 'settings-btn', 'button');
         this.messages = getElementFromFragment(this._content, 'messages', 'div');
         

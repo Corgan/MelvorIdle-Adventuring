@@ -349,8 +349,24 @@ export class AdventuringSlayers extends AdventuringPage {
     }
 
     renderAchievementSummary() {
-        const total = this.manager.achievements.allObjects.length;
-        const completed = this.manager.achievementManager.completedAchievements.size;
+        // Count total achievable items (regular achievements + all milestones in chains)
+        let total = 0;
+        let completed = 0;
+        
+        for (const achievement of this.manager.achievements.allObjects) {
+            if (achievement.isMilestoneChain) {
+                // Count each milestone separately
+                total += achievement.milestones.length;
+                completed += achievement._completedMilestones.size;
+            } else {
+                // Regular achievement counts as 1
+                total += 1;
+                if (achievement.isComplete()) {
+                    completed += 1;
+                }
+            }
+        }
+        
         const percent = total > 0 ? Math.floor((completed / total) * 100) : 0;
 
         this.component.achievementSummary.textContent = `${completed} / ${total} Complete`;
@@ -529,12 +545,15 @@ export class AdventuringSlayers extends AdventuringPage {
         progressBar.className = `progress-bar ${isComplete ? 'bg-success' : 'bg-info'}`;
         progressText.textContent = `${progress} / ${target}`;
 
-        // Update card border based on complete state
-        card.classList.remove('border', 'border-success');
+        // Update card border based on complete state (always have border to prevent pixel shift)
+        card.classList.remove('border-success', 'border-transparent');
+        card.classList.add('border');
         card.style.opacity = '';
         if(isComplete) {
-            card.classList.add('border', 'border-success');
+            card.classList.add('border-success');
             card.style.opacity = '0.6';
+        } else {
+            card.classList.add('border-transparent');
         }
 
         // Clear and re-render rewards

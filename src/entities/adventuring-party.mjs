@@ -246,10 +246,14 @@ class AdventuringParty {
 
     invalidateEffects(sourceId) {
         this.effectCache.invalidate(sourceId);
-        // Also invalidate hero stats UI since party effects affect them
+        // Also invalidate hero stats UI and breakdown cache since party effects affect them
         this.forEach(hero => {
             if (hero.stats) {
                 hero.stats.renderQueue.stats = true;
+            }
+            // Invalidate stat breakdown cache so tooltips show updated values
+            if (hero.statBreakdownCache) {
+                hero.statBreakdownCache.invalidate();
             }
         });
     }

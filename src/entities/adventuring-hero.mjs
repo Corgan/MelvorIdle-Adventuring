@@ -330,6 +330,7 @@ export class AdventuringHero extends AdventuringCharacter {
         this.equipment.slots.forEach(slot => {
             slot.renderQueue.valid = true;
             slot.renderQueue.icon = true;
+            slot.renderQueue.upgrade = true;
         });
 
         this.manager.party.forEach(member => member.renderQueue.jobs = true);
@@ -546,5 +547,8 @@ export class AdventuringHero extends AdventuringCharacter {
         else
             this.setPassiveJob(passiveJob);
         this.equipment.decode(reader, version);
+        
+        // Mark stats dirty after equipment is loaded so calculateStats runs in onLoad
+        this.invalidateStats();
     }
 }

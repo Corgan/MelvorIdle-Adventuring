@@ -250,18 +250,28 @@ class AdventuringCharacter {
     }
 
     getStatBonus(statId) {
-        let bonus = this.effectCache.getStatBonus(statId);
+        const charBonus = this.effectCache.getStatBonus(statId);
+        let flat = charBonus.flat || 0;
+        let percent = charBonus.percent || 0;
+        
         // Include party-wide effects for heroes
         if (this.isHero && this.party?.effectCache) {
-            bonus += this.party.effectCache.getStatBonus(statId);
+            const partyBonus = this.party.effectCache.getStatBonus(statId);
+            flat += partyBonus.flat || 0;
+            percent += partyBonus.percent || 0;
         }
-        return bonus;
+        
+        return { flat, percent };
     }
 
     invalidateEffects(sourceId) {
         this.effectCache.invalidate(sourceId);
         // Queue stats UI update since effect bonuses may have changed
         this.stats.renderQueue.stats = true;
+        // Invalidate stat breakdown cache so tooltips show updated values
+        if (this.statBreakdownCache) {
+            this.statBreakdownCache.invalidate();
+        }
     }
 
     getEffectiveStat(stat) {

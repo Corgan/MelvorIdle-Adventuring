@@ -301,15 +301,16 @@ function isInCombat(character) {
  * @param {Object} context.attacker - The attacker (for 'attacker' targeting)
  * @param {Object} context.target - The target (for 'target' targeting)
  * @param {Object} context.exclude - Character to exclude from multi-targeting
+ * @param {boolean} context.allowDead - Whether to include dead targets (for remove effects)
  * @returns {Array} Array of target characters
  */
 function resolveTargets(targetType, context) {
-    const { party, self, attacker, target, exclude } = context;
+    const { party, self, attacker, target, exclude, allowDead } = context;
     
     // Handle single-target types
     switch(targetType) {
         case "self":
-            return self && !self.dead ? [self] : [];
+            return self && (allowDead || !self.dead) ? [self] : [];
             
         case "attacker":
             return attacker && !attacker.dead ? [attacker] : [];
@@ -2269,7 +2270,8 @@ function getEffectAmount(effect, instance) {
         return effect.getAmount(instance);
     }
 
-    return effect.amount || 0;
+    // Check both 'value' (from createEffect) and 'amount' (legacy)
+    return effect.value ?? effect.amount ?? 0;
 }
 
 const UTILITY_EFFECT_XP = {
@@ -2361,13 +2363,17 @@ class EffectProcessor {
             ? encounter?.party 
             : context.manager.party;
         
+        // Remove effects should work on dead targets (to clean up auras at encounter end)
+        const isRemoveEffect = effect.type === 'remove' || effect.type === 'remove_stacks';
+        
         // Build resolution context
         const resolveContext = {
             party: targetParty,
             self: context.character,
             attacker: context.extra?.attacker,
             target: context.extra?.target,
-            exclude: null
+            exclude: null,
+            allowDead: isRemoveEffect
         };
         
         // Resolve targets
@@ -2377,8 +2383,11 @@ class EffectProcessor {
             return false;
         }
         
-        // Create instance and get handler
-        const instance = new SimpleEffectInstance(amount, sourceName, stacks);
+        // Use the effect's source if it's an actual instance (e.g., aura instance),
+        // otherwise create a simple instance for static effects
+        const instance = (effect.source && !effect.source._isSimple && typeof effect.source.remove === 'function')
+            ? effect.source
+            : new SimpleEffectInstance(amount, sourceName, stacks);
         const handler = this.handlers.get(effect.type);
         
         if (!handler) {
@@ -2391,8 +2400,6 @@ class EffectProcessor {
         
         // Apply to each target
         for (const target of targets) {
-            if (target.dead) continue;
-            
             // Create per-target context with target as character
             const targetContext = {
                 ...context,

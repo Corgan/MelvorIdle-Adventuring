@@ -57,7 +57,12 @@ export class AdventuringAuras {
                 const trigger = effectData.trigger;
                 const type = effectData.type;
 
-                const value = effectData.getAmount ? effectData.getAmount(auraInstance) : (effectData.amount || 0);
+                let value = effectData.getAmount ? effectData.getAmount(auraInstance) : (effectData.amount || 0);
+                
+                // Scale by stacks if perStack is true
+                if (effectData.perStack && auraInstance.stacks > 0) {
+                    value = value * auraInstance.stacks;
+                }
 
                 effects.push(createEffect(
                     {
@@ -65,7 +70,8 @@ export class AdventuringAuras {
                         type: type,
                         stat: effectData.id,
                         value: value,
-                        party: effectData.party
+                        party: effectData.party,
+                        target: effectData.target
                     },
                     auraInstance,
                     auraInstance.base.name,
