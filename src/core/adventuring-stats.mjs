@@ -24,6 +24,10 @@ export class AdventuringStats extends Map {
 
     setOwner(owner) {
         this.owner = owner;
+        // Also set on component for breakdown tooltips
+        if (this.component) {
+            this.component.setCharacter(owner);
+        }
     }
 
     get(statID) {

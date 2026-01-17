@@ -10,6 +10,9 @@ export class AdventuringStatsElement extends HTMLElement {
 
         this.stats = getElementFromFragment(this._content, 'stats', 'div');
         this.statsMap = new Map();
+        
+        // Reference to owning character (for breakdown tooltips)
+        this.character = null;
     }
 
     mount(parent) {
@@ -18,6 +21,14 @@ export class AdventuringStatsElement extends HTMLElement {
 
     connectedCallback() {
         this.appendChild(this._content);
+    }
+    
+    /**
+     * Set the character owner for breakdown tooltips
+     * @param {AdventuringCharacter} character
+     */
+    setCharacter(character) {
+        this.character = character;
     }
 
     update(stat, value) {
@@ -31,7 +42,7 @@ export class AdventuringStatsElement extends HTMLElement {
         }
         if(value !== 0 || stat.base !== undefined) {
             showElement(component);
-            component.setStatCompact(stat, value !== 0 ? value : "-", true);
+            component.setStatCompact(stat, value !== 0 ? value : "-", true, this.character);
         } else {
             hideElement(component);
         }

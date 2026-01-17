@@ -7,6 +7,7 @@ const { AdventuringCard } = await loadModule('src/progression/adventuring-card.m
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
 const { AdventuringPassiveBadgeElement } = await loadModule('src/entities/components/adventuring-passive-badge.mjs');
 const { evaluateCondition, StatCalculator } = await loadModule('src/core/adventuring-utils.mjs');
+const { StatBreakdownCache } = await loadModule('src/core/adventuring-stat-breakdown.mjs');
 
 const STARTER_LOADOUTS = {
     front: {
@@ -48,6 +49,9 @@ export class AdventuringHero extends AdventuringCharacter {
         this.equipment = new AdventuringEquipment(this.manager, this.game, this);
 
         this._statsDirty = true;
+        
+        // Stat breakdown cache for tooltip display
+        this.statBreakdownCache = new StatBreakdownCache(this, manager);
 
         this.component.equipment.classList.remove('d-none');
         this.equipment.component.mount(this.component.equipment);
@@ -161,6 +165,10 @@ export class AdventuringHero extends AdventuringCharacter {
 
     invalidateStats() {
         this._statsDirty = true;
+        // Also invalidate stat breakdown cache
+        if (this.statBreakdownCache) {
+            this.statBreakdownCache.invalidate();
+        }
     }
 
     calculateStats(force = false) {
@@ -192,6 +200,11 @@ export class AdventuringHero extends AdventuringCharacter {
         } else {
 
             this.hitpoints = Math.min(this.hitpoints, this.maxHitpoints);
+        }
+        
+        // Invalidate stat breakdown cache after recalculation
+        if (this.statBreakdownCache) {
+            this.statBreakdownCache.invalidate();
         }
 
         this.stats.renderQueue.stats = true;

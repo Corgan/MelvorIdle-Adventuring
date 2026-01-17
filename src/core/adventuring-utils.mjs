@@ -708,6 +708,71 @@ class EffectCache {
         return result;
     }
 
+    /**
+     * Get stat bonuses organized by source ID for breakdown display
+     * @param {string} statId - The stat ID to get bonuses for
+     * @returns {Map<string, {flat, percent, effects}>} sourceId → bonus data with individual effects
+     */
+    getStatBonusBySource(statId) {
+        this.rebuild();
+        
+        const bySource = new Map();
+        
+        this.sources.forEach((source, sourceId) => {
+            // Skip auras - they're handled separately for combat effects
+            if (sourceId === 'auras') return;
+            
+            try {
+                const effects = source.getEffects();
+                if (!Array.isArray(effects)) return;
+
+                let flat = 0;
+                let percent = 0;
+                const matchingEffects = [];
+
+                for (const effect of effects) {
+                    if (effect.trigger !== 'passive') continue;
+                    
+                    let matches = false;
+                    let value = effect.value ?? effect.amount ?? 0;
+                    
+                    // Handle stat_flat and stat_percent for this stat
+                    if ((effect.type === 'stat_flat' || effect.type === 'stat_percent') && effect.stat === statId) {
+                        matches = true;
+                        if (effect.type === 'stat_flat') {
+                            flat += value;
+                        } else {
+                            percent += value;
+                        }
+                    }
+                    
+                    // Handle all_stat_bonus (applies to every stat)
+                    if (effect.type === 'all_stat_bonus') {
+                        matches = true;
+                        flat += value;
+                    }
+                    
+                    if (matches) {
+                        matchingEffects.push({
+                            sourceName: effect.sourceName || sourceId,
+                            sourceRef: effect.source,
+                            flat: effect.type === 'stat_flat' || effect.type === 'all_stat_bonus' ? value : 0,
+                            percent: effect.type === 'stat_percent' ? value : 0
+                        });
+                    }
+                }
+
+                if (flat !== 0 || percent !== 0) {
+                    bySource.set(sourceId, { flat, percent, effects: matchingEffects });
+                }
+            } catch (e) {
+                console.warn(`EffectCache.getStatBonusBySource: Error processing source ${sourceId}:`, e);
+            }
+        });
+
+        return bySource;
+    }
+
     clear() {
         this.allEffectsCache = null;
         this.cachedByTrigger.clear();

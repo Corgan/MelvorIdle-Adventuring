@@ -155,6 +155,9 @@ export async function setup({ gameData, patch, loadTemplates, loadModule, loadSt
     await load('data/items/tier8.json');
     await load('data/items/tier9.json');
 
+    // Items - Boss Material Items
+    await load('data/items/tier_boss.json');
+
     // Items - Uniques and Accessories
     await load('data/items/uniques.json');
     await load('data/items/uniques_armor.json');
@@ -179,9 +182,6 @@ export async function setup({ gameData, patch, loadTemplates, loadModule, loadSt
     await load('data/items/archetype_artifacts/paladin.json');
     await load('data/items/archetype_artifacts/sage.json');
     await load('data/items/archetype_artifacts/shadow.json');
-
-    // Items - Boss Material Items
-    await load('data/items/tier_boss.json');
     
     await load('data/areas/chicken_coop.json');
     await load('data/areas/farmlands.json');
@@ -243,16 +243,16 @@ export async function setup({ gameData, patch, loadTemplates, loadModule, loadSt
     await load('data/achievement-stats.json');
 
     // Achievement system
-    await load('data/achievements/challenges.json');
     await load('data/achievements/combat.json');
-    await load('data/achievements/combat_jobs.json');
     await load('data/achievements/dungeons.json');
-    await load('data/achievements/equipment.json');
     await load('data/achievements/gauntlets.json');
+    await load('data/achievements/combat_jobs.json');
     await load('data/achievements/job_mastery.json');
     await load('data/achievements/slayer.json');
+    await load('data/achievements/equipment.json');
     await load('data/achievements/town.json');
     await load('data/achievements/town_jobs.json');
+    await load('data/achievements/challenges.json');
     
     if(cloudManager.hasAoDEntitlementAndIsEnabled)
         await load('data/data-aod.json');

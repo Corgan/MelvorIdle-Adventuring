@@ -3,6 +3,7 @@ const { loadModule } = mod.getContext(import.meta);
 const { AdventuringCharacter, AdventuringCharacterRenderQueue } = await loadModule('src/core/adventuring-character.mjs');
 const { UNKNOWN_MEDIA, RequirementsChecker } = await loadModule('src/core/adventuring-utils.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
+const { StatBreakdownCache } = await loadModule('src/core/adventuring-stat-breakdown.mjs');
 
 class AdventuringEnemyRenderQueue extends AdventuringCharacterRenderQueue {
     constructor() {
@@ -31,6 +32,9 @@ export class AdventuringEnemy extends AdventuringCharacter {
         this.enrageThreshold = 0;
         this.enrageBuff = null;
         this.phaseTransitioned = false;
+        
+        // Stat breakdown cache for tooltip display (enemies show combat effects only)
+        this.statBreakdownCache = new StatBreakdownCache(this, manager);
     }
 
     initEffectCache() {

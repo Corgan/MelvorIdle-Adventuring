@@ -1,3 +1,6 @@
+const { loadModule } = mod.getContext(import.meta);
+
+const { AdventuringStatBreakdownTooltipElement } = await loadModule('src/ui/components/adventuring-stat-breakdown-tooltip.mjs');
 
 export class AdventuringStatBadgeElement extends HTMLElement {
     constructor() {
@@ -13,6 +16,9 @@ export class AdventuringStatBadgeElement extends HTMLElement {
         this.labelEl = getElementFromFragment(this._content, 'label', 'small');
 
         this._tooltip = null;
+        this._breakdownTooltip = null;
+        this._stat = null;
+        this._character = null;
     }
 
     connectedCallback() {
@@ -35,11 +41,63 @@ export class AdventuringStatBadgeElement extends HTMLElement {
             animation: false
         });
     }
+    
+    /**
+     * Set up interactive breakdown tooltip for a character's stat
+     * @param {Object} stat - The stat object
+     * @param {Object} character - The character with statBreakdownCache
+     */
+    setBreakdownTooltip(stat, character) {
+        this.clearTooltip();
+        
+        this._stat = stat;
+        this._character = character;
+        
+        if (!character || !character.statBreakdownCache) {
+            // Fallback to simple tooltip
+            this._tooltip = tippy(this.content, {
+                content: `<span class="text-info">${stat.name}</span>`,
+                placement: 'top',
+                allowHTML: true,
+                interactive: false,
+                animation: false
+            });
+            return;
+        }
+
+        // Create breakdown tooltip element
+        const breakdownEl = new AdventuringStatBreakdownTooltipElement();
+        
+        this._breakdownTooltip = tippy(this.content, {
+            content: breakdownEl,
+            placement: 'right',
+            allowHTML: true,
+            interactive: true,
+            animation: false,
+            trigger: 'mouseenter click',
+            hideOnClick: false,
+            maxWidth: 450,
+            appendTo: document.body,
+            onShow: () => {
+                // Rebuild breakdown on show to get latest values
+                if (this._character && this._character.statBreakdownCache && this._stat) {
+                    const breakdown = this._character.statBreakdownCache.getBreakdown(this._stat);
+                    if (breakdown) {
+                        breakdownEl.setBreakdown(breakdown);
+                    }
+                }
+            }
+        });
+    }
 
     clearTooltip() {
         if(this._tooltip) {
             this._tooltip.destroy();
             this._tooltip = null;
+        }
+        if(this._breakdownTooltip) {
+            this._breakdownTooltip.destroy();
+            this._breakdownTooltip = null;
         }
     }
 
@@ -52,8 +110,10 @@ export class AdventuringStatBadgeElement extends HTMLElement {
         this.labelEl.textContent = label;
     }
 
-    setStatDataFromStat(stat, value, showPrefix = true) {
-        this.iconEl.classList.add('d-none');
+    setStatDataFromStat(stat, value, showPrefix = true) {
+
+        this.iconEl.classList.add('d-none');
+
         if(!this.imgEl) {
             this.imgEl = document.createElement('img');
             this.imgEl.className = 'skill-icon-xxs mr-1';
@@ -69,17 +129,21 @@ export class AdventuringStatBadgeElement extends HTMLElement {
         this.clearTooltip();
     }
 
-    setStatCompact(stat, value, small = false) {
-        this.iconEl.classList.add('d-none');
+    setStatCompact(stat, value, small = false, character = null) {
+
+        this.iconEl.classList.add('d-none');
+
         if(!this.imgEl) {
             this.imgEl = document.createElement('img');
             this.imgEl.className = 'skill-icon-xxs';
             this.iconEl.parentNode.insertBefore(this.imgEl, this.iconEl);
         }
         this.imgEl.classList.remove('d-none');
-        this.imgEl.src = stat.media;
+        this.imgEl.src = stat.media;
+
         this.col.className = 'col-4 mb-1';
-        this.content.className = 'd-flex flex-column align-items-center';
+        this.content.className = 'd-flex flex-column align-items-center';
+
         if(small) {
             this.imgEl.className = 'mb-1';
             this.imgEl.style.width = '16px';
@@ -91,9 +155,16 @@ export class AdventuringStatBadgeElement extends HTMLElement {
         }
 
         this.valueEl.className = 'font-w600 text-white';
-        this.valueEl.textContent = `${value}`;
+        this.valueEl.textContent = `${value}`;
+
         this.labelEl.classList.add('d-none');
-        this.setTooltipContent(`<span class="text-info">${stat.name}</span>`);
+        
+        // Use breakdown tooltip if character provided, otherwise simple tooltip
+        if (character && character.statBreakdownCache) {
+            this.setBreakdownTooltip(stat, character);
+        } else {
+            this.setTooltipContent(`<span class="text-info">${stat.name}</span>`);
+        }
     }
 
     reset() {
@@ -112,6 +183,8 @@ export class AdventuringStatBadgeElement extends HTMLElement {
         this.labelEl.textContent = '';
         this.labelEl.classList.remove('d-none');
         this.clearTooltip();
+        this._stat = null;
+        this._character = null;
     }
 }
 window.customElements.define('adventuring-stat-badge', AdventuringStatBadgeElement);
