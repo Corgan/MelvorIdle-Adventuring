@@ -6,9 +6,12 @@ export class AdventuringEquipmentSet extends NamespacedObject {
         this.manager = manager;
         this.game = game;
 
-        this._name = data.name;
+        this._name = data.name;
+
         this._itemIds = data.items || [];
-        this.items = []; // Resolved in postDataRegistration
+        this.items = []; // Resolved in postDataRegistration
+
+
         this.bonuses = data.bonuses || [];
     }
 
@@ -17,7 +20,8 @@ export class AdventuringEquipmentSet extends NamespacedObject {
     }
 
     postDataRegistration() {
-        this.items = this._itemIds.map(id => this.manager.baseItems.getObjectByID(id)).filter(item => item);
+        this.items = this._itemIds.map(id => this.manager.baseItems.getObjectByID(id)).filter(item => item);
+
         this.items.forEach(item => {
             if(item) {
                 item.set = this;
@@ -44,11 +48,19 @@ export class AdventuringEquipmentSet extends NamespacedObject {
         activeBonuses.forEach(bonus => {
             if(bonus.effects) {
                 bonus.effects.forEach(effect => {
-                    effects.push({
+                    const effectObj = {
                         ...effect,
                         source: 'equipment_set',
                         sourceName: `${this.name} (${bonus.pieces}pc)`
-                    });
+                    };
+                    // Preserve getAmount and getStacks methods if they exist
+                    if (typeof effect.getAmount === 'function') {
+                        effectObj.getAmount = effect.getAmount.bind(effect);
+                    }
+                    if (typeof effect.getStacks === 'function') {
+                        effectObj.getStacks = effect.getStacks.bind(effect);
+                    }
+                    effects.push(effectObj);
                 });
             }
         });

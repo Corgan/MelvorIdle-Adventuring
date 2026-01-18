@@ -826,7 +826,6 @@ export class AdventuringSlayers extends AdventuringPage {
             { id: 'adventuring:slayer_tasks_completed', icon: 'fa-scroll', color: 'warning', label: 'Slayer Tasks' },
             { id: 'adventuring:total_damage', icon: 'fa-bolt', color: 'danger', label: 'Total Damage' },
             { id: 'adventuring:total_healing', icon: 'fa-heart', color: 'success', label: 'Total Healing' },
-            { id: 'adventuring:flawless_wins', icon: 'fa-star', color: 'warning', label: 'Flawless Wins' },
             { id: 'adventuring:solo_wins', icon: 'fa-user', color: 'info', label: 'Solo Wins' },
             { id: 'adventuring:last_stand_wins', icon: 'fa-fist-raised', color: 'danger', label: 'Last Stand Wins' },
             { id: 'adventuring:floors_explored', icon: 'fa-map', color: 'info', label: 'Floors Explored' },
@@ -914,13 +913,6 @@ export class AdventuringSlayers extends AdventuringPage {
             badges.appendChild(diffBadge);
         }
 
-        if(run.wasFlawless) {
-            const flawlessBadge = document.createElement('span');
-            flawlessBadge.className = 'badge badge-success mr-1';
-            flawlessBadge.textContent = 'Flawless';
-            badges.appendChild(flawlessBadge);
-        }
-
         if(run.isSolo) {
             const soloBadge = document.createElement('span');
             soloBadge.className = 'badge badge-dark';
@@ -953,12 +945,6 @@ export class AdventuringSlayers extends AdventuringPage {
             diffBadge.className = `badge badge-${this.getDifficultyColor(run.difficulty)} mr-1`;
             diffBadge.textContent = run.difficulty.name;
             this.component.runDetailBadges.appendChild(diffBadge);
-        }
-        if(run.wasFlawless) {
-            const flawlessBadge = document.createElement('span');
-            flawlessBadge.className = 'badge badge-success mr-1';
-            flawlessBadge.textContent = 'Flawless';
-            this.component.runDetailBadges.appendChild(flawlessBadge);
         }
         if(run.isSolo) {
             const soloBadge = document.createElement('span');
@@ -1055,7 +1041,6 @@ export class AdventuringSlayers extends AdventuringPage {
         const frag = getTemplateNode('adventuring-run-encounter-template');
 
         const encounterNum = getElementFromFragment(frag, 'encounter-num', 'span');
-        const flawlessBadge = getElementFromFragment(frag, 'flawless-badge', 'span');
         const encDamageDealt = getElementFromFragment(frag, 'enc-damage-dealt', 'span');
         const encDamageTaken = getElementFromFragment(frag, 'enc-damage-taken', 'span');
         const encTurns = getElementFromFragment(frag, 'enc-turns', 'span');
@@ -1064,10 +1049,6 @@ export class AdventuringSlayers extends AdventuringPage {
         encDamageDealt.textContent = this.formatNumber(encounter.damageDealt);
         encDamageTaken.textContent = this.formatNumber(encounter.damageTaken);
         encTurns.textContent = encounter.turnsElapsed;
-
-        if(encounter.wasFlawless) {
-            flawlessBadge.classList.remove('d-none');
-        }
 
         return frag.firstElementChild;
     }

@@ -293,6 +293,16 @@ export class AdventuringEquipmentSlot {
         this.renderQueue.upgrade = true;
 
         this.equipment.invalidateSetCache();
+        
+        // Re-render all slots with set items so set bonus tooltips update
+        if (item.set) {
+            this.equipment.slots.forEach(slot => {
+                if (slot.item && slot.item.set === item.set) {
+                    slot.renderQueue.icon = true;
+                }
+            });
+        }
+        
         if(this.equipment.character && this.equipment.character.effectCache) {
             this.equipment.character.invalidateEffects('equipment');
         }
@@ -302,6 +312,7 @@ export class AdventuringEquipmentSlot {
     }
 
     setEmpty() {
+        const previousItem = this.item;
         this.item.renderQueue.equipped = true;
         this.item.occupies.forEach(slot => {
             let equipmentSlot = this.equipment.slots.get(slot);
@@ -315,6 +326,16 @@ export class AdventuringEquipmentSlot {
         this.renderQueue.upgrade = true;
 
         this.equipment.invalidateSetCache();
+        
+        // Re-render all slots with set items so set bonus tooltips update
+        if (previousItem && previousItem.set) {
+            this.equipment.slots.forEach(slot => {
+                if (slot.item && slot.item.set === previousItem.set) {
+                    slot.renderQueue.icon = true;
+                }
+            });
+        }
+        
         if(this.equipment.character && this.equipment.character.effectCache) {
             this.equipment.character.invalidateEffects('equipment');
         }

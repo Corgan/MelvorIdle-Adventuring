@@ -186,7 +186,7 @@ export class AdventuringEncounter extends AdventuringPage {
             this.currentTurn.resetEffectLimits('turn');
         }
 
-        this.turnTimer.start(this.turnInterval);
+        this.turnTimer.start(this.manager.scaleInterval(this.turnInterval));
 
         this.manager.overview.renderQueue.turnProgressBar = true;
         this.manager.overview.renderQueue.status = true;
@@ -202,7 +202,7 @@ export class AdventuringEncounter extends AdventuringPage {
         );
 
         if (result.negated === 'miss') {
-            this.manager.log.add(`${this.currentTurn.name}'s attack misses ${target.name}!`, {
+            this.manager.log.add(`${this.currentTurn.getDisplayName()}'s attack misses ${target.getDisplayName()}!`, {
                 category: 'combat_miss',
                 source: this.currentTurn,
                 target: target
@@ -250,7 +250,7 @@ export class AdventuringEncounter extends AdventuringPage {
         });
 
         if(this.passiveEffects.checkExecute(this.currentTurn, target)) {
-            this.manager.log.add(`${this.currentTurn.name} executes ${target.name}!`, {
+            this.manager.log.add(`${this.currentTurn.getDisplayName()} executes ${target.getDisplayName()}!`, {
                 category: 'combat_death',
                 source: this.currentTurn,
                 target: target
@@ -262,7 +262,7 @@ export class AdventuringEncounter extends AdventuringPage {
         const reflectAmount = this.passiveEffects.calculateReflect(this.currentTurn, target, damageDealt);
         if(reflectAmount > 0) {
             this.currentTurn.damage({ amount: reflectAmount }, target);
-            this.manager.log.add(`${target.name} reflects ${reflectAmount} damage to ${this.currentTurn.name}!`, {
+            this.manager.log.add(`${target.getDisplayName()} reflects ${reflectAmount} damage to ${this.currentTurn.getDisplayName()}!`, {
                 category: 'combat_damage',
                 source: target,
                 target: this.currentTurn
@@ -291,7 +291,7 @@ export class AdventuringEncounter extends AdventuringPage {
     processTurn() {
 
         if(this.manager.timersPaused) {
-            this.turnTimer.start(this.turnInterval);
+            this.turnTimer.start(this.manager.scaleInterval(this.turnInterval));
             return;
         }
 
@@ -309,7 +309,7 @@ export class AdventuringEncounter extends AdventuringPage {
 
         let currentHit = this.currentAction.hits[this.currentHit];
         if(currentHit !== undefined) {
-            this.hitTimer.start(currentHit.delay !== undefined ? currentHit.delay : this.hitInterval);
+            this.hitTimer.start(this.manager.scaleInterval(currentHit.delay !== undefined ? currentHit.delay : this.hitInterval));
             this.manager.overview.renderQueue.turnProgressBar = true;
             this.updateTurnCards();
         } else {
@@ -346,7 +346,7 @@ export class AdventuringEncounter extends AdventuringPage {
             
             if(targetingMods.forcedTarget && !targetingMods.forcedTarget.dead) {
                 targets = [targetingMods.forcedTarget];
-                this.manager.log.add(`${this.currentTurn.name} is forced to attack ${targetingMods.forcedTarget.name}!`, {
+                this.manager.log.add(`${this.currentTurn.getDisplayName()} is forced to attack ${targetingMods.forcedTarget.getDisplayName()}!`, {
                     category: 'combat_mechanics',
                     source: this.currentTurn,
                     target: targetingMods.forcedTarget
@@ -392,7 +392,7 @@ export class AdventuringEncounter extends AdventuringPage {
                             const critText = isCrit ? ' (CRIT!)' : '';
                             const effectVerb = (effect.type === "damage" || effect.type === "damage_flat") ? 'damages' : 'heals';
                             const category = (effect.type === "damage" || effect.type === "damage_flat") ? 'combat_damage' : 'combat_heal';
-                            this.manager.log.add(`${this.currentTurn.name} ${effectVerb} ${target.name} with ${this.currentAction.name} for ${builtEffect.amount}${critText}`, {
+                            this.manager.log.add(`${this.currentTurn.getDisplayName()} ${effectVerb} ${target.getDisplayName()} with ${this.currentAction.name} for ${builtEffect.amount}${critText}`, {
                                 category,
                                 source: this.currentTurn,
                                 target: target
@@ -440,7 +440,7 @@ export class AdventuringEncounter extends AdventuringPage {
         if(endTurnDelay === 0) {
             this.processHit();
         } else {
-            this.hitTimer.start(endTurnDelay);
+            this.hitTimer.start(this.manager.scaleInterval(endTurnDelay));
         }
         this.manager.overview.renderQueue.turnProgressBar = true;
     }
@@ -453,7 +453,7 @@ export class AdventuringEncounter extends AdventuringPage {
         if(isSpender && !this.isEchoAction) {
             if(this.passiveEffects.checkSpellEcho(this.currentTurn)) {
                 shouldEcho = true;
-                this.manager.log.add(`${this.currentTurn.name}'s spell echoes!`, {
+                this.manager.log.add(`${this.currentTurn.getDisplayName()}'s spell echoes!`, {
                     category: 'combat_mechanics',
                     source: this.currentTurn
                 });
@@ -492,7 +492,7 @@ export class AdventuringEncounter extends AdventuringPage {
             this.hitHistory = [];
             let firstHit = this.currentAction.hits[0];
             if(firstHit !== undefined) {
-                this.hitTimer.start(firstHit.delay !== undefined ? firstHit.delay : this.hitInterval);
+                this.hitTimer.start(this.manager.scaleInterval(firstHit.delay !== undefined ? firstHit.delay : this.hitInterval));
             } else {
                 this.processHit();
             }

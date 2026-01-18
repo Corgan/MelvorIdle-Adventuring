@@ -264,14 +264,28 @@ export class StatBreakdownCache {
 
     /**
      * Collect base stat values
+     * For heroes: use stat definition's base value
+     * For enemies: use the character's current stat values (set from monster data)
      */
     _collectBaseStats() {
-        this.manager.stats.forEach(stat => {
-            const breakdown = this.breakdowns.get(stat.id);
-            if (breakdown && stat.base !== undefined) {
-                breakdown.base = stat.base;
-            }
-        });
+        if (this.character.isHero) {
+            // Heroes use the stat definition's base value
+            this.manager.stats.forEach(stat => {
+                const breakdown = this.breakdowns.get(stat.id);
+                if (breakdown && stat.base !== undefined) {
+                    breakdown.base = stat.base;
+                }
+            });
+        } else {
+            // Enemies/monsters use their actual stat values as the base
+            this.manager.stats.forEach(stat => {
+                const breakdown = this.breakdowns.get(stat.id);
+                if (breakdown) {
+                    // Get the monster's current stat value
+                    breakdown.base = this.character.stats.get(stat) || 0;
+                }
+            });
+        }
     }
 
     /**

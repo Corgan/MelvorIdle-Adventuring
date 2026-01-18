@@ -36,7 +36,7 @@ export class AdventuringGrimoire {
             totalLearned: this.learnedAbilities.size
         });
 
-        this.manager.log.add(`${hero.name} learned ${ability.name}!`, {
+        this.manager.log.add(`${hero.getDisplayName()} learned ${ability.name}!`, {
             category: 'loot_items',
             source: hero
         });

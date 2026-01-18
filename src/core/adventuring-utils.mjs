@@ -1,5 +1,16 @@
 const { loadModule } = mod.getContext(import.meta);
 
+// Import from split modules for re-export (backward compatibility)
+const { StatCalculator: StatCalculatorModule } = await loadModule('src/core/stat-calculator.mjs');
+const { EffectLimitTracker: EffectLimitTrackerModule } = await loadModule('src/core/effect-limit-tracker.mjs');
+const { EffectCache: EffectCacheModule } = await loadModule('src/core/effect-cache.mjs');
+const { EffectProcessor: EffectProcessorModule, createStandardEffectProcessor } = await loadModule('src/core/effect-processor.mjs');
+const { RequirementsChecker: RequirementsCheckerModule, formatRequirement: formatRequirementModule, formatRequirements: formatRequirementsModule } = await loadModule('src/core/requirements-checker.mjs');
+const { AdventuringWeightedTable: WeightedTableModule } = await loadModule('src/core/weighted-table.mjs');
+const { evaluateCondition: evaluateConditionModule, describeCondition: describeConditionModule, describeLimitSuffix } = await loadModule('src/core/condition-evaluator.mjs');
+const { safeNumber, safeDivide, safeMath, safeClamp, safePercent, safeFloor, safeRound, safeCeil } = await loadModule('src/core/safe-numbers.mjs');
+
+// Keep legacy local definitions for now, will be removed in future refactor
 class StatCalculator {
 
     static calculate(baseValue, bonuses = { flat: 0, percent: 0 }, globalPercent = 0) {
@@ -140,7 +151,10 @@ class PassiveEffectProcessor {
         if (missCheck.missed) {
             return { negated: 'miss', amount: 0 };
         }
-        amount = (missCheck.amount !== undefined && missCheck.amount !== null) ? missCheck.amount : amount;
+        const missAmount = missCheck.amount;
+        if (missAmount !== undefined && missAmount !== null && !isNaN(missAmount)) {
+            amount = missAmount;
+        }
         if (missCheck.damageContributions) {
             damageContributions = damageContributions.concat(missCheck.damageContributions);
         }
@@ -150,7 +164,10 @@ class PassiveEffectProcessor {
             target.trigger('dodge', { attacker, ...context });
             return { negated: 'dodge', amount: 0 };
         }
-        amount = (dodgeCheck.amount !== undefined && dodgeCheck.amount !== null) ? dodgeCheck.amount : amount;
+        const dodgeAmount = dodgeCheck.amount;
+        if (dodgeAmount !== undefined && dodgeAmount !== null && !isNaN(dodgeAmount)) {
+            amount = dodgeAmount;
+        }
         if (dodgeCheck.damageContributions) {
             damageContributions = damageContributions.concat(dodgeCheck.damageContributions);
         }
@@ -167,8 +184,11 @@ class PassiveEffectProcessor {
 
         const critResult = this._processCritical(amount, attacker);
 
+        // Safeguard against NaN propagation
+        const finalAmount = isNaN(critResult.amount) ? 0 : critResult.amount;
+
         return {
-            amount: critResult.amount,
+            amount: finalAmount,
             isCrit: critResult.isCrit,
             negated: false,
             damageContributions
@@ -183,12 +203,19 @@ class PassiveEffectProcessor {
         amount = this._applyPercentBonus(amount, target, 'healing_received');
 
         const deliverResult = caster.trigger('before_heal_delivered', { target, amount, ...context });
-        amount = (deliverResult.amount !== undefined && deliverResult.amount !== null) ? deliverResult.amount : amount;
+        const deliverAmount = deliverResult.amount;
+        if (deliverAmount !== undefined && deliverAmount !== null && !isNaN(deliverAmount)) {
+            amount = deliverAmount;
+        }
 
         const receiveResult = target.trigger('before_heal_received', { caster, amount, ...context });
-        amount = (receiveResult.amount !== undefined && receiveResult.amount !== null) ? receiveResult.amount : amount;
+        const receiveAmount = receiveResult.amount;
+        if (receiveAmount !== undefined && receiveAmount !== null && !isNaN(receiveAmount)) {
+            amount = receiveAmount;
+        }
 
-        return { amount };
+        // Safeguard against NaN
+        return { amount: isNaN(amount) ? 0 : amount };
     }
 
     processEnergyGain(character, baseEnergy) {
@@ -895,9 +922,19 @@ class EffectCache {
         }
 
         // Compute stacks - handle both static and dynamic
-        let stacks = effect.stacks || 1;
+        let stacks = 1;
         if (typeof effect.getStacks === 'function') {
             stacks = effect.getStacks(host);
+        } else if (typeof effect.stacks === 'number') {
+            stacks = effect.stacks;
+        } else if (effect.stacks && typeof effect.stacks.base === 'number') {
+            // Handle object format { base: N, scaling: [...] } when getStacks doesn't exist
+            stacks = effect.stacks.base;
+        }
+
+        // Ensure stacks is a valid number
+        if (isNaN(stacks) || stacks < 1) {
+            stacks = 1;
         }
 
         // Build processor context and apply
@@ -2465,7 +2502,7 @@ function createDefaultEffectProcessor() {
         const target = ctx.character;
         const caster = ctx.caster || ctx.character;
 
-        ctx.manager.log.add(`${target.name} receives ${amount} ${effectLabel} from ${instance.base.name}`, {
+        ctx.manager.log.add(`${target.getDisplayName()} receives ${amount} ${effectLabel} from ${instance.base.name}`, {
             category: isDamage ? 'combat_damage' : 'combat_heal',
             source: caster,
             target: target
@@ -2493,8 +2530,8 @@ function createDefaultEffectProcessor() {
         const healAmount = Math.ceil(target.maxHitpoints * (percentValue / 100));
         target.heal({ amount: healAmount }, caster);
         
-        const casterName = caster?.name || 'Effect';
-        ctx.manager.log.add(`${casterName}'s ${instance.base.name} heals ${target.name} for ${healAmount} (${percentValue}%)`, {
+        const casterName = caster?.getDisplayName?.() || caster?.name || 'Effect';
+        ctx.manager.log.add(`${casterName}'s ${instance.base.name} heals ${target.getDisplayName()} for ${healAmount} (${percentValue}%)`, {
             category: 'combat_heal',
             source: caster,
             target: target
@@ -2545,8 +2582,8 @@ function createDefaultEffectProcessor() {
         }
 
         for (const auraId of auraIds) {
-            const casterName = caster?.name || 'Effect';
-            ctx.manager.log.add(`${casterName}'s ${instance.base.name} applies ${getAuraName(ctx.manager, auraId)} to ${target.name}`, {
+            const casterName = caster?.getDisplayName?.() || caster?.name || 'Effect';
+            ctx.manager.log.add(`${casterName}'s ${instance.base.name} applies ${getAuraName(ctx.manager, auraId)} to ${target.getDisplayName()}`, {
                 category: 'status_buff',
                 source: caster,
                 target: target
@@ -2583,8 +2620,8 @@ function createDefaultEffectProcessor() {
 
         if (!target.dead) {
             for (const auraId of auraIds) {
-                const casterName = caster?.name || 'Effect';
-                ctx.manager.log.add(`${casterName}'s ${instance.base.name} applies ${getAuraName(ctx.manager, auraId)} to ${target.name}`, {
+                const casterName = caster?.getDisplayName?.() || caster?.name || 'Effect';
+                ctx.manager.log.add(`${casterName}'s ${instance.base.name} applies ${getAuraName(ctx.manager, auraId)} to ${target.getDisplayName()}`, {
                     category: 'status_debuff',
                     source: caster,
                     target: target
@@ -2936,8 +2973,15 @@ function createDefaultEffectProcessor() {
 
     processor.register('absorb', (effect, instance, ctx) => {
         const amountPerStack = firstDefined(effect.amount, 1);
-        const totalAbsorb = amountPerStack * instance.stacks;
+        const stackCount = typeof instance.stacks === 'number' ? instance.stacks : 1;
+        const totalAbsorb = amountPerStack * stackCount;
         const damage = ctx.extra.amount || 0;
+
+        // Guard against NaN
+        if (isNaN(totalAbsorb) || isNaN(damage)) {
+            console.warn('[absorb] NaN detected - amountPerStack:', amountPerStack, 'stacks:', instance.stacks, 'damage:', damage);
+            return ctx.extra;
+        }
 
         const absorbed = Math.min(damage, totalAbsorb);
         ctx.extra.amount = damage - absorbed;
@@ -3364,6 +3408,19 @@ export {
     EffectLimitTracker,
 
     getFromRegistry,
-    requireFromRegistry
+    requireFromRegistry,
+
+    // Re-exported from split modules
+    WeightedTableModule as AdventuringWeightedTableModule,
+    createStandardEffectProcessor,
+    describeLimitSuffix,
+    safeNumber,
+    safeDivide,
+    safeMath,
+    safeClamp,
+    safePercent,
+    safeFloor,
+    safeRound,
+    safeCeil
 }
 

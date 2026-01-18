@@ -50,12 +50,20 @@ export class AdventuringEnemy extends AdventuringCharacter {
                 if (!passive || !passive.effects) continue;
 
                 for (const effect of passive.effects) {
-                    effects.push({
+                    const effectObj = {
                         ...effect,
                         source: passive,
                         sourceName: `${this.base.name} (${passive.name})`,
                         sourceType: 'monsterPassive'
-                    });
+                    };
+                    // Preserve getAmount and getStacks methods if they exist
+                    if (typeof effect.getAmount === 'function') {
+                        effectObj.getAmount = effect.getAmount.bind(effect);
+                    }
+                    if (typeof effect.getStacks === 'function') {
+                        effectObj.getStacks = effect.getStacks.bind(effect);
+                    }
+                    effects.push(effectObj);
                 }
             }
             return effects;
@@ -180,7 +188,7 @@ export class AdventuringEnemy extends AdventuringCharacter {
         this.currentPhase = phaseIndex;
         this.phaseTransitioned = true;
 
-        this.manager.log.add(`${this.base.name} enters Phase ${phaseIndex + 1}!`, {
+        this.manager.log.add(`${this.getDisplayName()} enters Phase ${phaseIndex + 1}!`, {
             category: 'combat_mechanics',
             target: this
         });
@@ -215,7 +223,7 @@ export class AdventuringEnemy extends AdventuringCharacter {
         if(phase.amount) {
             const healAmount = Math.floor(this.maxHitpoints * (phase.amount / 100));
             this.heal({ amount: healAmount });
-            this.manager.log.add(`${this.base.name} heals for ${healAmount}!`, {
+            this.manager.log.add(`${this.getDisplayName()} heals for ${healAmount}!`, {
                 category: 'combat_heal',
                 target: this
             });
@@ -240,7 +248,7 @@ export class AdventuringEnemy extends AdventuringCharacter {
 
     triggerEnrage() {
         this.isEnraged = true;
-        this.manager.log.add(`${this.base.name} becomes ENRAGED!`, {
+        this.manager.log.add(`${this.getDisplayName()} becomes ENRAGED!`, {
             category: 'combat_mechanics',
             target: this
         });

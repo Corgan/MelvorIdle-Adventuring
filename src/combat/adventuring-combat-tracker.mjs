@@ -106,19 +106,16 @@ export class EncounterStats {
         writer.writeUint32(this.turnsElapsed);
         writer.writeFloat64(this.highestSingleHit);
 
-        // Encode abilitiesUsed as Set of namespaced IDs
         writer.writeSet(this.abilitiesUsed, (ability, w) => {
             w.writeNamespacedObject(ability);
         });
 
-        // Encode damageDealtByMonster as Map
         writer.writeMap(
             this.damageDealtByMonster,
             (monster, w) => w.writeNamespacedObject(monster),
             (value, w) => w.writeFloat64(value)
         );
 
-        // Encode damageTakenByMonster as Map
         writer.writeMap(
             this.damageTakenByMonster,
             (monster, w) => w.writeNamespacedObject(monster),
@@ -136,11 +133,7 @@ export class EncounterStats {
         // Decode abilitiesUsed
         this.abilitiesUsed = new Set();
         reader.getSet((r) => {
-            // Try to resolve ability from various sources
-            let ability = r.getNamespacedObject(this.manager.generators);
-            if (!ability || typeof ability === 'string') {
-                ability = r.getNamespacedObject(this.manager.spenders);
-            }
+            const ability = r.getNamespacedObject(this.manager.abilities);
             if (ability && typeof ability !== 'string') {
                 this.abilitiesUsed.add(ability);
             }
@@ -324,26 +317,22 @@ export class RunStats {
             writer.writeNamespacedObject(this.difficulty);
         }
 
-        // Encode abilitiesUsed
         writer.writeSet(this.abilitiesUsed, (ability, w) => {
             w.writeNamespacedObject(ability);
         });
 
-        // Encode damageDealtByMonster
         writer.writeMap(
             this.damageDealtByMonster,
             (monster, w) => w.writeNamespacedObject(monster),
             (value, w) => w.writeFloat64(value)
         );
 
-        // Encode damageTakenByMonster
         writer.writeMap(
             this.damageTakenByMonster,
             (monster, w) => w.writeNamespacedObject(monster),
             (value, w) => w.writeFloat64(value)
         );
 
-        // Encode equipmentWorn
         writer.writeSet(this.equipmentWorn, (item, w) => {
             w.writeNamespacedObject(item);
         });
@@ -375,10 +364,7 @@ export class RunStats {
         // Decode abilitiesUsed
         this.abilitiesUsed = new Set();
         reader.getSet((r) => {
-            let ability = r.getNamespacedObject(this.manager.generators);
-            if (!ability || typeof ability === 'string') {
-                ability = r.getNamespacedObject(this.manager.spenders);
-            }
+            const ability = r.getNamespacedObject(this.manager.abilities);
             if (ability && typeof ability !== 'string') {
                 this.abilitiesUsed.add(ability);
             }

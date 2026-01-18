@@ -98,6 +98,38 @@ class AdventuringCharacter {
     }
 
     /**
+     * Get this character's position in their party.
+     * @param {boolean} short - If true, returns short form (F/C/B), otherwise full (Front/Center/Back)
+     * @returns {string|null} The position label, or null if not in a party
+     */
+    getPosition(short = false) {
+        if (!this.party) return null;
+        if (this === this.party.front) return short ? 'F' : 'Front';
+        if (this === this.party.center) return short ? 'C' : 'Center';
+        if (this === this.party.back) return short ? 'B' : 'Back';
+        return null;
+    }
+
+    /**
+     * Get this character's name for display, adding position if there are duplicate names in the party.
+     * @param {boolean} short - If true, uses short position form (F/C/B)
+     * @returns {string} The name, optionally with position suffix like "Goblin (Front)" or "Goblin (F)"
+     */
+    getDisplayName(short = false) {
+        if (!this.party) return this.name;
+        
+        // Count how many party members have the same name
+        const sameNameCount = this.party.all.filter(m => m.name === this.name).length;
+        
+        if (sameNameCount > 1) {
+            const position = this.getPosition(short);
+            return position ? `${this.name} (${position})` : this.name;
+        }
+        
+        return this.name;
+    }
+
+    /**
      * Get a party by type relative to this character's perspective.
      * @param {'ally'|'enemy'} type - Which party to get
      * @returns {Party} The requested party
@@ -151,7 +183,7 @@ class AdventuringCharacter {
 
     setGenerator(generator) {
         if(generator === undefined)
-            generator = this.manager.generators.getObjectByID('adventuring:none');
+            generator = this.manager.generators.getObjectByID('adventuring:none_generator');
 
         this.generator = generator;
         this.renderQueue.generator = true;
@@ -159,7 +191,7 @@ class AdventuringCharacter {
 
     setSpender(spender) {
         if(spender === undefined)
-            spender = this.manager.spenders.getObjectByID('adventuring:none');
+            spender = this.manager.spenders.getObjectByID('adventuring:none_spender');
 
         this.spender = spender;
         this.renderQueue.spender = true;
@@ -350,7 +382,7 @@ class AdventuringCharacter {
                     } else {
                         this.hitpoints = 1;
                     }
-                    this.manager.log.add(`${this.name} cheated death!`, {
+                    this.manager.log.add(`${this.getDisplayName()} cheated death!`, {
                         category: 'combat_mechanics',
                         source: this
                     });
@@ -477,7 +509,7 @@ class AdventuringCharacter {
     }
 
     onDeath() {
-        this.manager.log.add(`${this.name} dies`, {
+        this.manager.log.add(`${this.getDisplayName()} dies`, {
             category: 'combat_death',
             source: this
         });
@@ -502,7 +534,7 @@ class AdventuringCharacter {
             return;
 
         this.component.nameText.textContent = this.name;
-        this.card.name = this.name;
+        this.card.name = this.getDisplayName(true);
         this.card.renderQueue.name = true;
 
         this.renderQueue.name = false;

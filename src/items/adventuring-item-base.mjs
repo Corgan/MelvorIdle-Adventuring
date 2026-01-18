@@ -58,6 +58,11 @@ export class AdventuringItemBase extends AdventuringMasteryAction {
         this.isArtifact = data.isArtifact === true;
         this.isJobWeapon = data.isJobWeapon === true;
         
+        // Explicit item category override (for artifacts, job weapons, etc.)
+        if(data.itemCategory !== undefined) {
+            this._itemCategory = data.itemCategory;
+        }
+        
         // Job-specific item restriction (for job weapons)
         if(data.allowedJobs !== undefined) {
             this._allowedJobs = data.allowedJobs;
@@ -148,6 +153,12 @@ export class AdventuringItemBase extends AdventuringMasteryAction {
         if(this._type !== undefined) {
             this.type = this.manager.itemTypes.getObjectByID(this._type);
             delete this._type;
+        }
+
+        // Parse explicit item category override
+        if(this._itemCategory !== undefined) {
+            this.itemCategory = this.manager.itemCategories.getObjectByID(this._itemCategory);
+            delete this._itemCategory;
         }
 
         if(this.requirements.length > 0) {
@@ -426,6 +437,24 @@ export class AdventuringItemBase extends AdventuringMasteryAction {
 
     get category() {
         return this.manager.categories.getObjectByID('adventuring:Equipment');
+    }
+
+    /**
+     * Gets the effective item category for armory display.
+     * Priority: explicit itemCategory > type.category > default melee
+     * @returns {AdventuringItemCategory|undefined}
+     */
+    get effectiveItemCategory() {
+        // Explicit itemCategory override takes priority
+        if(this.itemCategory !== undefined) {
+            return this.itemCategory;
+        }
+        // Fall back to the type's category
+        if(this.type !== undefined && this.type.category !== undefined) {
+            return this.type.category;
+        }
+        // Default to melee category
+        return this.manager.itemCategories.getObjectByID('adventuring:melee');
     }
 
     get upgradeable() {

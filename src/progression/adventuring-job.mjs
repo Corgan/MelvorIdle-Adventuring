@@ -123,12 +123,21 @@ export class AdventuringJob extends AdventuringMasteryAction {
             if (!passive.effects) continue;
             
             for (const effect of passive.effects) {
-                results.push({
+                // Create effect object that preserves methods from the original effect
+                const effectObj = {
                     ...effect,
                     source: passive,
                     sourceName: `${this.name} (${passive.name})`,
                     sourceType: 'jobPassive'
-                });
+                };
+                // Preserve getAmount and getStacks methods if they exist
+                if (typeof effect.getAmount === 'function') {
+                    effectObj.getAmount = effect.getAmount.bind(effect);
+                }
+                if (typeof effect.getStacks === 'function') {
+                    effectObj.getStacks = effect.getStacks.bind(effect);
+                }
+                results.push(effectObj);
             }
         }
 

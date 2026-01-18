@@ -126,6 +126,9 @@ export async function setup({ gameData, patch, loadTemplates, loadModule, loadSt
     await load('data/jobs/combat/spellblade.json');
     await load('data/jobs/combat/warden.json');
 
+    // Items - Categories (must be before types)
+    await load('data/items/categories.json');
+
     // Items - Types
     await load('data/items/types.json');
     

@@ -48,6 +48,7 @@ const { CombatTracker } = await loadModule('src/combat/adventuring-combat-tracke
 
 const { AdventuringItemSlot } = await loadModule('src/items/adventuring-item-slot.mjs');
 const { AdventuringItemType } = await loadModule('src/items/adventuring-item-type.mjs');
+const { AdventuringItemCategory } = await loadModule('src/items/adventuring-item-category.mjs');
 const { AdventuringItemBase } = await loadModule('src/items/adventuring-item-base.mjs');
 const { AdventuringMaterial } = await loadModule('src/items/adventuring-material.mjs');
 const { AdventuringMaterialCategory } = await loadModule('src/items/adventuring-material-category.mjs');
@@ -91,6 +92,7 @@ export class Adventuring extends SkillWithMastery {
         this.jobs = new NamespaceRegistry(this.game.registeredNamespaces);
         this.generators = new NamespaceRegistry(this.game.registeredNamespaces);
         this.spenders = new NamespaceRegistry(this.game.registeredNamespaces);
+        this.abilities = new NamespaceRegistry(this.game.registeredNamespaces); // Unified registry for encode/decode
         this.passives = new NamespaceRegistry(this.game.registeredNamespaces);
         this.auras = new NamespaceRegistry(this.game.registeredNamespaces);
         this.buffs = new NamespaceRegistry(this.game.registeredNamespaces);
@@ -113,6 +115,7 @@ export class Adventuring extends SkillWithMastery {
 
         this.itemSlots = new NamespaceRegistry(this.game.registeredNamespaces);
         this.itemTypes = new NamespaceRegistry(this.game.registeredNamespaces);
+        this.itemCategories = new NamespaceRegistry(this.game.registeredNamespaces);
 
         this.materials = new NamespaceRegistry(this.game.registeredNamespaces);
         this.materialCategories = new NamespaceRegistry(this.game.registeredNamespaces);
@@ -187,6 +190,26 @@ export class Adventuring extends SkillWithMastery {
 
 
         this.autoRepeatArea = null;
+    }
+
+    /**
+     * Check if debug speed mode is enabled (character named "Adventuring Enjoyer")
+     * @returns {boolean}
+     */
+    get isDebugSpeed() {
+        return this.game.characterName === 'Adventuring Enjoyer';
+    }
+
+    /**
+     * Scale an interval for debug speed mode (divides by 100 if enabled)
+     * @param {number} interval - The base interval in ms
+     * @returns {number} The scaled interval (minimum 50ms for tick compatibility)
+     */
+    scaleInterval(interval) {
+        if (this.isDebugSpeed) {
+            return Math.max(50, Math.floor(interval / 25));
+        }
+        return Math.max(50, interval);
     }
 
     setAutoRepeatArea(area) {
@@ -609,7 +632,7 @@ export class Adventuring extends SkillWithMastery {
         this.game.activeAction = this;
 
         if(!this.dungeon.exploreTimer.isActive)
-            this.dungeon.exploreTimer.start(this.dungeon.exploreInterval);
+            this.dungeon.exploreTimer.start(this.dungeon.getEffectiveExploreInterval());
 
         if(this.townTimer.isActive)
             this.townTimer.stop();
@@ -643,7 +666,7 @@ export class Adventuring extends SkillWithMastery {
         this.game.clearActiveAction(false);
 
         if(!this.townTimer.isActive)
-            this.townTimer.start(this.townInterval);
+            this.townTimer.start(this.scaleInterval(this.townInterval));
 
         this.town.resetActions();
 
@@ -671,7 +694,7 @@ export class Adventuring extends SkillWithMastery {
             this.encounter.currentTimer.tick();
         } else {
             if(!this.dungeon.exploreTimer.isActive)
-                this.dungeon.exploreTimer.start(this.dungeon.exploreInterval);
+                this.dungeon.exploreTimer.start(this.dungeon.getEffectiveExploreInterval());
             this.dungeon.exploreTimer.tick();
         }
 
@@ -697,7 +720,7 @@ export class Adventuring extends SkillWithMastery {
         });
 
         if(!this.townTimer.isActive) {
-            this.townTimer.start(this.townInterval);
+            this.townTimer.start(this.scaleInterval(this.townInterval));
 
             this.town.resetActions();
 
@@ -764,7 +787,7 @@ export class Adventuring extends SkillWithMastery {
 
         this.town.performActions();
 
-        this.townTimer.start(this.townInterval);
+        this.townTimer.start(this.scaleInterval(this.townInterval));
         this.overview.renderQueue.turnProgressBar = true;
     }
 
@@ -860,6 +883,7 @@ export class Adventuring extends SkillWithMastery {
             data.generators.forEach(data => {
                 let generator = new AdventuringGenerator(namespace, data, this, this.game);
                 this.generators.registerObject(generator);
+                this.abilities.registerObject(generator);
             });
         }
 
@@ -867,6 +891,7 @@ export class Adventuring extends SkillWithMastery {
             data.spenders.forEach(data => {
                 let spender = new AdventuringSpender(namespace, data, this, this.game);
                 this.spenders.registerObject(spender);
+                this.abilities.registerObject(spender);
             });
         }
 
@@ -947,6 +972,13 @@ export class Adventuring extends SkillWithMastery {
             data.itemSlots.forEach(data => {
                 let slot = new AdventuringItemSlot(namespace, data, this, this.game);
                 this.itemSlots.registerObject(slot);
+            });
+        }
+
+        if(data.itemCategories !== undefined) {
+            data.itemCategories.forEach(data => {
+                let category = new AdventuringItemCategory(namespace, data, this, this.game);
+                this.itemCategories.registerObject(category);
             });
         }
 
@@ -1081,20 +1113,63 @@ export class Adventuring extends SkillWithMastery {
         });
 
         this.cached = {
+            // Jobs
             noneJob: this.jobs.getObjectByID('adventuring:none'),
             slayerJob: this.jobs.getObjectByID('adventuring:slayer'),
+            
+            // Items
             noneItem: this.baseItems.getObjectByID('adventuring:none'),
             noneItemSlot: this.itemSlots.getObjectByID('adventuring:none'),
+            
+            // Abilities
+            noneGenerator: this.generators.getObjectByID('adventuring:none_generator'),
+            noneSpender: this.spenders.getObjectByID('adventuring:none_spender'),
+            
+            // Materials
             slayerCoins: this.materials.getObjectByID('adventuring:slayer_coins'),
             currency: this.materials.getObjectByID('adventuring:currency'),
-            defaultGenerator: this.generators.getObjectByID('adventuring:basic_attack'),
-            defaultSpender: this.spenders.getObjectByID('adventuring:basic_strike')
+            salvage: this.materials.getObjectByID('adventuring:salvage'),
+            pristineSalvage: this.materials.getObjectByID('adventuring:pristine_salvage'),
+            mythicSalvage: this.materials.getObjectByID('adventuring:mythic_salvage'),
+            
+            // Common buffs
+            might: this.buffs.getObjectByID('adventuring:might'),
+            haste: this.buffs.getObjectByID('adventuring:haste'),
+            regeneration: this.buffs.getObjectByID('adventuring:regeneration'),
+            barrier: this.buffs.getObjectByID('adventuring:barrier'),
+            focus: this.buffs.getObjectByID('adventuring:focus'),
+            
+            // Common debuffs
+            vulnerability: this.debuffs.getObjectByID('adventuring:vulnerability'),
+            slow: this.debuffs.getObjectByID('adventuring:slow'),
+            poison: this.debuffs.getObjectByID('adventuring:poison'),
+            burn: this.debuffs.getObjectByID('adventuring:burn'),
+            bleed: this.debuffs.getObjectByID('adventuring:bleed'),
+            stun: this.debuffs.getObjectByID('adventuring:stun'),
+            
+            // Difficulties
+            normalDifficulty: this.difficulties.getObjectByID('adventuring:normal'),
+            heroicDifficulty: this.difficulties.getObjectByID('adventuring:heroic'),
+            mythicDifficulty: this.difficulties.getObjectByID('adventuring:mythic'),
+            endlessDifficulty: this.difficulties.getObjectByID('adventuring:endless'),
+            
+            // Item categories
+            meleeCategory: this.itemCategories.getObjectByID('adventuring:melee'),
+            rangedCategory: this.itemCategories.getObjectByID('adventuring:ranged'),
+            magicCategory: this.itemCategories.getObjectByID('adventuring:magic'),
+            heavyCategory: this.itemCategories.getObjectByID('adventuring:heavy'),
+            mediumCategory: this.itemCategories.getObjectByID('adventuring:medium'),
+            lightCategory: this.itemCategories.getObjectByID('adventuring:light'),
+            accessoriesCategory: this.itemCategories.getObjectByID('adventuring:accessories'),
+            artifactsCategory: this.itemCategories.getObjectByID('adventuring:artifacts'),
+            jobweaponsCategory: this.itemCategories.getObjectByID('adventuring:jobweapons')
         };
 
         this.combatJobs = this.jobs.allObjects.filter(job => job.id !== 'adventuring:none' && !job.isPassive);
         this.passiveJobs = this.jobs.allObjects.filter(job => job.id !== 'adventuring:none' && job.isPassive);
 
         this.auras.forEach(aura => aura.postDataRegistration());
+        this.itemTypes.forEach(itemType => itemType.postDataRegistration());
         this.materials.forEach(material => material.postDataRegistration());
         this.baseItems.forEach(baseItem => baseItem.postDataRegistration());
         this.consumableTypes.forEach(consumable => consumable.postDataRegistration());
@@ -1273,12 +1348,20 @@ export class Adventuring extends SkillWithMastery {
             if (!passive.effects) continue;
             
             for (const effect of passive.effects) {
-                results.push({
+                const effectObj = {
                     ...effect,
                     source: passive,
                     sourceName: `Achievement (${passive.name})`,
                     sourceType: 'globalPassive'
-                });
+                };
+                // Preserve getAmount and getStacks methods if they exist
+                if (typeof effect.getAmount === 'function') {
+                    effectObj.getAmount = effect.getAmount.bind(effect);
+                }
+                if (typeof effect.getStacks === 'function') {
+                    effectObj.getStacks = effect.getStacks.bind(effect);
+                }
+                results.push(effectObj);
             }
         }
 
@@ -1299,6 +1382,15 @@ export class Adventuring extends SkillWithMastery {
         const gen = this.generators.getObjectByID(id);
         if (gen !== undefined) return gen;
         return this.spenders.getObjectByID(id);
+    }
+
+    /**
+     * Checks if an ability is one of the "none" placeholder abilities.
+     * @param {AdventuringAbility} ability - The ability to check
+     * @returns {boolean} True if the ability is the none_generator or none_spender
+     */
+    isNoneAbility(ability) {
+        return ability === this.cached.noneGenerator || ability === this.cached.noneSpender;
     }
 
     encode(writer) {
@@ -1369,13 +1461,8 @@ export class Adventuring extends SkillWithMastery {
 
             const numLearned = reader.getUint32();
             for(let i = 0; i < numLearned; i++) {
-
-                let ability = reader.getNamespacedObject(this.generators);
-                if(typeof ability === 'string') {
-
-                    ability = this.spenders.getObjectByID(ability);
-                }
-                if(ability !== undefined && typeof ability !== 'string') {
+                const ability = reader.getNamespacedObject(this.abilities);
+                if(ability && typeof ability !== 'string') {
                     this.learnedAbilities.add(ability.id);
                 }
             }
@@ -1389,13 +1476,8 @@ export class Adventuring extends SkillWithMastery {
 
             const numSeen = reader.getUint32();
             for(let i = 0; i < numSeen; i++) {
-
-                let ability = reader.getNamespacedObject(this.generators);
-                if(typeof ability === 'string') {
-
-                    ability = this.spenders.getObjectByID(ability);
-                }
-                if(ability !== undefined && typeof ability !== 'string') {
+                const ability = reader.getNamespacedObject(this.abilities);
+                if(ability && typeof ability !== 'string') {
                     this.seenAbilities.add(ability.id);
                 }
             }

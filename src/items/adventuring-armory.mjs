@@ -30,7 +30,7 @@ export class AdventuringArmory extends AdventuringPage {
         this.masterfulItems = new Map();  // Track Masterful rank items
         this.droppedItems = new Map();  // Track items unlocked via loot/drop system
         this.artifactTiers = new Map();  // Track artifact prestige tiers (0, 1, 2)
-        this.activeCategory = 'melee'; // Currently selected category
+        this.activeCategory = null; // Currently selected category (set in postDataRegistration)
 
         this.component = createElement('adventuring-armory');
         this.renderQueue = new AdventuringArmoryRenderQueue();
@@ -46,20 +46,8 @@ export class AdventuringArmory extends AdventuringPage {
         this.component.upgradeButton.onclick = () => this.upgradeSelected();
         this.component.back.onclick = () => this.back();
 
-        this.categoryNames = {
-            recent: '★ Recently Unlocked',
-            melee: 'Melee',
-            ranged: 'Ranged',
-            magic: 'Magic',
-            heavy: 'Heavy Armor',
-            medium: 'Medium Armor',
-            light: 'Light Armor',
-            accessories: 'Accessories',
-            artifacts: 'Artifacts',
-            jobweapons: 'Job Weapons'
-        };
-
-        this.component.optionRecent.onclick = () => this.setCategory('recent');
+        // Category click handlers - use string IDs that get resolved in setCategory
+        this.component.optionRecent.onclick = () => this.showRecentItems();
         this.component.optionMelee.onclick = () => this.setCategory('melee');
         this.component.optionRanged.onclick = () => this.setCategory('ranged');
         this.component.optionMagic.onclick = () => this.setCategory('magic');
@@ -72,50 +60,47 @@ export class AdventuringArmory extends AdventuringPage {
     }
 
     getItemCategory(baseItem) {
-
-        if(baseItem.isJobWeapon) return 'jobweapons';
-        if(baseItem.isArtifact) return 'artifacts';
-
-        if(!baseItem.type) return 'melee';
-        const typeId = baseItem.type.id;
-
-        const meleeTypes = ['adventuring:dagger', 'adventuring:sword1h', 'adventuring:sword2h', 'adventuring:axe', 'adventuring:scimitar', 'adventuring:fists', 'adventuring:polearm', 'adventuring:hammer2h', 'adventuring:mace', 'adventuring:shield'];
-        if(meleeTypes.includes(typeId)) return 'melee';
-
-        const rangedTypes = ['adventuring:knives', 'adventuring:javelin', 'adventuring:crossbow', 'adventuring:shortbow', 'adventuring:longbow', 'adventuring:buckler', 'adventuring:quiver'];
-        if(rangedTypes.includes(typeId)) return 'ranged';
-
-        const magicTypes = ['adventuring:wand', 'adventuring:staff', 'adventuring:orb', 'adventuring:spellbook'];
-        if(magicTypes.includes(typeId)) return 'magic';
-
-        const heavyTypes = ['adventuring:helm', 'adventuring:platebody', 'adventuring:platelegs', 'adventuring:gauntlets', 'adventuring:sabatons'];
-        if(heavyTypes.includes(typeId)) return 'heavy';
-
-        const mediumTypes = ['adventuring:cowl', 'adventuring:vest', 'adventuring:chaps', 'adventuring:vambraces', 'adventuring:boots'];
-        if(mediumTypes.includes(typeId)) return 'medium';
-
-        const lightTypes = ['adventuring:hat', 'adventuring:robes', 'adventuring:bottoms', 'adventuring:mitts', 'adventuring:slippers'];
-        if(lightTypes.includes(typeId)) return 'light';
-
-        const accessoryTypes = ['adventuring:amulet', 'adventuring:ring', 'adventuring:cape'];
-        if(accessoryTypes.includes(typeId)) return 'accessories';
-
-        return 'melee'; // Default
+        // Use the item's effectiveItemCategory which handles all priority logic
+        return baseItem.effectiveItemCategory;
     }
 
     setCategory(category) {
+        // Accept either a category object or a string ID
+        if (typeof category === 'string') {
+            category = this.manager.itemCategories.getObjectByID(`adventuring:${category}`);
+        }
         this.activeCategory = category;
 
-        this.component.categoryDropdownButton.textContent = this.categoryNames[category] || category;
+        this.component.categoryDropdownButton.textContent = category ? category.name : 'Unknown';
 
         this.renderCategoryItems();
+    }
+
+    /**
+     * Show recently unlocked items (special pseudo-category)
+     */
+    showRecentItems() {
+        this.activeCategory = null;
+        this.component.categoryDropdownButton.textContent = '★ Recently Unlocked';
+        this.renderCategoryItems();
+    }
+
+    /**
+     * Check if a category is an armor category (for grouping by set)
+     */
+    isArmorCategory(category) {
+        if (!category) return false;
+        const armorCategoryIds = ['adventuring:heavy', 'adventuring:medium', 'adventuring:light'];
+        return armorCategoryIds.includes(category.id);
     }
 
     renderCategoryItems() {
         this.component.items.replaceChildren();
 
         let categoryItems;
-        if(this.activeCategory === 'recent') {
+        
+        // Special case: no activeCategory means "recent" view
+        if (this.activeCategory === null) {
             categoryItems = this.manager.baseItems.filter(item =>
                 item.id !== 'adventuring:none' && this.isNew(item)
             );
@@ -125,15 +110,15 @@ export class AdventuringArmory extends AdventuringPage {
                 baseItem.renderQueue.tooltip = true;
             });
             return;
-        } else {
-            categoryItems = this.manager.baseItems.filter(item =>
-                item.id !== 'adventuring:none' && this.getItemCategory(item) === this.activeCategory
-            );
         }
+        
+        // Normal category filtering
+        categoryItems = this.manager.baseItems.filter(item =>
+            item.id !== 'adventuring:none' && this.getItemCategory(item) === this.activeCategory
+        );
 
         // For armor categories (heavy, medium, light), group by equipment set
-        const armorCategories = ['heavy', 'medium', 'light'];
-        if(armorCategories.includes(this.activeCategory)) {
+        if (this.isArmorCategory(this.activeCategory)) {
             const setGroups = new Map();
             categoryItems.forEach(item => {
                 const setName = item.set ? item.set.name : 'Uniques';
@@ -209,9 +194,14 @@ export class AdventuringArmory extends AdventuringPage {
         this.component.optionRecent.classList.toggle('d-none', newCount === 0);
 
         if(newCount > 0) {
-            this.setCategory('recent');
+            this.showRecentItems();
         } else {
-            this.renderCategoryItems();
+            // Default to melee category if no recent items
+            if (this.activeCategory === null) {
+                this.setCategory('melee');
+            } else {
+                this.renderCategoryItems();
+            }
         }
 
         this.markAllViewed();

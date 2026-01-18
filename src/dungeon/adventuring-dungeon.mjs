@@ -182,11 +182,12 @@ export class AdventuringDungeon extends AdventuringPage {
     }
 
     getEffectiveExploreInterval() {
-        if(!this.area) return this.exploreInterval;
+        if(!this.area) return this.manager.scaleInterval(this.exploreInterval);
 
         const bonuses = this.area.getMasteryBonuses();
-        const speedMultiplier = 1 - (bonuses.exploreSpeedBonus || 0);
-        return Math.floor(this.exploreInterval * speedMultiplier);
+        const speedMultiplier = Math.max(0.01, 1 - (bonuses.exploreSpeedBonus || 0));
+        const baseInterval = Math.max(50, Math.floor(this.exploreInterval * speedMultiplier));
+        return Math.max(50, this.manager.scaleInterval(baseInterval));
     }
 
     explore() {
@@ -277,7 +278,7 @@ export class AdventuringDungeon extends AdventuringPage {
         this.manager.party.combatParty.forEach(member => {
             let amount = Math.floor(member.maxHitpoints * damagePercent / 100);
             member.damage({ amount: amount });
-            this.manager.log.add(`${sourceName} did ${amount} damage to ${member.name}`, {
+            this.manager.log.add(`${sourceName} did ${amount} damage to ${member.getDisplayName()}`, {
                 category: 'dungeon_events',
                 target: member
             });
@@ -291,13 +292,13 @@ export class AdventuringDungeon extends AdventuringPage {
             if(member.dead) {
 
                 member.revive({ amount: healPercent });
-                this.manager.log.add(`${sourceName} revived ${member.name} to ${amount} health.`, {
+                this.manager.log.add(`${sourceName} revived ${member.getDisplayName()} to ${amount} health.`, {
                     category: 'dungeon_events',
                     target: member
                 });
             } else {
                 member.heal({ amount: amount });
-                this.manager.log.add(`${sourceName} healed ${member.name} for ${amount} health.`, {
+                this.manager.log.add(`${sourceName} healed ${member.getDisplayName()} for ${amount} health.`, {
                     category: 'dungeon_events',
                     target: member
                 });
@@ -478,6 +479,9 @@ export class AdventuringDungeon extends AdventuringPage {
 
         // End the run tracking (abandoned)
         this.manager.combatTracker.endRun(false);
+
+        // Disable auto-run when abandoning
+        this.manager.setAutoRepeatArea(null);
 
         if(this.area !== undefined)
             this.manager.log.add(`Abandoned ${this.area.name} on floor ${this.progress+1}`, { category: 'dungeon_progress' });
