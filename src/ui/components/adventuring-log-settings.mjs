@@ -13,6 +13,7 @@ export class AdventuringLogSettingsElement extends HTMLElement {
         this.onToggleCategory = null;
         this.onToggleSlot = null;
         this.onShowAllSlots = null;
+        this.onToggleEnemyOnly = null;
         this.onSetLimit = null;
     }
 
@@ -105,7 +106,7 @@ export class AdventuringLogSettingsElement extends HTMLElement {
             }
         }
         
-        // Render slot toggles
+        // Render slot toggles (heroes + enemies)
         if (this.slotsContainer) {
             this.slotsContainer.replaceChildren();
             
@@ -118,7 +119,7 @@ export class AdventuringLogSettingsElement extends HTMLElement {
             };
             this.slotsContainer.appendChild(allBtn);
             
-            // Individual slot buttons
+            // Individual hero slot buttons
             for (let slot = 0; slot < 3; slot++) {
                 const btn = document.createElement('button');
                 const isEnabled = filterSettings.showAllSlots || filterSettings.enabledSlots.has(slot);
@@ -129,6 +130,23 @@ export class AdventuringLogSettingsElement extends HTMLElement {
                 };
                 this.slotsContainer.appendChild(btn);
             }
+            
+            // Separator
+            const sep = document.createElement('span');
+            sep.className = 'mx-1';
+            sep.textContent = '|';
+            this.slotsContainer.appendChild(sep);
+            
+            // "Enemies" toggle button
+            const enemyBtn = document.createElement('button');
+            const enemyEnabled = filterSettings.showAllSlots || filterSettings.showEnemyOnly;
+            enemyBtn.className = `btn btn-sm mr-1 mb-1 ${enemyEnabled ? 'btn-outline-danger' : 'btn-outline-secondary'}`;
+            enemyBtn.textContent = 'Enemies';
+            enemyBtn.title = 'Show messages involving only enemies (no heroes)';
+            enemyBtn.onclick = () => {
+                if (this.onToggleEnemyOnly) this.onToggleEnemyOnly();
+            };
+            this.slotsContainer.appendChild(enemyBtn);
         }
     }
 }

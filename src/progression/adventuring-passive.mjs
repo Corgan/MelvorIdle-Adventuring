@@ -1,7 +1,8 @@
 const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringScalableEffect } = await loadModule('src/combat/adventuring-scalable-effect.mjs');
-const { RequirementsChecker, buildEffectReplacements, buildDescription } = await loadModule('src/core/adventuring-utils.mjs');
+const { RequirementsChecker } = await loadModule('src/core/utils/requirements-checker.mjs');
+const { buildEffectReplacements, buildDescription } = await loadModule('src/core/utils/adventuring-utils.mjs');
 
 class AdventuringPassiveEffect extends AdventuringScalableEffect {
     constructor(manager, game, passive, data) {
@@ -29,8 +30,12 @@ export class AdventuringPassive extends NamespacedObject {
     }
 
     get unlocked() {
+        // Fast path: once unlocked, always unlocked
+        if (this._unlockedCached) return true;
         if (this._reqChecker === undefined) return true;
-        return this._reqChecker.check();
+        const result = this._reqChecker.check();
+        if (result) this._unlockedCached = true;
+        return result;
     }
 
     unlockedBy(job) {

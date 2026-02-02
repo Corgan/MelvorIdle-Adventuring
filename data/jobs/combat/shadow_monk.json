@@ -1,277 +1,204 @@
 {
-    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
-    "namespace": "adventuring",
-    "data": {
-        "skillData": [
-            {
-                "skillID": "adventuring:Adventuring",
-                "data": {
-                    "jobs": [
-                        {
-                            "id": "shadow_monk",
-                            "tier": 5,
-                            "name": "Shadow Monk",
-                            "media": "melvor:assets/media/skills/thieving/thieving.png#tint=blue",
-                            "requirements": [
-                                {
-                                    "type": "job_level",
-                                    "job": "adventuring:monk",
-                                    "level": 25
-                                },
-                                {
-                                    "type": "job_level",
-                                    "job": "adventuring:assassin",
-                                    "level": 20
-                                },
-                                {
-                                    "type": "area_mastery",
-                                    "area": "adventuring:shadow_temple",
-                                    "level": 50
-                                }
-                            ],
-                            "isMilestoneReward": true,
-                            "allowedItems": [
-                                "adventuring:cowl",
-                                "adventuring:vest",
-                                "adventuring:chaps",
-                                "adventuring:vambraces",
-                                "adventuring:boots",
-                                "adventuring:amulet",
-                                "adventuring:ring",
-                                "adventuring:cape",
-                                "adventuring:dagger",
-                                "adventuring:fists"
-                            ],
-                            "scaling": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 1.25
-                                },
-                                {
-                                    "id": "adventuring:defence",
-                                    "amount": 0.75
-                                },
-                                {
-                                    "id": "adventuring:agility",
-                                    "amount": 3.5
-                                },
-                                {
-                                    "id": "adventuring:strength",
-                                    "amount": 2.0
-                                }
-                            ]
-                        }
-                    ],
-                    "generators": [
-                        {
-                            "id": "pressure_points",
-                            "name": "Pressure Points",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:shadow_monk",
-                                    "level": 1
-                                }
-                            ],
-                            "energy": 30,
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 20,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:agility",
-                                                        "amount": 0.4
-                                                    },
-                                                    {
-                                                        "id": "adventuring:strength",
-                                                        "amount": 0.3
-                                                    }
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            "type": "debuff",
-                                            "id": "adventuring:stun",
-                                            "stacks": {
-                                                "base": 1,
-                                                "scaling": []
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "shadow_fist",
-                            "name": "Shadow Fist",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:shadow_monk",
-                                    "level": 10
-                                }
-                            ],
-                            "energy": 25,
-                            "stealthCrit": true,
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 25,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:agility",
-                                                        "amount": 0.5
-                                                    },
-                                                    {
-                                                        "id": "adventuring:strength",
-                                                        "amount": 0.25
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                },
-                                {
-                                    "target": "self",
-                                    "effects": [
-                                        {
-                                            "type": "buff",
-                                            "id": "adventuring:haste",
-                                            "stacks": {
-                                                "base": 2,
-                                                "scaling": []
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "void_palm",
-                            "name": "Void Palm",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:shadow_monk",
-                                    "level": 20
-                                }
-                            ],
-                            "energy": 40,
-                            "scalesWithEnergy": true,
-                            "hits": [
-                                {
-                                    "target": "all",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 15,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:agility",
-                                                        "amount": 0.35
-                                                    },
-                                                    {
-                                                        "id": "adventuring:strength",
-                                                        "amount": 0.25
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ],
-                    "spenders": [
-                        {
-                            "id": "one_with_shadows",
-                            "name": "One with Shadows",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:shadow_monk",
-                                    "level": 30
-                                }
-                            ],
-                            "hits": [
-                                {
-                                    "target": "self",
-                                    "effects": [
-                                        {
-                                            "type": "buff",
-                                            "id": "adventuring:phase",
-                                            "stacks": {
-                                                "base": 2,
-                                                "scaling": []
-                                            }
-                                        },
-                                        {
-                                            "type": "buff",
-                                            "id": "adventuring:invisible",
-                                            "stacks": {
-                                                "base": 2,
-                                                "scaling": []
-                                            }
-                                        }
-                                    ]
-                                }
-                            ],
-                            "cost": 80
-                        },
-                        {
-                            "id": "thousand_shadow_fists",
-                            "name": "Thousand Shadow Fists",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:shadow_monk",
-                                    "level": 40
-                                }
-                            ],
-                            "hits": [
-                                {
-                                    "target": "random",
-                                    "party": "enemy",
-                                    "repeat": 12,
-                                    "delay": 50,
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 8,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:agility",
-                                                        "amount": 0.2
-                                                    },
-                                                    {
-                                                        "id": "adventuring:strength",
-                                                        "amount": 0.15
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ],
-                            "cost": 100
-                        }
-                    ]
-                }
-            }
-        ]
-    }
+	"$schema": "../job_schema.json",
+	"namespace": "adventuring",
+	"packages": {
+		"combat_jobs": {
+			"jobs": {
+				"shadow_monk": {
+					"name": "Shadow Monk",
+					"tier": 5,
+					"media": "assets/jobs/shadow_monk.png",
+					"requirements": [
+						{ "type": "job_level", "job": "adventuring:monk", "level": 25 },
+						{ "type": "job_level", "job": "adventuring:assassin", "level": 20 }
+					],
+					"abilities": [
+						{
+							"id": "pressure_points",
+							"name": "Pressure Points",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "Strikes pressure points to damage and stun.",
+							"energy": 25,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:shadow_monk", "level": 1 }],
+							"hits": [{ "target": "front", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 10, "scaling": [{ "id": "adventuring:agility", "amount": 0.4 }, { "id": "adventuring:strength", "amount": 0.3 }] } },
+								{ "type": "debuff", "id": "adventuring:stun", "stacks": 2 }
+							] }]
+						},
+						{
+							"id": "shadow_flurry",
+							"name": "Shadow Flurry",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "A rapid flurry of shadow-infused strikes.",
+							"cost": 140,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:shadow_monk", "level": 1 }],
+							"hits": [
+								{ "target": "random", "party": "enemy", "repeat": 5, "delay": 80, "effects": [
+									{ "type": "damage_flat", "amount": { "base": 6, "scaling": [{ "id": "adventuring:agility", "amount": 0.25 }, { "id": "adventuring:strength", "amount": 0.2 }] } }
+								] },
+								{ "target": "self", "effects": [
+									{ "type": "buff", "id": "adventuring:haste", "stacks": 3 }
+								] }
+							]
+						},
+						{
+							"id": "shadow_fist",
+							"name": "Shadow Fist",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "A shadow-infused fist strike that guarantees a crit from stealth.",
+							"energy": 25,
+							"stealthCrit": true,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:shadow_monk", "level": 10 }],
+							"hits": [
+								{ "target": "front", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "amount": { "base": 13, "scaling": [{ "id": "adventuring:agility", "amount": 0.5 }, { "id": "adventuring:strength", "amount": 0.25 }] } }
+								] },
+								{ "target": "self", "effects": [
+									{ "type": "buff", "id": "adventuring:haste", "stacks": 2 }
+								] }
+							]
+						},
+						{
+							"id": "one_with_shadows",
+							"name": "One with Shadows",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "Becomes one with the shadows, gaining evasion and stealth.",
+							"cost": 145,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:shadow_monk", "level": 15 }],
+							"hits": [{ "target": "self", "effects": [
+								{ "type": "buff", "id": "adventuring:phase", "stacks": 3 },
+								{ "type": "buff", "id": "adventuring:invisible", "stacks": 3 },
+								{ "type": "buff", "id": "adventuring:evasion", "stacks": { "base": 4, "scaling": [{ "id": "adventuring:agility", "amount": 0.1 }] } }
+							] }]
+						},
+						{
+							"id": "shadow_attunement",
+							"name": "Shadow Attunement",
+							"type": "passive",
+							"media": "assets/abilities/passive.png",
+							"description": "Shadow attunement grants stealth and speed at battle start.",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:shadow_monk", "level": 20 }],
+							"effects": [
+								{ "trigger": "encounter_start", "type": "buff", "target": "self", "id": "adventuring:stealth", "stacks": 4 },
+								{ "trigger": "encounter_start", "type": "buff", "target": "self", "id": "adventuring:haste", "stacks": 3 }
+							]
+						},
+						{
+							"id": "void_palm",
+							"name": "Void Palm",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "A palm strike infused with void energy hits all enemies.",
+							"energy": 30,
+							"requirements": [{ "type": "job_level", "job": "adventuring:shadow_monk", "level": 25 }],
+							"hits": [{ "target": "all", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 8, "scaling": [{ "id": "adventuring:agility", "amount": 0.35 }, { "id": "adventuring:strength", "amount": 0.25 }] } },
+								{ "type": "debuff", "id": "adventuring:weaken", "stacks": 2 }
+							] }]
+						},
+						{
+							"id": "ghost_strike",
+							"name": "Ghost Strike",
+							"type": "passive",
+							"media": "assets/abilities/passive.png",
+							"description": "Your attacks grant stealth and stun enemies.",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:shadow_monk", "level": 40 }],
+							"effects": [
+								{ "trigger": "after_damage_delivered", "type": "buff", "target": "self", "id": "adventuring:stealth", "stacks": 2 },
+								{ "trigger": "after_damage_delivered", "type": "debuff", "target": "trigger_target", "id": "adventuring:stun", "stacks": 1 }
+							]
+						},
+						{
+							"id": "thousand_shadow_fists",
+							"name": "Thousand Shadow Fists",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "Unleashes a barrage of shadow fists on random enemies.",
+							"cost": 180,
+							"requirements": [{ "type": "job_level", "job": "adventuring:shadow_monk", "level": 50 }],
+							"hits": [{ "target": "random", "party": "enemy", "repeat": 15, "delay": 50, "effects": [
+								{ "type": "damage_flat", "amount": { "base": 5, "scaling": [{ "id": "adventuring:agility", "amount": 0.2 }, { "id": "adventuring:strength", "amount": 0.15 }] } }
+							] }]
+						},
+						{
+							"id": "shadow_strike",
+							"name": "Shadow Strike",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "A devastating shadow strike that stuns from stealth.",
+							"energy": 35,
+							"stealthCrit": true,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:shadow_monk", "level": 60 }],
+							"hits": [{ "target": "front", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 18, "scaling": [{ "id": "adventuring:agility", "amount": 0.7 }, { "id": "adventuring:strength", "amount": 0.4 }] } },
+								{ "type": "debuff", "id": "adventuring:stun", "stacks": 3 }
+							] }]
+						},
+						{
+							"id": "phantom_assault",
+							"name": "Phantom Assault",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "A phantom assault of lightning-fast strikes.",
+							"cost": 175,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:shadow_monk", "level": 70 }],
+							"hits": [{ "target": "random", "party": "enemy", "repeat": 5, "delay": 100, "effects": [
+								{ "type": "damage_flat", "amount": { "base": 10, "scaling": [{ "id": "adventuring:agility", "amount": 0.4 }, { "id": "adventuring:strength", "amount": 0.3 }] } },
+								{ "type": "damage_flat", "amount": { "base": 0, "scaling": [{ "id": "adventuring:stealth", "scaleFrom": "buff", "scaleTarget": "caster", "amount": 4, "consume": true }] } }
+							] }]
+						},
+						{
+							"id": "ethereal_form",
+							"name": "Ethereal Form",
+							"type": "passive",
+							"media": "assets/abilities/passive.png",
+							"description": "When wounded, you become ethereal and nearly untouchable.",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:shadow_monk", "level": 80 }],
+							"effects": [
+								{ "trigger": "hp_crossed_below", "threshold": 50, "type": "buff", "target": "self", "id": "adventuring:phase", "stacks": 5 },
+								{ "trigger": "hp_crossed_below", "threshold": 50, "type": "buff", "target": "self", "id": "adventuring:evasion", "stacks": { "base": 5, "scaling": [{ "id": "adventuring:agility", "amount": 0.15 }] } }
+							]
+						},
+						{
+							"id": "death_touch",
+							"name": "Death Touch",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "The legendary death touch technique.",
+							"energy": 40,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:shadow_monk", "level": 90 }],
+							"hits": [{ "target": "front", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 25, "scaling": [{ "id": "adventuring:agility", "amount": 0.9 }, { "id": "adventuring:strength", "amount": 0.5 }] } },
+								{ "type": "debuff", "id": "adventuring:stun", "stacks": 4 },
+								{ "type": "debuff", "id": "adventuring:weaken", "stacks": 4 }
+							] }]
+						},
+						{
+							"id": "shadow_annihilation",
+							"name": "Shadow Annihilation",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "The ultimate shadow monk technique - annihilation from all directions.",
+							"cost": 250,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:shadow_monk", "level": 99 }],
+							"hits": [
+								{ "target": "random", "party": "enemy", "repeat": 20, "delay": 40, "effects": [
+									{ "type": "damage_flat", "amount": { "base": 8, "scaling": [{ "id": "adventuring:agility", "amount": 0.3 }, { "id": "adventuring:strength", "amount": 0.2 }] } },
+									{ "type": "damage_flat", "amount": { "base": 0, "scaling": [{ "id": "adventuring:stealth", "scaleFrom": "buff", "scaleTarget": "caster", "amount": 3, "consume": true }] } }
+								] },
+								{ "target": "self", "effects": [
+									{ "type": "buff", "id": "adventuring:haste", "stacks": { "base": 8, "scaling": [{ "id": "adventuring:agility", "amount": 0.2 }] } },
+									{ "type": "buff", "id": "adventuring:stealth", "stacks": { "base": 6, "scaling": [{ "id": "adventuring:agility", "amount": 0.15 }] } }
+								] }
+							]
+						}
+					]
+				}
+			}
+		}
+	}
 }

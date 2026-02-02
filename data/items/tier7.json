@@ -1,999 +1,1249 @@
 {
-    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
-    "namespace": "adventuring",
-    "data": {
-        "skillData": [
-            {
-                "skillID": "adventuring:Adventuring",
-                "data": {
-                    "baseItems": [
-                        {
-                            "id": "leviathans_trident",
-                            "name": "Leviathan's Trident",
-                            "media": "melvor:assets/media/bank/weapon_javelin_adamant.png",
-                            "type": "adventuring:polearm",
-                            "materials": [
-                                {
-                                    "id": "adventuring:currency",
-                                    "qty": 350
-                                },
-                                {
-                                    "id": "adventuring:parts",
-                                    "qty": 14
-                                }
-                            ],
-                            "base": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 25
-                                },
-                                {
-                                    "id": "adventuring:strength",
-                                    "amount": 52
-                                },
-                                {
-                                    "id": "adventuring:agility",
-                                    "amount": 28
-                                }
-                            ],
-                            "scaling": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 2.2
-                                },
-                                {
-                                    "id": "adventuring:strength",
-                                    "amount": 4.5
-                                },
-                                {
-                                    "id": "adventuring:agility",
-                                    "amount": 2.4
-                                }
-                            ],
-                            "effects": [
-                                {
-                                    "trigger": "after_damage_delivered",
-                                    "type": "debuff",
-                                    "id": "adventuring:weaken",
-                                    "target": "target",
-                                    "amount": 8,
-                                    "scaling": 0.8,
-                                    "stacks": 3,
-                                    "chance": 40
-                                },
-                                {
-                                    "trigger": "spender",
-                                    "type": "damage_flat",
-                                    "target": "target",
-                                    "amount": 15,
-                                    "scaling": 1.5
-                                }
-                            ],
-                            "requirements": [
-                                {
-                                    "type": "area_cleared",
-                                    "area": "adventuring:earth_temple"
-                                }
-                            ],
-                            "upgradeMaterials": {
-                                "1": [
-                                    "adventuring:earth_essence",
-                                    "adventuring:sea_scale"
-                                ],
-                                "4": [
-                                    "adventuring:knights_crest"
-                                ],
-                                "7": [
-                                    "adventuring:shadow_essence"
-                                ]
-                            }
-                        },
-                        {
-                            "id": "pressure_suit",
-                            "name": "Pressure Suit",
-                            "media": "melvor:assets/media/bank/armour_platebody_adamant.png",
-                            "type": "adventuring:vest",
-                            "materials": [
-                                {
-                                    "id": "adventuring:currency",
-                                    "qty": 350
-                                },
-                                {
-                                    "id": "adventuring:parts",
-                                    "qty": 14
-                                }
-                            ],
-                            "base": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 45
-                                },
-                                {
-                                    "id": "adventuring:defence",
-                                    "amount": 48
-                                },
-                                {
-                                    "id": "adventuring:strength",
-                                    "amount": 15
-                                }
-                            ],
-                            "scaling": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 4
-                                },
-                                {
-                                    "id": "adventuring:defence",
-                                    "amount": 4.2
-                                },
-                                {
-                                    "id": "adventuring:strength",
-                                    "amount": 1.2
-                                }
-                            ],
-                            "effects": [
-                                {
-                                    "trigger": "after_damage_received",
-                                    "type": "buff",
-                                    "id": "adventuring:fortify",
-                                    "target": "self",
-                                    "amount": 5,
-                                    "stacks": 2,
-                                    "chance": 35
-                                },
-                                {
-                                    "trigger": "encounter_start",
-                                    "type": "buff",
-                                    "id": "adventuring:barrier",
-                                    "target": "self",
-                                    "stacks": 8
-                                }
-                            ],
-                            "requirements": [
-                                {
-                                    "type": "area_cleared",
-                                    "area": "adventuring:earth_temple"
-                                }
-                            ],
-                            "upgradeMaterials": {
-                                "1": [
-                                    "adventuring:earth_essence",
-                                    "adventuring:sea_scale"
-                                ],
-                                "4": [
-                                    "adventuring:knights_crest"
-                                ],
-                                "7": [
-                                    "adventuring:shadow_essence"
-                                ]
-                            }
-                        },
-                        {
-                            "id": "deep_pearl_amulet",
-                            "name": "Deep Pearl Amulet",
-                            "media": "melvor:assets/media/bank/amulet_of_incantation.png",
-                            "type": "adventuring:amulet",
-                            "materials": [
-                                {
-                                    "id": "adventuring:currency",
-                                    "qty": 280
-                                },
-                                {
-                                    "id": "adventuring:parts",
-                                    "qty": 14
-                                }
-                            ],
-                            "base": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 18
-                                },
-                                {
-                                    "id": "adventuring:magic",
-                                    "amount": 32
-                                },
-                                {
-                                    "id": "adventuring:prayer",
-                                    "amount": 22
-                                }
-                            ],
-                            "scaling": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 1.5
-                                },
-                                {
-                                    "id": "adventuring:magic",
-                                    "amount": 2.8
-                                },
-                                {
-                                    "id": "adventuring:prayer",
-                                    "amount": 1.8
-                                }
-                            ],
-                            "effects": [
-                                {
-                                    "trigger": "heal",
-                                    "type": "heal_flat",
-                                    "target": "all",
-                                    "party": "ally",
-                                    "amount": 3,
-                                    "scaling": 0.3
-                                },
-                                {
-                                    "trigger": "after_damage_received",
-                                    "condition": {
-                                        "type": "hp_crossed_below",
-                                        "threshold": 30
-                                    },
-                                    "limit": "combat",
-                                    "times": 1,
-                                    "type": "buff",
-                                    "id": "adventuring:regeneration",
-                                    "target": "self",
-                                    "stacks": 5
-                                }
-                            ],
-                            "requirements": [
-                                {
-                                    "type": "area_cleared",
-                                    "area": "adventuring:earth_temple"
-                                }
-                            ],
-                            "upgradeMaterials": {
-                                "1": [
-                                    "adventuring:earth_essence",
-                                    "adventuring:sea_scale"
-                                ],
-                                "4": [
-                                    "adventuring:knights_crest"
-                                ],
-                                "7": [
-                                    "adventuring:shadow_essence"
-                                ]
-                            }
-                        },
-                        {
-                            "id": "krakens_grasp",
-                            "name": "Kraken's Grasp",
-                            "media": "melvor:assets/media/bank/weapon_crossbow_dragon.png#shade=orange",
-                            "type": "adventuring:axe",
-                            "materials": [
-                                {
-                                    "id": "adventuring:currency",
-                                    "qty": 525
-                                },
-                                {
-                                    "id": "adventuring:parts",
-                                    "qty": 21
-                                }
-                            ],
-                            "base": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 22
-                                },
-                                {
-                                    "id": "adventuring:strength",
-                                    "amount": 58
-                                },
-                                {
-                                    "id": "adventuring:defence",
-                                    "amount": 18
-                                }
-                            ],
-                            "scaling": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 1.8
-                                },
-                                {
-                                    "id": "adventuring:strength",
-                                    "amount": 5
-                                },
-                                {
-                                    "id": "adventuring:defence",
-                                    "amount": 1.4
-                                }
-                            ],
-                            "effects": [
-                                {
-                                    "trigger": "after_damage_delivered",
-                                    "type": "debuff",
-                                    "id": "adventuring:slow",
-                                    "target": "target",
-                                    "stacks": 2,
-                                    "chance": 50
-                                },
-                                {
-                                    "trigger": "after_damage_delivered",
-                                    "type": "damage_flat",
-                                    "target": "target",
-                                    "amount": 10,
-                                    "scaling": 1,
-                                    "chance": 25
-                                }
-                            ],
-                            "requirements": [
-                                {
-                                    "type": "area_cleared",
-                                    "area": "adventuring:earth_temple"
-                                }
-                            ],
-                            "upgradeMaterials": {
-                                "1": [
-                                    "adventuring:earth_essence",
-                                    "adventuring:sea_scale"
-                                ],
-                                "4": [
-                                    "adventuring:knights_crest"
-                                ],
-                                "7": [
-                                    "adventuring:shadow_essence"
-                                ]
-                            }
-                        },
-                        {
-                            "id": "archons_blade",
-                            "name": "Archon's Blade",
-                            "media": "melvor:assets/media/bank/weapon_sword_ancient.png",
-                            "type": "adventuring:sword2h",
-                            "materials": [
-                                {
-                                    "id": "adventuring:currency",
-                                    "qty": 525
-                                },
-                                {
-                                    "id": "adventuring:parts",
-                                    "qty": 21
-                                }
-                            ],
-                            "base": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 28
-                                },
-                                {
-                                    "id": "adventuring:strength",
-                                    "amount": 55
-                                },
-                                {
-                                    "id": "adventuring:prayer",
-                                    "amount": 32
-                                }
-                            ],
-                            "scaling": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 2.4
-                                },
-                                {
-                                    "id": "adventuring:strength",
-                                    "amount": 4.8
-                                },
-                                {
-                                    "id": "adventuring:prayer",
-                                    "amount": 2.8
-                                }
-                            ],
-                            "effects": [
-                                {
-                                    "trigger": "after_damage_delivered",
-                                    "type": "buff",
-                                    "id": "adventuring:might",
-                                    "target": "self",
-                                    "stacks": 2,
-                                    "chance": 40
-                                },
-                                {
-                                    "trigger": "kill",
-                                    "type": "heal_flat",
-                                    "target": "all",
-                                    "party": "ally",
-                                    "amount": 20,
-                                    "scaling": 2
-                                }
-                            ],
-                            "requirements": [
-                                {
-                                    "type": "area_cleared",
-                                    "area": "adventuring:earth_temple"
-                                }
-                            ],
-                            "upgradeMaterials": {
-                                "1": [
-                                    "adventuring:earth_essence",
-                                    "adventuring:sea_scale"
-                                ],
-                                "4": [
-                                    "adventuring:knights_crest"
-                                ],
-                                "7": [
-                                    "adventuring:shadow_essence"
-                                ]
-                            }
-                        },
-                        {
-                            "id": "wings_of_light",
-                            "name": "Wings of Light",
-                            "media": "melvor:assets/media/bank/cape_of_completion.png",
-                            "type": "adventuring:cape",
-                            "materials": [
-                                {
-                                    "id": "adventuring:currency",
-                                    "qty": 350
-                                },
-                                {
-                                    "id": "adventuring:parts",
-                                    "qty": 14
-                                }
-                            ],
-                            "base": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 22
-                                },
-                                {
-                                    "id": "adventuring:agility",
-                                    "amount": 38
-                                },
-                                {
-                                    "id": "adventuring:prayer",
-                                    "amount": 25
-                                }
-                            ],
-                            "scaling": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 1.8
-                                },
-                                {
-                                    "id": "adventuring:agility",
-                                    "amount": 3.2
-                                },
-                                {
-                                    "id": "adventuring:prayer",
-                                    "amount": 2.2
-                                }
-                            ],
-                            "effects": [
-                                {
-                                    "trigger": "after_damage_received",
-                                    "type": "buff",
-                                    "id": "adventuring:evasion",
-                                    "target": "self",
-                                    "stacks": 3,
-                                    "chance": 30
-                                },
-                                {
-                                    "trigger": "round_start",
-                                    "type": "heal_flat",
-                                    "target": "self",
-                                    "amount": 5,
-                                    "scaling": 0.5
-                                }
-                            ],
-                            "requirements": [
-                                {
-                                    "type": "area_cleared",
-                                    "area": "adventuring:earth_temple"
-                                }
-                            ],
-                            "upgradeMaterials": {
-                                "1": [
-                                    "adventuring:earth_essence",
-                                    "adventuring:sea_scale"
-                                ],
-                                "4": [
-                                    "adventuring:knights_crest"
-                                ],
-                                "7": [
-                                    "adventuring:shadow_essence"
-                                ]
-                            }
-                        },
-                        {
-                            "id": "star_crown",
-                            "name": "Star Crown",
-                            "media": "melvor:assets/media/bank/fez_amulet.png",
-                            "type": "adventuring:helm",
-                            "materials": [
-                                {
-                                    "id": "adventuring:currency",
-                                    "qty": 420
-                                },
-                                {
-                                    "id": "adventuring:parts",
-                                    "qty": 21
-                                }
-                            ],
-                            "base": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 25
-                                },
-                                {
-                                    "id": "adventuring:magic",
-                                    "amount": 42
-                                },
-                                {
-                                    "id": "adventuring:defence",
-                                    "amount": 22
-                                }
-                            ],
-                            "scaling": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 2
-                                },
-                                {
-                                    "id": "adventuring:magic",
-                                    "amount": 3.6
-                                },
-                                {
-                                    "id": "adventuring:defence",
-                                    "amount": 1.8
-                                }
-                            ],
-                            "effects": [
-                                {
-                                    "trigger": "encounter_start",
-                                    "type": "buff",
-                                    "id": "adventuring:focus",
-                                    "target": "all",
-                                    "party": "ally",
-                                    "stacks": 5
-                                },
-                                {
-                                    "trigger": "spender",
-                                    "type": "buff",
-                                    "id": "adventuring:barrier",
-                                    "target": "self",
-                                    "stacks": 2
-                                }
-                            ],
-                            "requirements": [
-                                {
-                                    "type": "area_cleared",
-                                    "area": "adventuring:earth_temple"
-                                }
-                            ],
-                            "upgradeMaterials": {
-                                "1": [
-                                    "adventuring:earth_essence",
-                                    "adventuring:sea_scale"
-                                ],
-                                "4": [
-                                    "adventuring:knights_crest"
-                                ],
-                                "7": [
-                                    "adventuring:shadow_essence"
-                                ]
-                            }
-                        },
-                        {
-                            "id": "eclipse_ring",
-                            "name": "Eclipse Ring",
-                            "media": "melvor:assets/media/bank/ring_of_wealth.png",
-                            "type": "adventuring:ring",
-                            "materials": [
-                                {
-                                    "id": "adventuring:currency",
-                                    "qty": 210
-                                },
-                                {
-                                    "id": "adventuring:parts",
-                                    "qty": 7
-                                }
-                            ],
-                            "base": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 15
-                                },
-                                {
-                                    "id": "adventuring:strength",
-                                    "amount": 25
-                                },
-                                {
-                                    "id": "adventuring:magic",
-                                    "amount": 25
-                                }
-                            ],
-                            "scaling": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 1.2
-                                },
-                                {
-                                    "id": "adventuring:strength",
-                                    "amount": 2.2
-                                },
-                                {
-                                    "id": "adventuring:magic",
-                                    "amount": 2.2
-                                }
-                            ],
-                            "effects": [
-                                {
-                                    "trigger": "after_damage_delivered",
-                                    "type": "buff",
-                                    "id": "adventuring:might",
-                                    "target": "self",
-                                    "stacks": 1,
-                                    "chance": 25
-                                },
-                                {
-                                    "trigger": "after_damage_delivered",
-                                    "type": "damage_flat",
-                                    "target": "target",
-                                    "amount": 8,
-                                    "scaling": 0.8,
-                                    "chance": 25
-                                }
-                            ],
-                            "requirements": [
-                                {
-                                    "type": "area_cleared",
-                                    "area": "adventuring:earth_temple"
-                                }
-                            ],
-                            "upgradeMaterials": {
-                                "1": [
-                                    "adventuring:earth_essence",
-                                    "adventuring:sea_scale"
-                                ],
-                                "4": [
-                                    "adventuring:knights_crest"
-                                ],
-                                "7": [
-                                    "adventuring:shadow_essence"
-                                ]
-                            }
-                        },
-                        {
-                            "id": "depths_knives",
-                            "name": "Depths Throwing Knives",
-                            "media": "melvor:assets/media/bank/weapon_throwingknife_dragon.png",
-                            "type": "adventuring:knives",
-                            "materials": [
-                                {
-                                    "id": "adventuring:currency",
-                                    "qty": 3500
-                                },
-                                {
-                                    "id": "adventuring:big_parts",
-                                    "qty": 20
-                                }
-                            ],
-                            "base": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 25
-                                },
-                                {
-                                    "id": "adventuring:agility",
-                                    "amount": 28
-                                },
-                                {
-                                    "id": "adventuring:strength",
-                                    "amount": 28
-                                }
-                            ],
-                            "scaling": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 2.5
-                                },
-                                {
-                                    "id": "adventuring:agility",
-                                    "amount": 2.8
-                                },
-                                {
-                                    "id": "adventuring:strength",
-                                    "amount": 2.8
-                                }
-                            ],
-                            "requirements": [
-                                {
-                                    "type": "dropped"
-                                }
-                            ],
-                            "upgradeMaterials": {
-                                "1": [
-                                    "adventuring:living_metal"
-                                ],
-                                "4": [
-                                    "adventuring:arcane_dust"
-                                ]
-                            }
-                        },
-                        {
-                            "id": "depths_javelin",
-                            "name": "Depths Javelin",
-                            "media": "melvor:assets/media/bank/weapon_javelin_dragon.png",
-                            "type": "adventuring:javelin",
-                            "materials": [
-                                {
-                                    "id": "adventuring:currency",
-                                    "qty": 3800
-                                },
-                                {
-                                    "id": "adventuring:big_parts",
-                                    "qty": 22
-                                }
-                            ],
-                            "base": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 28
-                                },
-                                {
-                                    "id": "adventuring:agility",
-                                    "amount": 45
-                                },
-                                {
-                                    "id": "adventuring:strength",
-                                    "amount": 18
-                                }
-                            ],
-                            "scaling": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 2.8
-                                },
-                                {
-                                    "id": "adventuring:agility",
-                                    "amount": 4.5
-                                },
-                                {
-                                    "id": "adventuring:strength",
-                                    "amount": 1.8
-                                }
-                            ],
-                            "requirements": [
-                                {
-                                    "type": "dropped"
-                                }
-                            ],
-                            "upgradeMaterials": {
-                                "1": [
-                                    "adventuring:living_metal"
-                                ],
-                                "4": [
-                                    "adventuring:arcane_dust"
-                                ]
-                            }
-                        },
-                        {
-                            "id": "depths_crossbow",
-                            "name": "Depths Crossbow",
-                            "media": "melvor:assets/media/bank/weapon_crossbow_dragon.png",
-                            "type": "adventuring:crossbow",
-                            "materials": [
-                                {
-                                    "id": "adventuring:currency",
-                                    "qty": 4000
-                                },
-                                {
-                                    "id": "adventuring:big_parts",
-                                    "qty": 25
-                                }
-                            ],
-                            "base": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 25
-                                },
-                                {
-                                    "id": "adventuring:agility",
-                                    "amount": 30
-                                },
-                                {
-                                    "id": "adventuring:ranged",
-                                    "amount": 42
-                                }
-                            ],
-                            "scaling": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 2.5
-                                },
-                                {
-                                    "id": "adventuring:agility",
-                                    "amount": 3
-                                },
-                                {
-                                    "id": "adventuring:ranged",
-                                    "amount": 4.2
-                                }
-                            ],
-                            "requirements": [
-                                {
-                                    "type": "dropped"
-                                }
-                            ],
-                            "upgradeMaterials": {
-                                "1": [
-                                    "adventuring:living_metal"
-                                ],
-                                "4": [
-                                    "adventuring:arcane_dust"
-                                ]
-                            }
-                        },
-                        {
-                            "id": "depths_mace",
-                            "name": "Depths Mace",
-                            "media": "melvor:assets/media/bank/weapon_battleaxe_bronze.png",
-                            "type": "adventuring:mace",
-                            "materials": [
-                                {
-                                    "id": "adventuring:currency",
-                                    "qty": 3800
-                                },
-                                {
-                                    "id": "adventuring:big_parts",
-                                    "qty": 22
-                                }
-                            ],
-                            "base": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 30
-                                },
-                                {
-                                    "id": "adventuring:strength",
-                                    "amount": 75
-                                }
-                            ],
-                            "scaling": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 3
-                                },
-                                {
-                                    "id": "adventuring:strength",
-                                    "amount": 7.5
-                                }
-                            ],
-                            "requirements": [
-                                {
-                                    "type": "dropped"
-                                }
-                            ],
-                            "upgradeMaterials": {
-                                "1": [
-                                    "adventuring:living_metal"
-                                ],
-                                "4": [
-                                    "adventuring:arcane_dust"
-                                ]
-                            }
-                        },
-                        {
-                            "id": "depths_warhammer",
-                            "name": "Depths Warhammer",
-                            "media": "melvor:assets/media/bank/weapon_battleaxe_bronze.png",
-                            "type": "adventuring:hammer2h",
-                            "materials": [
-                                {
-                                    "id": "adventuring:currency",
-                                    "qty": 4500
-                                },
-                                {
-                                    "id": "adventuring:big_parts",
-                                    "qty": 28
-                                }
-                            ],
-                            "base": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 38
-                                },
-                                {
-                                    "id": "adventuring:strength",
-                                    "amount": 105
-                                }
-                            ],
-                            "scaling": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 3.8
-                                },
-                                {
-                                    "id": "adventuring:strength",
-                                    "amount": 10.5
-                                }
-                            ],
-                            "requirements": [
-                                {
-                                    "type": "dropped"
-                                }
-                            ],
-                            "upgradeMaterials": {
-                                "1": [
-                                    "adventuring:living_metal"
-                                ],
-                                "4": [
-                                    "adventuring:arcane_dust"
-                                ]
-                            }
-                        },
-                        {
-                            "id": "depths_orb",
-                            "name": "Depths Orb",
-                            "media": "melvor:assets/media/bank/rune_water.png",
-                            "type": "adventuring:orb",
-                            "materials": [
-                                {
-                                    "id": "adventuring:currency",
-                                    "qty": 3500
-                                },
-                                {
-                                    "id": "adventuring:arcane_dust",
-                                    "qty": 30
-                                }
-                            ],
-                            "base": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 25
-                                },
-                                {
-                                    "id": "adventuring:magic",
-                                    "amount": 55
-                                },
-                                {
-                                    "id": "adventuring:prayer",
-                                    "amount": 35
-                                }
-                            ],
-                            "scaling": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 2.5
-                                },
-                                {
-                                    "id": "adventuring:magic",
-                                    "amount": 5.5
-                                },
-                                {
-                                    "id": "adventuring:prayer",
-                                    "amount": 3.5
-                                }
-                            ],
-                            "requirements": [
-                                {
-                                    "type": "dropped"
-                                }
-                            ],
-                            "upgradeMaterials": {
-                                "1": [
-                                    "adventuring:living_metal"
-                                ],
-                                "4": [
-                                    "adventuring:arcane_dust"
-                                ]
-                            }
-                        }
-                    ],
-                    "equipmentPools": [
-                        {
-                            "id": "tier7_realm_of_chaos",
-                            "name": "Realm of Chaos Drops (T7)",
-                            "items": [
-                                "adventuring:depths_knives",
-                                "adventuring:depths_javelin",
-                                "adventuring:depths_crossbow",
-                                "adventuring:depths_mace",
-                                "adventuring:depths_warhammer",
-                                "adventuring:depths_orb"
-                            ]
-                        }
-                    ]
-                }
-            }
-        ]
-    }
+	"$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+	"namespace": "adventuring",
+	"data": {
+		"skillData": [
+			{
+				"skillID": "adventuring:Adventuring",
+				"data": {
+					"baseItems": [
+						{
+							"id": "leviathans_trident",
+							"name": "Leviathan's Trident",
+							"media": "melvor:assets/media/bank/weapon_javelin_adamant.png",
+							"type": "adventuring:polearm",
+							"materials": [
+								{
+									"id": "adventuring:currency",
+									"qty": 350
+								},
+								{
+									"id": "adventuring:parts",
+									"qty": 14
+								}
+							],
+							"effects": [
+								{
+									"trigger": "passive",
+									"type": "stat_flat",
+									"stat": "adventuring:hitpoints",
+									"amount": {
+										"base": 4.5,
+										"scaling": [
+											{
+												"id": "level",
+												"amount": 0.88
+											}
+										]
+									},
+									"scaleFrom": "equipment"
+								},
+								{
+									"trigger": "passive",
+									"type": "stat_flat",
+									"stat": "adventuring:strength",
+									"amount": {
+										"base": 4.5,
+										"scaling": [
+											{
+												"id": "level",
+												"amount": 0.88
+											}
+										]
+									},
+									"scaleFrom": "equipment"
+								},
+								{
+									"trigger": "passive",
+									"type": "stat_flat",
+									"stat": "adventuring:agility",
+									"amount": {
+										"base": 4.5,
+										"scaling": [
+											{
+												"id": "level",
+												"amount": 0.88
+											}
+										]
+									},
+									"scaleFrom": "equipment"
+								},
+								{
+									"trigger": "after_damage_delivered",
+									"type": "debuff",
+									"id": "adventuring:weaken",
+									"target": "target",
+									"amount": 8,
+									"scaling": 0.8,
+									"stacks": 3,
+									"chance": 40
+								},
+								{
+									"trigger": "spender",
+									"type": "damage_flat",
+									"target": "target",
+									"amount": 15,
+									"scaling": 1.5
+								}
+							],
+							"requirements": [
+								{
+									"type": "area_cleared",
+									"area": "adventuring:earth_temple"
+								}
+							],
+							"upgradeMaterials": {
+								"1": [
+									"adventuring:earth_essence",
+									"adventuring:sea_scale"
+								],
+								"4": [
+									"adventuring:knights_crest"
+								],
+								"7": [
+									"adventuring:shadow_essence"
+								]
+							},
+							"tier": 7
+						},
+						{
+							"id": "pressure_suit",
+							"name": "Pressure Suit",
+							"media": "melvor:assets/media/bank/armour_platebody_adamant.png",
+							"type": "adventuring:vest",
+							"materials": [
+								{
+									"id": "adventuring:currency",
+									"qty": 350
+								},
+								{
+									"id": "adventuring:parts",
+									"qty": 14
+								}
+							],
+							"effects": [
+								{
+									"trigger": "passive",
+									"type": "stat_flat",
+									"stat": "adventuring:hitpoints",
+									"amount": {
+										"base": 4.5,
+										"scaling": [
+											{
+												"id": "level",
+												"amount": 0.88
+											}
+										]
+									},
+									"scaleFrom": "equipment"
+								},
+								{
+									"trigger": "passive",
+									"type": "stat_flat",
+									"stat": "adventuring:defence",
+									"amount": {
+										"base": 4.5,
+										"scaling": [
+											{
+												"id": "level",
+												"amount": 0.88
+											}
+										]
+									},
+									"scaleFrom": "equipment"
+								},
+								{
+									"trigger": "passive",
+									"type": "stat_flat",
+									"stat": "adventuring:strength",
+									"amount": {
+										"base": 4.5,
+										"scaling": [
+											{
+												"id": "level",
+												"amount": 0.88
+											}
+										]
+									},
+									"scaleFrom": "equipment"
+								},
+								{
+									"trigger": "after_damage_received",
+									"type": "buff",
+									"id": "adventuring:fortify",
+									"target": "self",
+									"amount": 5,
+									"stacks": 2,
+									"chance": 35
+								},
+								{
+									"trigger": "encounter_start",
+									"type": "buff",
+									"id": "adventuring:barrier",
+									"target": "self",
+									"stacks": 8
+								}
+							],
+							"requirements": [
+								{
+									"type": "area_cleared",
+									"area": "adventuring:earth_temple"
+								}
+							],
+							"upgradeMaterials": {
+								"1": [
+									"adventuring:earth_essence",
+									"adventuring:sea_scale"
+								],
+								"4": [
+									"adventuring:knights_crest"
+								],
+								"7": [
+									"adventuring:shadow_essence"
+								]
+							},
+							"tier": 7
+						},
+						{
+							"id": "deep_pearl_amulet",
+							"name": "Deep Pearl Amulet",
+							"media": "melvor:assets/media/bank/amulet_of_incantation.png",
+							"type": "adventuring:amulet",
+							"materials": [
+								{
+									"id": "adventuring:currency",
+									"qty": 280
+								},
+								{
+									"id": "adventuring:parts",
+									"qty": 14
+								}
+							],
+							"effects": [
+								{
+									"trigger": "passive",
+									"type": "stat_flat",
+									"stat": "adventuring:hitpoints",
+									"amount": {
+										"base": 4.5,
+										"scaling": [
+											{
+												"id": "level",
+												"amount": 0.88
+											}
+										]
+									},
+									"scaleFrom": "equipment"
+								},
+								{
+									"trigger": "passive",
+									"type": "stat_flat",
+									"stat": "adventuring:magic",
+									"amount": {
+										"base": 4.5,
+										"scaling": [
+											{
+												"id": "level",
+												"amount": 0.88
+											}
+										]
+									},
+									"scaleFrom": "equipment"
+								},
+								{
+									"trigger": "passive",
+									"type": "stat_flat",
+									"stat": "adventuring:prayer",
+									"amount": {
+										"base": 4.5,
+										"scaling": [
+											{
+												"id": "level",
+												"amount": 0.88
+											}
+										]
+									},
+									"scaleFrom": "equipment"
+								},
+								{
+									"trigger": "heal",
+									"type": "heal_flat",
+									"target": "all",
+									"party": "ally",
+									"amount": 3,
+									"scaling": 0.3
+								},
+								{
+									"trigger": "after_damage_received",
+									"condition": {
+										"type": "hp_crossed_below",
+										"threshold": 30
+									},
+									"limit": "combat",
+									"times": 1,
+									"type": "buff",
+									"id": "adventuring:regeneration",
+									"target": "self",
+									"stacks": 5
+								}
+							],
+							"requirements": [
+								{
+									"type": "area_cleared",
+									"area": "adventuring:earth_temple"
+								}
+							],
+							"upgradeMaterials": {
+								"1": [
+									"adventuring:earth_essence",
+									"adventuring:sea_scale"
+								],
+								"4": [
+									"adventuring:knights_crest"
+								],
+								"7": [
+									"adventuring:shadow_essence"
+								]
+							},
+							"tier": 7
+						},
+						{
+							"id": "krakens_grasp",
+							"name": "Kraken's Grasp",
+							"media": "melvor:assets/media/bank/weapon_crossbow_dragon.png#shade=orange",
+							"type": "adventuring:axe",
+							"materials": [
+								{
+									"id": "adventuring:currency",
+									"qty": 525
+								},
+								{
+									"id": "adventuring:parts",
+									"qty": 21
+								}
+							],
+							"effects": [
+								{
+									"trigger": "passive",
+									"type": "stat_flat",
+									"stat": "adventuring:hitpoints",
+									"amount": {
+										"base": 4.5,
+										"scaling": [
+											{
+												"id": "level",
+												"amount": 0.88
+											}
+										]
+									},
+									"scaleFrom": "equipment"
+								},
+								{
+									"trigger": "passive",
+									"type": "stat_flat",
+									"stat": "adventuring:strength",
+									"amount": {
+										"base": 4.5,
+										"scaling": [
+											{
+												"id": "level",
+												"amount": 0.88
+											}
+										]
+									},
+									"scaleFrom": "equipment"
+								},
+								{
+									"trigger": "passive",
+									"type": "stat_flat",
+									"stat": "adventuring:defence",
+									"amount": {
+										"base": 4.5,
+										"scaling": [
+											{
+												"id": "level",
+												"amount": 0.88
+											}
+										]
+									},
+									"scaleFrom": "equipment"
+								},
+								{
+									"trigger": "after_damage_delivered",
+									"type": "debuff",
+									"id": "adventuring:slow",
+									"target": "target",
+									"stacks": 2,
+									"chance": 50
+								},
+								{
+									"trigger": "after_damage_delivered",
+									"type": "damage_flat",
+									"target": "target",
+									"amount": 10,
+									"scaling": 1,
+									"chance": 25
+								}
+							],
+							"requirements": [
+								{
+									"type": "area_cleared",
+									"area": "adventuring:earth_temple"
+								}
+							],
+							"upgradeMaterials": {
+								"1": [
+									"adventuring:earth_essence",
+									"adventuring:sea_scale"
+								],
+								"4": [
+									"adventuring:knights_crest"
+								],
+								"7": [
+									"adventuring:shadow_essence"
+								]
+							},
+							"tier": 7
+						},
+						{
+							"id": "archons_blade",
+							"name": "Archon's Blade",
+							"media": "melvor:assets/media/bank/weapon_sword_ancient.png",
+							"type": "adventuring:sword2h",
+							"materials": [
+								{
+									"id": "adventuring:currency",
+									"qty": 525
+								},
+								{
+									"id": "adventuring:parts",
+									"qty": 21
+								}
+							],
+							"effects": [
+								{
+									"trigger": "passive",
+									"type": "stat_flat",
+									"stat": "adventuring:hitpoints",
+									"amount": {
+										"base": 4.5,
+										"scaling": [
+											{
+												"id": "level",
+												"amount": 0.88
+											}
+										]
+									},
+									"scaleFrom": "equipment"
+								},
+								{
+									"trigger": "passive",
+									"type": "stat_flat",
+									"stat": "adventuring:strength",
+									"amount": {
+										"base": 4.5,
+										"scaling": [
+											{
+												"id": "level",
+												"amount": 0.88
+											}
+										]
+									},
+									"scaleFrom": "equipment"
+								},
+								{
+									"trigger": "passive",
+									"type": "stat_flat",
+									"stat": "adventuring:prayer",
+									"amount": {
+										"base": 4.5,
+										"scaling": [
+											{
+												"id": "level",
+												"amount": 0.88
+											}
+										]
+									},
+									"scaleFrom": "equipment"
+								},
+								{
+									"trigger": "after_damage_delivered",
+									"type": "buff",
+									"id": "adventuring:might",
+									"target": "self",
+									"stacks": 2,
+									"chance": 40
+								},
+								{
+									"trigger": "kill",
+									"type": "heal_flat",
+									"target": "all",
+									"party": "ally",
+									"amount": 20,
+									"scaling": 2
+								}
+							],
+							"requirements": [
+								{
+									"type": "area_cleared",
+									"area": "adventuring:earth_temple"
+								}
+							],
+							"upgradeMaterials": {
+								"1": [
+									"adventuring:earth_essence",
+									"adventuring:sea_scale"
+								],
+								"4": [
+									"adventuring:knights_crest"
+								],
+								"7": [
+									"adventuring:shadow_essence"
+								]
+							},
+							"tier": 7
+						},
+						{
+							"id": "wings_of_light",
+							"name": "Wings of Light",
+							"media": "melvor:assets/media/bank/cape_of_completion.png",
+							"type": "adventuring:cape",
+							"materials": [
+								{
+									"id": "adventuring:currency",
+									"qty": 350
+								},
+								{
+									"id": "adventuring:parts",
+									"qty": 14
+								}
+							],
+							"effects": [
+								{
+									"trigger": "passive",
+									"type": "stat_flat",
+									"stat": "adventuring:hitpoints",
+									"amount": {
+										"base": 4.5,
+										"scaling": [
+											{
+												"id": "level",
+												"amount": 0.88
+											}
+										]
+									},
+									"scaleFrom": "equipment"
+								},
+								{
+									"trigger": "passive",
+									"type": "stat_flat",
+									"stat": "adventuring:agility",
+									"amount": {
+										"base": 4.5,
+										"scaling": [
+											{
+												"id": "level",
+												"amount": 0.88
+											}
+										]
+									},
+									"scaleFrom": "equipment"
+								},
+								{
+									"trigger": "passive",
+									"type": "stat_flat",
+									"stat": "adventuring:prayer",
+									"amount": {
+										"base": 4.5,
+										"scaling": [
+											{
+												"id": "level",
+												"amount": 0.88
+											}
+										]
+									},
+									"scaleFrom": "equipment"
+								},
+								{
+									"trigger": "after_damage_received",
+									"type": "buff",
+									"id": "adventuring:evasion",
+									"target": "self",
+									"stacks": 3,
+									"chance": 30
+								},
+								{
+									"trigger": "round_start",
+									"type": "heal_flat",
+									"target": "self",
+									"amount": 5,
+									"scaling": 0.5
+								}
+							],
+							"requirements": [
+								{
+									"type": "area_cleared",
+									"area": "adventuring:earth_temple"
+								}
+							],
+							"upgradeMaterials": {
+								"1": [
+									"adventuring:earth_essence",
+									"adventuring:sea_scale"
+								],
+								"4": [
+									"adventuring:knights_crest"
+								],
+								"7": [
+									"adventuring:shadow_essence"
+								]
+							},
+							"tier": 7
+						},
+						{
+							"id": "star_crown",
+							"name": "Star Crown",
+							"media": "melvor:assets/media/bank/fez_amulet.png",
+							"type": "adventuring:helm",
+							"materials": [
+								{
+									"id": "adventuring:currency",
+									"qty": 420
+								},
+								{
+									"id": "adventuring:parts",
+									"qty": 21
+								}
+							],
+							"effects": [
+								{
+									"trigger": "passive",
+									"type": "stat_flat",
+									"stat": "adventuring:hitpoints",
+									"amount": {
+										"base": 4.5,
+										"scaling": [
+											{
+												"id": "level",
+												"amount": 0.88
+											}
+										]
+									},
+									"scaleFrom": "equipment"
+								},
+								{
+									"trigger": "passive",
+									"type": "stat_flat",
+									"stat": "adventuring:magic",
+									"amount": {
+										"base": 4.5,
+										"scaling": [
+											{
+												"id": "level",
+												"amount": 0.88
+											}
+										]
+									},
+									"scaleFrom": "equipment"
+								},
+								{
+									"trigger": "passive",
+									"type": "stat_flat",
+									"stat": "adventuring:defence",
+									"amount": {
+										"base": 4.5,
+										"scaling": [
+											{
+												"id": "level",
+												"amount": 0.88
+											}
+										]
+									},
+									"scaleFrom": "equipment"
+								},
+								{
+									"trigger": "encounter_start",
+									"type": "buff",
+									"id": "adventuring:focus",
+									"target": "all",
+									"party": "ally",
+									"stacks": 5
+								},
+								{
+									"trigger": "spender",
+									"type": "buff",
+									"id": "adventuring:barrier",
+									"target": "self",
+									"stacks": 2
+								}
+							],
+							"requirements": [
+								{
+									"type": "area_cleared",
+									"area": "adventuring:earth_temple"
+								}
+							],
+							"upgradeMaterials": {
+								"1": [
+									"adventuring:earth_essence",
+									"adventuring:sea_scale"
+								],
+								"4": [
+									"adventuring:knights_crest"
+								],
+								"7": [
+									"adventuring:shadow_essence"
+								]
+							},
+							"tier": 7
+						},
+						{
+							"id": "eclipse_ring",
+							"name": "Eclipse Ring",
+							"media": "melvor:assets/media/bank/ring_of_wealth.png",
+							"type": "adventuring:ring",
+							"materials": [
+								{
+									"id": "adventuring:currency",
+									"qty": 210
+								},
+								{
+									"id": "adventuring:parts",
+									"qty": 7
+								}
+							],
+							"effects": [
+								{
+									"trigger": "passive",
+									"type": "stat_flat",
+									"stat": "adventuring:hitpoints",
+									"amount": {
+										"base": 4.5,
+										"scaling": [
+											{
+												"id": "level",
+												"amount": 0.88
+											}
+										]
+									},
+									"scaleFrom": "equipment"
+								},
+								{
+									"trigger": "passive",
+									"type": "stat_flat",
+									"stat": "adventuring:strength",
+									"amount": {
+										"base": 4.5,
+										"scaling": [
+											{
+												"id": "level",
+												"amount": 0.88
+											}
+										]
+									},
+									"scaleFrom": "equipment"
+								},
+								{
+									"trigger": "passive",
+									"type": "stat_flat",
+									"stat": "adventuring:magic",
+									"amount": {
+										"base": 4.5,
+										"scaling": [
+											{
+												"id": "level",
+												"amount": 0.88
+											}
+										]
+									},
+									"scaleFrom": "equipment"
+								},
+								{
+									"trigger": "after_damage_delivered",
+									"type": "buff",
+									"id": "adventuring:might",
+									"target": "self",
+									"stacks": 1,
+									"chance": 25
+								},
+								{
+									"trigger": "after_damage_delivered",
+									"type": "damage_flat",
+									"target": "target",
+									"amount": 8,
+									"scaling": 0.8,
+									"chance": 25
+								}
+							],
+							"requirements": [
+								{
+									"type": "area_cleared",
+									"area": "adventuring:earth_temple"
+								}
+							],
+							"upgradeMaterials": {
+								"1": [
+									"adventuring:earth_essence",
+									"adventuring:sea_scale"
+								],
+								"4": [
+									"adventuring:knights_crest"
+								],
+								"7": [
+									"adventuring:shadow_essence"
+								]
+							},
+							"tier": 7
+						},
+						{
+							"id": "depths_knives",
+							"name": "Depths Throwing Knives",
+							"media": "melvor:assets/media/bank/weapon_throwingknife_dragon.png",
+							"type": "adventuring:knives",
+							"materials": [
+								{
+									"id": "adventuring:currency",
+									"qty": 3500
+								},
+								{
+									"id": "adventuring:big_parts",
+									"qty": 20
+								}
+							],
+							"requirements": [
+								{
+									"type": "dropped"
+								}
+							],
+							"upgradeMaterials": {
+								"1": [
+									"adventuring:living_metal"
+								],
+								"4": [
+									"adventuring:arcane_dust"
+								]
+							},
+							"effects": [
+								{
+									"trigger": "passive",
+									"type": "stat_flat",
+									"stat": "adventuring:hitpoints",
+									"amount": {
+										"base": 4.5,
+										"scaling": [
+											{
+												"id": "level",
+												"amount": 0.88
+											}
+										]
+									},
+									"scaleFrom": "equipment"
+								},
+								{
+									"trigger": "passive",
+									"type": "stat_flat",
+									"stat": "adventuring:agility",
+									"amount": {
+										"base": 4.5,
+										"scaling": [
+											{
+												"id": "level",
+												"amount": 0.88
+											}
+										]
+									},
+									"scaleFrom": "equipment"
+								},
+								{
+									"trigger": "passive",
+									"type": "stat_flat",
+									"stat": "adventuring:strength",
+									"amount": {
+										"base": 4.5,
+										"scaling": [
+											{
+												"id": "level",
+												"amount": 0.88
+											}
+										]
+									},
+									"scaleFrom": "equipment"
+								}
+							],
+							"tier": 7
+						},
+						{
+							"id": "depths_javelin",
+							"name": "Depths Javelin",
+							"media": "melvor:assets/media/bank/weapon_javelin_dragon.png",
+							"type": "adventuring:javelin",
+							"materials": [
+								{
+									"id": "adventuring:currency",
+									"qty": 3800
+								},
+								{
+									"id": "adventuring:big_parts",
+									"qty": 22
+								}
+							],
+							"requirements": [
+								{
+									"type": "dropped"
+								}
+							],
+							"upgradeMaterials": {
+								"1": [
+									"adventuring:living_metal"
+								],
+								"4": [
+									"adventuring:arcane_dust"
+								]
+							},
+							"effects": [
+								{
+									"trigger": "passive",
+									"type": "stat_flat",
+									"stat": "adventuring:hitpoints",
+									"amount": {
+										"base": 4.5,
+										"scaling": [
+											{
+												"id": "level",
+												"amount": 0.88
+											}
+										]
+									},
+									"scaleFrom": "equipment"
+								},
+								{
+									"trigger": "passive",
+									"type": "stat_flat",
+									"stat": "adventuring:agility",
+									"amount": {
+										"base": 4.5,
+										"scaling": [
+											{
+												"id": "level",
+												"amount": 0.88
+											}
+										]
+									},
+									"scaleFrom": "equipment"
+								},
+								{
+									"trigger": "passive",
+									"type": "stat_flat",
+									"stat": "adventuring:strength",
+									"amount": {
+										"base": 4.5,
+										"scaling": [
+											{
+												"id": "level",
+												"amount": 0.88
+											}
+										]
+									},
+									"scaleFrom": "equipment"
+								}
+							],
+							"tier": 7
+						},
+						{
+							"id": "depths_crossbow",
+							"name": "Depths Crossbow",
+							"media": "melvor:assets/media/bank/weapon_crossbow_dragon.png",
+							"type": "adventuring:crossbow",
+							"materials": [
+								{
+									"id": "adventuring:currency",
+									"qty": 4000
+								},
+								{
+									"id": "adventuring:big_parts",
+									"qty": 25
+								}
+							],
+							"requirements": [
+								{
+									"type": "dropped"
+								}
+							],
+							"upgradeMaterials": {
+								"1": [
+									"adventuring:living_metal"
+								],
+								"4": [
+									"adventuring:arcane_dust"
+								]
+							},
+							"effects": [
+								{
+									"trigger": "passive",
+									"type": "stat_flat",
+									"stat": "adventuring:hitpoints",
+									"amount": {
+										"base": 4.5,
+										"scaling": [
+											{
+												"id": "level",
+												"amount": 0.88
+											}
+										]
+									},
+									"scaleFrom": "equipment"
+								},
+								{
+									"trigger": "passive",
+									"type": "stat_flat",
+									"stat": "adventuring:agility",
+									"amount": {
+										"base": 4.5,
+										"scaling": [
+											{
+												"id": "level",
+												"amount": 0.88
+											}
+										]
+									},
+									"scaleFrom": "equipment"
+								},
+								{
+									"trigger": "passive",
+									"type": "stat_flat",
+									"stat": "adventuring:ranged",
+									"amount": {
+										"base": 4.5,
+										"scaling": [
+											{
+												"id": "level",
+												"amount": 0.88
+											}
+										]
+									},
+									"scaleFrom": "equipment"
+								}
+							],
+							"tier": 7
+						},
+						{
+							"id": "depths_mace",
+							"name": "Depths Mace",
+							"media": "melvor:assets/media/bank/weapon_battleaxe_bronze.png",
+							"type": "adventuring:mace",
+							"materials": [
+								{
+									"id": "adventuring:currency",
+									"qty": 3800
+								},
+								{
+									"id": "adventuring:big_parts",
+									"qty": 22
+								}
+							],
+							"requirements": [
+								{
+									"type": "dropped"
+								}
+							],
+							"upgradeMaterials": {
+								"1": [
+									"adventuring:living_metal"
+								],
+								"4": [
+									"adventuring:arcane_dust"
+								]
+							},
+							"effects": [
+								{
+									"trigger": "passive",
+									"type": "stat_flat",
+									"stat": "adventuring:hitpoints",
+									"amount": {
+										"base": 4.5,
+										"scaling": [
+											{
+												"id": "level",
+												"amount": 0.88
+											}
+										]
+									},
+									"scaleFrom": "equipment"
+								},
+								{
+									"trigger": "passive",
+									"type": "stat_flat",
+									"stat": "adventuring:strength",
+									"amount": {
+										"base": 4.5,
+										"scaling": [
+											{
+												"id": "level",
+												"amount": 0.88
+											}
+										]
+									},
+									"scaleFrom": "equipment"
+								}
+							],
+							"tier": 7
+						},
+						{
+							"id": "depths_warhammer",
+							"name": "Depths Warhammer",
+							"media": "melvor:assets/media/bank/weapon_battleaxe_bronze.png",
+							"type": "adventuring:hammer2h",
+							"materials": [
+								{
+									"id": "adventuring:currency",
+									"qty": 4500
+								},
+								{
+									"id": "adventuring:big_parts",
+									"qty": 28
+								}
+							],
+							"requirements": [
+								{
+									"type": "dropped"
+								}
+							],
+							"upgradeMaterials": {
+								"1": [
+									"adventuring:living_metal"
+								],
+								"4": [
+									"adventuring:arcane_dust"
+								]
+							},
+							"effects": [
+								{
+									"trigger": "passive",
+									"type": "stat_flat",
+									"stat": "adventuring:hitpoints",
+									"amount": {
+										"base": 4.5,
+										"scaling": [
+											{
+												"id": "level",
+												"amount": 0.88
+											}
+										]
+									},
+									"scaleFrom": "equipment"
+								},
+								{
+									"trigger": "passive",
+									"type": "stat_flat",
+									"stat": "adventuring:strength",
+									"amount": {
+										"base": 4.5,
+										"scaling": [
+											{
+												"id": "level",
+												"amount": 0.88
+											}
+										]
+									},
+									"scaleFrom": "equipment"
+								}
+							],
+							"tier": 7
+						},
+						{
+							"id": "depths_orb",
+							"name": "Depths Orb",
+							"media": "melvor:assets/media/bank/rune_water.png",
+							"type": "adventuring:orb",
+							"materials": [
+								{
+									"id": "adventuring:currency",
+									"qty": 3500
+								},
+								{
+									"id": "adventuring:arcane_dust",
+									"qty": 30
+								}
+							],
+							"requirements": [
+								{
+									"type": "dropped"
+								}
+							],
+							"upgradeMaterials": {
+								"1": [
+									"adventuring:living_metal"
+								],
+								"4": [
+									"adventuring:arcane_dust"
+								]
+							},
+							"effects": [
+								{
+									"trigger": "passive",
+									"type": "stat_flat",
+									"stat": "adventuring:hitpoints",
+									"amount": {
+										"base": 4.5,
+										"scaling": [
+											{
+												"id": "level",
+												"amount": 0.88
+											}
+										]
+									},
+									"scaleFrom": "equipment"
+								},
+								{
+									"trigger": "passive",
+									"type": "stat_flat",
+									"stat": "adventuring:magic",
+									"amount": {
+										"base": 4.5,
+										"scaling": [
+											{
+												"id": "level",
+												"amount": 0.88
+											}
+										]
+									},
+									"scaleFrom": "equipment"
+								},
+								{
+									"trigger": "passive",
+									"type": "stat_flat",
+									"stat": "adventuring:prayer",
+									"amount": {
+										"base": 4.5,
+										"scaling": [
+											{
+												"id": "level",
+												"amount": 0.88
+											}
+										]
+									},
+									"scaleFrom": "equipment"
+								}
+							],
+							"tier": 7
+						}
+					],
+					"equipmentPools": [
+						{
+							"id": "tier7_realm_of_chaos",
+							"name": "Realm of Chaos Drops (T7)",
+							"items": [
+								"adventuring:depths_knives",
+								"adventuring:depths_javelin",
+								"adventuring:depths_crossbow",
+								"adventuring:depths_mace",
+								"adventuring:depths_warhammer",
+								"adventuring:depths_orb"
+							]
+						}
+					]
+				}
+			}
+		]
+	}
 }

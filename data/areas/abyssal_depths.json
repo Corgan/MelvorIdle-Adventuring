@@ -1,1121 +1,1107 @@
 {
-    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
-    "namespace": "adventuring",
-    "data": {
-        "skillData": [
-            {
-                "skillID": "adventuring:Adventuring",
-                "data": {
-                    "passives": [
-                        {
-                            "id": "pressure_adaptation",
-                            "name": "Pressure Adaptation",
-                            "effects": [
-                                {
-                                    "trigger": "round_start",
-                                    "type": "buff",
-                                    "target": "self",
-                                    "id": "adventuring:fortify",
-                                    "stacks": {
-                                        "base": 2,
-                                        "scaling": []
-                                    }
-                                }
-                            ]
-                        },
-                        {
-                            "id": "bioluminescence",
-                            "name": "Bioluminescence",
-                            "effects": [
-                                {
-                                    "trigger": "after_damage_delivered",
-                                    "type": "debuff",
-                                    "target": "target",
-                                    "id": "adventuring:blind",
-                                    "chance": 25,
-                                    "stacks": {
-                                        "base": 1,
-                                        "scaling": []
-                                    }
-                                }
-                            ]
-                        },
-                        {
-                            "id": "tidal_fury",
-                            "name": "Tidal Fury",
-                            "effects": [
-                                {
-                                    "trigger": "encounter_start",
-                                    "type": "buff",
-                                    "target": "all",
-                                    "party": "ally",
-                                    "id": "adventuring:might",
-                                    "stacks": {
-                                        "base": 4,
-                                        "scaling": []
-                                    }
-                                }
-                            ]
-                        }
-                    ],
-                    "areas": [
-                        {
-                            "id": "abyssal_depths",
-                            "name": "Abyssal Depths",
-                            "media": "melvor:assets/media/skills/fishing/fishing.png#shade=darkblue",
-                            "requirements": [
-                                {
-                                    "type": "skill_level",
-                                    "level": 70
-                                }
-                            ],
-                            "height": 12,
-                            "width": 7,
-                            "floors": [
-                                {
-                                    "monsters": [
-                                        {
-                                            "id": "adventuring:abyssal_leech",
-                                            "weight": 60
-                                        },
-                                        {
-                                            "id": "adventuring:deep_angler",
-                                            "weight": 40
-                                        }
-                                    ],
-                                    "exit": [
-                                        "adventuring:abyssal_leech",
-                                        "adventuring:abyssal_leech",
-                                        "adventuring:deep_angler"
-                                    ]
-                                },
-                                {
-                                    "monsters": [
-                                        {
-                                            "id": "adventuring:abyssal_leech",
-                                            "weight": 40
-                                        },
-                                        {
-                                            "id": "adventuring:deep_angler",
-                                            "weight": 40
-                                        },
-                                        {
-                                            "id": "adventuring:kraken_spawn",
-                                            "weight": 20
-                                        }
-                                    ],
-                                    "exit": [
-                                        "adventuring:deep_angler",
-                                        "adventuring:deep_angler",
-                                        "adventuring:kraken_spawn"
-                                    ]
-                                },
-                                {
-                                    "monsters": [
-                                        {
-                                            "id": "adventuring:deep_angler",
-                                            "weight": 35
-                                        },
-                                        {
-                                            "id": "adventuring:kraken_spawn",
-                                            "weight": 35
-                                        },
-                                        {
-                                            "id": "adventuring:brine_witch",
-                                            "weight": 30
-                                        }
-                                    ],
-                                    "exit": [
-                                        "adventuring:kraken_spawn",
-                                        "adventuring:kraken_spawn",
-                                        "adventuring:brine_witch"
-                                    ]
-                                },
-                                {
-                                    "monsters": [
-                                        {
-                                            "id": "adventuring:kraken_spawn",
-                                            "weight": 30
-                                        },
-                                        {
-                                            "id": "adventuring:brine_witch",
-                                            "weight": 35
-                                        },
-                                        {
-                                            "id": "adventuring:drowned_knight",
-                                            "weight": 35
-                                        }
-                                    ],
-                                    "exit": [
-                                        "adventuring:brine_witch",
-                                        "adventuring:drowned_knight",
-                                        "adventuring:drowned_knight"
-                                    ]
-                                },
-                                {
-                                    "monsters": [
-                                        {
-                                            "id": "adventuring:brine_witch",
-                                            "weight": 30
-                                        },
-                                        {
-                                            "id": "adventuring:drowned_knight",
-                                            "weight": 40
-                                        },
-                                        {
-                                            "id": "adventuring:tidal_elemental",
-                                            "weight": 30
-                                        }
-                                    ],
-                                    "exit": [
-                                        "adventuring:drowned_knight",
-                                        "adventuring:drowned_knight",
-                                        "adventuring:tidal_elemental"
-                                    ]
-                                },
-                                {
-                                    "monsters": [
-                                        {
-                                            "id": "adventuring:drowned_knight",
-                                            "weight": 35
-                                        },
-                                        {
-                                            "id": "adventuring:tidal_elemental",
-                                            "weight": 65
-                                        }
-                                    ],
-                                    "exit": [
-                                        "adventuring:tidal_elemental",
-                                        "adventuring:tidal_elemental",
-                                        "adventuring:the_leviathan"
-                                    ]
-                                }
-                            ]
-                        }
-                    ],
-                    "monsters": [
-                        {
-                            "id": "abyssal_leech",
-                            "name": "Abyssal Leech",
-                            "media": "melvor:assets/media/monsters/leech.png",
-                            "tags": [
-                                "aquatic",
-                                "beast"
-                            ],
-                            "xp": 17,
-                            "stats": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 50
-                                },
-                                {
-                                    "id": "adventuring:defence",
-                                    "amount": 24
-                                },
-                                {
-                                    "id": "adventuring:agility",
-                                    "amount": 72
-                                },
-                                {
-                                    "id": "adventuring:strength",
-                                    "amount": 28
-                                },
-                                {
-                                    "id": "adventuring:ranged",
-                                    "amount": 45
-                                },
-                                {
-                                    "id": "adventuring:magic",
-                                    "amount": 50
-                                },
-                                {
-                                    "id": "adventuring:prayer",
-                                    "amount": 40
-                                }
-                            ],
-                            "generator": "adventuring:abyssal_siphon",
-                            "spender": "adventuring:leeching_swarm",
-                            "passives": [],
-                            "loot": [
-                                {
-                                    "id": "adventuring:currency",
-                                    "qty": 18,
-                                    "type": "currency"
-                                },
-                                {
-                                    "id": "adventuring:parts",
-                                    "qty": 3,
-                                    "type": "salvage"
-                                },
-                                {
-                                    "id": "adventuring:abyssal_scale",
-                                    "qty": 2,
-                                    "type": "materials",
-                                    "chance": 0.4
-                                },
-                                {
-                                    "type": "equipment_pool",
-                                    "pool": "adventuring:tier4_abyssal_depths",
-                                    "chance": 0.03
-                                }
-                            ]
-                        },
-                        {
-                            "id": "deep_angler",
-                            "name": "Deep Angler",
-                            "media": "melvor:assets/media/monsters/leech.png#shade=red",
-                            "tags": [
-                                "aquatic",
-                                "beast"
-                            ],
-                            "xp": 18,
-                            "stats": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 48
-                                },
-                                {
-                                    "id": "adventuring:defence",
-                                    "amount": 24
-                                },
-                                {
-                                    "id": "adventuring:agility",
-                                    "amount": 65
-                                },
-                                {
-                                    "id": "adventuring:strength",
-                                    "amount": 30
-                                },
-                                {
-                                    "id": "adventuring:ranged",
-                                    "amount": 48
-                                },
-                                {
-                                    "id": "adventuring:magic",
-                                    "amount": 58
-                                },
-                                {
-                                    "id": "adventuring:prayer",
-                                    "amount": 42
-                                }
-                            ],
-                            "generator": "adventuring:lure_flash",
-                            "spender": "adventuring:crushing_bite",
-                            "passives": [
-                                "adventuring:bioluminescence"
-                            ],
-                            "loot": [
-                                {
-                                    "id": "adventuring:currency",
-                                    "qty": 20,
-                                    "type": "currency"
-                                },
-                                {
-                                    "id": "adventuring:parts",
-                                    "qty": 3,
-                                    "type": "salvage"
-                                },
-                                {
-                                    "id": "adventuring:abyssal_scale",
-                                    "qty": 2,
-                                    "type": "materials",
-                                    "chance": 0.35
-                                },
-                                {
-                                    "id": "adventuring:deep_pearl",
-                                    "qty": 1,
-                                    "type": "materials",
-                                    "chance": 0.15
-                                },
-                                {
-                                    "type": "equipment_pool",
-                                    "pool": "adventuring:tier4_abyssal_depths",
-                                    "chance": 0.03
-                                }
-                            ]
-                        },
-                        {
-                            "id": "kraken_spawn",
-                            "name": "Kraken Spawn",
-                            "media": "melvor:assets/media/monsters/tentacle.png#shade=purple",
-                            "tags": [
-                                "aquatic",
-                                "beast"
-                            ],
-                            "xp": 18,
-                            "stats": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 55
-                                },
-                                {
-                                    "id": "adventuring:defence",
-                                    "amount": 28
-                                },
-                                {
-                                    "id": "adventuring:agility",
-                                    "amount": 68
-                                },
-                                {
-                                    "id": "adventuring:strength",
-                                    "amount": 32
-                                },
-                                {
-                                    "id": "adventuring:ranged",
-                                    "amount": 55
-                                },
-                                {
-                                    "id": "adventuring:magic",
-                                    "amount": 52
-                                },
-                                {
-                                    "id": "adventuring:prayer",
-                                    "amount": 45
-                                }
-                            ],
-                            "generator": "adventuring:crushing_tentacles",
-                            "spender": "adventuring:death_grip",
-                            "passives": [],
-                            "loot": [
-                                {
-                                    "id": "adventuring:currency",
-                                    "qty": 22,
-                                    "type": "currency"
-                                },
-                                {
-                                    "id": "adventuring:parts",
-                                    "qty": 4,
-                                    "type": "salvage"
-                                },
-                                {
-                                    "id": "adventuring:abyssal_scale",
-                                    "qty": 3,
-                                    "type": "materials",
-                                    "chance": 0.3
-                                },
-                                {
-                                    "id": "adventuring:kraken_ink",
-                                    "qty": 2,
-                                    "type": "materials",
-                                    "chance": 0.25
-                                },
-                                {
-                                    "type": "equipment_pool",
-                                    "pool": "adventuring:tier4_abyssal_depths",
-                                    "chance": 0.03
-                                }
-                            ]
-                        },
-                        {
-                            "id": "brine_witch",
-                            "name": "Brine Witch",
-                            "media": "melvor:assets/media/monsters/water_guard.png#shade=cyan",
-                            "tags": [
-                                "aquatic",
-                                "humanoid",
-                                "mage"
-                            ],
-                            "xp": 18,
-                            "stats": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 46
-                                },
-                                {
-                                    "id": "adventuring:defence",
-                                    "amount": 26
-                                },
-                                {
-                                    "id": "adventuring:agility",
-                                    "amount": 62
-                                },
-                                {
-                                    "id": "adventuring:strength",
-                                    "amount": 22
-                                },
-                                {
-                                    "id": "adventuring:ranged",
-                                    "amount": 50
-                                },
-                                {
-                                    "id": "adventuring:magic",
-                                    "amount": 85
-                                },
-                                {
-                                    "id": "adventuring:prayer",
-                                    "amount": 60
-                                }
-                            ],
-                            "generator": "adventuring:salt_curse",
-                            "spender": "adventuring:tidal_surge",
-                            "passives": [],
-                            "loot": [
-                                {
-                                    "id": "adventuring:currency",
-                                    "qty": 24,
-                                    "type": "currency"
-                                },
-                                {
-                                    "id": "adventuring:parts",
-                                    "qty": 3,
-                                    "type": "salvage"
-                                },
-                                {
-                                    "id": "adventuring:brine_salt",
-                                    "qty": 3,
-                                    "type": "materials",
-                                    "chance": 0.4
-                                },
-                                {
-                                    "id": "adventuring:arcane_dust",
-                                    "qty": 2,
-                                    "type": "materials",
-                                    "chance": 0.25
-                                },
-                                {
-                                    "type": "equipment_pool",
-                                    "pool": "adventuring:tier4_abyssal_depths",
-                                    "chance": 0.03
-                                }
-                            ]
-                        },
-                        {
-                            "id": "drowned_knight",
-                            "name": "Drowned Knight",
-                            "media": "melvor:assets/media/monsters/rune_knight.png#shade=gray",
-                            "tags": [
-                                "aquatic",
-                                "undead",
-                                "humanoid"
-                            ],
-                            "xp": 21,
-                            "stats": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 60
-                                },
-                                {
-                                    "id": "adventuring:defence",
-                                    "amount": 30
-                                },
-                                {
-                                    "id": "adventuring:agility",
-                                    "amount": 55
-                                },
-                                {
-                                    "id": "adventuring:strength",
-                                    "amount": 34
-                                },
-                                {
-                                    "id": "adventuring:ranged",
-                                    "amount": 45
-                                },
-                                {
-                                    "id": "adventuring:magic",
-                                    "amount": 48
-                                },
-                                {
-                                    "id": "adventuring:prayer",
-                                    "amount": 35
-                                }
-                            ],
-                            "generator": "adventuring:corroded_slash",
-                            "spender": "adventuring:anchor_smash",
-                            "passives": [
-                                "adventuring:pressure_adaptation"
-                            ],
-                            "loot": [
-                                {
-                                    "id": "adventuring:currency",
-                                    "qty": 26,
-                                    "type": "currency"
-                                },
-                                {
-                                    "id": "adventuring:parts",
-                                    "qty": 4,
-                                    "type": "salvage"
-                                },
-                                {
-                                    "id": "adventuring:abyssal_scale",
-                                    "qty": 3,
-                                    "type": "materials",
-                                    "chance": 0.35
-                                },
-                                {
-                                    "id": "adventuring:pressure_crystal",
-                                    "qty": 1,
-                                    "type": "materials",
-                                    "chance": 0.2
-                                },
-                                {
-                                    "type": "equipment_pool",
-                                    "pool": "adventuring:tier4_abyssal_depths",
-                                    "chance": 0.03
-                                }
-                            ]
-                        },
-                        {
-                            "id": "tidal_elemental",
-                            "name": "Tidal Elemental",
-                            "media": "melvor:assets/media/monsters/water_golem.png",
-                            "tags": [
-                                "aquatic",
-                                "elemental"
-                            ],
-                            "xp": 21,
-                            "stats": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 62
-                                },
-                                {
-                                    "id": "adventuring:defence",
-                                    "amount": 30
-                                },
-                                {
-                                    "id": "adventuring:agility",
-                                    "amount": 60
-                                },
-                                {
-                                    "id": "adventuring:strength",
-                                    "amount": 32
-                                },
-                                {
-                                    "id": "adventuring:ranged",
-                                    "amount": 52
-                                },
-                                {
-                                    "id": "adventuring:magic",
-                                    "amount": 78
-                                },
-                                {
-                                    "id": "adventuring:prayer",
-                                    "amount": 55
-                                }
-                            ],
-                            "generator": "adventuring:pressure_surge",
-                            "spender": "adventuring:whirlpool",
-                            "passives": [],
-                            "loot": [
-                                {
-                                    "id": "adventuring:currency",
-                                    "qty": 28,
-                                    "type": "currency"
-                                },
-                                {
-                                    "id": "adventuring:parts",
-                                    "qty": 4,
-                                    "type": "salvage"
-                                },
-                                {
-                                    "id": "adventuring:pressure_crystal",
-                                    "qty": 2,
-                                    "type": "materials",
-                                    "chance": 0.3
-                                },
-                                {
-                                    "id": "adventuring:deep_pearl",
-                                    "qty": 1,
-                                    "type": "materials",
-                                    "chance": 0.18
-                                },
-                                {
-                                    "type": "equipment_pool",
-                                    "pool": "adventuring:tier4_abyssal_depths",
-                                    "chance": 0.03
-                                }
-                            ]
-                        },
-                        {
-                            "id": "the_leviathan",
-                            "name": "The Leviathan",
-                            "media": "melvor:assets/media/monsters/tentacle.png#shade=darkblue",
-                            "tags": [
-                                "aquatic",
-                                "beast",
-                                "boss"
-                            ],
-                            "isBoss": true,
-                            "xp": 57,
-                            "stats": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 110
-                                },
-                                {
-                                    "id": "adventuring:defence",
-                                    "amount": 40
-                                },
-                                {
-                                    "id": "adventuring:agility",
-                                    "amount": 65
-                                },
-                                {
-                                    "id": "adventuring:strength",
-                                    "amount": 42
-                                },
-                                {
-                                    "id": "adventuring:ranged",
-                                    "amount": 60
-                                },
-                                {
-                                    "id": "adventuring:magic",
-                                    "amount": 75
-                                },
-                                {
-                                    "id": "adventuring:prayer",
-                                    "amount": 50
-                                }
-                            ],
-                            "generator": "adventuring:crushing_maw",
-                            "spender": "adventuring:abyssal_roar",
-                            "passives": [
-                                "adventuring:tidal_fury",
-                                "adventuring:pressure_adaptation"
-                            ],
-                            "loot": [
-                                {
-                                    "id": "adventuring:currency",
-                                    "qty": 75,
-                                    "type": "currency"
-                                },
-                                {
-                                    "id": "adventuring:big_parts",
-                                    "qty": 3,
-                                    "type": "salvage"
-                                },
-                                {
-                                    "type": "salvage",
-                                    "id": "adventuring:legendary_salvage",
-                                    "qty": 2
-                                },
-                                {
-                                    "id": "adventuring:abyssal_scale",
-                                    "qty": 8,
-                                    "type": "materials",
-                                    "chance": 1
-                                },
-                                {
-                                    "id": "adventuring:deep_pearl",
-                                    "qty": 3,
-                                    "type": "materials",
-                                    "chance": 0.8
-                                },
-                                {
-                                    "id": "adventuring:kraken_ink",
-                                    "qty": 4,
-                                    "type": "materials",
-                                    "chance": 0.7
-                                },
-                                {
-                                    "id": "adventuring:leviathans_heart",
-                                    "qty": 1,
-                                    "type": "materials",
-                                    "chance": 1
-                                },
-                                {
-                                    "type": "equipment_pool",
-                                    "pool": "adventuring:tier4_abyssal_depths",
-                                    "chance": 0.15
-                                }
-                            ]
-                        }
-                    ],
-                    "materials": [
-                        {
-                            "id": "abyssal_scale",
-                            "name": "Abyssal Scale",
-                            "media": "melvor:assets/media/bank/dragonhide_blue.png",
-                            "category": "adventuring:monster_drops"
-                        },
-                        {
-                            "id": "deep_pearl",
-                            "name": "Deep Pearl",
-                            "media": "melvor:assets/media/bank/pearl.png#shade=blue",
-                            "category": "adventuring:monster_drops"
-                        },
-                        {
-                            "id": "kraken_ink",
-                            "name": "Kraken Ink",
-                            "media": "melvor:assets/media/bank/potion_herblore_i.png#shade=navy",
-                            "category": "adventuring:monster_drops"
-                        },
-                        {
-                            "id": "pressure_crystal",
-                            "name": "Pressure Crystal",
-                            "media": "melvor:assets/media/bank/diamond.png#shade=cyan",
-                            "category": "adventuring:monster_drops"
-                        },
-                        {
-                            "id": "brine_salt",
-                            "name": "Brine Salt",
-                            "media": "melvor:assets/media/bank/stardust.png#shade=white",
-                            "category": "adventuring:monster_drops"
-                        },
-                        {
-                            "id": "leviathans_heart",
-                            "name": "Leviathan's Heart",
-                            "media": "melvor:assets/media/bank/ruby.png#shade=red",
-                            "category": "adventuring:boss_drops"
-                        }
-                    ],
-                    "generators": [
-                        {
-                            "id": "abyssal_siphon",
-                            "name": "Abyssal Siphon",
-                            "requirements": [],
-                            "isEnemy": true,
-                            "energy": 25,
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "damage_type": "agility",
-                                            "amount": 12,
-                                            "scaling": 0.4
-                                        },
-                                        {
-                                            "type": "heal_flat",
-                                            "amount": 6,
-                                            "scaling": 0.3
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "lure_flash",
-                            "name": "Lure Flash",
-                            "requirements": [],
-                            "isEnemy": true,
-                            "energy": 28,
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "damage_type": "magic",
-                                            "amount": 14,
-                                            "scaling": 0.4
-                                        },
-                                        {
-                                            "type": "debuff",
-                                            "id": "adventuring:blind",
-                                            "stacks": 1
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "crushing_tentacles",
-                            "name": "Crushing Tentacles",
-                            "requirements": [],
-                            "isEnemy": true,
-                            "energy": 26,
-                            "hits": [
-                                {
-                                    "target": "random",
-                                    "count": 2,
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "damage_type": "strength",
-                                            "amount": 10,
-                                            "scaling": 0.5
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "salt_curse",
-                            "name": "Salt Curse",
-                            "requirements": [],
-                            "isEnemy": true,
-                            "energy": 30,
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "damage_type": "magic",
-                                            "amount": 16,
-                                            "scaling": 0.4
-                                        },
-                                        {
-                                            "type": "debuff",
-                                            "id": "adventuring:poison",
-                                            "stacks": 2
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "corroded_slash",
-                            "name": "Corroded Slash",
-                            "requirements": [],
-                            "isEnemy": true,
-                            "energy": 28,
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "damage_type": "strength",
-                                            "amount": 18,
-                                            "scaling": 0.4
-                                        },
-                                        {
-                                            "type": "debuff",
-                                            "id": "adventuring:weaken",
-                                            "stacks": 1
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "pressure_surge",
-                            "name": "Pressure Surge",
-                            "requirements": [],
-                            "isEnemy": true,
-                            "energy": 32,
-                            "hits": [
-                                {
-                                    "target": "all",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "damage_type": "magic",
-                                            "amount": 12,
-                                            "scaling": 0.4
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "crushing_maw",
-                            "name": "Crushing Maw",
-                            "requirements": [],
-                            "isEnemy": true,
-                            "energy": 35,
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "damage_type": "strength",
-                                            "amount": 25,
-                                            "scaling": 0.45
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ],
-                    "spenders": [
-                        {
-                            "id": "leeching_swarm",
-                            "name": "Leeching Swarm",
-                            "requirements": [],
-                            "isEnemy": true,
-                            "cost": 55,
-                            "hits": [
-                                {
-                                    "target": "all",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "damage_type": "agility",
-                                            "amount": 10,
-                                            "scaling": 0.5
-                                        },
-                                        {
-                                            "type": "heal_flat",
-                                            "amount": 8,
-                                            "scaling": 0.4
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "crushing_bite",
-                            "name": "Crushing Bite",
-                            "requirements": [],
-                            "isEnemy": true,
-                            "cost": 60,
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "damage_type": "strength",
-                                            "amount": 22,
-                                            "scaling": 0.45
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "death_grip",
-                            "name": "Death Grip",
-                            "requirements": [],
-                            "isEnemy": true,
-                            "cost": 65,
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "damage_type": "strength",
-                                            "amount": 18,
-                                            "scaling": 0.4
-                                        },
-                                        {
-                                            "type": "debuff",
-                                            "id": "adventuring:stun",
-                                            "stacks": 1
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "tidal_surge",
-                            "name": "Tidal Surge",
-                            "requirements": [],
-                            "isEnemy": true,
-                            "cost": 70,
-                            "hits": [
-                                {
-                                    "target": "all",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "damage_type": "magic",
-                                            "amount": 20,
-                                            "scaling": 0.4
-                                        },
-                                        {
-                                            "type": "debuff",
-                                            "id": "adventuring:slow",
-                                            "stacks": 2
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "anchor_smash",
-                            "name": "Anchor Smash",
-                            "requirements": [],
-                            "isEnemy": true,
-                            "cost": 75,
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "damage_type": "strength",
-                                            "amount": 28,
-                                            "scaling": 0.45
-                                        },
-                                        {
-                                            "type": "debuff",
-                                            "id": "adventuring:stun",
-                                            "stacks": 1
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "whirlpool",
-                            "name": "Whirlpool",
-                            "requirements": [],
-                            "isEnemy": true,
-                            "cost": 80,
-                            "hits": [
-                                {
-                                    "target": "all",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "damage_type": "magic",
-                                            "amount": 22,
-                                            "scaling": 0.4
-                                        }
-                                    ]
-                                },
-                                {
-                                    "target": "all",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "damage_type": "magic",
-                                            "amount": 12,
-                                            "scaling": 0.5
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "abyssal_roar",
-                            "name": "Abyssal Roar",
-                            "requirements": [],
-                            "isEnemy": true,
-                            "cost": 100,
-                            "hits": [
-                                {
-                                    "target": "all",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "damage_type": "strength",
-                                            "amount": 30,
-                                            "scaling": 0.45
-                                        },
-                                        {
-                                            "type": "debuff",
-                                            "id": "adventuring:fear",
-                                            "stacks": 2
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ]
-                }
-            }
-        ]
-    }
+	"$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+	"namespace": "adventuring",
+	"data": {
+		"skillData": [
+			{
+				"skillID": "adventuring:Adventuring",
+				"data": {
+					"passives": [
+						{
+							"id": "pressure_adaptation",
+							"name": "Pressure Adaptation",
+							"effects": [
+								{
+									"trigger": "round_start",
+									"type": "buff",
+									"target": "self",
+									"id": "adventuring:fortify",
+									"stacks": {
+										"base": 2,
+										"scaling": []
+									}
+								}
+							]
+						},
+						{
+							"id": "bioluminescence",
+							"name": "Bioluminescence",
+							"effects": [
+								{
+									"trigger": "after_damage_delivered",
+									"type": "debuff",
+									"target": "target",
+									"id": "adventuring:blind",
+									"chance": 25,
+									"stacks": {
+										"base": 1,
+										"scaling": []
+									}
+								}
+							]
+						},
+						{
+							"id": "tidal_fury",
+							"name": "Tidal Fury",
+							"effects": [
+								{
+									"trigger": "encounter_start",
+									"type": "buff",
+									"target": "all",
+									"party": "ally",
+									"id": "adventuring:might",
+									"stacks": {
+										"base": 4,
+										"scaling": []
+									}
+								}
+							]
+						}
+					],
+					"areas": [
+						{
+							"id": "abyssal_depths",
+							"name": "Abyssal Depths",
+							"media": "melvor:assets/media/skills/fishing/fishing.png#shade=darkblue",
+							"requirements": [
+								{
+									"type": "area_cleared",
+									"area": "adventuring:crystal_caverns"
+								}
+							],
+							"height": 12,
+							"width": 7,
+							"floors": [
+								{
+									"monsters": [
+										{
+											"id": "adventuring:abyssal_leech",
+											"weight": 60
+										},
+										{
+											"id": "adventuring:deep_angler",
+											"weight": 40
+										}
+									],
+									"exit": [
+										"adventuring:abyssal_leech",
+										"adventuring:abyssal_leech",
+										"adventuring:deep_angler"
+									]
+								},
+								{
+									"monsters": [
+										{
+											"id": "adventuring:abyssal_leech",
+											"weight": 40
+										},
+										{
+											"id": "adventuring:deep_angler",
+											"weight": 40
+										},
+										{
+											"id": "adventuring:kraken_spawn",
+											"weight": 20
+										}
+									],
+									"exit": [
+										"adventuring:deep_angler",
+										"adventuring:deep_angler",
+										"adventuring:kraken_spawn"
+									]
+								},
+								{
+									"monsters": [
+										{
+											"id": "adventuring:deep_angler",
+											"weight": 35
+										},
+										{
+											"id": "adventuring:kraken_spawn",
+											"weight": 35
+										},
+										{
+											"id": "adventuring:brine_witch",
+											"weight": 30
+										}
+									],
+									"exit": [
+										"adventuring:kraken_spawn",
+										"adventuring:kraken_spawn",
+										"adventuring:brine_witch"
+									]
+								},
+								{
+									"monsters": [
+										{
+											"id": "adventuring:kraken_spawn",
+											"weight": 30
+										},
+										{
+											"id": "adventuring:brine_witch",
+											"weight": 35
+										},
+										{
+											"id": "adventuring:drowned_knight",
+											"weight": 35
+										}
+									],
+									"exit": [
+										"adventuring:brine_witch",
+										"adventuring:drowned_knight",
+										"adventuring:drowned_knight"
+									]
+								},
+								{
+									"monsters": [
+										{
+											"id": "adventuring:brine_witch",
+											"weight": 30
+										},
+										{
+											"id": "adventuring:drowned_knight",
+											"weight": 40
+										},
+										{
+											"id": "adventuring:tidal_elemental",
+											"weight": 30
+										}
+									],
+									"exit": [
+										"adventuring:drowned_knight",
+										"adventuring:drowned_knight",
+										"adventuring:tidal_elemental"
+									]
+								},
+								{
+									"monsters": [
+										{
+											"id": "adventuring:drowned_knight",
+											"weight": 35
+										},
+										{
+											"id": "adventuring:tidal_elemental",
+											"weight": 65
+										}
+									],
+									"exit": [
+										"adventuring:tidal_elemental",
+										"adventuring:tidal_elemental",
+										"adventuring:the_leviathan"
+									]
+								}
+							],
+							"tier": 6
+						}
+					],
+					"monsters": [
+						{
+							"id": "abyssal_leech",
+							"name": "Abyssal Leech",
+							"media": "melvor:assets/media/monsters/leech.png",
+							"tags": [
+								"aquatic",
+								"beast"
+							],
+							"xp": 25,
+							"stats": [
+								{
+									"id": "adventuring:hitpoints",
+									"amount": 43
+								},
+								{
+									"id": "adventuring:defence",
+									"amount": 85
+								},
+								{
+									"id": "adventuring:agility",
+									"amount": 68
+								},
+								{
+									"id": "adventuring:strength",
+									"amount": 568
+								},
+								{
+									"id": "adventuring:magic",
+									"amount": 43
+								},
+								{
+									"id": "adventuring:ranged",
+									"amount": 43
+								},
+								{
+									"id": "adventuring:prayer",
+									"amount": 85
+								}
+							],
+							"generator": "adventuring:abyssal_siphon",
+							"spender": "adventuring:leeching_swarm",
+							"passives": [],
+							"loot": [
+								{
+									"id": "adventuring:currency",
+									"qty": 18,
+									"type": "currency"
+								},
+								{
+									"id": "adventuring:parts",
+									"qty": 3,
+									"type": "salvage"
+								},
+								{
+									"id": "adventuring:abyssal_scale",
+									"qty": 2,
+									"type": "materials",
+									"chance": 0.4
+								},
+								{
+									"type": "equipment_pool",
+									"pool": "adventuring:tier4_abyssal_depths",
+									"chance": 0.03
+								}
+							]
+						},
+						{
+							"id": "deep_angler",
+							"name": "Deep Angler",
+							"media": "melvor:assets/media/monsters/leech.png#shade=red",
+							"tags": [
+								"aquatic",
+								"beast"
+							],
+							"xp": 25,
+							"stats": [
+								{
+									"id": "adventuring:hitpoints",
+									"amount": 46
+								},
+								{
+									"id": "adventuring:defence",
+									"amount": 91
+								},
+								{
+									"id": "adventuring:agility",
+									"amount": 73
+								},
+								{
+									"id": "adventuring:strength",
+									"amount": 608
+								},
+								{
+									"id": "adventuring:magic",
+									"amount": 46
+								},
+								{
+									"id": "adventuring:ranged",
+									"amount": 46
+								},
+								{
+									"id": "adventuring:prayer",
+									"amount": 91
+								}
+							],
+							"generator": "adventuring:lure_flash",
+							"spender": "adventuring:crushing_bite",
+							"passives": [
+								"adventuring:bioluminescence"
+							],
+							"loot": [
+								{
+									"id": "adventuring:currency",
+									"qty": 20,
+									"type": "currency"
+								},
+								{
+									"id": "adventuring:parts",
+									"qty": 3,
+									"type": "salvage"
+								},
+								{
+									"id": "adventuring:abyssal_scale",
+									"qty": 2,
+									"type": "materials",
+									"chance": 0.35
+								},
+								{
+									"id": "adventuring:deep_pearl",
+									"qty": 1,
+									"type": "materials",
+									"chance": 0.15
+								},
+								{
+									"type": "equipment_pool",
+									"pool": "adventuring:tier4_abyssal_depths",
+									"chance": 0.03
+								}
+							]
+						},
+						{
+							"id": "kraken_spawn",
+							"name": "Kraken Spawn",
+							"media": "melvor:assets/media/monsters/tentacle.png#shade=purple",
+							"tags": [
+								"aquatic",
+								"beast"
+							],
+							"xp": 25,
+							"stats": [
+								{
+									"id": "adventuring:hitpoints",
+									"amount": 49
+								},
+								{
+									"id": "adventuring:defence",
+									"amount": 97
+								},
+								{
+									"id": "adventuring:agility",
+									"amount": 78
+								},
+								{
+									"id": "adventuring:strength",
+									"amount": 648
+								},
+								{
+									"id": "adventuring:magic",
+									"amount": 49
+								},
+								{
+									"id": "adventuring:ranged",
+									"amount": 49
+								},
+								{
+									"id": "adventuring:prayer",
+									"amount": 97
+								}
+							],
+							"generator": "adventuring:crushing_tentacles",
+							"spender": "adventuring:death_grip",
+							"passives": [],
+							"loot": [
+								{
+									"id": "adventuring:currency",
+									"qty": 22,
+									"type": "currency"
+								},
+								{
+									"id": "adventuring:parts",
+									"qty": 4,
+									"type": "salvage"
+								},
+								{
+									"id": "adventuring:abyssal_scale",
+									"qty": 3,
+									"type": "materials",
+									"chance": 0.3
+								},
+								{
+									"id": "adventuring:kraken_ink",
+									"qty": 2,
+									"type": "materials",
+									"chance": 0.25
+								},
+								{
+									"type": "equipment_pool",
+									"pool": "adventuring:tier4_abyssal_depths",
+									"chance": 0.03
+								}
+							]
+						},
+						{
+							"id": "brine_witch",
+							"name": "Brine Witch",
+							"media": "melvor:assets/media/monsters/water_guard.png#shade=cyan",
+							"tags": [
+								"aquatic",
+								"humanoid",
+								"mage"
+							],
+							"xp": 25,
+							"stats": [
+								{
+									"id": "adventuring:hitpoints",
+									"amount": 52
+								},
+								{
+									"id": "adventuring:defence",
+									"amount": 103
+								},
+								{
+									"id": "adventuring:agility",
+									"amount": 83
+								},
+								{
+									"id": "adventuring:strength",
+									"amount": 52
+								},
+								{
+									"id": "adventuring:magic",
+									"amount": 688
+								},
+								{
+									"id": "adventuring:ranged",
+									"amount": 52
+								},
+								{
+									"id": "adventuring:prayer",
+									"amount": 103
+								}
+							],
+							"generator": "adventuring:salt_curse",
+							"spender": "adventuring:tidal_surge",
+							"passives": [],
+							"loot": [
+								{
+									"id": "adventuring:currency",
+									"qty": 24,
+									"type": "currency"
+								},
+								{
+									"id": "adventuring:parts",
+									"qty": 3,
+									"type": "salvage"
+								},
+								{
+									"id": "adventuring:brine_salt",
+									"qty": 3,
+									"type": "materials",
+									"chance": 0.4
+								},
+								{
+									"id": "adventuring:arcane_dust",
+									"qty": 2,
+									"type": "materials",
+									"chance": 0.25
+								},
+								{
+									"type": "equipment_pool",
+									"pool": "adventuring:tier4_abyssal_depths",
+									"chance": 0.03
+								}
+							]
+						},
+						{
+							"id": "drowned_knight",
+							"name": "Drowned Knight",
+							"media": "melvor:assets/media/monsters/rune_knight.png#shade=gray",
+							"tags": [
+								"aquatic",
+								"undead",
+								"humanoid"
+							],
+							"xp": 25,
+							"stats": [
+								{
+									"id": "adventuring:hitpoints",
+									"amount": 55
+								},
+								{
+									"id": "adventuring:defence",
+									"amount": 109
+								},
+								{
+									"id": "adventuring:agility",
+									"amount": 87
+								},
+								{
+									"id": "adventuring:strength",
+									"amount": 728
+								},
+								{
+									"id": "adventuring:magic",
+									"amount": 55
+								},
+								{
+									"id": "adventuring:ranged",
+									"amount": 55
+								},
+								{
+									"id": "adventuring:prayer",
+									"amount": 109
+								}
+							],
+							"generator": "adventuring:corroded_slash",
+							"spender": "adventuring:anchor_smash",
+							"passives": [
+								"adventuring:pressure_adaptation"
+							],
+							"loot": [
+								{
+									"id": "adventuring:currency",
+									"qty": 26,
+									"type": "currency"
+								},
+								{
+									"id": "adventuring:parts",
+									"qty": 4,
+									"type": "salvage"
+								},
+								{
+									"id": "adventuring:abyssal_scale",
+									"qty": 3,
+									"type": "materials",
+									"chance": 0.35
+								},
+								{
+									"id": "adventuring:pressure_crystal",
+									"qty": 1,
+									"type": "materials",
+									"chance": 0.2
+								},
+								{
+									"type": "equipment_pool",
+									"pool": "adventuring:tier4_abyssal_depths",
+									"chance": 0.03
+								}
+							]
+						},
+						{
+							"id": "tidal_elemental",
+							"name": "Tidal Elemental",
+							"media": "melvor:assets/media/monsters/water_golem.png",
+							"tags": [
+								"aquatic",
+								"elemental"
+							],
+							"xp": 25,
+							"stats": [
+								{
+									"id": "adventuring:hitpoints",
+									"amount": 58
+								},
+								{
+									"id": "adventuring:defence",
+									"amount": 115
+								},
+								{
+									"id": "adventuring:agility",
+									"amount": 92
+								},
+								{
+									"id": "adventuring:strength",
+									"amount": 768
+								},
+								{
+									"id": "adventuring:magic",
+									"amount": 58
+								},
+								{
+									"id": "adventuring:ranged",
+									"amount": 58
+								},
+								{
+									"id": "adventuring:prayer",
+									"amount": 115
+								}
+							],
+							"generator": "adventuring:pressure_surge",
+							"spender": "adventuring:whirlpool",
+							"passives": [],
+							"loot": [
+								{
+									"id": "adventuring:currency",
+									"qty": 28,
+									"type": "currency"
+								},
+								{
+									"id": "adventuring:parts",
+									"qty": 4,
+									"type": "salvage"
+								},
+								{
+									"id": "adventuring:pressure_crystal",
+									"qty": 2,
+									"type": "materials",
+									"chance": 0.3
+								},
+								{
+									"id": "adventuring:deep_pearl",
+									"qty": 1,
+									"type": "materials",
+									"chance": 0.18
+								},
+								{
+									"type": "equipment_pool",
+									"pool": "adventuring:tier4_abyssal_depths",
+									"chance": 0.03
+								}
+							]
+						},
+						{
+							"id": "the_leviathan",
+							"name": "The Leviathan",
+							"media": "melvor:assets/media/monsters/tentacle.png#shade=darkblue",
+							"tags": [
+								"aquatic",
+								"beast",
+								"boss"
+							],
+							"isBoss": true,
+							"xp": 75,
+							"stats": [
+								{
+									"id": "adventuring:hitpoints",
+									"amount": 237
+								},
+								{
+									"id": "adventuring:defence",
+									"amount": 153
+								},
+								{
+									"id": "adventuring:agility",
+									"amount": 123
+								},
+								{
+									"id": "adventuring:strength",
+									"amount": 1021
+								},
+								{
+									"id": "adventuring:magic",
+									"amount": 77
+								},
+								{
+									"id": "adventuring:ranged",
+									"amount": 77
+								},
+								{
+									"id": "adventuring:prayer",
+									"amount": 153
+								}
+							],
+							"generator": "adventuring:crushing_maw",
+							"spender": "adventuring:abyssal_roar",
+							"passives": [
+								"adventuring:tidal_fury",
+								"adventuring:pressure_adaptation"
+							],
+							"loot": [
+								{
+									"id": "adventuring:currency",
+									"qty": 75,
+									"type": "currency"
+								},
+								{
+									"id": "adventuring:big_parts",
+									"qty": 3,
+									"type": "salvage"
+								},
+								{
+									"type": "salvage",
+									"id": "adventuring:legendary_salvage",
+									"qty": 2
+								},
+								{
+									"id": "adventuring:abyssal_scale",
+									"qty": 8,
+									"type": "materials",
+									"chance": 1
+								},
+								{
+									"id": "adventuring:deep_pearl",
+									"qty": 3,
+									"type": "materials",
+									"chance": 0.8
+								},
+								{
+									"id": "adventuring:kraken_ink",
+									"qty": 4,
+									"type": "materials",
+									"chance": 0.7
+								},
+								{
+									"id": "adventuring:leviathans_heart",
+									"qty": 1,
+									"type": "materials",
+									"chance": 1
+								},
+								{
+									"type": "equipment_pool",
+									"pool": "adventuring:tier4_abyssal_depths",
+									"chance": 0.15
+								}
+							]
+						}
+					],
+					"materials": [
+						{
+							"id": "abyssal_scale",
+							"name": "Abyssal Scale",
+							"media": "melvor:assets/media/bank/dragonhide_blue.png",
+							"category": "adventuring:monster_drops"
+						},
+						{
+							"id": "deep_pearl",
+							"name": "Deep Pearl",
+							"media": "melvor:assets/media/bank/pearl.png#shade=blue",
+							"category": "adventuring:monster_drops"
+						},
+						{
+							"id": "kraken_ink",
+							"name": "Kraken Ink",
+							"media": "melvor:assets/media/bank/potion_herblore_i.png#shade=navy",
+							"category": "adventuring:monster_drops"
+						},
+						{
+							"id": "pressure_crystal",
+							"name": "Pressure Crystal",
+							"media": "melvor:assets/media/bank/diamond.png#shade=cyan",
+							"category": "adventuring:monster_drops"
+						},
+						{
+							"id": "brine_salt",
+							"name": "Brine Salt",
+							"media": "melvor:assets/media/bank/stardust.png#shade=white",
+							"category": "adventuring:monster_drops"
+						},
+						{
+							"id": "leviathans_heart",
+							"name": "Leviathan's Heart",
+							"media": "melvor:assets/media/bank/ruby.png#shade=red",
+							"category": "adventuring:boss_drops"
+						}
+					],
+					"generators": [
+						{
+							"id": "abyssal_siphon",
+							"name": "Abyssal Siphon",
+							"requirements": [],
+							"isEnemy": true,
+							"energy": 25,
+							"hits": [
+								{
+									"target": "front",
+									"party": "enemy",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"amount": 6,
+											"scaling": 0.4
+										},
+										{
+											"type": "heal_flat",
+											"amount": 6,
+											"scaling": 0.3
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "lure_flash",
+							"name": "Lure Flash",
+							"requirements": [],
+							"isEnemy": true,
+							"energy": 28,
+							"hits": [
+								{
+									"target": "front",
+									"party": "enemy",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"amount": 7,
+											"scaling": 0.4
+										},
+										{
+											"type": "debuff",
+											"id": "adventuring:blind",
+											"stacks": 1
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "crushing_tentacles",
+							"name": "Crushing Tentacles",
+							"requirements": [],
+							"isEnemy": true,
+							"energy": 26,
+							"hits": [
+								{
+									"target": "random",
+									"count": 2,
+									"effects": [
+										{
+											"type": "damage_flat",
+											"amount": 5,
+											"scaling": 0.5
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "salt_curse",
+							"name": "Salt Curse",
+							"requirements": [],
+							"isEnemy": true,
+							"energy": 30,
+							"hits": [
+								{
+									"target": "front",
+									"party": "enemy",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"amount": 8,
+											"scaling": 0.4
+										},
+										{
+											"type": "debuff",
+											"id": "adventuring:poison",
+											"stacks": 2
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "corroded_slash",
+							"name": "Corroded Slash",
+							"requirements": [],
+							"isEnemy": true,
+							"energy": 28,
+							"hits": [
+								{
+									"target": "front",
+									"party": "enemy",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"amount": 9,
+											"scaling": 0.4
+										},
+										{
+											"type": "debuff",
+											"id": "adventuring:weaken",
+											"stacks": 1
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "pressure_surge",
+							"name": "Pressure Surge",
+							"requirements": [],
+							"isEnemy": true,
+							"energy": 32,
+							"hits": [
+								{
+									"target": "all",
+									"party": "enemy",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"amount": 6,
+											"scaling": 0.4
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "crushing_maw",
+							"name": "Crushing Maw",
+							"requirements": [],
+							"isEnemy": true,
+							"energy": 35,
+							"hits": [
+								{
+									"target": "front",
+									"party": "enemy",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"amount": 13,
+											"scaling": 0.45
+										}
+									]
+								}
+							]
+						}
+					],
+					"spenders": [
+						{
+							"id": "leeching_swarm",
+							"name": "Leeching Swarm",
+							"requirements": [],
+							"isEnemy": true,
+							"cost": 55,
+							"hits": [
+								{
+									"target": "all",
+									"party": "enemy",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"amount": 5,
+											"scaling": 0.5
+										},
+										{
+											"type": "heal_flat",
+											"amount": 8,
+											"scaling": 0.4
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "crushing_bite",
+							"name": "Crushing Bite",
+							"requirements": [],
+							"isEnemy": true,
+							"cost": 60,
+							"hits": [
+								{
+									"target": "front",
+									"party": "enemy",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"amount": 11,
+											"scaling": 0.45
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "death_grip",
+							"name": "Death Grip",
+							"requirements": [],
+							"isEnemy": true,
+							"cost": 65,
+							"hits": [
+								{
+									"target": "front",
+									"party": "enemy",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"amount": 9,
+											"scaling": 0.4
+										},
+										{
+											"type": "debuff",
+											"id": "adventuring:stun",
+											"stacks": 1
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "tidal_surge",
+							"name": "Tidal Surge",
+							"requirements": [],
+							"isEnemy": true,
+							"cost": 70,
+							"hits": [
+								{
+									"target": "all",
+									"party": "enemy",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"amount": 10,
+											"scaling": 0.4
+										},
+										{
+											"type": "debuff",
+											"id": "adventuring:slow",
+											"stacks": 2
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "anchor_smash",
+							"name": "Anchor Smash",
+							"requirements": [],
+							"isEnemy": true,
+							"cost": 75,
+							"hits": [
+								{
+									"target": "front",
+									"party": "enemy",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"amount": 14,
+											"scaling": 0.45
+										},
+										{
+											"type": "debuff",
+											"id": "adventuring:stun",
+											"stacks": 1
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "whirlpool",
+							"name": "Whirlpool",
+							"requirements": [],
+							"isEnemy": true,
+							"cost": 80,
+							"hits": [
+								{
+									"target": "all",
+									"party": "enemy",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"amount": 11,
+											"scaling": 0.4
+										}
+									]
+								},
+								{
+									"target": "all",
+									"party": "enemy",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"amount": 6,
+											"scaling": 0.5
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "abyssal_roar",
+							"name": "Abyssal Roar",
+							"requirements": [],
+							"isEnemy": true,
+							"cost": 100,
+							"hits": [
+								{
+									"target": "all",
+									"party": "enemy",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"amount": 15,
+											"scaling": 0.45
+										},
+										{
+											"type": "debuff",
+											"id": "adventuring:fear",
+											"stacks": 2
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
+		]
+	}
 }

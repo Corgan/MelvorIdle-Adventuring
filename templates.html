@@ -1220,82 +1220,7 @@
 
         <!-- Run History Tab -->
         <div id="runs-content" class="col-12 d-none">
-            <!-- Run List View -->
-            <div id="runs-list-view">
-                <div class="col-12 p-3">
-                    <div class="block block-rounded bg-combat-dark p-3">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h5 class="font-w600 text-info m-0"><i class="fa fa-history mr-2"></i>Recent Runs</h5>
-                            <small class="text-muted">Last 50 runs (session only)</small>
-                        </div>
-                        <div id="runs-list" class="row no-gutters"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Run Details View (hidden by default) -->
-            <div id="runs-details-view" class="d-none">
-                <div class="col-12 p-3">
-                    <button id="runs-back-btn" class="btn btn-sm btn-alt-info mb-3">
-                        <i class="fa fa-arrow-left mr-1"></i> Back to Run List
-                    </button>
-                    <div class="block block-rounded bg-combat-dark p-3">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <div>
-                                <h5 id="run-detail-title" class="font-w600 text-warning m-0">Run Details</h5>
-                                <small id="run-detail-subtitle" class="text-muted"></small>
-                            </div>
-                            <div id="run-detail-badges"></div>
-                        </div>
-                        
-                        <!-- Run Stats Summary -->
-                        <div class="row mb-3" id="run-detail-stats">
-                            <div class="col-6 col-md-3 text-center mb-2">
-                                <div class="block block-rounded-double bg-combat-inner-dark p-2">
-                                    <div class="text-danger font-w700" id="run-stat-damage-dealt">0</div>
-                                    <small class="text-muted">Damage Dealt</small>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-3 text-center mb-2">
-                                <div class="block block-rounded-double bg-combat-inner-dark p-2">
-                                    <div class="text-warning font-w700" id="run-stat-damage-taken">0</div>
-                                    <small class="text-muted">Damage Taken</small>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-3 text-center mb-2">
-                                <div class="block block-rounded-double bg-combat-inner-dark p-2">
-                                    <div class="text-success font-w700" id="run-stat-healing">0</div>
-                                    <small class="text-muted">Healing Done</small>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-3 text-center mb-2">
-                                <div class="block block-rounded-double bg-combat-inner-dark p-2">
-                                    <div class="text-info font-w700" id="run-stat-turns">0</div>
-                                    <small class="text-muted">Total Turns</small>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Abilities Used -->
-                        <div class="mb-3">
-                            <h6 class="font-w600 text-muted mb-2">Abilities Used</h6>
-                            <div id="run-detail-abilities" class="d-flex flex-wrap"></div>
-                        </div>
-
-                        <!-- Monsters Fought -->
-                        <div class="mb-3">
-                            <h6 class="font-w600 text-muted mb-2">Monsters Fought</h6>
-                            <div id="run-detail-monsters" class="row no-gutters"></div>
-                        </div>
-
-                        <!-- Encounter Breakdown -->
-                        <div>
-                            <h6 class="font-w600 text-muted mb-2">Encounter Breakdown</h6>
-                            <div id="run-detail-encounters" class="row no-gutters"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <div id="runs-container" class="p-2"></div>
         </div>
 
         <!-- Stats Tab -->
@@ -1306,58 +1231,6 @@
                     <div class="row" id="global-stats-list"></div>
                 </div>
             </div>
-        </div>
-    </div>
-</template>
-
-<!-- Run List Item Template -->
-<template id="adventuring-run-list-item-template">
-    <div class="col-12 p-1">
-        <div id="card" class="block block-rounded-double bg-combat-inner-dark p-2 mb-0 d-flex align-items-center pointer" style="cursor: pointer;">
-            <img id="area-icon" class="skill-icon-md mr-3 flex-shrink-0" src="">
-            <div class="flex-grow-1" style="min-width: 0;">
-                <div class="d-flex justify-content-between align-items-center mb-1">
-                    <span id="area-name" class="font-w600 text-white text-truncate"></span>
-                    <div id="badges" class="d-flex"></div>
-                </div>
-                <div class="d-flex justify-content-between align-items-center">
-                    <div class="d-flex align-items-center">
-                        <small class="text-muted mr-3"><i class="fa fa-sword mr-1"></i><span id="damage-dealt">0</span> dmg</small>
-                        <small class="text-muted mr-3"><i class="fa fa-shield mr-1"></i><span id="damage-taken">0</span> taken</small>
-                        <small class="text-muted"><i class="fa fa-clock mr-1"></i><span id="turns">0</span> turns</small>
-                    </div>
-                    <small id="encounters-count" class="text-info"></small>
-                </div>
-            </div>
-            <i class="fa fa-chevron-right ml-2 text-muted"></i>
-        </div>
-    </div>
-</template>
-
-<!-- Run Encounter Card Template -->
-<template id="adventuring-run-encounter-template">
-    <div class="col-12 col-md-6 p-1">
-        <div id="card" class="block block-rounded-double bg-combat-inner-dark p-2 mb-0">
-            <div class="d-flex justify-content-between align-items-center mb-1">
-                <span id="encounter-num" class="font-w600 text-info"></span>
-            </div>
-            <div class="d-flex justify-content-between">
-                <small class="text-muted"><span class="text-danger" id="enc-damage-dealt">0</span> dealt</small>
-                <small class="text-muted"><span class="text-warning" id="enc-damage-taken">0</span> taken</small>
-                <small class="text-muted"><span class="text-info" id="enc-turns">0</span> turns</small>
-            </div>
-        </div>
-    </div>
-</template>
-
-<!-- Run Monster Damage Template -->
-<template id="adventuring-run-monster-template">
-    <div class="col-6 col-md-4 col-lg-3 p-1">
-        <div id="card" class="block block-rounded-double bg-combat-inner-dark p-2 mb-0 text-center">
-            <img id="monster-icon" class="skill-icon-sm mb-1" src="">
-            <div id="monster-name" class="font-size-xs text-truncate text-white"></div>
-            <small class="text-danger"><span id="damage-to">0</span> dealt</small>
-            <small class="text-warning ml-2"><span id="damage-from">0</span> taken</small>
         </div>
     </div>
 </template>
@@ -2244,6 +2117,231 @@
             <span class="badge" id="typeBadge"></span>
             <small class="text-muted ml-2 text-right" id="qty" style="min-width: 50px;">-</small>
             <small class="text-muted ml-2 text-right" id="chance" style="min-width: 50px;">-</small>
+        </div>
+    </div>
+</template>
+
+<!-- Run History Templates -->
+<template id="adventuring-run-history-template">
+    <div id="page" class="row no-gutters d-none" style="overflow-x: hidden;">
+        <div id="header" class="col-12">
+            <button id="back" class="btn btn-alt-info ml-3 mr-3 mb-3 mt-2 position-absolute" style="z-index: 10;">Back to Town</button>
+            <h3 class="font-w700 text-combat-smoke text-center m-0 mt-2">Run History</h3>
+        </div>
+        <div id="leftColumn" class="col-12 col-md-4 adventuring-scrollbar" style="max-height: 70vh; overflow-y: auto; overflow-x: hidden;">
+            <div class="block-content p-2">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <small class="text-muted" id="runCount">0 runs</small>
+                    <button id="clearAll" class="btn btn-sm btn-outline-danger">Clear All</button>
+                </div>
+                <div id="runList"></div>
+                <div id="emptyState" class="text-center text-muted p-4">
+                    <i class="fa fa-history fa-2x mb-2"></i>
+                    <div>No runs recorded yet</div>
+                    <small>Complete a dungeon run to see it here</small>
+                </div>
+            </div>
+        </div>
+        <div id="rightColumn" class="col-12 col-md-8 adventuring-scrollbar" style="max-height: 70vh; overflow-y: auto; overflow-x: hidden;">
+            <div id="detailPanel" class="block-content p-2"></div>
+        </div>
+    </div>
+</template>
+
+<template id="adventuring-run-list-item-template">
+    <div id="item" class="block block-rounded bg-combat-inner-dark p-2 mb-2 pointer-enabled" style="cursor: pointer;">
+        <div class="d-flex align-items-center">
+            <span id="outcomeIcon" class="mr-2" style="font-size: 1.2rem;"></span>
+            <div class="flex-grow-1">
+                <div class="d-flex justify-content-between">
+                    <span id="areaName" class="font-w600"></span>
+                    <small id="difficulty" class="badge"></small>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <small class="text-muted"><span id="turns">0</span>t</small>
+                    <small class="text-muted"><span id="damage">0</span> dmg</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="adventuring-run-summary-template">
+    <div id="summary">
+        <div class="d-flex align-items-center mb-3">
+            <img id="areaIcon" class="skill-icon-sm mr-2" src="">
+            <div>
+                <h5 id="areaName" class="font-w600 text-combat-smoke m-0"></h5>
+                <div>
+                    <span id="difficulty" class="badge mr-2"></span>
+                    <span id="outcome" class="badge"></span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mb-3">
+            <div class="col-4 text-center">
+                <div class="font-size-lg font-w600" id="totalTurns">0</div>
+                <small class="text-muted">Turns</small>
+            </div>
+            <div class="col-4 text-center">
+                <div class="font-size-lg font-w600" id="encounterCount">0</div>
+                <small class="text-muted">Encounters</small>
+            </div>
+            <div class="col-4 text-center">
+                <div class="font-size-lg font-w600" id="partySize">0</div>
+                <small class="text-muted">Heroes</small>
+            </div>
+        </div>
+        
+        <h6 class="font-w600 text-combat-smoke mb-2">Party Breakdown</h6>
+        <div id="heroStats" class="block block-rounded bg-combat-inner-dark p-2 mb-3"></div>
+        
+        <h6 class="font-w600 text-combat-smoke mb-2">Top Abilities</h6>
+        <div id="abilityStats" class="block block-rounded bg-combat-inner-dark p-2 mb-3"></div>
+        
+        <h6 class="font-w600 text-combat-smoke mb-2">Monsters Faced</h6>
+        <div id="monsterStats" class="block block-rounded bg-combat-inner-dark p-2 mb-3"></div>
+        
+        <button id="viewTimeline" class="btn btn-block btn-outline-info">View Encounter Timeline</button>
+    </div>
+</template>
+
+<template id="adventuring-encounter-timeline-template">
+    <div id="timeline">
+        <div class="d-flex align-items-center mb-3">
+            <button id="backToSummary" class="btn btn-sm btn-alt-info mr-3">
+                <i class="fa fa-arrow-left"></i> Back
+            </button>
+            <h5 class="font-w600 text-combat-smoke m-0">Encounter Timeline</h5>
+        </div>
+        
+        <div class="row mb-3">
+            <div class="col-4 text-center">
+                <div class="font-size-lg font-w600" id="totalTurns">0</div>
+                <small class="text-muted">Turns</small>
+            </div>
+            <div class="col-4 text-center">
+                <div class="font-size-lg font-w600 text-success" id="totalDealt">0</div>
+                <small class="text-muted">Dmg Dealt</small>
+            </div>
+            <div class="col-4 text-center">
+                <div class="font-size-lg font-w600 text-danger" id="totalTaken">0</div>
+                <small class="text-muted">Dmg Taken</small>
+            </div>
+        </div>
+        
+        <div id="snakeContainer" class="position-relative"></div>
+    </div>
+</template>
+
+<template id="adventuring-timeline-row-template">
+    <div id="row" class="d-flex mb-2" style="gap: 8px;"></div>
+</template>
+
+<template id="adventuring-encounter-tile-template">
+    <div id="tile" class="block block-rounded text-center p-2 pointer-enabled" style="width: 120px; min-height: 100px; cursor: pointer;">
+        <div id="tileType" class="font-size-xs text-muted mb-1"></div>
+        <div id="monsters" class="d-flex justify-content-center mb-1" style="gap: 2px;"></div>
+        <div class="font-size-sm">
+            <span id="turns" class="text-info">0</span>t
+        </div>
+        <div class="font-size-xs">
+            <span class="text-success">+<span id="dealt">0</span></span>
+            <span class="text-danger">-<span id="taken">0</span></span>
+        </div>
+    </div>
+</template>
+
+<template id="adventuring-encounter-detail-template">
+    <div id="detail">
+        <div class="d-flex align-items-center mb-3">
+            <button id="backToTimeline" class="btn btn-sm btn-alt-info mr-3">
+                <i class="fa fa-arrow-left"></i> Back
+            </button>
+            <h5 class="font-w600 text-combat-smoke m-0">Encounter <span id="encounterNum">#1</span></h5>
+            <span id="tileType" class="badge ml-2"></span>
+        </div>
+        
+        <div class="row mb-3">
+            <div class="col-3 text-center">
+                <div class="font-size-lg font-w600" id="turns">0</div>
+                <small class="text-muted">Turns</small>
+            </div>
+            <div class="col-3 text-center">
+                <div class="font-size-lg font-w600 text-success" id="dealt">0</div>
+                <small class="text-muted">Dealt</small>
+            </div>
+            <div class="col-3 text-center">
+                <div class="font-size-lg font-w600 text-danger" id="taken">0</div>
+                <small class="text-muted">Taken</small>
+            </div>
+            <div class="col-3 text-center">
+                <div class="font-size-lg font-w600 text-info" id="healed">0</div>
+                <small class="text-muted">Healed</small>
+            </div>
+        </div>
+        
+        <h6 class="font-w600 text-combat-smoke mb-2">Heroes</h6>
+        <div id="heroBreakdown" class="block block-rounded bg-combat-inner-dark p-2 mb-3"></div>
+        
+        <h6 class="font-w600 text-combat-smoke mb-2">Enemies</h6>
+        <div id="enemyBreakdown" class="block block-rounded bg-combat-inner-dark p-2 mb-3"></div>
+        
+        <h6 class="font-w600 text-combat-smoke mb-2">Abilities Used</h6>
+        <div id="abilityBreakdown" class="block block-rounded bg-combat-inner-dark p-2"></div>
+    </div>
+</template>
+
+<template id="adventuring-hero-stat-row-template">
+    <div id="row" class="d-flex align-items-center p-2 mb-1 border-bottom border-dark">
+        <img id="icon" class="skill-icon-xs mr-2" src="">
+        <span id="name" class="font-w600 flex-grow-1"></span>
+        <div class="d-flex" style="gap: 16px;">
+            <div class="text-center" style="min-width: 60px;">
+                <div class="text-success font-w600" id="dealt">0</div>
+                <small class="text-muted">dealt</small>
+            </div>
+            <div class="text-center" style="min-width: 60px;">
+                <div class="text-danger font-w600" id="taken">0</div>
+                <small class="text-muted">taken</small>
+            </div>
+            <div class="text-center" style="min-width: 60px;">
+                <div class="text-info font-w600" id="healed">0</div>
+                <small class="text-muted">healed</small>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="adventuring-ability-stat-row-template">
+    <div id="row" class="d-flex align-items-center p-2 mb-1 border-bottom border-dark">
+        <img id="icon" class="skill-icon-xs mr-2" src="">
+        <span id="name" class="font-w600 flex-grow-1"></span>
+        <div class="d-flex" style="gap: 16px;">
+            <div class="text-center" style="min-width: 50px;">
+                <div class="font-w600" id="uses">0</div>
+                <small class="text-muted">uses</small>
+            </div>
+            <div class="text-center" style="min-width: 60px;">
+                <div class="text-success font-w600" id="damage">0</div>
+                <small class="text-muted">dmg</small>
+            </div>
+            <div class="text-center" style="min-width: 50px;">
+                <div class="text-warning font-w600" id="percent">0%</div>
+                <small class="text-muted">of total</small>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="adventuring-monster-stat-row-template">
+    <div id="row" class="d-flex align-items-center p-2 mb-1 border-bottom border-dark">
+        <img id="icon" class="skill-icon-xs mr-2" src="">
+        <span id="name" class="font-w600 flex-grow-1"></span>
+        <div class="text-center" style="min-width: 60px;">
+            <div class="text-success font-w600" id="dealt">0</div>
+            <small class="text-muted">to it</small>
         </div>
     </div>
 </template>

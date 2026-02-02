@@ -1,514 +1,252 @@
 {
-    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
-    "namespace": "adventuring",
-    "data": {
-        "skillData": [
-            {
-                "skillID": "adventuring:Adventuring",
-                "data": {
-                    "jobs": [
-                        {
-                            "id": "templar",
-                            "tier": 3,
-                            "name": "Templar",
-                            "media": "melvor:assets/media/skills/prayer/prayer.png#tint=magenta",
-                            "requirements": [
-                                {
-                                    "type": "job_level",
-                                    "job": "adventuring:guardian",
-                                    "level": 20
-                                },
-                                {
-                                    "type": "job_level",
-                                    "job": "adventuring:crusader",
-                                    "level": 15
-                                },
-                                {
-                                    "type": "area_mastery",
-                                    "area": "adventuring:mummys_tomb",
-                                    "level": 25
-                                }
-                            ],
-                            "isMilestoneReward": true,
-                            "allowedItems": [
-                                "adventuring:helm",
-                                "adventuring:platebody",
-                                "adventuring:platelegs",
-                                "adventuring:gauntlets",
-                                "adventuring:sabatons",
-                                "adventuring:amulet",
-                                "adventuring:ring",
-                                "adventuring:cape",
-                                "adventuring:shield",
-                                "adventuring:mace",
-                                "adventuring:staff"
-                            ],
-                            "scaling": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 1.75
-                                },
-                                {
-                                    "id": "adventuring:defence",
-                                    "amount": 1.25
-                                },
-                                {
-                                    "id": "adventuring:agility",
-                                    "amount": 0.25
-                                },
-                                {
-                                    "id": "adventuring:strength",
-                                    "amount": 0.75
-                                },
-                                {
-                                    "id": "adventuring:prayer",
-                                    "amount": 2
-                                }
-                            ]
-                        }
-                    ],
-                    "generators": [
-                        {
-                            "id": "holy_smash",
-                            "name": "Holy Smash",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:templar",
-                                    "level": 1
-                                }
-                            ],
-                            "energy": 28,
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 12,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:strength",
-                                                        "amount": 0.2
-                                                    },
-                                                    {
-                                                        "id": "adventuring:prayer",
-                                                        "amount": 0.2
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                },
-                                {
-                                    "target": "lowest",
-                                    "party": "ally",
-                                    "effects": [
-                                        {
-                                            "type": "heal_flat",
-                                            "amount": {
-                                                "base": 8,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:prayer",
-                                                        "amount": 0.2
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "righteous_fury",
-                            "name": "Righteous Fury",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:templar",
-                                    "level": 15
-                                }
-                            ],
-                            "energy": 30,
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 18,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:strength",
-                                                        "amount": 0.25
-                                                    },
-                                                    {
-                                                        "id": "adventuring:prayer",
-                                                        "amount": 0.25
-                                                    }
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            "type": "debuff",
-                                            "id": "adventuring:burn",
-                                            "stacks": {
-                                                "base": 2,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:prayer",
-                                                        "amount": 0.1
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                },
-                                {
-                                    "target": "self",
-                                    "party": "ally",
-                                    "effects": [
-                                        {
-                                            "type": "buff",
-                                            "id": "adventuring:divine_favor",
-                                            "stacks": {
-                                                "base": 2,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:prayer",
-                                                        "amount": 0.1
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ],
-                    "spenders": [
-                        {
-                            "id": "holy_ground",
-                            "name": "Holy Ground",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:templar",
-                                    "level": 1
-                                }
-                            ],
-                            "cost": 130,
-                            "hits": [
-                                {
-                                    "target": "all",
-                                    "party": "ally",
-                                    "effects": [
-                                        {
-                                            "type": "heal_flat",
-                                            "amount": {
-                                                "base": 15,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:prayer",
-                                                        "amount": 0.4
-                                                    }
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            "type": "buff",
-                                            "id": "adventuring:regen",
-                                            "stacks": {
-                                                "base": 3,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:prayer",
-                                                        "amount": 0.1
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "divine_judgment",
-                            "name": "Divine Judgment",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:templar",
-                                    "level": 20
-                                }
-                            ],
-                            "cost": 160,
-                            "hits": [
-                                {
-                                    "target": "all",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 25,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:strength",
-                                                        "amount": 0.4
-                                                    },
-                                                    {
-                                                        "id": "adventuring:prayer",
-                                                        "amount": 0.5
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                },
-                                {
-                                    "target": "self",
-                                    "party": "ally",
-                                    "effects": [
-                                        {
-                                            "type": "heal_flat",
-                                            "amount": {
-                                                "base": 12,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:prayer",
-                                                        "amount": 0.25
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "crusaders_wrath",
-                            "name": "Crusader's Wrath",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:templar",
-                                    "level": 25
-                                }
-                            ],
-                            "cost": 170,
-                            "hits": [
-                                {
-                                    "target": "all",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 22,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:strength",
-                                                        "amount": 0.35
-                                                    },
-                                                    {
-                                                        "id": "adventuring:prayer",
-                                                        "amount": 0.4
-                                                    }
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            "type": "debuff",
-                                            "id": "adventuring:burn",
-                                            "stacks": {
-                                                "base": 3,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:prayer",
-                                                        "amount": 0.1
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                },
-                                {
-                                    "target": "self",
-                                    "party": "ally",
-                                    "effects": [
-                                        {
-                                            "type": "heal_flat",
-                                            "amount": {
-                                                "base": 15,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:prayer",
-                                                        "amount": 0.3
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "salvation",
-                            "name": "Salvation",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:templar",
-                                    "level": 35
-                                }
-                            ],
-                            "cost": 200,
-                            "hits": [
-                                {
-                                    "target": "dead",
-                                    "party": "ally",
-                                    "effects": [
-                                        {
-                                            "type": "revive",
-                                            "amount": {
-                                                "base": 40,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:prayer",
-                                                        "amount": 1.5
-                                                    }
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            "type": "buff",
-                                            "id": "adventuring:divine_favor",
-                                            "stacks": {
-                                                "base": 3,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:prayer",
-                                                        "amount": 0.15
-                                                    }
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            "type": "buff",
-                                            "id": "adventuring:barrier",
-                                            "stacks": {
-                                                "base": 5,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:prayer",
-                                                        "amount": 0.25
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ],
-                    "passives": [
-                        {
-                            "id": "sacred_aura",
-                            "name": "Sacred Aura",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:templar",
-                                    "level": 25
-                                }
-                            ],
-                            "effects": [
-                                {
-                                    "trigger": "encounter_start",
-                                    "type": "buff",
-                                    "target": "all",
-                                    "party": "ally",
-                                    "id": "adventuring:divine_favor",
-                                    "stacks": {
-                                        "base": 2,
-                                        "scaling": [
-                                            {
-                                                "id": "adventuring:prayer",
-                                                "amount": 0.1
-                                            }
-                                        ]
-                                    }
-                                },
-                                {
-                                    "trigger": "encounter_start",
-                                    "type": "buff",
-                                    "target": "all",
-                                    "party": "ally",
-                                    "id": "adventuring:regen",
-                                    "stacks": {
-                                        "base": 2,
-                                        "scaling": [
-                                            {
-                                                "id": "adventuring:prayer",
-                                                "amount": 0.1
-                                            }
-                                        ]
-                                    }
-                                }
-                            ]
-                        },
-                        {
-                            "id": "holy_bulwark",
-                            "name": "Holy Bulwark",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:templar",
-                                    "level": 30
-                                }
-                            ],
-                            "effects": [
-                                {
-                                    "trigger": "encounter_start",
-                                    "type": "buff",
-                                    "target": "self",
-                                    "id": "adventuring:block",
-                                    "stacks": {
-                                        "base": 4,
-                                        "scaling": [
-                                            {
-                                                "id": "adventuring:defence",
-                                                "amount": 0.25
-                                            }
-                                        ]
-                                    }
-                                },
-                                {
-                                    "trigger": "encounter_start",
-                                    "type": "buff",
-                                    "target": "self",
-                                    "id": "adventuring:barrier",
-                                    "stacks": {
-                                        "base": 5,
-                                        "scaling": [
-                                            {
-                                                "id": "adventuring:prayer",
-                                                "amount": 0.25
-                                            }
-                                        ]
-                                    }
-                                }
-                            ]
-                        }
-                    ]
-                }
-            }
-        ]
-    }
+	"$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+	"namespace": "adventuring",
+	"data": {
+		"skillData": [
+			{
+				"skillID": "adventuring:Adventuring",
+				"data": {
+					"jobs": [
+						{
+							"id": "templar",
+							"tier": 3,
+							"archetypes": ["healer", "tank"],
+							"name": "Templar",
+							"media": "melvor:assets/media/skills/prayer/prayer.png#tint=magenta",
+							"requirements": [
+								{ "type": "job_level", "job": "adventuring:guardian", "level": 20 },
+								{ "type": "job_level", "job": "adventuring:crusader", "level": 15 },
+								{ "type": "area_mastery", "area": "adventuring:mummys_tomb", "level": 25 }
+							],
+							"isMilestoneReward": true,
+							"allowedItems": [
+								"adventuring:helm",
+								"adventuring:platebody",
+								"adventuring:platelegs",
+								"adventuring:gauntlets",
+								"adventuring:sabatons",
+								"adventuring:amulet",
+								"adventuring:ring",
+								"adventuring:cape",
+								"adventuring:shield",
+								"adventuring:mace",
+								"adventuring:staff"
+							],
+							"effects": [
+								{ "trigger": "passive", "type": "stat_flat", "stat": "adventuring:hitpoints", "amount": { "scaling": [{ "id": "level", "amount": 7.5 }] }, "scaleFrom": "combatJob" },
+								{ "trigger": "passive", "type": "stat_flat", "stat": "adventuring:defence", "amount": { "scaling": [{ "id": "level", "amount": 0.75 }] }, "scaleFrom": "combatJob" },
+								{ "trigger": "passive", "type": "stat_flat", "stat": "adventuring:agility", "amount": { "scaling": [{ "id": "level", "amount": 0.125 }] }, "scaleFrom": "combatJob" },
+								{ "trigger": "passive", "type": "stat_flat", "stat": "adventuring:strength", "amount": { "scaling": [{ "id": "level", "amount": 1.75 }] }, "scaleFrom": "combatJob" },
+								{ "trigger": "passive", "type": "stat_flat", "stat": "adventuring:prayer", "amount": { "scaling": [{ "id": "level", "amount": 3.625 }] }, "scaleFrom": "combatJob" }
+							]
+						}
+					],
+					"generators": [
+						{
+							"id": "holy_smash",
+							"name": "Holy Smash",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:templar", "level": 1 }],
+							"energy": 30,
+							"hits": [
+								{ "target": "front", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "amount": { "base": 6, "scaling": [
+										{ "id": "adventuring:strength", "amount": 0.2 },
+										{ "id": "adventuring:prayer", "amount": 0.2 }
+									] } }
+								] },
+								{ "target": "lowest", "party": "ally", "effects": [
+									{ "type": "heal_flat", "amount": { "base": 4, "scaling": [{ "id": "adventuring:prayer", "amount": 0.2 }] } }
+								] }
+							]
+						},
+						{
+							"id": "righteous_fury",
+							"name": "Righteous Fury",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:templar", "level": 10 }],
+							"energy": 25,
+							"hits": [
+								{ "target": "front", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "amount": { "base": 8, "scaling": [
+										{ "id": "adventuring:strength", "amount": 0.2 },
+										{ "id": "adventuring:prayer", "amount": 0.25 }
+									] } },
+									{ "type": "debuff", "id": "adventuring:burn", "stacks": { "base": 2, "scaling": [{ "id": "adventuring:prayer", "amount": 0.1 }] } }
+								] },
+								{ "target": "self", "effects": [
+									{ "type": "buff", "id": "adventuring:divine_favor", "stacks": { "base": 2, "scaling": [{ "id": "adventuring:prayer", "amount": 0.1 }] } }
+								] }
+							]
+						},
+						{
+							"id": "radiant_smite",
+							"name": "Radiant Smite",
+							"requirements": [{ "type": "job_level", "job": "adventuring:templar", "level": 25 }],
+							"energy": 30,
+							"hits": [
+								{ "target": "all", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "amount": { "base": 6, "scaling": [
+										{ "id": "adventuring:strength", "amount": 0.2 },
+										{ "id": "adventuring:prayer", "amount": 0.25 }
+									] } },
+									{ "type": "debuff", "id": "adventuring:burn", "stacks": 2 }
+								] },
+								{ "target": "lowest", "party": "ally", "effects": [
+									{ "type": "heal_flat", "amount": { "base": 4, "scaling": [{ "id": "adventuring:prayer", "amount": 0.15 }] } }
+								] }
+							]
+						},
+						{
+							"id": "templars_purification",
+							"name": "Templar's Purification",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:templar", "level": 60 }],
+							"energy": 30,
+							"hits": [{ "target": "front", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 15, "scaling": [
+									{ "id": "adventuring:strength", "amount": 0.4 },
+									{ "id": "adventuring:prayer", "amount": 0.5 },
+									{ "id": "adventuring:burn", "scaleFrom": "debuff", "scaleTarget": "target", "amount": 5, "consume": true }
+								] } }
+							] }]
+						},
+						{
+							"id": "sanctified_wrath",
+							"name": "Sanctified Wrath",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:templar", "level": 90 }],
+							"energy": 40,
+							"hits": [
+								{ "target": "all", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "amount": { "base": 14, "scaling": [
+										{ "id": "adventuring:strength", "amount": 0.5 },
+										{ "id": "adventuring:prayer", "amount": 0.55 }
+									] } },
+									{ "type": "debuff", "id": "adventuring:burn", "stacks": 3 },
+									{ "type": "debuff", "id": "adventuring:atonement", "stacks": 2 }
+								] },
+								{ "target": "lowest", "party": "ally", "effects": [
+									{ "type": "heal_flat", "amount": { "base": 8, "scaling": [{ "id": "adventuring:prayer", "amount": 0.3 }] } }
+								] }
+							]
+						}
+					],
+					"spenders": [
+						{
+							"id": "holy_ground",
+							"name": "Holy Ground",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:templar", "level": 1 }],
+							"cost": 130,
+							"hits": [{ "target": "all", "party": "ally", "effects": [
+								{ "type": "heal_flat", "amount": { "base": 8, "scaling": [{ "id": "adventuring:prayer", "amount": 0.4 }] } },
+								{ "type": "buff", "id": "adventuring:regen", "stacks": { "base": 3, "scaling": [{ "id": "adventuring:prayer", "amount": 0.1 }] } }
+							] }]
+						},
+						{
+							"id": "divine_judgment",
+							"name": "Divine Judgment",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:templar", "level": 15 }],
+							"cost": 120,
+							"hits": [
+								{ "target": "all", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "amount": { "base": 10, "scaling": [
+										{ "id": "adventuring:strength", "amount": 0.3 },
+										{ "id": "adventuring:prayer", "amount": 0.35 }
+									] } }
+								] },
+								{ "target": "self", "effects": [
+									{ "type": "heal_flat", "amount": { "base": 6, "scaling": [{ "id": "adventuring:prayer", "amount": 0.25 }] } }
+								] }
+							]
+						},
+						{
+							"id": "crusaders_wrath",
+							"name": "Crusader's Wrath",
+							"requirements": [{ "type": "job_level", "job": "adventuring:templar", "level": 50 }],
+							"cost": 150,
+							"hits": [
+								{ "target": "all", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "amount": { "base": 12, "scaling": [
+										{ "id": "adventuring:strength", "amount": 0.4 },
+										{ "id": "adventuring:prayer", "amount": 0.45 }
+									] } },
+									{ "type": "debuff", "id": "adventuring:burn", "stacks": { "base": 3, "scaling": [{ "id": "adventuring:prayer", "amount": 0.1 }] } }
+								] },
+								{ "target": "self", "effects": [
+									{ "type": "heal_flat", "amount": { "base": 10, "scaling": [{ "id": "adventuring:prayer", "amount": 0.35 }] } }
+								] }
+							]
+						},
+						{
+							"id": "holy_retribution",
+							"name": "Holy Retribution",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:templar", "level": 70 }],
+							"cost": 160,
+							"hits": [
+								{ "target": "all", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "amount": { "base": 14, "scaling": [
+										{ "id": "adventuring:strength", "amount": 0.45 },
+										{ "id": "adventuring:prayer", "amount": 0.5 }
+									] } },
+									{ "type": "debuff", "id": "adventuring:burn", "stacks": 3 }
+								] },
+								{ "target": "all", "party": "ally", "effects": [
+									{ "type": "buff", "id": "adventuring:divine_favor", "stacks": 3 },
+									{ "type": "buff", "id": "adventuring:barrier", "stacks": { "base": 3, "scaling": [{ "id": "adventuring:prayer", "amount": 0.1 }] } }
+								] }
+							]
+						},
+						{
+							"id": "radiant_deliverance",
+							"name": "Radiant Deliverance",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:templar", "level": 99 }],
+							"cost": 200,
+							"hits": [
+								{ "target": "dead", "party": "ally", "effects": [
+									{ "type": "revive", "amount": { "base": 50, "scaling": [{ "id": "adventuring:prayer", "amount": 2.0 }] } },
+									{ "type": "buff", "id": "adventuring:divine_favor", "stacks": 5 },
+									{ "type": "buff", "id": "adventuring:barrier", "stacks": { "base": 6, "scaling": [{ "id": "adventuring:prayer", "amount": 0.3 }] } }
+								] },
+								{ "target": "all", "party": "ally", "effects": [
+									{ "type": "heal_flat", "amount": { "base": 25, "scaling": [{ "id": "adventuring:prayer", "amount": 0.8 }] } },
+									{ "type": "buff", "id": "adventuring:divine_favor", "stacks": 4 },
+									{ "type": "buff", "id": "adventuring:regen", "stacks": 4 }
+								] },
+								{ "target": "all", "party": "enemy", "effects": [
+									{ "type": "debuff", "id": "adventuring:burn", "stacks": 4 },
+									{ "type": "debuff", "id": "adventuring:atonement", "stacks": 3 }
+								] }
+							]
+						}
+					],
+					"passives": [
+						{
+							"id": "sacred_aura",
+							"name": "Sacred Aura",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:templar", "level": 20 }],
+							"effects": [
+								{ "trigger": "encounter_start", "type": "buff", "target": "all", "party": "ally", "id": "adventuring:divine_favor", "stacks": { "base": 2, "scaling": [{ "id": "adventuring:prayer", "amount": 0.1 }] } },
+								{ "trigger": "encounter_start", "type": "buff", "target": "all", "party": "ally", "id": "adventuring:regen", "stacks": { "base": 2, "scaling": [{ "id": "adventuring:prayer", "amount": 0.1 }] } }
+							]
+						},
+						{
+							"id": "divine_shield",
+							"name": "Divine Shield",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:templar", "level": 40 }],
+							"effects": [
+								{ "trigger": "after_damage_received", "type": "buff", "target": "self", "id": "adventuring:barrier", "stacks": { "base": 3, "scaling": [{ "id": "adventuring:prayer", "amount": 0.15 }] }, "condition": { "type": "hp_below", "threshold": 50 } },
+								{ "trigger": "after_damage_received", "type": "buff", "target": "self", "id": "adventuring:divine_favor", "stacks": 2, "condition": { "type": "hp_below", "threshold": 50 } }
+							]
+						},
+						{
+							"id": "martyrs_blessing",
+							"name": "Martyr's Blessing",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:templar", "level": 80 }],
+							"effects": [
+								{ "trigger": "ally_death", "type": "buff", "target": "all", "party": "ally", "id": "adventuring:barrier", "stacks": 4 },
+								{ "trigger": "ally_death", "type": "buff", "target": "all", "party": "ally", "id": "adventuring:divine_favor", "stacks": 3 }
+							]
+						}
+					]
+				}
+			}
+		]
+	}
 }

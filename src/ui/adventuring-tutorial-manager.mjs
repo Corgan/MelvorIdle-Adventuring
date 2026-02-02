@@ -5,42 +5,63 @@ const { AdventuringTutorialTooltipElement } = await loadModule('src/ui/component
 export class AdventuringTutorialManager {
     constructor(manager, game) {
         this.manager = manager;
-        this.game = game;
+        this.game = game;
+
         this.completedTutorials = new Set();  // Set<AdventuringTutorial>
         this.skippedTutorials = new Set();    // Set<AdventuringTutorial>
-        this.skipAll = false;
+        this.skipAll = false;
+
         this.queue = [];                       // Array<AdventuringTutorial>
         this.activeTutorial = null;            // Currently displaying
-        this.activeStepIndex = 0;
-        this._elementCache = new Map();
+        this.activeStepIndex = 0;
+
+
+        this._elementCache = new Map();
+
         this.component = createElement('adventuring-tutorial-tooltip');
         this.component.manager = this;
+
+        // Register conductor listeners for tutorial triggers
+        this.manager.conductor.listen([
+            'encounter_start',
+            'dungeon_start', 
+            'currency_collected',
+            'material_collected',
+            'monster_seen',
+            'skill_level_up',
+            'mastery_level_up'
+        ], (type, context) => this.checkTriggers(type, context));
     }
 
-    postDataRegistration() {
+    postDataRegistration() {
+
         document.body.appendChild(this.component);
     }
 
-    checkTriggers(triggerType, context = {}) {
+    checkTriggers(eventType, context = {}) {
         if(this.skipAll) return;
 
         this.manager.tutorials.allObjects.forEach(tutorial => {
-            if(tutorial.checkTrigger(triggerType, context)) {
+            if(tutorial.checkTrigger(eventType, context)) {
                 this.queueTutorial(tutorial);
             }
         });
     }
 
     checkAllPendingTutorials() {
-        if(this.skipAll) return;
+        if(this.skipAll) return;
+
         const eligible = [];
 
-        this.manager.tutorials.allObjects.forEach(tutorial => {
+        this.manager.tutorials.allObjects.forEach(tutorial => {
+
             if(this.completedTutorials.has(tutorial)) return;
             if(this.skippedTutorials.has(tutorial)) return;
             if(this.queue.includes(tutorial)) return;
-            if(this.activeTutorial === tutorial) return;
-            if(tutorial.trigger && tutorial.trigger.type === 'chained') {
+            if(this.activeTutorial === tutorial) return;
+
+            if(tutorial.trigger && tutorial.trigger.type === 'chained') {
+
                 const parentCompleted = this.manager.tutorials.allObjects.some(parent => {
                     return parent.chainTo === tutorial.id && this.completedTutorials.has(parent);
                 });
@@ -48,39 +69,46 @@ export class AdventuringTutorialManager {
                     eligible.push(tutorial);
                 }
                 return;
-            }
+            }
+
             if(this.isTutorialEligible(tutorial)) {
                 eligible.push(tutorial);
             }
-        });
-        eligible.sort((a, b) => a.priority - b.priority);
+        });
+
+        eligible.sort((a, b) => a.priority - b.priority);
+
         eligible.forEach(tutorial => this.queueTutorial(tutorial));
     }
 
     isTutorialEligible(tutorial) {
         if(!tutorial.trigger) return false;
+        const triggerType = tutorial.trigger.type;
 
-        switch(tutorial.trigger.type) {
+        switch(triggerType) {
             case 'immediate':
                 return true;
 
             case 'chained':
                 return false;
 
-            case 'currency':
+            case 'currency_threshold':
                 const currency = this.manager.stash.getCurrency(tutorial.trigger.currencyId || 'currency');
                 return currency >= tutorial.trigger.amount;
 
-            case 'material':
+            case 'material_threshold':
                 return this.checkMaterialTrigger(tutorial);
 
-            case 'mastery':
+            case 'mastery_level_up':
                 return this.checkMasteryTrigger(tutorial);
 
-            case 'skillLevel':
+            case 'skill_level_up':
                 return this.manager.level >= tutorial.trigger.level;
 
-            case 'event':
+            // Direct event triggers are not eligible on page load
+            case 'encounter_start':
+            case 'dungeon_start':
+            case 'monster_seen':
                 return false;
 
             default:
@@ -144,13 +172,15 @@ export class AdventuringTutorialManager {
         if(this.completedTutorials.has(tutorial)) return;
         if(this.skippedTutorials.has(tutorial)) return;
         if(this.queue.includes(tutorial)) return;
-        if(this.activeTutorial === tutorial) return;
+        if(this.activeTutorial === tutorial) return;
+
         const insertIndex = this.queue.findIndex(t => t.priority > tutorial.priority);
         if(insertIndex === -1) {
             this.queue.push(tutorial);
         } else {
             this.queue.splice(insertIndex, 0, tutorial);
-        }
+        }
+
         if(!this.activeTutorial) {
             this.activateNext();
         }
@@ -169,7 +199,8 @@ export class AdventuringTutorialManager {
         this.showCurrentStep();
     }
 
-    canDisplay(tutorial) {
+    canDisplay(tutorial) {
+
         var currentPage = this.game.openPage;
         if(!currentPage || currentPage.action !== this.manager) {
             return false;
@@ -187,36 +218,46 @@ export class AdventuringTutorialManager {
         }
     }
 
-    onStateChange() {
-        this.clearElementCache();
+    onStateChange() {
+
+        this.clearElementCache();
+
         if(this.activeTutorial && !this.component._visible) {
             this.showCurrentStep();
         }
     }
 
-    onOverviewPageChange() {
-        this.clearElementCache();
+    onOverviewPageChange() {
+
+        this.clearElementCache();
+
         if(this.activeTutorial && !this.component._visible) {
             this.showCurrentStep();
         }
     }
 
-    onPageVisible() {
-        this.checkAllPendingTutorials();
+    onPageVisible() {
+
+        this.checkAllPendingTutorials();
+
         if(this.activeTutorial) {
             this.showCurrentStep();
         }
     }
 
-    onPageHidden() {
+    onPageHidden() {
+
         this.component.hide();
         this.clearRetry();
         this.clearElementCache();
     }
 
-    onOfflineLoopExited() {
-        setTimeout(() => {
-            this.checkAllPendingTutorials();
+    onOfflineLoopExited() {
+
+        setTimeout(() => {
+
+            this.checkAllPendingTutorials();
+
             var currentPage = this.game.openPage;
             if(currentPage && currentPage.action === this.manager) {
                 if(this.activeTutorial) {
@@ -234,21 +275,26 @@ export class AdventuringTutorialManager {
         var value = parts[1];
 
         switch(type) {
-            case 'page':
+            case 'page':
+
                 return this.manager.overview.activePage === value;
 
-            case 'building':
+            case 'building':
+
                 var building = this.manager.buildings.getObjectByID(this.manager.namespace + ':' + value);
                 if(!building || !building.page) return false;
                 return this.manager.overview.activePage === building.page;
 
-            case 'backToTown':
-                return this.manager.overview.activePage === 'town';
+            case 'backToTown':
+
+                return this.manager.overview.activePage === 'town';
+
             case 'area':
             case 'difficultyButton':
             case 'adventureButton':
             case 'autoRepeat':
-                return false;
+                return false;
+
             case 'dungeonFloor':
             case 'turnOrderCards':
             case 'turnProgressBar':
@@ -264,33 +310,41 @@ export class AdventuringTutorialManager {
     showCurrentStep() {
         if(!this.activeTutorial) {
             return;
-        }
+        }
+
         if(!confirmedLoaded) {
             this.component.hide();
             this.scheduleRetry();
             return;
-        }
+        }
+
         if(!inFocus) {
-            this.component.hide();
+            this.component.hide();
+
             return;
-        }
+        }
+
         if(loadingOfflineProgress) {
             this.component.hide();
             this.scheduleRetry();
             return;
-        }
+        }
+
         if(Swal.isVisible()) {
             this.component.hide();
             this.scheduleRetry();
             return;
-        }
+        }
+
         const offlineModal = document.getElementById('modal-offline-loading');
         if(offlineModal && offlineModal.classList.contains('show')) {
             this.component.hide();
             this.scheduleRetry();
             return;
-        }
-        if(!this.canDisplay(this.activeTutorial)) {
+        }
+
+        if(!this.canDisplay(this.activeTutorial)) {
+
             this.component.hide();
             return;
         }
@@ -300,22 +354,29 @@ export class AdventuringTutorialManager {
         if(!step) {
             this.completeTutorial();
             return;
-        }
+        }
+
         if(this.shouldSkipStep(step)) {
             this.activeStepIndex++;
             this.showCurrentStep();
             return;
-        }
-        var targetElement = step.target ? this.resolveTarget(step.target) : null;
+        }
+
+        var targetElement = step.target ? this.resolveTarget(step.target) : null;
+
         if(step.target && !targetElement) {
-            if(!this.isOnCorrectPageForTarget(step.target)) {
+            if(!this.isOnCorrectPageForTarget(step.target)) {
+
                 this.component.hide();
                 return;
-            }
+            }
+
             this.scheduleRetry();
             return;
-        }
-        this.clearRetry();
+        }
+
+        this.clearRetry();
+
         this.component.show(targetElement, step.message, step.position);
     }
 
@@ -339,27 +400,35 @@ export class AdventuringTutorialManager {
 
         const [type] = target.split(':');
 
-        switch(type) {
+        switch(type) {
+
             case 'area':
             case 'difficultyButton':
             case 'adventureButton':
             case 'autoRepeat':
-                return this.manager.overview.activePage === 'crossroads';
+                return this.manager.overview.activePage === 'crossroads';
+
             case 'dungeonFloor':
-                return this.manager.isActive && !this.manager.encounter.isFighting;
+                return this.manager.isActive && !this.manager.encounter.isFighting;
+
             case 'turnOrderCards':
             case 'turnProgressBar':
             case 'combatLog':
             case 'combatAbilities':
-                return this.manager.isActive && this.manager.encounter.isFighting;
+                return this.manager.isActive && this.manager.encounter.isFighting;
+
             case 'dungeon':
-                return this.manager.isActive;
+                return this.manager.isActive;
+
             case 'building':
-                return this.manager.overview.activePage === 'town';
+                return this.manager.overview.activePage === 'town';
+
             case 'drink':
-                return this.manager.overview.activePage === 'tavern';
+                return this.manager.overview.activePage === 'tavern';
+
             case 'consumable':
-                return this.manager.overview.activePage === 'alchemist';
+                return this.manager.overview.activePage === 'alchemist';
+
             case 'item':
                 return this.manager.overview.activePage === 'armory';
 
@@ -379,7 +448,8 @@ export class AdventuringTutorialManager {
         var cached = this._elementCache.get(target);
         if (this._isCachedElementValid(cached)) {
             return cached;
-        }
+        }
+
         this._elementCache.delete(target);
         return null;
     }
@@ -395,11 +465,14 @@ export class AdventuringTutorialManager {
     }
 
     resolveTarget(target) {
-        if(!target) return null;
+        if(!target) return null;
+
         var cached = this._getCachedElement(target);
         if (cached) return cached;
 
-        var result = this._resolveTargetUncached(target);
+        var result = this._resolveTargetUncached(target);
+
+
         if (result && target.indexOf(':any') === -1) {
             this._cacheElement(target, result);
         }
@@ -407,7 +480,8 @@ export class AdventuringTutorialManager {
         return result;
     }
 
-    _resolveTargetUncached(target) {
+    _resolveTargetUncached(target) {
+
         if(target.startsWith('#') || target.startsWith('.')) {
             return document.querySelector(target);
         }
@@ -415,35 +489,42 @@ export class AdventuringTutorialManager {
         const [type, value] = target.split(':');
 
         switch(type) {
-            case 'page':
+            case 'page':
+
                 return this.manager.overview.getButtonElement(value);
 
-            case 'hero':
+            case 'hero':
+
                 var heroIndex = parseInt(value);
                 var hero = this.manager.party.all[heroIndex];
                 if(!hero) return null;
                 return hero.component;
 
-            case 'combatJob':
+            case 'combatJob':
+
                 var combatJobIndex = parseInt(value);
                 var combatJobHero = this.manager.party.all[combatJobIndex];
                 if(!combatJobHero || !combatJobHero.component) return null;
                 return combatJobHero.component.combatJob;
 
-            case 'passiveJob':
+            case 'passiveJob':
+
                 var passiveJobIndex = parseInt(value);
                 var passiveJobHero = this.manager.party.all[passiveJobIndex];
                 if(!passiveJobHero || !passiveJobHero.component) return null;
                 return passiveJobHero.component.passiveJob;
 
-            case 'job':
-                if(value === 'any') {
+            case 'job':
+
+                if(value === 'any') {
+
                     return document.querySelector('.tippy-box .pointer-enabled.bg-combat-inner-dark') ||
                            document.querySelector('.tippy-box .pointer-enabled.adventuring-selected');
                 }
                 return document.querySelector('adventuring-job-small[data-id="' + value + '"]');
 
-            case 'ability':
+            case 'ability':
+
                 var abilityParts = value.split(':');
                 var heroIdx = parseInt(abilityParts[0]) || 0;
                 var slotIdx = abilityParts.length > 1 ? parseInt(abilityParts[1]) : 0;
@@ -451,45 +532,55 @@ export class AdventuringTutorialManager {
                 if(!abilityHero || !abilityHero.component) return null;
                 return slotIdx === 0 ? abilityHero.component.generator : abilityHero.component.spender;
 
-            case 'combatAbilities':
+            case 'combatAbilities':
+
                 var abilitiesHeroIdx = value === 'any' ? 0 : parseInt(value) || 0;
                 var abilitiesHero = this.manager.party.all[abilitiesHeroIdx];
                 if(!abilitiesHero || !abilitiesHero.component) return null;
                 return abilitiesHero.component.abilities;
 
-            case 'item':
+            case 'item':
+
                 return this.manager.armory.component.querySelector('[data-slot="' + value + '"]');
 
-            case 'drink':
-                if(value === 'any') {
+            case 'drink':
+
+                if(value === 'any') {
+
                     var tavernDrinks = this.manager.tavern.component.drinks;
-                    if(tavernDrinks && tavernDrinks.firstElementChild) {
+                    if(tavernDrinks && tavernDrinks.firstElementChild) {
+
                         return tavernDrinks.firstElementChild.querySelector('.block-rounded-double') ||
                                tavernDrinks.firstElementChild;
                     }
                 }
                 return null;
 
-            case 'consumable':
+            case 'consumable':
+
                 if(value === 'any') {
                     return document.querySelector('adventuring-consumable');
                 }
                 return null;
 
-            case 'area':
+            case 'area':
+
                 if(this.manager.overview.activePage !== 'crossroads') return null;
                 if(value === 'any') {
                     return document.querySelector('adventuring-area');
-                }
+                }
+
                 var specificArea = this.manager.areas.getObjectByID(this.manager.namespace + ':' + value);
                 if(specificArea && specificArea.component) {
                     return specificArea.component;
                 }
                 return null;
 
-            case 'difficultyButton':
+            case 'difficultyButton':
+
                 if(this.manager.overview.activePage !== 'crossroads') return null;
-                if(value === 'any') {
+                if(value === 'any') {
+
                     for(var da of this.manager.crossroads.areas) {
                         if(da.unlocked && da.component && da.component.difficultyButton) {
                             return da.component.difficultyButton;
@@ -498,7 +589,9 @@ export class AdventuringTutorialManager {
                 }
                 return null;
 
-            case 'difficultyOption':
+            case 'difficultyOption':
+
+
                 var dropdownItems = document.querySelectorAll('.dropdown-menu.show .dropdown-item');
                 for(var di of dropdownItems) {
                     if(di.textContent.toLowerCase().includes(value.toLowerCase())) {
@@ -507,7 +600,8 @@ export class AdventuringTutorialManager {
                 }
                 return null;
 
-            case 'adventureButton':
+            case 'adventureButton':
+
                 if(this.manager.overview.activePage !== 'crossroads') return null;
                 if(value === 'any') {
                     for(var aa of this.manager.crossroads.areas) {
@@ -518,9 +612,11 @@ export class AdventuringTutorialManager {
                 }
                 return null;
 
-            case 'autoRepeat':
+            case 'autoRepeat':
+
                 if(this.manager.overview.activePage !== 'crossroads') return null;
-                if(value === 'any') {
+                if(value === 'any') {
+
                     for(var ar of this.manager.crossroads.areas) {
                         if(ar.autoRunUnlocked && ar.component && ar.component.autoRepeatContainer) {
                             return ar.component.autoRepeatContainer;
@@ -529,46 +625,55 @@ export class AdventuringTutorialManager {
                 }
                 return null;
 
-            case 'building':
+            case 'building':
+
                 var buildingObj = this.manager.buildings.getObjectByID(this.manager.namespace + ':' + value);
                 if(!buildingObj) return null;
                 return buildingObj.component;
 
-            case 'backToTown':
+            case 'backToTown':
+
                 return document.querySelector('#back[class*="btn"]') ||
                        document.querySelector('button#back');
 
-            case 'dungeon':
+            case 'dungeon':
+
                 if(!this.manager.isActive) return null;
                 if(value === 'any') {
                     return document.querySelector('adventuring-dungeon-cell');
                 }
                 return null;
 
-            case 'dungeonFloor':
+            case 'dungeonFloor':
+
                 if(!this.manager.isActive) return null;
                 if(this.manager.encounter.isFighting) return null;
                 return this.manager.dungeon.component.dungeon;
 
-            case 'turnOrderCards':
+            case 'turnOrderCards':
+
                 if(!this.manager.isActive) return null;
                 if(!this.manager.encounter.isFighting) return null;
                 return this.manager.overview.component.cards;
 
-            case 'turnProgressBar':
+            case 'turnProgressBar':
+
                 if(!this.manager.isActive) return null;
                 if(!this.manager.encounter.isFighting) return null;
                 return this.manager.overview.component.turnProgress;
 
-            case 'statusText':
+            case 'statusText':
+
                 return this.manager.overview.component.statusText;
 
-            case 'combatLog':
+            case 'combatLog':
+
                 if(!this.manager.isActive) return null;
                 if(!this.manager.encounter.isFighting) return null;
                 return this.manager.overview.component.log;
 
-            case 'element':
+            case 'element':
+
                 return document.getElementById(value);
 
             default:
@@ -592,16 +697,19 @@ export class AdventuringTutorialManager {
 
         this.clearRetry();
         const completed = this.activeTutorial;
-        this.completedTutorials.add(completed);
+        this.completedTutorials.add(completed);
+
         if(completed.chainTo) {
             const chainedTutorial = this.manager.tutorials.getObjectByID(completed.chainTo);
-            if(chainedTutorial && !this.completedTutorials.has(chainedTutorial) && !this.skippedTutorials.has(chainedTutorial)) {
+            if(chainedTutorial && !this.completedTutorials.has(chainedTutorial) && !this.skippedTutorials.has(chainedTutorial)) {
+
                 this.queue.unshift(chainedTutorial);
             }
         }
 
         this.activeTutorial = null;
-        this.activeStepIndex = 0;
+        this.activeStepIndex = 0;
+
         this.checkAllPendingTutorials();
 
         this.activateNext();
@@ -642,16 +750,20 @@ export class AdventuringTutorialManager {
     }
 
     encode(writer) {
-        writer.writeBoolean(this.skipAll);
+        writer.writeBoolean(this.skipAll);
+
         writer.writeSet(this.completedTutorials, (tutorial, w) => {
             w.writeNamespacedObject(tutorial);
-        });
+        });
+
         writer.writeSet(this.skippedTutorials, (tutorial, w) => {
             w.writeNamespacedObject(tutorial);
-        });
+        });
+
         writer.writeArray(this.queue, (tutorial, w) => {
             w.writeNamespacedObject(tutorial);
-        });
+        });
+
         writer.writeBoolean(this.activeTutorial !== null);
         if(this.activeTutorial) {
             writer.writeNamespacedObject(this.activeTutorial);
@@ -660,19 +772,22 @@ export class AdventuringTutorialManager {
     }
 
     decode(reader, version) {
-        this.skipAll = reader.getBoolean();
+        this.skipAll = reader.getBoolean();
+
         reader.getSet((r) => {
             const tutorial = r.getNamespacedObject(this.manager.tutorials);
             if(tutorial && typeof tutorial !== 'string') {
                 this.completedTutorials.add(tutorial);
             }
-        });
+        });
+
         reader.getSet((r) => {
             const tutorial = r.getNamespacedObject(this.manager.tutorials);
             if(tutorial && typeof tutorial !== 'string') {
                 this.skippedTutorials.add(tutorial);
             }
-        });
+        });
+
         this.queue = [];
         const queueLength = reader.getUint32();
         for(let i = 0; i < queueLength; i++) {
@@ -680,7 +795,8 @@ export class AdventuringTutorialManager {
             if(tutorial && typeof tutorial !== 'string') {
                 this.queue.push(tutorial);
             }
-        }
+        }
+
         if(reader.getBoolean()) {
             const tutorial = reader.getNamespacedObject(this.manager.tutorials);
             if(tutorial && typeof tutorial !== 'string') {

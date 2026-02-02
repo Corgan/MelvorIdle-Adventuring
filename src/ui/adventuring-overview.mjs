@@ -1,7 +1,7 @@
 const { loadModule, getResourceUrl } = mod.getContext(import.meta);
 
-const { AdventuringCards } = await loadModule('src/progression/adventuring-cards.mjs');
-const { describeEffect } = await loadModule('src/core/adventuring-utils.mjs');
+const { AdventuringCards } = await loadModule('src/ui/adventuring-cards.mjs');
+const { describeEffect } = await loadModule('src/core/utils/adventuring-utils.mjs');
 
 await loadModule('src/ui/components/adventuring-overview.mjs');
 await loadModule('src/ui/components/adventuring-overview-button.mjs');
@@ -127,6 +127,7 @@ export class AdventuringOverview {
         }
     }
 
+    // Required by base class contract - no additional registration needed
     postDataRegistration() {
 
     }
@@ -217,7 +218,7 @@ export class AdventuringOverview {
         const effects = [];
 
         if(this.manager.isActive) {
-            const difficulty = this.manager.dungeon.area !== undefined ? this.manager.dungeon.area.getDifficulty() : undefined;
+            const difficulty = this.manager.dungeon.area !== undefined ? this.manager.dungeon.area.difficulty : undefined;
             if(difficulty) {
                 effects.push({
                     name: difficulty.name,
@@ -239,7 +240,7 @@ export class AdventuringOverview {
             }
         });
 
-        const tavernDrinks = this.manager.tavern.getActiveDrinks();
+        const tavernDrinks = this.manager.tavern.activeDrinks;
         tavernDrinks.forEach(({ drink, tier, runsRemaining }) => {
             effects.push({
                 name: drink.getTierName(tier),

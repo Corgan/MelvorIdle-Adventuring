@@ -1,6 +1,7 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { RequirementsChecker, defaultEffectProcessor, buildEffectContext } = await loadModule('src/core/adventuring-utils.mjs');
+const { RequirementsChecker } = await loadModule('src/core/utils/requirements-checker.mjs');
+const { defaultEffectProcessor, buildEffectContext } = await loadModule('src/core/utils/adventuring-utils.mjs');
 
 export class AdventuringTownAction extends NamespacedObject {
     constructor(namespace, data, manager, game) {
@@ -43,7 +44,9 @@ export class AdventuringTownAction extends NamespacedObject {
     }
 
     execute(character, building) {
-        this.effects.forEach(effect => {
+        this.effects.forEach(effect => {
+
+
             const context = {
                 character: character,
                 manager: this.manager,

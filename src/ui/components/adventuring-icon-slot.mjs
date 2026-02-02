@@ -1,6 +1,6 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { AdventuringTooltipElement } = await loadModule('src/core/adventuring-tooltip-element.mjs');
+const { AdventuringTooltipElement } = await loadModule('src/core/components/adventuring-tooltip-element.mjs');
 
 export class AdventuringIconSlotElement extends AdventuringTooltipElement {
     constructor() {

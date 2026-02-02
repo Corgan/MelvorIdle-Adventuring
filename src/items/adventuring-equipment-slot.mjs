@@ -1,7 +1,7 @@
 const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringEquipmentSlotElement } = await loadModule('src/items/components/adventuring-equipment-slot.mjs');
-const { createTooltip } = await loadModule('src/core/adventuring-tooltip-element.mjs');
+const { createTooltip } = await loadModule('src/core/components/adventuring-tooltip-element.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
 const { AdventuringIconButtonElement } = await loadModule('src/ui/components/adventuring-icon-button.mjs');
 const { AdventuringEmptyStateElement } = await loadModule('src/ui/components/adventuring-empty-state.mjs');
@@ -307,7 +307,7 @@ export class AdventuringEquipmentSlot {
             this.equipment.character.invalidateEffects('equipment');
         }
         if(this.equipment.character?.manager?.party?.effectCache) {
-            this.equipment.character.manager.party.invalidateEffects('heroEquipment');
+            this.equipment.character.manager.party.invalidateEffects('equipment');
         }
     }
 
@@ -340,7 +340,7 @@ export class AdventuringEquipmentSlot {
             this.equipment.character.invalidateEffects('equipment');
         }
         if(this.equipment.character?.manager?.party?.effectCache) {
-            this.equipment.character.manager.party.invalidateEffects('heroEquipment');
+            this.equipment.character.manager.party.invalidateEffects('equipment');
         }
     }
 

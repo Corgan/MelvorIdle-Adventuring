@@ -1,353 +1,164 @@
 {
-    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
-    "namespace": "adventuring",
-    "data": {
-        "skillData": [
-            {
-                "skillID": "adventuring:Adventuring",
-                "data": {
-                    "jobs": [
-                        {
-                            "id": "sniper",
-                            "tier": 1,
-                            "name": "Sniper",
-                            "media": "melvor:assets/media/skills/ranged/ranged.png#tint=blue",
-                            "requirements": [
-                                {
-                                    "type": "job_level",
-                                    "job": "adventuring:ranger",
-                                    "level": 20
-                                }
-                            ],
-                            "isMilestoneReward": true,
-                            "allowedItems": [
-                                "adventuring:cowl",
-                                "adventuring:vest",
-                                "adventuring:chaps",
-                                "adventuring:vambraces",
-                                "adventuring:boots",
-                                "adventuring:amulet",
-                                "adventuring:ring",
-                                "adventuring:cape",
-                                "adventuring:longbow",
-                                "adventuring:crossbow"
-                            ],
-                            "scaling": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 0.75
-                                },
-                                {
-                                    "id": "adventuring:defence",
-                                    "amount": 0.25
-                                },
-                                {
-                                    "id": "adventuring:agility",
-                                    "amount": 2
-                                },
-                                {
-                                    "id": "adventuring:strength",
-                                    "amount": 0.5
-                                }
-                            ]
-                        }
-                    ],
-                    "generators": [
-                        {
-                            "id": "precise_shot",
-                            "name": "Precise Shot",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:sniper",
-                                    "level": 1
-                                }
-                            ],
-                            "energy": 25,
-                            "hits": [
-                                {
-                                    "target": "back",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 18,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:agility",
-                                                        "amount": 0.45
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "marked_target",
-                            "name": "Marked Target",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:sniper",
-                                    "level": 10
-                                }
-                            ],
-                            "energy": 25,
-                            "hits": [
-                                {
-                                    "target": "lowest",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 10,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:agility",
-                                                        "amount": 0.25
-                                                    }
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            "type": "debuff",
-                                            "id": "adventuring:marked",
-                                            "stacks": {
-                                                "base": 3,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:agility",
-                                                        "amount": 0.1
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ],
-                    "spenders": [
-                        {
-                            "id": "headshot",
-                            "name": "Headshot",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:sniper",
-                                    "level": 1
-                                }
-                            ],
-                            "cost": 140,
-                            "hits": [
-                                {
-                                    "target": "back",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 50,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:agility",
-                                                        "amount": 1.5
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "killshot",
-                            "name": "Killshot",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:sniper",
-                                    "level": 20
-                                }
-                            ],
-                            "cost": 180,
-                            "hits": [
-                                {
-                                    "target": "lowest",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 70,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:agility",
-                                                        "amount": 2
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "piercing_shot",
-                            "name": "Piercing Shot",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:sniper",
-                                    "level": 25
-                                }
-                            ],
-                            "cost": 160,
-                            "hits": [
-                                {
-                                    "target": "all",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 30,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:agility",
-                                                        "amount": 0.8
-                                                    }
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            "type": "debuff",
-                                            "id": "adventuring:marked",
-                                            "stacks": {
-                                                "base": 2,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:agility",
-                                                        "amount": 0.1
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "precision_shot",
-                            "name": "Precision Shot",
-                            "requirements": [
-                                {
-                                    "type": "job_level",
-                                    "job": "adventuring:sniper",
-                                    "level": 20
-                                }
-                            ],
-                            "cost": 100,
-                            "hits": [
-                                {
-                                    "target": "back",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 30,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:ranged",
-                                                        "amount": 0.5
-                                                    }
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            "type": "debuff",
-                                            "id": "adventuring:marked",
-                                            "stacks": {
-                                                "base": 3,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:ranged",
-                                                        "amount": 0.1
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ],
-                    "passives": [
-                        {
-                            "id": "focus",
-                            "name": "Focus",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:sniper",
-                                    "level": 15
-                                }
-                            ],
-                            "effects": [
-                                {
-                                    "trigger": "encounter_start",
-                                    "type": "buff",
-                                    "target": "self",
-                                    "id": "adventuring:haste",
-                                    "stacks": {
-                                        "base": 2,
-                                        "scaling": [
-                                            {
-                                                "id": "adventuring:agility",
-                                                "amount": 0.1
-                                            }
-                                        ]
-                                    }
-                                }
-                            ]
-                        },
-                        {
-                            "id": "eagle_eye",
-                            "name": "Eagle Eye",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:sniper",
-                                    "level": 30
-                                }
-                            ],
-                            "effects": [
-                                {
-                                    "trigger": "round_start",
-                                    "type": "debuff",
-                                    "target": "lowest",
-                                    "party": "enemy",
-                                    "id": "adventuring:marked",
-                                    "stacks": {
-                                        "base": 2,
-                                        "scaling": [
-                                            {
-                                                "id": "adventuring:agility",
-                                                "amount": 0.1
-                                            }
-                                        ]
-                                    }
-                                }
-                            ]
-                        }
-                    ]
-                }
-            }
-        ]
-    }
+	"$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+	"namespace": "adventuring",
+	"data": {
+		"skillData": [
+			{
+				"skillID": "adventuring:Adventuring",
+				"data": {
+					"jobs": [
+						{
+							"id": "sniper",
+							"tier": 1,
+							"archetypes": ["dps"],
+							"name": "Sniper",
+							"media": "melvor:assets/media/skills/ranged/ranged.png#tint=blue",
+							"requirements": [{ "type": "job_level", "job": "adventuring:ranger", "level": 20 }],
+							"isMilestoneReward": true,
+							"allowedItems": ["adventuring:cowl","adventuring:vest","adventuring:chaps","adventuring:vambraces","adventuring:boots","adventuring:amulet","adventuring:ring","adventuring:cape","adventuring:longbow","adventuring:crossbow"],
+							"effects": [
+								{ "trigger": "passive", "type": "stat_flat", "stat": "adventuring:hitpoints", "amount": { "scaling": [{ "id": "level", "amount": 6 }] }, "scaleFrom": "combatJob" },
+								{ "trigger": "passive", "type": "stat_flat", "stat": "adventuring:defence", "amount": { "scaling": [{ "id": "level", "amount": 0.75 }] }, "scaleFrom": "combatJob" },
+								{ "trigger": "passive", "type": "stat_flat", "stat": "adventuring:agility", "amount": { "scaling": [{ "id": "level", "amount": 1.75 }] }, "scaleFrom": "combatJob" },
+								{ "trigger": "passive", "type": "stat_flat", "stat": "adventuring:strength", "amount": { "scaling": [{ "id": "level", "amount": 0.25 }] }, "scaleFrom": "combatJob" }
+							]
+						}
+					],
+					"generators": [
+						{
+							"id": "precise_shot",
+							"name": "Precise Shot",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:sniper", "level": 1 }],
+							"energy": 25,
+							"hits": [{ "target": "back", "party": "enemy", "effects": [{ "type": "damage_flat", "amount": { "base": 9, "scaling": [{ "id": "adventuring:agility", "amount": 0.45 }] } }] }]
+						},
+						{
+							"id": "marked_target",
+							"name": "Marked Target",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:sniper", "level": 10 }],
+							"energy": 25,
+							"hits": [{ "target": "lowest", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 7, "scaling": [{ "id": "adventuring:agility", "amount": 0.35 }] } },
+								{ "type": "debuff", "id": "adventuring:marked", "stacks": { "base": 3, "scaling": [{ "id": "adventuring:agility", "amount": 0.1 }] } }
+							] }]
+						},
+						{
+							"id": "steady_aim",
+							"name": "Steady Aim",
+							"requirements": [{ "type": "job_level", "job": "adventuring:sniper", "level": 25 }],
+							"energy": 20,
+							"hits": [
+								{ "target": "back", "party": "enemy", "effects": [{ "type": "damage_flat", "amount": { "base": 6, "scaling": [{ "id": "adventuring:agility", "amount": 0.3 }] } }] },
+								{ "target": "self", "effects": [{ "type": "buff", "id": "adventuring:precision", "stacks": { "base": 2 } }] }
+							]
+						},
+						{
+							"id": "aimed_shot",
+							"name": "Aimed Shot",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:sniper", "level": 60 }],
+							"energy": 30,
+							"hits": [
+								{ "target": "back", "party": "enemy", "effects": [{ "type": "damage_flat", "amount": { "base": 16, "scaling": [{ "id": "adventuring:agility", "amount": 0.6 }] } }] },
+								{ "target": "self", "effects": [{ "type": "buff", "id": "adventuring:precision", "stacks": { "base": 3 } }] }
+							]
+						},
+						{
+							"id": "vital_strike",
+							"name": "Vital Strike",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:sniper", "level": 90 }],
+							"energy": 30,
+							"hits": [{ "target": "lowest", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 14, "scaling": [
+									{ "id": "adventuring:agility", "amount": 0.55 },
+									{ "id": "adventuring:marked", "scaleFrom": "debuff", "scaleTarget": "target", "amount": 5, "consume": false }
+								] } }
+							] }]
+						}
+					],
+					"spenders": [
+						{
+							"id": "headshot",
+							"name": "Headshot",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:sniper", "level": 1 }],
+							"cost": 140,
+							"hits": [{ "target": "back", "party": "enemy", "effects": [{ "type": "damage_flat", "amount": { "base": 25, "scaling": [{ "id": "adventuring:agility", "amount": 1.5 }] } }] }]
+						},
+						{
+							"id": "piercing_shot",
+							"name": "Piercing Shot",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:sniper", "level": 15 }],
+							"cost": 100,
+							"hits": [{ "target": "all", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 10, "scaling": [{ "id": "adventuring:agility", "amount": 0.5 }] } },
+								{ "type": "debuff", "id": "adventuring:marked", "stacks": { "base": 2, "scaling": [{ "id": "adventuring:agility", "amount": 0.1 }] } }
+							] }]
+						},
+						{
+							"id": "precision_shot",
+							"name": "Precision Shot",
+							"requirements": [{ "type": "job_level", "job": "adventuring:sniper", "level": 50 }],
+							"cost": 100,
+							"hits": [{ "target": "back", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 15, "scaling": [{ "id": "adventuring:agility", "amount": 0.5 }] } },
+								{ "type": "debuff", "id": "adventuring:marked", "stacks": { "base": 3, "scaling": [{ "id": "adventuring:agility", "amount": 0.1 }] } }
+							] }]
+						},
+						{
+							"id": "killshot",
+							"name": "Killshot",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:sniper", "level": 70 }],
+							"cost": 180,
+							"hits": [{ "target": "lowest", "party": "enemy", "effects": [{ "type": "damage_flat", "amount": { "base": 35, "scaling": [{ "id": "adventuring:agility", "amount": 2 }] } }] }]
+						},
+						{
+							"id": "perfect_shot",
+							"name": "Perfect Shot",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:sniper", "level": 99 }],
+							"cost": 180,
+							"hits": [
+								{ "target": "lowest", "party": "enemy", "delay": 0, "effects": [
+									{ "type": "damage_flat", "amount": { "base": 30, "scaling": [
+										{ "id": "adventuring:agility", "amount": 1.2 },
+										{ "id": "adventuring:marked", "scaleFrom": "debuff", "scaleTarget": "target", "amount": 8, "consume": false }
+									] } }
+								] },
+								{ "target": "lowest", "party": "enemy", "delay": 200, "effects": [
+									{ "type": "damage_flat", "amount": { "base": 30, "scaling": [
+										{ "id": "adventuring:agility", "amount": 1.2 },
+										{ "id": "adventuring:marked", "scaleFrom": "debuff", "scaleTarget": "target", "amount": 8, "consume": true }
+									] } }
+								] }
+							]
+						}
+					],
+					"passives": [
+						{
+							"id": "focus",
+							"name": "Focus",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:sniper", "level": 20 }],
+							"effects": [{ "trigger": "encounter_start", "type": "buff", "target": "self", "id": "adventuring:haste", "stacks": { "base": 2, "scaling": [{ "id": "adventuring:agility", "amount": 0.1 }] } }]
+						},
+						{
+							"id": "eagle_eye",
+							"name": "Eagle Eye",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:sniper", "level": 40 }],
+							"effects": [
+								{ "trigger": "crit", "type": "buff", "target": "self", "id": "adventuring:focus", "stacks": 2 },
+								{ "trigger": "crit", "type": "buff", "target": "self", "id": "adventuring:precision", "stacks": 1 }
+							]
+						},
+						{
+							"id": "dead_eye",
+							"name": "Dead Eye",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:sniper", "level": 80 }],
+							"effects": [
+								{ "trigger": "round_start", "type": "buff", "target": "self", "id": "adventuring:precision", "stacks": { "base": 2 } },
+								{ "trigger": "round_start", "type": "buff", "target": "self", "id": "adventuring:might", "stacks": { "base": 1 } }
+							]
+						}
+					]
+				}
+			}
+		]
+	}
 }

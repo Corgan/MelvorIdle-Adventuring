@@ -2,7 +2,7 @@ const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringConsumableElement } = await loadModule('src/items/components/adventuring-consumable.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
-const { createEffect, describeEffectsInline, buildDescription } = await loadModule('src/core/adventuring-utils.mjs');
+const { createEffect, describeEffectsInline, buildDescription } = await loadModule('src/core/utils/adventuring-utils.mjs');
 
 class AdventuringConsumableRenderQueue {
     constructor() {
@@ -33,10 +33,16 @@ export class AdventuringConsumable extends NamespacedObject {
         this._sourceJobId = data.sourceJob; // Resolved in postDataRegistration
         this.sourceJob = null;
 
+        // Order position for sorting (processed by manager._buildAllSortOrders)
+        this.orderPosition = data.orderPosition || null;
+        this.sortOrder = 9999;
+
         this.category = null;
 
-        this.customDescription = data.customDescription;
-        this.target = data.target || 'self';
+        this.customDescription = data.customDescription;
+
+        this.target = data.target || 'self';
+
         this._tiers = data.tiers || [];
         this.tiers = new Map(); // Map<tierNumber, tierData>
 
@@ -143,13 +149,16 @@ export class AdventuringConsumable extends NamespacedObject {
 
     craftTier(tier) {
         const materials = this.getTierMaterials(tier);
-        if (!materials || materials.size === 0) return false;
+        if (!materials || materials.size === 0) return false;
+
         for (const [mat, qty] of materials) {
             if (this.manager.stash.getCount(mat) < qty) return false;
-        }
+        }
+
         for (const [mat, qty] of materials) {
             this.manager.stash.remove(mat, qty);
-        }
+        }
+
         this.manager.consumables.addCharges(this, tier, 1);
         this.renderQueue.updateAll();
         return true;
@@ -173,16 +182,19 @@ export class AdventuringConsumable extends NamespacedObject {
         return TooltipBuilder.forConsumable(this).build();
     }
 
-    postDataRegistration() {
+    postDataRegistration() {
+
         if (this._sourceJobId) {
             this.sourceJob = this.manager.jobs.getObjectByID(this._sourceJobId);
         }
 
         if (!this.category && this.type) {
             this.category = this.manager.consumableCategories.getObjectByID(`adventuring:${this.type}`);
-        }
+        }
+
         for (const tierData of this._tiers) {
-            const tier = tierData.tier;
+            const tier = tierData.tier;
+
             const materials = new Map();
             if (tierData.materials) {
                 for (const { id, count } of tierData.materials) {
@@ -191,9 +203,10 @@ export class AdventuringConsumable extends NamespacedObject {
                         materials.set(material, count);
                     }
                 }
-            }
+            }
+
             const effects = (tierData.effects || []).map(effectData => {
-                return createEffect(effectData, this, this.getTierName(tier));
+                return createEffect(effectData, [{ type: 'consumable', name: this.getTierName(tier), ref: this }]);
             });
 
             this.tiers.set(tier, {
@@ -216,7 +229,8 @@ export class AdventuringConsumable extends NamespacedObject {
     }
 
     onClick() {
-        if (this.manager.consumables.active) {
+        if (this.manager.consumables.active) {
+
             this.manager.consumables.selectConsumable(this);
         }
     }
@@ -235,7 +249,8 @@ export class AdventuringConsumable extends NamespacedObject {
     }
 
     renderCharges() {
-        if (!this.renderQueue.charges) return;
+        if (!this.renderQueue.charges) return;
+
         const total = this.totalCharges;
         this.component.charges.textContent = total;
         this.component.charges.classList.toggle('d-none', total <= 0);

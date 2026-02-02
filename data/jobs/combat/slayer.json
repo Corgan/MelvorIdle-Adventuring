@@ -1,258 +1,222 @@
 {
-    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
-    "namespace": "adventuring",
-    "data": {
-        "skillData": [
-            {
-                "skillID": "adventuring:Adventuring",
-                "data": {
-                    "jobs": [
-                        {
-                            "id": "slayer",
-                            "tier": 2,
-                            "name": "Slayer",
-                            "media": "melvor:assets/media/skills/combat/attack.png#tint=blue",
-                            "requirements": [
-                                {
-                                    "type": "slayer_tasks_completed",
-                                    "count": 10
-                                }
-                            ],
-                            "isMilestoneReward": true,
-                            "allowedItems": [
-                                "adventuring:helm",
-                                "adventuring:platebody",
-                                "adventuring:platelegs",
-                                "adventuring:gauntlets",
-                                "adventuring:sabatons",
-                                "adventuring:cowl",
-                                "adventuring:vest",
-                                "adventuring:chaps",
-                                "adventuring:vambraces",
-                                "adventuring:boots",
-                                "adventuring:hat",
-                                "adventuring:robes",
-                                "adventuring:bottoms",
-                                "adventuring:mitts",
-                                "adventuring:slippers",
-                                "adventuring:amulet",
-                                "adventuring:ring",
-                                "adventuring:cape",
-                                "adventuring:shield",
-                                "adventuring:dagger",
-                                "adventuring:sword1h",
-                                "adventuring:sword2h",
-                                "adventuring:axe",
-                                "adventuring:scimitar",
-                                "adventuring:fists",
-                                "adventuring:knives",
-                                "adventuring:javelin",
-                                "adventuring:shortbow",
-                                "adventuring:longbow",
-                                "adventuring:crossbow",
-                                "adventuring:wand",
-                                "adventuring:staff"
-                            ],
-                            "scaling": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 1
-                                },
-                                {
-                                    "id": "adventuring:defence",
-                                    "amount": 0.5
-                                },
-                                {
-                                    "id": "adventuring:agility",
-                                    "amount": 0.75
-                                },
-                                {
-                                    "id": "adventuring:strength",
-                                    "amount": 0.75
-                                },
-                                {
-                                    "id": "adventuring:ranged",
-                                    "amount": 0.75
-                                },
-                                {
-                                    "id": "adventuring:magic",
-                                    "amount": 0.75
-                                }
-                            ]
-                        }
-                    ],
-                    "generators": [
-                        {
-                            "id": "study",
-                            "name": "Study",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:slayer",
-                                    "level": 1
-                                }
-                            ],
-                            "energy": 25,
-                            "learnType": "generator",
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 8,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:strength",
-                                                        "amount": 0.15
-                                                    },
-                                                    {
-                                                        "id": "adventuring:ranged",
-                                                        "amount": 0.15
-                                                    },
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.15
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "analyze",
-                            "name": "Analyze",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:slayer",
-                                    "level": 20
-                                }
-                            ],
-                            "energy": 30,
-                            "learnType": "generator",
-                            "learnBonus": 25,
-                            "hits": [
-                                {
-                                    "target": "random",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 12,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:strength",
-                                                        "amount": 0.2
-                                                    },
-                                                    {
-                                                        "id": "adventuring:ranged",
-                                                        "amount": 0.2
-                                                    },
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.2
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ],
-                    "spenders": [
-                        {
-                            "id": "assimilate",
-                            "name": "Assimilate",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:slayer",
-                                    "level": 1
-                                }
-                            ],
-                            "cost": 100,
-                            "learnType": "spender",
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 25,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:strength",
-                                                        "amount": 0.4
-                                                    },
-                                                    {
-                                                        "id": "adventuring:ranged",
-                                                        "amount": 0.4
-                                                    },
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.4
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "devour",
-                            "name": "Devour",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:slayer",
-                                    "level": 30
-                                }
-                            ],
-                            "cost": 100,
-                            "learnType": "spender",
-                            "learnBonus": 25,
-                            "hits": [
-                                {
-                                    "target": "all",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 15,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:strength",
-                                                        "amount": 0.25
-                                                    },
-                                                    {
-                                                        "id": "adventuring:ranged",
-                                                        "amount": 0.25
-                                                    },
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.25
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ]
-                }
-            }
-        ]
-    }
+	"$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+	"namespace": "adventuring",
+	"data": {
+		"skillData": [
+			{
+				"skillID": "adventuring:Adventuring",
+				"data": {
+					"jobs": [
+						{
+							"id": "slayer",
+							"tier": 2,
+							"archetypes": ["dps", "tank", "healer", "support"],
+							"name": "Slayer",
+							"media": "melvor:assets/media/skills/combat/attack.png#tint=blue",
+							"requirements": [{ "type": "slayer_tasks_completed", "count": 10 }],
+							"isMilestoneReward": true,
+							"allowedItems": ["adventuring:helm","adventuring:platebody","adventuring:platelegs","adventuring:gauntlets","adventuring:sabatons","adventuring:cowl","adventuring:vest","adventuring:chaps","adventuring:vambraces","adventuring:boots","adventuring:hat","adventuring:robes","adventuring:bottoms","adventuring:mitts","adventuring:slippers","adventuring:amulet","adventuring:ring","adventuring:cape","adventuring:shield","adventuring:dagger","adventuring:sword1h","adventuring:sword2h","adventuring:axe","adventuring:scimitar","adventuring:fists","adventuring:knives","adventuring:javelin","adventuring:shortbow","adventuring:longbow","adventuring:crossbow","adventuring:wand","adventuring:staff"],
+							"effects": [
+								{ "trigger": "passive", "type": "stat_flat", "stat": "adventuring:hitpoints", "amount": { "scaling": [{ "id": "level", "amount": 7.5 }] }, "scaleFrom": "combatJob" },
+								{ "trigger": "passive", "type": "stat_flat", "stat": "adventuring:defence", "amount": { "scaling": [{ "id": "level", "amount": 1.75 }] }, "scaleFrom": "combatJob" },
+								{ "trigger": "passive", "type": "stat_flat", "stat": "adventuring:agility", "amount": { "scaling": [{ "id": "level", "amount": 0.375 }] }, "scaleFrom": "combatJob" },
+								{ "trigger": "passive", "type": "stat_flat", "stat": "adventuring:strength", "amount": { "scaling": [{ "id": "level", "amount": 3.625 }] }, "scaleFrom": "combatJob" },
+								{ "trigger": "passive", "type": "stat_flat", "stat": "adventuring:ranged", "amount": { "scaling": [{ "id": "level", "amount": 0.75 }] }, "scaleFrom": "combatJob" },
+								{ "trigger": "passive", "type": "stat_flat", "stat": "adventuring:magic", "amount": { "scaling": [{ "id": "level", "amount": 0.375 }] }, "scaleFrom": "combatJob" }
+							]
+						}
+					],
+					"generators": [
+						{
+							"id": "study",
+							"name": "Study",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:slayer", "level": 1 }],
+							"energy": 20,
+							"learnType": "generator",
+							"hits": [{ "target": "front", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 4, "scaling": [
+									{ "id": "adventuring:strength", "amount": 0.15 },
+									{ "id": "adventuring:ranged", "amount": 0.15 },
+									{ "id": "adventuring:magic", "amount": 0.15 }
+								] } }
+							] }]
+						},
+						{
+							"id": "exploit_weakness",
+							"name": "Exploit Weakness",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:slayer", "level": 10 }],
+							"energy": 20,
+							"hits": [{ "target": "front", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 7, "scaling": [
+									{ "id": "adventuring:strength", "amount": 0.2 },
+									{ "id": "adventuring:ranged", "amount": 0.2 },
+									{ "id": "adventuring:magic", "amount": 0.2 }
+								] } },
+								{ "type": "debuff", "id": "adventuring:marked", "stacks": { "base": 3, "scaling": [{ "id": "adventuring:strength", "amount": 0.1 }] } }
+							] }]
+						},
+						{
+							"id": "analyze",
+							"name": "Analyze",
+							"requirements": [{ "type": "job_level", "job": "adventuring:slayer", "level": 25 }],
+							"energy": 30,
+							"learnType": "generator",
+							"learnBonus": 25,
+							"hits": [{ "target": "all", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 5, "scaling": [
+									{ "id": "adventuring:strength", "amount": 0.15 },
+									{ "id": "adventuring:ranged", "amount": 0.15 },
+									{ "id": "adventuring:magic", "amount": 0.15 }
+								] } },
+								{ "type": "debuff", "id": "adventuring:marked", "stacks": 1 }
+							] }]
+						},
+						{
+							"id": "slayers_execute",
+							"name": "Slayer's Execute",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:slayer", "level": 60 }],
+							"energy": 30,
+							"hits": [{ "target": "front", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 15, "scaling": [
+									{ "id": "adventuring:strength", "amount": 0.4 },
+									{ "id": "adventuring:ranged", "amount": 0.4 },
+									{ "id": "adventuring:magic", "amount": 0.4 },
+									{ "id": "adventuring:marked", "scaleFrom": "debuff", "scaleTarget": "target", "amount": 5, "consume": true }
+								] } }
+							] }]
+						},
+						{
+							"id": "master_study",
+							"name": "Master Study",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:slayer", "level": 90 }],
+							"energy": 35,
+							"learnType": "generator",
+							"learnBonus": 50,
+							"hits": [{ "target": "all", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 10, "scaling": [
+									{ "id": "adventuring:strength", "amount": 0.3 },
+									{ "id": "adventuring:ranged", "amount": 0.3 },
+									{ "id": "adventuring:magic", "amount": 0.3 }
+								] } },
+								{ "type": "debuff", "id": "adventuring:marked", "stacks": 2 }
+							] }]
+						}
+					],
+					"spenders": [
+						{
+							"id": "assimilate",
+							"name": "Assimilate",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:slayer", "level": 1 }],
+							"cost": 100,
+							"learnType": "spender",
+							"hits": [{ "target": "front", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 13, "scaling": [
+									{ "id": "adventuring:strength", "amount": 0.4 },
+									{ "id": "adventuring:ranged", "amount": 0.4 },
+									{ "id": "adventuring:magic", "amount": 0.4 }
+								] } }
+							] }]
+						},
+						{
+							"id": "slayers_mark",
+							"name": "Slayer's Mark",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:slayer", "level": 15 }],
+							"cost": 110,
+							"hits": [{ "target": "front", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 10, "scaling": [
+									{ "id": "adventuring:strength", "amount": 0.3 },
+									{ "id": "adventuring:ranged", "amount": 0.3 },
+									{ "id": "adventuring:magic", "amount": 0.3 }
+								] } },
+								{ "type": "debuff", "id": "adventuring:vulnerable", "stacks": 4 },
+								{ "type": "debuff", "id": "adventuring:weaken", "stacks": 2 }
+							] }]
+						},
+						{
+							"id": "devour",
+							"name": "Devour",
+							"requirements": [{ "type": "job_level", "job": "adventuring:slayer", "level": 50 }],
+							"cost": 130,
+							"learnType": "spender",
+							"learnBonus": 25,
+							"hits": [{ "target": "all", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 8, "scaling": [
+									{ "id": "adventuring:strength", "amount": 0.25 },
+									{ "id": "adventuring:ranged", "amount": 0.25 },
+									{ "id": "adventuring:magic", "amount": 0.25 }
+								] } }
+							] }]
+						},
+						{
+							"id": "consume_knowledge",
+							"name": "Consume Knowledge",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:slayer", "level": 70 }],
+							"cost": 140,
+							"learnType": "spender",
+							"learnBonus": 50,
+							"hits": [{ "target": "front", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 18, "scaling": [
+									{ "id": "adventuring:strength", "amount": 0.5 },
+									{ "id": "adventuring:ranged", "amount": 0.5 },
+									{ "id": "adventuring:magic", "amount": 0.5 }
+								] } },
+								{ "type": "debuff", "id": "adventuring:vulnerable", "stacks": 3 }
+							] }]
+						},
+						{
+							"id": "omniscience",
+							"name": "Omniscience",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:slayer", "level": 99 }],
+							"cost": 175,
+							"hits": [
+								{ "target": "all", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "amount": { "base": 25, "scaling": [
+										{ "id": "adventuring:strength", "amount": 0.6 },
+										{ "id": "adventuring:ranged", "amount": 0.6 },
+										{ "id": "adventuring:magic", "amount": 0.6 },
+										{ "id": "adventuring:marked", "scaleFrom": "debuff", "scaleTarget": "target", "amount": 6, "consume": true }
+									] } },
+									{ "type": "debuff", "id": "adventuring:vulnerable", "stacks": 5 },
+									{ "type": "debuff", "id": "adventuring:weaken", "stacks": 4 }
+								] },
+								{ "target": "self", "effects": [
+									{ "type": "buff", "id": "adventuring:might", "stacks": 5 },
+									{ "type": "buff", "id": "adventuring:haste", "stacks": 4 },
+									{ "type": "buff", "id": "adventuring:focus", "stacks": 4 }
+								] }
+							]
+						}
+					],
+					"passives": [
+						{
+							"id": "quick_learner",
+							"name": "Quick Learner",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:slayer", "level": 20 }],
+							"effects": [
+								{ "trigger": "encounter_start", "type": "buff", "target": "self", "id": "adventuring:focus", "stacks": { "base": 3, "scaling": [{ "id": "adventuring:strength", "amount": 0.1 }] } }
+							]
+						},
+						{
+							"id": "adaptive_combat",
+							"name": "Adaptive Combat",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:slayer", "level": 40 }],
+							"effects": [
+								{ "trigger": "kill", "type": "buff", "target": "self", "id": "adventuring:might", "stacks": 3 },
+								{ "trigger": "kill", "type": "buff", "target": "self", "id": "adventuring:haste", "stacks": 2 }
+							]
+						},
+						{
+							"id": "monster_expert",
+							"name": "Monster Expert",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:slayer", "level": 80 }],
+							"effects": [
+								{ "trigger": "after_damage_delivered", "type": "debuff", "target": "target", "id": "adventuring:marked", "stacks": 1 },
+								{ "trigger": "after_damage_delivered", "type": "buff", "target": "self", "id": "adventuring:precision", "stacks": 1 }
+							]
+						}
+					]
+				}
+			}
+		]
+	}
 }

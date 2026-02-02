@@ -1,6 +1,7 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { formatRequirement, describeEffectsInline, describeEffectFull, describeEffect } = await loadModule('src/core/adventuring-utils.mjs');
+const { formatRequirement } = await loadModule('src/core/utils/requirements-checker.mjs');
+const { describeEffectsInline, describeEffectFull, describeEffect } = await loadModule('src/core/utils/adventuring-utils.mjs');
 
 export class TooltipBuilder {
     constructor() {
@@ -489,7 +490,7 @@ export class TooltipBuilder {
 
             if(item.effects && item.effects.length > 0) {
                 tooltip.separator();
-                item.getEffectDescriptions().forEach(desc => {
+                item.effectDescriptions.forEach(desc => {
                     tooltip.info(desc);
                 });
             }
@@ -530,7 +531,7 @@ export class TooltipBuilder {
         if(area.unlocked) {
             tooltip.masteryProgressFor(manager, area);
 
-            tooltip.effects(area.getMasteryBonusEffects(), manager);
+            tooltip.effects(area.masteryBonusEffects, manager);
 
             if(area.autoRunUnlocked) {
                 const isActive = manager.autoRepeatArea === area;
@@ -541,7 +542,7 @@ export class TooltipBuilder {
                 }
             }
 
-            const nextMilestone = area.getNextMilestone();
+            const nextMilestone = area.nextMilestone;
             if(nextMilestone) {
                 let description = nextMilestone.description;
                 if (!description && nextMilestone.effects !== undefined) {
@@ -553,7 +554,7 @@ export class TooltipBuilder {
                 tooltip.separator().warning('Mastered!');
             }
 
-            tooltip.difficultyInfo(area.getDifficulty(), manager);
+            tooltip.difficultyInfo(area.difficulty, manager);
 
             if(area.bestEndlessStreak > 0) {
                 tooltip.separator().warning(`Best Endless: ${area.bestEndlessStreak} waves`);
@@ -784,12 +785,18 @@ export class TooltipBuilder {
 
     usableByJobs(jobs, manager, addSeparator = true) {
         if(!jobs || jobs.length === 0) return this;
-        const validJobs = jobs.filter(job => job !== manager.cached.noneJob);
+        // Filter out none job and passive jobs
+        const validJobs = jobs.filter(job => job !== manager.cached.noneJob && !job.isPassive);
         if(validJobs.length === 0) return this;
         
-        // If almost all jobs can use it (90%+), don't show anything - it's essentially universal
-        const totalJobs = manager.jobs.size;
-        if(validJobs.length >= totalJobs * 0.9) return this;
+        // Count combat jobs (non-passive) for comparison
+        const combatJobs = manager.jobs.allObjects.filter(job => !job.isPassive);
+        const totalCombatJobs = combatJobs.length;
+        
+        // If ALL combat jobs can use it, don't show anything - it's universal
+        if(validJobs.length >= totalCombatJobs) {
+            return this;
+        }
 
         if(addSeparator) this.separator();
         this.hint('Usable By:');

@@ -1,352 +1,215 @@
 {
-    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
-    "namespace": "adventuring",
-    "data": {
-        "skillData": [
-            {
-                "skillID": "adventuring:Adventuring",
-                "data": {
-                    "jobs": [
-                        {
-                            "id": "necromancer",
-                            "tier": 5,
-                            "name": "Necromancer",
-                            "media": "melvor:assets/media/skills/magic/magic.png#tint=purple",
-                            "requirements": [
-                                {
-                                    "type": "job_level",
-                                    "job": "adventuring:wizard",
-                                    "level": 15
-                                },
-                                {
-                                    "type": "job_level",
-                                    "job": "adventuring:cleric",
-                                    "level": 10
-                                }
-                            ],
-                            "isMilestoneReward": true,
-                            "allowedItems": [
-                                "adventuring:hat",
-                                "adventuring:robes",
-                                "adventuring:bottoms",
-                                "adventuring:mitts",
-                                "adventuring:slippers",
-                                "adventuring:amulet",
-                                "adventuring:ring",
-                                "adventuring:cape",
-                                "adventuring:staff",
-                                "adventuring:spellbook"
-                            ],
-                            "scaling": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 0.8
-                                },
-                                {
-                                    "id": "adventuring:defence",
-                                    "amount": 0.3
-                                },
-                                {
-                                    "id": "adventuring:agility",
-                                    "amount": 0.4
-                                },
-                                {
-                                    "id": "adventuring:magic",
-                                    "amount": 2.2
-                                },
-                                {
-                                    "id": "adventuring:prayer",
-                                    "amount": 1.5
-                                }
-                            ]
-                        }
-                    ],
-                    "generators": [
-                        {
-                            "id": "death_bolt",
-                            "name": "Death Bolt",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:necromancer",
-                                    "level": 1
-                                }
-                            ],
-                            "energy": 25,
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 14,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.35
-                                                    },
-                                                    {
-                                                        "id": "adventuring:prayer",
-                                                        "amount": 0.15
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "essence_drain",
-                            "name": "Essence Drain",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:necromancer",
-                                    "level": 8
-                                }
-                            ],
-                            "energy": 28,
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 10,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.25
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                },
-                                {
-                                    "target": "self",
-                                    "party": "ally",
-                                    "effects": [
-                                        {
-                                            "type": "heal_flat",
-                                            "amount": {
-                                                "base": 8,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:prayer",
-                                                        "amount": 0.2
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "bone_shards",
-                            "name": "Bone Shards",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:necromancer",
-                                    "level": 15
-                                }
-                            ],
-                            "energy": 30,
-                            "hits": [
-                                {
-                                    "target": "all",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 8,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.2
-                                                    }
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            "type": "debuff",
-                                            "id": "adventuring:weaken",
-                                            "stacks": {
-                                                "base": 2,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.03
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ],
-                    "spenders": [
-                        {
-                            "id": "necrotic_pact",
-                            "name": "Necrotic Pact",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:necromancer",
-                                    "level": 1
-                                }
-                            ],
-                            "hits": [
-                                {
-                                    "target": "self",
-                                    "party": "ally",
-                                    "effects": [
-                                        {
-                                            "type": "buff",
-                                            "id": "adventuring:might",
-                                            "stacks": {
-                                                "base": 2,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.1
-                                                    }
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            "type": "buff",
-                                            "id": "adventuring:vampirism",
-                                            "stacks": {
-                                                "base": 2,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:prayer",
-                                                        "amount": 0.05
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ],
-                            "cost": 80
-                        },
-                        {
-                            "id": "corpse_explosion",
-                            "name": "Corpse Explosion",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:necromancer",
-                                    "level": 12
-                                }
-                            ],
-                            "hits": [
-                                {
-                                    "target": "all",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 30,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.6
-                                                    },
-                                                    {
-                                                        "id": "adventuring:prayer",
-                                                        "amount": 0.3
-                                                    }
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            "type": "debuff",
-                                            "id": "adventuring:curse",
-                                            "stacks": {
-                                                "base": 3,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.05
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ],
-                            "cost": 100
-                        },
-                        {
-                            "id": "necrotic_siphon",
-                            "name": "Necrotic Siphon",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:necromancer",
-                                    "level": 20
-                                }
-                            ],
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 45,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.8
-                                                    },
-                                                    {
-                                                        "id": "adventuring:prayer",
-                                                        "amount": 0.4
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                },
-                                {
-                                    "target": "all",
-                                    "party": "ally",
-                                    "effects": [
-                                        {
-                                            "type": "heal_flat",
-                                            "amount": {
-                                                "base": 15,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:prayer",
-                                                        "amount": 0.4
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ],
-                            "cost": 100
-                        }
-                    ]
-                }
-            }
-        ]
-    }
+	"$schema": "../job_schema.json",
+	"namespace": "adventuring",
+	"packages": {
+		"combat_jobs": {
+			"jobs": {
+				"necromancer": {
+					"name": "Necromancer",
+					"tier": 5,
+					"media": "assets/jobs/necromancer.png",
+					"requirements": [
+						{ "type": "job_level", "job": "adventuring:warlock", "level": 30 },
+						{ "type": "job_level", "job": "adventuring:reaper", "level": 25 }
+					],
+					"abilities": [
+						{
+							"id": "death_bolt",
+							"name": "Death Bolt",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "A bolt of death energy that curses the target.",
+							"energy": 25,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:necromancer", "level": 1 }],
+							"hits": [{ "target": "front", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "element": "dark", "amount": { "base": 7, "scaling": [
+									{ "id": "adventuring:magic", "amount": 0.35 },
+									{ "id": "adventuring:prayer", "amount": 0.15 }
+								] } },
+								{ "type": "debuff", "id": "adventuring:curse", "stacks": { "base": 2, "scaling": [{ "id": "adventuring:magic", "amount": 0.1 }] } }
+							] }]
+						},
+						{
+							"id": "necrotic_pact",
+							"name": "Necrotic Pact",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "Forms a pact with death for power and life drain.",
+							"cost": 140,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:necromancer", "level": 1 }],
+							"hits": [{ "target": "self", "effects": [
+								{ "type": "buff", "id": "adventuring:might", "stacks": { "base": 3, "scaling": [{ "id": "adventuring:magic", "amount": 0.1 }] } },
+								{ "type": "buff", "id": "adventuring:vampirism", "stacks": { "base": 3, "scaling": [{ "id": "adventuring:prayer", "amount": 0.1 }] } }
+							] }]
+						},
+						{
+							"id": "essence_drain",
+							"name": "Essence Drain",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "Drains the life essence from an enemy.",
+							"energy": 25,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:necromancer", "level": 10 }],
+							"hits": [
+								{ "target": "front", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "element": "dark", "lifesteal": 0.5, "amount": { "base": 6, "scaling": [{ "id": "adventuring:magic", "amount": 0.3 }] } }
+								] },
+								{ "target": "self", "effects": [
+									{ "type": "heal_flat", "amount": { "base": 4, "scaling": [{ "id": "adventuring:prayer", "amount": 0.2 }] } }
+								] }
+							]
+						},
+						{
+							"id": "corpse_explosion",
+							"name": "Corpse Explosion",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "Causes corpses to explode, cursing all enemies.",
+							"cost": 145,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:necromancer", "level": 15 }],
+							"hits": [{ "target": "all", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "element": "dark", "amount": { "base": 15, "scaling": [
+									{ "id": "adventuring:magic", "amount": 0.6 },
+									{ "id": "adventuring:prayer", "amount": 0.3 }
+								] } },
+								{ "type": "debuff", "id": "adventuring:curse", "stacks": { "base": 3, "scaling": [{ "id": "adventuring:magic", "amount": 0.1 }] } }
+							] }]
+						},
+						{
+							"id": "deaths_embrace",
+							"name": "Death's Embrace",
+							"type": "passive",
+							"media": "assets/abilities/passive.png",
+							"description": "Death embraces you at battle start, granting vampirism.",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:necromancer", "level": 20 }],
+							"effects": [
+								{ "trigger": "encounter_start", "type": "buff", "target": "self", "id": "adventuring:vampirism", "stacks": { "base": 4, "scaling": [{ "id": "adventuring:prayer", "amount": 0.15 }] } },
+								{ "trigger": "encounter_start", "type": "buff", "target": "self", "id": "adventuring:might", "stacks": 3 }
+							]
+						},
+						{
+							"id": "bone_shards",
+							"name": "Bone Shards",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "Launches bone shards that weaken all enemies.",
+							"energy": 30,
+							"requirements": [{ "type": "job_level", "job": "adventuring:necromancer", "level": 25 }],
+							"hits": [{ "target": "all", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "element": "dark", "amount": { "base": 8, "scaling": [{ "id": "adventuring:magic", "amount": 0.3 }] } },
+								{ "type": "debuff", "id": "adventuring:weaken", "stacks": { "base": 3, "scaling": [{ "id": "adventuring:magic", "amount": 0.1 }] } }
+							] }]
+						},
+						{
+							"id": "soul_harvest",
+							"name": "Soul Harvest",
+							"type": "passive",
+							"media": "assets/abilities/passive.png",
+							"description": "Harvesting souls from kills heals and empowers you.",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:necromancer", "level": 40 }],
+							"effects": [
+								{ "trigger": "kill", "type": "heal_flat", "target": "self", "amount": { "base": 10, "scaling": [{ "id": "adventuring:prayer", "amount": 0.3 }] } },
+								{ "trigger": "kill", "type": "buff", "target": "self", "id": "adventuring:might", "stacks": 2 }
+							]
+						},
+						{
+							"id": "necrotic_siphon",
+							"name": "Necrotic Siphon",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "Siphons life from a target to heal all allies.",
+							"cost": 180,
+							"requirements": [{ "type": "job_level", "job": "adventuring:necromancer", "level": 50 }],
+							"hits": [
+								{ "target": "front", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "element": "dark", "amount": { "base": 23, "scaling": [
+										{ "id": "adventuring:magic", "amount": 0.8 },
+										{ "id": "adventuring:prayer", "amount": 0.4 }
+									] } },
+									{ "type": "debuff", "id": "adventuring:curse", "stacks": 4 }
+								] },
+								{ "target": "all", "party": "ally", "effects": [
+									{ "type": "heal_flat", "amount": { "base": 8, "scaling": [{ "id": "adventuring:prayer", "amount": 0.4 }] } }
+								] }
+							]
+						},
+						{
+							"id": "death_coil",
+							"name": "Death Coil",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "A coil of death that heals you as it damages.",
+							"energy": 35,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:necromancer", "level": 60 }],
+							"hits": [{ "target": "front", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "element": "dark", "lifesteal": 0.6, "amount": { "base": 18, "scaling": [{ "id": "adventuring:magic", "amount": 0.6 }] } },
+								{ "type": "debuff", "id": "adventuring:curse", "stacks": { "base": 4, "scaling": [{ "id": "adventuring:magic", "amount": 0.15 }] } }
+							] }]
+						},
+						{
+							"id": "army_of_the_dead",
+							"name": "Army of the Dead",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "Raises an army of the dead to assault all enemies.",
+							"cost": 175,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:necromancer", "level": 70 }],
+							"hits": [{ "target": "all", "party": "enemy", "delay": 100, "repeat": 4, "effects": [
+								{ "type": "damage_flat", "element": "dark", "amount": { "base": 10, "scaling": [{ "id": "adventuring:magic", "amount": 0.4 }] } },
+								{ "type": "debuff", "id": "adventuring:curse", "stacks": 2 }
+							] }]
+						},
+						{
+							"id": "undying_will",
+							"name": "Undying Will",
+							"type": "passive",
+							"media": "assets/abilities/passive.png",
+							"description": "Your will to survive prevents death once per battle.",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:necromancer", "level": 80 }],
+							"effects": [
+								{ "trigger": "before_death", "type": "prevent_death", "target": "self", "limit": "combat" },
+								{ "trigger": "before_death", "type": "heal_flat", "target": "self", "amount": { "base": 15, "scaling": [{ "id": "adventuring:prayer", "amount": 0.5 }] } },
+								{ "trigger": "before_death", "type": "buff", "target": "self", "id": "adventuring:vampirism", "stacks": 5 }
+							]
+						},
+						{
+							"id": "plague_swarm",
+							"name": "Plague Swarm",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "Releases a plague swarm that poisons and curses all enemies.",
+							"energy": 40,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:necromancer", "level": 90 }],
+							"hits": [{ "target": "all", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "element": "dark", "amount": { "base": 15, "scaling": [{ "id": "adventuring:magic", "amount": 0.5 }] } },
+								{ "type": "debuff", "id": "adventuring:poison", "stacks": 5 },
+								{ "type": "debuff", "id": "adventuring:curse", "stacks": 4 }
+							] }]
+						},
+						{
+							"id": "apocalypse",
+							"name": "Apocalypse",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "The ultimate necromantic spell - devastation and resurrection.",
+							"cost": 250,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:necromancer", "level": 99 }],
+							"hits": [
+								{ "target": "all", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "element": "dark", "amount": { "base": 35, "scaling": [{ "id": "adventuring:magic", "amount": 1.2 }] } },
+									{ "type": "debuff", "id": "adventuring:curse", "stacks": { "base": 8, "scaling": [{ "id": "adventuring:magic", "amount": 0.25 }] } },
+									{ "type": "debuff", "id": "adventuring:weaken", "stacks": 6 }
+								] },
+								{ "target": "all", "party": "ally", "effects": [
+									{ "type": "revive", "amount": { "base": 0.5 } },
+									{ "type": "buff", "id": "adventuring:vampirism", "stacks": { "base": 8, "scaling": [{ "id": "adventuring:prayer", "amount": 0.25 }] } },
+									{ "type": "buff", "id": "adventuring:might", "stacks": { "base": 6, "scaling": [{ "id": "adventuring:magic", "amount": 0.2 }] } }
+								] }
+							]
+						}
+					]
+				}
+			}
+		}
+	}
 }

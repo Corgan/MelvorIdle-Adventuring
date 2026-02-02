@@ -784,28 +784,49 @@ export class AdventuringAchievement extends NamespacedObject {
 
         // Fallback to special case handling for non-stat requirements
         switch(req.type) {
-            // Derived stats (computed from map stats)
+            // Derived stats (computed from nested map stats)
             case 'total_clears':
-                return stats.getMapTotal('adventuring:clears_by_difficulty');
+                return stats.getNestedGrandTotal('adventuring:clears_by_area_difficulty');
             
             case 'heroic_clears': {
                 const heroicDiff = this.manager.difficulties.getObjectByID('adventuring:heroic');
-                const diffStat = this.manager.achievementStats.getObjectByID('adventuring:clears_by_difficulty');
-                return heroicDiff && diffStat ? stats.getMap(diffStat, heroicDiff) : 0;
+                const areaDiffStat = this.manager.achievementStats.getObjectByID('adventuring:clears_by_area_difficulty');
+                if (!heroicDiff || !areaDiffStat) return 0;
+                // Sum across all areas for this difficulty
+                let total = 0;
+                for (const area of this.manager.areas.allObjects) {
+                    total += stats.getNested(areaDiffStat, area, heroicDiff) || 0;
+                }
+                return total;
             }
             
             case 'mythic_clears': {
                 const mythicDiff = this.manager.difficulties.getObjectByID('adventuring:mythic');
-                const diffStat = this.manager.achievementStats.getObjectByID('adventuring:clears_by_difficulty');
-                return mythicDiff && diffStat ? stats.getMap(diffStat, mythicDiff) : 0;
+                const areaDiffStat = this.manager.achievementStats.getObjectByID('adventuring:clears_by_area_difficulty');
+                if (!mythicDiff || !areaDiffStat) return 0;
+                // Sum across all areas for this difficulty
+                let total = 0;
+                for (const area of this.manager.areas.allObjects) {
+                    total += stats.getNested(areaDiffStat, area, mythicDiff) || 0;
+                }
+                return total;
             }
             
             case 'difficulty_clears': {
                 const fullDiffId = req.difficulty.includes(':') ? req.difficulty : `adventuring:${req.difficulty}`;
                 const difficulty = this.manager.difficulties.getObjectByID(fullDiffId);
-                const diffStat = this.manager.achievementStats.getObjectByID('adventuring:clears_by_difficulty');
-                return difficulty && diffStat ? stats.getMap(diffStat, difficulty) : 0;
+                const areaDiffStat = this.manager.achievementStats.getObjectByID('adventuring:clears_by_area_difficulty');
+                if (!difficulty || !areaDiffStat) return 0;
+                // Sum across all areas for this difficulty
+                let total = 0;
+                for (const area of this.manager.areas.allObjects) {
+                    total += stats.getNested(areaDiffStat, area, difficulty) || 0;
+                }
+                return total;
             }
+
+            case 'solo_wins':
+                return stats.getNestedGrandTotal('adventuring:solo_clears');
             
             case 'solo_dungeon_clears':
                 return stats.getNestedGrandTotal('adventuring:solo_clears');
@@ -829,11 +850,8 @@ export class AdventuringAchievement extends NamespacedObject {
             }
 
             case 'total_production': {
-                const items = stats.get('adventuring:items_produced');
-                const mats = stats.get('adventuring:materials_produced');
-                const cons = stats.get('adventuring:consumables_produced');
-                const conv = stats.get('adventuring:conversions_completed');
-                return items + mats + cons + conv;
+                // items_produced now counts everything including conversions
+                return stats.get('adventuring:items_produced') || 0;
             }
 
             // Non-stat requirements (game state queries)
@@ -1399,7 +1417,7 @@ export class AdventuringAchievement extends NamespacedObject {
     }
 
     getRewardsText() {
-        const { getEffectDescriptionsList } = loadModule('src/core/adventuring-utils.mjs');
+        const { getEffectDescriptionsList } = loadModule('src/core/utils/adventuring-utils.mjs');
         const parts = [];
         for(const reward of this.rewards) {
             switch(reward.type) {
@@ -1450,11 +1468,72 @@ export class AchievementManager {
 
         // Tracked achievement progress: Map<achievementId, trackingData>
         this._trackedProgress = new Map();
+
+        // Register with conductor to receive all triggers
+        // We listen for all events since achievements can trigger on any event type
+        this.manager.conductor.listen('*', (type, context) => this._handleTrigger(type, context));
     }
 
-    init() {
-        // Party.effectCache handles achievement effects now
+    onLoad() {
+        // Build trigger cache after data is loaded
         this._buildTriggerCache();
+    }
+
+    /**
+     * Handler called by conductor for all trigger events
+     * @param {string} type - The trigger type
+     * @param {object} context - Trigger context
+     */
+    _handleTrigger(type, context) {
+        // Process stats for this trigger (does NOT require immediate achievement check)
+        if (this.stats) {
+            this.stats.processTrigger(type, context);
+        }
+
+        // Check triggered achievements
+        if (!this._triggerCacheBuilt) {
+            this._buildTriggerCache();
+        }
+
+        const candidates = this._triggerCache.get(type);
+        if (!candidates || candidates.size === 0) {
+            return;
+        }
+
+        for (const achievement of candidates) {
+            if (achievement.isComplete()) {
+                continue;
+            }
+
+            // For milestone chains, get current milestone's requirement
+            let req;
+            let isMilestone = false;
+            if (achievement.isMilestoneChain) {
+                const milestone = achievement.getCurrentMilestone();
+                if (!milestone) continue;
+                req = milestone.requirement;
+                isMilestone = true;
+            } else {
+                req = achievement.requirement;
+            }
+
+            // Check conditions if present
+            if (req.conditions && !this._meetsConditions(req.conditions, context)) {
+                continue;
+            }
+
+            // Handle tracked/unique achievements
+            if (req.trackUnique) {
+                this._processTrackedTrigger(achievement, req, context, isMilestone);
+            } else {
+                // Simple trigger - complete immediately
+                if (isMilestone) {
+                    this._completeMilestone(achievement, achievement.getCurrentMilestone());
+                } else {
+                    this.completeAchievement(achievement);
+                }
+            }
+        }
     }
 
     /**
@@ -1517,58 +1596,19 @@ export class AchievementManager {
     }
 
     /**
-     * Handle a trigger event from the game
+     * Handle a trigger event from the game.
+     * DEPRECATED: Call conductor.trigger() directly instead.
+     * This method forwards to the conductor for backward compatibility.
      * @param {string} triggerType - The type of trigger (e.g., 'kill', 'dungeon_end')
      * @param {Object} context - Context including encounterStats, runStats, etc.
      */
     trigger(triggerType, context = {}) {
-        if (!this._triggerCacheBuilt) {
-            this._buildTriggerCache();
-        }
-
-        const candidates = this._triggerCache.get(triggerType);
-        if (!candidates || candidates.size === 0) {
-            return;
-        }
-
-        for (const achievement of candidates) {
-            if (achievement.isComplete()) {
-                continue;
-            }
-
-            // For milestone chains, get current milestone's requirement
-            let req;
-            let isMilestone = false;
-            if (achievement.isMilestoneChain) {
-                const milestone = achievement.getCurrentMilestone();
-                if (!milestone) continue;
-                req = milestone.requirement;
-                isMilestone = true;
-            } else {
-                req = achievement.requirement;
-            }
-
-            // Check conditions if present
-            if (req.conditions && !this._meetsConditions(req.conditions, context)) {
-                continue;
-            }
-
-            // Handle tracked/unique achievements
-            if (req.trackUnique) {
-                this._processTrackedTrigger(achievement, req, context, isMilestone);
-            } else {
-                // Simple trigger - complete immediately
-                if (isMilestone) {
-                    this._completeMilestone(achievement, achievement.getCurrentMilestone());
-                } else {
-                    this.completeAchievement(achievement);
-                }
-            }
-        }
+        // Forward to conductor - this will call back to _handleTrigger
+        this.manager.conductor.trigger(triggerType, context);
     }
 
     /**
-     * Process a tracked/unique trigger (e.g., "flawless clear with each job")
+     * Process a tracked/unique trigger (e.g., "clear with each job")
      * @param {AdventuringAchievement} achievement 
      * @param {Object} req - The requirement object
      * @param {Object} context - Trigger context
@@ -1711,9 +1751,7 @@ export class AchievementManager {
                             trigger: effect.trigger || 'passive',
                             value: effect.value ?? effect.amount ?? 0,
                             id: `achievement:${achievement.localID}:${effect.type}:${effect.stat || ''}`,
-                            source: achievement,
-                            sourceName: achievement.name,
-                            sourceType: 'achievement'
+                            sourcePath: [{ type: 'achievement', name: achievement.name, ref: achievement }]
                         });
                     }
                 }
@@ -1735,9 +1773,10 @@ export class AchievementManager {
                                 trigger: effect.trigger || 'passive',
                                 value: effect.value ?? effect.amount ?? 0,
                                 id: `milestone:${milestone.id}:${effect.type}:${effect.stat || ''}`,
-                                source: achievement,
-                                sourceName: milestone.name,
-                                sourceType: 'milestone'
+                                sourcePath: [
+                                    { type: 'achievement', name: achievement.name, ref: achievement },
+                                    { type: 'milestone', name: milestone.name, ref: milestone }
+                                ]
                             });
                         }
                     }
@@ -1820,182 +1859,22 @@ export class AchievementManager {
         return null;
     }
 
-    recordKill(monster) {
-        // Build tags array with resolved tag objects
-        const tags = [];
-        if (monster.tags) {
-            for (const tagName of monster.tags) {
-                const fullTagId = tagName.includes(':') ? tagName : `adventuring:${tagName}`;
-                const tag = this.manager.tags.getObjectByID(fullTagId);
-                if (tag) tags.push(tag);
-            }
-        }
-        
-        this.stats.processTrigger('monster_killed', {
-            monster,
-            tags
-        });
-        this.markDirty();
-    }
-
-    recordDungeonClear(area, difficulty, isEndless, endlessWave) {
-        // Check for solo
-        const noneJob = this.manager.cached.noneJob;
-        const activeHeroes = this.manager.party.all.filter(h => h.combatJob && h.combatJob !== noneJob);
-        const isSolo = activeHeroes.length === 1;
-        
-        this.stats.processTrigger('dungeon_end', {
-            area,
-            difficulty,
-            isEndless,
-            isSolo
-        });
-        
-        if (isEndless) {
-            // Get the primary job (first active hero's combat job)
-            const primaryJob = activeHeroes.length > 0 ? activeHeroes[0].combatJob : null;
-            this.stats.processTrigger('endless_wave', {
-                wave: endlessWave,
-                area,
-                difficulty,
-                isSolo,
-                primaryJob
-            });
-        }
-        
-        this.markDirty();
-    }
-
-    recordMaterials(qty) {
-        this.stats.processTrigger('materials_gained', { quantity: qty });
-        this.markDirty();
-    }
-
-    recordCurrency(qty) {
-        this.stats.processTrigger('currency_gained', { quantity: qty });
-        this.markDirty();
-    }
-
-    recordUniqueMonster() {
-        this.stats.processTrigger('monster_discovered', {});
-        this.markDirty();
-    }
-
-    recordCombatEnd(options) {
-        const { flawless, rounds, lastStand, heroes } = options;
-        const totalDamage = options.totalDamage || 0;
-        const totalHealing = options.totalHealing || 0;
-
-        // Check for solo
-        let isSolo = false;
-        if (heroes) {
-            const noneJob = this.manager.cached.noneJob;
-            const activeHeroes = heroes.filter(h => h.combatJob && h.combatJob !== noneJob);
-            isSolo = activeHeroes.length === 1;
-        }
-        
-        this.stats.processTrigger('combat_end', {
-            wasFlawless: flawless,
-            wasLastStand: lastStand,
-            isSolo,
-            rounds,
-            totalDamage,
-            totalHealing
-        });
-        
-        this.markDirty();
-    }
-
-    recordSlayerTask() {
-        this.stats.processTrigger('slayer_task_completed', {});
-        this.markDirty();
-    }
-
-    recordBuffApplied(count = 1) {
-        for (let i = 0; i < count; i++) {
-            this.stats.processTrigger('buff_applied', {});
-        }
-        this.markDirty();
-    }
-
-    recordDebuffApplied(count = 1) {
-        for (let i = 0; i < count; i++) {
-            this.stats.processTrigger('debuff_applied', {});
-        }
-        this.markDirty();
-    }
-
-    recordFloorExplored() {
-        this.stats.processTrigger('floor_completed', {});
-        this.markDirty();
-    }
-
-    recordSpecialTile() {
-        this.stats.processTrigger('special_tile_found', {});
-        this.markDirty();
-    }
-
-    /**
-     * Record production from town job workshops
-     * @param {string} outputType - 'item', 'material', 'consumable', or 'conversion'
-     * @param {number} count - Number of items produced
-     * @param {Object} job - The job object associated with production (optional)
-     */
-    recordProduction(outputType, count = 1, job = null) {
-        for (let i = 0; i < count; i++) {
-            if (outputType === 'conversion') {
-                this.stats.processTrigger('conversion_completed', { job });
-            } else {
-                this.stats.processTrigger('item_produced', {
-                    job,
-                    itemType: outputType
-                });
-            }
-        }
-
-        this.markDirty();
-    }
-
-    /**
-     * Record equipment upgrade
-     */
-    recordEquipmentUpgrade() {
-        this.stats.processTrigger('equipment_upgraded', {});
-        this.markDirty();
-    }
-
-    /**
-     * Record equipment crafted/unlocked
-     */
-    recordEquipmentCrafted() {
-        this.stats.processTrigger('equipment_crafted', {});
-        this.markDirty();
-    }
-
-    /**
-     * Record materials gained from combat drops only
-     * @param {number} qty - Amount of materials gained
-     */
-    recordCombatMaterials(qty) {
-        this.stats.processTrigger('combat_materials_gained', { quantity: qty });
-        this.markDirty();
-    }
-
-    /**
-     * Record currency gained from combat drops only
-     * @param {number} qty - Amount of currency gained
-     */
-    recordCombatCurrency(qty) {
-        this.stats.processTrigger('combat_currency_gained', { quantity: qty });
-        this.markDirty();
-    }
-
     markDirty() {
         this._needsCheck = true;
     }
 
     checkIfDirty() {
         if(this._needsCheck) {
+            // During offline progress, throttle achievement checks heavily
+            // since they're expensive and rarely complete mid-offline
+            if(loadingOfflineProgress) {
+                // Only check every 100 dirty marks during offline
+                this._offlineCheckCounter = (this._offlineCheckCounter || 0) + 1;
+                if(this._offlineCheckCounter < 100) {
+                    return;
+                }
+                this._offlineCheckCounter = 0;
+            }
             this._needsCheck = false;
             this.checkAchievements();
         }
@@ -2009,10 +1888,16 @@ export class AchievementManager {
         for(const achievement of this.manager.achievements.allObjects) {
             if(achievement.isComplete()) continue;
 
+            // Skip triggered achievements - they complete via _handleTrigger, not polling
+            if(achievement.requirement?.type === 'triggered' && !achievement.isMilestoneChain) continue;
+
             // Handle milestone chain achievements
             if(achievement.isMilestoneChain) {
                 const milestone = achievement.getCurrentMilestone();
-                if(milestone && achievement.isMet()) {
+                if(!milestone) continue;
+                // Skip if current milestone is triggered
+                if(milestone.requirement?.type === 'triggered') continue;
+                if(achievement.isMet()) {
                     this._completeMilestone(achievement, milestone);
                     newCompletions = true;
                 }

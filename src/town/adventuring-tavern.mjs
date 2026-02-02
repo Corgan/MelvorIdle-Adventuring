@@ -1,11 +1,9 @@
 const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringPage } = await loadModule('src/ui/adventuring-page.mjs');
-const { createEffect, filterEffects } = await loadModule('src/core/adventuring-utils.mjs');
+const { createEffect, filterEffects } = await loadModule('src/core/utils/adventuring-utils.mjs');
 
 await loadModule('src/town/components/adventuring-tavern.mjs');
-
-const MAX_EQUIPPED_DRINKS = 3;
 
 class AdventuringTavernRenderQueue {
     constructor() {
@@ -39,7 +37,12 @@ export class AdventuringTavern extends AdventuringPage {
         this.selectedTier = 1;
 
         this.component.back.onclick = () => this.back();
+
+        // Consume charges at end of dungeon runs
+        this.manager.conductor.listen('dungeon_end', () => this.consumeCharges());
     }
+
+    get maxEquipped() { return this.manager.config.limits.maxEquippedDrinks; }
 
     back() {
         if(this.active) {
@@ -49,6 +52,7 @@ export class AdventuringTavern extends AdventuringPage {
 
     onLoad() {
         super.onLoad();
+        this.renderQueue.queueAll();
     }
 
     onShow() {
@@ -66,6 +70,7 @@ export class AdventuringTavern extends AdventuringPage {
         this.manager.party.setAllLocked(true);
     }
 
+    // Required by base class contract - no additional registration needed
     postDataRegistration() {
 
     }
@@ -142,8 +147,8 @@ export class AdventuringTavern extends AdventuringPage {
     }
 
     equip(drink, tier) {
-        if (this.equipped.size >= MAX_EQUIPPED_DRINKS && !this.isEquipped(drink)) {
-            this.manager.log.add(`Cannot equip more than ${MAX_EQUIPPED_DRINKS} drinks.`, {
+        if (this.equipped.size >= this.maxEquipped && !this.isEquipped(drink)) {
+            this.manager.log.add(`Cannot equip more than ${this.maxEquipped} drinks.`, {
                 category: 'town'
             });
             return false;
@@ -200,7 +205,7 @@ export class AdventuringTavern extends AdventuringPage {
 
 
 
-    getActiveDrinks() {
+    get activeDrinks() {
         const active = [];
         for (const [drink, tier] of this.equipped.entries()) {
             const charges = this.getCharges(drink, tier);
@@ -222,14 +227,8 @@ export class AdventuringTavern extends AdventuringPage {
         for (const [drink, tier] of this.equipped.entries()) {
             if (this.getCharges(drink, tier) > 0) {
                 const tierEffects = drink.getTierEffects(tier);
-                for (const effectData of tierEffects) {
-                    effects.push(createEffect(
-                        effectData,
-                        drink,
-                        drink.getTierName(tier),
-                        'tavern'
-                    ));
-                }
+                // Effects already have sourcePath from drink.postDataRegistration()
+                effects.push(...tierEffects);
             }
         }
 
@@ -295,8 +294,8 @@ export class AdventuringTavern extends AdventuringPage {
             return;
 
         this.component.renderEquippedSlots(
-            this.getActiveDrinks(),
-            MAX_EQUIPPED_DRINKS,
+            this.activeDrinks,
+            this.maxEquipped,
             (drink) => {
                 this.unequip(drink);
                 this.render();

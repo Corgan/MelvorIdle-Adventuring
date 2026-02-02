@@ -2,7 +2,8 @@ const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringWorkshop } = await loadModule('src/town/adventuring-workshop.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
-const { RequirementsChecker, getLockedMedia, UNKNOWN_MEDIA } = await loadModule('src/core/adventuring-utils.mjs');
+const { RequirementsChecker } = await loadModule('src/core/utils/requirements-checker.mjs');
+const { getLockedMedia, UNKNOWN_MEDIA } = await loadModule('src/core/utils/adventuring-utils.mjs');
 
 const { AdventuringBuildingElement } = await loadModule('src/town/components/adventuring-building.mjs');
 
@@ -36,7 +37,8 @@ export class AdventuringBuilding extends NamespacedObject {
 
         this.requirements = data.requirements;
         if(data.actions !== undefined)
-            this._actions = data.actions;
+            this._actions = data.actions;
+
 
         if(data.itemSlotOrder !== undefined)
             this.itemSlotOrder = data.itemSlotOrder;
@@ -79,8 +81,12 @@ export class AdventuringBuilding extends NamespacedObject {
     }
 
     get unlocked() {
+        // Fast path: once unlocked, always unlocked
+        if (this._unlockedCached) return true;
         if (this._reqChecker === undefined) return true;
-        return this._reqChecker.check();
+        const result = this._reqChecker.check();
+        if (result) this._unlockedCached = true;
+        return result;
     }
 
     get tooltip() {

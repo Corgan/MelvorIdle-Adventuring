@@ -83,14 +83,20 @@ export class RequirementsChecker {
             case 'area_cleared': {
                 const area = this.manager.areas.getObjectByID(req.area);
                 if (!area) return false;
-                let xp = 0;
-                if (this.manager.actionMastery) {
-                    const masteryEntry = this.manager.actionMastery.get(area);
-                    if (masteryEntry && masteryEntry.xp) {
-                        xp = masteryEntry.xp;
-                    }
-                }
-                return xp > 0;
+                return this.manager.crossroads.clearedAreas.has(area.id);
+            }
+
+            case 'area_cleared_difficulty': {
+                // Check if area has been cleared at least once on specific difficulty
+                const fullAreaId = req.area.includes(':') ? req.area : `adventuring:${req.area}`;
+                const fullDiffId = req.difficulty.includes(':') ? req.difficulty : `adventuring:${req.difficulty}`;
+                const area = this.manager.areas.getObjectByID(fullAreaId);
+                const difficulty = this.manager.difficulties.getObjectByID(fullDiffId);
+                if (!area || !difficulty) return false;
+                const areaDiffStat = this.manager.achievementStats.getObjectByID('adventuring:clears_by_area_difficulty');
+                if (!areaDiffStat) return false;
+                const clears = this.manager.achievementManager.stats.getNested(areaDiffStat, area, difficulty) || 0;
+                return clears >= (req.count || 1);
             }
 
             case 'dropped':
@@ -119,7 +125,11 @@ export class RequirementsChecker {
     _checkJobLevel(jobId, level) {
         const job = this.manager.jobs.getObjectByID(jobId);
         if (!job) return false;
-        return this.manager.getMasteryLevel(job) >= level;
+        // Access actionMastery directly to avoid recursive job.unlocked checks
+        // For requirement purposes, having the mastery level is sufficient
+        const masteryData = this.manager.actionMastery.get(job);
+        const masteryLevel = masteryData?.level ?? 1;
+        return masteryLevel >= level;
     }
 
     _checkCurrentJobLevel(jobId, level, character) {
@@ -132,7 +142,10 @@ export class RequirementsChecker {
 
         const job = this.manager.jobs.getObjectByID(jobId);
         if (!job) return false;
-        return this.manager.getMasteryLevel(job) >= level;
+        // Access actionMastery directly to avoid recursive job.unlocked checks
+        const masteryData = this.manager.actionMastery.get(job);
+        const masteryLevel = masteryData?.level ?? 1;
+        return masteryLevel >= level;
     }
 
     _hasCurrentJob(jobId, character) {
@@ -276,6 +289,15 @@ export function formatRequirement(req, manager, context = {}) {
             const area = manager.areas.getObjectByID(req.area);
             const areaName = area !== undefined ? area.name : req.area;
             text = `Clear ${areaName}`;
+            break;
+        }
+
+        case 'area_cleared_difficulty': {
+            const area = manager.areas.getObjectByID(req.area);
+            const areaName = area !== undefined ? area.name : req.area;
+            const difficulty = manager.difficulties?.getObjectByID(req.difficulty);
+            const diffName = difficulty !== undefined ? difficulty.name : req.difficulty;
+            text = `Clear ${areaName} on ${diffName}`;
             break;
         }
 

@@ -1,689 +1,691 @@
 {
-  "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
-  "namespace": "adventuring",
-  "data": {
-    "skillData": [
-      {
-        "skillID": "adventuring:Adventuring",
-        "data": {
-          "passives": [
-            {
-              "id": "undead_fortitude",
-              "name": "Undead Fortitude",
-              "effects": [
-                {
-                  "trigger": "turn_start",
-                  "type": "heal_flat",
-                  "target": "self",
-                  "amount": {
-                    "base": 2,
-                    "scaling": []
-                  },
-                  "stacks": {
-                    "base": 1,
-                    "scaling": []
-                  }
-                }
-              ]
-            }
-          ],
-          "areas": [
-            {
-              "id": "graveyard",
-              "name": "Graveyard",
-              "media": "melvor:assets/media/skills/combat/death.png#shade=gray",
-              "requirements": [
-                {
-                  "type": "skill_level",
-                  "level": 20
-                }
-              ],
-              "height": 8,
-              "width": 6,
-              "floors": [
-                {
-                  "monsters": [
-                    {
-                      "id": "adventuring:skeleton",
-                      "weight": 75
-                    },
-                    {
-                      "id": "adventuring:ghost",
-                      "weight": 25
-                    }
-                  ],
-                  "exit": [
-                    "adventuring:skeleton",
-                    "adventuring:skeleton",
-                    "adventuring:ghost"
-                  ]
-                },
-                {
-                  "monsters": [
-                    {
-                      "id": "adventuring:skeleton",
-                      "weight": 50
-                    },
-                    {
-                      "id": "adventuring:ghost",
-                      "weight": 25
-                    },
-                    {
-                      "id": "adventuring:zombie_hand",
-                      "weight": 25
-                    }
-                  ],
-                  "exit": [
-                    "adventuring:skeleton",
-                    "adventuring:ghost",
-                    "adventuring:zombie_hand"
-                  ]
-                },
-                {
-                  "monsters": [
-                    {
-                      "id": "adventuring:skeleton",
-                      "weight": 20
-                    },
-                    {
-                      "id": "adventuring:ghost",
-                      "weight": 30
-                    },
-                    {
-                      "id": "adventuring:zombie_hand",
-                      "weight": 40
-                    },
-                    {
-                      "id": "adventuring:zombie",
-                      "weight": 10
-                    }
-                  ],
-                  "exit": [
-                    "adventuring:ghost",
-                    "adventuring:zombie_hand",
-                    "adventuring:zombie"
-                  ]
-                },
-                {
-                  "monsters": [
-                    {
-                      "id": "adventuring:ghost",
-                      "weight": 30
-                    },
-                    {
-                      "id": "adventuring:zombie_hand",
-                      "weight": 40
-                    },
-                    {
-                      "id": "adventuring:zombie",
-                      "weight": 30
-                    }
-                  ],
-                  "exit": [
-                    "adventuring:zombie_hand",
-                    "adventuring:zombie",
-                    "adventuring:zombie"
-                  ]
-                },
-                {
-                  "monsters": [
-                    {
-                      "id": "adventuring:zombie_hand",
-                      "weight": 30
-                    },
-                    {
-                      "id": "adventuring:zombie",
-                      "weight": 70
-                    }
-                  ],
-                  "exit": [
-                    "adventuring:zombie",
-                    "adventuring:zombie",
-                    "adventuring:zombie"
-                  ]
-                },
-                {
-                  "monsters": [
-                    {
-                      "id": "adventuring:zombie_hand",
-                      "weight": 20
-                    },
-                    {
-                      "id": "adventuring:zombie",
-                      "weight": 80
-                    }
-                  ],
-                  "exit": [
-                    "adventuring:zombie",
-                    "adventuring:zombie",
-                    "adventuring:zombie_leader"
-                  ]
-                }
-              ]
-            }
-          ],
-          "monsters": [
-            {
-              "id": "skeleton",
-              "name": "Skeleton",
-              "media": "melvor:assets/media/monsters/skeleton.png",
-              "tags": [
-                "undead"
-              ],
-              "xp": 3,
-              "stats": [
-                {
-                  "id": "adventuring:hitpoints",
-                  "amount": 17
-                },
-                {
-                  "id": "adventuring:defence",
-                  "amount": 9
-                },
-                {
-                  "id": "adventuring:agility",
-                  "amount": 26
-                },
-                {
-                  "id": "adventuring:strength",
-                  "amount": 8
-                },
-                {
-                  "id": "adventuring:ranged",
-                  "amount": 26
-                },
-                {
-                  "id": "adventuring:magic",
-                  "amount": 26
-                },
-                {
-                  "id": "adventuring:prayer",
-                  "amount": 14
-                }
-              ],
-              "generator": "adventuring:gnaw",
-              "spender": "adventuring:throw_rib",
-              "passives": [],
-              "loot": [
-                {
-                  "id": "adventuring:currency",
-                  "qty": 2,
-                  "type": "currency"
-                },
-                {
-                  "id": "adventuring:parts",
-                  "qty": 1,
-                  "type": "salvage"
-                },
-                {
-                  "id": "adventuring:bone_fragment",
-                  "qty": 2,
-                  "type": "materials",
-                  "chance": 0.4
-                },
-                {
-                  "type": "equipment_pool",
-                  "pool": "adventuring:tier2_graveyard",
-                  "chance": 0.03
-                }
-              ]
-            },
-            {
-              "id": "ghost",
-              "name": "Ghost",
-              "media": "melvor:assets/media/monsters/ghost.png",
-              "tags": [
-                "undead"
-              ],
-              "xp": 3,
-              "stats": [
-                {
-                  "id": "adventuring:hitpoints",
-                  "amount": 17
-                },
-                {
-                  "id": "adventuring:defence",
-                  "amount": 10
-                },
-                {
-                  "id": "adventuring:agility",
-                  "amount": 32
-                },
-                {
-                  "id": "adventuring:strength",
-                  "amount": 10
-                },
-                {
-                  "id": "adventuring:ranged",
-                  "amount": 26
-                },
-                {
-                  "id": "adventuring:magic",
-                  "amount": 30
-                },
-                {
-                  "id": "adventuring:prayer",
-                  "amount": 18
-                }
-              ],
-              "generator": "adventuring:haunt",
-              "spender": "adventuring:possess",
-              "passives": [],
-              "loot": [
-                {
-                  "id": "adventuring:currency",
-                  "qty": 2,
-                  "type": "currency"
-                },
-                {
-                  "id": "adventuring:parts",
-                  "qty": 1,
-                  "type": "salvage"
-                },
-                {
-                  "id": "adventuring:bone_fragment",
-                  "qty": 1,
-                  "type": "materials",
-                  "chance": 0.25
-                },
-                {
-                  "type": "equipment_pool",
-                  "pool": "adventuring:tier2_graveyard",
-                  "chance": 0.03
-                }
-              ]
-            },
-            {
-              "id": "zombie_hand",
-              "name": "Zombie Hand",
-              "media": "melvor:assets/media/monsters/zombie_hand.png",
-              "tags": [
-                "undead"
-              ],
-              "xp": 3,
-              "stats": [
-                {
-                  "id": "adventuring:hitpoints",
-                  "amount": 16
-                },
-                {
-                  "id": "adventuring:defence",
-                  "amount": 8
-                },
-                {
-                  "id": "adventuring:agility",
-                  "amount": 24
-                },
-                {
-                  "id": "adventuring:strength",
-                  "amount": 8
-                },
-                {
-                  "id": "adventuring:ranged",
-                  "amount": 24
-                },
-                {
-                  "id": "adventuring:magic",
-                  "amount": 24
-                },
-                {
-                  "id": "adventuring:prayer",
-                  "amount": 12
-                }
-              ],
-              "generator": "adventuring:grave_slap",
-              "spender": "adventuring:strangle",
-              "passives": [],
-              "loot": [
-                {
-                  "id": "adventuring:currency",
-                  "qty": 2,
-                  "type": "currency"
-                },
-                {
-                  "id": "adventuring:parts",
-                  "qty": 1,
-                  "type": "salvage"
-                },
-                {
-                  "id": "adventuring:bone_fragment",
-                  "qty": 1,
-                  "type": "materials",
-                  "chance": 0.3
-                },
-                {
-                  "type": "equipment_pool",
-                  "pool": "adventuring:tier2_graveyard",
-                  "chance": 0.03
-                }
-              ]
-            },
-            {
-              "id": "zombie",
-              "name": "Zombie",
-              "media": "melvor:assets/media/monsters/zombie.png",
-              "tags": [
-                "undead"
-              ],
-              "xp": 3,
-              "stats": [
-                {
-                  "id": "adventuring:hitpoints",
-                  "amount": 18
-                },
-                {
-                  "id": "adventuring:defence",
-                  "amount": 9
-                },
-                {
-                  "id": "adventuring:agility",
-                  "amount": 24
-                },
-                {
-                  "id": "adventuring:strength",
-                  "amount": 9
-                },
-                {
-                  "id": "adventuring:ranged",
-                  "amount": 18
-                },
-                {
-                  "id": "adventuring:magic",
-                  "amount": 18
-                },
-                {
-                  "id": "adventuring:prayer",
-                  "amount": 12
-                }
-              ],
-              "generator": "adventuring:gnaw",
-              "spender": "adventuring:eat_brains",
-              "passives": [],
-              "loot": [
-                {
-                  "id": "adventuring:currency",
-                  "qty": 2,
-                  "type": "currency"
-                },
-                {
-                  "id": "adventuring:parts",
-                  "qty": 1,
-                  "type": "salvage"
-                },
-                {
-                  "id": "adventuring:bone_fragment",
-                  "qty": 2,
-                  "type": "materials",
-                  "chance": 0.35
-                },
-                {
-                  "type": "equipment_pool",
-                  "pool": "adventuring:tier2_graveyard",
-                  "chance": 0.03
-                }
-              ]
-            },
-            {
-              "id": "zombie_leader",
-              "name": "Zombie Leader",
-              "media": "melvor:assets/media/monsters/zombie_leader.png",
-              "tags": [
-                "undead"
-              ],
-              "xp": 12,
-              "stats": [
-                {
-                  "id": "adventuring:hitpoints",
-                  "amount": 28
-                },
-                {
-                  "id": "adventuring:defence",
-                  "amount": 12
-                },
-                {
-                  "id": "adventuring:agility",
-                  "amount": 26
-                },
-                {
-                  "id": "adventuring:strength",
-                  "amount": 10
-                },
-                {
-                  "id": "adventuring:ranged",
-                  "amount": 26
-                },
-                {
-                  "id": "adventuring:magic",
-                  "amount": 26
-                },
-                {
-                  "id": "adventuring:prayer",
-                  "amount": 16
-                }
-              ],
-              "generator": "adventuring:gnaw",
-              "spender": "adventuring:eat_brains",
-              "passives": [],
-              "loot": [
-                {
-                  "id": "adventuring:currency",
-                  "qty": 2,
-                  "type": "currency"
-                },
-                {
-                  "id": "adventuring:parts",
-                  "qty": 1,
-                  "type": "salvage"
-                },
-                {
-                  "id": "adventuring:bone_fragment",
-                  "qty": 3,
-                  "type": "materials",
-                  "chance": 0.5
-                },
-                {
-                  "type": "equipment_pool",
-                  "pool": "adventuring:tier2_graveyard",
-                  "chance": 0.15
-                }
-              ]
-            }
-          ],
-          "generators": [
-            {
-              "id": "grave_slap",
-              "name": "Grave Slap",
-              "requirements": [],
-              "isEnemy": true,
-              "energy": 20,
-              "hits": [
-                {
-                  "target": "front",
-                  "party": "enemy",
-                  "effects": [
-                    {
-                      "type": "damage_flat",
-                      "amount": {
-                        "base": 8,
-                        "scaling": [
-                          {
-                            "id": "adventuring:strength",
-                            "amount": 0.3
-                          }
-                        ]
-                      }
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "id": "gnaw",
-              "name": "Gnaw",
-              "requirements": [],
-              "isEnemy": true,
-              "energy": 50,
-              "hits": [
-                {
-                  "target": "front",
-                  "party": "enemy",
-                  "effects": [
-                    {
-                      "type": "damage_flat",
-                      "amount": {
-                        "base": 5,
-                        "scaling": [
-                          {
-                            "id": "adventuring:strength",
-                            "amount": 0.3
-                          }
-                        ]
-                      }
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "id": "haunt",
-              "name": "Haunt",
-              "requirements": [],
-              "isEnemy": true,
-              "energy": 50,
-              "hits": [
-                {
-                  "target": "random",
-                  "party": "enemy",
-                  "effects": [
-                    {
-                      "type": "damage_flat",
-                      "amount": {
-                        "base": 5,
-                        "scaling": [
-                          {
-                            "id": "adventuring:strength",
-                            "amount": 0.3
-                          }
-                        ]
-                      }
-                    }
-                  ]
-                }
-              ]
-            }
-          ],
-          "spenders": [
-            {
-              "id": "throw_rib",
-              "name": "Throw Rib",
-              "requirements": [],
-              "isEnemy": true,
-              "cost": 100,
-              "hits": [
-                {
-                  "target": "back",
-                  "party": "enemy",
-                  "effects": [
-                    {
-                      "type": "damage_flat",
-                      "amount": {
-                        "base": 20,
-                        "scaling": [
-                          {
-                            "id": "adventuring:strength",
-                            "amount": 0.4
-                          }
-                        ]
-                      }
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "id": "strangle",
-              "name": "Strangle",
-              "requirements": [],
-              "isEnemy": true,
-              "cost": 100,
-              "hits": [
-                {
-                  "target": "random",
-                  "party": "enemy",
-                  "effects": [
-                    {
-                      "type": "damage_flat",
-                      "amount": {
-                        "base": 20,
-                        "scaling": [
-                          {
-                            "id": "adventuring:strength",
-                            "amount": 0.4
-                          }
-                        ]
-                      }
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "id": "eat_brains",
-              "name": "Eat Brains",
-              "requirements": [],
-              "isEnemy": true,
-              "cost": 100,
-              "hits": [
-                {
-                  "target": "front",
-                  "party": "enemy",
-                  "effects": [
-                    {
-                      "type": "damage_flat",
-                      "amount": {
-                        "base": 20,
-                        "scaling": [
-                          {
-                            "id": "adventuring:strength",
-                            "amount": 0.4
-                          }
-                        ]
-                      }
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "id": "possess",
-              "name": "Possess",
-              "requirements": [],
-              "isEnemy": true,
-              "cost": 100,
-              "hits": [
-                {
-                  "target": "random",
-                  "party": "enemy",
-                  "effects": [
-                    {
-                      "type": "damage_flat",
-                      "amount": {
-                        "base": 20,
-                        "scaling": [
-                          {
-                            "id": "adventuring:strength",
-                            "amount": 0.4
-                          }
-                        ]
-                      }
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-      }
-    ]
-  }
+	"$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+	"namespace": "adventuring",
+	"data": {
+		"skillData": [
+			{
+				"skillID": "adventuring:Adventuring",
+				"data": {
+					"passives": [
+						{
+							"id": "undead_fortitude",
+							"name": "Undead Fortitude",
+							"effects": [
+								{
+									"trigger": "turn_start",
+									"type": "heal_flat",
+									"target": "self",
+									"amount": {
+										"base": 2,
+										"scaling": []
+									},
+									"stacks": {
+										"base": 1,
+										"scaling": []
+									}
+								}
+							]
+						}
+					],
+					"areas": [
+						{
+							"id": "graveyard",
+							"name": "Graveyard",
+							"media": "melvor:assets/media/skills/combat/death.png#shade=gray",
+							"requirements": [
+								{
+									"type": "area_cleared",
+									"area": "adventuring:spider_nest"
+								}
+							],
+							"height": 8,
+							"width": 6,
+							"floors": [
+								{
+									"monsters": [
+										{
+											"id": "adventuring:skeleton",
+											"weight": 75
+										},
+										{
+											"id": "adventuring:ghost",
+											"weight": 25
+										}
+									],
+									"exit": [
+										"adventuring:skeleton",
+										"adventuring:skeleton",
+										"adventuring:ghost"
+									]
+								},
+								{
+									"monsters": [
+										{
+											"id": "adventuring:skeleton",
+											"weight": 50
+										},
+										{
+											"id": "adventuring:ghost",
+											"weight": 25
+										},
+										{
+											"id": "adventuring:zombie_hand",
+											"weight": 25
+										}
+									],
+									"exit": [
+										"adventuring:skeleton",
+										"adventuring:ghost",
+										"adventuring:zombie_hand"
+									]
+								},
+								{
+									"monsters": [
+										{
+											"id": "adventuring:skeleton",
+											"weight": 20
+										},
+										{
+											"id": "adventuring:ghost",
+											"weight": 30
+										},
+										{
+											"id": "adventuring:zombie_hand",
+											"weight": 40
+										},
+										{
+											"id": "adventuring:zombie",
+											"weight": 10
+										}
+									],
+									"exit": [
+										"adventuring:ghost",
+										"adventuring:zombie_hand",
+										"adventuring:zombie"
+									]
+								},
+								{
+									"monsters": [
+										{
+											"id": "adventuring:ghost",
+											"weight": 30
+										},
+										{
+											"id": "adventuring:zombie_hand",
+											"weight": 40
+										},
+										{
+											"id": "adventuring:zombie",
+											"weight": 30
+										}
+									],
+									"exit": [
+										"adventuring:zombie_hand",
+										"adventuring:zombie",
+										"adventuring:zombie"
+									]
+								},
+								{
+									"monsters": [
+										{
+											"id": "adventuring:zombie_hand",
+											"weight": 30
+										},
+										{
+											"id": "adventuring:zombie",
+											"weight": 70
+										}
+									],
+									"exit": [
+										"adventuring:zombie",
+										"adventuring:zombie",
+										"adventuring:zombie"
+									]
+								},
+								{
+									"monsters": [
+										{
+											"id": "adventuring:zombie_hand",
+											"weight": 20
+										},
+										{
+											"id": "adventuring:zombie",
+											"weight": 80
+										}
+									],
+									"exit": [
+										"adventuring:zombie",
+										"adventuring:zombie",
+										"adventuring:zombie_leader"
+									]
+								}
+							],
+							"tier": 2
+						}
+					],
+					"monsters": [
+						{
+							"id": "skeleton",
+							"name": "Skeleton",
+							"media": "melvor:assets/media/monsters/skeleton.png",
+							"tags": [
+								"undead"
+							],
+							"xp": 6,
+							"stats": [
+								{
+									"id": "adventuring:hitpoints",
+									"amount": 17
+								},
+								{
+									"id": "adventuring:defence",
+									"amount": 28
+								},
+								{
+									"id": "adventuring:agility",
+									"amount": 23
+								},
+								{
+									"id": "adventuring:strength",
+									"amount": 26
+								},
+								{
+									"id": "adventuring:magic",
+									"amount": 14
+								},
+								{
+									"id": "adventuring:ranged",
+									"amount": 14
+								},
+								{
+									"id": "adventuring:prayer",
+									"amount": 28
+								}
+							],
+							"generator": "adventuring:gnaw",
+							"spender": "adventuring:throw_rib",
+							"passives": [],
+							"loot": [
+								{
+									"id": "adventuring:currency",
+									"qty": 2,
+									"type": "currency"
+								},
+								{
+									"id": "adventuring:parts",
+									"qty": 1,
+									"type": "salvage"
+								},
+								{
+									"id": "adventuring:bone_fragment",
+									"qty": 2,
+									"type": "materials",
+									"chance": 0.4
+								},
+								{
+									"type": "equipment_pool",
+									"pool": "adventuring:tier2_graveyard",
+									"chance": 0.03
+								}
+							]
+						},
+						{
+							"id": "ghost",
+							"name": "Ghost",
+							"media": "melvor:assets/media/monsters/ghost.png",
+							"tags": [
+								"undead"
+							],
+							"xp": 6,
+							"stats": [
+								{
+									"id": "adventuring:hitpoints",
+									"amount": 19
+								},
+								{
+									"id": "adventuring:defence",
+									"amount": 32
+								},
+								{
+									"id": "adventuring:agility",
+									"amount": 25
+								},
+								{
+									"id": "adventuring:strength",
+									"amount": 28
+								},
+								{
+									"id": "adventuring:magic",
+									"amount": 16
+								},
+								{
+									"id": "adventuring:ranged",
+									"amount": 16
+								},
+								{
+									"id": "adventuring:prayer",
+									"amount": 32
+								}
+							],
+							"generator": "adventuring:haunt",
+							"spender": "adventuring:possess",
+							"passives": [],
+							"loot": [
+								{
+									"id": "adventuring:currency",
+									"qty": 2,
+									"type": "currency"
+								},
+								{
+									"id": "adventuring:parts",
+									"qty": 1,
+									"type": "salvage"
+								},
+								{
+									"id": "adventuring:bone_fragment",
+									"qty": 1,
+									"type": "materials",
+									"chance": 0.25
+								},
+								{
+									"type": "equipment_pool",
+									"pool": "adventuring:tier2_graveyard",
+									"chance": 0.03
+								}
+							]
+						},
+						{
+							"id": "zombie_hand",
+							"name": "Zombie Hand",
+							"media": "melvor:assets/media/monsters/zombie_hand.png",
+							"tags": [
+								"undead"
+							],
+							"xp": 6,
+							"stats": [
+								{
+									"id": "adventuring:hitpoints",
+									"amount": 21
+								},
+								{
+									"id": "adventuring:defence",
+									"amount": 35
+								},
+								{
+									"id": "adventuring:agility",
+									"amount": 28
+								},
+								{
+									"id": "adventuring:strength",
+									"amount": 30
+								},
+								{
+									"id": "adventuring:magic",
+									"amount": 18
+								},
+								{
+									"id": "adventuring:ranged",
+									"amount": 18
+								},
+								{
+									"id": "adventuring:prayer",
+									"amount": 35
+								}
+							],
+							"generator": "adventuring:grave_slap",
+							"spender": "adventuring:strangle",
+							"passives": [],
+							"loot": [
+								{
+									"id": "adventuring:currency",
+									"qty": 2,
+									"type": "currency"
+								},
+								{
+									"id": "adventuring:parts",
+									"qty": 1,
+									"type": "salvage"
+								},
+								{
+									"id": "adventuring:bone_fragment",
+									"qty": 1,
+									"type": "materials",
+									"chance": 0.3
+								},
+								{
+									"type": "equipment_pool",
+									"pool": "adventuring:tier2_graveyard",
+									"chance": 0.03
+								}
+							]
+						},
+						{
+							"id": "zombie",
+							"name": "Zombie",
+							"media": "melvor:assets/media/monsters/zombie.png",
+							"tags": [
+								"undead"
+							],
+							"xp": 6,
+							"stats": [
+								{
+									"id": "adventuring:hitpoints",
+									"amount": 23
+								},
+								{
+									"id": "adventuring:defence",
+									"amount": 38
+								},
+								{
+									"id": "adventuring:agility",
+									"amount": 30
+								},
+								{
+									"id": "adventuring:strength",
+									"amount": 32
+								},
+								{
+									"id": "adventuring:magic",
+									"amount": 19
+								},
+								{
+									"id": "adventuring:ranged",
+									"amount": 19
+								},
+								{
+									"id": "adventuring:prayer",
+									"amount": 38
+								}
+							],
+							"generator": "adventuring:gnaw",
+							"spender": "adventuring:eat_brains",
+							"passives": [],
+							"loot": [
+								{
+									"id": "adventuring:currency",
+									"qty": 2,
+									"type": "currency"
+								},
+								{
+									"id": "adventuring:parts",
+									"qty": 1,
+									"type": "salvage"
+								},
+								{
+									"id": "adventuring:bone_fragment",
+									"qty": 2,
+									"type": "materials",
+									"chance": 0.35
+								},
+								{
+									"type": "equipment_pool",
+									"pool": "adventuring:tier2_graveyard",
+									"chance": 0.03
+								}
+							]
+						},
+						{
+							"id": "zombie_leader",
+							"name": "Zombie Leader",
+							"media": "melvor:assets/media/monsters/zombie_leader.png",
+							"tags": [
+								"undead",
+								"boss"
+							],
+							"xp": 18,
+							"stats": [
+								{
+									"id": "adventuring:hitpoints",
+									"amount": 95
+								},
+								{
+									"id": "adventuring:defence",
+									"amount": 52
+								},
+								{
+									"id": "adventuring:agility",
+									"amount": 42
+								},
+								{
+									"id": "adventuring:strength",
+									"amount": 42
+								},
+								{
+									"id": "adventuring:magic",
+									"amount": 26
+								},
+								{
+									"id": "adventuring:ranged",
+									"amount": 26
+								},
+								{
+									"id": "adventuring:prayer",
+									"amount": 52
+								}
+							],
+							"generator": "adventuring:gnaw",
+							"spender": "adventuring:eat_brains",
+							"passives": [],
+							"loot": [
+								{
+									"id": "adventuring:currency",
+									"qty": 2,
+									"type": "currency"
+								},
+								{
+									"id": "adventuring:parts",
+									"qty": 1,
+									"type": "salvage"
+								},
+								{
+									"id": "adventuring:bone_fragment",
+									"qty": 3,
+									"type": "materials",
+									"chance": 0.5
+								},
+								{
+									"type": "equipment_pool",
+									"pool": "adventuring:tier2_graveyard",
+									"chance": 0.15
+								}
+							]
+						}
+					],
+					"generators": [
+						{
+							"id": "grave_slap",
+							"name": "Grave Slap",
+							"requirements": [],
+							"isEnemy": true,
+							"energy": 20,
+							"hits": [
+								{
+									"target": "front",
+									"party": "enemy",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"amount": {
+												"base": 4,
+												"scaling": [
+													{
+														"id": "adventuring:strength",
+														"amount": 0.3
+													}
+												]
+											}
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "gnaw",
+							"name": "Gnaw",
+							"requirements": [],
+							"isEnemy": true,
+							"energy": 50,
+							"hits": [
+								{
+									"target": "front",
+									"party": "enemy",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"amount": {
+												"base": 3,
+												"scaling": [
+													{
+														"id": "adventuring:strength",
+														"amount": 0.3
+													}
+												]
+											}
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "haunt",
+							"name": "Haunt",
+							"requirements": [],
+							"isEnemy": true,
+							"energy": 50,
+							"hits": [
+								{
+									"target": "random",
+									"party": "enemy",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"amount": {
+												"base": 3,
+												"scaling": [
+													{
+														"id": "adventuring:strength",
+														"amount": 0.3
+													}
+												]
+											}
+										}
+									]
+								}
+							]
+						}
+					],
+					"spenders": [
+						{
+							"id": "throw_rib",
+							"name": "Throw Rib",
+							"requirements": [],
+							"isEnemy": true,
+							"cost": 100,
+							"hits": [
+								{
+									"target": "back",
+									"party": "enemy",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"amount": {
+												"base": 10,
+												"scaling": [
+													{
+														"id": "adventuring:strength",
+														"amount": 0.4
+													}
+												]
+											}
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "strangle",
+							"name": "Strangle",
+							"requirements": [],
+							"isEnemy": true,
+							"cost": 100,
+							"hits": [
+								{
+									"target": "random",
+									"party": "enemy",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"amount": {
+												"base": 10,
+												"scaling": [
+													{
+														"id": "adventuring:strength",
+														"amount": 0.4
+													}
+												]
+											}
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "eat_brains",
+							"name": "Eat Brains",
+							"requirements": [],
+							"isEnemy": true,
+							"cost": 100,
+							"hits": [
+								{
+									"target": "front",
+									"party": "enemy",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"amount": {
+												"base": 10,
+												"scaling": [
+													{
+														"id": "adventuring:strength",
+														"amount": 0.4
+													}
+												]
+											}
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "possess",
+							"name": "Possess",
+							"requirements": [],
+							"isEnemy": true,
+							"cost": 100,
+							"hits": [
+								{
+									"target": "random",
+									"party": "enemy",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"amount": {
+												"base": 10,
+												"scaling": [
+													{
+														"id": "adventuring:strength",
+														"amount": 0.4
+													}
+												]
+											}
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
+		]
+	}
 }

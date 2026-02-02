@@ -1,9 +1,8 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { AdventuringStats } = await loadModule('src/core/adventuring-stats.mjs');
 const { AdventuringEquipmentSlot } = await loadModule('src/items/adventuring-equipment-slot.mjs');
 const { AdventuringEquipmentElement } = await loadModule('src/items/components/adventuring-equipment.mjs');
-const { createEffect, filterEffects } = await loadModule('src/core/adventuring-utils.mjs');
+const { createEffect, filterEffects } = await loadModule('src/core/utils/adventuring-utils.mjs');
 
 export class AdventuringEquipment {
     constructor(manager, game, character) {
@@ -15,7 +14,6 @@ export class AdventuringEquipment {
 
         this.locked = false;
         this.slots = new Map();
-        this.stats = new AdventuringStats(this.manager, this.game);
     }
 
     get equippedItems() {
@@ -78,20 +76,19 @@ export class AdventuringEquipment {
         this._cachedSetCounts = undefined;
     }
 
+    /**
+     * Recalculate stats for all equipped items (for tooltip display).
+     * Note: Equipment stats flow to hero via getEffects() → effectCache.
+     */
     calculateStats() {
-        this.stats.reset();
         this.forEachValidEquipped((item, slot) => {
-
             item.calculateStats(this.character);
-            item.stats.forEach((value, stat) => {
-                let old = this.stats.get(stat);
-                this.stats.set(stat, old + value);
-            });
         });
     }
 
     /**
-     * Get effects from equipped items
+     * Get all effects from equipped items (stats + procs + set bonuses).
+     * Unified method for effectCache integration.
      * @param {Object} filters - Optional filters (trigger, party, type, etc.)
      * @returns {Array} Filtered effects with source metadata
      */
@@ -105,16 +102,22 @@ export class AdventuringEquipment {
         let effects = [];
 
         this.forEachValidEquipped((item, slot) => {
-            // Note: Base equipment stats flow through calculateStats() → StatCalculator.aggregate()
-            // Only item.effects (buffs, triggers, etc.) are returned here
+            // 1. All effects from items (stats + special effects)
+            if (item.getEffects) {
+                const itemEffects = item.getEffects(this.character);
+                for (const effect of itemEffects) {
+                    if (trigger !== undefined && effect.trigger !== trigger) continue;
+                    effects.push(effect);
+                }
+            }
 
-            if(item.effects && item.effects.length > 0) {
+            // 2. Legacy item.effects array (buffs, triggers, procs) - for items not yet converted
+            if (item.effects && item.effects.length > 0) {
                 item.effects.forEach(effect => {
-
-                    if(trigger !== undefined && effect.trigger !== trigger) return;
+                    if (trigger !== undefined && effect.trigger !== trigger) return;
 
                     let amount = effect.amount || 0;
-                    if(effect.scaling && item.level > 0) {
+                    if (effect.scaling && item.level > 0) {
                         amount += Math.floor(item.level * effect.scaling);
                     }
 
@@ -128,23 +131,22 @@ export class AdventuringEquipment {
                             chance: effect.chance,
                             party: effect.party
                         },
-                        item,
-                        item.name,
-                        'equipment'
+                        [{ type: 'equipment', name: item.name, ref: item }]
                     ));
                 });
             }
         });
 
-        if(this.character && this.manager && this.manager.equipmentSets) {
+        // 3. Equipment set bonuses
+        if (this.character && this.manager && this.manager.equipmentSets) {
             const setCounts = this.getSetPieceCounts();
             setCounts.forEach((count, set) => {
-                if(count <= 0) return;
+                if (count <= 0) return;
                 const setEffects = set.getActiveEffects(this.character);
                 setEffects.forEach(effect => {
-
-                    if(trigger !== undefined && effect.trigger !== trigger) return;
-
+                    if (trigger !== undefined && effect.trigger !== trigger) return;
+                    
+                    // Effects already have sourcePath from set.getActiveEffects()
                     effects.push(createEffect(
                         {
                             trigger: effect.trigger || 'passive',
@@ -158,9 +160,7 @@ export class AdventuringEquipment {
                             threshold: effect.threshold,
                             party: effect.party
                         },
-                        { name: effect.sourceName },
-                        effect.sourceName,
-                        'equipmentSet'
+                        effect.sourcePath || [{ type: 'equipmentSet', name: set.name, ref: set }]
                     ));
                 });
             });

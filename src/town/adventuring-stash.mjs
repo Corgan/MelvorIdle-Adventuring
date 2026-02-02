@@ -116,6 +116,7 @@ export class AdventuringStash extends AdventuringPage {
         });
     }
 
+    // Required by base class contract - no additional registration needed
     postDataRegistration() {
 
     }
@@ -155,20 +156,19 @@ export class AdventuringStash extends AdventuringPage {
             });
 
             if(material.isCurrency) {
-                this.manager.achievementManager.recordCurrency(qty);
-                // Track combat-specific currency for achievements
-                if(options.fromCombat) {
-                    this.manager.achievementManager.recordCombatCurrency(qty);
-                }
-                this.manager.tutorialManager.checkTriggers('currency');
+                // Fire currency_collected trigger (achievements + tutorials listen)
+                this.manager.conductor.trigger('currency_collected', {
+                    material,
+                    quantity: qty,
+                    fromCombat: options.fromCombat || false
+                });
             } else {
-                this.manager.achievementManager.recordMaterials(qty);
-                // Track combat-specific materials for achievements
-                if(options.fromCombat) {
-                    this.manager.achievementManager.recordCombatMaterials(qty);
-                }
-                this.manager.tutorialManager.checkTriggers('material');
-                this.manager.slayers.onMaterialCollected(material, qty);
+                // Fire material_collected trigger (achievements, slayers, tutorials listen)
+                this.manager.conductor.trigger('material_collected', {
+                    material,
+                    quantity: qty,
+                    fromCombat: options.fromCombat || false
+                });
             }
         }
     }

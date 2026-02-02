@@ -2,8 +2,8 @@ const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringMaterialElement } = await loadModule('src/items/components/adventuring-material.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
-
-const { AdventuringWeightedTable, getLockedMedia } = await loadModule('src/core/adventuring-utils.mjs');
+const { AdventuringWeightedTable } = await loadModule('src/core/utils/weighted-table.mjs');
+const { getLockedMedia } = await loadModule('src/core/utils/adventuring-utils.mjs');
 
 class AdventuringMaterialRenderQueue {
     constructor(){
@@ -40,6 +40,10 @@ export class AdventuringMaterial extends NamespacedObject {
         this.alwaysUnlocked = data.alwaysUnlocked === true;
         this._categoryID = data.category; // Store raw ID for postDataRegistration lookup
         this.tier = data.tier; // Optional tier (1=crude, 2=refined, 3=immaculate, 4=transcendent)
+
+        // Order position for sorting (processed by manager._buildAllSortOrders)
+        this.orderPosition = data.orderPosition || null;
+        this.sortOrder = 9999;
     }
 
     get name() {

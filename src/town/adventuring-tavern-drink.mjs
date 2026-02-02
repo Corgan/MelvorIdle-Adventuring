@@ -1,6 +1,6 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { createEffect, describeEffectsInline, buildDescription } = await loadModule('src/core/adventuring-utils.mjs');
+const { createEffect, describeEffectsInline, buildDescription } = await loadModule('src/core/utils/adventuring-utils.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
 const { AdventuringTavernDrinkElement } = await loadModule('src/town/components/adventuring-tavern-drink.mjs');
 
@@ -30,6 +30,10 @@ export class AdventuringTavernDrink extends NamespacedObject {
 
         this._name = data.name;
         this._media = data.media;
+
+        // Order position for sorting (processed by manager._buildAllSortOrders)
+        this.orderPosition = data.orderPosition || null;
+        this.sortOrder = 9999;
 
         this._tiers = data.tiers || [];
         this.tiers = new Map(); // Map<tierNumber, tierData>
@@ -218,7 +222,7 @@ export class AdventuringTavernDrink extends NamespacedObject {
                 return createEffect({
                     ...effectData,
                     trigger: 'passive'
-                }, this, this.getTierName(tier));
+                }, [{ type: 'tavern', name: this.getTierName(tier), ref: this }]);
             });
 
             const materials = new Map();

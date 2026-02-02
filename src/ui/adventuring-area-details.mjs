@@ -1,9 +1,9 @@
 const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringDetailsPage } = await loadModule('src/ui/adventuring-details-page.mjs');
-const { ComponentPool } = await loadModule('src/core/component-pool.mjs');
+const { ComponentPool } = await loadModule('src/core/utils/component-pool.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
-const { getEffectDescriptionsList } = await loadModule('src/core/adventuring-utils.mjs');
+const { getEffectDescriptionsList } = await loadModule('src/core/utils/adventuring-utils.mjs');
 const { AdventuringIconButtonElement } = await loadModule('src/ui/components/adventuring-icon-button.mjs');
 
 await loadModule('src/dungeon/components/adventuring-area-details.mjs');

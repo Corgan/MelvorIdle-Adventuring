@@ -21,9 +21,11 @@ export class AdventuringPage {
 
     onLoad() { }
 
-    onPageChange() {
+    onPageChange() {
+
     }
 
+    // Override in subclasses that need post-registration setup
     postDataRegistration() {
 
     }
@@ -32,7 +34,8 @@ export class AdventuringPage {
 
     }
 
-    reset() {
+    reset() {
+
     }
 
     getErrorLog() {

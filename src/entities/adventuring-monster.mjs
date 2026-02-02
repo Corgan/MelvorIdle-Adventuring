@@ -1,7 +1,9 @@
 const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringMasteryAction } = await loadModule('src/core/adventuring-mastery-action.mjs');
-const { AdventuringWeightedTable, addMasteryXPWithBonus, AdventuringBadgeRenderQueue, getLockedMedia, UNKNOWN_MEDIA } = await loadModule('src/core/adventuring-utils.mjs');
+const { AdventuringWeightedTable } = await loadModule('src/core/utils/weighted-table.mjs');
+const { addMasteryXPWithBonus, getLockedMedia, UNKNOWN_MEDIA } = await loadModule('src/core/utils/adventuring-utils.mjs');
+const { AdventuringBadgeRenderQueue } = await loadModule('src/core/utils/render-queues.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
 
 const { AdventuringMonsterElement } = await loadModule('src/entities/components/adventuring-monster.mjs');
@@ -17,6 +19,10 @@ export class AdventuringMonster extends AdventuringMasteryAction {
         this.generator = data.generator;
         this.spender = data.spender;
         this.passives = data.passives;
+
+        // Order position for sorting (processed by manager._buildAllSortOrders)
+        this.orderPosition = data.orderPosition;
+        this.sortOrder = 9999;  // Default high value, set by _buildAllSortOrders
 
         this.component = createElement('adventuring-monster');
         this.renderQueue = new AdventuringBadgeRenderQueue();
@@ -79,6 +85,7 @@ export class AdventuringMonster extends AdventuringMasteryAction {
         this.renderQueue.newBadge = true;
     }
 
+    // Required by base class contract - no additional registration needed
     postDataRegistration() {
 
     }
@@ -144,7 +151,8 @@ export class AdventuringMonster extends AdventuringMasteryAction {
         if(!this.renderQueue.clickable)
             return;
 
-        this.component.clickable.classList.toggle('pointer-enabled', this.unlocked);
+        this.component.clickable.classList.toggle('pointer-enabled', this.unlocked);
+
         this.component.clickable.onclick = () => this.viewDetails();
 
         this.renderQueue.clickable = false;

@@ -28,6 +28,7 @@ class LogFilterSettings {
         // Slot filters - 0=front, 1=center, 2=back - all enabled by default
         this.enabledSlots = new Set([0, 1, 2]);
         this.showAllSlots = true;  // When true, slot filter is bypassed
+        this.showEnemyOnly = true; // Show messages with no hero involvement
         
         // Message limit
         this.messageLimit = DEFAULT_MESSAGE_LIMIT;
@@ -81,13 +82,21 @@ class LogFilterSettings {
     }
     
     /**
+     * Toggle showing enemy-only messages
+     */
+    toggleEnemyOnly() {
+        this.showEnemyOnly = !this.showEnemyOnly;
+    }
+    
+    /**
      * Get filter object for message filtering
      */
     getFilters() {
         return {
             categories: this.enabledCategories,
             slots: this.enabledSlots,
-            showAllSlots: this.showAllSlots
+            showAllSlots: this.showAllSlots,
+            showEnemyOnly: this.showEnemyOnly
         };
     }
     
@@ -114,6 +123,7 @@ export class AdventuringMessageLog {
         this.component.onToggleCategory = (id) => this.toggleCategory(id);
         this.component.onToggleSlot = (slot) => this.toggleSlot(slot);
         this.component.onShowAllSlots = () => this.showAllSlots();
+        this.component.onToggleEnemyOnly = () => this.toggleEnemyOnly();
         this.component.onSetLimit = (limit) => this.setMessageLimit(limit);
         
         // Provide settings data to component
@@ -200,6 +210,14 @@ export class AdventuringMessageLog {
     }
     
     /**
+     * Toggle enemy-only messages
+     */
+    toggleEnemyOnly() {
+        this.filterSettings.toggleEnemyOnly();
+        this.renderQueue.messages = true;
+    }
+    
+    /**
      * Update message limit
      */
     setMessageLimit(limit) {
@@ -267,12 +285,13 @@ export class AdventuringMessageLog {
         // Encode message limit
         writer.writeUint16(this.filterSettings.messageLimit);
         
-        // Encode slot settings (3 bits for slots + 1 bit for showAllSlots)
+        // Encode slot settings (3 bits for slots + 1 bit for showAllSlots + 1 bit for showEnemyOnly)
         let slotBits = 0;
-        if (this.filterSettings.showAllSlots) slotBits |= 0b1000;
-        if (this.filterSettings.enabledSlots.has(0)) slotBits |= 0b0001;
-        if (this.filterSettings.enabledSlots.has(1)) slotBits |= 0b0010;
-        if (this.filterSettings.enabledSlots.has(2)) slotBits |= 0b0100;
+        if (this.filterSettings.showAllSlots) slotBits |= 0b01000;
+        if (this.filterSettings.showEnemyOnly) slotBits |= 0b10000;
+        if (this.filterSettings.enabledSlots.has(0)) slotBits |= 0b00001;
+        if (this.filterSettings.enabledSlots.has(1)) slotBits |= 0b00010;
+        if (this.filterSettings.enabledSlots.has(2)) slotBits |= 0b00100;
         writer.writeUint8(slotBits);
         
         return writer;
@@ -296,11 +315,12 @@ export class AdventuringMessageLog {
         
         // Decode slot settings
         const slotBits = reader.getUint8();
-        this.filterSettings.showAllSlots = (slotBits & 0b1000) !== 0;
+        this.filterSettings.showAllSlots = (slotBits & 0b01000) !== 0;
+        this.filterSettings.showEnemyOnly = (slotBits & 0b10000) !== 0 || !(slotBits & 0b10000); // Default true for old saves
         this.filterSettings.enabledSlots.clear();
-        if (slotBits & 0b0001) this.filterSettings.enabledSlots.add(0);
-        if (slotBits & 0b0010) this.filterSettings.enabledSlots.add(1);
-        if (slotBits & 0b0100) this.filterSettings.enabledSlots.add(2);
+        if (slotBits & 0b00001) this.filterSettings.enabledSlots.add(0);
+        if (slotBits & 0b00010) this.filterSettings.enabledSlots.add(1);
+        if (slotBits & 0b00100) this.filterSettings.enabledSlots.add(2);
 
         return reader;
     }

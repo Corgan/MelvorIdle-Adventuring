@@ -1,8 +1,8 @@
 const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringPage } = await loadModule('src/ui/adventuring-page.mjs');
-const { AdventuringSlayerTask, SlayerTaskGenerator } = await loadModule('src/progression/adventuring-slayer-task.mjs');
-const { getEffectDescriptionsList } = await loadModule('src/core/adventuring-utils.mjs');
+const { AdventuringSlayerTask, SlayerTaskGenerator } = await loadModule('src/progression/slayer/adventuring-slayer-task.mjs');
+const { getEffectDescriptionsList } = await loadModule('src/core/utils/adventuring-utils.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
 const { AdventuringIconButtonElement } = await loadModule('src/ui/components/adventuring-icon-button.mjs');
 
@@ -12,6 +12,7 @@ const { AdventuringStatBadgeElement } = await loadModule('src/progression/compon
 const { AdventuringAchievementRewardElement } = await loadModule('src/progression/components/adventuring-achievement-reward.mjs');
 const { AdventuringInfoMessageElement } = await loadModule('src/ui/components/adventuring-info-message.mjs');
 const { AdventuringEmptyStateElement } = await loadModule('src/ui/components/adventuring-empty-state.mjs');
+const { AdventuringRunHistoryElement } = await loadModule('src/ui/components/adventuring-run-history.mjs');
 
 class SlayersRenderQueue {
     constructor() {
@@ -62,7 +63,10 @@ export class AdventuringSlayers extends AdventuringPage {
         this.component.tabAchievements.onclick = () => this.switchTab('achievements');
         this.component.tabRuns.onclick = () => this.switchTab('runs');
         this.component.tabStats.onclick = () => this.switchTab('stats');
-        this.component.runsBackBtn.onclick = () => this.showRunsList();
+        
+        // Set up embedded run history component
+        this.runHistoryComponent = new AdventuringRunHistoryElement();
+        this.runHistoryComponent.setEmbedded(true);
     }
 
     switchTab(tab) {
@@ -82,28 +86,12 @@ export class AdventuringSlayers extends AdventuringPage {
             this.renderQueue.achievements = true;
             this.render();
         } else if(tab === 'runs') {
-            this.showRunsList();
             this.renderQueue.runs = true;
             this.render();
         } else if(tab === 'stats') {
             this.renderQueue.stats = true;
             this.render();
         }
-    }
-
-    showRunsList() {
-        this.selectedRun = null;
-        this.component.runsListView.classList.remove('d-none');
-        this.component.runsDetailsView.classList.add('d-none');
-        this.renderQueue.runs = true;
-        this.render();
-    }
-
-    showRunDetails(run, index) {
-        this.selectedRun = { run, index };
-        this.component.runsListView.classList.add('d-none');
-        this.component.runsDetailsView.classList.remove('d-none');
-        this.renderRunDetails();
     }
 
     back() {
@@ -121,6 +109,28 @@ export class AdventuringSlayers extends AdventuringPage {
 
     onLoad() {
         super.onLoad();
+        this.renderQueue.queueAll();
+        
+        // Listen for events via conductor
+        this.manager.conductor.listen('monster_killed', (type, context) => {
+            if (context.monster) {
+                this._onMonsterKilled(context.monster);
+            }
+        });
+        
+        this.manager.conductor.listen('dungeon_end', (type, context) => {
+            if (context.area) {
+                this._onDungeonCleared(context.area);
+            }
+            // Queue runs tab to re-render with new history
+            this.renderQueue.runs = true;
+        });
+        
+        this.manager.conductor.listen('material_collected', (type, context) => {
+            if (context.material && context.quantity) {
+                this._onMaterialCollected(context.material, context.quantity);
+            }
+        });
     }
 
     onShow() {
@@ -135,6 +145,7 @@ export class AdventuringSlayers extends AdventuringPage {
         this.manager.party.setAllLocked(true);
     }
 
+    // Required by base class contract - no additional registration needed
     postDataRegistration() {
     }
 
@@ -257,10 +268,8 @@ export class AdventuringSlayers extends AdventuringPage {
             this.activeTasks.splice(index, 1);
             this.totalTasksCompleted++;
 
-            this.manager.achievementManager.recordSlayerTask();
-
-            // Fire slayer_task_complete trigger for achievements
-            this.manager.achievementManager.trigger('slayer_task_complete', {
+            // Fire slayer_task_complete trigger (achievements listen)
+            this.manager.conductor.trigger('slayer_task_complete', {
                 task: task,
                 taskType: task.taskType,
                 tier: task.tier,
@@ -288,7 +297,11 @@ export class AdventuringSlayers extends AdventuringPage {
         return false;
     }
 
-    onMonsterKilled(monster) {
+    /**
+     * Internal handler for monster kill events.
+     * @param {Object} monster - The monster that was killed
+     */
+    _onMonsterKilled(monster) {
         this.activeTasks.forEach(task => {
 
             if(task.taskType && task.taskType.id === 'adventuring:kill' && task.targetId === monster.id) {
@@ -308,7 +321,12 @@ export class AdventuringSlayers extends AdventuringPage {
         });
     }
 
-    onMaterialCollected(material, amount) {
+    /**
+     * Internal handler for material collection events.
+     * @param {Object} material - The material collected
+     * @param {number} amount - Amount collected
+     */
+    _onMaterialCollected(material, amount) {
         this.activeTasks.forEach(task => {
             if(task.taskType && task.taskType.id === 'adventuring:collect' && task.targetId === material.id) {
                 task.addProgress(amount);
@@ -317,7 +335,11 @@ export class AdventuringSlayers extends AdventuringPage {
         });
     }
 
-    onDungeonCleared(area) {
+    /**
+     * Internal handler for dungeon clear events.
+     * @param {Object} area - The area that was cleared
+     */
+    _onDungeonCleared(area) {
         this.activeTasks.forEach(task => {
             if(task.taskType && task.taskType.id === 'adventuring:clear' && task.targetId === area.id) {
                 task.addProgress(1);
@@ -349,6 +371,8 @@ export class AdventuringSlayers extends AdventuringPage {
     }
 
     renderAchievementSummary() {
+        if (!this.component?.achievementSummary) return;
+        
         // Count total achievable items (regular achievements + all milestones in chains)
         let total = 0;
         let completed = 0;
@@ -593,7 +617,7 @@ export class AdventuringSlayers extends AdventuringPage {
                     rewardEl.setAbility(ability.name, null, tooltipContent);
                 }
             } else if(reward.type === 'equipment') {
-                const equip = this.manager.equipment.getObjectByID(reward.id);
+                const equip = this.manager.itemBase.getObjectByID(reward.id);
                 if(equip) {
                     const tooltipContent = TooltipBuilder.forEquipment(equip, this.manager).build();
                     rewardEl.setMaterial(1, equip.media, tooltipContent);
@@ -790,33 +814,33 @@ export class AdventuringSlayers extends AdventuringPage {
     // ======== RUN HISTORY METHODS ========
 
     renderRuns() {
-        if(!this.renderQueue.runs && !this.renderQueue.all)
+        if (!this.renderQueue.runs && !this.renderQueue.all)
             return;
 
-        this.destroyTippyIn(this.component.runsList);
-        this.component.runsList.replaceChildren();
-
-        const history = this.manager.combatTracker.history;
-
-        if(history.length === 0) {
-            const empty = new AdventuringEmptyStateElement();
-            empty.setFullWidthMessage('No run history yet. Complete some dungeon runs to see your stats!');
-            this.component.runsList.appendChild(empty);
-        } else {
-            // Show runs in reverse chronological order (most recent first)
-            for(let i = history.length - 1; i >= 0; i--) {
-                const run = history[i];
-                const card = this.createRunListItem(run, i);
-                this.component.runsList.appendChild(card);
-            }
+        // Init the run history component if not done yet
+        if (!this.runHistoryComponent._initialized) {
+            this.runHistoryComponent.init(this.manager);
+            this.runHistoryComponent._initialized = true;
+            this.component.runsContainer.appendChild(this.runHistoryComponent);
         }
-
+        
+        // Queue a full render on the component
+        this.runHistoryComponent.renderQueue.queueAll();
+        this.runHistoryComponent.render();
+        
         this.renderQueue.runs = false;
     }
+
+    // ======== END RUN HISTORY METHODS ========
 
     renderStats() {
         if(!this.renderQueue.stats && !this.renderQueue.all)
             return;
+
+        if (!this.component?.globalStatsList) {
+            this.renderQueue.stats = false;
+            return;
+        }
 
         this.component.globalStatsList.replaceChildren();
 
@@ -826,15 +850,12 @@ export class AdventuringSlayers extends AdventuringPage {
             { id: 'adventuring:slayer_tasks_completed', icon: 'fa-scroll', color: 'warning', label: 'Slayer Tasks' },
             { id: 'adventuring:total_damage', icon: 'fa-bolt', color: 'danger', label: 'Total Damage' },
             { id: 'adventuring:total_healing', icon: 'fa-heart', color: 'success', label: 'Total Healing' },
-            { id: 'adventuring:solo_wins', icon: 'fa-user', color: 'info', label: 'Solo Wins' },
-            { id: 'adventuring:last_stand_wins', icon: 'fa-fist-raised', color: 'danger', label: 'Last Stand Wins' },
             { id: 'adventuring:floors_explored', icon: 'fa-map', color: 'info', label: 'Floors Explored' },
             { id: 'adventuring:special_tiles_found', icon: 'fa-gem', color: 'warning', label: 'Special Tiles Found' },
             { id: 'adventuring:unique_monsters_seen', icon: 'fa-book', color: 'primary', label: 'Bestiary Entries' },
             { id: 'adventuring:combat_currency_earned', icon: 'fa-coins', color: 'warning', label: 'Currency Earned' },
             { id: 'adventuring:combat_materials_collected', icon: 'fa-box', color: 'info', label: 'Materials Collected' },
             { id: 'adventuring:equipment_upgrades', icon: 'fa-arrow-up', color: 'success', label: 'Equipment Upgrades' },
-            { id: 'adventuring:equipment_crafted', icon: 'fa-hammer', color: 'primary', label: 'Equipment Crafted' },
             { id: 'adventuring:buffs_applied', icon: 'fa-plus-circle', color: 'success', label: 'Buffs Applied' },
             { id: 'adventuring:debuffs_applied', icon: 'fa-minus-circle', color: 'danger', label: 'Debuffs Applied' }
         ];
@@ -878,181 +899,6 @@ export class AdventuringSlayers extends AdventuringPage {
         return Math.floor(value).toLocaleString();
     }
 
-    createRunListItem(run, index) {
-        const frag = getTemplateNode('adventuring-run-list-item-template');
-
-        const card = getElementFromFragment(frag, 'card', 'div');
-        const areaIcon = getElementFromFragment(frag, 'area-icon', 'img');
-        const areaName = getElementFromFragment(frag, 'area-name', 'span');
-        const badges = getElementFromFragment(frag, 'badges', 'div');
-        const damageDealt = getElementFromFragment(frag, 'damage-dealt', 'span');
-        const damageTaken = getElementFromFragment(frag, 'damage-taken', 'span');
-        const turns = getElementFromFragment(frag, 'turns', 'span');
-        const encountersCount = getElementFromFragment(frag, 'encounters-count', 'small');
-
-        // Area info
-        if(run.area) {
-            areaIcon.src = run.area.media;
-            areaName.textContent = run.area.name;
-        } else {
-            areaIcon.src = this.manager.getResourceUrl('assets/media/empty.png');
-            areaName.textContent = 'Unknown Area';
-        }
-
-        // Stats
-        damageDealt.textContent = this.formatNumber(run.damageDealt);
-        damageTaken.textContent = this.formatNumber(run.damageTaken);
-        turns.textContent = run.turnsElapsed;
-        encountersCount.textContent = `${run.encounters.length} encounters`;
-
-        // Badges
-        if(run.difficulty) {
-            const diffBadge = document.createElement('span');
-            diffBadge.className = `badge badge-${this.getDifficultyColor(run.difficulty)} mr-1`;
-            diffBadge.textContent = run.difficulty.name;
-            badges.appendChild(diffBadge);
-        }
-
-        if(run.isSolo) {
-            const soloBadge = document.createElement('span');
-            soloBadge.className = 'badge badge-dark';
-            soloBadge.textContent = 'Solo';
-            badges.appendChild(soloBadge);
-        }
-
-        card.onclick = () => this.showRunDetails(run, index);
-
-        return frag.firstElementChild;
-    }
-
-    renderRunDetails() {
-        if(!this.selectedRun) return;
-
-        const { run, index } = this.selectedRun;
-
-        // Title and subtitle
-        if(run.area) {
-            this.component.runDetailTitle.textContent = run.area.name;
-        } else {
-            this.component.runDetailTitle.textContent = 'Unknown Area';
-        }
-        this.component.runDetailSubtitle.textContent = `Run #${index + 1} • ${run.encounters.length} encounters • ${run.partySize} hero${run.partySize !== 1 ? 'es' : ''}`;
-
-        // Badges
-        this.component.runDetailBadges.replaceChildren();
-        if(run.difficulty) {
-            const diffBadge = document.createElement('span');
-            diffBadge.className = `badge badge-${this.getDifficultyColor(run.difficulty)} mr-1`;
-            diffBadge.textContent = run.difficulty.name;
-            this.component.runDetailBadges.appendChild(diffBadge);
-        }
-        if(run.isSolo) {
-            const soloBadge = document.createElement('span');
-            soloBadge.className = 'badge badge-dark';
-            soloBadge.textContent = 'Solo';
-            this.component.runDetailBadges.appendChild(soloBadge);
-        }
-
-        // Stats
-        this.component.runStatDamageDealt.textContent = this.formatNumber(run.damageDealt);
-        this.component.runStatDamageTaken.textContent = this.formatNumber(run.damageTaken);
-        this.component.runStatHealing.textContent = this.formatNumber(run.healingReceived);
-        this.component.runStatTurns.textContent = run.turnsElapsed;
-
-        // Abilities used
-        this.component.runDetailAbilities.replaceChildren();
-        if(run.abilitiesUsed.size === 0) {
-            const noAbilities = document.createElement('small');
-            noAbilities.className = 'text-muted';
-            noAbilities.textContent = 'No abilities recorded';
-            this.component.runDetailAbilities.appendChild(noAbilities);
-        } else {
-            for(const ability of run.abilitiesUsed) {
-                const abilityIcon = document.createElement('img');
-                abilityIcon.className = 'skill-icon-sm mr-1 mb-1';
-                abilityIcon.src = ability.media;
-                abilityIcon.title = ability.name;
-                this.component.runDetailAbilities.appendChild(abilityIcon);
-            }
-        }
-
-        // Monsters fought
-        this.component.runDetailMonsters.replaceChildren();
-        const allMonsters = new Map();
-        
-        // Merge damage dealt and taken by monster
-        for(const [monster, damage] of run.damageDealtByMonster) {
-            if(!allMonsters.has(monster)) {
-                allMonsters.set(monster, { dealt: 0, taken: 0 });
-            }
-            allMonsters.get(monster).dealt = damage;
-        }
-        for(const [monster, damage] of run.damageTakenByMonster) {
-            if(!allMonsters.has(monster)) {
-                allMonsters.set(monster, { dealt: 0, taken: 0 });
-            }
-            allMonsters.get(monster).taken = damage;
-        }
-
-        if(allMonsters.size === 0) {
-            const noMonsters = document.createElement('div');
-            noMonsters.className = 'col-12';
-            noMonsters.innerHTML = '<small class="text-muted">No monster data recorded</small>';
-            this.component.runDetailMonsters.appendChild(noMonsters);
-        } else {
-            for(const [monster, data] of allMonsters) {
-                const card = this.createMonsterDamageCard(monster, data.dealt, data.taken);
-                this.component.runDetailMonsters.appendChild(card);
-            }
-        }
-
-        // Encounter breakdown
-        this.component.runDetailEncounters.replaceChildren();
-        if(run.encounters.length === 0) {
-            const noEnc = document.createElement('div');
-            noEnc.className = 'col-12';
-            noEnc.innerHTML = '<small class="text-muted">No encounter data recorded</small>';
-            this.component.runDetailEncounters.appendChild(noEnc);
-        } else {
-            run.encounters.forEach((enc, i) => {
-                const card = this.createEncounterCard(enc, i);
-                this.component.runDetailEncounters.appendChild(card);
-            });
-        }
-    }
-
-    createMonsterDamageCard(monster, damageDealt, damageTaken) {
-        const frag = getTemplateNode('adventuring-run-monster-template');
-
-        const monsterIcon = getElementFromFragment(frag, 'monster-icon', 'img');
-        const monsterName = getElementFromFragment(frag, 'monster-name', 'div');
-        const damageTo = getElementFromFragment(frag, 'damage-to', 'span');
-        const damageFrom = getElementFromFragment(frag, 'damage-from', 'span');
-
-        monsterIcon.src = monster.media;
-        monsterName.textContent = monster.name;
-        damageTo.textContent = this.formatNumber(damageDealt);
-        damageFrom.textContent = this.formatNumber(damageTaken);
-
-        return frag.firstElementChild;
-    }
-
-    createEncounterCard(encounter, index) {
-        const frag = getTemplateNode('adventuring-run-encounter-template');
-
-        const encounterNum = getElementFromFragment(frag, 'encounter-num', 'span');
-        const encDamageDealt = getElementFromFragment(frag, 'enc-damage-dealt', 'span');
-        const encDamageTaken = getElementFromFragment(frag, 'enc-damage-taken', 'span');
-        const encTurns = getElementFromFragment(frag, 'enc-turns', 'span');
-
-        encounterNum.textContent = `Encounter ${index + 1}`;
-        encDamageDealt.textContent = this.formatNumber(encounter.damageDealt);
-        encDamageTaken.textContent = this.formatNumber(encounter.damageTaken);
-        encTurns.textContent = encounter.turnsElapsed;
-
-        return frag.firstElementChild;
-    }
-
     getDifficultyColor(difficulty) {
         if(!difficulty) return 'secondary';
         const id = difficulty.localID || difficulty.id.replace('adventuring:', '');
@@ -1084,6 +930,11 @@ export class AdventuringSlayers extends AdventuringPage {
         if(!this.renderQueue.availableTasks && !this.renderQueue.all)
             return;
 
+        if (!this.component?.availableTasks) {
+            this.renderQueue.availableTasks = false;
+            return;
+        }
+
         this.destroyTippyIn(this.component.availableTasks);
         this.component.availableTasks.replaceChildren();
 
@@ -1114,6 +965,11 @@ export class AdventuringSlayers extends AdventuringPage {
     renderActiveTasks() {
         if(!this.renderQueue.activeTasks && !this.renderQueue.all)
             return;
+
+        if (!this.component?.activeTasks) {
+            this.renderQueue.activeTasks = false;
+            return;
+        }
 
         this.destroyTippyIn(this.component.activeTasks);
         this.component.activeTasks.replaceChildren();

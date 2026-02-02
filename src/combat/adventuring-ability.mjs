@@ -1,8 +1,9 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { AdventuringStats } = await loadModule('src/core/adventuring-stats.mjs');
+const { AdventuringStats } = await loadModule('src/core/stats/adventuring-stats.mjs');
 const { AdventuringScalableEffect } = await loadModule('src/combat/adventuring-scalable-effect.mjs');
-const { RequirementsChecker, buildHitEffectReplacements, buildDescription } = await loadModule('src/core/adventuring-utils.mjs');
+const { RequirementsChecker } = await loadModule('src/core/utils/requirements-checker.mjs');
+const { buildHitEffectReplacements, buildDescription } = await loadModule('src/core/utils/adventuring-utils.mjs');
 
 const { AdventuringAbilityElement } = await loadModule('src/combat/components/adventuring-ability.mjs');
 const { AdventuringAbilityDetailsElement } = await loadModule('src/combat/components/adventuring-ability-details.mjs');
@@ -35,7 +36,8 @@ class AdventuringAbilityHitEffect extends AdventuringScalableEffect {
     }
 
     postDataRegistration() {
-        super.postDataRegistration();
+        super.postDataRegistration();
+
         if(this.type === "buff" || this.type === "debuff") {
             if(this.stacks === undefined) {
                 this.stacks = { base: 1 };
@@ -82,7 +84,8 @@ export class AdventuringAbility extends NamespacedObject {
             this.learnType = data.learnType;
         if(data.learnBonus !== undefined)
             this.learnBonus = data.learnBonus;
-        this.isEnemy = data.isEnemy === true;
+        this.isEnemy = data.isEnemy === true;
+
         this.isAchievementAbility = data.isAchievementAbility === true ||
             (data.requirements && data.requirements.some(r => r.type === 'achievement_completion'));
         this.requirements = data.requirements;
@@ -97,7 +100,8 @@ export class AdventuringAbility extends NamespacedObject {
     }
 
     postDataRegistration() {
-        this.hits.forEach(hit => hit.postDataRegistration());
+        this.hits.forEach(hit => hit.postDataRegistration());
+
         this._reqChecker = new RequirementsChecker(this.manager, this.requirements);
     }
 
@@ -107,25 +111,35 @@ export class AdventuringAbility extends NamespacedObject {
         return this._reqChecker.referencesJob(job.id);
     }
 
-    get unlocked() {
+    get unlocked() {
+        // Fast path: once unlocked, always unlocked (for regular abilities)
+        if (this._unlockedCached) return true;
+
         if(this.isEnemy)
-            return this.manager.learnedAbilities.has(this.id);
+            return this.manager.learnedAbilities.has(this.id);
+
         if(this.isAchievementAbility)
-            return this.manager.achievementManager.isAbilityUnlocked(this.id);
+            return this.manager.achievementManager.isAbilityUnlocked(this.id);
+
         if (this._reqChecker === undefined) return true;
-        return this._reqChecker.check();
+        const result = this._reqChecker.check();
+        if (result) this._unlockedCached = true;
+        return result;
     }
 
-    canEquip(character) {
+    canEquip(character) {
+
         if(this.isEnemy) {
             if(!this.manager.learnedAbilities.has(this.id)) return false;
             const slayerJob = this.manager.cached.slayerJob;
             if(slayerJob === undefined) return false;
             return (character.combatJob === slayerJob) || (character.passiveJob === slayerJob);
-        }
+        }
+
         if(this.isAchievementAbility) {
             return this.manager.achievementManager.isAbilityUnlocked(this.id);
-        }
+        }
+
         if (this._reqChecker === undefined) return true;
         return this._reqChecker.check({ character });
     }
@@ -178,8 +192,10 @@ export class AdventuringAbility extends NamespacedObject {
         if(this.unlocked) {
             let stats = undefined;
             if(this.renderQueue.descriptionCharacter)
-                stats = this.renderQueue.descriptionCharacter.stats;
-            this.component.description.innerHTML = this.getDescription(stats, 'scaled');
+                stats = this.renderQueue.descriptionCharacter.stats;
+
+            this.component.description.innerHTML = this.getDescription(stats, 'scaled');
+
             this.details.description.innerHTML = this.getDescription(undefined, 'multiplier');
 
         } else {

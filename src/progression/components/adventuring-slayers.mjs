@@ -28,20 +28,7 @@ export class AdventuringSlayersElement extends AdventuringSubpageElement {
 
         // Run History Tab
         this.runsContent = getElementFromFragment(this._content, 'runs-content', 'div');
-        this.runsListView = getElementFromFragment(this._content, 'runs-list-view', 'div');
-        this.runsList = getElementFromFragment(this._content, 'runs-list', 'div');
-        this.runsDetailsView = getElementFromFragment(this._content, 'runs-details-view', 'div');
-        this.runsBackBtn = getElementFromFragment(this._content, 'runs-back-btn', 'button');
-        this.runDetailTitle = getElementFromFragment(this._content, 'run-detail-title', 'h5');
-        this.runDetailSubtitle = getElementFromFragment(this._content, 'run-detail-subtitle', 'small');
-        this.runDetailBadges = getElementFromFragment(this._content, 'run-detail-badges', 'div');
-        this.runStatDamageDealt = getElementFromFragment(this._content, 'run-stat-damage-dealt', 'div');
-        this.runStatDamageTaken = getElementFromFragment(this._content, 'run-stat-damage-taken', 'div');
-        this.runStatHealing = getElementFromFragment(this._content, 'run-stat-healing', 'div');
-        this.runStatTurns = getElementFromFragment(this._content, 'run-stat-turns', 'div');
-        this.runDetailAbilities = getElementFromFragment(this._content, 'run-detail-abilities', 'div');
-        this.runDetailMonsters = getElementFromFragment(this._content, 'run-detail-monsters', 'div');
-        this.runDetailEncounters = getElementFromFragment(this._content, 'run-detail-encounters', 'div');
+        this.runsContainer = getElementFromFragment(this._content, 'runs-container', 'div');
 
         // Stats Tab
         this.statsContent = getElementFromFragment(this._content, 'stats-content', 'div');

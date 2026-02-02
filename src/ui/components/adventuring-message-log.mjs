@@ -1,6 +1,6 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { createTooltip } = await loadModule('src/core/adventuring-tooltip-element.mjs');
+const { createTooltip } = await loadModule('src/core/components/adventuring-tooltip-element.mjs');
 const { AdventuringLogSettingsElement } = await loadModule('src/ui/components/adventuring-log-settings.mjs');
 
 export class AdventuringMessageLogElement extends HTMLElement {

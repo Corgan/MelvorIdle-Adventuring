@@ -1,7 +1,8 @@
 const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringAuraInstance } = await loadModule('src/combat/adventuring-aura-instance.mjs');
-const { createEffect, evaluateCondition, buildEffectContext, defaultEffectProcessor } = await loadModule('src/core/adventuring-utils.mjs');
+const { evaluateCondition } = await loadModule('src/core/effects/condition-evaluator.mjs');
+const { createEffect, buildEffectContext, defaultEffectProcessor } = await loadModule('src/core/utils/adventuring-utils.mjs');
 
 const { AdventuringAurasElement } = await loadModule('src/combat/components/adventuring-auras.mjs');
 
@@ -57,25 +58,21 @@ export class AdventuringAuras {
                 const trigger = effectData.trigger;
                 const type = effectData.type;
 
+                // getAmount already handles perStack scaling internally, so don't multiply by stacks again
                 let value = effectData.getAmount ? effectData.getAmount(auraInstance) : (effectData.amount || 0);
-                
-                // Scale by stacks if perStack is true
-                if (effectData.perStack && auraInstance.stacks > 0) {
-                    value = value * auraInstance.stacks;
-                }
 
                 effects.push(createEffect(
                     {
                         trigger: trigger,
                         type: type,
-                        stat: effectData.id,
+                        stat: effectData.stat,
                         value: value,
                         party: effectData.party,
-                        target: effectData.target
+                        target: effectData.target,
+                        id: effectData.id,
+                        source: auraInstance  // Allow effect processor to call instance.remove()
                     },
-                    auraInstance,
-                    auraInstance.base.name,
-                    'aura'
+                    [{ type: 'aura', name: auraInstance.base.name, ref: auraInstance }]
                 ));
             });
         }
@@ -274,6 +271,7 @@ export class AdventuringAuras {
 
     }
 
+    // Required by base class contract - no additional registration needed
     postDataRegistration() {
 
     }

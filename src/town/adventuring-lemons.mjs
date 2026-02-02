@@ -90,6 +90,7 @@ export class AdventuringLemons extends AdventuringPage {
         this.manager.party.setAllLocked(true);
     }
 
+    // Required by base class contract - no additional registration needed
     postDataRegistration() {
 
     }

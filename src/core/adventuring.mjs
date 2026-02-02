@@ -1,6 +1,6 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { AdventuringStat } = await loadModule('src/core/adventuring-stat.mjs');
+const { AdventuringStat } = await loadModule('src/core/stats/adventuring-stat.mjs');
 const { AdventuringBuilding } = await loadModule('src/town/adventuring-building.mjs');
 const { AdventuringTownAction } = await loadModule('src/town/adventuring-town-action.mjs');
 const { AdventuringProduct } = await loadModule('src/ui/adventuring-product.mjs');
@@ -14,7 +14,7 @@ const { AdventuringArea } = await loadModule('src/dungeon/adventuring-area.mjs')
 const { AdventuringDifficulty } = await loadModule('src/dungeon/adventuring-difficulty.mjs');
 const { AdventuringMonster } = await loadModule('src/entities/adventuring-monster.mjs');
 const { AdventuringDungeonTile } = await loadModule('src/dungeon/adventuring-dungeon-tile.mjs');
-const { AdventuringSlayerTaskType, AdventuringRewardType } = await loadModule('src/progression/adventuring-slayer-task.mjs');
+const { AdventuringSlayerTaskType, AdventuringRewardType } = await loadModule('src/progression/slayer/adventuring-slayer-task.mjs');
 const { AdventuringAchievementCategory, AdventuringAchievement, AdventuringMilestone, AchievementManager } = await loadModule('src/progression/adventuring-achievements.mjs');
 const { AdventuringAchievementStat } = await loadModule('src/progression/adventuring-achievement-stat.mjs');
 
@@ -27,24 +27,25 @@ const { AdventuringHeroParty, AdventuringEnemyParty } = await loadModule('src/en
 const { AdventuringTown } = await loadModule('src/town/adventuring-town.mjs');
 
 const { AdventuringTrainer } = await loadModule('src/town/adventuring-trainer.mjs');
-const { AdventuringJobDetails } = await loadModule('src/progression/adventuring-job-details.mjs');
+const { AdventuringJobDetails } = await loadModule('src/ui/adventuring-job-details.mjs');
 
 const { AdventuringArmory } = await loadModule('src/items/adventuring-armory.mjs');
 const { AdventuringTavern } = await loadModule('src/town/adventuring-tavern.mjs');
 const { AdventuringTavernDrink } = await loadModule('src/town/adventuring-tavern-drink.mjs');
-const { AdventuringSlayers } = await loadModule('src/progression/adventuring-slayers.mjs');
+const { AdventuringSlayers } = await loadModule('src/progression/slayer/adventuring-slayers.mjs');
 const { AdventuringLemons } = await loadModule('src/town/adventuring-lemons.mjs');
 const { AdventuringConsumables } = await loadModule('src/items/adventuring-consumables.mjs');
 const { AdventuringConsumable } = await loadModule('src/items/adventuring-consumable.mjs');
 
 const { AdventuringStash } = await loadModule('src/town/adventuring-stash.mjs');
 const { AdventuringBestiary } = await loadModule('src/entities/adventuring-bestiary.mjs');
-const { AdventuringMonsterDetails } = await loadModule('src/entities/adventuring-monster-details.mjs');
+const { AdventuringMonsterDetails } = await loadModule('src/ui/adventuring-monster-details.mjs');
 const { AdventuringCrossroads } = await loadModule('src/dungeon/adventuring-crossroads.mjs');
-const { AdventuringAreaDetails } = await loadModule('src/dungeon/adventuring-area-details.mjs');
+const { AdventuringAreaDetails } = await loadModule('src/ui/adventuring-area-details.mjs');
 const { AdventuringDungeon } = await loadModule('src/dungeon/adventuring-dungeon.mjs');
 const { AdventuringEncounter } = await loadModule('src/combat/adventuring-encounter.mjs');
 const { CombatTracker } = await loadModule('src/combat/adventuring-combat-tracker.mjs');
+const { AdventuringConductor } = await loadModule('src/core/adventuring-conductor.mjs');
 
 const { AdventuringItemSlot } = await loadModule('src/items/adventuring-item-slot.mjs');
 const { AdventuringItemType } = await loadModule('src/items/adventuring-item-type.mjs');
@@ -60,8 +61,9 @@ const { AdventuringTutorialManager } = await loadModule('src/ui/adventuring-tuto
 const { AdventuringEquipmentSet } = await loadModule('src/items/adventuring-equipment-set.mjs');
 const { AdventuringEquipmentPool } = await loadModule('src/items/adventuring-equipment-pool.mjs');
 const { AdventuringLootTable } = await loadModule('src/items/adventuring-loot-table.mjs');
-const { AdventuringGrimoire } = await loadModule('src/slayer/adventuring-grimoire.mjs');
+const { AdventuringGrimoire } = await loadModule('src/progression/slayer/adventuring-grimoire.mjs');
 const { AdventuringTag } = await loadModule('src/core/adventuring-tag.mjs');
+const { loadEffectDescriptions } = await loadModule('src/core/effects/effect-descriptions.mjs');
 
 const { AdventuringPageElement } = await loadModule('src/core/components/adventuring.mjs');
 
@@ -80,6 +82,13 @@ export class Adventuring extends SkillWithMastery {
         this.renderQueue = new AdventuringRenderQueue();
         this.isActive = false;
         this.timersPaused = false;
+
+        // Configuration from data (defaults overridden by base.json)
+        this.config = {
+            timers: { turn: 1500, hit: 150, endTurn: 100, explore: 1500 },
+            xpValues: { floorBase: 40, dungeonComplete: 250 },
+            limits: { maxUpgrades: 10, maxEquippedConsumables: 3, maxEquippedDrinks: 3 }
+        };
 
         this.learnedAbilities = new Set();
 
@@ -110,6 +119,9 @@ export class Adventuring extends SkillWithMastery {
         this.achievementMilestones = new NamespaceRegistry(this.game.registeredNamespaces);
         this.achievementStats = new NamespaceRegistry(this.game.registeredNamespaces);
 
+        // Conductor must be created first so other systems can register listeners in constructors
+        this.conductor = new AdventuringConductor(this);
+
         this.achievementManager = new AchievementManager(this, game);
         this.combatTracker = new CombatTracker(this);
 
@@ -130,6 +142,17 @@ export class Adventuring extends SkillWithMastery {
         this.masteryCategories = new NamespaceRegistry(this.game.registeredNamespaces);
 
         this.tutorials = new NamespaceRegistry(this.game.registeredNamespaces);
+
+        // Pending order data (processed in postDataRegistration)
+        this._pendingAreaOrders = [];
+        this._pendingJobOrders = [];
+        this._pendingMaterialOrders = [];
+        this._pendingItemOrders = [];
+        this._pendingTavernOrders = [];
+        this._pendingConsumableOrders = [];
+        this._pendingMonsterOrders = [];
+        this._pendingDifficultyOrders = [];
+        this._pendingEquipmentSetOrders = [];
 
         this.component = createElement('adventuring-page');
 
@@ -207,7 +230,7 @@ export class Adventuring extends SkillWithMastery {
      */
     scaleInterval(interval) {
         if (this.isDebugSpeed) {
-            return Math.max(50, Math.floor(interval / 25));
+            return Math.max(50, Math.floor(interval / 2));
         }
         return Math.max(50, interval);
     }
@@ -271,8 +294,10 @@ export class Adventuring extends SkillWithMastery {
 
         this._xp = 0;
         this.masteryPoolXP = 0;
+        // Reset both xp AND level for each mastery action
         this.actionMastery.forEach((data, action) => {
             data.xp = 0;
+            data.level = 1;
         });
 
         this.learnedAbilities.clear();
@@ -286,14 +311,36 @@ export class Adventuring extends SkillWithMastery {
         this.armory.upgradeLevels.forEach((level, item) => {
             this.armory.upgradeLevels.set(item, 0);
         });
+        this.armory.masterfulItems.clear();
+        this.armory.droppedItems.clear();
+        // Reset artifact tiers on items before clearing
+        this.armory.artifactTiers.forEach((tier, item) => {
+            if (item.isArtifact && typeof item.applyArtifactTier === 'function') {
+                item.applyArtifactTier(0);
+            }
+        });
+        this.armory.artifactTiers.clear();
         this.armory.clearSelected();
 
-        this.stash.reset();
         this.materials.allObjects.forEach(material => {
             material.renderQueue.updateAll();
         });
 
         this.tavern.resetDrinks();
+
+        // Reset workshop buildings (stored items and work orders)
+        this.buildings.allObjects.forEach(building => {
+            if (building.type === 'workshop' && building.page) {
+                building.page.storedItems.clear();
+                building.page.workOrders.forEach(order => {
+                    order.active = false;
+                    order.product = null;
+                    order.tier = 1;
+                    order.count = 0;
+                    order.completed = 0;
+                });
+            }
+        });
 
         this.consumables.resetCharges();
 
@@ -303,50 +350,82 @@ export class Adventuring extends SkillWithMastery {
 
         this.achievementManager.resetAll();
 
+        this.combatTracker.run.reset();
+        this.combatTracker.encounter.reset();
+        this.combatTracker.history = [];
+
         this.grimoire.resetAll();
 
         this.tutorialManager.resetState();
 
-        this.bestiary.reset();
+        // Reset crossroads progress
+        this.crossroads.clearedAreas.clear();
+
+        // Clear all cached unlock states (entities cache unlock checks for performance)
+        this.jobs.allObjects.forEach(job => { job._unlockedCached = undefined; });
+        this.areas.allObjects.forEach(area => { area._unlockedCached = undefined; });
+        this.baseItems.allObjects.forEach(item => { item._unlockedCached = undefined; });
+        this.generators.allObjects.forEach(gen => { gen._unlockedCached = undefined; });
+        this.spenders.allObjects.forEach(spd => { spd._unlockedCached = undefined; });
+        this.passives.allObjects.forEach(pas => { pas._unlockedCached = undefined; });
+        this.buildings.allObjects.forEach(bld => { bld._unlockedCached = undefined; });
+
+        this.areas.allObjects.forEach(area => {
+            area.selectedDifficulty = null;
+            area.bestEndlessStreak = 0;
+        });
 
         this.areas.allObjects.forEach(area => {
             area.renderQueue.updateAll();
         });
 
+        // Reset all heroes to "new player" state
         this.party.forEach(hero => {
-
-            hero.name = undefined;
-
-            hero.setCombatJob(this.jobs.getObjectByID('adventuring:none'));
-            hero.setPassiveJob(this.jobs.getObjectByID('adventuring:none'));
-
-            hero.setGenerator(this.generators.getObjectByID('adventuring:slap'));
-            hero.setSpender(this.spenders.getObjectByID('adventuring:backhand'));
-
-            hero.equipment.slots.forEach(slot => {
-                slot.setEmpty();
-            });
-
+            // Clear combat state
             hero.dead = false;
             hero.energy = 0;
             hero.auras.clear();
 
+            // Clear equipment
+            hero.equipment.slots.forEach(slot => {
+                slot.setEmpty();
+            });
+
+            // Reset stats to base
             hero.stats.reset();
             this.stats.allObjects.forEach(stat => {
                 if(stat.base !== undefined)
                     hero.stats.set(stat, stat.base);
             });
 
-        });
+            // Reset jobs and abilities to defaults
+            hero.setCombatJob(this.jobs.getObjectByID('adventuring:none'));
+            hero.setPassiveJob(this.jobs.getObjectByID('adventuring:none'));
+            hero.setGenerator(this.generators.getObjectByID('adventuring:slap'));
+            hero.setSpender(this.spenders.getObjectByID('adventuring:backhand'));
 
-        this.party.forEach(hero => {
+            // Generate new name and apply starter loadout
+            hero.name = hero.getRandomName(this.party.all.map(m => m.name));
+            hero.renderQueue.name = true;
+            hero._applyStarterLoadout();
+
+            // Recalculate stats and set HP to max
             hero.calculateStats();
             hero.hitpoints = hero.maxHitpoints;
+            hero.renderQueue.hitpoints = true;
+
+            // Invalidate caches (don't re-initialize them)
+            hero.effectCache.invalidate();
+            if (hero.statBreakdownCache) {
+                hero.statBreakdownCache.invalidate();
+            }
         });
 
-        this.party.forEach(hero => {
-            hero._applyStarterLoadout();
-        });
+        // Invalidate party and encounter effect caches
+        this.party.effectCache.invalidate();
+        if (this.encounter.effectCache) {
+            this.encounter.effectCache.invalidate();
+        }
 
         this.jobs.allObjects.forEach(job => job.renderQueue.updateAll());
         this.areas.allObjects.forEach(area => area.renderQueue.updateAll());
@@ -398,6 +477,8 @@ export class Adventuring extends SkillWithMastery {
 
         this.overview.onLoad();
         this.party.onLoad();
+        this.encounter.onLoad();
+        this.achievementManager.onLoad();
 
         if(this._pendingReset) {
             this._pendingReset = false;
@@ -441,7 +522,7 @@ export class Adventuring extends SkillWithMastery {
         });
 
         this.achievementManager.markDirty();
-        this.tutorialManager.checkTriggers('skill', { level: newLevel });
+        this.conductor.trigger('skill_level_up', { level: newLevel, oldLevel });
 
         this.jobs.forEach(job => {
             job.renderQueue.name = true;
@@ -481,7 +562,7 @@ export class Adventuring extends SkillWithMastery {
 
         // Fire job_level_up trigger for job mastery increases
         if (action instanceof AdventuringJob) {
-            this.achievementManager.trigger('job_level_up', {
+            this.conductor.trigger('job_level_up', {
                 job: action,
                 jobId: action.id,
                 jobName: action.name,
@@ -753,12 +834,19 @@ export class Adventuring extends SkillWithMastery {
             const firstJob = this.jobs.registeredObjects.values().next().value;
             if(firstJob !== undefined && action instanceof firstJob.constructor) {
                 category = 'job';
+                // Update mastery bonus cache and invalidate job effects for all heroes using this job
+                action.updateCachedMasteryBonus();
+                this.party.forEach(hero => {
+                    if (hero.combatJob === action || hero.passiveJob === action) {
+                        hero.invalidateJobEffects();
+                    }
+                });
             } else if(this.areas.allObjects.includes(action)) {
                 category = 'area';
             } else if(this.baseItems.allObjects.includes(action)) {
                 category = 'equipment';
             }
-            this.tutorialManager.checkTriggers('mastery', { category, level: newLevel });
+            this.conductor.trigger('mastery_level_up', { category, level: newLevel, action });
 
             if(newLevel >= 99 && this.party) {
                 this.party.onMasteryMaxed();
@@ -769,6 +857,24 @@ export class Adventuring extends SkillWithMastery {
     onPageChange() {
         this.overview.renderQueue.turnProgressBar = true;
         this.pages.onPageChange();
+    }
+
+    /**
+     * Syncs the current page to match the game state.
+     * Called after offline progress to ensure UI reflects actual state.
+     */
+    syncPageState() {
+        if (this.isActive) {
+            // In a dungeon run
+            if (this.encounter.isFighting) {
+                this.encounter.go();
+            } else {
+                this.dungeon.go();
+            }
+        } else {
+            // Not in a run - should be in town
+            this.town.go();
+        }
     }
 
     onShow() {
@@ -792,6 +898,9 @@ export class Adventuring extends SkillWithMastery {
     }
 
     render() {
+        // Skip all rendering during offline progress to prevent visual flickering
+        if (loadingOfflineProgress)
+            return;
 
         if (this._pendingReset)
             return;
@@ -804,6 +913,11 @@ export class Adventuring extends SkillWithMastery {
 
     registerData(namespace, data) {
         super.registerData(namespace, data); // pets, rareDrops, minibar, customMilestones
+
+        // Load effect descriptions (triggers, targets, templates, conditions, layouts, starterLoadouts)
+        if(data.effectDescriptions !== undefined || data.triggers !== undefined || data.targets !== undefined || data.conditions !== undefined || data.layouts !== undefined || data.starterLoadouts !== undefined) {
+            loadEffectDescriptions(data);
+        }
 
         if(data.categories !== undefined) {
             data.categories.forEach(data => {
@@ -834,6 +948,17 @@ export class Adventuring extends SkillWithMastery {
 
         if(data.overview !== undefined)
             this.overview.registerData(data.overview);
+
+        // Load constants from data
+        if(data.timers !== undefined) {
+            this.config.timers = { ...this.config.timers, ...data.timers };
+        }
+        if(data.xpValues !== undefined) {
+            this.config.xpValues = { ...this.config.xpValues, ...data.xpValues };
+        }
+        if(data.limits !== undefined) {
+            this.config.limits = { ...this.config.limits, ...data.limits };
+        }
 
         if(data.stats !== undefined) {
             data.stats.forEach(data => {
@@ -1091,6 +1216,35 @@ export class Adventuring extends SkillWithMastery {
                 this.achievementStats.registerObject(stat);
             });
         }
+
+        // Collect order data for processing in postDataRegistration
+        if(data.areaOrder !== undefined) {
+            this._pendingAreaOrders.push(data.areaOrder);
+        }
+        if(data.jobOrder !== undefined) {
+            this._pendingJobOrders.push(data.jobOrder);
+        }
+        if(data.materialOrder !== undefined) {
+            this._pendingMaterialOrders.push(data.materialOrder);
+        }
+        if(data.itemOrder !== undefined) {
+            this._pendingItemOrders.push(data.itemOrder);
+        }
+        if(data.tavernOrder !== undefined) {
+            this._pendingTavernOrders.push(data.tavernOrder);
+        }
+        if(data.consumableOrder !== undefined) {
+            this._pendingConsumableOrders.push(data.consumableOrder);
+        }
+        if(data.monsterOrder !== undefined) {
+            this._pendingMonsterOrders.push(data.monsterOrder);
+        }
+        if(data.difficultyOrder !== undefined) {
+            this._pendingDifficultyOrders.push(data.difficultyOrder);
+        }
+        if(data.equipmentSetOrder !== undefined) {
+            this._pendingEquipmentSetOrders.push(data.equipmentSetOrder);
+        }
     }
 
     postDataRegistration() {
@@ -1105,6 +1259,9 @@ export class Adventuring extends SkillWithMastery {
         this.generators.forEach(generator => generator.postDataRegistration());
         this.spenders.forEach(spender => spender.postDataRegistration());
         this.passives.forEach(passive => passive.postDataRegistration());
+
+        // Process all entity orderings after all entities are registered
+        this._buildAllSortOrders();
 
         this.passivesByJob = new Map();
         this.jobs.forEach(job => {
@@ -1203,8 +1360,6 @@ export class Adventuring extends SkillWithMastery {
 
         this.tutorialManager.postDataRegistration();
 
-        this.achievementManager.init();
-
         let capesToExclude = ["melvorF:Max_Skillcape", "melvorTotH:Superior_Max_Skillcape"];
         let skillCapes = this.game.shop.purchases.filter(purchase => capesToExclude.includes(purchase.id));
         skillCapes.forEach(cape => {
@@ -1215,6 +1370,111 @@ export class Adventuring extends SkillWithMastery {
                 allSkillLevelsRequirement.exceptions.add(this);
             }
         });
+    }
+
+    /**
+     * Generic method to build sort order for any entity registry.
+     * @param {NamespaceRegistry} registry - The registry containing the entities
+     * @param {Array} pendingOrders - Array of order arrays collected from data
+     * @param {string} orderKey - Key name for storing the ordered list (e.g., 'areaOrder')
+     * @returns {Array} The ordered entity list
+     */
+    _buildEntitySortOrder(registry, pendingOrders, orderKey) {
+        // Start with the combined order from all order arrays
+        const orderedIds = [];
+        pendingOrders.forEach(orderArray => {
+            orderArray.forEach(id => {
+                if (!orderedIds.includes(id)) {
+                    orderedIds.push(id);
+                }
+            });
+        });
+
+        // Process individual orderPosition overrides
+        registry.allObjects.forEach(entity => {
+            if (!entity.orderPosition) return;
+            
+            const pos = entity.orderPosition;
+            const currentIndex = orderedIds.indexOf(entity.id);
+            
+            // Remove from current position if present
+            if (currentIndex !== -1) {
+                orderedIds.splice(currentIndex, 1);
+            }
+            
+            if (pos.insertStart) {
+                orderedIds.unshift(entity.id);
+            } else if (pos.insertEnd) {
+                orderedIds.push(entity.id);
+            } else if (pos.insertAfter) {
+                const afterIndex = orderedIds.indexOf(pos.insertAfter);
+                if (afterIndex !== -1) {
+                    orderedIds.splice(afterIndex + 1, 0, entity.id);
+                } else {
+                    orderedIds.push(entity.id);
+                }
+            } else if (pos.insertBefore) {
+                const beforeIndex = orderedIds.indexOf(pos.insertBefore);
+                if (beforeIndex !== -1) {
+                    orderedIds.splice(beforeIndex, 0, entity.id);
+                } else {
+                    orderedIds.push(entity.id);
+                }
+            }
+        });
+
+        // Assign sortOrder to each entity (unordered entities get a high sortOrder)
+        registry.allObjects.forEach(entity => {
+            const index = orderedIds.indexOf(entity.id);
+            entity.sortOrder = index !== -1 ? index : 9999;
+        });
+
+        // Store the ordered list for reference
+        const orderedList = orderedIds.map(id => registry.getObjectByID(id)).filter(e => e);
+        this[orderKey] = orderedList;
+
+        return orderedList;
+    }
+
+    /**
+     * Build sort orders for all entity types that have ordering data.
+     */
+    _buildAllSortOrders() {
+        // Areas
+        this._buildEntitySortOrder(this.areas, this._pendingAreaOrders, 'areaOrder');
+        this._pendingAreaOrders = [];
+
+        // Jobs
+        this._buildEntitySortOrder(this.jobs, this._pendingJobOrders, 'jobOrder');
+        this._pendingJobOrders = [];
+
+        // Materials
+        this._buildEntitySortOrder(this.materials, this._pendingMaterialOrders, 'materialOrder');
+        this._pendingMaterialOrders = [];
+
+        // Base Items
+        this._buildEntitySortOrder(this.baseItems, this._pendingItemOrders, 'itemOrder');
+        this._pendingItemOrders = [];
+
+        // Tavern Drinks
+        this._buildEntitySortOrder(this.tavernDrinks, this._pendingTavernOrders, 'tavernOrder');
+        this._pendingTavernOrders = [];
+
+        // Consumables
+        this._buildEntitySortOrder(this.consumableTypes, this._pendingConsumableOrders, 'consumableOrder');
+        this._pendingConsumableOrders = [];
+
+        // Monsters
+        this._buildEntitySortOrder(this.monsters, this._pendingMonsterOrders, 'monsterOrder');
+        this._pendingMonsterOrders = [];
+
+        // Difficulties
+        this._buildEntitySortOrder(this.difficulties, this._pendingDifficultyOrders, 'difficultyOrder');
+        this._pendingDifficultyOrders = [];
+
+        // Equipment Sets
+        this._buildEntitySortOrder(this.equipmentSets, this._pendingEquipmentSetOrders, 'equipmentSetOrder');
+        this._pendingEquipmentSetOrders = [];
     }
 
     buildSourceLookups() {
@@ -1350,9 +1610,7 @@ export class Adventuring extends SkillWithMastery {
             for (const effect of passive.effects) {
                 const effectObj = {
                     ...effect,
-                    source: passive,
-                    sourceName: `Achievement (${passive.name})`,
-                    sourceType: 'globalPassive'
+                    sourcePath: [{ type: 'globalPassive', name: `Achievement (${passive.name})`, ref: passive }]
                 };
                 // Preserve getAmount and getStacks methods if they exist
                 if (typeof effect.getAmount === 'function') {

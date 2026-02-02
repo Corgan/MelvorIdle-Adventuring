@@ -1,457 +1,239 @@
 {
-    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
-    "namespace": "adventuring",
-    "data": {
-        "skillData": [{
-            "skillID": "adventuring:Adventuring",
-            "data": {
-                "jobs": [
-                    {
-                        "id": "sage",
-                        "tier": 4,
-                        "name": "Sage",
-                        "media": "melvor:assets/media/skills/magic/magic.png#tint=magenta",
-                        "requirements": [
-                            { "type": "job_level", "job": "adventuring:inquisitor", "level": 25 },
-                            { "type": "job_level", "job": "adventuring:reaper", "level": 20 },
-                            { "type": "area_mastery", "area": "adventuring:mummys_tomb", "level": 50 }
-                        ],
-                        "isMilestoneReward": true,
-                        "allowedItems": [
-                            "adventuring:hat",
-                            "adventuring:robes",
-                            "adventuring:bottoms",
-                            "adventuring:mitts",
-                            "adventuring:slippers",
-                            "adventuring:amulet",
-                            "adventuring:ring",
-                            "adventuring:cape",
-                            "adventuring:staff",
-                            "adventuring:wand",
-                            "adventuring:spellbook"
-                        ],
-                        "scaling": [
-                            { "id": "adventuring:hitpoints", "amount": 1.25 },
-                            { "id": "adventuring:defence", "amount": 0.5 },
-                            { "id": "adventuring:agility", "amount": 1.0 },
-                            { "id": "adventuring:magic", "amount": 2.0 },
-                            { "id": "adventuring:prayer", "amount": 2.0 }
-                        ]
-                    }
-                ],
-                "generators": [
-                    {
-                        "id": "elemental_harmony",
-                        "name": "Elemental Harmony",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:sage", "level": 1 }
-                        ],
-                        "energy": 30,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 15,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "amount": 0.35 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            },
-                            {
-                                "target": "lowest",
-                                "party": "ally",
-                                "effects": [
-                                    {
-                                        "type": "heal_flat",
-                                        "amount": {
-                                            "base": 12,
-                                            "scaling": [
-                                                { "id": "adventuring:prayer", "amount": 0.3 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "wisdom_of_ages",
-                        "name": "Wisdom of Ages",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:sage", "level": 20 }
-                        ],
-                        "energy": 35,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "ally",
-                                "effects": [
-                                    {
-                                        "type": "heal_flat",
-                                        "amount": {
-                                            "base": 10,
-                                            "scaling": [
-                                                { "id": "adventuring:prayer", "amount": 0.25 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:arcane_power",
-                                        "stacks": {
-                                            "base": 2,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "amount": 0.1 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ],
-                "spenders": [
-                    {
-                        "id": "cosmic_balance",
-                        "name": "Cosmic Balance",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:sage", "level": 10 }
-                        ],
-                        "cost": 160,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 20,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "amount": 0.5 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            },
-                            {
-                                "target": "all",
-                                "party": "ally",
-                                "effects": [
-                                    {
-                                        "type": "heal_flat",
-                                        "amount": {
-                                            "base": 15,
-                                            "scaling": [
-                                                { "id": "adventuring:prayer", "amount": 0.4 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "harmonic_wave",
-                        "name": "Harmonic Wave",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:sage", "level": 15 }
-                        ],
-                        "cost": 155,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "delay": 100,
-                                "repeat": 2,
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 18,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "amount": 0.45 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            },
-                            {
-                                "target": "all",
-                                "party": "ally",
-                                "effects": [
-                                    {
-                                        "type": "heal_flat",
-                                        "amount": {
-                                            "base": 15,
-                                            "scaling": [
-                                                { "id": "adventuring:prayer", "amount": 0.35 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "mystic_equilibrium",
-                        "name": "Mystic Equilibrium",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:sage", "level": 20 }
-                        ],
-                        "cost": 175,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 22,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "amount": 0.55 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:chill",
-                                        "stacks": {
-                                            "base": 3,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "amount": 0.1 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            },
-                            {
-                                "target": "all",
-                                "party": "ally",
-                                "effects": [
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:divine_favor",
-                                        "stacks": {
-                                            "base": 2,
-                                            "scaling": [
-                                                { "id": "adventuring:prayer", "amount": 0.1 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "enlightenment",
-                        "name": "Enlightenment",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:sage", "level": 25 }
-                        ],
-                        "cost": 180,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "ally",
-                                "effects": [
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:arcane_power",
-                                        "stacks": {
-                                            "base": 4,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "amount": 0.2 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:divine_favor",
-                                        "stacks": {
-                                            "base": 4,
-                                            "scaling": [
-                                                { "id": "adventuring:prayer", "amount": 0.2 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:haste",
-                                        "stacks": {
-                                            "base": 2,
-                                            "scaling": [
-                                                { "id": "adventuring:agility", "amount": 0.1 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "sages_enlightenment",
-                        "name": "Sage's Enlightenment",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:sage", "level": 40 }
-                        ],
-                        "cost": 280,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 45,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "amount": 1.2 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:curse",
-                                        "stacks": {
-                                            "base": 3,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "amount": 0.1 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            },
-                            {
-                                "target": "all",
-                                "party": "ally",
-                                "effects": [
-                                    {
-                                        "type": "heal_flat",
-                                        "amount": {
-                                            "base": 35,
-                                            "scaling": [
-                                                { "id": "adventuring:prayer", "amount": 1.0 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:regen",
-                                        "stacks": {
-                                            "base": 4,
-                                            "scaling": [
-                                                { "id": "adventuring:prayer", "amount": 0.15 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:barrier",
-                                        "stacks": {
-                                            "base": 4,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "amount": 0.2 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ],
-                "passives": [
-                    {
-                        "id": "cosmic_awareness",
-                        "name": "Cosmic Awareness",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:sage", "level": 30 }
-                        ],
-                        "effects": [
-                            {
-                                "trigger": "encounter_start",
-                                "type": "buff",
-                                "target": "all",
-                                "party": "ally",
-                                "id": "adventuring:arcane_power",
-                                "stacks": {
-                                    "base": 3,
-                                    "scaling": [
-                                        { "id": "adventuring:magic", "amount": 0.15 }
-                                    ]
-                                }
-                            },
-                            {
-                                "trigger": "encounter_start",
-                                "type": "buff",
-                                "target": "all",
-                                "party": "ally",
-                                "id": "adventuring:divine_favor",
-                                "stacks": {
-                                    "base": 3,
-                                    "scaling": [
-                                        { "id": "adventuring:prayer", "amount": 0.15 }
-                                    ]
-                                }
-                            },
-                            {
-                                "trigger": "encounter_start",
-                                "type": "buff",
-                                "target": "all",
-                                "party": "ally",
-                                "id": "adventuring:regen",
-                                "stacks": {
-                                    "base": 3,
-                                    "scaling": [
-                                        { "id": "adventuring:prayer", "amount": 0.1 }
-                                    ]
-                                }
-                            }
-                        ]
-                    },
-                    {
-                        "id": "balanced_mind",
-                        "name": "Balanced Mind",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:sage", "level": 25 }
-                        ],
-                        "effects": [
-                            {
-                                "trigger": "encounter_start",
-                                "type": "buff",
-                                "target": "self",
-                                "id": "adventuring:barrier",
-                                "stacks": {
-                                    "base": 5,
-                                    "scaling": [
-                                        { "id": "adventuring:magic", "amount": 0.25 }
-                                    ]
-                                }
-                            },
-                            {
-                                "trigger": "encounter_start",
-                                "type": "debuff",
-                                "target": "all",
-                                "party": "enemy",
-                                "id": "adventuring:curse",
-                                "stacks": {
-                                    "base": 2,
-                                    "scaling": [
-                                        { "id": "adventuring:magic", "amount": 0.1 }
-                                    ]
-                                }
-                            }
-                        ]
-                    }
-                ]
-            }
-        }]
-    }
+	"$schema": "../job_schema.json",
+	"namespace": "adventuring",
+	"packages": {
+		"combat_jobs": {
+			"jobs": {
+				"sage": {
+					"name": "Sage",
+					"tier": 4,
+					"media": "assets/jobs/sage.png",
+					"requirements": [
+						{ "type": "job_level", "job": "adventuring:inquisitor", "level": 25 },
+						{ "type": "job_level", "job": "adventuring:reaper", "level": 20 }
+					],
+					"abilities": [
+						{
+							"id": "elemental_harmony",
+							"name": "Elemental Harmony",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "Channels elemental forces to damage an enemy and heal the weakest ally.",
+							"energy": 30,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:sage", "level": 1 }],
+							"hits": [
+								{ "target": "front", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "amount": { "base": 7, "scaling": [{ "id": "adventuring:magic", "amount": 0.35 }] } },
+									{ "type": "debuff", "id": "adventuring:curse", "stacks": 2 }
+								] },
+								{ "target": "lowest", "party": "ally", "effects": [
+									{ "type": "heal_flat", "amount": { "base": 4, "scaling": [{ "id": "adventuring:prayer", "amount": 0.2 }] } }
+								] }
+							]
+						},
+						{
+							"id": "cosmic_balance",
+							"name": "Cosmic Balance",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "Restores cosmic balance by damaging all enemies and healing all allies.",
+							"cost": 150,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:sage", "level": 1 }],
+							"hits": [
+								{ "target": "all", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "amount": { "base": 10, "scaling": [{ "id": "adventuring:magic", "amount": 0.5 }] } }
+								] },
+								{ "target": "all", "party": "ally", "effects": [
+									{ "type": "heal_flat", "amount": { "base": 8, "scaling": [{ "id": "adventuring:prayer", "amount": 0.4 }] } }
+								] }
+							]
+						},
+						{
+							"id": "mystic_surge",
+							"name": "Mystic Surge",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "A surge of mystic energy curses enemies and blesses allies.",
+							"energy": 30,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:sage", "level": 10 }],
+							"hits": [
+								{ "target": "front", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "amount": { "base": 9, "scaling": [{ "id": "adventuring:magic", "amount": 0.45 }] } },
+									{ "type": "debuff", "id": "adventuring:curse", "stacks": { "base": 2, "scaling": [{ "id": "adventuring:magic", "amount": 0.1 }] } }
+								] },
+								{ "target": "all", "party": "ally", "effects": [
+									{ "type": "buff", "id": "adventuring:divine_favor", "stacks": 2 }
+								] }
+							]
+						},
+						{
+							"id": "harmonic_convergence",
+							"name": "Harmonic Convergence",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "Converging harmonies heal and empower all allies in waves.",
+							"cost": 155,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:sage", "level": 15 }],
+							"hits": [{ "target": "all", "party": "ally", "delay": 150, "repeat": 2, "effects": [
+								{ "type": "heal_flat", "amount": { "base": 8, "scaling": [{ "id": "adventuring:prayer", "amount": 0.4 }] } },
+								{ "type": "buff", "id": "adventuring:arcane_power", "stacks": { "base": 2, "scaling": [{ "id": "adventuring:magic", "amount": 0.1 }] } }
+							] }]
+						},
+						{
+							"id": "balanced_mind",
+							"name": "Balanced Mind",
+							"type": "passive",
+							"media": "assets/abilities/passive.png",
+							"description": "A balanced mind grants protection and empowerment at battle start.",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:sage", "level": 20 }],
+							"effects": [
+								{ "trigger": "encounter_start", "type": "buff", "target": "self", "id": "adventuring:barrier", "stacks": { "base": 5, "scaling": [{ "id": "adventuring:magic", "amount": 0.25 }] } },
+								{ "trigger": "encounter_start", "type": "buff", "target": "self", "id": "adventuring:arcane_power", "stacks": 3 },
+								{ "trigger": "encounter_start", "type": "buff", "target": "self", "id": "adventuring:divine_favor", "stacks": 3 }
+							]
+						},
+						{
+							"id": "wisdom_of_ages",
+							"name": "Wisdom of Ages",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "Ancient wisdom damages all enemies while blessing all allies.",
+							"energy": 35,
+							"requirements": [{ "type": "job_level", "job": "adventuring:sage", "level": 25 }],
+							"hits": [
+								{ "target": "all", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "amount": { "base": 7, "scaling": [{ "id": "adventuring:magic", "amount": 0.35 }] } },
+									{ "type": "debuff", "id": "adventuring:curse", "stacks": 2 }
+								] },
+								{ "target": "all", "party": "ally", "effects": [
+									{ "type": "heal_flat", "amount": { "base": 5, "scaling": [{ "id": "adventuring:prayer", "amount": 0.25 }] } },
+									{ "type": "buff", "id": "adventuring:arcane_power", "stacks": 2 },
+									{ "type": "buff", "id": "adventuring:divine_favor", "stacks": 2 }
+								] }
+							]
+						},
+						{
+							"id": "enlightened_presence",
+							"name": "Enlightened Presence",
+							"type": "passive",
+							"media": "assets/abilities/passive.png",
+							"description": "Your enlightened presence heals and protects each round.",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:sage", "level": 40 }],
+							"effects": [
+								{ "trigger": "round_start", "type": "heal_flat", "target": "self", "amount": { "base": 4, "scaling": [{ "id": "adventuring:prayer", "amount": 0.15 }] } },
+								{ "trigger": "round_start", "type": "buff", "target": "self", "id": "adventuring:barrier", "stacks": 2 }
+							]
+						},
+						{
+							"id": "cosmic_equilibrium",
+							"name": "Cosmic Equilibrium",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "Enforces cosmic equilibrium with devastating consequences.",
+							"cost": 180,
+							"requirements": [{ "type": "job_level", "job": "adventuring:sage", "level": 50 }],
+							"hits": [
+								{ "target": "all", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "amount": { "base": 14, "scaling": [{ "id": "adventuring:magic", "amount": 0.7 }] } },
+									{ "type": "debuff", "id": "adventuring:curse", "stacks": 3 },
+									{ "type": "debuff", "id": "adventuring:chill", "stacks": 3 }
+								] },
+								{ "target": "all", "party": "ally", "effects": [
+									{ "type": "heal_flat", "amount": { "base": 10, "scaling": [{ "id": "adventuring:prayer", "amount": 0.5 }] } }
+								] }
+							]
+						},
+						{
+							"id": "arcane_divine_fusion",
+							"name": "Arcane-Divine Fusion",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "Fuses arcane and divine power, consuming arcane_power for bonus damage.",
+							"energy": 35,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:sage", "level": 60 }],
+							"hits": [
+								{ "target": "front", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "amount": { "base": 14, "scaling": [
+										{ "id": "adventuring:magic", "amount": 0.65 },
+										{ "id": "adventuring:arcane_power", "scaleFrom": "buff", "scaleTarget": "caster", "amount": 3, "consume": true }
+									] } }
+								] },
+								{ "target": "self", "effects": [
+									{ "type": "buff", "id": "adventuring:divine_favor", "stacks": 4 }
+								] }
+							]
+						},
+						{
+							"id": "sages_blessing",
+							"name": "Sage's Blessing",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "Bestows the sage's full blessing upon all allies.",
+							"cost": 175,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:sage", "level": 70 }],
+							"hits": [{ "target": "all", "party": "ally", "effects": [
+								{ "type": "heal_flat", "amount": { "base": 15, "scaling": [{ "id": "adventuring:prayer", "amount": 0.75 }] } },
+								{ "type": "buff", "id": "adventuring:regen", "stacks": { "base": 4, "scaling": [{ "id": "adventuring:prayer", "amount": 0.15 }] } },
+								{ "type": "buff", "id": "adventuring:divine_favor", "stacks": { "base": 4, "scaling": [{ "id": "adventuring:prayer", "amount": 0.2 }] } },
+								{ "type": "buff", "id": "adventuring:barrier", "stacks": { "base": 4, "scaling": [{ "id": "adventuring:magic", "amount": 0.2 }] } }
+							] }]
+						},
+						{
+							"id": "cosmic_awareness",
+							"name": "Cosmic Awareness",
+							"type": "passive",
+							"media": "assets/abilities/passive.png",
+							"description": "Cosmic awareness heals the weakest ally whenever you deal damage.",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:sage", "level": 80 }],
+							"effects": [
+								{ "trigger": "after_damage_delivered", "type": "heal_flat", "target": "lowest", "party": "ally", "amount": { "base": 3, "scaling": [{ "id": "adventuring:prayer", "amount": 0.12 }] } }
+							]
+						},
+						{
+							"id": "astral_surge",
+							"name": "Astral Surge",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "Channels astral power to devastate all enemies.",
+							"energy": 40,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:sage", "level": 90 }],
+							"hits": [
+								{ "target": "all", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "amount": { "base": 12, "scaling": [{ "id": "adventuring:magic", "amount": 0.6 }] } },
+									{ "type": "debuff", "id": "adventuring:curse", "stacks": 3 },
+									{ "type": "debuff", "id": "adventuring:chill", "stacks": 2 }
+								] },
+								{ "target": "self", "effects": [
+									{ "type": "buff", "id": "adventuring:arcane_power", "stacks": 3 }
+								] }
+							]
+						},
+						{
+							"id": "transcendence",
+							"name": "Transcendence",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "Achieves transcendence - ultimate balance of destruction and restoration.",
+							"cost": 250,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:sage", "level": 99 }],
+							"hits": [
+								{ "target": "all", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "amount": { "base": 25, "scaling": [{ "id": "adventuring:magic", "amount": 1.2 }] } },
+									{ "type": "debuff", "id": "adventuring:curse", "stacks": 5 },
+									{ "type": "debuff", "id": "adventuring:chill", "stacks": 4 }
+								] },
+								{ "target": "all", "party": "ally", "effects": [
+									{ "type": "heal_flat", "amount": { "base": 35, "scaling": [{ "id": "adventuring:prayer", "amount": 1.8 }] } },
+									{ "type": "buff", "id": "adventuring:arcane_power", "stacks": { "base": 5, "scaling": [{ "id": "adventuring:magic", "amount": 0.25 }] } },
+									{ "type": "buff", "id": "adventuring:divine_favor", "stacks": { "base": 5, "scaling": [{ "id": "adventuring:prayer", "amount": 0.25 }] } },
+									{ "type": "buff", "id": "adventuring:regen", "stacks": 5 },
+									{ "type": "buff", "id": "adventuring:barrier", "stacks": { "base": 5, "scaling": [{ "id": "adventuring:magic", "amount": 0.25 }] } }
+								] }
+							]
+						}
+					]
+				}
+			}
+		}
+	}
 }

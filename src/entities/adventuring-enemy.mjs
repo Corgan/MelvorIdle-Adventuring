@@ -1,9 +1,10 @@
 const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringCharacter, AdventuringCharacterRenderQueue } = await loadModule('src/core/adventuring-character.mjs');
-const { UNKNOWN_MEDIA, RequirementsChecker } = await loadModule('src/core/adventuring-utils.mjs');
+const { RequirementsChecker } = await loadModule('src/core/utils/requirements-checker.mjs');
+const { UNKNOWN_MEDIA } = await loadModule('src/core/utils/adventuring-utils.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
-const { StatBreakdownCache } = await loadModule('src/core/adventuring-stat-breakdown.mjs');
+const { StatBreakdownCache } = await loadModule('src/core/stats/adventuring-stat-breakdown.mjs');
 
 class AdventuringEnemyRenderQueue extends AdventuringCharacterRenderQueue {
     constructor() {
@@ -52,9 +53,7 @@ export class AdventuringEnemy extends AdventuringCharacter {
                 for (const effect of passive.effects) {
                     const effectObj = {
                         ...effect,
-                        source: passive,
-                        sourceName: `${this.base.name} (${passive.name})`,
-                        sourceType: 'monsterPassive'
+                        sourcePath: [{ type: 'monsterPassive', name: `${this.base.name} (${passive.name})`, ref: passive }]
                     };
                     // Preserve getAmount and getStacks methods if they exist
                     if (typeof effect.getAmount === 'function') {
@@ -69,9 +68,21 @@ export class AdventuringEnemy extends AdventuringCharacter {
             return effects;
         });
 
-        // Dungeon effects that target enemies (difficulty modifiers, etc.)
-        this.effectCache.registerSource('dungeonEffects', () => 
-            this.manager.dungeon?.getEffects({ party: 'enemy' }) || []
+        // Difficulty effects (stat bonuses for enemies)
+        this.effectCache.registerSource('difficulty', () => {
+            const difficulty = this.manager.dungeon?.difficulty;
+            if (!difficulty) return [];
+            
+            // Get effects that target enemies
+            const allEffects = difficulty.getEffects();
+            return allEffects.filter(e => 
+                e.target === 'all' && e.party === 'enemy'
+            );
+        });
+
+        // Shared encounter effects (environment + heroes targeting enemies)
+        this.effectCache.registerSource('encounter', () => 
+            this.manager.encounter?.getEffects() || []
         );
     }
 
@@ -272,177 +283,220 @@ export class AdventuringEnemy extends AdventuringCharacter {
         }
     }
 
-    onDeath() {
-        super.onDeath();
-        if(this.xp) {
+    /**
+     * Calculate XP multiplier based on difficulty and mastery bonuses
+     * @returns {number} The XP multiplier
+     */
+    _calculateXPMultiplier() {
+        const area = this.manager.dungeon.area;
+        const difficultyXPBonus = this.manager.dungeon.getBonus('xp_percent') / 100;
+        const masteryBonuses = area ? area.masteryBonuses : { xpBonus: 0 };
+        return 1 + difficultyXPBonus + masteryBonuses.xpBonus;
+    }
 
-            const area = this.manager.dungeon.area;
-            const difficultyXPBonus = this.manager.dungeon.getBonus('xp_percent') / 100;
-            const masteryBonuses = area ? area.getMasteryBonuses() : { xpBonus: 0 };
-            const xpMultiplier = 1 + difficultyXPBonus + masteryBonuses.xpBonus;
-            const bonusXP = Math.ceil(this.xp * xpMultiplier);
+    /**
+     * Award skill and job XP on enemy death
+     * @param {number} xpMultiplier - The XP multiplier to apply
+     */
+    _awardXP(xpMultiplier) {
+        const area = this.manager.dungeon.area;
+        const bonusXP = Math.ceil(this.xp * xpMultiplier);
 
-            this.manager.addXP(bonusXP, area || this.base);
+        this.manager.addXP(bonusXP, area || this.base);
+        this.manager.party.awardJobXP(bonusXP);
+    }
 
-            this.manager.party.awardJobXP(bonusXP);
+    /**
+     * Award mastery XP on enemy death
+     * @param {number} xpMultiplier - The XP multiplier to apply
+     */
+    _awardMasteryXP(xpMultiplier) {
+        const masteryXP = this.base.masteryXP || 25;
+        const bonusMasteryXP = Math.ceil(masteryXP * xpMultiplier);
+        this.base.addXP(bonusMasteryXP);
 
-            const masteryXP = this.base.masteryXP || 25;
-            const bonusMasteryXP = Math.ceil(masteryXP * xpMultiplier);
-            this.base.addXP(bonusMasteryXP);
-
-            this.manager.encounter.party.all.forEach(enemy => {
-                if(enemy.base === this.base) {
-                    enemy.renderQueue.iconTooltip = true;
-                }
-            });
-
-            const lootTable = this.base.lootGenerator.table;
-
-            const processLoot = (id, qty, isCurrency = false) => {
-
-                const dropQtyBonus = this.manager.party.getMonsterDropQtyBonus(this.base);
-                if(dropQtyBonus > 0) {
-                    qty = Math.ceil(qty * (1 + dropQtyBonus));
-                }
-
-                const materialDropBonus = this.manager.party.getMaterialDropRateBonus();
-                if(materialDropBonus > 0) {
-                    qty = Math.ceil(qty * (1 + materialDropBonus));
-                }
-
-                // Apply currency-specific bonus
-                if(isCurrency) {
-                    const currencyBonus = this.manager.party.getCurrencyDropBonus();
-                    if(currencyBonus > 0) {
-                        qty = Math.ceil(qty * (1 + currencyBonus));
-                    }
-                }
-
-                const lootBonus = this.manager.dungeon.getBonus('loot_percent');
-                if(lootBonus > 0) {
-                    qty = Math.ceil(qty * (1 + lootBonus / 100));
-                }
-
-                this.manager.stash.add(id, qty, { fromCombat: true });
-            };
-
-            const getQty = (entry) => {
-                if(entry.qty !== undefined) return entry.qty;
-                if(entry.minQty !== undefined && entry.maxQty !== undefined) {
-                    return entry.minQty + Math.floor(Math.random() * (entry.maxQty - entry.minQty + 1));
-                }
-                return 1;
-            };
-
-            const checkConditions = (entry) => {
-                if(!entry.conditions || entry.conditions.length === 0) return true;
-                const checker = new RequirementsChecker(this.manager, entry.conditions);
-                return checker.check({});
-            };
-
-            const expandLootEntries = (entries) => {
-                const expanded = [];
-                for(const entry of entries) {
-                    if(entry.type === 'table') {
-
-                        const table = this.manager.lootTables.getObjectByID(entry.table);
-                        if(table) {
-                            expanded.push(...table.getEntries());
-                        } else {
-                            console.warn(`[Adventuring] Unknown loot table: ${entry.table}`);
-                        }
-                    } else {
-                        expanded.push(entry);
-                    }
-                }
-                return expanded;
-            };
-
-            const expandedLoot = expandLootEntries(lootTable);
-
-            for(const entry of expandedLoot) {
-
-                if(!checkConditions(entry)) continue;
-
-                const lootType = (entry.type !== undefined) ? entry.type : this.inferLootType(entry);
-
-                switch(lootType) {
-                    case 'currency': {
-
-                        const baseQty = getQty(entry);
-                        const variance = 0.8 + (Math.random() * 0.4);
-                        const qty = Math.max(1, Math.round(baseQty * variance));
-                        processLoot(entry.id, qty, true);  // true = isCurrency
-                        break;
-                    }
-
-                    case 'salvage': {
-
-                        const baseQty = getQty(entry);
-                        const qty = 1 + Math.floor(Math.random() * baseQty);
-                        processLoot(entry.id, qty);
-                        break;
-                    }
-
-                    case 'materials': {
-
-                        const dropChance = (entry.chance !== undefined) ? entry.chance : (entry.weight / 100);
-                        if(Math.random() < dropChance) {
-                            processLoot(entry.id, getQty(entry));
-                        }
-                        break;
-                    }
-
-                    case 'equipment_pool': {
-
-                        const pool = this.manager.equipmentPools.getObjectByID(entry.pool);
-                        if(!pool) {
-                            console.warn(`[Adventuring] Unknown equipment pool: ${entry.pool}`);
-                            break;
-                        }
-
-                        if(!pool.hasAvailable()) break;
-
-                        const dropChance = (entry.chance !== undefined) ? entry.chance : 0.1;
-                        if(Math.random() < dropChance) {
-                            const item = pool.roll();
-                            if(item) {
-
-                                const rarity = entry.rarity || item.rarity || null;
-                                this.manager.armory.markDropped(item, true, rarity);
-                            }
-                        }
-                        break;
-                    }
-
-                    case 'equipment': {
-
-                        const item = this.manager.baseItems.getObjectByID(entry.id);
-                        if(!item) {
-                            console.warn(`[Adventuring] Unknown equipment: ${entry.id}`);
-                            break;
-                        }
-
-                        if(this.manager.armory.hasDropped(item)) break;
-
-                        const dropChance = (entry.chance !== undefined) ? entry.chance : 0.01;
-                        if(Math.random() < dropChance) {
-
-                            const rarity = entry.rarity || item.rarity || null;
-                            this.manager.armory.markDropped(item, true, rarity);
-                        }
-                        break;
-                    }
-                }
+        // Update tooltip for all enemies of this type
+        this.manager.encounter.party.all.forEach(enemy => {
+            if(enemy.base === this.base) {
+                enemy.renderQueue.iconTooltip = true;
             }
+        });
+    }
 
-            const dropRateBonus = this.manager.party.getMonsterDropRateBonus(this.base);
-            const materialEntries = lootTable.filter(e => ((e.type !== undefined) ? e.type : this.inferLootType(e)) === 'materials');
-            if(dropRateBonus > 0 && materialEntries.length > 0 && Math.random() < dropRateBonus) {
-                const bonusMaterial = materialEntries[Math.floor(Math.random() * materialEntries.length)];
-                processLoot(bonusMaterial.id, getQty(bonusMaterial));
+    /**
+     * Apply quantity bonuses to loot drops
+     * @param {string} id - The loot item ID
+     * @param {number} qty - Base quantity
+     * @param {boolean} isCurrency - Whether this is currency
+     */
+    _processLoot(id, qty, isCurrency = false) {
+        const dropQtyBonus = this.manager.party.getMonsterDropQtyBonus(this.base);
+        if(dropQtyBonus > 0) {
+            qty = Math.ceil(qty * (1 + dropQtyBonus));
+        }
+
+        const materialDropBonus = this.manager.party.getMaterialDropRateBonus();
+        if(materialDropBonus > 0) {
+            qty = Math.ceil(qty * (1 + materialDropBonus));
+        }
+
+        if(isCurrency) {
+            const currencyBonus = this.manager.party.getCurrencyDropBonus();
+            if(currencyBonus > 0) {
+                qty = Math.ceil(qty * (1 + currencyBonus));
             }
         }
+
+        const lootBonus = this.manager.dungeon.getBonus('loot_percent');
+        if(lootBonus > 0) {
+            qty = Math.ceil(qty * (1 + lootBonus / 100));
+        }
+
+        this.manager.stash.add(id, qty, { fromCombat: true });
+    }
+
+    /**
+     * Get quantity from a loot entry
+     * @param {Object} entry - The loot entry
+     * @returns {number} The quantity
+     */
+    _getLootQty(entry) {
+        if(entry.qty !== undefined) return entry.qty;
+        if(entry.minQty !== undefined && entry.maxQty !== undefined) {
+            return entry.minQty + Math.floor(Math.random() * (entry.maxQty - entry.minQty + 1));
+        }
+        return 1;
+    }
+
+    /**
+     * Check if loot entry conditions are met
+     * @param {Object} entry - The loot entry
+     * @returns {boolean} Whether conditions pass
+     */
+    _checkLootConditions(entry) {
+        if(!entry.conditions || entry.conditions.length === 0) return true;
+        const checker = new RequirementsChecker(this.manager, entry.conditions);
+        return checker.check({});
+    }
+
+    /**
+     * Expand loot table references into actual entries
+     * @param {Array} entries - Raw loot entries
+     * @returns {Array} Expanded entries
+     */
+    _expandLootEntries(entries) {
+        const expanded = [];
+        for(const entry of entries) {
+            if(entry.type === 'table') {
+                const table = this.manager.lootTables.getObjectByID(entry.table);
+                if(table) {
+                    expanded.push(...table.getEntries());
+                } else {
+                    console.warn(`[Adventuring] Unknown loot table: ${entry.table}`);
+                }
+            } else {
+                expanded.push(entry);
+            }
+        }
+        return expanded;
+    }
+
+    /**
+     * Process a single loot entry
+     * @param {Object} entry - The loot entry to process
+     */
+    _processLootEntry(entry) {
+        if(!this._checkLootConditions(entry)) return;
+
+        const lootType = (entry.type !== undefined) ? entry.type : this.inferLootType(entry);
+
+        switch(lootType) {
+            case 'currency': {
+                const baseQty = this._getLootQty(entry);
+                const variance = 0.8 + (Math.random() * 0.4);
+                const qty = Math.max(1, Math.round(baseQty * variance));
+                this._processLoot(entry.id, qty, true);
+                break;
+            }
+
+            case 'salvage': {
+                const baseQty = this._getLootQty(entry);
+                const qty = 1 + Math.floor(Math.random() * baseQty);
+                this._processLoot(entry.id, qty);
+                break;
+            }
+
+            case 'materials': {
+                const dropChance = (entry.chance !== undefined) ? entry.chance : (entry.weight / 100);
+                if(Math.random() < dropChance) {
+                    this._processLoot(entry.id, this._getLootQty(entry));
+                }
+                break;
+            }
+
+            case 'equipment_pool': {
+                const pool = this.manager.equipmentPools.getObjectByID(entry.pool);
+                if(!pool) {
+                    console.warn(`[Adventuring] Unknown equipment pool: ${entry.pool}`);
+                    break;
+                }
+                if(!pool.hasAvailable()) break;
+                const dropChance = (entry.chance !== undefined) ? entry.chance : 0.1;
+                if(Math.random() < dropChance) {
+                    const item = pool.roll();
+                    if(item) {
+                        this.manager.armory.markDropped(item, true);
+                    }
+                }
+                break;
+            }
+
+            case 'equipment': {
+                const item = this.manager.baseItems.getObjectByID(entry.id);
+                if(!item) {
+                    console.warn(`[Adventuring] Unknown equipment: ${entry.id}`);
+                    break;
+                }
+                if(this.manager.armory.hasDropped(item)) break;
+                const dropChance = (entry.chance !== undefined) ? entry.chance : 0.01;
+                if(Math.random() < dropChance) {
+                    this.manager.armory.markDropped(item, true);
+                }
+                break;
+            }
+        }
+    }
+
+    /**
+     * Process all loot drops on death
+     */
+    _processLootDrops() {
+        const lootTable = this.base.lootGenerator.table;
+        const expandedLoot = this._expandLootEntries(lootTable);
+
+        for(const entry of expandedLoot) {
+            this._processLootEntry(entry);
+        }
+
+        // Bonus material drop from mastery
+        const dropRateBonus = this.manager.party.getMonsterDropRateBonus(this.base);
+        const materialEntries = lootTable.filter(e => 
+            ((e.type !== undefined) ? e.type : this.inferLootType(e)) === 'materials'
+        );
+        if(dropRateBonus > 0 && materialEntries.length > 0 && Math.random() < dropRateBonus) {
+            const bonusMaterial = materialEntries[Math.floor(Math.random() * materialEntries.length)];
+            this._processLoot(bonusMaterial.id, this._getLootQty(bonusMaterial));
+        }
+    }
+
+    onDeath() {
+        super.onDeath();
+        if(!this.xp) return;
+
+        const xpMultiplier = this._calculateXPMultiplier();
+        this._awardXP(xpMultiplier);
+        this._awardMasteryXP(xpMultiplier);
+        this._processLootDrops();
     }
 
     inferLootType(entry) {

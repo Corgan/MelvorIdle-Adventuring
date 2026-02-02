@@ -46,6 +46,8 @@ export async function setup({ gameData, patch, loadTemplates, loadModule, loadSt
     game.adventuring = game.registerSkill(game.registeredNamespaces.getNamespace('adventuring'), Adventuring);
 
     await load('data/base.json');
+    await load('data/effects/descriptions.json');
+    await load('data/progression/starter-loadouts.json');
     await load('data/difficulties.json');
 
     // Tier 1 combat jobs
@@ -233,6 +235,17 @@ export async function setup({ gameData, patch, loadTemplates, loadModule, loadSt
     // Tavern drinks (passive run-length effects)
     await load('data/tavern-drinks.json');
 
+    // Entity ordering (must be after all entities of each type are loaded)
+    await load('data/progression/area-order.json');
+    await load('data/progression/job-order.json');
+    await load('data/progression/material-order.json');
+    await load('data/progression/item-order.json');
+    await load('data/progression/tavern-order.json');
+    await load('data/progression/consumable-order.json');
+    await load('data/progression/monster-order.json');
+    await load('data/progression/difficulty-order.json');
+    await load('data/progression/equipmentset-order.json');
+
     // Slayer task types
     await load('data/slayer-tasks.json');
 
@@ -317,6 +330,10 @@ export async function setup({ gameData, patch, loadTemplates, loadModule, loadSt
         // Hook offline loop exit to trigger tutorial checks after offline progress completes
         game._events.on('offlineLoopExited', () => {
             game.adventuring.tutorialManager.onOfflineLoopExited();
+            // Force achievement check after offline progress (may have been throttled)
+            game.adventuring.achievementManager.checkAchievements();
+            // Sync page state after offline progress (e.g., if run ended while offline)
+            game.adventuring.syncPageState();
         });
         
         // Load and mount the game guide

@@ -1,368 +1,207 @@
 {
-    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
-    "namespace": "adventuring",
-    "data": {
-        "skillData": [
-            {
-                "skillID": "adventuring:Adventuring",
-                "data": {
-                    "jobs": [
-                        {
-                            "id": "monk",
-                            "tier": 1,
-                            "name": "Monk",
-                            "media": "melvor:assets/media/skills/strength/strength.png#tint=orange",
-                            "requirements": [
-                                {
-                                    "type": "job_level",
-                                    "job": "adventuring:cleric",
-                                    "level": 15
-                                }
-                            ],
-                            "isMilestoneReward": true,
-                            "allowedItems": [
-                                "adventuring:cowl",
-                                "adventuring:vest",
-                                "adventuring:chaps",
-                                "adventuring:vambraces",
-                                "adventuring:boots",
-                                "adventuring:amulet",
-                                "adventuring:ring",
-                                "adventuring:cape",
-                                "adventuring:staff",
-                                "adventuring:fists"
-                            ],
-                            "scaling": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 1
-                                },
-                                {
-                                    "id": "adventuring:defence",
-                                    "amount": 0.5
-                                },
-                                {
-                                    "id": "adventuring:agility",
-                                    "amount": 1.25
-                                },
-                                {
-                                    "id": "adventuring:strength",
-                                    "amount": 0.75
-                                },
-                                {
-                                    "id": "adventuring:prayer",
-                                    "amount": 1.5
-                                }
-                            ]
-                        }
-                    ],
-                    "generators": [
-                        {
-                            "id": "palm_strike",
-                            "name": "Palm Strike",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:monk",
-                                    "level": 1
-                                }
-                            ],
-                            "energy": 20,
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 10,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:strength",
-                                                        "amount": 0.2
-                                                    },
-                                                    {
-                                                        "id": "adventuring:agility",
-                                                        "amount": 0.2
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "inner_peace",
-                            "name": "Inner Peace",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:monk",
-                                    "level": 10
-                                }
-                            ],
-                            "energy": 25,
-                            "hits": [
-                                {
-                                    "target": "lowest",
-                                    "party": "ally",
-                                    "effects": [
-                                        {
-                                            "type": "heal_flat",
-                                            "amount": {
-                                                "base": 12,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:prayer",
-                                                        "amount": 0.3
-                                                    }
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            "type": "buff",
-                                            "id": "adventuring:regen",
-                                            "stacks": {
-                                                "base": 2,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:prayer",
-                                                        "amount": 0.05
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ],
-                    "spenders": [
-                        {
-                            "id": "flurry_of_blows",
-                            "name": "Flurry of Blows",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:monk",
-                                    "level": 1
-                                }
-                            ],
-                            "cost": 100,
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "delay": 100,
-                                    "repeat": 5,
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 5,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:agility",
-                                                        "amount": 0.15
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "tranquility",
-                            "name": "Tranquility",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:monk",
-                                    "level": 15
-                                }
-                            ],
-                            "cost": 120,
-                            "hits": [
-                                {
-                                    "target": "all",
-                                    "party": "ally",
-                                    "effects": [
-                                        {
-                                            "type": "heal_flat",
-                                            "amount": {
-                                                "base": 15,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:prayer",
-                                                        "amount": 0.35
-                                                    }
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            "type": "buff",
-                                            "id": "adventuring:haste",
-                                            "stacks": {
-                                                "base": 2,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:agility",
-                                                        "amount": 0.05
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "chi_explosion",
-                            "name": "Chi Explosion",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:monk",
-                                    "level": 25
-                                }
-                            ],
-                            "cost": 160,
-                            "hits": [
-                                {
-                                    "target": "all",
-                                    "party": "enemy",
-                                    "delay": 100,
-                                    "repeat": 3,
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 12,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:agility",
-                                                        "amount": 0.25
-                                                    },
-                                                    {
-                                                        "id": "adventuring:prayer",
-                                                        "amount": 0.2
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "deep_meditation",
-                            "name": "Deep Meditation",
-                            "requirements": [
-                                {
-                                    "type": "job_level",
-                                    "job": "adventuring:monk",
-                                    "level": 20
-                                }
-                            ],
-                            "cost": 80,
-                            "hits": [
-                                {
-                                    "target": "self",
-                                    "party": "ally",
-                                    "effects": [
-                                        {
-                                            "type": "heal_flat",
-                                            "amount": {
-                                                "base": 25,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:agility",
-                                                        "amount": 0.3
-                                                    }
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            "type": "buff",
-                                            "id": "adventuring:regen",
-                                            "stacks": {
-                                                "base": 3,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:agility",
-                                                        "amount": 0.1
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ],
-                    "passives": [
-                        {
-                            "id": "meditation",
-                            "name": "Meditation",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:monk",
-                                    "level": 20
-                                }
-                            ],
-                            "effects": [
-                                {
-                                    "trigger": "encounter_start",
-                                    "type": "buff",
-                                    "target": "self",
-                                    "id": "adventuring:regen",
-                                    "stacks": {
-                                        "base": 3,
-                                        "scaling": [
-                                            {
-                                                "id": "adventuring:prayer",
-                                                "amount": 0.15
-                                            }
-                                        ]
-                                    }
-                                }
-                            ]
-                        },
-                        {
-                            "id": "inner_focus",
-                            "name": "Inner Focus",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:monk",
-                                    "level": 30
-                                }
-                            ],
-                            "effects": [
-                                {
-                                    "trigger": "round_start",
-                                    "type": "buff",
-                                    "target": "self",
-                                    "id": "adventuring:haste",
-                                    "stacks": {
-                                        "base": 1,
-                                        "scaling": [
-                                            {
-                                                "id": "adventuring:agility",
-                                                "amount": 0.05
-                                            }
-                                        ]
-                                    }
-                                }
-                            ]
-                        }
-                    ]
-                }
-            }
-        ]
-    }
+	"$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+	"namespace": "adventuring",
+	"data": {
+		"skillData": [
+			{
+				"skillID": "adventuring:Adventuring",
+				"data": {
+					"jobs": [
+						{
+							"id": "monk",
+							"tier": 1,
+							"archetypes": ["dps", "healer"],
+							"name": "Monk",
+							"media": "melvor:assets/media/skills/combat/attack.png#tint=orange",
+							"requirements": [{ "type": "job_level", "job": "adventuring:cleric", "level": 15 }],
+							"isMilestoneReward": true,
+							"allowedItems": [
+								"adventuring:cowl",
+								"adventuring:vest",
+								"adventuring:chaps",
+								"adventuring:vambraces",
+								"adventuring:boots",
+								"adventuring:amulet",
+								"adventuring:ring",
+								"adventuring:cape",
+								"adventuring:staff",
+								"adventuring:fists"
+							],
+							"effects": [
+								{
+									"trigger": "passive",
+									"type": "stat_flat",
+									"stat": "adventuring:hitpoints",
+									"amount": { "scaling": [{ "id": "level", "amount": 6.25 }] },
+									"scaleFrom": "combatJob"
+								},
+								{
+									"trigger": "passive",
+									"type": "stat_flat",
+									"stat": "adventuring:agility",
+									"amount": { "scaling": [{ "id": "level", "amount": 2 }] },
+									"scaleFrom": "combatJob"
+								},
+								{
+									"trigger": "passive",
+									"type": "stat_flat",
+									"stat": "adventuring:strength",
+									"amount": { "scaling": [{ "id": "level", "amount": 1.5 }] },
+									"scaleFrom": "combatJob"
+								},
+								{
+									"trigger": "passive",
+									"type": "stat_flat",
+									"stat": "adventuring:prayer",
+									"amount": { "scaling": [{ "id": "level", "amount": 2.5 }] },
+									"scaleFrom": "combatJob"
+								}
+							]
+						}
+					],
+					"generators": [
+						{
+							"id": "palm_strike",
+							"name": "Palm Strike",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:monk", "level": 1 }],
+							"energy": 25,
+							"hits": [{ "target": "front", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 6, "scaling": [{ "id": "adventuring:strength", "amount": 0.2 }, { "id": "adventuring:agility", "amount": 0.2 }] } }
+							] }]
+						},
+						{
+							"id": "inner_peace",
+							"name": "Inner Peace",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:monk", "level": 10 }],
+							"energy": 25,
+							"hits": [{ "target": "lowest", "party": "ally", "effects": [
+								{ "type": "heal_flat", "amount": { "base": 8, "scaling": [{ "id": "adventuring:prayer", "amount": 0.35 }] } },
+								{ "type": "buff", "id": "adventuring:regen", "stacks": { "base": 2, "scaling": [{ "id": "adventuring:prayer", "amount": 0.05 }] } }
+							] }]
+						},
+						{
+							"id": "chi_strike",
+							"name": "Chi Strike",
+							"requirements": [{ "type": "job_level", "job": "adventuring:monk", "level": 25 }],
+							"energy": 30,
+							"hits": [
+								{ "target": "front", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "amount": { "base": 8, "scaling": [{ "id": "adventuring:agility", "amount": 0.35 }] } }
+								] },
+								{ "target": "self", "party": "ally", "effects": [
+									{ "type": "heal_flat", "amount": { "base": 5, "scaling": [{ "id": "adventuring:prayer", "amount": 0.2 }] } }
+								] }
+							]
+						},
+						{
+							"id": "tiger_palm",
+							"name": "Tiger Palm",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:monk", "level": 60 }],
+							"energy": 35,
+							"hits": [{ "target": "front", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 15, "scaling": [{ "id": "adventuring:strength", "amount": 0.35 }, { "id": "adventuring:agility", "amount": 0.35 }] } },
+								{ "type": "debuff", "id": "adventuring:stun", "stacks": 1 }
+							] }]
+						},
+						{
+							"id": "thousand_fists",
+							"name": "Thousand Fists",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:monk", "level": 90 }],
+							"energy": 40,
+							"hits": [{ "target": "all", "party": "enemy", "delay": 60, "repeat": 5, "effects": [
+								{ "type": "damage_flat", "amount": { "base": 5, "scaling": [{ "id": "adventuring:agility", "amount": 0.2 }] } }
+							] }]
+						}
+					],
+					"spenders": [
+						{
+							"id": "flurry_of_blows",
+							"name": "Flurry of Blows",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:monk", "level": 1 }],
+							"cost": 140,
+							"hits": [{ "target": "front", "party": "enemy", "delay": 100, "repeat": 5, "effects": [
+								{ "type": "damage_flat", "amount": { "base": 4, "scaling": [{ "id": "adventuring:agility", "amount": 0.2 }] } }
+							] }]
+						},
+						{
+							"id": "tranquility",
+							"name": "Tranquility",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:monk", "level": 15 }],
+							"cost": 145,
+							"hits": [{ "target": "all", "party": "ally", "effects": [
+								{ "type": "heal_flat", "amount": { "base": 10, "scaling": [{ "id": "adventuring:prayer", "amount": 0.4 }] } },
+								{ "type": "buff", "id": "adventuring:haste", "stacks": { "base": 2, "scaling": [{ "id": "adventuring:agility", "amount": 0.05 }] } }
+							] }]
+						},
+						{
+							"id": "deep_meditation",
+							"name": "Deep Meditation",
+							"requirements": [{ "type": "job_level", "job": "adventuring:monk", "level": 50 }],
+							"cost": 180,
+							"hits": [{ "target": "all", "party": "ally", "effects": [
+								{ "type": "heal_flat", "amount": { "base": 15, "scaling": [{ "id": "adventuring:prayer", "amount": 0.5 }] } },
+								{ "type": "buff", "id": "adventuring:regen", "stacks": { "base": 3, "scaling": [{ "id": "adventuring:prayer", "amount": 0.1 }] } }
+							] }]
+						},
+						{
+							"id": "rising_sun_kick",
+							"name": "Rising Sun Kick",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:monk", "level": 70 }],
+							"cost": 175,
+							"hits": [
+								{ "target": "front", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "amount": { "base": 20, "scaling": [{ "id": "adventuring:agility", "amount": 0.7 }] } }
+								] },
+								{ "target": "self", "party": "ally", "effects": [
+									{ "type": "buff", "id": "adventuring:haste", "stacks": 4 },
+									{ "type": "buff", "id": "adventuring:might", "stacks": 3 }
+								] }
+							]
+						},
+						{
+							"id": "touch_of_nirvana",
+							"name": "Touch of Nirvana",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:monk", "level": 99 }],
+							"cost": 250,
+							"hits": [
+								{ "target": "front", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "amount": { "base": 30, "scaling": [{ "id": "adventuring:agility", "amount": 0.8 }, { "id": "adventuring:prayer", "amount": 0.5 }] } }
+								] },
+								{ "target": "all", "party": "ally", "effects": [
+									{ "type": "heal_flat", "amount": { "base": 25, "scaling": [{ "id": "adventuring:prayer", "amount": 1 }] } },
+									{ "type": "buff", "id": "adventuring:regen", "stacks": 5 }
+								] }
+							]
+						}
+					],
+					"passives": [
+						{
+							"id": "meditation",
+							"name": "Meditation",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:monk", "level": 20 }],
+							"effects": [
+								{ "trigger": "encounter_start", "type": "buff", "target": "self", "id": "adventuring:regen", "stacks": { "base": 3, "scaling": [{ "id": "adventuring:prayer", "amount": 0.15 }] } }
+							]
+						},
+						{
+							"id": "inner_focus",
+							"name": "Inner Focus",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:monk", "level": 40 }],
+							"effects": [
+								{ "trigger": "round_start", "type": "buff", "target": "self", "id": "adventuring:haste", "stacks": { "base": 2, "scaling": [{ "id": "adventuring:agility", "amount": 0.08 }] }, "condition": { "type": "hp_above", "threshold": 75 } }
+							]
+						},
+						{
+							"id": "enlightenment",
+							"name": "Enlightenment",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:monk", "level": 80 }],
+							"effects": [
+								{ "trigger": "after_damage_delivered", "type": "heal_flat", "target": "self", "amount": { "base": 3, "scaling": [{ "id": "adventuring:prayer", "amount": 0.1 }] } }
+							]
+						}
+					]
+				}
+			}
+		]
+	}
 }

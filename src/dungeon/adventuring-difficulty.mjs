@@ -1,7 +1,7 @@
 const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringScalableEffect } = await loadModule('src/combat/adventuring-scalable-effect.mjs');
-const { getAuraName, UNKNOWN_MEDIA, describeEffectsInline } = await loadModule('src/core/adventuring-utils.mjs');
+const { getAuraName, UNKNOWN_MEDIA, describeEffectsInline } = await loadModule('src/core/utils/adventuring-utils.mjs');
 
 class DifficultyEffect extends AdventuringScalableEffect {
     constructor(manager, game, difficulty, data) {
@@ -26,6 +26,9 @@ export class AdventuringDifficulty extends NamespacedObject {
 
         this.isEndless = data.isEndless === true;
 
+        // Order position for sorting (processed by manager._buildAllSortOrders)
+        this.orderPosition = data.orderPosition;
+        this.sortOrder = 9999;  // Default high value, set by _buildAllSortOrders
 
         this.waveScaling = data.waveScaling || null;
 
@@ -86,8 +89,11 @@ export class AdventuringDifficulty extends NamespacedObject {
                 value: value,
                 stacks: stacks,
                 aura: effect.id,  // For buff/debuff effects, this is the aura ID
-                source: this,
-                sourceName: this.name
+                // Pass through filter fields for stat bonuses
+                target: effect.target,
+                party: effect.party,
+                stat: effect.stat,
+                sourcePath: [{ type: 'difficulty', name: this.name, ref: this }]
             };
         });
     }

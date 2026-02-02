@@ -19,6 +19,13 @@ export class AdventuringBestiary extends AdventuringPage {
 
     onLoad() {
         super.onLoad();
+        
+        // Listen for monster kills via conductor
+        this.manager.conductor.listen('monster_killed', (type, context) => {
+            if (context.monster) {
+                this._onMonsterKilled(context.monster);
+            }
+        });
     }
 
     onShow() {
@@ -79,17 +86,16 @@ export class AdventuringBestiary extends AdventuringPage {
 
         monster.renderQueue.updateAll();
 
-        if(wasNew) {
-
-            if(wasEmpty) {
-                this.manager.tutorialManager.checkTriggers('event', { event: 'firstMonsterSeen' });
-            }
-
-            this.manager.achievementManager.recordUniqueMonster();
+        if(wasNew && wasEmpty) {
+            this.manager.conductor.trigger('monster_seen', { monster, isFirst: true });
         }
     }
 
-    registerKill(monster) {
+    /**
+     * Called via conductor when a monster is killed.
+     * @param {Object} monster - The monster that was killed
+     */
+    _onMonsterKilled(monster) {
         if(typeof monster === "string")
             monster = this.manager.monsters.getObjectByID(monster);
 
@@ -109,10 +115,6 @@ export class AdventuringBestiary extends AdventuringPage {
 
         if(this.manager.monsterdetails && this.manager.monsterdetails.monster === monster) {
             this.manager.monsterdetails.renderQueue.mastery = true;
-        }
-
-        if(this.manager.achievementManager) {
-            this.manager.achievementManager.recordKill(monster);
         }
     }
 

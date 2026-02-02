@@ -1,275 +1,620 @@
 {
-    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
-    "namespace": "adventuring",
-    "data": {
-        "skillData": [
-            {
-                "skillID": "adventuring:Adventuring",
-                "data": {
-                    "baseItems": [
-                        {
-                            "id": "priest_amulet",
-                            "name": "Divine Grace Pendant",
-                            "media": "melvor:assets/media/bank/amulet_of_prayers.png#shade=gold",
-                            "type": "adventuring:amulet",
-                            "isArtifact": true,"itemCategory": "adventuring:artifacts",
-                            "requirements": [
-                                { "type": "job_level", "job": "adventuring:cleric", "level": 75 },
-                                { "type": "job_level", "job": "adventuring:priest", "level": 75 },
-                                { "type": "job_level", "job": "adventuring:druid", "level": 75 }
-                            ],
-                            "tiers": [
-                                {
-                                    "name": "Divine Grace Pendant",
-                                    "base": [
-                                        { "id": "adventuring:prayer", "amount": 40 },
-                                        { "id": "adventuring:hitpoints", "amount": 30 }
-                                    ],
-                                    "scaling": [
-                                        { "id": "adventuring:prayer", "amount": 3.3 },
-                                        { "id": "adventuring:hitpoints", "amount": 2.5 }
-                                    ],
-                                    "materials": [
-                                        { "id": "adventuring:currency", "qty": 15000 },
-                                        { "id": "adventuring:pristine_salvage", "qty": 25 }
-                                    ]
-                                },
-                                {
-                                    "name": "Empowered Divine Grace Pendant",
-                                    "base": [
-                                        { "id": "adventuring:prayer", "amount": 70 },
-                                        { "id": "adventuring:hitpoints", "amount": 52 }
-                                    ],
-                                    "scaling": [
-                                        { "id": "adventuring:prayer", "amount": 5.8 },
-                                        { "id": "adventuring:hitpoints", "amount": 4.4 }
-                                    ],
-                                    "effects": [
-                                        {
-                                            "trigger": "passive",
-                                            "type": "healing_bonus",
-                                            "amount": 15
-                                        }
-                                    ],
-                                    "materials": [
-                                        { "id": "adventuring:currency", "qty": 50000 },
-                                        { "id": "adventuring:mythic_salvage", "qty": 20 }
-                                    ]
-                                },
-                                {
-                                    "name": "Ascended Divine Grace Pendant",
-                                    "base": [
-                                        { "id": "adventuring:prayer", "amount": 115 },
-                                        { "id": "adventuring:hitpoints", "amount": 85 }
-                                    ],
-                                    "scaling": [
-                                        { "id": "adventuring:prayer", "amount": 9.5 },
-                                        { "id": "adventuring:hitpoints", "amount": 7.2 }
-                                    ],
-                                    "effects": [
-                                        {
-                                            "trigger": "passive",
-                                            "type": "healing_bonus",
-                                            "amount": 25
-                                        },
-                                        {
-                                            "trigger": "heal",
-                                            "type": "buff",
-                                            "id": "adventuring:blessed",
-                                            "target": "heal_target",
-                                            "stacks": 1,
-                                            "chance": 25
-                                        }
-                                    ],
-                                    "materials": [
-                                        { "id": "adventuring:currency", "qty": 150000 },
-                                        { "id": "adventuring:mythic_salvage", "qty": 50 },
-                                        { "id": "adventuring:chaos_core", "qty": 1 }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "priest_ring",
-                            "name": "Ring of Restoration",
-                            "media": "melvor:assets/media/bank/ring_of_power.png#shade=gold",
-                            "type": "adventuring:ring",
-                            "isArtifact": true,"itemCategory": "adventuring:artifacts",
-                            "requirements": [
-                                { "type": "job_level", "job": "adventuring:priest", "level": 75 },
-                                { "type": "job_level", "job": "adventuring:highpriest", "level": 75 }
-                            ],
-                            "tiers": [
-                                {
-                                    "name": "Ring of Restoration",
-                                    "base": [
-                                        { "id": "adventuring:prayer", "amount": 35 },
-                                        { "id": "adventuring:hitpoints", "amount": 25 }
-                                    ],
-                                    "scaling": [
-                                        { "id": "adventuring:prayer", "amount": 2.9 },
-                                        { "id": "adventuring:hitpoints", "amount": 2.1 }
-                                    ],
-                                    "materials": [
-                                        { "id": "adventuring:currency", "qty": 15000 },
-                                        { "id": "adventuring:pristine_salvage", "qty": 25 }
-                                    ]
-                                },
-                                {
-                                    "name": "Empowered Ring of Restoration",
-                                    "base": [
-                                        { "id": "adventuring:prayer", "amount": 60 },
-                                        { "id": "adventuring:hitpoints", "amount": 44 }
-                                    ],
-                                    "scaling": [
-                                        { "id": "adventuring:prayer", "amount": 5 },
-                                        { "id": "adventuring:hitpoints", "amount": 3.7 }
-                                    ],
-                                    "effects": [
-                                        {
-                                            "trigger": "round_start",
-                                            "type": "heal_flat",
-                                            "target": "lowest_hp",
-                                            "party": "ally",
-                                            "amount": 5,
-                                            "scaling": 0.5
-                                        }
-                                    ],
-                                    "materials": [
-                                        { "id": "adventuring:currency", "qty": 50000 },
-                                        { "id": "adventuring:mythic_salvage", "qty": 20 }
-                                    ]
-                                },
-                                {
-                                    "name": "Ascended Ring of Restoration",
-                                    "base": [
-                                        { "id": "adventuring:prayer", "amount": 100 },
-                                        { "id": "adventuring:hitpoints", "amount": 72 }
-                                    ],
-                                    "scaling": [
-                                        { "id": "adventuring:prayer", "amount": 8.5 },
-                                        { "id": "adventuring:hitpoints", "amount": 6 }
-                                    ],
-                                    "effects": [
-                                        {
-                                            "trigger": "round_start",
-                                            "type": "heal_flat",
-                                            "target": "lowest_hp",
-                                            "party": "ally",
-                                            "amount": 10,
-                                            "scaling": 1
-                                        },
-                                        {
-                                            "trigger": "passive",
-                                            "type": "cost_reduction",
-                                            "ability_type": "prayer",
-                                            "amount": 10
-                                        }
-                                    ],
-                                    "materials": [
-                                        { "id": "adventuring:currency", "qty": 150000 },
-                                        { "id": "adventuring:mythic_salvage", "qty": 50 },
-                                        { "id": "adventuring:chaos_core", "qty": 1 }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "priest_cape",
-                            "name": "Vestments of Light",
-                            "media": "melvor:assets/media/bank/cape_of_completion.png#shade=gold",
-                            "type": "adventuring:cape",
-                            "isArtifact": true,"itemCategory": "adventuring:artifacts",
-                            "requirements": [
-                                { "type": "job_level", "job": "adventuring:cleric", "level": 75 },
-                                { "type": "job_level", "job": "adventuring:priest", "level": 75 },
-                                { "type": "job_level", "job": "adventuring:druid", "level": 75 },
-                                { "type": "job_level", "job": "adventuring:highpriest", "level": 75 }
-                            ],
-                            "tiers": [
-                                {
-                                    "name": "Vestments of Light",
-                                    "base": [
-                                        { "id": "adventuring:prayer", "amount": 30 },
-                                        { "id": "adventuring:hitpoints", "amount": 30 },
-                                        { "id": "adventuring:defence", "amount": 15 }
-                                    ],
-                                    "scaling": [
-                                        { "id": "adventuring:prayer", "amount": 2.5 },
-                                        { "id": "adventuring:hitpoints", "amount": 2.5 },
-                                        { "id": "adventuring:defence", "amount": 1.2 }
-                                    ],
-                                    "materials": [
-                                        { "id": "adventuring:currency", "qty": 15000 },
-                                        { "id": "adventuring:pristine_salvage", "qty": 25 }
-                                    ]
-                                },
-                                {
-                                    "name": "Empowered Vestments of Light",
-                                    "base": [
-                                        { "id": "adventuring:prayer", "amount": 52 },
-                                        { "id": "adventuring:hitpoints", "amount": 52 },
-                                        { "id": "adventuring:defence", "amount": 26 }
-                                    ],
-                                    "scaling": [
-                                        { "id": "adventuring:prayer", "amount": 4.4 },
-                                        { "id": "adventuring:hitpoints", "amount": 4.4 },
-                                        { "id": "adventuring:defence", "amount": 2.2 }
-                                    ],
-                                    "effects": [
-                                        {
-                                            "trigger": "encounter_start",
-                                            "type": "buff",
-                                            "id": "adventuring:regeneration",
-                                            "target": "all",
-                                            "party": "ally",
-                                            "stacks": 1
-                                        }
-                                    ],
-                                    "materials": [
-                                        { "id": "adventuring:currency", "qty": 50000 },
-                                        { "id": "adventuring:mythic_salvage", "qty": 20 }
-                                    ]
-                                },
-                                {
-                                    "name": "Ascended Vestments of Light",
-                                    "base": [
-                                        { "id": "adventuring:prayer", "amount": 85 },
-                                        { "id": "adventuring:hitpoints", "amount": 85 },
-                                        { "id": "adventuring:defence", "amount": 42 }
-                                    ],
-                                    "scaling": [
-                                        { "id": "adventuring:prayer", "amount": 7.2 },
-                                        { "id": "adventuring:hitpoints", "amount": 7.2 },
-                                        { "id": "adventuring:defence", "amount": 3.6 }
-                                    ],
-                                    "effects": [
-                                        {
-                                            "trigger": "encounter_start",
-                                            "type": "buff",
-                                            "id": "adventuring:regeneration",
-                                            "target": "all",
-                                            "party": "ally",
-                                            "stacks": 2
-                                        },
-                                        {
-                                            "trigger": "heal",
-                                            "type": "cleanse",
-                                            "target": "heal_target",
-                                            "stacks": 1
-                                        }
-                                    ],
-                                    "materials": [
-                                        { "id": "adventuring:currency", "qty": 150000 },
-                                        { "id": "adventuring:mythic_salvage", "qty": 50 },
-                                        { "id": "adventuring:chaos_core", "qty": 1 }
-                                    ]
-                                }
-                            ]
-                        }
-                    ]
-                }
-            }
-        ]
-    }
+	"$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+	"namespace": "adventuring",
+	"data": {
+		"skillData": [
+			{
+				"skillID": "adventuring:Adventuring",
+				"data": {
+					"baseItems": [
+						{
+							"id": "priest_amulet",
+							"name": "Divine Grace Pendant",
+							"media": "melvor:assets/media/bank/amulet_of_prayers.png#shade=gold",
+							"type": "adventuring:amulet",
+							"isArtifact": true,
+							"itemCategory": "adventuring:artifacts",
+							"requirements": [
+								{
+									"type": "job_level",
+									"job": "adventuring:cleric",
+									"level": 75
+								},
+								{
+									"type": "job_level",
+									"job": "adventuring:priest",
+									"level": 75
+								},
+								{
+									"type": "job_level",
+									"job": "adventuring:druid",
+									"level": 75
+								}
+							],
+							"tiers": [
+								{
+									"name": "Divine Grace Pendant",
+									"materials": [
+										{
+											"id": "adventuring:currency",
+											"qty": 15000
+										},
+										{
+											"id": "adventuring:pristine_salvage",
+											"qty": 25
+										}
+									],
+									"effects": [
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:prayer",
+											"amount": {
+												"base": 5,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:hitpoints",
+											"amount": {
+												"base": 5,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										}
+									]
+								},
+								{
+									"name": "Empowered Divine Grace Pendant",
+									"effects": [
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:prayer",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:hitpoints",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "healing_bonus",
+											"amount": 15
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:currency",
+											"qty": 50000
+										},
+										{
+											"id": "adventuring:mythic_salvage",
+											"qty": 20
+										}
+									]
+								},
+								{
+									"name": "Ascended Divine Grace Pendant",
+									"effects": [
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:prayer",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.25
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:hitpoints",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.25
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "healing_bonus",
+											"amount": 25
+										},
+										{
+											"trigger": "heal",
+											"type": "buff",
+											"id": "adventuring:blessed",
+											"target": "heal_target",
+											"stacks": 1,
+											"chance": 25
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:currency",
+											"qty": 150000
+										},
+										{
+											"id": "adventuring:mythic_salvage",
+											"qty": 50
+										},
+										{
+											"id": "adventuring:chaos_core",
+											"qty": 1
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "priest_ring",
+							"name": "Ring of Restoration",
+							"media": "melvor:assets/media/bank/ring_of_power.png#shade=gold",
+							"type": "adventuring:ring",
+							"isArtifact": true,
+							"itemCategory": "adventuring:artifacts",
+							"requirements": [
+								{
+									"type": "job_level",
+									"job": "adventuring:priest",
+									"level": 75
+								},
+								{
+									"type": "job_level",
+									"job": "adventuring:highpriest",
+									"level": 75
+								}
+							],
+							"tiers": [
+								{
+									"name": "Ring of Restoration",
+									"materials": [
+										{
+											"id": "adventuring:currency",
+											"qty": 15000
+										},
+										{
+											"id": "adventuring:pristine_salvage",
+											"qty": 25
+										}
+									],
+									"effects": [
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:prayer",
+											"amount": {
+												"base": 5,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:hitpoints",
+											"amount": {
+												"base": 5,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										}
+									]
+								},
+								{
+									"name": "Empowered Ring of Restoration",
+									"effects": [
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:prayer",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:hitpoints",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "round_start",
+											"type": "heal_flat",
+											"target": "lowest_hp",
+											"party": "ally",
+											"amount": 5,
+											"scaling": 0.5
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:currency",
+											"qty": 50000
+										},
+										{
+											"id": "adventuring:mythic_salvage",
+											"qty": 20
+										}
+									]
+								},
+								{
+									"name": "Ascended Ring of Restoration",
+									"effects": [
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:prayer",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.25
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:hitpoints",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.25
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "round_start",
+											"type": "heal_flat",
+											"target": "lowest_hp",
+											"party": "ally",
+											"amount": 10,
+											"scaling": 1
+										},
+										{
+											"trigger": "passive",
+											"type": "cost_reduction",
+											"ability_type": "prayer",
+											"amount": 10
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:currency",
+											"qty": 150000
+										},
+										{
+											"id": "adventuring:mythic_salvage",
+											"qty": 50
+										},
+										{
+											"id": "adventuring:chaos_core",
+											"qty": 1
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "priest_cape",
+							"name": "Vestments of Light",
+							"media": "melvor:assets/media/bank/cape_of_completion.png#shade=gold",
+							"type": "adventuring:cape",
+							"isArtifact": true,
+							"itemCategory": "adventuring:artifacts",
+							"requirements": [
+								{
+									"type": "job_level",
+									"job": "adventuring:cleric",
+									"level": 75
+								},
+								{
+									"type": "job_level",
+									"job": "adventuring:priest",
+									"level": 75
+								},
+								{
+									"type": "job_level",
+									"job": "adventuring:druid",
+									"level": 75
+								},
+								{
+									"type": "job_level",
+									"job": "adventuring:highpriest",
+									"level": 75
+								}
+							],
+							"tiers": [
+								{
+									"name": "Vestments of Light",
+									"materials": [
+										{
+											"id": "adventuring:currency",
+											"qty": 15000
+										},
+										{
+											"id": "adventuring:pristine_salvage",
+											"qty": 25
+										}
+									],
+									"effects": [
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:prayer",
+											"amount": {
+												"base": 5,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:hitpoints",
+											"amount": {
+												"base": 5,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:defence",
+											"amount": {
+												"base": 5,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										}
+									]
+								},
+								{
+									"name": "Empowered Vestments of Light",
+									"effects": [
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:prayer",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:hitpoints",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:defence",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "encounter_start",
+											"type": "buff",
+											"id": "adventuring:regeneration",
+											"target": "all",
+											"party": "ally",
+											"stacks": 1
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:currency",
+											"qty": 50000
+										},
+										{
+											"id": "adventuring:mythic_salvage",
+											"qty": 20
+										}
+									]
+								},
+								{
+									"name": "Ascended Vestments of Light",
+									"effects": [
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:prayer",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.25
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:hitpoints",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.25
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:defence",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.25
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "encounter_start",
+											"type": "buff",
+											"id": "adventuring:regeneration",
+											"target": "all",
+											"party": "ally",
+											"stacks": 2
+										},
+										{
+											"trigger": "heal",
+											"type": "cleanse",
+											"target": "heal_target",
+											"stacks": 1
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:currency",
+											"qty": 150000
+										},
+										{
+											"id": "adventuring:mythic_salvage",
+											"qty": 50
+										},
+										{
+											"id": "adventuring:chaos_core",
+											"qty": 1
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
+		]
+	}
 }

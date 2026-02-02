@@ -1,8 +1,8 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { AdventuringStats } = await loadModule('src/core/adventuring-stats.mjs');
+const { AdventuringStats } = await loadModule('src/core/stats/adventuring-stats.mjs');
 const { AdventuringScalableEffect } = await loadModule('src/combat/adventuring-scalable-effect.mjs');
-const { parseDescription, buildEffectReplacements, describeEffectFull } = await loadModule('src/core/adventuring-utils.mjs');
+const { parseDescription, buildEffectReplacements, describeEffectFull } = await loadModule('src/core/utils/adventuring-utils.mjs');
 
 const { AdventuringAuraElement } = await loadModule('src/combat/components/adventuring-aura.mjs');
 

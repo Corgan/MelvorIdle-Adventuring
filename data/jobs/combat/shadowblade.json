@@ -1,430 +1,205 @@
 {
-    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
-    "namespace": "adventuring",
-    "data": {
-        "skillData": [
-            {
-                "skillID": "adventuring:Adventuring",
-                "data": {
-                    "jobs": [
-                        {
-                            "id": "shadowblade",
-                            "tier": 3,
-                            "name": "Shadowblade",
-                            "media": "melvor:assets/media/skills/thieving/thieving.png#tint=red",
-                            "requirements": [
-                                {
-                                    "type": "job_level",
-                                    "job": "adventuring:assassin",
-                                    "level": 20
-                                },
-                                {
-                                    "type": "job_level",
-                                    "job": "adventuring:warlock",
-                                    "level": 15
-                                },
-                                {
-                                    "type": "area_mastery",
-                                    "area": "adventuring:vampire_crypt",
-                                    "level": 25
-                                }
-                            ],
-                            "isMilestoneReward": true,
-                            "allowedItems": [
-                                "adventuring:cowl",
-                                "adventuring:vest",
-                                "adventuring:chaps",
-                                "adventuring:vambraces",
-                                "adventuring:boots",
-                                "adventuring:amulet",
-                                "adventuring:ring",
-                                "adventuring:cape",
-                                "adventuring:dagger",
-                                "adventuring:wand"
-                            ],
-                            "scaling": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 0.75
-                                },
-                                {
-                                    "id": "adventuring:defence",
-                                    "amount": 0.25
-                                },
-                                {
-                                    "id": "adventuring:agility",
-                                    "amount": 2
-                                },
-                                {
-                                    "id": "adventuring:magic",
-                                    "amount": 1
-                                }
-                            ]
-                        }
-                    ],
-                    "generators": [
-                        {
-                            "id": "shade_slash",
-                            "name": "Shade Slash",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:shadowblade",
-                                    "level": 1
-                                }
-                            ],
-                            "energy": 25,
-                            "hits": [
-                                {
-                                    "target": "back",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 18,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:agility",
-                                                        "amount": 0.35
-                                                    },
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.15
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "dark_blade",
-                            "name": "Dark Blade",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:shadowblade",
-                                    "level": 15
-                                }
-                            ],
-                            "energy": 30,
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 12,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:agility",
-                                                        "amount": 0.25
-                                                    },
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.15
-                                                    }
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            "type": "debuff",
-                                            "id": "adventuring:poison",
-                                            "stacks": {
-                                                "base": 2,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.1
-                                                    }
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            "type": "debuff",
-                                            "id": "adventuring:curse",
-                                            "stacks": {
-                                                "base": 2,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.05
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ],
-                    "spenders": [
-                        {
-                            "id": "umbral_waltz",
-                            "name": "Umbral Waltz",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:shadowblade",
-                                    "level": 1
-                                }
-                            ],
-                            "cost": 140,
-                            "hits": [
-                                {
-                                    "target": "random",
-                                    "party": "enemy",
-                                    "delay": 100,
-                                    "repeat": 5,
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 10,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:agility",
-                                                        "amount": 0.3
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "void_step",
-                            "name": "Void Step",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:shadowblade",
-                                    "level": 20
-                                }
-                            ],
-                            "cost": 110,
-                            "hits": [
-                                {
-                                    "target": "self",
-                                    "party": "ally",
-                                    "effects": [
-                                        {
-                                            "type": "buff",
-                                            "id": "adventuring:invisibility",
-                                            "stacks": {
-                                                "base": 2,
-                                                "scaling": []
-                                            }
-                                        },
-                                        {
-                                            "type": "buff",
-                                            "id": "adventuring:haste",
-                                            "stacks": {
-                                                "base": 3,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:agility",
-                                                        "amount": 0.1
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "shadow_execution",
-                            "name": "Shadow Execution",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:shadowblade",
-                                    "level": 25
-                                }
-                            ],
-                            "cost": 160,
-                            "hits": [
-                                {
-                                    "target": "lowest",
-                                    "party": "enemy",
-                                    "delay": 80,
-                                    "repeat": 3,
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 20,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:agility",
-                                                        "amount": 0.45
-                                                    },
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.2
-                                                    }
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            "type": "debuff",
-                                            "id": "adventuring:marked",
-                                            "stacks": {
-                                                "base": 2,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:agility",
-                                                        "amount": 0.1
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "soul_rend",
-                            "name": "Soul Rend",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:shadowblade",
-                                    "level": 35
-                                }
-                            ],
-                            "cost": 180,
-                            "hits": [
-                                {
-                                    "target": "lowest",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 70,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:agility",
-                                                        "amount": 1.5
-                                                    },
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.5
-                                                    }
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            "type": "debuff",
-                                            "id": "adventuring:curse",
-                                            "stacks": {
-                                                "base": 5,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.15
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ],
-                    "passives": [
-                        {
-                            "id": "phantom_form",
-                            "name": "Phantom Form",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:shadowblade",
-                                    "level": 25
-                                }
-                            ],
-                            "effects": [
-                                {
-                                    "trigger": "encounter_start",
-                                    "type": "buff",
-                                    "target": "self",
-                                    "id": "adventuring:invisibility",
-                                    "stacks": {
-                                        "base": 1,
-                                        "scaling": []
-                                    }
-                                },
-                                {
-                                    "trigger": "encounter_start",
-                                    "type": "buff",
-                                    "target": "self",
-                                    "id": "adventuring:haste",
-                                    "stacks": {
-                                        "base": 2,
-                                        "scaling": [
-                                            {
-                                                "id": "adventuring:agility",
-                                                "amount": 0.1
-                                            }
-                                        ]
-                                    }
-                                }
-                            ]
-                        },
-                        {
-                            "id": "shadow_predator",
-                            "name": "Shadow Predator",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:shadowblade",
-                                    "level": 30
-                                }
-                            ],
-                            "effects": [
-                                {
-                                    "trigger": "encounter_start",
-                                    "type": "debuff",
-                                    "target": "all",
-                                    "party": "enemy",
-                                    "id": "adventuring:poison",
-                                    "stacks": {
-                                        "base": 2,
-                                        "scaling": [
-                                            {
-                                                "id": "adventuring:magic",
-                                                "amount": 0.1
-                                            }
-                                        ]
-                                    }
-                                },
-                                {
-                                    "trigger": "encounter_start",
-                                    "type": "buff",
-                                    "target": "self",
-                                    "id": "adventuring:might",
-                                    "stacks": {
-                                        "base": 3,
-                                        "scaling": [
-                                            {
-                                                "id": "adventuring:agility",
-                                                "amount": 0.15
-                                            }
-                                        ]
-                                    }
-                                }
-                            ]
-                        }
-                    ]
-                }
-            }
-        ]
-    }
+	"$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+	"namespace": "adventuring",
+	"data": {
+		"skillData": [
+			{
+				"skillID": "adventuring:Adventuring",
+				"data": {
+					"jobs": [
+						{
+							"id": "shadowblade",
+							"tier": 3,
+							"archetypes": ["dps"],
+							"name": "Shadowblade",
+							"media": "melvor:assets/media/skills/thieving/thieving.png#tint=red",
+							"requirements": [
+								{ "type": "job_level", "job": "adventuring:assassin", "level": 20 },
+								{ "type": "job_level", "job": "adventuring:warlock", "level": 15 },
+								{ "type": "area_mastery", "area": "adventuring:vampire_crypt", "level": 25 }
+							],
+							"isMilestoneReward": true,
+							"allowedItems": [
+								"adventuring:cowl",
+								"adventuring:vest",
+								"adventuring:chaps",
+								"adventuring:vambraces",
+								"adventuring:boots",
+								"adventuring:amulet",
+								"adventuring:ring",
+								"adventuring:cape",
+								"adventuring:dagger",
+								"adventuring:wand"
+							],
+							"effects": [
+								{ "trigger": "passive", "type": "stat_flat", "stat": "adventuring:hitpoints", "amount": { "scaling": [{ "id": "level", "amount": 6 }] }, "scaleFrom": "combatJob" },
+								{ "trigger": "passive", "type": "stat_flat", "stat": "adventuring:defence", "amount": { "scaling": [{ "id": "level", "amount": 0.125 }] }, "scaleFrom": "combatJob" },
+								{ "trigger": "passive", "type": "stat_flat", "stat": "adventuring:agility", "amount": { "scaling": [{ "id": "level", "amount": 3.625 }] }, "scaleFrom": "combatJob" },
+								{ "trigger": "passive", "type": "stat_flat", "stat": "adventuring:magic", "amount": { "scaling": [{ "id": "level", "amount": 0.75 }] }, "scaleFrom": "combatJob" }
+							]
+						}
+					],
+					"generators": [
+						{
+							"id": "shade_slash",
+							"name": "Shade Slash",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:shadowblade", "level": 1 }],
+							"energy": 25,
+							"hits": [{ "target": "back", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 9, "scaling": [
+									{ "id": "adventuring:agility", "amount": 0.35 },
+									{ "id": "adventuring:magic", "amount": 0.15 }
+								] } }
+							] }]
+						},
+						{
+							"id": "dark_blade",
+							"name": "Dark Blade",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:shadowblade", "level": 10 }],
+							"energy": 25,
+							"hits": [{ "target": "front", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 7, "scaling": [
+									{ "id": "adventuring:agility", "amount": 0.3 },
+									{ "id": "adventuring:magic", "amount": 0.15 }
+								] } },
+								{ "type": "debuff", "id": "adventuring:poison", "stacks": { "base": 2, "scaling": [{ "id": "adventuring:magic", "amount": 0.08 }] } },
+								{ "type": "debuff", "id": "adventuring:curse", "stacks": { "base": 2, "scaling": [{ "id": "adventuring:magic", "amount": 0.05 }] } }
+							] }]
+						},
+						{
+							"id": "shadow_strike",
+							"name": "Shadow Strike",
+							"requirements": [{ "type": "job_level", "job": "adventuring:shadowblade", "level": 25 }],
+							"energy": 25,
+							"hits": [{ "target": "all", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 6, "scaling": [
+									{ "id": "adventuring:agility", "amount": 0.25 },
+									{ "id": "adventuring:magic", "amount": 0.15 }
+								] } },
+								{ "type": "debuff", "id": "adventuring:poison", "stacks": 2 }
+							] }]
+						},
+						{
+							"id": "umbral_assault",
+							"name": "Umbral Assault",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:shadowblade", "level": 60 }],
+							"energy": 30,
+							"hits": [{ "target": "lowest", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 15, "scaling": [
+									{ "id": "adventuring:agility", "amount": 0.55 },
+									{ "id": "adventuring:magic", "amount": 0.25 },
+									{ "id": "adventuring:marked", "scaleFrom": "debuff", "scaleTarget": "target", "amount": 5, "consume": true }
+								] } }
+							] }]
+						},
+						{
+							"id": "twilight_carnage",
+							"name": "Twilight Carnage",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:shadowblade", "level": 90 }],
+							"energy": 35,
+							"hits": [{ "target": "all", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 12, "scaling": [
+									{ "id": "adventuring:agility", "amount": 0.5 },
+									{ "id": "adventuring:magic", "amount": 0.25 }
+								] } },
+								{ "type": "debuff", "id": "adventuring:curse", "stacks": 2 },
+								{ "type": "debuff", "id": "adventuring:poison", "stacks": 2 },
+								{ "type": "debuff", "id": "adventuring:marked", "stacks": 2 }
+							] }]
+						}
+					],
+					"spenders": [
+						{
+							"id": "umbral_waltz",
+							"name": "Umbral Waltz",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:shadowblade", "level": 1 }],
+							"cost": 120,
+							"hits": [{ "target": "random", "party": "enemy", "delay": 100, "repeat": 5, "effects": [
+								{ "type": "damage_flat", "amount": { "base": 5, "scaling": [{ "id": "adventuring:agility", "amount": 0.3 }] } }
+							] }]
+						},
+						{
+							"id": "void_step",
+							"name": "Void Step",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:shadowblade", "level": 15 }],
+							"cost": 110,
+							"hits": [{ "target": "self", "effects": [
+								{ "type": "buff", "id": "adventuring:invisibility", "stacks": 2 },
+								{ "type": "buff", "id": "adventuring:haste", "stacks": { "base": 3, "scaling": [{ "id": "adventuring:agility", "amount": 0.1 }] } }
+							] }]
+						},
+						{
+							"id": "shadow_ballet",
+							"name": "Shadow Ballet",
+							"requirements": [{ "type": "job_level", "job": "adventuring:shadowblade", "level": 50 }],
+							"cost": 140,
+							"hits": [{ "target": "all", "party": "enemy", "delay": 80, "repeat": 3, "effects": [
+								{ "type": "damage_flat", "amount": { "base": 8, "scaling": [
+									{ "id": "adventuring:agility", "amount": 0.35 },
+									{ "id": "adventuring:magic", "amount": 0.15 }
+								] } },
+								{ "type": "debuff", "id": "adventuring:poison", "stacks": 1 }
+							] }]
+						},
+						{
+							"id": "shadow_execution",
+							"name": "Shadow Execution",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:shadowblade", "level": 70 }],
+							"cost": 150,
+							"hits": [{ "target": "lowest", "party": "enemy", "delay": 80, "repeat": 3, "effects": [
+								{ "type": "damage_flat", "amount": { "base": 12, "scaling": [
+									{ "id": "adventuring:agility", "amount": 0.5 },
+									{ "id": "adventuring:magic", "amount": 0.2 }
+								] } },
+								{ "type": "debuff", "id": "adventuring:marked", "stacks": { "base": 2, "scaling": [{ "id": "adventuring:agility", "amount": 0.1 }] } }
+							] }]
+						},
+						{
+							"id": "shadowblades_execution",
+							"name": "Shadowblade's Execution",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:shadowblade", "level": 99 }],
+							"cost": 175,
+							"hits": [{ "target": "lowest", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 40, "scaling": [
+									{ "id": "adventuring:agility", "amount": 1.8 },
+									{ "id": "adventuring:magic", "amount": 0.6 },
+									{ "id": "adventuring:marked", "scaleFrom": "debuff", "scaleTarget": "target", "amount": 6, "consume": true },
+									{ "id": "adventuring:poison", "scaleFrom": "debuff", "scaleTarget": "target", "amount": 4, "consume": true },
+									{ "id": "adventuring:curse", "scaleFrom": "debuff", "scaleTarget": "target", "amount": 4, "consume": true }
+								] } }
+							] }]
+						}
+					],
+					"passives": [
+						{
+							"id": "phantom_form",
+							"name": "Phantom Form",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:shadowblade", "level": 20 }],
+							"effects": [
+								{ "trigger": "encounter_start", "type": "buff", "target": "self", "id": "adventuring:invisibility", "stacks": 1 },
+								{ "trigger": "encounter_start", "type": "buff", "target": "self", "id": "adventuring:haste", "stacks": { "base": 2, "scaling": [{ "id": "adventuring:agility", "amount": 0.1 }] } }
+							]
+						},
+						{
+							"id": "ambusher",
+							"name": "Ambusher",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:shadowblade", "level": 40 }],
+							"effects": [
+								{ "trigger": "kill", "type": "buff", "target": "self", "id": "adventuring:invisibility", "stacks": 1 },
+								{ "trigger": "kill", "type": "buff", "target": "self", "id": "adventuring:haste", "stacks": 3 }
+							]
+						},
+						{
+							"id": "reapers_shadow",
+							"name": "Reaper's Shadow",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:shadowblade", "level": 80 }],
+							"effects": [
+								{ "trigger": "after_damage_delivered", "type": "debuff", "target": "target", "id": "adventuring:marked", "stacks": 1 }
+							]
+						}
+					]
+				}
+			}
+		]
+	}
 }

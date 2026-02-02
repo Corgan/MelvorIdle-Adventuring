@@ -3,10 +3,9 @@ const { loadModule } = mod.getContext(import.meta);
 const { AdventuringPage } = await loadModule('src/ui/adventuring-page.mjs');
 const { AdventuringConsumablesElement } = await loadModule('src/items/components/adventuring-consumables.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
-const { evaluateCondition, createEffect, filterEffects } = await loadModule('src/core/adventuring-utils.mjs');
+const { evaluateCondition } = await loadModule('src/core/effects/condition-evaluator.mjs');
+const { createEffect, filterEffects } = await loadModule('src/core/utils/adventuring-utils.mjs');
 const { AdventuringCategorySectionElement } = await loadModule('src/ui/components/adventuring-category-section.mjs');
-
-const MAX_EQUIPPED_CONSUMABLES = 3;
 
 class AdventuringConsumablesRenderQueue {
     constructor() {
@@ -50,7 +49,13 @@ export class AdventuringConsumables extends AdventuringPage {
             const tier = i + 1;
             this.component.tierButtonElements[i].onclick = () => this.selectTier(tier);
         }
+
+        // Listen for dungeon lifecycle events
+        this.manager.conductor.listen('dungeon_start', () => this._onDungeonStart());
+        this.manager.conductor.listen('dungeon_end', () => this._onDungeonEnd());
     }
+
+    get maxEquipped() { return this.manager.config.limits.maxEquippedConsumables; }
 
     back() {
         if (this.active) {
@@ -104,7 +109,7 @@ export class AdventuringConsumables extends AdventuringPage {
             this.component.jobSections.appendChild(section);
         });
 
-        for (let i = 0; i < MAX_EQUIPPED_CONSUMABLES; i++) {
+        for (let i = 0; i < this.maxEquipped; i++) {
             const slot = this.component.slots[i];
             if (slot) {
                 slot.onclick = () => {
@@ -245,8 +250,8 @@ export class AdventuringConsumables extends AdventuringPage {
     }
 
     equip(consumable, tier) {
-        if (this.equipped.length >= MAX_EQUIPPED_CONSUMABLES) {
-            this.manager.log.add(`Cannot equip more than ${MAX_EQUIPPED_CONSUMABLES} consumables.`, {
+        if (this.equipped.length >= this.maxEquipped) {
+            this.manager.log.add(`Cannot equip more than ${this.maxEquipped} consumables.`, {
                 category: 'town'
             });
             return false;
@@ -311,15 +316,13 @@ export class AdventuringConsumables extends AdventuringPage {
         for (const { consumable, tier } of this.equipped) {
             if (this.getCharges(consumable, tier) > 0) {
                 const tierEffects = consumable.getTierEffects(tier);
-                for (const effectData of tierEffects) {
-                    const effect = createEffect(
-                        effectData,
-                        consumable,
-                        consumable.getTierName(tier),
-                        'consumable'
-                    );
-                    effect.sourceTier = tier;  // Include tier for charge consumption
-                    effects.push(effect);
+                // Effects already have sourcePath from consumable.postDataRegistration()
+                // Just add tier for charge tracking
+                for (const effect of tierEffects) {
+                    effects.push({
+                        ...effect,
+                        sourceTier: tier
+                    });
                 }
             }
         }
@@ -327,14 +330,17 @@ export class AdventuringConsumables extends AdventuringPage {
         return filterEffects(effects, filters);
     }
 
-
-
-
-    onDungeonStart() {
+    /**
+     * @private Called via conductor dungeon_start event
+     */
+    _onDungeonStart() {
         this.usedThisRun.clear();
     }
 
-    onDungeonEnd() {
+    /**
+     * @private Called via conductor dungeon_end event
+     */
+    _onDungeonEnd() {
         const preserveChance = this.manager.party.getConsumablePreservationChance();
 
         for (const { consumable, tier } of [...this.equipped]) {
@@ -352,7 +358,6 @@ export class AdventuringConsumables extends AdventuringPage {
             }
         }
 
-        this.manager.tavern.consumeCharges();
         this.usedThisRun.clear();
     }
 
@@ -368,7 +373,7 @@ export class AdventuringConsumables extends AdventuringPage {
     renderSlots() {
         if (!this.renderQueue.slots) return;
 
-        for (let i = 0; i < MAX_EQUIPPED_CONSUMABLES; i++) {
+        for (let i = 0; i < this.maxEquipped; i++) {
             const slot = this.component.slots[i];
             const entry = this.equipped[i];
 
@@ -422,7 +427,7 @@ export class AdventuringConsumables extends AdventuringPage {
             this.component.equipButton.textContent = 'Equip';
             this.component.equipButton.className = 'btn btn-secondary';
             this.component.equipButton.disabled = true;
-        } else if (this.equipped.length >= MAX_EQUIPPED_CONSUMABLES) {
+        } else if (this.equipped.length >= this.maxEquipped) {
             this.component.equipButton.textContent = 'Slots Full';
             this.component.equipButton.className = 'btn btn-secondary';
             this.component.equipButton.disabled = true;
@@ -501,4 +506,4 @@ export class AdventuringConsumables extends AdventuringPage {
     }
 }
 
-export { MAX_EQUIPPED_CONSUMABLES };
+

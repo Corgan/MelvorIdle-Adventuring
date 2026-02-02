@@ -13,6 +13,10 @@ export class AdventuringEquipmentSet extends NamespacedObject {
 
 
         this.bonuses = data.bonuses || [];
+
+        // Order position for sorting (processed by manager._buildAllSortOrders)
+        this.orderPosition = data.orderPosition;
+        this.sortOrder = 9999;  // Default high value, set by _buildAllSortOrders
     }
 
     get name() {
@@ -50,8 +54,11 @@ export class AdventuringEquipmentSet extends NamespacedObject {
                 bonus.effects.forEach(effect => {
                     const effectObj = {
                         ...effect,
-                        source: 'equipment_set',
-                        sourceName: `${this.name} (${bonus.pieces}pc)`
+                        // 2-level sourcePath: parent set name, child tier bonus
+                        sourcePath: [
+                            { type: 'equipmentSet', name: this.name, ref: this },
+                            { type: 'setBonus', name: `${bonus.pieces}pc Bonus`, ref: this }
+                        ]
                     };
                     // Preserve getAmount and getStacks methods if they exist
                     if (typeof effect.getAmount === 'function') {

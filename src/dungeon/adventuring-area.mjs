@@ -4,7 +4,10 @@ const { AdventuringMasteryAction } = await loadModule('src/core/adventuring-mast
 const { AdventuringAreaElement } = await loadModule('src/dungeon/components/adventuring-area.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
 
-const { AdventuringWeightedTable, addMasteryXPWithBonus, RequirementsChecker, AdventuringMasteryRenderQueue, getLockedMedia, UNKNOWN_MEDIA } = await loadModule('src/core/adventuring-utils.mjs');
+const { RequirementsChecker } = await loadModule('src/core/utils/requirements-checker.mjs');
+const { AdventuringWeightedTable } = await loadModule('src/core/utils/weighted-table.mjs');
+const { addMasteryXPWithBonus, getLockedMedia, UNKNOWN_MEDIA } = await loadModule('src/core/utils/adventuring-utils.mjs');
+const { AdventuringMasteryRenderQueue } = await loadModule('src/core/utils/render-queues.mjs');
 
 class AdventuringAreaRenderQueue extends AdventuringMasteryRenderQueue {
     constructor(){
@@ -30,6 +33,10 @@ export class AdventuringArea extends AdventuringMasteryAction {
         this._media = data.media;
 
         this.requirements = data.requirements || [];
+
+        // Order position for sorting (processed by manager._buildAreaSortOrder)
+        this.orderPosition = data.orderPosition || null;
+        this.sortOrder = 9999; // Default, will be set by _buildAreaSortOrder
 
         this.floors = data.floors;
 
@@ -62,7 +69,9 @@ export class AdventuringArea extends AdventuringMasteryAction {
         };
 
         this.component.card.onclick = (e) => {
-            // Don't open details if clicking in controls area (buttons, dropdown, etc)
+            // Don't open details if clicking on dropdown (button or menu)
+            if (e.target.closest('.dropdown')) return;
+            // Don't open details if clicking in controls area (buttons, etc)
             if (e.target.closest('#controls')) return;
             this.openDetails();
         };
@@ -83,6 +92,7 @@ export class AdventuringArea extends AdventuringMasteryAction {
         this.isGauntlet = (data.isGauntlet !== undefined) ? data.isGauntlet : false;
         this.gauntletTier = (data.gauntletTier !== undefined) ? data.gauntletTier : 0;
         this.gauntletRewardMultiplier = (data.gauntletRewardMultiplier !== undefined) ? data.gauntletRewardMultiplier : 1.0;
+        this.tier = (data.tier !== undefined) ? data.tier : 0;
 
         this.encounterFloorMax = data.encounterFloorMax; // undefined = use tile default
         this.encounterWeight = data.encounterWeight; // undefined = use tile default
@@ -99,7 +109,7 @@ export class AdventuringArea extends AdventuringMasteryAction {
         return 'adventuring:areas';
     }
 
-    getAllDifficulties() {
+    get allDifficulties() {
         return this.manager.difficulties.allObjects;
     }
 
@@ -107,7 +117,7 @@ export class AdventuringArea extends AdventuringMasteryAction {
         this.component.difficultyOptions.replaceChildren();
         this.difficultyOptionElements = [];
 
-        this.getAllDifficulties().forEach((difficulty) => {
+        this.allDifficulties.forEach((difficulty) => {
             const option = createElement('a', {
                 className: 'dropdown-item pointer-enabled',
                 text: difficulty.name
@@ -117,8 +127,8 @@ export class AdventuringArea extends AdventuringMasteryAction {
             this.difficultyOptionElements.push(option);
         });
 
-        if(!this.selectedDifficulty && this.getAllDifficulties().length > 0) {
-            this.selectedDifficulty = this.getAllDifficulties()[0];
+        if(!this.selectedDifficulty && this.allDifficulties.length > 0) {
+            this.selectedDifficulty = this.allDifficulties[0];
         }
     }
 
@@ -138,7 +148,7 @@ export class AdventuringArea extends AdventuringMasteryAction {
     }
 
     cycleDifficulty() {
-        const availableDifficulties = this.getAvailableDifficulties();
+        const availableDifficulties = this.availableDifficulties;
         if(availableDifficulties.length <= 1) return;
 
         const currentIndex = availableDifficulties.indexOf(this.selectedDifficulty);
@@ -149,12 +159,12 @@ export class AdventuringArea extends AdventuringMasteryAction {
         this.renderQueue.tooltip = true;
     }
 
-    getAvailableDifficulties() {
-        return this.getAllDifficulties().filter(d => d.isUnlocked(this));
+    get availableDifficulties() {
+        return this.allDifficulties.filter(d => d.isUnlocked(this));
     }
 
-    getDifficulty() {
-        return this.selectedDifficulty || this.getAllDifficulties()[0];
+    get difficulty() {
+        return this.selectedDifficulty || this.allDifficulties[0];
     }
 
     get name() {
@@ -169,7 +179,7 @@ export class AdventuringArea extends AdventuringMasteryAction {
         return this.manager.getMasteryLevel(this);
     }
 
-    getUnlockLevel() {
+    get unlockLevel() {
         for (const requirement of this.requirements) {
             if (requirement.type === "skill_level") {
                 return requirement.level;
@@ -179,8 +189,12 @@ export class AdventuringArea extends AdventuringMasteryAction {
     }
 
     get unlocked() {
+        // Fast path: once unlocked, always unlocked
+        if (this._unlockedCached) return true;
         if (this._reqChecker === undefined) return true;
-        return this._reqChecker.check();
+        const result = this._reqChecker.check();
+        if (result) this._unlockedCached = true;
+        return result;
     }
 
     get monsters() {
@@ -230,7 +244,7 @@ export class AdventuringArea extends AdventuringMasteryAction {
         }
     }
 
-    getMasteryBonuses() {
+    get masteryBonuses() {
 
         const xpBonus = this.manager.party.getDungeonXPBonus(this);
         const exploreSpeedBonus = this.manager.party.getExploreSpeedBonus(this);
@@ -238,8 +252,8 @@ export class AdventuringArea extends AdventuringMasteryAction {
         return { xpBonus, exploreSpeedBonus };
     }
 
-    getMasteryBonusEffects() {
-        const { xpBonus, exploreSpeedBonus } = this.getMasteryBonuses();
+    get masteryBonusEffects() {
+        const { xpBonus, exploreSpeedBonus } = this.masteryBonuses;
         const effects = [];
 
         if(xpBonus > 0) {
@@ -252,7 +266,7 @@ export class AdventuringArea extends AdventuringMasteryAction {
         return effects;
     }
 
-    getTileModifiers() {
+    get tileModifiers() {
 
         const trapMod = this.manager.party.getTrapSpawnRateMod();
         const fountainMod = this.manager.party.getFountainSpawnRateMod();
@@ -270,12 +284,12 @@ export class AdventuringArea extends AdventuringMasteryAction {
         return modifiers;
     }
 
-    getAchievedMilestones() {
+    get achievedMilestones() {
         const category = this.masteryCategory;
         return category ? category.getAchievedMilestones(this.level) : [];
     }
 
-    getNextMilestone() {
+    get nextMilestone() {
         const category = this.masteryCategory;
         return category ? category.getNextMilestone(this.level) : null;
     }
@@ -326,7 +340,7 @@ export class AdventuringArea extends AdventuringMasteryAction {
             return;
 
         if(this.unlocked) {
-            const difficulty = this.getDifficulty();
+            const difficulty = this.difficulty;
             this.component.nameText.textContent = this.name;
             this.component.level.textContent = ` (${this.level})`;
             this.component.level.className = difficulty.color;
@@ -334,7 +348,7 @@ export class AdventuringArea extends AdventuringMasteryAction {
             this.component.difficultyButton.textContent = difficulty.name;
             this.component.difficultyButton.className = `btn btn-sm dropdown-toggle ${difficulty.color.replace('text-', 'btn-')}`;
 
-            this.getAllDifficulties().forEach((mode, index) => {
+            this.allDifficulties.forEach((mode, index) => {
                 const option = this.difficultyOptionElements[index];
                 if(option) {
                     const isUnlocked = mode.isUnlocked(this);

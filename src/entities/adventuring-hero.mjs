@@ -2,30 +2,14 @@ const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringCharacter, AdventuringCharacterRenderQueue } = await loadModule('src/core/adventuring-character.mjs');
 const { AdventuringEquipment } = await loadModule('src/items/adventuring-equipment.mjs');
-const { AdventuringStats } = await loadModule('src/core/adventuring-stats.mjs');
-const { AdventuringCard } = await loadModule('src/progression/adventuring-card.mjs');
+const { AdventuringStats } = await loadModule('src/core/stats/adventuring-stats.mjs');
+const { AdventuringCard } = await loadModule('src/ui/adventuring-card.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
 const { AdventuringPassiveBadgeElement } = await loadModule('src/entities/components/adventuring-passive-badge.mjs');
-const { evaluateCondition, StatCalculator } = await loadModule('src/core/adventuring-utils.mjs');
-const { StatBreakdownCache } = await loadModule('src/core/adventuring-stat-breakdown.mjs');
-
-const STARTER_LOADOUTS = {
-    front: {
-        job: 'adventuring:fighter',
-        generator: 'adventuring:slash',
-        spender: 'adventuring:whirlwind'
-    },
-    center: {
-        job: 'adventuring:cleric',
-        generator: 'adventuring:holy_fire',
-        spender: 'adventuring:divine_heal'
-    },
-    back: {
-        job: 'adventuring:ranger',
-        generator: 'adventuring:shoot',
-        spender: 'adventuring:snipe'
-    }
-};
+const { StatCalculator } = await loadModule('src/core/stats/stat-calculator.mjs');
+const { evaluateCondition } = await loadModule('src/core/effects/condition-evaluator.mjs');
+const { StatBreakdownCache } = await loadModule('src/core/stats/adventuring-stat-breakdown.mjs');
+const { getStarterLoadouts } = await loadModule('src/core/effects/effect-descriptions.mjs');
 
 class AdventuringHeroRenderQueue extends AdventuringCharacterRenderQueue {
     constructor() {
@@ -138,7 +122,8 @@ export class AdventuringHero extends AdventuringCharacter {
 
     _applyStarterLoadout() {
         const position = this._getPartyPosition();
-        const loadout = STARTER_LOADOUTS[position];
+        const loadouts = getStarterLoadouts();
+        const loadout = loadouts[position];
         if(!loadout) return;
 
         const job = this.manager.jobs.getObjectByID(loadout.job);
@@ -185,15 +170,13 @@ export class AdventuringHero extends AdventuringCharacter {
                 this.stats.set(stat, stat.base);
         });
 
+        // Job and equipment stats flow through effectCache via getEffects()
+        // We still call calculateStats() for UI display (tooltips)
         if(this.combatJob !== undefined) this.combatJob.calculateStats();
         if(this.passiveJob !== undefined) this.passiveJob.calculateStats();
         if(this.equipment !== undefined) this.equipment.calculateStats();
 
-        StatCalculator.aggregate(this.stats,
-            this.combatJob ? this.combatJob.stats : null,
-            this.passiveJob ? this.passiveJob.stats : null,
-            this.equipment ? this.equipment.stats : null
-        );
+        // All stat sources now flow through effectCache - no aggregate needed
 
         if(shouldAdjust) {
             this.hitpoints = Math.min(this.maxHitpoints, Math.floor(this.maxHitpoints * hitpointPct));
@@ -217,17 +200,21 @@ export class AdventuringHero extends AdventuringCharacter {
     initEffectCache() {
         super.initEffectCache();
 
-        // Hero-specific sources
-        this.effectCache.registerSource('equipment', () => this.equipment.getEffects());
-        
-        // Job passives - need to check per-character requirements
-        this.effectCache.registerSource('combatJobPassives', () => 
-            this.combatJob?.getPassiveEffects ? this.combatJob.getPassiveEffects(this) : []
+        // Unified equipment source - stats + procs + set bonuses all in one
+        this.effectCache.registerSource('equipment', () => 
+            this.equipment?.getEffects ? this.equipment.getEffects() : []
         );
         
-        this.effectCache.registerSource('passiveJobPassives', () => {
-            if (!this.passiveJob || this.passiveJob === this.combatJob) return [];
-            return this.passiveJob.getPassiveEffects ? this.passiveJob.getPassiveEffects(this) : [];
+        // Unified combat job source - stats + passives all in one
+        this.effectCache.registerSource('combatJob', () => {
+            if (!this.combatJob || this.combatJob.id === 'adventuring:none') return [];
+            return this.combatJob.getEffects ? this.combatJob.getEffects(this, 'combatJob') : [];
+        });
+        
+        // Unified passive job source - stats + passives all in one
+        this.effectCache.registerSource('passiveJob', () => {
+            if (!this.passiveJob || this.passiveJob === this.combatJob || this.passiveJob.id === 'adventuring:none') return [];
+            return this.passiveJob.getEffects ? this.passiveJob.getEffects(this, 'passiveJob') : [];
         });
         
         // Global passives (achievement-unlocked)
@@ -240,19 +227,27 @@ export class AdventuringHero extends AdventuringCharacter {
             getEffects: (f) => this.manager.consumables?.getEffects(f) || [],
             filters: { scope: 'individual' },
             onTrigger: (effect, context, host) => {
+                // Get display name from sourcePath
+                const sourceName = effect.sourcePath && effect.sourcePath.length > 0 
+                    ? effect.sourcePath[effect.sourcePath.length - 1].name 
+                    : 'Consumable';
+                const sourceRef = effect.sourcePath && effect.sourcePath.length > 0 
+                    ? effect.sourcePath[effect.sourcePath.length - 1].ref 
+                    : effect.source;
+                    
                 // Handle consume_charge effect type
                 if (effect.type === 'consume_charge') {
                     const count = effect.count || 1;
-                    this.manager.consumables.removeCharges(effect.source, effect.sourceTier, count);
-                    this.manager.log.add(`${effect.sourceName} consumed ${count} charge(s).`, {
+                    this.manager.consumables.removeCharges(sourceRef, effect.sourceTier, count);
+                    this.manager.log.add(`${sourceName} consumed ${count} charge(s).`, {
                         category: 'system',
                         source: this
                     });
                 }
                 // Consume charges for triggered consumable effects (non-passive)
                 else if (effect.trigger !== 'passive') {
-                    this.manager.consumables.removeCharges(effect.source, effect.sourceTier, 1);
-                    this.manager.log.add(`${effect.sourceName} consumed a charge.`, {
+                    this.manager.consumables.removeCharges(sourceRef, effect.sourceTier, 1);
+                    this.manager.log.add(`${sourceName} consumed a charge.`, {
                         category: 'system',
                         source: this
                     });
@@ -264,11 +259,33 @@ export class AdventuringHero extends AdventuringCharacter {
             getEffects: (f) => this.manager.tavern?.getEffects(f) || [],
             filters: { scope: 'individual' }
         });
+
+        // Party-shared effects (including enemies targeting heroes)
+        this.effectCache.registerSource('party', () =>
+            this.manager.party?.getEffects() || []
+        );
     }
 
-    invalidateJobPassives() {
-        this.effectCache.invalidate('combatJobPassives');
-        this.effectCache.invalidate('passiveJobPassives');
+    /**
+     * Invalidate one or more effect sources and update render queues.
+     * @param {...string} sourceIds - The effect source IDs to invalidate
+     */
+    invalidateEffectSources(...sourceIds) {
+        for (const sourceId of sourceIds) {
+            this.effectCache.invalidate(sourceId);
+        }
+        this.stats.renderQueue.stats = true;
+        if (this.statBreakdownCache) {
+            this.statBreakdownCache.invalidate();
+        }
+    }
+
+    invalidateJobEffects() {
+        this.invalidateEffectSources('combatJob', 'passiveJob');
+    }
+
+    invalidateEquipmentEffects() {
+        this.invalidateEffectSources('equipment');
     }
 
     setLocked(locked) {
@@ -312,8 +329,16 @@ export class AdventuringHero extends AdventuringCharacter {
     }
 
     _onJobChange() {
+        // Update cached mastery bonus before stats are calculated
+        if (this.combatJob?.updateCachedMasteryBonus) {
+            this.combatJob.updateCachedMasteryBonus();
+        }
+        if (this.passiveJob?.updateCachedMasteryBonus) {
+            this.passiveJob.updateCachedMasteryBonus();
+        }
+        
         this.invalidateStats();
-        this.invalidateJobPassives();
+        this.invalidateJobEffects();
         this.calculateStats();
 
         if(!this.generator.canEquip(this))

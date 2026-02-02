@@ -1,1229 +1,1219 @@
 {
-    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
-    "namespace": "adventuring",
-    "data": {
-        "skillData": [
-            {
-                "skillID": "adventuring:Adventuring",
-                "data": {
-                    "passives": [
-                        {
-                            "id": "ancient_spirits",
-                            "name": "Ancient Spirits",
-                            "effects": [
-                                {
-                                    "trigger": "encounter_start",
-                                    "type": "buff",
-                                    "id": "adventuring:focus",
-                                    "target": "self",
-                                    "stacks": 3
-                                },
-                                {
-                                    "trigger": "ability",
-                                    "type": "heal_flat",
-                                    "target": "self",
-                                    "amount": 5,
-                                    "scaling": 0.5
-                                }
-                            ]
-                        },
-                        {
-                            "id": "forest_guardian",
-                            "name": "Forest Guardian",
-                            "effects": [
-                                {
-                                    "trigger": "encounter_start",
-                                    "type": "buff",
-                                    "id": "adventuring:barrier",
-                                    "target": "self",
-                                    "stacks": 4
-                                },
-                                {
-                                    "trigger": "encounter_start",
-                                    "type": "buff",
-                                    "id": "adventuring:fortify",
-                                    "target": "self",
-                                    "stacks": 2
-                                }
-                            ]
-                        },
-                        {
-                            "id": "natures_retribution",
-                            "name": "Nature's Retribution",
-                            "effects": [
-                                {
-                                    "trigger": "kill",
-                                    "type": "buff",
-                                    "id": "adventuring:might",
-                                    "target": "self",
-                                    "stacks": 5
-                                },
-                                {
-                                    "trigger": "kill",
-                                    "type": "heal_flat",
-                                    "target": "self",
-                                    "amount": 15,
-                                    "scaling": 0.45
-                                }
-                            ]
-                        }
-                    ],
-                    "areas": [
-                        {
-                            "id": "ancient_forest",
-                            "name": "Ancient Forest",
-                            "media": "melvor:assets/media/skills/woodcutting/woodcutting.png#shade=darkgreen",
-                            "requirements": [
-                                {
-                                    "type": "skill_level",
-                                    "level": 63
-                                }
-                            ],
-                            "width": 14,
-                            "height": 8,
-                            "floors": [
-                                {
-                                    "monsters": [
-                                        {
-                                            "id": "adventuring:forest_sprite",
-                                            "weight": 50
-                                        },
-                                        {
-                                            "id": "adventuring:ancient_treant",
-                                            "weight": 30
-                                        },
-                                        {
-                                            "id": "adventuring:wild_druid",
-                                            "weight": 20
-                                        }
-                                    ],
-                                    "exit": [
-                                        "adventuring:forest_sprite",
-                                        "adventuring:ancient_treant",
-                                        "adventuring:wild_druid"
-                                    ]
-                                },
-                                {
-                                    "monsters": [
-                                        {
-                                            "id": "adventuring:ancient_treant",
-                                            "weight": 35
-                                        },
-                                        {
-                                            "id": "adventuring:wild_druid",
-                                            "weight": 35
-                                        },
-                                        {
-                                            "id": "adventuring:dire_wolf",
-                                            "weight": 30
-                                        }
-                                    ],
-                                    "exit": [
-                                        "adventuring:ancient_treant",
-                                        "adventuring:wild_druid",
-                                        "adventuring:dire_wolf"
-                                    ]
-                                },
-                                {
-                                    "monsters": [
-                                        {
-                                            "id": "adventuring:wild_druid",
-                                            "weight": 25
-                                        },
-                                        {
-                                            "id": "adventuring:dire_wolf",
-                                            "weight": 30
-                                        },
-                                        {
-                                            "id": "adventuring:forest_warden",
-                                            "weight": 25
-                                        },
-                                        {
-                                            "id": "adventuring:ancient_bear",
-                                            "weight": 20
-                                        }
-                                    ],
-                                    "exit": [
-                                        "adventuring:dire_wolf",
-                                        "adventuring:forest_warden",
-                                        "adventuring:ancient_bear"
-                                    ]
-                                },
-                                {
-                                    "monsters": [
-                                        {
-                                            "id": "adventuring:forest_warden",
-                                            "weight": 30
-                                        },
-                                        {
-                                            "id": "adventuring:ancient_bear",
-                                            "weight": 35
-                                        },
-                                        {
-                                            "id": "adventuring:elder_treant",
-                                            "weight": 35
-                                        }
-                                    ],
-                                    "exit": [
-                                        "adventuring:forest_warden",
-                                        "adventuring:ancient_bear",
-                                        "adventuring:elder_treant"
-                                    ]
-                                },
-                                {
-                                    "monsters": [
-                                        {
-                                            "id": "adventuring:elder_treant",
-                                            "weight": 35
-                                        },
-                                        {
-                                            "id": "adventuring:ancient_bear",
-                                            "weight": 30
-                                        },
-                                        {
-                                            "id": "adventuring:archdruid",
-                                            "weight": 35
-                                        }
-                                    ],
-                                    "exit": [
-                                        "adventuring:elder_treant",
-                                        "adventuring:archdruid",
-                                        "adventuring:the_forest_heart"
-                                    ]
-                                }
-                            ]
-                        }
-                    ],
-                    "monsters": [
-                        {
-                            "id": "forest_sprite",
-                            "name": "Forest Sprite",
-                            "media": "melvor:assets/media/monsters/fairy.png",
-                            "tags": [
-                                "nature",
-                                "mage"
-                            ],
-                            "xp": 33,
-                            "stats": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 32
-                                },
-                                {
-                                    "id": "adventuring:defence",
-                                    "amount": 18
-                                },
-                                {
-                                    "id": "adventuring:agility",
-                                    "amount": 35
-                                },
-                                {
-                                    "id": "adventuring:strength",
-                                    "amount": 12
-                                },
-                                {
-                                    "id": "adventuring:ranged",
-                                    "amount": 15
-                                },
-                                {
-                                    "id": "adventuring:magic",
-                                    "amount": 42
-                                },
-                                {
-                                    "id": "adventuring:prayer",
-                                    "amount": 20
-                                }
-                            ],
-                            "generator": "adventuring:nature_bolt",
-                            "spender": "adventuring:healing_wind",
-                            "passives": [],
-                            "loot": [
-                                {
-                                    "id": "adventuring:nature_essence",
-                                    "minQty": 2,
-                                    "maxQty": 4,
-                                    "type": "materials",
-                                    "chance": 0.6
-                                },
-                                {
-                                    "id": "adventuring:spirit_sap",
-                                    "minQty": 1,
-                                    "maxQty": 2,
-                                    "type": "materials",
-                                    "chance": 0.3
-                                },
-                                {
-                                    "id": "adventuring:currency",
-                                    "minQty": 80,
-                                    "maxQty": 150,
-                                    "type": "currency"
-                                },
-                                {
-                                    "type": "equipment_pool",
-                                    "pool": "adventuring:tier4_ancient_forest",
-                                    "chance": 0.03
-                                }
-                            ]
-                        },
-                        {
-                            "id": "ancient_treant",
-                            "name": "Ancient Treant",
-                            "media": "melvor:assets/media/monsters/tree_spirit.png",
-                            "tags": [
-                                "nature",
-                                "melee"
-                            ],
-                            "xp": 36,
-                            "stats": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 48
-                                },
-                                {
-                                    "id": "adventuring:defence",
-                                    "amount": 22
-                                },
-                                {
-                                    "id": "adventuring:agility",
-                                    "amount": 18
-                                },
-                                {
-                                    "id": "adventuring:strength",
-                                    "amount": 20
-                                },
-                                {
-                                    "id": "adventuring:ranged",
-                                    "amount": 10
-                                },
-                                {
-                                    "id": "adventuring:magic",
-                                    "amount": 25
-                                },
-                                {
-                                    "id": "adventuring:prayer",
-                                    "amount": 15
-                                }
-                            ],
-                            "generator": "adventuring:root_slam",
-                            "spender": "adventuring:grasping_roots",
-                            "passives": [],
-                            "loot": [
-                                {
-                                    "id": "adventuring:ancient_bark",
-                                    "minQty": 2,
-                                    "maxQty": 5,
-                                    "type": "materials",
-                                    "chance": 0.55
-                                },
-                                {
-                                    "id": "adventuring:nature_essence",
-                                    "minQty": 1,
-                                    "maxQty": 3,
-                                    "type": "materials",
-                                    "chance": 0.35
-                                },
-                                {
-                                    "id": "adventuring:currency",
-                                    "minQty": 100,
-                                    "maxQty": 180,
-                                    "type": "currency"
-                                },
-                                {
-                                    "type": "equipment_pool",
-                                    "pool": "adventuring:tier4_ancient_forest",
-                                    "chance": 0.03
-                                }
-                            ]
-                        },
-                        {
-                            "id": "wild_druid",
-                            "name": "Wild Druid",
-                            "media": "melvor:assets/media/monsters/druid.png",
-                            "tags": [
-                                "nature",
-                                "mage",
-                                "humanoid"
-                            ],
-                            "xp": 33,
-                            "stats": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 38
-                                },
-                                {
-                                    "id": "adventuring:defence",
-                                    "amount": 20
-                                },
-                                {
-                                    "id": "adventuring:agility",
-                                    "amount": 30
-                                },
-                                {
-                                    "id": "adventuring:strength",
-                                    "amount": 14
-                                },
-                                {
-                                    "id": "adventuring:ranged",
-                                    "amount": 20
-                                },
-                                {
-                                    "id": "adventuring:magic",
-                                    "amount": 50
-                                },
-                                {
-                                    "id": "adventuring:prayer",
-                                    "amount": 35
-                                }
-                            ],
-                            "generator": "adventuring:nature_bolt",
-                            "spender": "adventuring:primal_restoration",
-                            "passives": [],
-                            "loot": [
-                                {
-                                    "id": "adventuring:nature_essence",
-                                    "minQty": 2,
-                                    "maxQty": 4,
-                                    "type": "materials",
-                                    "chance": 0.5
-                                },
-                                {
-                                    "id": "adventuring:spirit_sap",
-                                    "minQty": 1,
-                                    "maxQty": 3,
-                                    "type": "materials",
-                                    "chance": 0.35
-                                },
-                                {
-                                    "id": "adventuring:currency",
-                                    "minQty": 120,
-                                    "maxQty": 200,
-                                    "type": "currency"
-                                },
-                                {
-                                    "type": "equipment_pool",
-                                    "pool": "adventuring:tier4_ancient_forest",
-                                    "chance": 0.03
-                                }
-                            ]
-                        },
-                        {
-                            "id": "dire_wolf",
-                            "name": "Dire Wolf",
-                            "media": "melvor:assets/media/monsters/undead_wolf.png#shade=black",
-                            "tags": [
-                                "beast",
-                                "melee"
-                            ],
-                            "xp": 36,
-                            "stats": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 40
-                                },
-                                {
-                                    "id": "adventuring:defence",
-                                    "amount": 18
-                                },
-                                {
-                                    "id": "adventuring:agility",
-                                    "amount": 48
-                                },
-                                {
-                                    "id": "adventuring:strength",
-                                    "amount": 22
-                                },
-                                {
-                                    "id": "adventuring:ranged",
-                                    "amount": 15
-                                },
-                                {
-                                    "id": "adventuring:magic",
-                                    "amount": 10
-                                },
-                                {
-                                    "id": "adventuring:prayer",
-                                    "amount": 8
-                                }
-                            ],
-                            "generator": "adventuring:feral_bite",
-                            "spender": "adventuring:pack_howl",
-                            "passives": [],
-                            "loot": [
-                                {
-                                    "id": "adventuring:wolf_fang",
-                                    "minQty": 1,
-                                    "maxQty": 3,
-                                    "type": "materials",
-                                    "chance": 0.55
-                                },
-                                {
-                                    "id": "adventuring:ancient_bark",
-                                    "minQty": 1,
-                                    "maxQty": 2,
-                                    "type": "materials",
-                                    "chance": 0.3
-                                },
-                                {
-                                    "id": "adventuring:currency",
-                                    "minQty": 100,
-                                    "maxQty": 170,
-                                    "type": "currency"
-                                },
-                                {
-                                    "type": "equipment_pool",
-                                    "pool": "adventuring:tier4_ancient_forest",
-                                    "chance": 0.03
-                                }
-                            ]
-                        },
-                        {
-                            "id": "forest_warden",
-                            "name": "Forest Warden",
-                            "media": "melvor:assets/media/monsters/holy_archer.png#shade=green",
-                            "tags": [
-                                "nature",
-                                "ranged",
-                                "humanoid"
-                            ],
-                            "xp": 39,
-                            "stats": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 44
-                                },
-                                {
-                                    "id": "adventuring:defence",
-                                    "amount": 22
-                                },
-                                {
-                                    "id": "adventuring:agility",
-                                    "amount": 42
-                                },
-                                {
-                                    "id": "adventuring:strength",
-                                    "amount": 16
-                                },
-                                {
-                                    "id": "adventuring:ranged",
-                                    "amount": 55
-                                },
-                                {
-                                    "id": "adventuring:magic",
-                                    "amount": 30
-                                },
-                                {
-                                    "id": "adventuring:prayer",
-                                    "amount": 25
-                                }
-                            ],
-                            "generator": "adventuring:natures_arrow",
-                            "spender": "adventuring:entangling_shot",
-                            "passives": [],
-                            "loot": [
-                                {
-                                    "id": "adventuring:nature_essence",
-                                    "minQty": 2,
-                                    "maxQty": 4,
-                                    "type": "materials",
-                                    "chance": 0.45
-                                },
-                                {
-                                    "id": "adventuring:spirit_sap",
-                                    "minQty": 2,
-                                    "maxQty": 4,
-                                    "type": "materials",
-                                    "chance": 0.35
-                                },
-                                {
-                                    "id": "adventuring:currency",
-                                    "minQty": 140,
-                                    "maxQty": 220,
-                                    "type": "currency"
-                                },
-                                {
-                                    "type": "equipment_pool",
-                                    "pool": "adventuring:tier4_ancient_forest",
-                                    "chance": 0.03
-                                }
-                            ]
-                        },
-                        {
-                            "id": "ancient_bear",
-                            "name": "Ancient Bear",
-                            "media": "melvor:assets/media/monsters/undead_wolf.png#shade=brown",
-                            "tags": [
-                                "beast",
-                                "melee"
-                            ],
-                            "xp": 42,
-                            "stats": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 55
-                                },
-                                {
-                                    "id": "adventuring:defence",
-                                    "amount": 24
-                                },
-                                {
-                                    "id": "adventuring:agility",
-                                    "amount": 25
-                                },
-                                {
-                                    "id": "adventuring:strength",
-                                    "amount": 26
-                                },
-                                {
-                                    "id": "adventuring:ranged",
-                                    "amount": 10
-                                },
-                                {
-                                    "id": "adventuring:magic",
-                                    "amount": 15
-                                },
-                                {
-                                    "id": "adventuring:prayer",
-                                    "amount": 20
-                                }
-                            ],
-                            "generator": "adventuring:maul",
-                            "spender": "adventuring:primal_roar",
-                            "passives": [],
-                            "loot": [
-                                {
-                                    "id": "adventuring:wolf_fang",
-                                    "minQty": 2,
-                                    "maxQty": 4,
-                                    "type": "materials",
-                                    "chance": 0.4
-                                },
-                                {
-                                    "id": "adventuring:ancient_bark",
-                                    "minQty": 2,
-                                    "maxQty": 4,
-                                    "type": "materials",
-                                    "chance": 0.4
-                                },
-                                {
-                                    "id": "adventuring:currency",
-                                    "minQty": 150,
-                                    "maxQty": 250,
-                                    "type": "currency"
-                                },
-                                {
-                                    "type": "equipment_pool",
-                                    "pool": "adventuring:tier4_ancient_forest",
-                                    "chance": 0.03
-                                }
-                            ]
-                        },
-                        {
-                            "id": "elder_treant",
-                            "name": "Elder Treant",
-                            "media": "melvor:assets/media/monsters/tree_spirit.png",
-                            "tags": [
-                                "nature",
-                                "melee"
-                            ],
-                            "xp": 45,
-                            "stats": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 60
-                                },
-                                {
-                                    "id": "adventuring:defence",
-                                    "amount": 26
-                                },
-                                {
-                                    "id": "adventuring:agility",
-                                    "amount": 15
-                                },
-                                {
-                                    "id": "adventuring:strength",
-                                    "amount": 24
-                                },
-                                {
-                                    "id": "adventuring:ranged",
-                                    "amount": 8
-                                },
-                                {
-                                    "id": "adventuring:magic",
-                                    "amount": 35
-                                },
-                                {
-                                    "id": "adventuring:prayer",
-                                    "amount": 25
-                                }
-                            ],
-                            "generator": "adventuring:root_slam",
-                            "spender": "adventuring:forest_wrath",
-                            "passives": [],
-                            "loot": [
-                                {
-                                    "id": "adventuring:ancient_bark",
-                                    "minQty": 3,
-                                    "maxQty": 6,
-                                    "type": "materials",
-                                    "chance": 0.5
-                                },
-                                {
-                                    "id": "adventuring:nature_essence",
-                                    "minQty": 2,
-                                    "maxQty": 4,
-                                    "type": "materials",
-                                    "chance": 0.35
-                                },
-                                {
-                                    "id": "adventuring:currency",
-                                    "minQty": 180,
-                                    "maxQty": 280,
-                                    "type": "currency"
-                                },
-                                {
-                                    "type": "equipment_pool",
-                                    "pool": "adventuring:tier4_ancient_forest",
-                                    "chance": 0.15
-                                }
-                            ]
-                        },
-                        {
-                            "id": "archdruid",
-                            "name": "Archdruid",
-                            "media": "melvor:assets/media/monsters/druid.png",
-                            "tags": [
-                                "nature",
-                                "mage",
-                                "humanoid"
-                            ],
-                            "xp": 48,
-                            "stats": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 48
-                                },
-                                {
-                                    "id": "adventuring:defence",
-                                    "amount": 24
-                                },
-                                {
-                                    "id": "adventuring:agility",
-                                    "amount": 35
-                                },
-                                {
-                                    "id": "adventuring:strength",
-                                    "amount": 18
-                                },
-                                {
-                                    "id": "adventuring:ranged",
-                                    "amount": 25
-                                },
-                                {
-                                    "id": "adventuring:magic",
-                                    "amount": 65
-                                },
-                                {
-                                    "id": "adventuring:prayer",
-                                    "amount": 50
-                                }
-                            ],
-                            "generator": "adventuring:forest_vengeance",
-                            "spender": "adventuring:sylvan_rejuvenation",
-                            "passives": [],
-                            "loot": [
-                                {
-                                    "id": "adventuring:spirit_sap",
-                                    "minQty": 3,
-                                    "maxQty": 5,
-                                    "type": "materials",
-                                    "chance": 0.45
-                                },
-                                {
-                                    "id": "adventuring:nature_essence",
-                                    "minQty": 3,
-                                    "maxQty": 5,
-                                    "type": "materials",
-                                    "chance": 0.4
-                                },
-                                {
-                                    "id": "adventuring:currency",
-                                    "minQty": 200,
-                                    "maxQty": 300,
-                                    "type": "currency"
-                                },
-                                {
-                                    "type": "equipment_pool",
-                                    "pool": "adventuring:tier4_ancient_forest",
-                                    "chance": 0.03
-                                }
-                            ]
-                        },
-                        {
-                            "id": "the_forest_heart",
-                            "name": "The Forest Heart",
-                            "media": "melvor:assets/media/monsters/tree_spirit.png",
-                            "tags": [
-                                "nature",
-                                "boss"
-                            ],
-                            "isBoss": true,
-                            "xp": 63,
-                            "stats": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 90
-                                },
-                                {
-                                    "id": "adventuring:defence",
-                                    "amount": 34
-                                },
-                                {
-                                    "id": "adventuring:agility",
-                                    "amount": 30
-                                },
-                                {
-                                    "id": "adventuring:strength",
-                                    "amount": 32
-                                },
-                                {
-                                    "id": "adventuring:ranged",
-                                    "amount": 30
-                                },
-                                {
-                                    "id": "adventuring:magic",
-                                    "amount": 60
-                                },
-                                {
-                                    "id": "adventuring:prayer",
-                                    "amount": 55
-                                }
-                            ],
-                            "generator": "adventuring:forest_vengeance",
-                            "spender": "adventuring:forest_awakening",
-                            "passives": [
-                                "adventuring:forest_guardian",
-                                "adventuring:natures_retribution"
-                            ],
-                            "loot": [
-                                {
-                                    "type": "salvage",
-                                    "id": "adventuring:superior_salvage",
-                                    "qty": 2
-                                },
-                                {
-                                    "id": "adventuring:forest_heart",
-                                    "minQty": 1,
-                                    "maxQty": 2,
-                                    "type": "materials",
-                                    "chance": 1
-                                },
-                                {
-                                    "id": "adventuring:ancient_bark",
-                                    "minQty": 5,
-                                    "maxQty": 10,
-                                    "type": "materials",
-                                    "chance": 1
-                                },
-                                {
-                                    "id": "adventuring:nature_essence",
-                                    "minQty": 5,
-                                    "maxQty": 8,
-                                    "type": "materials",
-                                    "chance": 1
-                                },
-                                {
-                                    "id": "adventuring:spirit_sap",
-                                    "minQty": 4,
-                                    "maxQty": 7,
-                                    "type": "materials",
-                                    "chance": 1
-                                },
-                                {
-                                    "type": "equipment_pool",
-                                    "pool": "adventuring:tier4_ancient_forest",
-                                    "chance": 0.15
-                                }
-                            ]
-                        }
-                    ],
-                    "generators": [
-                        {
-                            "id": "nature_bolt",
-                            "name": "Nature Bolt",
-                            "requirements": [],
-                            "isEnemy": true,
-                            "energy": 25,
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "damage_type": "magic",
-                                            "amount": 12,
-                                            "scaling": 1
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "root_slam",
-                            "name": "Root Slam",
-                            "requirements": [],
-                            "isEnemy": true,
-                            "energy": 30,
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "damage_type": "strength",
-                                            "amount": 18,
-                                            "scaling": 0.4
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "feral_bite",
-                            "name": "Feral Bite",
-                            "requirements": [],
-                            "isEnemy": true,
-                            "energy": 25,
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "damage_type": "strength",
-                                            "amount": 14,
-                                            "scaling": 0.35
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "natures_arrow",
-                            "name": "Nature's Arrow",
-                            "requirements": [],
-                            "isEnemy": true,
-                            "energy": 25,
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "damage_type": "ranged",
-                                            "amount": 15,
-                                            "scaling": 1
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "maul",
-                            "name": "Maul",
-                            "requirements": [],
-                            "isEnemy": true,
-                            "energy": 30,
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "damage_type": "strength",
-                                            "amount": 20,
-                                            "scaling": 0.45
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "forest_vengeance",
-                            "name": "Forest Vengeance",
-                            "requirements": [],
-                            "isEnemy": true,
-                            "energy": 30,
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "damage_type": "magic",
-                                            "amount": 16,
-                                            "scaling": 0.4
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ],
-                    "spenders": [
-                        {
-                            "id": "healing_wind",
-                            "name": "Healing Wind",
-                            "requirements": [],
-                            "isEnemy": true,
-                            "cost": 50,
-                            "hits": [
-                                {
-                                    "target": "self",
-                                    "effects": [
-                                        {
-                                            "type": "heal_flat",
-                                            "amount": 20,
-                                            "scaling": 0.35
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "grasping_roots",
-                            "name": "Grasping Roots",
-                            "requirements": [],
-                            "isEnemy": true,
-                            "cost": 60,
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "damage_type": "strength",
-                                            "amount": 15,
-                                            "scaling": 1
-                                        },
-                                        {
-                                            "type": "debuff",
-                                            "id": "adventuring:slow",
-                                            "stacks": 3
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "sylvan_rejuvenation",
-                            "name": "Sylvan Rejuvenation",
-                            "requirements": [],
-                            "isEnemy": true,
-                            "cost": 70,
-                            "hits": [
-                                {
-                                    "target": "all",
-                                    "party": "ally",
-                                    "effects": [
-                                        {
-                                            "type": "heal_flat",
-                                            "amount": 15,
-                                            "scaling": 0.35
-                                        },
-                                        {
-                                            "type": "buff",
-                                            "id": "adventuring:regen",
-                                            "stacks": 2
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "pack_howl",
-                            "name": "Pack Howl",
-                            "requirements": [],
-                            "isEnemy": true,
-                            "cost": 55,
-                            "hits": [
-                                {
-                                    "target": "all",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "debuff",
-                                            "id": "adventuring:fear",
-                                            "stacks": 2
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "entangling_shot",
-                            "name": "Entangling Shot",
-                            "requirements": [],
-                            "isEnemy": true,
-                            "cost": 60,
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "damage_type": "ranged",
-                                            "amount": 18,
-                                            "scaling": 0.35
-                                        },
-                                        {
-                                            "type": "debuff",
-                                            "id": "adventuring:slow",
-                                            "stacks": 2
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "primal_roar",
-                            "name": "Primal Roar",
-                            "requirements": [],
-                            "isEnemy": true,
-                            "cost": 65,
-                            "hits": [
-                                {
-                                    "target": "all",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "damage_type": "strength",
-                                            "amount": 12,
-                                            "scaling": 0.35
-                                        },
-                                        {
-                                            "type": "debuff",
-                                            "id": "adventuring:weaken",
-                                            "stacks": 2
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "forest_wrath",
-                            "name": "Forest Wrath",
-                            "requirements": [],
-                            "isEnemy": true,
-                            "cost": 75,
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "damage_type": "strength",
-                                            "amount": 28,
-                                            "scaling": 0.45
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "primal_restoration",
-                            "name": "Primal Restoration",
-                            "requirements": [],
-                            "isEnemy": true,
-                            "cost": 80,
-                            "hits": [
-                                {
-                                    "target": "all",
-                                    "party": "ally",
-                                    "effects": [
-                                        {
-                                            "type": "heal_flat",
-                                            "amount": 25,
-                                            "scaling": 0.4
-                                        },
-                                        {
-                                            "type": "buff",
-                                            "id": "adventuring:might",
-                                            "stacks": 3
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "forest_awakening",
-                            "name": "Forest Awakening",
-                            "requirements": [],
-                            "isEnemy": true,
-                            "cost": 100,
-                            "hits": [
-                                {
-                                    "target": "all",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "damage_type": "magic",
-                                            "amount": 35,
-                                            "scaling": 0.45
-                                        },
-                                        {
-                                            "type": "debuff",
-                                            "id": "adventuring:slow",
-                                            "stacks": 4
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ],
-                    "materials": [
-                        {
-                            "id": "ancient_bark",
-                            "name": "Ancient Bark",
-                            "media": "melvor:assets/media/bank/logs_red_oak.png",
-                            "category": "adventuring:monster_drops"
-                        },
-                        {
-                            "id": "nature_essence",
-                            "name": "Nature Essence",
-                            "media": "melvor:assets/media/bank/rune_nature.png",
-                            "category": "adventuring:monster_drops"
-                        },
-                        {
-                            "id": "spirit_sap",
-                            "name": "Spirit Sap",
-                            "media": "melvor:assets/media/bank/potion_crafting_ii.png",
-                            "category": "adventuring:monster_drops"
-                        },
-                        {
-                            "id": "wolf_fang",
-                            "name": "Dire Wolf Fang",
-                            "media": "melvor:assets/media/bank/dragon_claw_fragment.png#shade=gray",
-                            "category": "adventuring:monster_drops"
-                        },
-                        {
-                            "id": "forest_heart",
-                            "name": "Heart of the Forest",
-                            "media": "melvor:assets/media/bank/mastery_token_woodcutting.png#shade=green",
-                            "category": "adventuring:boss_drops"
-                        }
-                    ]
-                }
-            }
-        ]
-    }
+	"$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+	"namespace": "adventuring",
+	"data": {
+		"skillData": [
+			{
+				"skillID": "adventuring:Adventuring",
+				"data": {
+					"passives": [
+						{
+							"id": "ancient_spirits",
+							"name": "Ancient Spirits",
+							"effects": [
+								{
+									"trigger": "encounter_start",
+									"type": "buff",
+									"id": "adventuring:focus",
+									"target": "self",
+									"stacks": 3
+								},
+								{
+									"trigger": "ability",
+									"type": "heal_flat",
+									"target": "self",
+									"amount": 5,
+									"scaling": 0.5
+								}
+							]
+						},
+						{
+							"id": "forest_guardian",
+							"name": "Forest Guardian",
+							"effects": [
+								{
+									"trigger": "encounter_start",
+									"type": "buff",
+									"id": "adventuring:barrier",
+									"target": "self",
+									"stacks": 4
+								},
+								{
+									"trigger": "encounter_start",
+									"type": "buff",
+									"id": "adventuring:fortify",
+									"target": "self",
+									"stacks": 2
+								}
+							]
+						},
+						{
+							"id": "natures_retribution",
+							"name": "Nature's Retribution",
+							"effects": [
+								{
+									"trigger": "kill",
+									"type": "buff",
+									"id": "adventuring:might",
+									"target": "self",
+									"stacks": 5
+								},
+								{
+									"trigger": "kill",
+									"type": "heal_flat",
+									"target": "self",
+									"amount": 15,
+									"scaling": 0.45
+								}
+							]
+						}
+					],
+					"areas": [
+						{
+							"id": "ancient_forest",
+							"name": "Ancient Forest",
+							"media": "melvor:assets/media/skills/woodcutting/woodcutting.png#shade=darkgreen",
+							"requirements": [
+								{
+									"type": "area_cleared",
+									"area": "adventuring:vampire_crypt"
+								}
+							],
+							"width": 14,
+							"height": 8,
+							"floors": [
+								{
+									"monsters": [
+										{
+											"id": "adventuring:forest_sprite",
+											"weight": 50
+										},
+										{
+											"id": "adventuring:ancient_treant",
+											"weight": 30
+										},
+										{
+											"id": "adventuring:wild_druid",
+											"weight": 20
+										}
+									],
+									"exit": [
+										"adventuring:forest_sprite",
+										"adventuring:ancient_treant",
+										"adventuring:wild_druid"
+									]
+								},
+								{
+									"monsters": [
+										{
+											"id": "adventuring:ancient_treant",
+											"weight": 35
+										},
+										{
+											"id": "adventuring:wild_druid",
+											"weight": 35
+										},
+										{
+											"id": "adventuring:dire_wolf",
+											"weight": 30
+										}
+									],
+									"exit": [
+										"adventuring:ancient_treant",
+										"adventuring:wild_druid",
+										"adventuring:dire_wolf"
+									]
+								},
+								{
+									"monsters": [
+										{
+											"id": "adventuring:wild_druid",
+											"weight": 25
+										},
+										{
+											"id": "adventuring:dire_wolf",
+											"weight": 30
+										},
+										{
+											"id": "adventuring:forest_warden",
+											"weight": 25
+										},
+										{
+											"id": "adventuring:ancient_bear",
+											"weight": 20
+										}
+									],
+									"exit": [
+										"adventuring:dire_wolf",
+										"adventuring:forest_warden",
+										"adventuring:ancient_bear"
+									]
+								},
+								{
+									"monsters": [
+										{
+											"id": "adventuring:forest_warden",
+											"weight": 30
+										},
+										{
+											"id": "adventuring:ancient_bear",
+											"weight": 35
+										},
+										{
+											"id": "adventuring:elder_treant",
+											"weight": 35
+										}
+									],
+									"exit": [
+										"adventuring:forest_warden",
+										"adventuring:ancient_bear",
+										"adventuring:elder_treant"
+									]
+								},
+								{
+									"monsters": [
+										{
+											"id": "adventuring:elder_treant",
+											"weight": 35
+										},
+										{
+											"id": "adventuring:ancient_bear",
+											"weight": 30
+										},
+										{
+											"id": "adventuring:archdruid",
+											"weight": 35
+										}
+									],
+									"exit": [
+										"adventuring:elder_treant",
+										"adventuring:archdruid",
+										"adventuring:the_forest_heart"
+									]
+								}
+							],
+							"tier": 6
+						}
+					],
+					"monsters": [
+						{
+							"id": "forest_sprite",
+							"name": "Forest Sprite",
+							"media": "melvor:assets/media/monsters/fairy.png",
+							"tags": [
+								"nature",
+								"mage"
+							],
+							"xp": 22,
+							"stats": [
+								{
+									"id": "adventuring:hitpoints",
+									"amount": 43
+								},
+								{
+									"id": "adventuring:defence",
+									"amount": 85
+								},
+								{
+									"id": "adventuring:agility",
+									"amount": 68
+								},
+								{
+									"id": "adventuring:strength",
+									"amount": 43
+								},
+								{
+									"id": "adventuring:magic",
+									"amount": 568
+								},
+								{
+									"id": "adventuring:ranged",
+									"amount": 43
+								},
+								{
+									"id": "adventuring:prayer",
+									"amount": 85
+								}
+							],
+							"generator": "adventuring:nature_bolt",
+							"spender": "adventuring:healing_wind",
+							"passives": [],
+							"loot": [
+								{
+									"id": "adventuring:nature_essence",
+									"minQty": 2,
+									"maxQty": 4,
+									"type": "materials",
+									"chance": 0.6
+								},
+								{
+									"id": "adventuring:spirit_sap",
+									"minQty": 1,
+									"maxQty": 2,
+									"type": "materials",
+									"chance": 0.3
+								},
+								{
+									"id": "adventuring:currency",
+									"minQty": 80,
+									"maxQty": 150,
+									"type": "currency"
+								},
+								{
+									"type": "equipment_pool",
+									"pool": "adventuring:tier4_ancient_forest",
+									"chance": 0.03
+								}
+							]
+						},
+						{
+							"id": "ancient_treant",
+							"name": "Ancient Treant",
+							"media": "melvor:assets/media/monsters/tree_spirit.png",
+							"tags": [
+								"nature",
+								"melee"
+							],
+							"xp": 22,
+							"stats": [
+								{
+									"id": "adventuring:hitpoints",
+									"amount": 45
+								},
+								{
+									"id": "adventuring:defence",
+									"amount": 89
+								},
+								{
+									"id": "adventuring:agility",
+									"amount": 72
+								},
+								{
+									"id": "adventuring:strength",
+									"amount": 596
+								},
+								{
+									"id": "adventuring:magic",
+									"amount": 45
+								},
+								{
+									"id": "adventuring:ranged",
+									"amount": 45
+								},
+								{
+									"id": "adventuring:prayer",
+									"amount": 89
+								}
+							],
+							"generator": "adventuring:root_slam",
+							"spender": "adventuring:grasping_roots",
+							"passives": [],
+							"loot": [
+								{
+									"id": "adventuring:ancient_bark",
+									"minQty": 2,
+									"maxQty": 5,
+									"type": "materials",
+									"chance": 0.55
+								},
+								{
+									"id": "adventuring:nature_essence",
+									"minQty": 1,
+									"maxQty": 3,
+									"type": "materials",
+									"chance": 0.35
+								},
+								{
+									"id": "adventuring:currency",
+									"minQty": 100,
+									"maxQty": 180,
+									"type": "currency"
+								},
+								{
+									"type": "equipment_pool",
+									"pool": "adventuring:tier4_ancient_forest",
+									"chance": 0.03
+								}
+							]
+						},
+						{
+							"id": "wild_druid",
+							"name": "Wild Druid",
+							"media": "melvor:assets/media/monsters/druid.png",
+							"tags": [
+								"nature",
+								"mage",
+								"humanoid"
+							],
+							"xp": 22,
+							"stats": [
+								{
+									"id": "adventuring:hitpoints",
+									"amount": 47
+								},
+								{
+									"id": "adventuring:defence",
+									"amount": 94
+								},
+								{
+									"id": "adventuring:agility",
+									"amount": 75
+								},
+								{
+									"id": "adventuring:strength",
+									"amount": 47
+								},
+								{
+									"id": "adventuring:magic",
+									"amount": 625
+								},
+								{
+									"id": "adventuring:ranged",
+									"amount": 47
+								},
+								{
+									"id": "adventuring:prayer",
+									"amount": 94
+								}
+							],
+							"generator": "adventuring:nature_bolt",
+							"spender": "adventuring:primal_restoration",
+							"passives": [],
+							"loot": [
+								{
+									"id": "adventuring:nature_essence",
+									"minQty": 2,
+									"maxQty": 4,
+									"type": "materials",
+									"chance": 0.5
+								},
+								{
+									"id": "adventuring:spirit_sap",
+									"minQty": 1,
+									"maxQty": 3,
+									"type": "materials",
+									"chance": 0.35
+								},
+								{
+									"id": "adventuring:currency",
+									"minQty": 120,
+									"maxQty": 200,
+									"type": "currency"
+								},
+								{
+									"type": "equipment_pool",
+									"pool": "adventuring:tier4_ancient_forest",
+									"chance": 0.03
+								}
+							]
+						},
+						{
+							"id": "dire_wolf",
+							"name": "Dire Wolf",
+							"media": "melvor:assets/media/monsters/undead_wolf.png#shade=black",
+							"tags": [
+								"beast",
+								"melee"
+							],
+							"xp": 22,
+							"stats": [
+								{
+									"id": "adventuring:hitpoints",
+									"amount": 49
+								},
+								{
+									"id": "adventuring:defence",
+									"amount": 98
+								},
+								{
+									"id": "adventuring:agility",
+									"amount": 78
+								},
+								{
+									"id": "adventuring:strength",
+									"amount": 654
+								},
+								{
+									"id": "adventuring:magic",
+									"amount": 49
+								},
+								{
+									"id": "adventuring:ranged",
+									"amount": 49
+								},
+								{
+									"id": "adventuring:prayer",
+									"amount": 98
+								}
+							],
+							"generator": "adventuring:feral_bite",
+							"spender": "adventuring:pack_howl",
+							"passives": [],
+							"loot": [
+								{
+									"id": "adventuring:wolf_fang",
+									"minQty": 1,
+									"maxQty": 3,
+									"type": "materials",
+									"chance": 0.55
+								},
+								{
+									"id": "adventuring:ancient_bark",
+									"minQty": 1,
+									"maxQty": 2,
+									"type": "materials",
+									"chance": 0.3
+								},
+								{
+									"id": "adventuring:currency",
+									"minQty": 100,
+									"maxQty": 170,
+									"type": "currency"
+								},
+								{
+									"type": "equipment_pool",
+									"pool": "adventuring:tier4_ancient_forest",
+									"chance": 0.03
+								}
+							]
+						},
+						{
+							"id": "forest_warden",
+							"name": "Forest Warden",
+							"media": "melvor:assets/media/monsters/holy_archer.png#shade=green",
+							"tags": [
+								"nature",
+								"ranged",
+								"humanoid"
+							],
+							"xp": 22,
+							"stats": [
+								{
+									"id": "adventuring:hitpoints",
+									"amount": 51
+								},
+								{
+									"id": "adventuring:defence",
+									"amount": 102
+								},
+								{
+									"id": "adventuring:agility",
+									"amount": 82
+								},
+								{
+									"id": "adventuring:strength",
+									"amount": 51
+								},
+								{
+									"id": "adventuring:magic",
+									"amount": 51
+								},
+								{
+									"id": "adventuring:ranged",
+									"amount": 682
+								},
+								{
+									"id": "adventuring:prayer",
+									"amount": 102
+								}
+							],
+							"generator": "adventuring:natures_arrow",
+							"spender": "adventuring:entangling_shot",
+							"passives": [],
+							"loot": [
+								{
+									"id": "adventuring:nature_essence",
+									"minQty": 2,
+									"maxQty": 4,
+									"type": "materials",
+									"chance": 0.45
+								},
+								{
+									"id": "adventuring:spirit_sap",
+									"minQty": 2,
+									"maxQty": 4,
+									"type": "materials",
+									"chance": 0.35
+								},
+								{
+									"id": "adventuring:currency",
+									"minQty": 140,
+									"maxQty": 220,
+									"type": "currency"
+								},
+								{
+									"type": "equipment_pool",
+									"pool": "adventuring:tier4_ancient_forest",
+									"chance": 0.03
+								}
+							]
+						},
+						{
+							"id": "ancient_bear",
+							"name": "Ancient Bear",
+							"media": "melvor:assets/media/monsters/undead_wolf.png#shade=brown",
+							"tags": [
+								"beast",
+								"melee"
+							],
+							"xp": 22,
+							"stats": [
+								{
+									"id": "adventuring:hitpoints",
+									"amount": 53
+								},
+								{
+									"id": "adventuring:defence",
+									"amount": 107
+								},
+								{
+									"id": "adventuring:agility",
+									"amount": 85
+								},
+								{
+									"id": "adventuring:strength",
+									"amount": 711
+								},
+								{
+									"id": "adventuring:magic",
+									"amount": 54
+								},
+								{
+									"id": "adventuring:ranged",
+									"amount": 54
+								},
+								{
+									"id": "adventuring:prayer",
+									"amount": 107
+								}
+							],
+							"generator": "adventuring:maul",
+							"spender": "adventuring:primal_roar",
+							"passives": [],
+							"loot": [
+								{
+									"id": "adventuring:wolf_fang",
+									"minQty": 2,
+									"maxQty": 4,
+									"type": "materials",
+									"chance": 0.4
+								},
+								{
+									"id": "adventuring:ancient_bark",
+									"minQty": 2,
+									"maxQty": 4,
+									"type": "materials",
+									"chance": 0.4
+								},
+								{
+									"id": "adventuring:currency",
+									"minQty": 150,
+									"maxQty": 250,
+									"type": "currency"
+								},
+								{
+									"type": "equipment_pool",
+									"pool": "adventuring:tier4_ancient_forest",
+									"chance": 0.03
+								}
+							]
+						},
+						{
+							"id": "elder_treant",
+							"name": "Elder Treant",
+							"media": "melvor:assets/media/monsters/tree_spirit.png",
+							"tags": [
+								"nature",
+								"melee"
+							],
+							"xp": 22,
+							"stats": [
+								{
+									"id": "adventuring:hitpoints",
+									"amount": 55
+								},
+								{
+									"id": "adventuring:defence",
+									"amount": 111
+								},
+								{
+									"id": "adventuring:agility",
+									"amount": 89
+								},
+								{
+									"id": "adventuring:strength",
+									"amount": 740
+								},
+								{
+									"id": "adventuring:magic",
+									"amount": 56
+								},
+								{
+									"id": "adventuring:ranged",
+									"amount": 56
+								},
+								{
+									"id": "adventuring:prayer",
+									"amount": 111
+								}
+							],
+							"generator": "adventuring:root_slam",
+							"spender": "adventuring:forest_wrath",
+							"passives": [],
+							"loot": [
+								{
+									"id": "adventuring:ancient_bark",
+									"minQty": 3,
+									"maxQty": 6,
+									"type": "materials",
+									"chance": 0.5
+								},
+								{
+									"id": "adventuring:nature_essence",
+									"minQty": 2,
+									"maxQty": 4,
+									"type": "materials",
+									"chance": 0.35
+								},
+								{
+									"id": "adventuring:currency",
+									"minQty": 180,
+									"maxQty": 280,
+									"type": "currency"
+								},
+								{
+									"type": "equipment_pool",
+									"pool": "adventuring:tier4_ancient_forest",
+									"chance": 0.15
+								}
+							]
+						},
+						{
+							"id": "archdruid",
+							"name": "Archdruid",
+							"media": "melvor:assets/media/monsters/druid.png",
+							"tags": [
+								"nature",
+								"mage",
+								"humanoid"
+							],
+							"xp": 22,
+							"stats": [
+								{
+									"id": "adventuring:hitpoints",
+									"amount": 58
+								},
+								{
+									"id": "adventuring:defence",
+									"amount": 115
+								},
+								{
+									"id": "adventuring:agility",
+									"amount": 92
+								},
+								{
+									"id": "adventuring:strength",
+									"amount": 58
+								},
+								{
+									"id": "adventuring:magic",
+									"amount": 768
+								},
+								{
+									"id": "adventuring:ranged",
+									"amount": 58
+								},
+								{
+									"id": "adventuring:prayer",
+									"amount": 115
+								}
+							],
+							"generator": "adventuring:forest_vengeance",
+							"spender": "adventuring:sylvan_rejuvenation",
+							"passives": [],
+							"loot": [
+								{
+									"id": "adventuring:spirit_sap",
+									"minQty": 3,
+									"maxQty": 5,
+									"type": "materials",
+									"chance": 0.45
+								},
+								{
+									"id": "adventuring:nature_essence",
+									"minQty": 3,
+									"maxQty": 5,
+									"type": "materials",
+									"chance": 0.4
+								},
+								{
+									"id": "adventuring:currency",
+									"minQty": 200,
+									"maxQty": 300,
+									"type": "currency"
+								},
+								{
+									"type": "equipment_pool",
+									"pool": "adventuring:tier4_ancient_forest",
+									"chance": 0.03
+								}
+							]
+						},
+						{
+							"id": "the_forest_heart",
+							"name": "The Forest Heart",
+							"media": "melvor:assets/media/monsters/tree_spirit.png",
+							"tags": [
+								"nature",
+								"boss"
+							],
+							"isBoss": true,
+							"xp": 66,
+							"stats": [
+								{
+									"id": "adventuring:hitpoints",
+									"amount": 237
+								},
+								{
+									"id": "adventuring:defence",
+									"amount": 153
+								},
+								{
+									"id": "adventuring:agility",
+									"amount": 123
+								},
+								{
+									"id": "adventuring:strength",
+									"amount": 1021
+								},
+								{
+									"id": "adventuring:magic",
+									"amount": 77
+								},
+								{
+									"id": "adventuring:ranged",
+									"amount": 77
+								},
+								{
+									"id": "adventuring:prayer",
+									"amount": 153
+								}
+							],
+							"generator": "adventuring:forest_vengeance",
+							"spender": "adventuring:forest_awakening",
+							"passives": [
+								"adventuring:forest_guardian",
+								"adventuring:natures_retribution"
+							],
+							"loot": [
+								{
+									"type": "salvage",
+									"id": "adventuring:superior_salvage",
+									"qty": 2
+								},
+								{
+									"id": "adventuring:forest_heart",
+									"minQty": 1,
+									"maxQty": 2,
+									"type": "materials",
+									"chance": 1
+								},
+								{
+									"id": "adventuring:ancient_bark",
+									"minQty": 5,
+									"maxQty": 10,
+									"type": "materials",
+									"chance": 1
+								},
+								{
+									"id": "adventuring:nature_essence",
+									"minQty": 5,
+									"maxQty": 8,
+									"type": "materials",
+									"chance": 1
+								},
+								{
+									"id": "adventuring:spirit_sap",
+									"minQty": 4,
+									"maxQty": 7,
+									"type": "materials",
+									"chance": 1
+								},
+								{
+									"type": "equipment_pool",
+									"pool": "adventuring:tier4_ancient_forest",
+									"chance": 0.15
+								}
+							]
+						}
+					],
+					"generators": [
+						{
+							"id": "nature_bolt",
+							"name": "Nature Bolt",
+							"requirements": [],
+							"isEnemy": true,
+							"energy": 25,
+							"hits": [
+								{
+									"target": "front",
+									"party": "enemy",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"amount": 6,
+											"scaling": 1
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "root_slam",
+							"name": "Root Slam",
+							"requirements": [],
+							"isEnemy": true,
+							"energy": 30,
+							"hits": [
+								{
+									"target": "front",
+									"party": "enemy",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"amount": 9,
+											"scaling": 0.4
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "feral_bite",
+							"name": "Feral Bite",
+							"requirements": [],
+							"isEnemy": true,
+							"energy": 25,
+							"hits": [
+								{
+									"target": "front",
+									"party": "enemy",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"amount": 7,
+											"scaling": 0.35
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "natures_arrow",
+							"name": "Nature's Arrow",
+							"requirements": [],
+							"isEnemy": true,
+							"energy": 25,
+							"hits": [
+								{
+									"target": "front",
+									"party": "enemy",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"amount": 8,
+											"scaling": 1
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "maul",
+							"name": "Maul",
+							"requirements": [],
+							"isEnemy": true,
+							"energy": 30,
+							"hits": [
+								{
+									"target": "front",
+									"party": "enemy",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"amount": 10,
+											"scaling": 0.45
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "forest_vengeance",
+							"name": "Forest Vengeance",
+							"requirements": [],
+							"isEnemy": true,
+							"energy": 30,
+							"hits": [
+								{
+									"target": "front",
+									"party": "enemy",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"amount": 8,
+											"scaling": 0.4
+										}
+									]
+								}
+							]
+						}
+					],
+					"spenders": [
+						{
+							"id": "healing_wind",
+							"name": "Healing Wind",
+							"requirements": [],
+							"isEnemy": true,
+							"cost": 50,
+							"hits": [
+								{
+									"target": "self",
+									"effects": [
+										{
+											"type": "heal_flat",
+											"amount": 20,
+											"scaling": 0.35
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "grasping_roots",
+							"name": "Grasping Roots",
+							"requirements": [],
+							"isEnemy": true,
+							"cost": 60,
+							"hits": [
+								{
+									"target": "front",
+									"party": "enemy",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"amount": 8,
+											"scaling": 1
+										},
+										{
+											"type": "debuff",
+											"id": "adventuring:slow",
+											"stacks": 3
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "sylvan_rejuvenation",
+							"name": "Sylvan Rejuvenation",
+							"requirements": [],
+							"isEnemy": true,
+							"cost": 70,
+							"hits": [
+								{
+									"target": "all",
+									"party": "ally",
+									"effects": [
+										{
+											"type": "heal_flat",
+											"amount": 15,
+											"scaling": 0.35
+										},
+										{
+											"type": "buff",
+											"id": "adventuring:regen",
+											"stacks": 2
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "pack_howl",
+							"name": "Pack Howl",
+							"requirements": [],
+							"isEnemy": true,
+							"cost": 55,
+							"hits": [
+								{
+									"target": "all",
+									"party": "enemy",
+									"effects": [
+										{
+											"type": "debuff",
+											"id": "adventuring:fear",
+											"stacks": 2
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "entangling_shot",
+							"name": "Entangling Shot",
+							"requirements": [],
+							"isEnemy": true,
+							"cost": 60,
+							"hits": [
+								{
+									"target": "front",
+									"party": "enemy",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"amount": 9,
+											"scaling": 0.35
+										},
+										{
+											"type": "debuff",
+											"id": "adventuring:slow",
+											"stacks": 2
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "primal_roar",
+							"name": "Primal Roar",
+							"requirements": [],
+							"isEnemy": true,
+							"cost": 65,
+							"hits": [
+								{
+									"target": "all",
+									"party": "enemy",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"amount": 6,
+											"scaling": 0.35
+										},
+										{
+											"type": "debuff",
+											"id": "adventuring:weaken",
+											"stacks": 2
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "forest_wrath",
+							"name": "Forest Wrath",
+							"requirements": [],
+							"isEnemy": true,
+							"cost": 75,
+							"hits": [
+								{
+									"target": "front",
+									"party": "enemy",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"amount": 14,
+											"scaling": 0.45
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "primal_restoration",
+							"name": "Primal Restoration",
+							"requirements": [],
+							"isEnemy": true,
+							"cost": 80,
+							"hits": [
+								{
+									"target": "all",
+									"party": "ally",
+									"effects": [
+										{
+											"type": "heal_flat",
+											"amount": 25,
+											"scaling": 0.4
+										},
+										{
+											"type": "buff",
+											"id": "adventuring:might",
+											"stacks": 3
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "forest_awakening",
+							"name": "Forest Awakening",
+							"requirements": [],
+							"isEnemy": true,
+							"cost": 100,
+							"hits": [
+								{
+									"target": "all",
+									"party": "enemy",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"amount": 18,
+											"scaling": 0.45
+										},
+										{
+											"type": "debuff",
+											"id": "adventuring:slow",
+											"stacks": 4
+										}
+									]
+								}
+							]
+						}
+					],
+					"materials": [
+						{
+							"id": "ancient_bark",
+							"name": "Ancient Bark",
+							"media": "melvor:assets/media/bank/logs_red_oak.png",
+							"category": "adventuring:monster_drops"
+						},
+						{
+							"id": "nature_essence",
+							"name": "Nature Essence",
+							"media": "melvor:assets/media/bank/rune_nature.png",
+							"category": "adventuring:monster_drops"
+						},
+						{
+							"id": "spirit_sap",
+							"name": "Spirit Sap",
+							"media": "melvor:assets/media/bank/potion_crafting_ii.png",
+							"category": "adventuring:monster_drops"
+						},
+						{
+							"id": "wolf_fang",
+							"name": "Dire Wolf Fang",
+							"media": "melvor:assets/media/bank/dragon_claw_fragment.png#shade=gray",
+							"category": "adventuring:monster_drops"
+						},
+						{
+							"id": "forest_heart",
+							"name": "Heart of the Forest",
+							"media": "melvor:assets/media/bank/mastery_token_woodcutting.png#shade=green",
+							"category": "adventuring:boss_drops"
+						}
+					]
+				}
+			}
+		]
+	}
 }

@@ -1,279 +1,663 @@
 {
-    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
-    "namespace": "adventuring",
-    "data": {
-        "skillData": [
-            {
-                "skillID": "adventuring:Adventuring",
-                "data": {
-                    "baseItems": [
-                        {
-                            "id": "berserker_amulet",
-                            "name": "Berserker's Fury Amulet",
-                            "media": "melvor:assets/media/bank/amulet_of_strength.png#shade=red",
-                            "type": "adventuring:amulet",
-                            "isArtifact": true,"itemCategory": "adventuring:artifacts",
-                            "requirements": [
-                                { "type": "job_level", "job": "adventuring:fighter", "level": 75 },
-                                { "type": "job_level", "job": "adventuring:berserker", "level": 75 },
-                                { "type": "job_level", "job": "adventuring:warlord", "level": 75 }
-                            ],
-                            "tiers": [
-                                {
-                                    "name": "Berserker's Fury Amulet",
-                                    "base": [
-                                        { "id": "adventuring:hitpoints", "amount": 25 },
-                                        { "id": "adventuring:strength", "amount": 35 },
-                                        { "id": "adventuring:agility", "amount": 15 }
-                                    ],
-                                    "scaling": [
-                                        { "id": "adventuring:hitpoints", "amount": 2 },
-                                        { "id": "adventuring:strength", "amount": 3 },
-                                        { "id": "adventuring:agility", "amount": 1.2 }
-                                    ],
-                                    "materials": [
-                                        { "id": "adventuring:currency", "qty": 15000 },
-                                        { "id": "adventuring:pristine_salvage", "qty": 25 }
-                                    ]
-                                },
-                                {
-                                    "name": "Empowered Fury Amulet",
-                                    "base": [
-                                        { "id": "adventuring:hitpoints", "amount": 45 },
-                                        { "id": "adventuring:strength", "amount": 60 },
-                                        { "id": "adventuring:agility", "amount": 25 }
-                                    ],
-                                    "scaling": [
-                                        { "id": "adventuring:hitpoints", "amount": 3.8 },
-                                        { "id": "adventuring:strength", "amount": 5 },
-                                        { "id": "adventuring:agility", "amount": 2.1 }
-                                    ],
-                                    "effects": [
-                                        {
-                                            "trigger": "encounter_start",
-                                            "type": "buff",
-                                            "id": "adventuring:berserk",
-                                            "target": "self",
-                                            "stacks": 1
-                                        }
-                                    ],
-                                    "materials": [
-                                        { "id": "adventuring:currency", "qty": 50000 },
-                                        { "id": "adventuring:mythic_salvage", "qty": 20 }
-                                    ]
-                                },
-                                {
-                                    "name": "Ascended Fury Amulet",
-                                    "base": [
-                                        { "id": "adventuring:hitpoints", "amount": 75 },
-                                        { "id": "adventuring:strength", "amount": 100 },
-                                        { "id": "adventuring:agility", "amount": 40 }
-                                    ],
-                                    "scaling": [
-                                        { "id": "adventuring:hitpoints", "amount": 6.2 },
-                                        { "id": "adventuring:strength", "amount": 8.5 },
-                                        { "id": "adventuring:agility", "amount": 3.4 }
-                                    ],
-                                    "effects": [
-                                        {
-                                            "trigger": "encounter_start",
-                                            "type": "buff",
-                                            "id": "adventuring:berserk",
-                                            "target": "self",
-                                            "stacks": 2
-                                        },
-                                        {
-                                            "trigger": "after_damage_delivered",
-                                            "type": "buff",
-                                            "id": "adventuring:bloodlust",
-                                            "target": "self",
-                                            "stacks": 1,
-                                            "chance": 20
-                                        }
-                                    ],
-                                    "materials": [
-                                        { "id": "adventuring:currency", "qty": 150000 },
-                                        { "id": "adventuring:mythic_salvage", "qty": 50 },
-                                        { "id": "adventuring:chaos_core", "qty": 1 }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "berserker_ring",
-                            "name": "Bloodrage Ring",
-                            "media": "melvor:assets/media/bank/ring_of_power.png#shade=red",
-                            "type": "adventuring:ring",
-                            "isArtifact": true,"itemCategory": "adventuring:artifacts",
-                            "requirements": [
-                                { "type": "job_level", "job": "adventuring:berserker", "level": 75 },
-                                { "type": "job_level", "job": "adventuring:champion", "level": 75 }
-                            ],
-                            "tiers": [
-                                {
-                                    "name": "Bloodrage Ring",
-                                    "base": [
-                                        { "id": "adventuring:strength", "amount": 30 },
-                                        { "id": "adventuring:agility", "amount": 20 }
-                                    ],
-                                    "scaling": [
-                                        { "id": "adventuring:strength", "amount": 2.5 },
-                                        { "id": "adventuring:agility", "amount": 1.7 }
-                                    ],
-                                    "materials": [
-                                        { "id": "adventuring:currency", "qty": 15000 },
-                                        { "id": "adventuring:pristine_salvage", "qty": 25 }
-                                    ]
-                                },
-                                {
-                                    "name": "Empowered Bloodrage Ring",
-                                    "base": [
-                                        { "id": "adventuring:strength", "amount": 52 },
-                                        { "id": "adventuring:agility", "amount": 35 }
-                                    ],
-                                    "scaling": [
-                                        { "id": "adventuring:strength", "amount": 4.4 },
-                                        { "id": "adventuring:agility", "amount": 3 }
-                                    ],
-                                    "effects": [
-                                        {
-                                            "trigger": "after_damage_received",
-                                            "type": "buff",
-                                            "id": "adventuring:might",
-                                            "target": "self",
-                                            "stacks": 1
-                                        }
-                                    ],
-                                    "materials": [
-                                        { "id": "adventuring:currency", "qty": 50000 },
-                                        { "id": "adventuring:mythic_salvage", "qty": 20 }
-                                    ]
-                                },
-                                {
-                                    "name": "Ascended Bloodrage Ring",
-                                    "base": [
-                                        { "id": "adventuring:strength", "amount": 85 },
-                                        { "id": "adventuring:agility", "amount": 55 }
-                                    ],
-                                    "scaling": [
-                                        { "id": "adventuring:strength", "amount": 7.2 },
-                                        { "id": "adventuring:agility", "amount": 4.6 }
-                                    ],
-                                    "effects": [
-                                        {
-                                            "trigger": "after_damage_received",
-                                            "type": "buff",
-                                            "id": "adventuring:might",
-                                            "target": "self",
-                                            "stacks": 2
-                                        },
-                                        {
-                                            "trigger": "passive",
-                                            "type": "crit_chance",
-                                            "amount": 15
-                                        }
-                                    ],
-                                    "materials": [
-                                        { "id": "adventuring:currency", "qty": 150000 },
-                                        { "id": "adventuring:mythic_salvage", "qty": 50 },
-                                        { "id": "adventuring:chaos_core", "qty": 1 }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "berserker_cape",
-                            "name": "Warmonger's Mantle",
-                            "media": "melvor:assets/media/bank/cape_of_completion.png#shade=red",
-                            "type": "adventuring:cape",
-                            "isArtifact": true,"itemCategory": "adventuring:artifacts",
-                            "requirements": [
-                                { "type": "job_level", "job": "adventuring:fighter", "level": 75 },
-                                { "type": "job_level", "job": "adventuring:berserker", "level": 75 },
-                                { "type": "job_level", "job": "adventuring:warlord", "level": 75 },
-                                { "type": "job_level", "job": "adventuring:champion", "level": 75 }
-                            ],
-                            "tiers": [
-                                {
-                                    "name": "Warmonger's Mantle",
-                                    "base": [
-                                        { "id": "adventuring:hitpoints", "amount": 30 },
-                                        { "id": "adventuring:strength", "amount": 25 },
-                                        { "id": "adventuring:defence", "amount": 15 }
-                                    ],
-                                    "scaling": [
-                                        { "id": "adventuring:hitpoints", "amount": 2.5 },
-                                        { "id": "adventuring:strength", "amount": 2.1 },
-                                        { "id": "adventuring:defence", "amount": 1.2 }
-                                    ],
-                                    "materials": [
-                                        { "id": "adventuring:currency", "qty": 15000 },
-                                        { "id": "adventuring:pristine_salvage", "qty": 25 }
-                                    ]
-                                },
-                                {
-                                    "name": "Empowered Warmonger's Mantle",
-                                    "base": [
-                                        { "id": "adventuring:hitpoints", "amount": 52 },
-                                        { "id": "adventuring:strength", "amount": 44 },
-                                        { "id": "adventuring:defence", "amount": 26 }
-                                    ],
-                                    "scaling": [
-                                        { "id": "adventuring:hitpoints", "amount": 4.4 },
-                                        { "id": "adventuring:strength", "amount": 3.7 },
-                                        { "id": "adventuring:defence", "amount": 2.2 }
-                                    ],
-                                    "effects": [
-                                        {
-                                            "trigger": "kill",
-                                            "type": "buff",
-                                            "id": "adventuring:haste",
-                                            "target": "self",
-                                            "stacks": 1
-                                        }
-                                    ],
-                                    "materials": [
-                                        { "id": "adventuring:currency", "qty": 50000 },
-                                        { "id": "adventuring:mythic_salvage", "qty": 20 }
-                                    ]
-                                },
-                                {
-                                    "name": "Ascended Warmonger's Mantle",
-                                    "base": [
-                                        { "id": "adventuring:hitpoints", "amount": 85 },
-                                        { "id": "adventuring:strength", "amount": 72 },
-                                        { "id": "adventuring:defence", "amount": 42 }
-                                    ],
-                                    "scaling": [
-                                        { "id": "adventuring:hitpoints", "amount": 7.2 },
-                                        { "id": "adventuring:strength", "amount": 6 },
-                                        { "id": "adventuring:defence", "amount": 3.6 }
-                                    ],
-                                    "effects": [
-                                        {
-                                            "trigger": "kill",
-                                            "type": "buff",
-                                            "id": "adventuring:haste",
-                                            "target": "self",
-                                            "stacks": 2
-                                        },
-                                        {
-                                            "trigger": "after_damage_delivered",
-                                            "type": "lifesteal",
-                                            "amount": 8
-                                        }
-                                    ],
-                                    "materials": [
-                                        { "id": "adventuring:currency", "qty": 150000 },
-                                        { "id": "adventuring:mythic_salvage", "qty": 50 },
-                                        { "id": "adventuring:chaos_core", "qty": 1 }
-                                    ]
-                                }
-                            ]
-                        }
-                    ]
-                }
-            }
-        ]
-    }
+	"$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+	"namespace": "adventuring",
+	"data": {
+		"skillData": [
+			{
+				"skillID": "adventuring:Adventuring",
+				"data": {
+					"baseItems": [
+						{
+							"id": "berserker_amulet",
+							"name": "Berserker's Fury Amulet",
+							"media": "melvor:assets/media/bank/amulet_of_strength.png#shade=red",
+							"type": "adventuring:amulet",
+							"isArtifact": true,
+							"itemCategory": "adventuring:artifacts",
+							"requirements": [
+								{
+									"type": "job_level",
+									"job": "adventuring:fighter",
+									"level": 75
+								},
+								{
+									"type": "job_level",
+									"job": "adventuring:berserker",
+									"level": 75
+								},
+								{
+									"type": "job_level",
+									"job": "adventuring:warlord",
+									"level": 75
+								}
+							],
+							"tiers": [
+								{
+									"name": "Berserker's Fury Amulet",
+									"materials": [
+										{
+											"id": "adventuring:currency",
+											"qty": 15000
+										},
+										{
+											"id": "adventuring:pristine_salvage",
+											"qty": 25
+										}
+									],
+									"effects": [
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:hitpoints",
+											"amount": {
+												"base": 5,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:strength",
+											"amount": {
+												"base": 5,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:agility",
+											"amount": {
+												"base": 5,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										}
+									]
+								},
+								{
+									"name": "Empowered Fury Amulet",
+									"effects": [
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:hitpoints",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:strength",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:agility",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "encounter_start",
+											"type": "buff",
+											"id": "adventuring:berserk",
+											"target": "self",
+											"stacks": 1
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:currency",
+											"qty": 50000
+										},
+										{
+											"id": "adventuring:mythic_salvage",
+											"qty": 20
+										}
+									]
+								},
+								{
+									"name": "Ascended Fury Amulet",
+									"effects": [
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:hitpoints",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.25
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:strength",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.25
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:agility",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.25
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "encounter_start",
+											"type": "buff",
+											"id": "adventuring:berserk",
+											"target": "self",
+											"stacks": 2
+										},
+										{
+											"trigger": "after_damage_delivered",
+											"type": "buff",
+											"id": "adventuring:bloodlust",
+											"target": "self",
+											"stacks": 1,
+											"chance": 20
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:currency",
+											"qty": 150000
+										},
+										{
+											"id": "adventuring:mythic_salvage",
+											"qty": 50
+										},
+										{
+											"id": "adventuring:chaos_core",
+											"qty": 1
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "berserker_ring",
+							"name": "Bloodrage Ring",
+							"media": "melvor:assets/media/bank/ring_of_power.png#shade=red",
+							"type": "adventuring:ring",
+							"isArtifact": true,
+							"itemCategory": "adventuring:artifacts",
+							"requirements": [
+								{
+									"type": "job_level",
+									"job": "adventuring:berserker",
+									"level": 75
+								},
+								{
+									"type": "job_level",
+									"job": "adventuring:champion",
+									"level": 75
+								}
+							],
+							"tiers": [
+								{
+									"name": "Bloodrage Ring",
+									"materials": [
+										{
+											"id": "adventuring:currency",
+											"qty": 15000
+										},
+										{
+											"id": "adventuring:pristine_salvage",
+											"qty": 25
+										}
+									],
+									"effects": [
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:strength",
+											"amount": {
+												"base": 5,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:agility",
+											"amount": {
+												"base": 5,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										}
+									]
+								},
+								{
+									"name": "Empowered Bloodrage Ring",
+									"effects": [
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:strength",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:agility",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "after_damage_received",
+											"type": "buff",
+											"id": "adventuring:might",
+											"target": "self",
+											"stacks": 1
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:currency",
+											"qty": 50000
+										},
+										{
+											"id": "adventuring:mythic_salvage",
+											"qty": 20
+										}
+									]
+								},
+								{
+									"name": "Ascended Bloodrage Ring",
+									"effects": [
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:strength",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.25
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:agility",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.25
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "after_damage_received",
+											"type": "buff",
+											"id": "adventuring:might",
+											"target": "self",
+											"stacks": 2
+										},
+										{
+											"trigger": "passive",
+											"type": "crit_chance",
+											"amount": 15
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:currency",
+											"qty": 150000
+										},
+										{
+											"id": "adventuring:mythic_salvage",
+											"qty": 50
+										},
+										{
+											"id": "adventuring:chaos_core",
+											"qty": 1
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "berserker_cape",
+							"name": "Warmonger's Mantle",
+							"media": "melvor:assets/media/bank/cape_of_completion.png#shade=red",
+							"type": "adventuring:cape",
+							"isArtifact": true,
+							"itemCategory": "adventuring:artifacts",
+							"requirements": [
+								{
+									"type": "job_level",
+									"job": "adventuring:fighter",
+									"level": 75
+								},
+								{
+									"type": "job_level",
+									"job": "adventuring:berserker",
+									"level": 75
+								},
+								{
+									"type": "job_level",
+									"job": "adventuring:warlord",
+									"level": 75
+								},
+								{
+									"type": "job_level",
+									"job": "adventuring:champion",
+									"level": 75
+								}
+							],
+							"tiers": [
+								{
+									"name": "Warmonger's Mantle",
+									"materials": [
+										{
+											"id": "adventuring:currency",
+											"qty": 15000
+										},
+										{
+											"id": "adventuring:pristine_salvage",
+											"qty": 25
+										}
+									],
+									"effects": [
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:hitpoints",
+											"amount": {
+												"base": 5,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:strength",
+											"amount": {
+												"base": 5,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:defence",
+											"amount": {
+												"base": 5,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										}
+									]
+								},
+								{
+									"name": "Empowered Warmonger's Mantle",
+									"effects": [
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:hitpoints",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:strength",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:defence",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "kill",
+											"type": "buff",
+											"id": "adventuring:haste",
+											"target": "self",
+											"stacks": 1
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:currency",
+											"qty": 50000
+										},
+										{
+											"id": "adventuring:mythic_salvage",
+											"qty": 20
+										}
+									]
+								},
+								{
+									"name": "Ascended Warmonger's Mantle",
+									"effects": [
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:hitpoints",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.25
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:strength",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.25
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:defence",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.25
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "kill",
+											"type": "buff",
+											"id": "adventuring:haste",
+											"target": "self",
+											"stacks": 2
+										},
+										{
+											"trigger": "after_damage_delivered",
+											"type": "lifesteal",
+											"amount": 8
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:currency",
+											"qty": 150000
+										},
+										{
+											"id": "adventuring:mythic_salvage",
+											"qty": 50
+										},
+										{
+											"id": "adventuring:chaos_core",
+											"qty": 1
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
+		]
+	}
 }

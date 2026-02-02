@@ -1,7 +1,7 @@
 const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringPage } = await loadModule('src/ui/adventuring-page.mjs');
-const { AdventuringStats } = await loadModule('src/core/adventuring-stats.mjs');
+const { AdventuringStats } = await loadModule('src/core/stats/adventuring-stats.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
 const { AdventuringAbilityRowElement } = await loadModule('src/progression/components/adventuring-ability-row.mjs');
 
@@ -62,7 +62,9 @@ export class AdventuringJobDetails extends AdventuringPage {
         this.job = job;
 
         this.scaling.reset();
-        this.job.scaling.forEach((value, stat) => {
+        // Get scaling from the effect system
+        const jobScaling = this.job.getStatScaling();
+        jobScaling.forEach((value, stat) => {
             this.scaling.set(stat, value);
         });
         this.scaling.renderQueue.stats = true;
@@ -74,6 +76,7 @@ export class AdventuringJobDetails extends AdventuringPage {
         this.renderQueue.jobStats = true;
     }
 
+    // Required by base class contract - no additional registration needed
     postDataRegistration() {
 
     }

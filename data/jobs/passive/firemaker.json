@@ -1,1882 +1,1893 @@
 {
-    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
-    "namespace": "adventuring",
-    "data": {
-        "skillData": [
-            {
-                "skillID": "adventuring:Adventuring",
-                "data": {
-                    "stats": [
-                        {
-                            "id": "firemaking",
-                            "name": "Firemaking",
-                            "media": "melvor:assets/media/main/firemaking_header.png#shade=red"
-                        }
-                    ],
-                    "jobs": [
-                        {
-                            "id": "firemaker",
-                            "name": "Firemaker",
-                            "media": "melvor:assets/media/main/firemaking_header.png#shade=red",
-                            "requirements": [
-                                {
-                                    "type": "skill_level",
-                                    "level": 10
-                                }
-                            ],
-                            "isMilestoneReward": true,
-                            "isPassive": true,
-                            "scaling": [
-                                {
-                                    "id": "adventuring:firemaking",
-                                    "amount": 1
-                                }
-                            ]
-                        }
-                    ],
-                    "materials": [
-                        {
-                            "id": "crude_ash",
-                            "name": "Crude Ash",
-                            "media": "melvor:assets/media/main/firemaking_header.png#shade=red",
-                            "category": "adventuring:salvage"
-                        },
-                        {
-                            "id": "refined_ash",
-                            "name": "Refined Ash",
-                            "media": "melvor:assets/media/bank/charcoal.png#shade=orange",
-                            "tier": 2,
-                            "category": "adventuring:salvage",
-                            "requirements": [
-                                {
-                                    "type": "job_level",
-                                    "job": "adventuring:firemaker",
-                                    "level": 25
-                                }
-                            ]
-                        },
-                        {
-                            "id": "immaculate_ash",
-                            "name": "Immaculate Ash",
-                            "media": "melvor:assets/media/bank/charcoal.png#shade=yellow",
-                            "tier": 3,
-                            "category": "adventuring:salvage",
-                            "requirements": [
-                                {
-                                    "type": "job_level",
-                                    "job": "adventuring:firemaker",
-                                    "level": 50
-                                }
-                            ]
-                        },
-                        {
-                            "id": "transcendent_ash",
-                            "name": "Transcendent Ash",
-                            "media": "melvor:assets/media/bank/charcoal.png#shade=green",
-                            "tier": 4,
-                            "category": "adventuring:salvage",
-                            "requirements": [
-                                {
-                                    "type": "job_level",
-                                    "job": "adventuring:firemaker",
-                                    "level": 75
-                                }
-                            ]
-                        },
-                        {
-                            "id": "eternal_ember",
-                            "name": "Eternal Ember",
-                            "media": "melvor:assets/media/main/firemaking_header.png#shade=orange",
-                            "category": "adventuring:special"
-                        }
-                    ],
-                    "buildings": [
-                        {
-                            "id": "fire_pit",
-                            "type": "workshop",
-                            "name": "Fire Pit",
-                            "description": "Burn wood to create light and warmth. Firemakers produce charcoal and bonfires.",
-                            "media": "melvor:assets/media/skills/township/Cottage.png",
-                            "requirements": [],
-                            "idle": [
-                                "Tending flames",
-                                "Gathering kindling"
-                            ],
-                            "actions": [
-                                "adventuring:work"
-                            ],
-                            "products": [
-                                "adventuring:craft_eternal_ember",
-                                "adventuring:convert_crude_to_refined_ash",
-                                "adventuring:convert_refined_to_immaculate_ash",
-                                "adventuring:convert_immaculate_to_transcendent_ash",
-                                "adventuring:convert_transcendent_to_immaculate_ash",
-                                "adventuring:convert_immaculate_to_refined_ash",
-                                "adventuring:convert_refined_to_crude_ash",
-                                "adventuring:craft_scorching_touch",
-                                "adventuring:craft_flame_cloak",
-                                "adventuring:craft_confident_blaze",
-                                "adventuring:craft_inner_fire",
-                                "adventuring:craft_inferno_burst",
-                                "adventuring:craft_flame_ward",
-                                "adventuring:craft_cauterize",
-                                "adventuring:craft_phoenix_tear"
-                            ]
-                        }
-                    ],
-                    "products": [
-                        {
-                            "id": "craft_eternal_ember",
-                            "material": "adventuring:eternal_ember",
-                            "outputType": "material",
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "count": 2,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:firemaker",
-                                            "level": 1
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_ash",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "count": 4,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:firemaker",
-                                            "level": 25
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_ash",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "count": 6,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:firemaker",
-                                            "level": 50
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_ash",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "count": 8,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:firemaker",
-                                            "level": 75
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_ash",
-                                            "count": 3
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "convert_crude_to_refined_ash",
-                            "outputType": "conversion",
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "material": "adventuring:refined_ash",
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:firemaker",
-                                            "level": 25
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_ash",
-                                            "count": 5
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "convert_refined_to_immaculate_ash",
-                            "outputType": "conversion",
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "material": "adventuring:immaculate_ash",
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:firemaker",
-                                            "level": 50
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_ash",
-                                            "count": 5
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "convert_immaculate_to_transcendent_ash",
-                            "outputType": "conversion",
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "material": "adventuring:transcendent_ash",
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:firemaker",
-                                            "level": 75
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_ash",
-                                            "count": 5
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "convert_transcendent_to_immaculate_ash",
-                            "outputType": "conversion",
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "material": "adventuring:immaculate_ash",
-                                    "count": 3,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:firemaker",
-                                            "level": 75
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_ash",
-                                            "count": 1
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "convert_immaculate_to_refined_ash",
-                            "outputType": "conversion",
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "material": "adventuring:refined_ash",
-                                    "count": 3,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:firemaker",
-                                            "level": 50
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_ash",
-                                            "count": 1
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "convert_refined_to_crude_ash",
-                            "outputType": "conversion",
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "material": "adventuring:crude_ash",
-                                    "count": 3,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:firemaker",
-                                            "level": 25
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_ash",
-                                            "count": 1
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "craft_scorching_touch",
-                            "consumable": "adventuring:scorching_touch",
-                            "outputType": "consumable",
-                            "count": 1,
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:firemaker",
-                                            "level": 1
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_ash",
-                                            "count": 2
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:firemaker",
-                                            "level": 25
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_ash",
-                                            "count": 2
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:firemaker",
-                                            "level": 50
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_ash",
-                                            "count": 2
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:firemaker",
-                                            "level": 75
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_ash",
-                                            "count": 2
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "craft_flame_cloak",
-                            "consumable": "adventuring:flame_cloak",
-                            "outputType": "consumable",
-                            "count": 1,
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:firemaker",
-                                            "level": 1
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_ash",
-                                            "count": 2
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:firemaker",
-                                            "level": 25
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_ash",
-                                            "count": 2
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:firemaker",
-                                            "level": 50
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_ash",
-                                            "count": 2
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:firemaker",
-                                            "level": 75
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_ash",
-                                            "count": 2
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "craft_confident_blaze",
-                            "consumable": "adventuring:confident_blaze",
-                            "outputType": "consumable",
-                            "count": 1,
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:firemaker",
-                                            "level": 1
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_ash",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:firemaker",
-                                            "level": 25
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_ash",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:firemaker",
-                                            "level": 50
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_ash",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:firemaker",
-                                            "level": 75
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_ash",
-                                            "count": 3
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "craft_inner_fire",
-                            "consumable": "adventuring:inner_fire",
-                            "outputType": "consumable",
-                            "count": 1,
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:firemaker",
-                                            "level": 1
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_ash",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:firemaker",
-                                            "level": 25
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_ash",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:firemaker",
-                                            "level": 50
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_ash",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:firemaker",
-                                            "level": 75
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_ash",
-                                            "count": 3
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "craft_inferno_burst",
-                            "consumable": "adventuring:inferno_burst",
-                            "outputType": "consumable",
-                            "count": 1,
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:firemaker",
-                                            "level": 1
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_ash",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:firemaker",
-                                            "level": 25
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_ash",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:firemaker",
-                                            "level": 50
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_ash",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:firemaker",
-                                            "level": 75
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_ash",
-                                            "count": 3
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "craft_flame_ward",
-                            "consumable": "adventuring:flame_ward",
-                            "outputType": "consumable",
-                            "count": 1,
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:firemaker",
-                                            "level": 1
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_ash",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:firemaker",
-                                            "level": 25
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_ash",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:firemaker",
-                                            "level": 50
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_ash",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:firemaker",
-                                            "level": 75
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_ash",
-                                            "count": 3
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "craft_cauterize",
-                            "consumable": "adventuring:cauterize",
-                            "outputType": "consumable",
-                            "count": 1,
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:firemaker",
-                                            "level": 1
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_ash",
-                                            "count": 2
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:firemaker",
-                                            "level": 25
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_ash",
-                                            "count": 2
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:firemaker",
-                                            "level": 50
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_ash",
-                                            "count": 2
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:firemaker",
-                                            "level": 75
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_ash",
-                                            "count": 2
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "craft_phoenix_tear",
-                            "consumable": "adventuring:phoenix_tear",
-                            "outputType": "consumable",
-                            "count": 1,
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:firemaker",
-                                            "level": 1
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_ash",
-                                            "count": 5
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:firemaker",
-                                            "level": 25
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_ash",
-                                            "count": 5
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:firemaker",
-                                            "level": 50
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_ash",
-                                            "count": 5
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:firemaker",
-                                            "level": 75
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_ash",
-                                            "count": 5
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ],
-                    "tiles": [
-                        {
-                            "id": "campfire_remains",
-                            "name": "Campfire Remains",
-                            "media": "melvor:assets/media/main/firemaking_header.png#shade=red",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:firemaker",
-                                    "level": 1
-                                }
-                            ],
-                            "weight": 10,
-                            "floor_max": 1,
-                            "dungeon_max": 1,
-                            "effects": [
-                                {
-                                    "type": "xp",
-                                    "amount": 30,
-                                    "job": "adventuring:firemaker"
-                                },
-                                {
-                                    "type": "loot",
-                                    "pool": [
-                                        {
-                                            "id": "adventuring:crude_ash",
-                                            "qty": 1,
-                                            "weight": 100
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "bonfire_pit",
-                            "name": "Bonfire Pit",
-                            "media": "melvor:assets/media/main/firemaking_header.png#shade=red",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:firemaker",
-                                    "level": 25
-                                }
-                            ],
-                            "weight": 8,
-                            "floor_max": 1,
-                            "dungeon_max": 2,
-                            "effects": [
-                                {
-                                    "type": "xp",
-                                    "amount": 75,
-                                    "job": "adventuring:firemaker"
-                                },
-                                {
-                                    "type": "loot",
-                                    "pool": [
-                                        {
-                                            "id": "adventuring:crude_ash",
-                                            "qty": 2,
-                                            "weight": 60
-                                        },
-                                        {
-                                            "id": "adventuring:refined_ash",
-                                            "qty": 1,
-                                            "weight": 40
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "sacred_brazier",
-                            "name": "Sacred Brazier",
-                            "media": "melvor:assets/media/main/firemaking_header.png#shade=red",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:firemaker",
-                                    "level": 50
-                                }
-                            ],
-                            "weight": 5,
-                            "floor_max": 1,
-                            "dungeon_max": 2,
-                            "effects": [
-                                {
-                                    "type": "xp",
-                                    "amount": 150,
-                                    "job": "adventuring:firemaker"
-                                },
-                                {
-                                    "type": "loot",
-                                    "pool": [
-                                        {
-                                            "id": "adventuring:crude_ash",
-                                            "qty": 1,
-                                            "weight": 30
-                                        },
-                                        {
-                                            "id": "adventuring:refined_ash",
-                                            "qty": 1,
-                                            "weight": 45
-                                        },
-                                        {
-                                            "id": "adventuring:immaculate_ash",
-                                            "qty": 1,
-                                            "weight": 25
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "infernal_pyre",
-                            "name": "Infernal Pyre",
-                            "media": "melvor:assets/media/main/firemaking_header.png#shade=red",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:firemaker",
-                                    "level": 75
-                                }
-                            ],
-                            "weight": 3,
-                            "floor_max": 1,
-                            "dungeon_max": 2,
-                            "effects": [
-                                {
-                                    "type": "xp",
-                                    "amount": 300,
-                                    "job": "adventuring:firemaker"
-                                },
-                                {
-                                    "type": "loot",
-                                    "pool": [
-                                        {
-                                            "id": "adventuring:crude_ash",
-                                            "qty": 1,
-                                            "weight": 15
-                                        },
-                                        {
-                                            "id": "adventuring:refined_ash",
-                                            "qty": 1,
-                                            "weight": 30
-                                        },
-                                        {
-                                            "id": "adventuring:immaculate_ash",
-                                            "qty": 1,
-                                            "weight": 35
-                                        },
-                                        {
-                                            "id": "adventuring:transcendent_ash",
-                                            "qty": 1,
-                                            "weight": 20
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ],
-                    "consumableTypes": [
-                        {
-                            "id": "scorching_touch",
-                            "name": "Scorching Touch",
-                            "media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=pink",
-                            "type": "ember",
-                            "sourceJob": "adventuring:firemaker",
-                            "maxCharges": 5,
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "nameSuffix": "I",
-                                    "media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=pink",
-                                    "flavorText": "Your attacks leave lingering flames.",
-                                    "effects": [
-                                        {
-                                            "type": "debuff",
-                                            "trigger": "after_damage_delivered",
-                                            "id": "adventuring:burn",
-                                            "stacks": 3,
-                                            "target": "target"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_kindling",
-                                            "count": 2
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "nameSuffix": "II",
-                                    "media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=pink",
-                                    "flavorText": "Flames spread across your foes.",
-                                    "effects": [
-                                        {
-                                            "type": "debuff",
-                                            "trigger": "after_damage_delivered",
-                                            "id": "adventuring:burn",
-                                            "stacks": 5,
-                                            "target": "target"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_kindling",
-                                            "count": 2
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "nameSuffix": "III",
-                                    "media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=pink",
-                                    "flavorText": "Intense burns consume your enemies.",
-                                    "effects": [
-                                        {
-                                            "type": "debuff",
-                                            "trigger": "after_damage_delivered",
-                                            "id": "adventuring:burn",
-                                            "stacks": 8,
-                                            "target": "target"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_kindling",
-                                            "count": 2
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "nameSuffix": "IV",
-                                    "media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=pink",
-                                    "flavorText": "Eternal flames devour all who oppose you.",
-                                    "effects": [
-                                        {
-                                            "type": "debuff",
-                                            "trigger": "after_damage_delivered",
-                                            "id": "adventuring:burn",
-                                            "stacks": 12,
-                                            "target": "target"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_kindling",
-                                            "count": 2
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "flame_cloak",
-                            "name": "Flame Cloak",
-                            "media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=yellow",
-                            "type": "ember",
-                            "sourceJob": "adventuring:firemaker",
-                            "maxCharges": 5,
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "nameSuffix": "I",
-                                    "media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=yellow",
-                                    "flavorText": "A fiery aura burns those who strike you.",
-                                    "effects": [
-                                        {
-                                            "type": "reflect",
-                                            "trigger": "after_damage_received",
-                                            "amount": 15,
-                                            "target": "attacker"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_kindling",
-                                            "count": 2
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "nameSuffix": "II",
-                                    "media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=yellow",
-                                    "flavorText": "Blazing retribution scorches attackers.",
-                                    "effects": [
-                                        {
-                                            "type": "reflect",
-                                            "trigger": "after_damage_received",
-                                            "amount": 25,
-                                            "target": "attacker"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_kindling",
-                                            "count": 2
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "nameSuffix": "III",
-                                    "media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=yellow",
-                                    "flavorText": "Molten vengeance sears all who touch you.",
-                                    "effects": [
-                                        {
-                                            "type": "reflect",
-                                            "trigger": "after_damage_received",
-                                            "amount": 35,
-                                            "target": "attacker"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_kindling",
-                                            "count": 2
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "nameSuffix": "IV",
-                                    "media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=yellow",
-                                    "flavorText": "Wreathed in hellfire, attackers are incinerated.",
-                                    "effects": [
-                                        {
-                                            "type": "reflect",
-                                            "trigger": "after_damage_received",
-                                            "amount": 50,
-                                            "target": "attacker"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_kindling",
-                                            "count": 2
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "confident_blaze",
-                            "name": "Confident Blaze",
-                            "media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=orange",
-                            "type": "ember",
-                            "sourceJob": "adventuring:firemaker",
-                            "maxCharges": 3,
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "nameSuffix": "I",
-                                    "media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=orange",
-                                    "flavorText": "Strike with fury while at full strength.",
-                                    "effects": [
-                                        {
-                                            "type": "damage_modifier_percent",
-                                            "trigger": "before_damage_delivered",
-                                            "condition": {
-                                                "type": "hp_above",
-                                                "threshold": 80
-                                            },
-                                            "amount": 20,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_kindling",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "nameSuffix": "II",
-                                    "media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=orange",
-                                    "flavorText": "Your healthy vigor ignites powerful strikes.",
-                                    "effects": [
-                                        {
-                                            "type": "damage_modifier_percent",
-                                            "trigger": "before_damage_delivered",
-                                            "condition": {
-                                                "type": "hp_above",
-                                                "threshold": 80
-                                            },
-                                            "amount": 35,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_kindling",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "nameSuffix": "III",
-                                    "media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=orange",
-                                    "flavorText": "Peak condition unleashes devastating fire.",
-                                    "effects": [
-                                        {
-                                            "type": "damage_modifier_percent",
-                                            "trigger": "before_damage_delivered",
-                                            "condition": {
-                                                "type": "hp_above",
-                                                "threshold": 80
-                                            },
-                                            "amount": 55,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_kindling",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "nameSuffix": "IV",
-                                    "media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=orange",
-                                    "flavorText": "Untouched strength channels solar fury.",
-                                    "effects": [
-                                        {
-                                            "type": "damage_modifier_percent",
-                                            "trigger": "before_damage_delivered",
-                                            "condition": {
-                                                "type": "hp_above",
-                                                "threshold": 80
-                                            },
-                                            "amount": 80,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_kindling",
-                                            "count": 3
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "inner_fire",
-                            "name": "Inner Fire",
-                            "media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=blue",
-                            "type": "ember",
-                            "sourceJob": "adventuring:firemaker",
-                            "maxCharges": 3,
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "nameSuffix": "I",
-                                    "media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=blue",
-                                    "flavorText": "Slaying enemies empowers you with flames.",
-                                    "effects": [
-                                        {
-                                            "type": "buff",
-                                            "trigger": "kill",
-                                            "id": "adventuring:empower",
-                                            "stacks": 3,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_kindling",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "nameSuffix": "II",
-                                    "media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=blue",
-                                    "flavorText": "Slaying enemies blazes your spirit.",
-                                    "effects": [
-                                        {
-                                            "type": "buff",
-                                            "trigger": "kill",
-                                            "id": "adventuring:empower",
-                                            "stacks": 5,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_kindling",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "nameSuffix": "III",
-                                    "media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=blue",
-                                    "flavorText": "Slaying enemies surges inferno energy.",
-                                    "effects": [
-                                        {
-                                            "type": "buff",
-                                            "trigger": "kill",
-                                            "id": "adventuring:empower",
-                                            "stacks": 8,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_kindling",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "nameSuffix": "IV",
-                                    "media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=blue",
-                                    "flavorText": "Slaying enemies ignites a star's heart within.",
-                                    "effects": [
-                                        {
-                                            "type": "buff",
-                                            "trigger": "kill",
-                                            "id": "adventuring:empower",
-                                            "stacks": 12,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_kindling",
-                                            "count": 3
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "inferno_burst",
-                            "name": "Inferno Burst",
-                            "media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=cyan",
-                            "type": "ember",
-                            "sourceJob": "adventuring:firemaker",
-                            "maxCharges": 3,
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "nameSuffix": "I",
-                                    "media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=cyan",
-                                    "flavorText": "Critical hits unleash explosive flames.",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "trigger": "crit",
-                                            "amount": 12,
-                                            "target": "enemy"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_kindling",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "nameSuffix": "II",
-                                    "media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=cyan",
-                                    "flavorText": "Devastating fire erupts on critical strikes.",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "trigger": "crit",
-                                            "amount": 20,
-                                            "target": "enemy"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_kindling",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "nameSuffix": "III",
-                                    "media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=cyan",
-                                    "flavorText": "Explosive flames consume your foes.",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "trigger": "crit",
-                                            "amount": 32,
-                                            "target": "enemy"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_kindling",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "nameSuffix": "IV",
-                                    "media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=cyan",
-                                    "flavorText": "Cataclysmic explosions annihilate enemies.",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "trigger": "crit",
-                                            "amount": 50,
-                                            "target": "enemy"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_kindling",
-                                            "count": 3
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "flame_ward",
-                            "name": "Flame Ward",
-                            "media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=green",
-                            "type": "ember",
-                            "sourceJob": "adventuring:firemaker",
-                            "maxCharges": 3,
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "nameSuffix": "I",
-                                    "media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=green",
-                                    "flavorText": "Fire purifies harmful effects.",
-                                    "effects": [
-                                        {
-                                            "type": "prevent_debuff",
-                                            "trigger": "before_debuff_received",
-                                            "condition": {
-                                                "type": "chance",
-                                                "value": 25
-                                            },
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_kindling",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "nameSuffix": "II",
-                                    "media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=green",
-                                    "flavorText": "Burning aura resists afflictions.",
-                                    "effects": [
-                                        {
-                                            "type": "prevent_debuff",
-                                            "trigger": "before_debuff_received",
-                                            "condition": {
-                                                "type": "chance",
-                                                "value": 35
-                                            },
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_kindling",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "nameSuffix": "III",
-                                    "media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=green",
-                                    "flavorText": "Sacred flames burn away curses.",
-                                    "effects": [
-                                        {
-                                            "type": "prevent_debuff",
-                                            "trigger": "before_debuff_received",
-                                            "condition": {
-                                                "type": "chance",
-                                                "value": 50
-                                            },
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_kindling",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "nameSuffix": "IV",
-                                    "media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=green",
-                                    "flavorText": "Eternal flames make you immune to darkness.",
-                                    "effects": [
-                                        {
-                                            "type": "prevent_debuff",
-                                            "trigger": "before_debuff_received",
-                                            "condition": {
-                                                "type": "chance",
-                                                "value": 70
-                                            },
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_kindling",
-                                            "count": 3
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "cauterize",
-                            "name": "Cauterize",
-                            "media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=red",
-                            "type": "ember",
-                            "sourceJob": "adventuring:firemaker",
-                            "maxCharges": 5,
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "nameSuffix": "I",
-                                    "media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=red",
-                                    "flavorText": "Flames seal wounds after striking.",
-                                    "effects": [
-                                        {
-                                            "type": "heal_percent",
-                                            "trigger": "after_damage_delivered",
-                                            "amount": 3,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_kindling",
-                                            "count": 2
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "nameSuffix": "II",
-                                    "media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=red",
-                                    "flavorText": "Hot embers mend your wounds.",
-                                    "effects": [
-                                        {
-                                            "type": "heal_percent",
-                                            "trigger": "after_damage_delivered",
-                                            "amount": 5,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_kindling",
-                                            "count": 2
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "nameSuffix": "III",
-                                    "media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=red",
-                                    "flavorText": "Sacred fire restores your vitality.",
-                                    "effects": [
-                                        {
-                                            "type": "heal_percent",
-                                            "trigger": "after_damage_delivered",
-                                            "amount": 8,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_kindling",
-                                            "count": 2
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "nameSuffix": "IV",
-                                    "media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=red",
-                                    "flavorText": "Phoenix flames heal all wounds.",
-                                    "effects": [
-                                        {
-                                            "type": "heal_percent",
-                                            "trigger": "after_damage_delivered",
-                                            "amount": 12,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_kindling",
-                                            "count": 2
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "phoenix_tear",
-                            "name": "Phoenix Tear",
-                            "media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=purple",
-                            "type": "ember",
-                            "sourceJob": "adventuring:firemaker",
-                            "maxCharges": 1,
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "nameSuffix": "I",
-                                    "media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=purple",
-                                    "flavorText": "Rise from the ashes.",
-                                    "effects": [
-                                        {
-                                            "type": "prevent_death",
-                                            "trigger": "before_death",
-                                            "target": "self",
-                                            "amount": 10,
-                                            "limit": "combat"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_kindling",
-                                            "count": 5
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "nameSuffix": "II",
-                                    "media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=purple",
-                                    "flavorText": "The phoenix's blessing revives you.",
-                                    "effects": [
-                                        {
-                                            "type": "prevent_death",
-                                            "trigger": "before_death",
-                                            "target": "self",
-                                            "amount": 15,
-                                            "limit": "combat"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_kindling",
-                                            "count": 5
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "nameSuffix": "III",
-                                    "media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=purple",
-                                    "flavorText": "Reborn in cleansing flame.",
-                                    "effects": [
-                                        {
-                                            "type": "prevent_death",
-                                            "trigger": "before_death",
-                                            "target": "self",
-                                            "amount": 20,
-                                            "limit": "combat"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_kindling",
-                                            "count": 5
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "nameSuffix": "IV",
-                                    "media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=purple",
-                                    "flavorText": "Immortal flames grant eternal life.",
-                                    "effects": [
-                                        {
-                                            "type": "prevent_death",
-                                            "trigger": "before_death",
-                                            "target": "self",
-                                            "amount": 25,
-                                            "limit": "combat"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_kindling",
-                                            "count": 5
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ]
-                }
-            }
-        ]
-    }
+	"$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+	"namespace": "adventuring",
+	"data": {
+		"skillData": [
+			{
+				"skillID": "adventuring:Adventuring",
+				"data": {
+					"stats": [
+						{
+							"id": "firemaking",
+							"name": "Firemaking",
+							"media": "melvor:assets/media/main/firemaking_header.png#shade=red"
+						}
+					],
+					"jobs": [
+						{
+							"id": "firemaker",
+							"archetypes": ["town"],
+							"name": "Firemaker",
+							"media": "melvor:assets/media/main/firemaking_header.png#shade=red",
+							"requirements": [
+								{
+									"type": "skill_level",
+									"level": 10
+								}
+							],
+							"isMilestoneReward": true,
+							"isPassive": true,
+							"effects": [
+								{
+									"trigger": "passive",
+									"type": "stat_flat",
+									"stat": "adventuring:firemaking",
+									"amount": {
+										"scaling": [
+											{
+												"id": "level",
+												"amount": 0.5
+											}
+										]
+									},
+									"scaleFrom": "passiveJob"
+								}
+							]
+						}
+					],
+					"materials": [
+						{
+							"id": "crude_ash",
+							"name": "Crude Ash",
+							"media": "melvor:assets/media/main/firemaking_header.png#shade=red",
+							"category": "adventuring:salvage"
+						},
+						{
+							"id": "refined_ash",
+							"name": "Refined Ash",
+							"media": "melvor:assets/media/bank/charcoal.png#shade=orange",
+							"tier": 2,
+							"category": "adventuring:salvage",
+							"requirements": [
+								{
+									"type": "job_level",
+									"job": "adventuring:firemaker",
+									"level": 25
+								}
+							]
+						},
+						{
+							"id": "immaculate_ash",
+							"name": "Immaculate Ash",
+							"media": "melvor:assets/media/bank/charcoal.png#shade=yellow",
+							"tier": 3,
+							"category": "adventuring:salvage",
+							"requirements": [
+								{
+									"type": "job_level",
+									"job": "adventuring:firemaker",
+									"level": 50
+								}
+							]
+						},
+						{
+							"id": "transcendent_ash",
+							"name": "Transcendent Ash",
+							"media": "melvor:assets/media/bank/charcoal.png#shade=green",
+							"tier": 4,
+							"category": "adventuring:salvage",
+							"requirements": [
+								{
+									"type": "job_level",
+									"job": "adventuring:firemaker",
+									"level": 75
+								}
+							]
+						},
+						{
+							"id": "eternal_ember",
+							"name": "Eternal Ember",
+							"media": "melvor:assets/media/main/firemaking_header.png#shade=orange",
+							"category": "adventuring:special"
+						}
+					],
+					"buildings": [
+						{
+							"id": "fire_pit",
+							"type": "workshop",
+							"name": "Fire Pit",
+							"description": "Burn wood to create light and warmth. Firemakers produce charcoal and bonfires.",
+							"media": "melvor:assets/media/skills/township/Cottage.png",
+							"requirements": [],
+							"idle": [
+								"Tending flames",
+								"Gathering kindling"
+							],
+							"actions": [
+								"adventuring:work"
+							],
+							"products": [
+								"adventuring:craft_eternal_ember",
+								"adventuring:convert_crude_to_refined_ash",
+								"adventuring:convert_refined_to_immaculate_ash",
+								"adventuring:convert_immaculate_to_transcendent_ash",
+								"adventuring:convert_transcendent_to_immaculate_ash",
+								"adventuring:convert_immaculate_to_refined_ash",
+								"adventuring:convert_refined_to_crude_ash",
+								"adventuring:craft_scorching_touch",
+								"adventuring:craft_flame_cloak",
+								"adventuring:craft_confident_blaze",
+								"adventuring:craft_inner_fire",
+								"adventuring:craft_inferno_burst",
+								"adventuring:craft_flame_ward",
+								"adventuring:craft_cauterize",
+								"adventuring:craft_phoenix_tear"
+							]
+						}
+					],
+					"products": [
+						{
+							"id": "craft_eternal_ember",
+							"material": "adventuring:eternal_ember",
+							"outputType": "material",
+							"tiers": [
+								{
+									"tier": 1,
+									"count": 2,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:firemaker",
+											"level": 1
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_ash",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"count": 4,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:firemaker",
+											"level": 25
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_ash",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"count": 6,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:firemaker",
+											"level": 50
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_ash",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"count": 8,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:firemaker",
+											"level": 75
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_ash",
+											"count": 3
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "convert_crude_to_refined_ash",
+							"outputType": "conversion",
+							"tiers": [
+								{
+									"tier": 1,
+									"material": "adventuring:refined_ash",
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:firemaker",
+											"level": 25
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_ash",
+											"count": 5
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "convert_refined_to_immaculate_ash",
+							"outputType": "conversion",
+							"tiers": [
+								{
+									"tier": 1,
+									"material": "adventuring:immaculate_ash",
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:firemaker",
+											"level": 50
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_ash",
+											"count": 5
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "convert_immaculate_to_transcendent_ash",
+							"outputType": "conversion",
+							"tiers": [
+								{
+									"tier": 1,
+									"material": "adventuring:transcendent_ash",
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:firemaker",
+											"level": 75
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_ash",
+											"count": 5
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "convert_transcendent_to_immaculate_ash",
+							"outputType": "conversion",
+							"tiers": [
+								{
+									"tier": 1,
+									"material": "adventuring:immaculate_ash",
+									"count": 3,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:firemaker",
+											"level": 75
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_ash",
+											"count": 1
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "convert_immaculate_to_refined_ash",
+							"outputType": "conversion",
+							"tiers": [
+								{
+									"tier": 1,
+									"material": "adventuring:refined_ash",
+									"count": 3,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:firemaker",
+											"level": 50
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_ash",
+											"count": 1
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "convert_refined_to_crude_ash",
+							"outputType": "conversion",
+							"tiers": [
+								{
+									"tier": 1,
+									"material": "adventuring:crude_ash",
+									"count": 3,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:firemaker",
+											"level": 25
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_ash",
+											"count": 1
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "craft_scorching_touch",
+							"consumable": "adventuring:scorching_touch",
+							"outputType": "consumable",
+							"count": 1,
+							"tiers": [
+								{
+									"tier": 1,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:firemaker",
+											"level": 1
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_ash",
+											"count": 2
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:firemaker",
+											"level": 25
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_ash",
+											"count": 2
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:firemaker",
+											"level": 50
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_ash",
+											"count": 2
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:firemaker",
+											"level": 75
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_ash",
+											"count": 2
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "craft_flame_cloak",
+							"consumable": "adventuring:flame_cloak",
+							"outputType": "consumable",
+							"count": 1,
+							"tiers": [
+								{
+									"tier": 1,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:firemaker",
+											"level": 1
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_ash",
+											"count": 2
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:firemaker",
+											"level": 25
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_ash",
+											"count": 2
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:firemaker",
+											"level": 50
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_ash",
+											"count": 2
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:firemaker",
+											"level": 75
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_ash",
+											"count": 2
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "craft_confident_blaze",
+							"consumable": "adventuring:confident_blaze",
+							"outputType": "consumable",
+							"count": 1,
+							"tiers": [
+								{
+									"tier": 1,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:firemaker",
+											"level": 1
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_ash",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:firemaker",
+											"level": 25
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_ash",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:firemaker",
+											"level": 50
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_ash",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:firemaker",
+											"level": 75
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_ash",
+											"count": 3
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "craft_inner_fire",
+							"consumable": "adventuring:inner_fire",
+							"outputType": "consumable",
+							"count": 1,
+							"tiers": [
+								{
+									"tier": 1,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:firemaker",
+											"level": 1
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_ash",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:firemaker",
+											"level": 25
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_ash",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:firemaker",
+											"level": 50
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_ash",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:firemaker",
+											"level": 75
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_ash",
+											"count": 3
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "craft_inferno_burst",
+							"consumable": "adventuring:inferno_burst",
+							"outputType": "consumable",
+							"count": 1,
+							"tiers": [
+								{
+									"tier": 1,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:firemaker",
+											"level": 1
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_ash",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:firemaker",
+											"level": 25
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_ash",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:firemaker",
+											"level": 50
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_ash",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:firemaker",
+											"level": 75
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_ash",
+											"count": 3
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "craft_flame_ward",
+							"consumable": "adventuring:flame_ward",
+							"outputType": "consumable",
+							"count": 1,
+							"tiers": [
+								{
+									"tier": 1,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:firemaker",
+											"level": 1
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_ash",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:firemaker",
+											"level": 25
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_ash",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:firemaker",
+											"level": 50
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_ash",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:firemaker",
+											"level": 75
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_ash",
+											"count": 3
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "craft_cauterize",
+							"consumable": "adventuring:cauterize",
+							"outputType": "consumable",
+							"count": 1,
+							"tiers": [
+								{
+									"tier": 1,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:firemaker",
+											"level": 1
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_ash",
+											"count": 2
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:firemaker",
+											"level": 25
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_ash",
+											"count": 2
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:firemaker",
+											"level": 50
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_ash",
+											"count": 2
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:firemaker",
+											"level": 75
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_ash",
+											"count": 2
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "craft_phoenix_tear",
+							"consumable": "adventuring:phoenix_tear",
+							"outputType": "consumable",
+							"count": 1,
+							"tiers": [
+								{
+									"tier": 1,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:firemaker",
+											"level": 1
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_ash",
+											"count": 5
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:firemaker",
+											"level": 25
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_ash",
+											"count": 5
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:firemaker",
+											"level": 50
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_ash",
+											"count": 5
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:firemaker",
+											"level": 75
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_ash",
+											"count": 5
+										}
+									]
+								}
+							]
+						}
+					],
+					"tiles": [
+						{
+							"id": "campfire_remains",
+							"name": "Campfire Remains",
+							"media": "melvor:assets/media/main/firemaking_header.png#shade=red",
+							"requirements": [
+								{
+									"type": "current_job_level",
+									"job": "adventuring:firemaker",
+									"level": 1
+								}
+							],
+							"weight": 10,
+							"floor_max": 1,
+							"dungeon_max": 1,
+							"effects": [
+								{
+									"type": "xp",
+									"amount": 30,
+									"job": "adventuring:firemaker"
+								},
+								{
+									"type": "loot",
+									"pool": [
+										{
+											"id": "adventuring:crude_ash",
+											"qty": 1,
+											"weight": 100
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "bonfire_pit",
+							"name": "Bonfire Pit",
+							"media": "melvor:assets/media/main/firemaking_header.png#shade=red",
+							"requirements": [
+								{
+									"type": "current_job_level",
+									"job": "adventuring:firemaker",
+									"level": 25
+								}
+							],
+							"weight": 8,
+							"floor_max": 1,
+							"dungeon_max": 2,
+							"effects": [
+								{
+									"type": "xp",
+									"amount": 75,
+									"job": "adventuring:firemaker"
+								},
+								{
+									"type": "loot",
+									"pool": [
+										{
+											"id": "adventuring:crude_ash",
+											"qty": 2,
+											"weight": 60
+										},
+										{
+											"id": "adventuring:refined_ash",
+											"qty": 1,
+											"weight": 40
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "sacred_brazier",
+							"name": "Sacred Brazier",
+							"media": "melvor:assets/media/main/firemaking_header.png#shade=red",
+							"requirements": [
+								{
+									"type": "current_job_level",
+									"job": "adventuring:firemaker",
+									"level": 50
+								}
+							],
+							"weight": 5,
+							"floor_max": 1,
+							"dungeon_max": 2,
+							"effects": [
+								{
+									"type": "xp",
+									"amount": 150,
+									"job": "adventuring:firemaker"
+								},
+								{
+									"type": "loot",
+									"pool": [
+										{
+											"id": "adventuring:crude_ash",
+											"qty": 1,
+											"weight": 30
+										},
+										{
+											"id": "adventuring:refined_ash",
+											"qty": 1,
+											"weight": 45
+										},
+										{
+											"id": "adventuring:immaculate_ash",
+											"qty": 1,
+											"weight": 25
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "infernal_pyre",
+							"name": "Infernal Pyre",
+							"media": "melvor:assets/media/main/firemaking_header.png#shade=red",
+							"requirements": [
+								{
+									"type": "current_job_level",
+									"job": "adventuring:firemaker",
+									"level": 75
+								}
+							],
+							"weight": 3,
+							"floor_max": 1,
+							"dungeon_max": 2,
+							"effects": [
+								{
+									"type": "xp",
+									"amount": 300,
+									"job": "adventuring:firemaker"
+								},
+								{
+									"type": "loot",
+									"pool": [
+										{
+											"id": "adventuring:crude_ash",
+											"qty": 1,
+											"weight": 15
+										},
+										{
+											"id": "adventuring:refined_ash",
+											"qty": 1,
+											"weight": 30
+										},
+										{
+											"id": "adventuring:immaculate_ash",
+											"qty": 1,
+											"weight": 35
+										},
+										{
+											"id": "adventuring:transcendent_ash",
+											"qty": 1,
+											"weight": 20
+										}
+									]
+								}
+							]
+						}
+					],
+					"consumableTypes": [
+						{
+							"id": "scorching_touch",
+							"name": "Scorching Touch",
+							"media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=pink",
+							"type": "ember",
+							"sourceJob": "adventuring:firemaker",
+							"maxCharges": 5,
+							"tiers": [
+								{
+									"tier": 1,
+									"nameSuffix": "I",
+									"media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=pink",
+									"flavorText": "Your attacks leave lingering flames.",
+									"effects": [
+										{
+											"type": "debuff",
+											"trigger": "after_damage_delivered",
+											"id": "adventuring:burn",
+											"stacks": 3,
+											"target": "target"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_kindling",
+											"count": 2
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"nameSuffix": "II",
+									"media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=pink",
+									"flavorText": "Flames spread across your foes.",
+									"effects": [
+										{
+											"type": "debuff",
+											"trigger": "after_damage_delivered",
+											"id": "adventuring:burn",
+											"stacks": 5,
+											"target": "target"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_kindling",
+											"count": 2
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"nameSuffix": "III",
+									"media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=pink",
+									"flavorText": "Intense burns consume your enemies.",
+									"effects": [
+										{
+											"type": "debuff",
+											"trigger": "after_damage_delivered",
+											"id": "adventuring:burn",
+											"stacks": 8,
+											"target": "target"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_kindling",
+											"count": 2
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"nameSuffix": "IV",
+									"media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=pink",
+									"flavorText": "Eternal flames devour all who oppose you.",
+									"effects": [
+										{
+											"type": "debuff",
+											"trigger": "after_damage_delivered",
+											"id": "adventuring:burn",
+											"stacks": 12,
+											"target": "target"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_kindling",
+											"count": 2
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "flame_cloak",
+							"name": "Flame Cloak",
+							"media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=yellow",
+							"type": "ember",
+							"sourceJob": "adventuring:firemaker",
+							"maxCharges": 5,
+							"tiers": [
+								{
+									"tier": 1,
+									"nameSuffix": "I",
+									"media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=yellow",
+									"flavorText": "A fiery aura burns those who strike you.",
+									"effects": [
+										{
+											"type": "reflect",
+											"trigger": "after_damage_received",
+											"amount": 15,
+											"target": "attacker"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_kindling",
+											"count": 2
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"nameSuffix": "II",
+									"media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=yellow",
+									"flavorText": "Blazing retribution scorches attackers.",
+									"effects": [
+										{
+											"type": "reflect",
+											"trigger": "after_damage_received",
+											"amount": 25,
+											"target": "attacker"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_kindling",
+											"count": 2
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"nameSuffix": "III",
+									"media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=yellow",
+									"flavorText": "Molten vengeance sears all who touch you.",
+									"effects": [
+										{
+											"type": "reflect",
+											"trigger": "after_damage_received",
+											"amount": 35,
+											"target": "attacker"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_kindling",
+											"count": 2
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"nameSuffix": "IV",
+									"media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=yellow",
+									"flavorText": "Wreathed in hellfire, attackers are incinerated.",
+									"effects": [
+										{
+											"type": "reflect",
+											"trigger": "after_damage_received",
+											"amount": 50,
+											"target": "attacker"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_kindling",
+											"count": 2
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "confident_blaze",
+							"name": "Confident Blaze",
+							"media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=orange",
+							"type": "ember",
+							"sourceJob": "adventuring:firemaker",
+							"maxCharges": 3,
+							"tiers": [
+								{
+									"tier": 1,
+									"nameSuffix": "I",
+									"media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=orange",
+									"flavorText": "Strike with fury while at full strength.",
+									"effects": [
+										{
+											"type": "damage_modifier_percent",
+											"trigger": "before_damage_delivered",
+											"condition": {
+												"type": "hp_above",
+												"threshold": 80
+											},
+											"amount": 20,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_kindling",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"nameSuffix": "II",
+									"media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=orange",
+									"flavorText": "Your healthy vigor ignites powerful strikes.",
+									"effects": [
+										{
+											"type": "damage_modifier_percent",
+											"trigger": "before_damage_delivered",
+											"condition": {
+												"type": "hp_above",
+												"threshold": 80
+											},
+											"amount": 35,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_kindling",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"nameSuffix": "III",
+									"media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=orange",
+									"flavorText": "Peak condition unleashes devastating fire.",
+									"effects": [
+										{
+											"type": "damage_modifier_percent",
+											"trigger": "before_damage_delivered",
+											"condition": {
+												"type": "hp_above",
+												"threshold": 80
+											},
+											"amount": 55,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_kindling",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"nameSuffix": "IV",
+									"media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=orange",
+									"flavorText": "Untouched strength channels solar fury.",
+									"effects": [
+										{
+											"type": "damage_modifier_percent",
+											"trigger": "before_damage_delivered",
+											"condition": {
+												"type": "hp_above",
+												"threshold": 80
+											},
+											"amount": 80,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_kindling",
+											"count": 3
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "inner_fire",
+							"name": "Inner Fire",
+							"media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=blue",
+							"type": "ember",
+							"sourceJob": "adventuring:firemaker",
+							"maxCharges": 3,
+							"tiers": [
+								{
+									"tier": 1,
+									"nameSuffix": "I",
+									"media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=blue",
+									"flavorText": "Slaying enemies empowers you with flames.",
+									"effects": [
+										{
+											"type": "buff",
+											"trigger": "kill",
+											"id": "adventuring:empower",
+											"stacks": 3,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_kindling",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"nameSuffix": "II",
+									"media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=blue",
+									"flavorText": "Slaying enemies blazes your spirit.",
+									"effects": [
+										{
+											"type": "buff",
+											"trigger": "kill",
+											"id": "adventuring:empower",
+											"stacks": 5,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_kindling",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"nameSuffix": "III",
+									"media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=blue",
+									"flavorText": "Slaying enemies surges inferno energy.",
+									"effects": [
+										{
+											"type": "buff",
+											"trigger": "kill",
+											"id": "adventuring:empower",
+											"stacks": 8,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_kindling",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"nameSuffix": "IV",
+									"media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=blue",
+									"flavorText": "Slaying enemies ignites a star's heart within.",
+									"effects": [
+										{
+											"type": "buff",
+											"trigger": "kill",
+											"id": "adventuring:empower",
+											"stacks": 12,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_kindling",
+											"count": 3
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "inferno_burst",
+							"name": "Inferno Burst",
+							"media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=cyan",
+							"type": "ember",
+							"sourceJob": "adventuring:firemaker",
+							"maxCharges": 3,
+							"tiers": [
+								{
+									"tier": 1,
+									"nameSuffix": "I",
+									"media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=cyan",
+									"flavorText": "Critical hits unleash explosive flames.",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"trigger": "crit",
+											"amount": 12,
+											"target": "enemy"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_kindling",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"nameSuffix": "II",
+									"media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=cyan",
+									"flavorText": "Devastating fire erupts on critical strikes.",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"trigger": "crit",
+											"amount": 20,
+											"target": "enemy"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_kindling",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"nameSuffix": "III",
+									"media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=cyan",
+									"flavorText": "Explosive flames consume your foes.",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"trigger": "crit",
+											"amount": 32,
+											"target": "enemy"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_kindling",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"nameSuffix": "IV",
+									"media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=cyan",
+									"flavorText": "Cataclysmic explosions annihilate enemies.",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"trigger": "crit",
+											"amount": 50,
+											"target": "enemy"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_kindling",
+											"count": 3
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "flame_ward",
+							"name": "Flame Ward",
+							"media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=green",
+							"type": "ember",
+							"sourceJob": "adventuring:firemaker",
+							"maxCharges": 3,
+							"tiers": [
+								{
+									"tier": 1,
+									"nameSuffix": "I",
+									"media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=green",
+									"flavorText": "Fire purifies harmful effects.",
+									"effects": [
+										{
+											"type": "prevent_debuff",
+											"trigger": "before_debuff_received",
+											"condition": {
+												"type": "chance",
+												"value": 25
+											},
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_kindling",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"nameSuffix": "II",
+									"media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=green",
+									"flavorText": "Burning aura resists afflictions.",
+									"effects": [
+										{
+											"type": "prevent_debuff",
+											"trigger": "before_debuff_received",
+											"condition": {
+												"type": "chance",
+												"value": 35
+											},
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_kindling",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"nameSuffix": "III",
+									"media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=green",
+									"flavorText": "Sacred flames burn away curses.",
+									"effects": [
+										{
+											"type": "prevent_debuff",
+											"trigger": "before_debuff_received",
+											"condition": {
+												"type": "chance",
+												"value": 50
+											},
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_kindling",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"nameSuffix": "IV",
+									"media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=green",
+									"flavorText": "Eternal flames make you immune to darkness.",
+									"effects": [
+										{
+											"type": "prevent_debuff",
+											"trigger": "before_debuff_received",
+											"condition": {
+												"type": "chance",
+												"value": 70
+											},
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_kindling",
+											"count": 3
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "cauterize",
+							"name": "Cauterize",
+							"media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=red",
+							"type": "ember",
+							"sourceJob": "adventuring:firemaker",
+							"maxCharges": 5,
+							"tiers": [
+								{
+									"tier": 1,
+									"nameSuffix": "I",
+									"media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=red",
+									"flavorText": "Flames seal wounds after striking.",
+									"effects": [
+										{
+											"type": "heal_percent",
+											"trigger": "after_damage_delivered",
+											"amount": 3,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_kindling",
+											"count": 2
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"nameSuffix": "II",
+									"media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=red",
+									"flavorText": "Hot embers mend your wounds.",
+									"effects": [
+										{
+											"type": "heal_percent",
+											"trigger": "after_damage_delivered",
+											"amount": 5,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_kindling",
+											"count": 2
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"nameSuffix": "III",
+									"media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=red",
+									"flavorText": "Sacred fire restores your vitality.",
+									"effects": [
+										{
+											"type": "heal_percent",
+											"trigger": "after_damage_delivered",
+											"amount": 8,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_kindling",
+											"count": 2
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"nameSuffix": "IV",
+									"media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=red",
+									"flavorText": "Phoenix flames heal all wounds.",
+									"effects": [
+										{
+											"type": "heal_percent",
+											"trigger": "after_damage_delivered",
+											"amount": 12,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_kindling",
+											"count": 2
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "phoenix_tear",
+							"name": "Phoenix Tear",
+							"media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=purple",
+							"type": "ember",
+							"sourceJob": "adventuring:firemaker",
+							"maxCharges": 1,
+							"tiers": [
+								{
+									"tier": 1,
+									"nameSuffix": "I",
+									"media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=purple",
+									"flavorText": "Rise from the ashes.",
+									"effects": [
+										{
+											"type": "prevent_death",
+											"trigger": "before_death",
+											"target": "self",
+											"amount": 10,
+											"limit": "combat"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_kindling",
+											"count": 5
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"nameSuffix": "II",
+									"media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=purple",
+									"flavorText": "The phoenix's blessing revives you.",
+									"effects": [
+										{
+											"type": "prevent_death",
+											"trigger": "before_death",
+											"target": "self",
+											"amount": 15,
+											"limit": "combat"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_kindling",
+											"count": 5
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"nameSuffix": "III",
+									"media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=purple",
+									"flavorText": "Reborn in cleansing flame.",
+									"effects": [
+										{
+											"type": "prevent_death",
+											"trigger": "before_death",
+											"target": "self",
+											"amount": 20,
+											"limit": "combat"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_kindling",
+											"count": 5
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"nameSuffix": "IV",
+									"media": "melvor:assets/media/bank/potion_firemaking_i.png#shade=purple",
+									"flavorText": "Immortal flames grant eternal life.",
+									"effects": [
+										{
+											"type": "prevent_death",
+											"trigger": "before_death",
+											"target": "self",
+											"amount": 25,
+											"limit": "combat"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_kindling",
+											"count": 5
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
+		]
+	}
 }

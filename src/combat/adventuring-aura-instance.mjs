@@ -1,8 +1,8 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { AdventuringStats } = await loadModule('src/core/adventuring-stats.mjs');
+const { AdventuringStats } = await loadModule('src/core/stats/adventuring-stats.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
-const { formatTrigger, defaultEffectProcessor } = await loadModule('src/core/adventuring-utils.mjs');
+const { formatTrigger, defaultEffectProcessor } = await loadModule('src/core/utils/adventuring-utils.mjs');
 
 const { AdventuringAuraInstanceElement } = await loadModule('src/combat/components/adventuring-aura-instance.mjs');
 
@@ -30,10 +30,18 @@ export class AdventuringAuraInstance {
 
         this.snapshotStats = null;
 
-        this.component = createElement('adventuring-aura-instance');
-        this.component.auraInstance = this;
+        this._component = null; // Lazy-created on first access
 
         this.renderQueue = new AdventuringAuraInstanceRenderQueue();
+    }
+
+    /** @returns {AdventuringAuraInstanceElement} Lazily created component */
+    get component() {
+        if (this._component === null) {
+            this._component = createElement('adventuring-aura-instance');
+            this._component.auraInstance = this;
+        }
+        return this._component;
     }
 
     captureSnapshot(character) {

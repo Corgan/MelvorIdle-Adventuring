@@ -1,7 +1,8 @@
 const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringDungeonCellElement } = await loadModule('src/dungeon/components/adventuring-dungeon-cell.mjs');
-const { describeEffect, formatRequirement } = await loadModule('src/core/adventuring-utils.mjs');
+const { formatRequirement } = await loadModule('src/core/utils/requirements-checker.mjs');
+const { describeEffect } = await loadModule('src/core/utils/adventuring-utils.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
 
 class AdventuringDungeonCellRenderQueue {

@@ -12,6 +12,7 @@ export class AdventuringCrossroads extends AdventuringPage {
         this.component = createElement('adventuring-crossroads');
 
         this.areas = [];
+        this.clearedAreas = new Set(); // Track which areas have been cleared (for unlock requirements)
     }
 
     get active() {
@@ -37,10 +38,15 @@ export class AdventuringCrossroads extends AdventuringPage {
     }
 
     postDataRegistration() {
-
-        this.areas = [...this.manager.areas.allObjects].sort((a, b) => {
-            return a.getUnlockLevel() - b.getUnlockLevel();
-        });
+        // Use the pre-computed areaOrder from manager, or fall back to sortOrder
+        if (this.manager.areaOrder && this.manager.areaOrder.length > 0) {
+            this.areas = [...this.manager.areaOrder];
+        } else {
+            // Fallback: sort by sortOrder (or unlockLevel if sortOrder not set)
+            this.areas = [...this.manager.areas.allObjects].sort((a, b) => {
+                return a.sortOrder - b.sortOrder;
+            });
+        }
 
         this.areas.forEach(area => {
             area.component.mount(this.component.areas);
@@ -72,6 +78,16 @@ export class AdventuringCrossroads extends AdventuringPage {
         if(this.manager.autoRepeatArea !== null) {
             writer.writeNamespacedObject(this.manager.autoRepeatArea);
         }
+
+        // Cleared areas
+        writer.writeUint16(this.clearedAreas.size);
+        this.clearedAreas.forEach(areaId => {
+            const area = this.manager.areas.getObjectByID(areaId);
+            if (area) {
+                writer.writeNamespacedObject(area);
+            }
+        });
+
         return writer;
     }
 
@@ -99,6 +115,15 @@ export class AdventuringCrossroads extends AdventuringPage {
             const autoRepeatArea = reader.getNamespacedObject(this.manager.areas);
             if(typeof autoRepeatArea !== "string") {
                 this.manager.autoRepeatArea = autoRepeatArea;
+            }
+        }
+
+        // Cleared areas
+        const numCleared = reader.getUint16();
+        for(let i = 0; i < numCleared; i++) {
+            const area = reader.getNamespacedObject(this.manager.areas);
+            if(area && typeof area !== 'string') {
+                this.clearedAreas.add(area.id);
             }
         }
     }

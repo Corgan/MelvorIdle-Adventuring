@@ -1,362 +1,231 @@
 {
-    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
-    "namespace": "adventuring",
-    "data": {
-        "skillData": [
-            {
-                "skillID": "adventuring:Adventuring",
-                "data": {
-                    "jobs": [
-                        {
-                            "id": "beastmaster",
-                            "tier": 5,
-                            "name": "Beastmaster",
-                            "media": "melvor:assets/media/pets/peri.png#tint=yellow",
-                            "requirements": [
-                                {
-                                    "type": "job_level",
-                                    "job": "adventuring:ranger",
-                                    "level": 15
-                                },
-                                {
-                                    "type": "job_level",
-                                    "job": "adventuring:druid",
-                                    "level": 10
-                                }
-                            ],
-                            "isMilestoneReward": true,
-                            "allowedItems": [
-                                "adventuring:helm",
-                                "adventuring:vest",
-                                "adventuring:platelegs",
-                                "adventuring:vambraces",
-                                "adventuring:boots",
-                                "adventuring:amulet",
-                                "adventuring:ring",
-                                "adventuring:cape",
-                                "adventuring:longbow",
-                                "adventuring:quiver"
-                            ],
-                            "scaling": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 1.0
-                                },
-                                {
-                                    "id": "adventuring:defence",
-                                    "amount": 0.5
-                                },
-                                {
-                                    "id": "adventuring:agility",
-                                    "amount": 1.8
-                                },
-                                {
-                                    "id": "adventuring:strength",
-                                    "amount": 1.5
-                                },
-                                {
-                                    "id": "adventuring:ranged",
-                                    "amount": 1.2
-                                }
-                            ]
-                        }
-                    ],
-                    "generators": [
-                        {
-                            "id": "beast_strike",
-                            "name": "Beast Strike",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:beastmaster",
-                                    "level": 1
-                                }
-                            ],
-                            "energy": 25,
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 12,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:strength",
-                                                        "amount": 0.25
-                                                    },
-                                                    {
-                                                        "id": "adventuring:agility",
-                                                        "amount": 0.25
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "pack_tactics",
-                            "name": "Pack Tactics",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:beastmaster",
-                                    "level": 8
-                                }
-                            ],
-                            "energy": 28,
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 14,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:strength",
-                                                        "amount": 0.3
-                                                    },
-                                                    {
-                                                        "id": "adventuring:agility",
-                                                        "amount": 0.2
-                                                    }
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            "type": "debuff",
-                                            "id": "adventuring:weaken",
-                                            "stacks": {
-                                                "base": 2,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:agility",
-                                                        "amount": 0.03
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "wild_roar",
-                            "name": "Wild Roar",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:beastmaster",
-                                    "level": 15
-                                }
-                            ],
-                            "energy": 30,
-                            "hits": [
-                                {
-                                    "target": "self",
-                                    "party": "ally",
-                                    "effects": [
-                                        {
-                                            "type": "buff",
-                                            "id": "adventuring:might",
-                                            "stacks": {
-                                                "base": 3,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:strength",
-                                                        "amount": 0.05
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                },
-                                {
-                                    "target": "all",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "debuff",
-                                            "id": "adventuring:blind",
-                                            "stacks": {
-                                                "base": 2,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:agility",
-                                                        "amount": 0.03
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ],
-                    "spenders": [
-                        {
-                            "id": "summon_companion",
-                            "name": "Summon Companion",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:beastmaster",
-                                    "level": 1
-                                }
-                            ],
-                            "hits": [
-                                {
-                                    "target": "self",
-                                    "party": "ally",
-                                    "effects": [
-                                        {
-                                            "type": "buff",
-                                            "id": "adventuring:might",
-                                            "stacks": {
-                                                "base": 3,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:strength",
-                                                        "amount": 0.1
-                                                    }
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            "type": "buff",
-                                            "id": "adventuring:fortify",
-                                            "stacks": {
-                                                "base": 2,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:agility",
-                                                        "amount": 0.05
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ],
-                            "cost": 80
-                        },
-                        {
-                            "id": "savage_assault",
-                            "name": "Savage Assault",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:beastmaster",
-                                    "level": 12
-                                }
-                            ],
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 25,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:strength",
-                                                        "amount": 0.5
-                                                    },
-                                                    {
-                                                        "id": "adventuring:agility",
-                                                        "amount": 0.4
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                },
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 25,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:strength",
-                                                        "amount": 0.5
-                                                    },
-                                                    {
-                                                        "id": "adventuring:agility",
-                                                        "amount": 0.4
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ],
-                            "cost": 100
-                        },
-                        {
-                            "id": "stampede",
-                            "name": "Stampede",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:beastmaster",
-                                    "level": 20
-                                }
-                            ],
-                            "hits": [
-                                {
-                                    "target": "all",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 35,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:strength",
-                                                        "amount": 0.7
-                                                    },
-                                                    {
-                                                        "id": "adventuring:agility",
-                                                        "amount": 0.5
-                                                    }
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            "type": "debuff",
-                                            "id": "adventuring:slow",
-                                            "stacks": {
-                                                "base": 3,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:agility",
-                                                        "amount": 0.05
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ],
-                            "cost": 100
-                        }
-                    ]
-                }
-            }
-        ]
-    }
+	"$schema": "../job_schema.json",
+	"namespace": "adventuring",
+	"packages": {
+		"combat_jobs": {
+			"jobs": {
+				"beastmaster": {
+					"name": "Beastmaster",
+					"tier": 5,
+					"media": "assets/jobs/beastmaster.png",
+					"requirements": [
+						{ "type": "job_level", "job": "adventuring:hunter", "level": 30 },
+						{ "type": "job_level", "job": "adventuring:druid", "level": 25 }
+					],
+					"abilities": [
+						{
+							"id": "beast_strike",
+							"name": "Beast Strike",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "Strikes with bestial fury, causing bleeding.",
+							"energy": 25,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:beastmaster", "level": 1 }],
+							"hits": [{ "target": "front", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 8, "scaling": [
+									{ "id": "adventuring:strength", "amount": 0.3 },
+									{ "id": "adventuring:agility", "amount": 0.25 }
+								] } },
+								{ "type": "debuff", "id": "adventuring:bleed", "stacks": 2 }
+							] }]
+						},
+						{
+							"id": "summon_companion",
+							"name": "Summon Companion",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "Calls a beast companion to attack.",
+							"cost": 140,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:beastmaster", "level": 1 }],
+							"hits": [
+								{ "target": "front", "party": "enemy", "delay": 100, "repeat": 2, "effects": [
+									{ "type": "damage_flat", "amount": { "base": 8, "scaling": [{ "id": "adventuring:strength", "amount": 0.35 }] } }
+								] },
+								{ "target": "self", "effects": [
+									{ "type": "buff", "id": "adventuring:might", "stacks": 3 }
+								] }
+							]
+						},
+						{
+							"id": "pack_tactics",
+							"name": "Pack Tactics",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "Coordinates a pack attack that weakens the target.",
+							"energy": 25,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:beastmaster", "level": 10 }],
+							"hits": [
+								{ "target": "front", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "amount": { "base": 10, "scaling": [{ "id": "adventuring:strength", "amount": 0.4 }] } },
+									{ "type": "debuff", "id": "adventuring:weaken", "stacks": { "base": 3, "scaling": [{ "id": "adventuring:strength", "amount": 0.1 }] } }
+								] },
+								{ "target": "self", "effects": [
+									{ "type": "buff", "id": "adventuring:haste", "stacks": 2 }
+								] }
+							]
+						},
+						{
+							"id": "savage_assault",
+							"name": "Savage Assault",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "A savage double strike with your companion.",
+							"cost": 145,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:beastmaster", "level": 15 }],
+							"hits": [{ "target": "front", "party": "enemy", "delay": 100, "repeat": 2, "effects": [
+								{ "type": "damage_flat", "amount": { "base": 14, "scaling": [
+									{ "id": "adventuring:strength", "amount": 0.5 },
+									{ "id": "adventuring:agility", "amount": 0.4 }
+								] } },
+								{ "type": "debuff", "id": "adventuring:bleed", "stacks": 3 }
+							] }]
+						},
+						{
+							"id": "alpha_presence",
+							"name": "Alpha Presence",
+							"type": "passive",
+							"media": "assets/abilities/passive.png",
+							"description": "Your alpha presence empowers the pack at combat start.",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:beastmaster", "level": 20 }],
+							"effects": [
+								{ "trigger": "encounter_start", "type": "buff", "target": "all", "party": "ally", "id": "adventuring:might", "stacks": { "base": 4, "scaling": [{ "id": "adventuring:strength", "amount": 0.15 }] } },
+								{ "trigger": "encounter_start", "type": "buff", "target": "all", "party": "ally", "id": "adventuring:haste", "stacks": 3 }
+							]
+						},
+						{
+							"id": "wild_roar",
+							"name": "Wild Roar",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "A terrifying roar that strikes fear into all enemies.",
+							"energy": 30,
+							"requirements": [{ "type": "job_level", "job": "adventuring:beastmaster", "level": 25 }],
+							"hits": [
+								{ "target": "all", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "amount": { "base": 7, "scaling": [{ "id": "adventuring:strength", "amount": 0.3 }] } },
+									{ "type": "debuff", "id": "adventuring:fear", "stacks": 2 }
+								] },
+								{ "target": "all", "party": "ally", "effects": [
+									{ "type": "buff", "id": "adventuring:might", "stacks": 2 }
+								] }
+							]
+						},
+						{
+							"id": "pack_hunter",
+							"name": "Pack Hunter",
+							"type": "passive",
+							"media": "assets/abilities/passive.png",
+							"description": "Killing an enemy empowers the entire pack.",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:beastmaster", "level": 40 }],
+							"effects": [
+								{ "trigger": "kill", "type": "buff", "target": "all", "party": "ally", "id": "adventuring:haste", "stacks": 2 },
+								{ "trigger": "kill", "type": "buff", "target": "all", "party": "ally", "id": "adventuring:might", "stacks": 2 }
+							]
+						},
+						{
+							"id": "stampede",
+							"name": "Stampede",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "Calls a stampede of beasts to trample all enemies.",
+							"cost": 175,
+							"requirements": [{ "type": "job_level", "job": "adventuring:beastmaster", "level": 50 }],
+							"hits": [{ "target": "all", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 18, "scaling": [
+									{ "id": "adventuring:strength", "amount": 0.7 },
+									{ "id": "adventuring:agility", "amount": 0.5 }
+								] } },
+								{ "type": "debuff", "id": "adventuring:bleed", "stacks": 4 },
+								{ "type": "debuff", "id": "adventuring:chill", "stacks": 3 }
+							] }]
+						},
+						{
+							"id": "feral_frenzy",
+							"name": "Feral Frenzy",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "A frenzied series of strikes from you and your beasts.",
+							"energy": 35,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:beastmaster", "level": 60 }],
+							"hits": [{ "target": "front", "party": "enemy", "delay": 80, "repeat": 4, "effects": [
+								{ "type": "damage_flat", "amount": { "base": 5, "scaling": [
+									{ "id": "adventuring:strength", "amount": 0.2 },
+									{ "id": "adventuring:agility", "amount": 0.2 }
+								] } },
+								{ "type": "debuff", "id": "adventuring:bleed", "stacks": 1 }
+							] }]
+						},
+						{
+							"id": "coordinated_strike",
+							"name": "Coordinated Strike",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "A perfectly coordinated attack that consumes bleed.",
+							"cost": 165,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:beastmaster", "level": 70 }],
+							"hits": [{ "target": "front", "party": "enemy", "delay": 100, "repeat": 3, "effects": [
+								{ "type": "damage_flat", "amount": { "base": 12, "scaling": [
+									{ "id": "adventuring:strength", "amount": 0.4 },
+									{ "id": "adventuring:agility", "amount": 0.3 },
+									{ "id": "adventuring:bleed", "scaleFrom": "debuff", "scaleTarget": "target", "amount": 4, "consume": true }
+								] } }
+							] }]
+						},
+						{
+							"id": "beast_bond",
+							"name": "Beast Bond",
+							"type": "passive",
+							"media": "assets/abilities/passive.png",
+							"description": "Your bond with beasts heals you when you deal damage.",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:beastmaster", "level": 80 }],
+							"effects": [
+								{ "trigger": "after_damage_delivered", "type": "heal_flat", "target": "self", "amount": { "base": 3, "scaling": [{ "id": "adventuring:strength", "amount": 0.1 }] } }
+							]
+						},
+						{
+							"id": "apex_strike",
+							"name": "Apex Strike",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "The ultimate predator's strike.",
+							"energy": 40,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:beastmaster", "level": 90 }],
+							"hits": [{ "target": "front", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 22, "scaling": [
+									{ "id": "adventuring:strength", "amount": 0.8 },
+									{ "id": "adventuring:agility", "amount": 0.6 }
+								] } },
+								{ "type": "debuff", "id": "adventuring:vulnerable", "stacks": 5 },
+								{ "type": "debuff", "id": "adventuring:bleed", "stacks": 4 }
+							] }]
+						},
+						{
+							"id": "primal_fury",
+							"name": "Primal Fury",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "Unleashes the full fury of the beast pack, consuming all DoTs.",
+							"cost": 230,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:beastmaster", "level": 99 }],
+							"hits": [
+								{ "target": "all", "party": "enemy", "delay": 80, "repeat": 5, "effects": [
+									{ "type": "damage_flat", "amount": { "base": 15, "scaling": [
+										{ "id": "adventuring:strength", "amount": 0.5 },
+										{ "id": "adventuring:agility", "amount": 0.4 },
+										{ "id": "adventuring:bleed", "scaleFrom": "debuff", "scaleTarget": "target", "amount": 4, "consume": true },
+										{ "id": "adventuring:poison", "scaleFrom": "debuff", "scaleTarget": "target", "amount": 3, "consume": true }
+									] } }
+								] },
+								{ "target": "all", "party": "ally", "effects": [
+									{ "type": "buff", "id": "adventuring:might", "stacks": { "base": 6, "scaling": [{ "id": "adventuring:strength", "amount": 0.2 }] } },
+									{ "type": "buff", "id": "adventuring:haste", "stacks": 5 },
+									{ "type": "buff", "id": "adventuring:fortify", "stacks": 4 }
+								] }
+							]
+						}
+					]
+				}
+			}
+		}
+	}
 }

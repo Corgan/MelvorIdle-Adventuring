@@ -24,8 +24,8 @@ export class AdventuringGrimoire {
 
         this.manager.achievementManager.markDirty();
 
-        // Fire ability_learned trigger for achievements
-        this.manager.achievementManager.trigger('ability_learned', {
+        // Fire ability_learned trigger
+        this.manager.conductor.trigger('ability_learned', {
             ability: ability,
             abilityId: ability.id,
             abilityName: ability.name,

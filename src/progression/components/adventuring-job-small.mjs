@@ -1,6 +1,6 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { AdventuringTooltipElement, createTooltip } = await loadModule('src/core/adventuring-tooltip-element.mjs');
+const { AdventuringTooltipElement, createTooltip } = await loadModule('src/core/components/adventuring-tooltip-element.mjs');
 const { AdventuringJobSelectorBtnElement } = await loadModule('src/progression/components/adventuring-job-selector-btn.mjs');
 
 export class AdventuringJobSmallElement extends AdventuringTooltipElement {

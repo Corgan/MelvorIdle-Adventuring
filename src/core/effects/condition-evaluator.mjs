@@ -1,3 +1,8 @@
+const { loadModule } = mod.getContext(import.meta);
+
+// Now safe to import effect-descriptions (no circular dependency)
+const { describeConditionFromData } = await loadModule('src/core/effects/effect-descriptions.mjs');
+
 /**
  * Evaluate a condition object against a context.
  * @param {Object} condition - The condition to evaluate
@@ -119,80 +124,12 @@ export function evaluateCondition(condition, context) {
 
 /**
  * Describe a condition in human-readable form.
+ * Uses data-driven templates from effect-descriptions.mjs.
  * @param {Object} condition - The condition object
  * @param {Object} manager - The manager for looking up aura names
  * @returns {string} Human-readable description
  */
 export function describeCondition(condition, manager) {
     if (!condition) return '';
-
-    const auraName = (auraId) => {
-        if (manager === undefined) return auraId || 'Unknown';
-        let aura = undefined;
-        if (manager.auras !== undefined) aura = manager.auras.getObjectByID(auraId);
-        if (aura === undefined && manager.buffs !== undefined) aura = manager.buffs.getObjectByID(auraId);
-        if (aura === undefined && manager.debuffs !== undefined) aura = manager.debuffs.getObjectByID(auraId);
-        return aura !== undefined ? aura.name : (auraId || 'Unknown');
-    };
-
-    switch (condition.type) {
-        case 'hp_below':
-            return `when below ${condition.threshold}% HP`;
-        case 'hp_above':
-            return `when above ${condition.threshold}% HP`;
-        case 'missing_hp':
-            return `when missing ${condition.min}+ HP`;
-        case 'has_buff':
-            return `while has ${auraName(condition.id)}`;
-        case 'has_debuff':
-            return `while has ${auraName(condition.id)}`;
-        case 'buff_stacks':
-            return `with ${condition.min}+ ${auraName(condition.id)} stacks`;
-        case 'enemy_hp_below':
-            return `vs enemies below ${condition.threshold}% HP`;
-        case 'enemy_hp_above':
-            return `vs enemies above ${condition.threshold}% HP`;
-        case 'chance':
-            return `(${condition.value}% chance)`;
-        case 'is_injured':
-            return `when injured`;
-        case 'is_full_hp':
-            return `at full HP`;
-        case 'any_ally_injured':
-            return `if any ally is injured`;
-        case 'all_allies_alive':
-            return `if all allies are alive`;
-        case 'hp_crossed_below':
-            return `when dropping below ${condition.threshold}% HP`;
-        case 'hp_crossed_above':
-            return `when rising above ${condition.threshold}% HP`;
-        case 'is_solo':
-            return `while adventuring solo`;
-        default:
-            return condition.type;
-    }
-}
-
-/**
- * Describe a limit suffix for effect descriptions.
- * @param {string} limitType - The limit type (combat, round, turn)
- * @param {number} times - How many times per limit period
- * @returns {string} Human-readable suffix
- */
-export function describeLimitSuffix(limitType, times) {
-    if (!limitType) return '';
-
-    const timesText = times === 1 ? 'once' : `${times} times`;
-
-    switch (limitType) {
-        case 'combat':
-        case 'encounter':
-            return `(${timesText} per encounter)`;
-        case 'round':
-            return `(${timesText} per round)`;
-        case 'turn':
-            return `(${timesText} per turn)`;
-        default:
-            return `(${timesText} per ${limitType})`;
-    }
+    return describeConditionFromData(condition, manager);
 }

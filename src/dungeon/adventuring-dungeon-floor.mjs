@@ -1,6 +1,6 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { AdventuringWeightedTable } = await loadModule('src/core/adventuring-utils.mjs');
+const { AdventuringWeightedTable } = await loadModule('src/core/utils/weighted-table.mjs');
 const { AdventuringDungeonCell } = await loadModule('src/dungeon/adventuring-dungeon-cell.mjs');
 
 const { AdventuringDungeonFloorElement } = await loadModule('src/dungeon/components/adventuring-dungeon-floor.mjs');
@@ -208,7 +208,7 @@ export class AdventuringDungeonFloor {
     chooseTile(x, y) {
 
         const area = this.dungeon.area;
-        const tileModifiers = area ? area.getTileModifiers() : {};
+        const tileModifiers = area ? area.tileModifiers : {};
 
         const hasMonsters = this.dungeon.currentFloor && this.dungeon.currentFloor.monsters && this.dungeon.currentFloor.monsters.length > 0;
 
@@ -318,8 +318,8 @@ export class AdventuringDungeonFloor {
         this.manager.dungeon.progress++;
         this.manager.overview.renderQueue.status = true;
 
-        if (this.manager.achievementManager) {
-            this.manager.achievementManager.recordFloorExplored();
+        if (this.manager.conductor) {
+            this.manager.conductor.trigger('floor_completed', {});
         }
 
         if(this.manager.dungeon.progress >= this.manager.dungeon.numFloors) {
@@ -327,7 +327,7 @@ export class AdventuringDungeonFloor {
         } else {
             if(this.manager.dungeon.area) {
                 const difficultyXPBonus = this.manager.dungeon.getBonus('xp_percent') / 100;
-                const floorXP = Math.floor(41 * (1 + difficultyXPBonus));
+                const floorXP = Math.floor(this.manager.config.xpValues.floorBase * (1 + difficultyXPBonus));
                 this.manager.dungeon.area.addXP(floorXP);
             }
             this.manager.dungeon.next();

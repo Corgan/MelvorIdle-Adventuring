@@ -1,423 +1,209 @@
 {
-    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
-    "namespace": "adventuring",
-    "data": {
-        "skillData": [
-            {
-                "skillID": "adventuring:Adventuring",
-                "data": {
-                    "jobs": [
-                        {
-                            "id": "crusader",
-                            "tier": 2,
-                            "name": "Crusader",
-                            "media": "melvor:assets/media/skills/prayer/prayer.png#tint=orange",
-                            "requirements": [
-                                {
-                                    "type": "job_level",
-                                    "job": "adventuring:paladin",
-                                    "level": 15
-                                },
-                                {
-                                    "type": "job_level",
-                                    "job": "adventuring:cleric",
-                                    "level": 10
-                                }
-                            ],
-                            "isMilestoneReward": true,
-                            "allowedItems": [
-                                "adventuring:helm",
-                                "adventuring:platebody",
-                                "adventuring:platelegs",
-                                "adventuring:gauntlets",
-                                "adventuring:sabatons",
-                                "adventuring:amulet",
-                                "adventuring:ring",
-                                "adventuring:cape",
-                                "adventuring:shield",
-                                "adventuring:sword1h",
-                                "adventuring:mace",
-                                "adventuring:sword2h"
-                            ],
-                            "scaling": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 1.5
-                                },
-                                {
-                                    "id": "adventuring:defence",
-                                    "amount": 1
-                                },
-                                {
-                                    "id": "adventuring:agility",
-                                    "amount": 0.5
-                                },
-                                {
-                                    "id": "adventuring:strength",
-                                    "amount": 1
-                                },
-                                {
-                                    "id": "adventuring:prayer",
-                                    "amount": 1.5
-                                }
-                            ]
-                        }
-                    ],
-                    "generators": [
-                        {
-                            "id": "holy_strike",
-                            "name": "Holy Strike",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:crusader",
-                                    "level": 1
-                                }
-                            ],
-                            "energy": 25,
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 12,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:strength",
-                                                        "amount": 0.2
-                                                    },
-                                                    {
-                                                        "id": "adventuring:prayer",
-                                                        "amount": 0.15
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                },
-                                {
-                                    "target": "self",
-                                    "party": "ally",
-                                    "effects": [
-                                        {
-                                            "type": "heal_flat",
-                                            "amount": {
-                                                "base": 5,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:prayer",
-                                                        "amount": 0.1
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "righteous_blow",
-                            "name": "Righteous Blow",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:crusader",
-                                    "level": 10
-                                }
-                            ],
-                            "energy": 25,
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 15,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:strength",
-                                                        "amount": 0.25
-                                                    },
-                                                    {
-                                                        "id": "adventuring:prayer",
-                                                        "amount": 0.2
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                },
-                                {
-                                    "target": "self",
-                                    "party": "ally",
-                                    "effects": [
-                                        {
-                                            "type": "buff",
-                                            "id": "adventuring:divine_favor",
-                                            "stacks": {
-                                                "base": 1,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:prayer",
-                                                        "amount": 0.05
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ],
-                    "spenders": [
-                        {
-                            "id": "judgment",
-                            "name": "Judgment",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:crusader",
-                                    "level": 1
-                                }
-                            ],
-                            "cost": 110,
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 25,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:strength",
-                                                        "amount": 0.4
-                                                    },
-                                                    {
-                                                        "id": "adventuring:prayer",
-                                                        "amount": 0.3
-                                                    }
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            "type": "debuff",
-                                            "id": "adventuring:burn",
-                                            "stacks": {
-                                                "base": 3,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:prayer",
-                                                        "amount": 0.1
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "zeal",
-                            "name": "Zeal",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:crusader",
-                                    "level": 15
-                                }
-                            ],
-                            "cost": 130,
-                            "hits": [
-                                {
-                                    "target": "all",
-                                    "party": "ally",
-                                    "effects": [
-                                        {
-                                            "type": "buff",
-                                            "id": "adventuring:might",
-                                            "stacks": {
-                                                "base": 2,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:strength",
-                                                        "amount": 0.1
-                                                    }
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            "type": "buff",
-                                            "id": "adventuring:divine_favor",
-                                            "stacks": {
-                                                "base": 2,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:prayer",
-                                                        "amount": 0.1
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "divine_wrath",
-                            "name": "Divine Wrath",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:crusader",
-                                    "level": 25
-                                }
-                            ],
-                            "cost": 170,
-                            "hits": [
-                                {
-                                    "target": "all",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 30,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:strength",
-                                                        "amount": 0.5
-                                                    },
-                                                    {
-                                                        "id": "adventuring:prayer",
-                                                        "amount": 0.5
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "holy_crusade",
-                            "name": "Holy Crusade",
-                            "requirements": [
-                                {
-                                    "type": "job_level",
-                                    "job": "adventuring:crusader",
-                                    "level": 20
-                                }
-                            ],
-                            "cost": 130,
-                            "hits": [
-                                {
-                                    "target": "all",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 15,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:strength",
-                                                        "amount": 0.2
-                                                    },
-                                                    {
-                                                        "id": "adventuring:prayer",
-                                                        "amount": 0.15
-                                                    }
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            "type": "debuff",
-                                            "id": "adventuring:atonement",
-                                            "stacks": {
-                                                "base": 2,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:prayer",
-                                                        "amount": 0.05
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ],
-                    "passives": [
-                        {
-                            "id": "crusaders_holy_aura",
-                            "name": "Crusader's Holy Aura",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:crusader",
-                                    "level": 20
-                                }
-                            ],
-                            "effects": [
-                                {
-                                    "trigger": "encounter_start",
-                                    "type": "buff",
-                                    "target": "all",
-                                    "party": "ally",
-                                    "id": "adventuring:divine_favor",
-                                    "stacks": {
-                                        "base": 2,
-                                        "scaling": [
-                                            {
-                                                "id": "adventuring:prayer",
-                                                "amount": 0.1
-                                            }
-                                        ]
-                                    }
-                                }
-                            ]
-                        },
-                        {
-                            "id": "righteous_fervor",
-                            "name": "Righteous Fervor",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:crusader",
-                                    "level": 30
-                                }
-                            ],
-                            "effects": [
-                                {
-                                    "trigger": "round_start",
-                                    "type": "debuff",
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "id": "adventuring:atonement",
-                                    "stacks": {
-                                        "base": 2,
-                                        "scaling": [
-                                            {
-                                                "id": "adventuring:prayer",
-                                                "amount": 0.1
-                                            }
-                                        ]
-                                    }
-                                }
-                            ]
-                        }
-                    ]
-                }
-            }
-        ]
-    }
+	"$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+	"namespace": "adventuring",
+	"data": {
+		"skillData": [
+			{
+				"skillID": "adventuring:Adventuring",
+				"data": {
+					"jobs": [
+						{
+							"id": "crusader",
+							"tier": 2,
+							"archetypes": ["dps", "support"],
+							"name": "Crusader",
+							"media": "melvor:assets/media/skills/prayer/prayer.png#tint=orange",
+							"requirements": [
+								{ "type": "job_level", "job": "adventuring:paladin", "level": 15 },
+								{ "type": "job_level", "job": "adventuring:cleric", "level": 10 }
+							],
+							"isMilestoneReward": true,
+							"allowedItems": ["adventuring:helm","adventuring:platebody","adventuring:platelegs","adventuring:gauntlets","adventuring:sabatons","adventuring:amulet","adventuring:ring","adventuring:cape","adventuring:shield","adventuring:sword1h","adventuring:mace","adventuring:sword2h"],
+							"effects": [
+								{ "trigger": "passive", "type": "stat_flat", "stat": "adventuring:hitpoints", "amount": { "scaling": [{ "id": "level", "amount": 7.5 }] }, "scaleFrom": "combatJob" },
+								{ "trigger": "passive", "type": "stat_flat", "stat": "adventuring:defence", "amount": { "scaling": [{ "id": "level", "amount": 1.75 }] }, "scaleFrom": "combatJob" },
+								{ "trigger": "passive", "type": "stat_flat", "stat": "adventuring:agility", "amount": { "scaling": [{ "id": "level", "amount": 0.25 }] }, "scaleFrom": "combatJob" },
+								{ "trigger": "passive", "type": "stat_flat", "stat": "adventuring:strength", "amount": { "scaling": [{ "id": "level", "amount": 0.75 }] }, "scaleFrom": "combatJob" },
+								{ "trigger": "passive", "type": "stat_flat", "stat": "adventuring:prayer", "amount": { "scaling": [{ "id": "level", "amount": 3.625 }] }, "scaleFrom": "combatJob" }
+							]
+						}
+					],
+					"generators": [
+						{
+							"id": "holy_strike",
+							"name": "Holy Strike",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:crusader", "level": 1 }],
+							"energy": 20,
+							"hits": [
+								{ "target": "front", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "amount": { "base": 6, "scaling": [{ "id": "adventuring:strength", "amount": 0.2 }, { "id": "adventuring:prayer", "amount": 0.15 }] } }
+								] },
+								{ "target": "self", "effects": [
+									{ "type": "heal_flat", "amount": { "base": 3, "scaling": [{ "id": "adventuring:prayer", "amount": 0.1 }] } }
+								] }
+							]
+						},
+						{
+							"id": "righteous_blow",
+							"name": "Righteous Blow",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:crusader", "level": 10 }],
+							"energy": 25,
+							"hits": [
+								{ "target": "front", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "amount": { "base": 8, "scaling": [{ "id": "adventuring:strength", "amount": 0.25 }, { "id": "adventuring:prayer", "amount": 0.2 }] } }
+								] },
+								{ "target": "self", "effects": [
+									{ "type": "buff", "id": "adventuring:divine_favor", "stacks": { "base": 1, "scaling": [{ "id": "adventuring:prayer", "amount": 0.05 }] } }
+								] }
+							]
+						},
+						{
+							"id": "consecration",
+							"name": "Consecration",
+							"requirements": [{ "type": "job_level", "job": "adventuring:crusader", "level": 25 }],
+							"energy": 25,
+							"hits": [{ "target": "all", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 5, "scaling": [{ "id": "adventuring:strength", "amount": 0.15 }, { "id": "adventuring:prayer", "amount": 0.15 }] } },
+								{ "type": "debuff", "id": "adventuring:burn", "stacks": 1 },
+								{ "type": "debuff", "id": "adventuring:atonement", "stacks": 1 }
+							] }]
+						},
+						{
+							"id": "righteous_smite",
+							"name": "Righteous Smite",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:crusader", "level": 60 }],
+							"energy": 30,
+							"hits": [{ "target": "front", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 12, "scaling": [
+									{ "id": "adventuring:strength", "amount": 0.35 },
+									{ "id": "adventuring:prayer", "amount": 0.3 },
+									{ "id": "adventuring:atonement", "scaleFrom": "debuff", "scaleTarget": "target", "amount": 5, "consume": true }
+								] } },
+								{ "type": "debuff", "id": "adventuring:burn", "stacks": 2 }
+							] }]
+						},
+						{
+							"id": "wrath_of_the_righteous",
+							"name": "Wrath of the Righteous",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:crusader", "level": 90 }],
+							"energy": 35,
+							"hits": [
+								{ "target": "all", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "amount": { "base": 12, "scaling": [{ "id": "adventuring:strength", "amount": 0.45 }, { "id": "adventuring:prayer", "amount": 0.4 }] } },
+									{ "type": "debuff", "id": "adventuring:burn", "stacks": 2 },
+									{ "type": "debuff", "id": "adventuring:atonement", "stacks": 2 }
+								] },
+								{ "target": "all", "party": "ally", "effects": [
+									{ "type": "buff", "id": "adventuring:divine_favor", "stacks": 2 }
+								] }
+							]
+						}
+					],
+					"spenders": [
+						{
+							"id": "holy_judgment",
+							"name": "Holy Judgment",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:crusader", "level": 1 }],
+							"cost": 100,
+							"hits": [{ "target": "front", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 13, "scaling": [{ "id": "adventuring:strength", "amount": 0.4 }, { "id": "adventuring:prayer", "amount": 0.3 }] } },
+								{ "type": "debuff", "id": "adventuring:burn", "stacks": { "base": 3, "scaling": [{ "id": "adventuring:prayer", "amount": 0.1 }] } }
+							] }]
+						},
+						{
+							"id": "zeal",
+							"name": "Zeal",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:crusader", "level": 15 }],
+							"cost": 120,
+							"hits": [{ "target": "all", "party": "ally", "effects": [
+								{ "type": "buff", "id": "adventuring:might", "stacks": { "base": 2, "scaling": [{ "id": "adventuring:strength", "amount": 0.1 }] } },
+								{ "type": "buff", "id": "adventuring:divine_favor", "stacks": { "base": 2, "scaling": [{ "id": "adventuring:prayer", "amount": 0.1 }] } }
+							] }]
+						},
+						{
+							"id": "holy_crusade",
+							"name": "Holy Crusade",
+							"requirements": [{ "type": "job_level", "job": "adventuring:crusader", "level": 50 }],
+							"cost": 130,
+							"hits": [
+								{ "target": "all", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "amount": { "base": 10, "scaling": [{ "id": "adventuring:strength", "amount": 0.3 }, { "id": "adventuring:prayer", "amount": 0.25 }] } },
+									{ "type": "debuff", "id": "adventuring:atonement", "stacks": 2 }
+								] },
+								{ "target": "all", "party": "ally", "effects": [
+									{ "type": "buff", "id": "adventuring:divine_favor", "stacks": 2 }
+								] }
+							]
+						},
+						{
+							"id": "divine_storm",
+							"name": "Divine Storm",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:crusader", "level": 70 }],
+							"cost": 140,
+							"hits": [
+								{ "target": "all", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "amount": { "base": 12, "scaling": [{ "id": "adventuring:strength", "amount": 0.4 }, { "id": "adventuring:prayer", "amount": 0.35 }] } },
+									{ "type": "debuff", "id": "adventuring:burn", "stacks": 3 }
+								] },
+								{ "target": "all", "party": "ally", "effects": [
+									{ "type": "buff", "id": "adventuring:barrier", "stacks": { "base": 3, "scaling": [{ "id": "adventuring:prayer", "amount": 0.1 }] } }
+								] }
+							]
+						},
+						{
+							"id": "divine_reckoning",
+							"name": "Divine Reckoning",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:crusader", "level": 99 }],
+							"cost": 175,
+							"hits": [
+								{ "target": "all", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "amount": { "base": 25, "scaling": [
+										{ "id": "adventuring:strength", "amount": 0.7 },
+										{ "id": "adventuring:prayer", "amount": 0.7 },
+										{ "id": "adventuring:atonement", "scaleFrom": "debuff", "scaleTarget": "target", "amount": 6, "consume": true }
+									] } },
+									{ "type": "debuff", "id": "adventuring:burn", "stacks": 5 }
+								] },
+								{ "target": "all", "party": "ally", "effects": [
+									{ "type": "heal_flat", "amount": { "base": 25, "scaling": [{ "id": "adventuring:prayer", "amount": 0.8 }] } },
+									{ "type": "buff", "id": "adventuring:divine_favor", "stacks": 5 },
+									{ "type": "buff", "id": "adventuring:barrier", "stacks": 4 },
+									{ "type": "buff", "id": "adventuring:might", "stacks": 4 }
+								] }
+							]
+						}
+					],
+					"passives": [
+						{
+							"id": "righteous_aura",
+							"name": "Righteous Aura",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:crusader", "level": 20 }],
+							"effects": [
+								{ "trigger": "encounter_start", "type": "buff", "target": "all", "party": "ally", "id": "adventuring:divine_favor", "stacks": { "base": 2, "scaling": [{ "id": "adventuring:prayer", "amount": 0.1 }] } }
+							]
+						},
+						{
+							"id": "avenging_light",
+							"name": "Avenging Light",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:crusader", "level": 40 }],
+							"effects": [
+								{ "trigger": "after_damage_received", "type": "heal_flat", "target": "self", "amount": { "base": 5, "scaling": [{ "id": "adventuring:prayer", "amount": 0.15 }] }, "condition": { "type": "hp_below", "threshold": 50 } },
+								{ "trigger": "after_damage_received", "type": "buff", "target": "self", "id": "adventuring:might", "stacks": 2, "condition": { "type": "hp_below", "threshold": 50 } }
+							]
+						},
+						{
+							"id": "martyr",
+							"name": "Martyr",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:crusader", "level": 80 }],
+							"effects": [
+								{ "trigger": "ally_death", "type": "heal_flat", "target": "self", "amount": { "base": 20, "scaling": [{ "id": "adventuring:prayer", "amount": 0.5 }] } },
+								{ "trigger": "ally_death", "type": "buff", "target": "self", "id": "adventuring:might", "stacks": 4 },
+								{ "trigger": "ally_death", "type": "buff", "target": "self", "id": "adventuring:divine_favor", "stacks": 3 }
+							]
+						}
+					]
+				}
+			}
+		]
+	}
 }

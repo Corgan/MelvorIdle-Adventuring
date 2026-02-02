@@ -1,6 +1,6 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { RequirementsChecker } = await loadModule('src/core/adventuring-utils.mjs');
+const { RequirementsChecker } = await loadModule('src/core/utils/requirements-checker.mjs');
 
 export class AdventuringProduct extends NamespacedObject {
     constructor(namespace, data, manager, game) {
@@ -10,11 +10,15 @@ export class AdventuringProduct extends NamespacedObject {
 
         this.outputType = data.outputType || 'item';
         this._output = data.item || data.material || data.consumable;
-        this.count = data.count || 1;
+        this.count = data.count || 1;
+
+
+
         if (data.tiers && Array.isArray(data.tiers)) {
             this.tiers = data.tiers;
             this.hasTiers = true;
-        } else {
+        } else {
+
             this.tiers = [{
                 tier: data.tier || 1,
                 requirements: data.requirements || [],
@@ -64,7 +68,8 @@ export class AdventuringProduct extends NamespacedObject {
             return 'assets/media/main/question.png';
         }
         return this.output !== undefined && this.output.media !== undefined ? this.output.media : 'assets/media/main/question.png';
-    }
+    }
+
     get name() {
         return this.getName(1);
     }
@@ -79,7 +84,8 @@ export class AdventuringProduct extends NamespacedObject {
 
     get materials() {
         return this.getMaterials(1);
-    }
+    }
+
     get item() {
         return this.output;
     }
@@ -89,7 +95,8 @@ export class AdventuringProduct extends NamespacedObject {
     }
 
     postDataRegistration() {
-        if (this.output) return;
+        if (this.output) return;
+
         this._reqCheckers = new Map();
         for (const tierData of this.tiers) {
             if (tierData.requirements && tierData.requirements.length > 0) {
@@ -98,7 +105,8 @@ export class AdventuringProduct extends NamespacedObject {
         }
 
         switch(this.outputType) {
-            case 'conversion':
+            case 'conversion':
+
                 for (const tierData of this.tiers) {
                     if (tierData.material) {
                         tierData.outputMaterial = this.manager.materials.getObjectByID(tierData.material);
@@ -106,7 +114,8 @@ export class AdventuringProduct extends NamespacedObject {
                             console.warn(`[Adventuring] Conversion product "${this.id}" tier ${tierData.tier} could not resolve material: ${tierData.material}`);
                         }
                     }
-                }
+                }
+
                 this.output = this.tiers[0] !== undefined ? this.tiers[0].outputMaterial : undefined;
                 break;
             case 'material':
@@ -134,16 +143,20 @@ export class AdventuringProduct extends NamespacedObject {
         for(let mat of materials) {
             let material = this.manager.materials.getObjectByID(mat.id);
             this.manager.stash.remove(material, mat.count);
-        }
+        }
+
         if (this.outputType === 'consumable' && this.output) {
             this.manager.consumables.addCharges(this.output, tier, count);
-        }
+        }
+
         if (this.outputType === 'conversion' && tierData.outputMaterial) {
             this.manager.stash.add(tierData.outputMaterial, count);
-        }
+        }
+
         if (this.outputType === 'material' && this.output) {
             this.manager.stash.add(this.output, count);
-        }
+        }
+
         return {
             output: this.outputType === 'conversion' ? tierData.outputMaterial : this.output,
             outputType: this.outputType,
@@ -153,14 +166,16 @@ export class AdventuringProduct extends NamespacedObject {
     }
 
     canMake(character, tier = 1) {
-        const materials = this.getMaterials(tier);
+        const materials = this.getMaterials(tier);
+
         if(materials.length > 0) {
             for(let material of materials) {
                 let mat = this.manager.materials.getObjectByID(material.id);
                 if(this.manager.stash.materialCounts.get(mat) < material.count)
                     return false;
             }
-        }
+        }
+
         if (this._reqCheckers === undefined) return true;
         const checker = this._reqCheckers.get(tier);
         if (checker === undefined) return true;

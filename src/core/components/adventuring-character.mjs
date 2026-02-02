@@ -1,6 +1,6 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { createTooltip } = await loadModule('src/core/adventuring-tooltip-element.mjs');
+const { createTooltip } = await loadModule('src/core/components/adventuring-tooltip-element.mjs');
 
 await loadModule('src/combat/components/adventuring-abilities.mjs');
 await loadModule('src/combat/components/adventuring-ability-small.mjs');

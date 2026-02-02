@@ -3,9 +3,13 @@ const { loadModule } = mod.getContext(import.meta);
 const { AdventuringMasteryAction } = await loadModule('src/core/adventuring-mastery-action.mjs');
 const { AdventuringItemBaseElement } = await loadModule('src/items/components/adventuring-item-base.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
-const { RequirementsChecker, formatRequirements, getEffectDescriptionsList, AdventuringEquipmentRenderQueue, buildDescription, getLockedMedia, StatCalculator, addMasteryXPWithBonus } = await loadModule('src/core/adventuring-utils.mjs');
+const { StatCalculator } = await loadModule('src/core/stats/stat-calculator.mjs');
+const { RequirementsChecker, formatRequirements } = await loadModule('src/core/utils/requirements-checker.mjs');
+const { getEffectDescriptionsList, buildDescription, getLockedMedia, addMasteryXPWithBonus, filterEffects } = await loadModule('src/core/utils/adventuring-utils.mjs');
+const { AdventuringEquipmentRenderQueue } = await loadModule('src/core/utils/render-queues.mjs');
 
-const { AdventuringStats } = await loadModule('src/core/adventuring-stats.mjs');
+const { AdventuringStats } = await loadModule('src/core/stats/adventuring-stats.mjs');
+const { AdventuringScalableEffect } = await loadModule('src/combat/adventuring-scalable-effect.mjs');
 
 export class AdventuringItemBase extends AdventuringMasteryAction {
     constructor(namespace, data, manager, game) {
@@ -13,6 +17,10 @@ export class AdventuringItemBase extends AdventuringMasteryAction {
 
         this._name = data.name;
         this._media = data.media;
+
+        // Order position for sorting (processed by manager._buildAllSortOrders)
+        this.orderPosition = data.orderPosition || null;
+        this.sortOrder = 9999;
 
         if(data.scaling !== undefined)
             this._scaling = data.scaling;
@@ -111,18 +119,28 @@ export class AdventuringItemBase extends AdventuringMasteryAction {
     }
 
     postDataRegistration() {
-        if(this._base !== undefined) {
-            this._base.forEach(({ id, amount }) => {
-                this.base.set(id, amount);
-            });
-            delete this._base;
-        }
+        // Convert effects array to statEffects for effectCache
+        this.statEffects = [];
 
-        if(this._scaling !== undefined) {
-            this._scaling.forEach(({ id, amount }) => {
-                this.scaling.set(id, amount);
-            });
-            delete this._scaling;
+        // Process effects array - convert passive stat_flat effects with scalable amounts to ScalableEffect objects
+        // This handles the newer data format where effects are defined with amount: { base, scaling }
+        if (this.effects && this.effects.length > 0) {
+            for (const effectData of this.effects) {
+                // Only convert passive stat_flat with scalable amount - matches job effect processing
+                if (effectData.trigger === 'passive' && effectData.type === 'stat_flat') {
+                    // Check if this is a scalable amount (object with base/scaling)
+                    if (effectData.amount && typeof effectData.amount === 'object') {
+                        const effect = new AdventuringScalableEffect(this.manager, this.game, effectData);
+                        effect.postDataRegistration();
+                        effect.sourceItem = this;
+                        this.statEffects.push(effect);
+                    }
+                }
+            }
+            // Remove converted stat effects from this.effects so they're not double-processed
+            this.effects = this.effects.filter(e => 
+                !(e.trigger === 'passive' && e.type === 'stat_flat' && e.amount && typeof e.amount === 'object')
+            );
         }
 
         if(this._materials !== undefined) {
@@ -266,25 +284,41 @@ export class AdventuringItemBase extends AdventuringMasteryAction {
     }
 
     calculateStats(character = null) {
-
         const effectiveLevel = character ? this.getEffectiveLevel(character) : this.level;
-
-        const statBonus = this.getMasteryEffectValue('equipment_stats_percent');
-        StatCalculator.calculateWithScaling(this.stats, this.base, this.scaling, effectiveLevel, statBonus);
-
-        if (this.isMasterful) {
-            this.applyMasterfulScaling();
+        const masteryBonus = this.getMasteryEffectValue('equipment_stats_percent');
+        const masterfulMultiplier = this.isMasterful ? this.masterfulMultiplier : 1;
+        
+        this.stats.reset();
+        
+        // Calculate stats from statEffects (converted from effects array)
+        for (const effect of this.statEffects) {
+            if (effect.stat && typeof effect.getAmount === 'function') {
+                const context = {
+                    item: {
+                        level: effectiveLevel,
+                        upgradeLevel: this.upgradeLevel,
+                        masteryLevel: this.level
+                    }
+                };
+                let value = effect.getAmount(null, null, context);
+                
+                // Apply mastery bonus and masterful multiplier
+                value = Math.floor(value * (1 + masteryBonus / 100) * masterfulMultiplier);
+                
+                const statId = typeof effect.stat === 'string' ? effect.stat : effect.stat.id;
+                this.stats.set(statId, (this.stats.get(statId) || 0) + value);
+            }
         }
     }
 
     applyMasterfulScaling() {
-        const multiplier = this.getMasterfulMultiplier();
+        const multiplier = this.masterfulMultiplier;
         if (multiplier > 1) {
             StatCalculator.applyMultiplier(this.stats, multiplier);
         }
     }
 
-    getMasterfulMultiplier() {
+    get masterfulMultiplier() {
         const tier = this.tier || 1;
         const maxTier = 10; // Assumed max tier
 
@@ -312,7 +346,7 @@ export class AdventuringItemBase extends AdventuringMasteryAction {
                     costItems.push(tooltip.iconValue(material.media, `<span class="${color}">${cost}</span> <small class="text-muted">(${owned})</small>`));
                 });
 
-                const tieredMats = this.getUpgradeTierMaterials();
+                const tieredMats = this.upgradeTierMaterials;
                 for (const material of tieredMats) {
                     const cost = this.getUpgradeTierCost(material);
                     const owned = this.manager.stash.materialCounts.get(material) || 0;
@@ -405,10 +439,10 @@ export class AdventuringItemBase extends AdventuringMasteryAction {
     }
 
     get levelCap() {
-
         if (this.upgradeLevel >= this.maxUpgrades) {
             return 99;
         }
+        // upgradeLevel 1 = cap 10, upgradeLevel 2 = cap 20, etc.
         return this.upgradeLevel * 10;
     }
 
@@ -431,8 +465,12 @@ export class AdventuringItemBase extends AdventuringMasteryAction {
     }
 
     get unlocked() {
+        // Fast path: once unlocked, always unlocked (for dropped items)
+        if (this._unlockedCached) return true;
         if (!this._reqChecker) return true;
-        return this._reqChecker.check({ item: this });
+        const result = this._reqChecker.check({ item: this });
+        if (result) this._unlockedCached = true;
+        return result;
     }
 
     get category() {
@@ -468,7 +506,7 @@ export class AdventuringItemBase extends AdventuringMasteryAction {
                 return false;
         }
 
-        const tieredMats = this.getUpgradeTierMaterials();
+        const tieredMats = this.upgradeTierMaterials;
         for (const material of tieredMats) {
             const cost = this.getUpgradeTierCost(material);
             if (cost > (this.manager.stash.materialCounts.get(material) || 0))
@@ -478,7 +516,7 @@ export class AdventuringItemBase extends AdventuringMasteryAction {
         return true;
     }
 
-    getUpgradeTierMaterials() {
+    get upgradeTierMaterials() {
         const nextLevel = this.upgradeLevel + 1;
 
         let activeThreshold = 1;
@@ -533,8 +571,127 @@ export class AdventuringItemBase extends AdventuringMasteryAction {
         return this._cachedPairs || [];
     }
 
-    getEffectDescriptions() {
+    get effectDescriptions() {
         return getEffectDescriptionsList(this.effects, this.manager);
+    }
+
+    /**
+     * Get all effects from this item (stats + any special effects).
+     * Stats scale with item level using scaleFrom: "equipment".
+     * Splits into separate lines: Base, Level Scaling, Mastery, Masterful
+     * @param {Object} character - The character using this item
+     * @param {Object} filters - Optional filters (trigger, type, etc.)
+     * @returns {Array} Array of effect objects with getAmount methods
+     */
+    getEffects(character, filters = {}) {
+        const results = [];
+
+        // 1. Stat effects from item data (scale with level)
+        if (this.statEffects && this.statEffects.length > 0) {
+            const item = this;
+            const effectiveLevel = character ? this.getEffectiveLevel(character) : this.level;
+            const masteryBonus = this.getMasteryEffectValue('equipment_stats_percent');
+            const masterfulMultiplier = this.isMasterful ? this.masterfulMultiplier : 1;
+
+            for (const effect of this.statEffects) {
+                // Get base and scaling values from the effect's amount structure
+                const baseValue = effect.amount?.base || 0;
+                const levelScaling = effect.amount?.propertyScaling?.get('level') || 0;
+                const levelScaledValue = Math.floor(levelScaling * effectiveLevel);
+                const totalBase = baseValue + levelScaledValue;
+                
+                // Only show base line if there's a base value
+                if (baseValue > 0) {
+                    const baseStatEffect = {
+                        trigger: 'passive',
+                        type: 'stat_flat',
+                        stat: effect.stat,
+                        sourcePath: [
+                            { type: 'equipment', name: `${this.name} (Lv.${effectiveLevel})`, ref: this },
+                            { type: 'itemBase', name: 'Base', ref: this }
+                        ],
+                        getAmount: () => baseValue
+                    };
+                    results.push(baseStatEffect);
+                }
+                
+                // Only show level scaling line if there's level scaling and level > 0
+                if (levelScaling > 0 && effectiveLevel > 0) {
+                    const levelEffect = {
+                        trigger: 'passive',
+                        type: 'stat_flat',
+                        stat: effect.stat,
+                        sourcePath: [
+                            { type: 'equipment', name: `${this.name} (Lv.${effectiveLevel})`, ref: this },
+                            { type: 'itemLevel', name: `Level Scaling`, ref: this }
+                        ],
+                        getAmount: () => levelScaledValue
+                    };
+                    results.push(levelEffect);
+                }
+                
+                // If no base or scaling, just show the total (fallback)
+                if (baseValue === 0 && levelScaling === 0) {
+                    const fallbackEffect = {
+                        trigger: 'passive',
+                        type: 'stat_flat',
+                        stat: effect.stat,
+                        sourcePath: [{ type: 'equipment', name: `${this.name} (Lv.${effectiveLevel})`, ref: this }],
+                        getAmount: (source, displayMode, context) => {
+                            const itemContext = {
+                                ...context,
+                                item: {
+                                    level: effectiveLevel,
+                                    upgradeLevel: item.upgradeLevel,
+                                    masteryLevel: item.level
+                                }
+                            };
+                            return effect.getAmount(source, displayMode, itemContext);
+                        }
+                    };
+                    results.push(fallbackEffect);
+                }
+                
+                // Mastery bonus effect (separate line if there's a mastery bonus)
+                if (masteryBonus > 0 && totalBase > 0) {
+                    const masteryEffect = {
+                        trigger: 'passive',
+                        type: 'stat_flat',
+                        stat: effect.stat,
+                        sourcePath: [
+                            { type: 'equipment', name: `${this.name} (Lv.${effectiveLevel})`, ref: this },
+                            { type: 'itemMastery', name: `Mastery (+${masteryBonus}%)`, ref: this }
+                        ],
+                        getAmount: () => Math.floor(totalBase * masteryBonus / 100)
+                    };
+                    results.push(masteryEffect);
+                }
+                
+                // Masterful bonus effect (separate line if item is masterful)
+                if (masterfulMultiplier > 1 && totalBase > 0) {
+                    const withMastery = Math.floor(totalBase * (1 + masteryBonus / 100));
+                    const masterfulBonus = Math.floor(withMastery * masterfulMultiplier) - withMastery;
+                    
+                    if (masterfulBonus > 0) {
+                        const masterfulEffect = {
+                            trigger: 'passive',
+                            type: 'stat_flat',
+                            stat: effect.stat,
+                            sourcePath: [
+                                { type: 'equipment', name: `${this.name} (Lv.${effectiveLevel})`, ref: this },
+                                { type: 'itemMasterful', name: `Masterful`, ref: this }
+                            ],
+                            getAmount: () => masterfulBonus
+                        };
+                        results.push(masterfulEffect);
+                    }
+                }
+            }
+        }
+
+        // 2. Special effects from item (buffs, procs, etc.) - handled by equipment.getEffects()
+
+        return filterEffects(results, filters);
     }
 
     getCost(material) {

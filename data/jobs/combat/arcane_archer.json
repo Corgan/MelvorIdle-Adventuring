@@ -1,398 +1,226 @@
 {
-    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
-    "namespace": "adventuring",
-    "data": {
-        "skillData": [
-            {
-                "skillID": "adventuring:Adventuring",
-                "data": {
-                    "jobs": [
-                        {
-                            "id": "arcane_archer",
-                            "tier": 5,
-                            "name": "Arcane Archer",
-                            "media": "melvor:assets/media/skills/ranged/ranged.png#tint=red",
-                            "requirements": [
-                                {
-                                    "type": "job_level",
-                                    "job": "adventuring:ranger",
-                                    "level": 18
-                                },
-                                {
-                                    "type": "job_level",
-                                    "job": "adventuring:wizard",
-                                    "level": 15
-                                }
-                            ],
-                            "isMilestoneReward": true,
-                            "allowedItems": [
-                                "adventuring:cowl",
-                                "adventuring:vest",
-                                "adventuring:chaps",
-                                "adventuring:vambraces",
-                                "adventuring:boots",
-                                "adventuring:amulet",
-                                "adventuring:ring",
-                                "adventuring:cape",
-                                "adventuring:longbow",
-                                "adventuring:wand",
-                                "adventuring:orb"
-                            ],
-                            "scaling": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 0.7
-                                },
-                                {
-                                    "id": "adventuring:defence",
-                                    "amount": 0.3
-                                },
-                                {
-                                    "id": "adventuring:agility",
-                                    "amount": 1.8
-                                },
-                                {
-                                    "id": "adventuring:magic",
-                                    "amount": 1.5
-                                }
-                            ]
-                        }
-                    ],
-                    "generators": [
-                        {
-                            "id": "arcane_arrow",
-                            "name": "Arcane Arrow",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:arcane_archer",
-                                    "level": 1
-                                }
-                            ],
-                            "energy": 24,
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 16,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:agility",
-                                                        "amount": 0.3
-                                                    },
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.3
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "elemental_shot",
-                            "name": "Elemental Shot",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:arcane_archer",
-                                    "level": 10
-                                }
-                            ],
-                            "energy": 26,
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 14,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:agility",
-                                                        "amount": 0.25
-                                                    },
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.25
-                                                    }
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            "type": "debuff",
-                                            "id": "adventuring:burn",
-                                            "stacks": {
-                                                "base": 4,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.1
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "seeking_volley",
-                            "name": "Seeking Volley",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:arcane_archer",
-                                    "level": 20
-                                }
-                            ],
-                            "energy": 28,
-                            "hits": [
-                                {
-                                    "target": "random",
-                                    "party": "enemy",
-                                    "count": 3,
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 12,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:agility",
-                                                        "amount": 0.2
-                                                    },
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.25
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ],
-                    "spenders": [
-                        {
-                            "id": "enchanted_volley",
-                            "name": "Enchanted Volley",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:arcane_archer",
-                                    "level": 1
-                                }
-                            ],
-                            "cost": 75,
-                            "hits": [
-                                {
-                                    "target": "all",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 30,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:agility",
-                                                        "amount": 0.5
-                                                    },
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.6
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "spellbind_arrow",
-                            "name": "Spellbind Arrow",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:arcane_archer",
-                                    "level": 15
-                                }
-                            ],
-                            "cost": 70,
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 28,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:agility",
-                                                        "amount": 0.4
-                                                    },
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.5
-                                                    }
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            "type": "debuff",
-                                            "id": "adventuring:silence",
-                                            "stacks": {
-                                                "base": 3,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.08
-                                                    }
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            "type": "debuff",
-                                            "id": "adventuring:chill",
-                                            "stacks": {
-                                                "base": 3,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.08
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "starfall",
-                            "name": "Starfall",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:arcane_archer",
-                                    "level": 25
-                                }
-                            ],
-                            "cost": 100,
-                            "hits": [
-                                {
-                                    "target": "all",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 45,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:agility",
-                                                        "amount": 0.6
-                                                    },
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.8
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                },
-                                {
-                                    "target": "self",
-                                    "party": "ally",
-                                    "effects": [
-                                        {
-                                            "type": "buff",
-                                            "id": "adventuring:arcane_power",
-                                            "stacks": {
-                                                "base": 5,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.12
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ],
-                    "passives": [
-                        {
-                            "id": "imbued_arrows",
-                            "name": "Imbued Arrows",
-                            "requirements": [
-                                {
-                                    "type": "job_level",
-                                    "job": "adventuring:arcane_archer",
-                                    "level": 8
-                                }
-                            ]
-                        },
-                        {
-                            "id": "mana_quiver",
-                            "name": "Mana Quiver",
-                            "requirements": [
-                                {
-                                    "type": "job_level",
-                                    "job": "adventuring:arcane_archer",
-                                    "level": 18
-                                }
-                            ],
-                            "effects": [
-                                {
-                                    "trigger": "encounter_start",
-                                    "type": "buff",
-                                    "id": "adventuring:arcane_power",
-                                    "target": "self",
-                                    "stacks": 3
-                                }
-                            ]
-                        },
-                        {
-                            "id": "spell_weaver",
-                            "name": "Spell Weaver",
-                            "requirements": [
-                                {
-                                    "type": "job_level",
-                                    "job": "adventuring:arcane_archer",
-                                    "level": 28
-                                }
-                            ],
-                            "effects": [
-                                {
-                                    "trigger": "crit",
-                                    "type": "debuff",
-                                    "random": true,
-                                    "target": "target",
-                                    "count": 2,
-                                    "stacks": 2
-                                }
-                            ]
-                        }
-                    ]
-                }
-            }
-        ]
-    }
+	"$schema": "../job_schema.json",
+	"namespace": "adventuring",
+	"packages": {
+		"combat_jobs": {
+			"jobs": {
+				"arcane_archer": {
+					"name": "Arcane Archer",
+					"tier": 5,
+					"media": "assets/jobs/arcane_archer.png",
+					"requirements": [
+						{ "type": "job_level", "job": "adventuring:sniper", "level": 30 },
+						{ "type": "job_level", "job": "adventuring:elementalist", "level": 25 }
+					],
+					"abilities": [
+						{
+							"id": "arcane_arrow",
+							"name": "Arcane Arrow",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "Fires an arrow infused with arcane energy.",
+							"energy": 25,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:arcane_archer", "level": 1 }],
+							"hits": [
+								{ "target": "front", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "amount": { "base": 8, "scaling": [
+										{ "id": "adventuring:agility", "amount": 0.3 },
+										{ "id": "adventuring:magic", "amount": 0.3 }
+									] } }
+								] },
+								{ "target": "self", "effects": [
+									{ "type": "buff", "id": "adventuring:arcane_power", "stacks": 2 }
+								] }
+							]
+						},
+						{
+							"id": "enchanted_volley",
+							"name": "Enchanted Volley",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "Unleashes a volley of enchanted arrows at all enemies.",
+							"cost": 140,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:arcane_archer", "level": 1 }],
+							"hits": [{ "target": "all", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 12, "scaling": [
+									{ "id": "adventuring:agility", "amount": 0.4 },
+									{ "id": "adventuring:magic", "amount": 0.5 }
+								] } },
+								{ "type": "debuff", "id": "adventuring:burn", "stacks": 2 }
+							] }]
+						},
+						{
+							"id": "elemental_shot",
+							"name": "Elemental Shot",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "An arrow imbued with fire and ice.",
+							"energy": 25,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:arcane_archer", "level": 10 }],
+							"hits": [{ "target": "front", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 9, "scaling": [
+									{ "id": "adventuring:agility", "amount": 0.35 },
+									{ "id": "adventuring:magic", "amount": 0.35 }
+								] } },
+								{ "type": "debuff", "id": "adventuring:burn", "stacks": { "base": 3, "scaling": [{ "id": "adventuring:magic", "amount": 0.1 }] } },
+								{ "type": "debuff", "id": "adventuring:chill", "stacks": 2 }
+							] }]
+						},
+						{
+							"id": "spellbind_arrow",
+							"name": "Spellbind Arrow",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "An arrow that silences and slows the target.",
+							"cost": 135,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:arcane_archer", "level": 15 }],
+							"hits": [{ "target": "front", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 16, "scaling": [
+									{ "id": "adventuring:agility", "amount": 0.5 },
+									{ "id": "adventuring:magic", "amount": 0.6 }
+								] } },
+								{ "type": "debuff", "id": "adventuring:chill", "stacks": { "base": 3, "scaling": [{ "id": "adventuring:magic", "amount": 0.08 }] } },
+								{ "type": "debuff", "id": "adventuring:silence", "stacks": { "base": 3, "scaling": [{ "id": "adventuring:magic", "amount": 0.08 }] } }
+							] }]
+						},
+						{
+							"id": "mana_quiver",
+							"name": "Mana Quiver",
+							"type": "passive",
+							"media": "assets/abilities/passive.png",
+							"description": "Your quiver pulses with arcane energy at the start of combat.",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:arcane_archer", "level": 20 }],
+							"effects": [
+								{ "trigger": "encounter_start", "type": "buff", "target": "self", "id": "adventuring:arcane_power", "stacks": { "base": 4, "scaling": [{ "id": "adventuring:magic", "amount": 0.15 }] } }
+							]
+						},
+						{
+							"id": "seeking_volley",
+							"name": "Seeking Volley",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "Arrows seek out all enemies.",
+							"energy": 30,
+							"requirements": [{ "type": "job_level", "job": "adventuring:arcane_archer", "level": 25 }],
+							"hits": [{ "target": "all", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 7, "scaling": [
+									{ "id": "adventuring:agility", "amount": 0.25 },
+									{ "id": "adventuring:magic", "amount": 0.3 }
+								] } },
+								{ "type": "debuff", "id": "adventuring:burn", "stacks": 2 }
+							] }]
+						},
+						{
+							"id": "spell_weaver",
+							"name": "Spell Weaver",
+							"type": "passive",
+							"media": "assets/abilities/passive.png",
+							"description": "Your attacks weave additional debuffs onto targets.",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:arcane_archer", "level": 40 }],
+							"effects": [
+								{ "trigger": "after_damage_delivered", "type": "debuff", "target": "target", "id": "adventuring:burn", "stacks": 1, "condition": { "type": "chance", "value": 50 } }
+							]
+						},
+						{
+							"id": "starfall",
+							"name": "Starfall",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "Calls down a rain of arcane stars on all enemies.",
+							"cost": 170,
+							"requirements": [{ "type": "job_level", "job": "adventuring:arcane_archer", "level": 50 }],
+							"hits": [{ "target": "all", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 18, "scaling": [
+									{ "id": "adventuring:agility", "amount": 0.6 },
+									{ "id": "adventuring:magic", "amount": 0.8 }
+								] } },
+								{ "type": "debuff", "id": "adventuring:burn", "stacks": 3 },
+								{ "type": "debuff", "id": "adventuring:chill", "stacks": 3 },
+								{ "type": "debuff", "id": "adventuring:shock", "stacks": 3 }
+							] }]
+						},
+						{
+							"id": "arcane_barrage",
+							"name": "Arcane Barrage",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "Rapid-fire arcane arrows that stack burn.",
+							"energy": 35,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:arcane_archer", "level": 60 }],
+							"hits": [{ "target": "front", "party": "enemy", "delay": 100, "repeat": 3, "effects": [
+								{ "type": "damage_flat", "amount": { "base": 6, "scaling": [
+									{ "id": "adventuring:agility", "amount": 0.2 },
+									{ "id": "adventuring:magic", "amount": 0.25 }
+								] } },
+								{ "type": "debuff", "id": "adventuring:burn", "stacks": 1 }
+							] }]
+						},
+						{
+							"id": "mystic_piercer",
+							"name": "Mystic Piercer",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "A devastating shot that consumes arcane power.",
+							"cost": 165,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:arcane_archer", "level": 70 }],
+							"hits": [{ "target": "lowest", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 25, "scaling": [
+									{ "id": "adventuring:agility", "amount": 0.7 },
+									{ "id": "adventuring:magic", "amount": 0.9 },
+									{ "id": "adventuring:arcane_power", "scaleFrom": "buff", "scaleTarget": "caster", "amount": 4, "consume": true }
+								] } }
+							] }]
+						},
+						{
+							"id": "arcane_infusion",
+							"name": "Arcane Infusion",
+							"type": "passive",
+							"media": "assets/abilities/passive.png",
+							"description": "Infuses the party with arcane energy each round.",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:arcane_archer", "level": 80 }],
+							"effects": [
+								{ "trigger": "round_start", "type": "buff", "target": "self", "id": "adventuring:arcane_power", "stacks": 2 },
+								{ "trigger": "round_start", "type": "buff", "target": "all", "party": "ally", "id": "adventuring:haste", "stacks": 1 }
+							]
+						},
+						{
+							"id": "annihilating_arrow",
+							"name": "Annihilating Arrow",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "An arrow of pure destruction.",
+							"energy": 40,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:arcane_archer", "level": 90 }],
+							"hits": [{ "target": "front", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 20, "scaling": [
+									{ "id": "adventuring:agility", "amount": 0.7 },
+									{ "id": "adventuring:magic", "amount": 0.8 }
+								] } },
+								{ "type": "debuff", "id": "adventuring:vulnerable", "stacks": 4 },
+								{ "type": "debuff", "id": "adventuring:burn", "stacks": 3 }
+							] }]
+						},
+						{
+							"id": "rain_of_stars",
+							"name": "Rain of Stars",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "Calls down a devastating storm of arcane stars that consumes all DoTs.",
+							"cost": 220,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:arcane_archer", "level": 99 }],
+							"hits": [{ "target": "all", "party": "enemy", "delay": 100, "repeat": 5, "effects": [
+								{ "type": "damage_flat", "amount": { "base": 12, "scaling": [
+									{ "id": "adventuring:agility", "amount": 0.5 },
+									{ "id": "adventuring:magic", "amount": 0.6 },
+									{ "id": "adventuring:burn", "scaleFrom": "debuff", "scaleTarget": "target", "amount": 3, "consume": true },
+									{ "id": "adventuring:chill", "scaleFrom": "debuff", "scaleTarget": "target", "amount": 3, "consume": true },
+									{ "id": "adventuring:shock", "scaleFrom": "debuff", "scaleTarget": "target", "amount": 3, "consume": true }
+								] } }
+							] }]
+						}
+					]
+				}
+			}
+		}
+	}
 }

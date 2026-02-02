@@ -54,10 +54,7 @@
                         "name": "Dungeon Exploration",
                         "requiresState": "dungeon",
                         "priority": 0,
-                        "trigger": { 
-                            "type": "event",
-                            "event": "dungeonStart"
-                        },
+                        "trigger": { "type": "dungeon_start" },
                         "steps": [
                             {
                                 "target": "dungeonFloor:",
@@ -76,10 +73,7 @@
                         "name": "Combat System",
                         "requiresState": "dungeon",
                         "priority": 0,
-                        "trigger": { 
-                            "type": "event",
-                            "event": "combatStart"
-                        },
+                        "trigger": { "type": "encounter_start" },
                         "steps": [
                             {
                                 "target": "turnOrderCards:",
@@ -99,7 +93,7 @@
                         "priority": 20,
                         "requiresState": "town",
                         "trigger": { 
-                            "type": "currency",
+                            "type": "currency_threshold",
                             "currencyId": "currency",
                             "amount": 25
                         },
@@ -117,7 +111,7 @@
                         "priority": 20,
                         "requiresState": "town",
                         "trigger": {
-                            "type": "material",
+                            "type": "material_threshold",
                             "check": "anyUpgrade"
                         },
                         "steps": [
@@ -134,7 +128,7 @@
                         "priority": 20,
                         "requiresState": "town",
                         "trigger": {
-                            "type": "material",
+                            "type": "material_threshold",
                             "check": "anyCraft"
                         },
                         "steps": [
@@ -150,8 +144,8 @@
                         "name": "Slayer Tasks",
                         "priority": 15,
                         "trigger": {
-                            "type": "event",
-                            "event": "firstMonsterSeen"
+                            "type": "monster_seen",
+                            "conditions": { "isFirst": true }
                         },
                         "requiresState": "town",
                         "steps": [
@@ -167,7 +161,7 @@
                         "name": "Mastery System",
                         "priority": 30,
                         "trigger": {
-                            "type": "mastery",
+                            "type": "mastery_level_up",
                             "category": "job",
                             "level": 10
                         },
@@ -185,7 +179,7 @@
                         "name": "Auto-Run",
                         "priority": 25,
                         "trigger": {
-                            "type": "mastery",
+                            "type": "mastery_level_up",
                             "category": "area",
                             "level": 10
                         },
@@ -203,7 +197,7 @@
                         "name": "Difficulty Modes",
                         "priority": 30,
                         "trigger": {
-                            "type": "mastery",
+                            "type": "mastery_level_up",
                             "category": "area",
                             "level": 25
                         },
@@ -221,3 +215,4 @@
         }]
     }
 }
+

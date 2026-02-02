@@ -1,720 +1,1714 @@
 {
-    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
-    "namespace": "adventuring",
-    "data": {
-        "skillData": [
-            {
-                "skillID": "adventuring:Adventuring",
-                "data": {
-                    "baseItems": [
-                        {
-                            "id": "assassins_blade",
-                            "name": "Assassin's Blade",
-                            "media": "melvor:assets/media/bank/weapon_dagger_dragon.png#shade=black",
-                            "type": "adventuring:dagger",
-                            "isJobWeapon": true,"itemCategory": "adventuring:jobweapons",
-                            "allowedJobs": ["adventuring:assassin"],
-                            "requirements": [
-                                { "type": "achievement_completion", "id": "adventuring:assassin_weapon_mastery" }
-                            ],
-                            "tiers": [
-                                {
-                                    "name": "Assassin's Blade",
-                                    "base": [
-                                        { "id": "adventuring:strength", "amount": 45 },
-                                        { "id": "adventuring:agility", "amount": 50 }
-                                    ],
-                                    "scaling": [
-                                        { "id": "adventuring:strength", "amount": 4 },
-                                        { "id": "adventuring:agility", "amount": 4.5 }
-                                    ],
-                                    "materials": [
-                                        { "id": "adventuring:currency", "qty": 12000 },
-                                        { "id": "adventuring:pristine_salvage", "qty": 25 }
-                                    ]
-                                },
-                                {
-                                    "name": "Deathbringer",
-                                    "base": [
-                                        { "id": "adventuring:strength", "amount": 75 },
-                                        { "id": "adventuring:agility", "amount": 83 }
-                                    ],
-                                    "scaling": [
-                                        { "id": "adventuring:strength", "amount": 6.7 },
-                                        { "id": "adventuring:agility", "amount": 7.5 }
-                                    ],
-                                    "effects": [
-                                        {
-                                            "trigger": "crit",
-                                            "type": "damage_flat",
-                                            "target": "target",
-                                            "amount": 20,
-                                            "scaling": 2
-                                        }
-                                    ],
-                                    "materials": [
-                                        { "id": "adventuring:currency", "qty": 60000 },
-                                        { "id": "adventuring:mythic_salvage", "qty": 18 }
-                                    ]
-                                },
-                                {
-                                    "name": "Fatesealer",
-                                    "base": [
-                                        { "id": "adventuring:strength", "amount": 123 },
-                                        { "id": "adventuring:agility", "amount": 137 }
-                                    ],
-                                    "scaling": [
-                                        { "id": "adventuring:strength", "amount": 11 },
-                                        { "id": "adventuring:agility", "amount": 12 }
-                                    ],
-                                    "effects": [
-                                        {
-                                            "trigger": "crit",
-                                            "type": "damage_flat",
-                                            "target": "target",
-                                            "amount": 40,
-                                            "scaling": 4
-                                        },
-                                        {
-                                            "trigger": "kill",
-                                            "type": "buff",
-                                            "id": "adventuring:invisible",
-                                            "target": "self",
-                                            "stacks": 1
-                                        }
-                                    ],
-                                    "materials": [
-                                        { "id": "adventuring:currency", "qty": 180000 },
-                                        { "id": "adventuring:mythic_salvage", "qty": 55 },
-                                        { "id": "adventuring:chaos_core", "qty": 1 }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "bards_lute",
-                            "name": "Bard's Lute",
-                            "media": "melvor:assets/media/bank/almighty_lute.png",
-                            "type": "adventuring:wand",
-                            "isJobWeapon": true,"itemCategory": "adventuring:jobweapons",
-                            "allowedJobs": ["adventuring:bard"],
-                            "requirements": [
-                                { "type": "achievement_completion", "id": "adventuring:bard_weapon_mastery" }
-                            ],
-                            "tiers": [
-                                {
-                                    "name": "Bard's Lute",
-                                    "base": [
-                                        { "id": "adventuring:hitpoints", "amount": 30 },
-                                        { "id": "adventuring:magic", "amount": 30 },
-                                        { "id": "adventuring:agility", "amount": 30 }
-                                    ],
-                                    "scaling": [
-                                        { "id": "adventuring:hitpoints", "amount": 2.7 },
-                                        { "id": "adventuring:magic", "amount": 2.7 },
-                                        { "id": "adventuring:agility", "amount": 2.7 }
-                                    ],
-                                    "materials": [
-                                        { "id": "adventuring:currency", "qty": 12000 },
-                                        { "id": "adventuring:pristine_salvage", "qty": 25 }
-                                    ]
-                                },
-                                {
-                                    "name": "Virtuoso's Lute",
-                                    "base": [
-                                        { "id": "adventuring:hitpoints", "amount": 50 },
-                                        { "id": "adventuring:magic", "amount": 50 },
-                                        { "id": "adventuring:agility", "amount": 50 }
-                                    ],
-                                    "scaling": [
-                                        { "id": "adventuring:hitpoints", "amount": 4.5 },
-                                        { "id": "adventuring:magic", "amount": 4.5 },
-                                        { "id": "adventuring:agility", "amount": 4.5 }
-                                    ],
-                                    "effects": [
-                                        {
-                                            "trigger": "round_start",
-                                            "type": "buff",
-                                            "id": "adventuring:might",
-                                            "target": "all",
-                                            "party": "ally",
-                                            "stacks": 1,
-                                            "chance": 30
-                                        }
-                                    ],
-                                    "materials": [
-                                        { "id": "adventuring:currency", "qty": 60000 },
-                                        { "id": "adventuring:mythic_salvage", "qty": 18 }
-                                    ]
-                                },
-                                {
-                                    "name": "Symphony of War",
-                                    "base": [
-                                        { "id": "adventuring:hitpoints", "amount": 82 },
-                                        { "id": "adventuring:magic", "amount": 82 },
-                                        { "id": "adventuring:agility", "amount": 82 }
-                                    ],
-                                    "scaling": [
-                                        { "id": "adventuring:hitpoints", "amount": 7.2 },
-                                        { "id": "adventuring:magic", "amount": 7.2 },
-                                        { "id": "adventuring:agility", "amount": 7.2 }
-                                    ],
-                                    "effects": [
-                                        {
-                                            "trigger": "round_start",
-                                            "type": "buff",
-                                            "id": "adventuring:might",
-                                            "target": "all",
-                                            "party": "ally",
-                                            "stacks": 1,
-                                            "chance": 50
-                                        },
-                                        {
-                                            "trigger": "encounter_start",
-                                            "type": "buff",
-                                            "id": "adventuring:haste",
-                                            "target": "all",
-                                            "party": "ally",
-                                            "stacks": 2
-                                        }
-                                    ],
-                                    "materials": [
-                                        { "id": "adventuring:currency", "qty": 180000 },
-                                        { "id": "adventuring:mythic_salvage", "qty": 55 },
-                                        { "id": "adventuring:chaos_core", "qty": 1 }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "guardians_tower_shield",
-                            "name": "Guardian's Tower Shield",
-                            "media": "melvor:assets/media/bank/armour_shield_dragon.png#shade=blue",
-                            "type": "adventuring:shield",
-                            "isJobWeapon": true,"itemCategory": "adventuring:jobweapons",
-                            "allowedJobs": ["adventuring:guardian"],
-                            "requirements": [
-                                { "type": "achievement_completion", "id": "adventuring:guardian_weapon_mastery" }
-                            ],
-                            "tiers": [
-                                {
-                                    "name": "Guardian's Tower Shield",
-                                    "base": [
-                                        { "id": "adventuring:hitpoints", "amount": 50 },
-                                        { "id": "adventuring:defence", "amount": 60 }
-                                    ],
-                                    "scaling": [
-                                        { "id": "adventuring:hitpoints", "amount": 4.5 },
-                                        { "id": "adventuring:defence", "amount": 5.5 }
-                                    ],
-                                    "materials": [
-                                        { "id": "adventuring:currency", "qty": 12000 },
-                                        { "id": "adventuring:pristine_salvage", "qty": 25 }
-                                    ]
-                                },
-                                {
-                                    "name": "Bulwark of Ages",
-                                    "base": [
-                                        { "id": "adventuring:hitpoints", "amount": 83 },
-                                        { "id": "adventuring:defence", "amount": 100 }
-                                    ],
-                                    "scaling": [
-                                        { "id": "adventuring:hitpoints", "amount": 7.5 },
-                                        { "id": "adventuring:defence", "amount": 9 }
-                                    ],
-                                    "effects": [
-                                        {
-                                            "trigger": "passive",
-                                            "type": "damage_reduction",
-                                            "amount": 0.1
-                                        }
-                                    ],
-                                    "materials": [
-                                        { "id": "adventuring:currency", "qty": 60000 },
-                                        { "id": "adventuring:mythic_salvage", "qty": 18 }
-                                    ]
-                                },
-                                {
-                                    "name": "Eternal Bastion",
-                                    "base": [
-                                        { "id": "adventuring:hitpoints", "amount": 137 },
-                                        { "id": "adventuring:defence", "amount": 165 }
-                                    ],
-                                    "scaling": [
-                                        { "id": "adventuring:hitpoints", "amount": 12 },
-                                        { "id": "adventuring:defence", "amount": 14.5 }
-                                    ],
-                                    "effects": [
-                                        {
-                                            "trigger": "passive",
-                                            "type": "damage_reduction",
-                                            "amount": 0.15
-                                        },
-                                        {
-                                            "trigger": "encounter_start",
-                                            "type": "buff",
-                                            "id": "adventuring:barrier",
-                                            "target": "all",
-                                            "party": "ally",
-                                            "stacks": 3
-                                        }
-                                    ],
-                                    "materials": [
-                                        { "id": "adventuring:currency", "qty": 180000 },
-                                        { "id": "adventuring:mythic_salvage", "qty": 55 },
-                                        { "id": "adventuring:chaos_core", "qty": 1 }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "knights_lance",
-                            "name": "Knight's Lance",
-                            "media": "melvor:assets/media/bank/weapon_2h_dragon.png#shade=silver",
-                            "type": "adventuring:polearm",
-                            "isJobWeapon": true,"itemCategory": "adventuring:jobweapons",
-                            "allowedJobs": ["adventuring:knight"],
-                            "requirements": [
-                                { "type": "achievement_completion", "id": "adventuring:knight_weapon_mastery" }
-                            ],
-                            "tiers": [
-                                {
-                                    "name": "Knight's Lance",
-                                    "base": [
-                                        { "id": "adventuring:hitpoints", "amount": 35 },
-                                        { "id": "adventuring:strength", "amount": 40 },
-                                        { "id": "adventuring:defence", "amount": 35 }
-                                    ],
-                                    "scaling": [
-                                        { "id": "adventuring:hitpoints", "amount": 3.2 },
-                                        { "id": "adventuring:strength", "amount": 3.6 },
-                                        { "id": "adventuring:defence", "amount": 3.2 }
-                                    ],
-                                    "materials": [
-                                        { "id": "adventuring:currency", "qty": 12000 },
-                                        { "id": "adventuring:pristine_salvage", "qty": 25 }
-                                    ]
-                                },
-                                {
-                                    "name": "Champion's Lance",
-                                    "base": [
-                                        { "id": "adventuring:hitpoints", "amount": 58 },
-                                        { "id": "adventuring:strength", "amount": 67 },
-                                        { "id": "adventuring:defence", "amount": 58 }
-                                    ],
-                                    "scaling": [
-                                        { "id": "adventuring:hitpoints", "amount": 5.3 },
-                                        { "id": "adventuring:strength", "amount": 6 },
-                                        { "id": "adventuring:defence", "amount": 5.3 }
-                                    ],
-                                    "effects": [
-                                        {
-                                            "trigger": "after_damage_received",
-                                            "type": "damage_flat",
-                                            "target": "attacker",
-                                            "amount": 10,
-                                            "scaling": 1
-                                        }
-                                    ],
-                                    "materials": [
-                                        { "id": "adventuring:currency", "qty": 60000 },
-                                        { "id": "adventuring:mythic_salvage", "qty": 18 }
-                                    ]
-                                },
-                                {
-                                    "name": "Lance of the Realm",
-                                    "base": [
-                                        { "id": "adventuring:hitpoints", "amount": 95 },
-                                        { "id": "adventuring:strength", "amount": 110 },
-                                        { "id": "adventuring:defence", "amount": 95 }
-                                    ],
-                                    "scaling": [
-                                        { "id": "adventuring:hitpoints", "amount": 8.5 },
-                                        { "id": "adventuring:strength", "amount": 9.5 },
-                                        { "id": "adventuring:defence", "amount": 8.5 }
-                                    ],
-                                    "effects": [
-                                        {
-                                            "trigger": "after_damage_received",
-                                            "type": "damage_flat",
-                                            "target": "attacker",
-                                            "amount": 20,
-                                            "scaling": 2
-                                        },
-                                        {
-                                            "trigger": "passive",
-                                            "type": "damage_reduction",
-                                            "amount": 0.08
-                                        }
-                                    ],
-                                    "materials": [
-                                        { "id": "adventuring:currency", "qty": 180000 },
-                                        { "id": "adventuring:mythic_salvage", "qty": 55 },
-                                        { "id": "adventuring:chaos_core", "qty": 1 }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "crusaders_hammer",
-                            "name": "Crusader's Hammer",
-                            "media": "melvor:assets/media/bank/weapon_2h_ancient.png#shade=white",
-                            "type": "adventuring:hammer2h",
-                            "isJobWeapon": true,"itemCategory": "adventuring:jobweapons",
-                            "allowedJobs": ["adventuring:crusader"],
-                            "requirements": [
-                                { "type": "achievement_completion", "id": "adventuring:crusader_weapon_mastery" }
-                            ],
-                            "tiers": [
-                                {
-                                    "name": "Crusader's Hammer",
-                                    "base": [
-                                        { "id": "adventuring:hitpoints", "amount": 40 },
-                                        { "id": "adventuring:strength", "amount": 50 },
-                                        { "id": "adventuring:prayer", "amount": 30 }
-                                    ],
-                                    "scaling": [
-                                        { "id": "adventuring:hitpoints", "amount": 3.6 },
-                                        { "id": "adventuring:strength", "amount": 4.5 },
-                                        { "id": "adventuring:prayer", "amount": 2.7 }
-                                    ],
-                                    "materials": [
-                                        { "id": "adventuring:currency", "qty": 12000 },
-                                        { "id": "adventuring:pristine_salvage", "qty": 25 }
-                                    ]
-                                },
-                                {
-                                    "name": "Holy Avenger",
-                                    "base": [
-                                        { "id": "adventuring:hitpoints", "amount": 67 },
-                                        { "id": "adventuring:strength", "amount": 83 },
-                                        { "id": "adventuring:prayer", "amount": 50 }
-                                    ],
-                                    "scaling": [
-                                        { "id": "adventuring:hitpoints", "amount": 6 },
-                                        { "id": "adventuring:strength", "amount": 7.5 },
-                                        { "id": "adventuring:prayer", "amount": 4.5 }
-                                    ],
-                                    "effects": [
-                                        {
-                                            "trigger": "after_damage_delivered",
-                                            "type": "debuff",
-                                            "id": "adventuring:stun",
-                                            "target": "target",
-                                            "stacks": 1,
-                                            "chance": 15
-                                        }
-                                    ],
-                                    "materials": [
-                                        { "id": "adventuring:currency", "qty": 60000 },
-                                        { "id": "adventuring:mythic_salvage", "qty": 18 }
-                                    ]
-                                },
-                                {
-                                    "name": "Hammer of Divine Wrath",
-                                    "base": [
-                                        { "id": "adventuring:hitpoints", "amount": 110 },
-                                        { "id": "adventuring:strength", "amount": 137 },
-                                        { "id": "adventuring:prayer", "amount": 82 }
-                                    ],
-                                    "scaling": [
-                                        { "id": "adventuring:hitpoints", "amount": 9.5 },
-                                        { "id": "adventuring:strength", "amount": 12 },
-                                        { "id": "adventuring:prayer", "amount": 7.2 }
-                                    ],
-                                    "effects": [
-                                        {
-                                            "trigger": "after_damage_delivered",
-                                            "type": "debuff",
-                                            "id": "adventuring:stun",
-                                            "target": "target",
-                                            "stacks": 1,
-                                            "chance": 25
-                                        },
-                                        {
-                                            "trigger": "kill",
-                                            "type": "heal_flat",
-                                            "target": "all",
-                                            "party": "ally",
-                                            "amount": 15,
-                                            "scaling": 1.5
-                                        }
-                                    ],
-                                    "materials": [
-                                        { "id": "adventuring:currency", "qty": 180000 },
-                                        { "id": "adventuring:mythic_salvage", "qty": 55 },
-                                        { "id": "adventuring:chaos_core", "qty": 1 }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "slayers_blade",
-                            "name": "Slayer's Blade",
-                            "media": "melvor:assets/media/bank/weapon_sword_ancient.png#shade=red",
-                            "type": "adventuring:sword1h",
-                            "isJobWeapon": true,"itemCategory": "adventuring:jobweapons",
-                            "allowedJobs": ["adventuring:slayer"],
-                            "requirements": [
-                                { "type": "achievement_completion", "id": "adventuring:slayer_weapon_mastery" }
-                            ],
-                            "tiers": [
-                                {
-                                    "name": "Slayer's Blade",
-                                    "base": [
-                                        { "id": "adventuring:strength", "amount": 35 },
-                                        { "id": "adventuring:ranged", "amount": 35 },
-                                        { "id": "adventuring:magic", "amount": 35 }
-                                    ],
-                                    "scaling": [
-                                        { "id": "adventuring:strength", "amount": 3.2 },
-                                        { "id": "adventuring:ranged", "amount": 3.2 },
-                                        { "id": "adventuring:magic", "amount": 3.2 }
-                                    ],
-                                    "materials": [
-                                        { "id": "adventuring:currency", "qty": 12000 },
-                                        { "id": "adventuring:pristine_salvage", "qty": 25 }
-                                    ]
-                                },
-                                {
-                                    "name": "Executioner's Blade",
-                                    "base": [
-                                        { "id": "adventuring:strength", "amount": 58 },
-                                        { "id": "adventuring:ranged", "amount": 58 },
-                                        { "id": "adventuring:magic", "amount": 58 }
-                                    ],
-                                    "scaling": [
-                                        { "id": "adventuring:strength", "amount": 5.3 },
-                                        { "id": "adventuring:ranged", "amount": 5.3 },
-                                        { "id": "adventuring:magic", "amount": 5.3 }
-                                    ],
-                                    "effects": [
-                                        {
-                                            "trigger": "passive",
-                                            "type": "damage_bonus",
-                                            "condition": "target_below_50_hp",
-                                            "amount": 0.2
-                                        }
-                                    ],
-                                    "materials": [
-                                        { "id": "adventuring:currency", "qty": 60000 },
-                                        { "id": "adventuring:mythic_salvage", "qty": 18 }
-                                    ]
-                                },
-                                {
-                                    "name": "Blade of Annihilation",
-                                    "base": [
-                                        { "id": "adventuring:strength", "amount": 95 },
-                                        { "id": "adventuring:ranged", "amount": 95 },
-                                        { "id": "adventuring:magic", "amount": 95 }
-                                    ],
-                                    "scaling": [
-                                        { "id": "adventuring:strength", "amount": 8.5 },
-                                        { "id": "adventuring:ranged", "amount": 8.5 },
-                                        { "id": "adventuring:magic", "amount": 8.5 }
-                                    ],
-                                    "effects": [
-                                        {
-                                            "trigger": "passive",
-                                            "type": "damage_bonus",
-                                            "condition": "target_below_50_hp",
-                                            "amount": 0.35
-                                        },
-                                        {
-                                            "trigger": "kill",
-                                            "type": "buff",
-                                            "id": "adventuring:might",
-                                            "target": "self",
-                                            "stacks": 3
-                                        }
-                                    ],
-                                    "materials": [
-                                        { "id": "adventuring:currency", "qty": 180000 },
-                                        { "id": "adventuring:mythic_salvage", "qty": 55 },
-                                        { "id": "adventuring:chaos_core", "qty": 1 }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "samurais_katana",
-                            "name": "Samurai's Katana",
-                            "media": "melvor:assets/media/bank/weapon_sword_divine.png#shade=red",
-                            "type": "adventuring:sword2h",
-                            "isJobWeapon": true,"itemCategory": "adventuring:jobweapons",
-                            "allowedJobs": ["adventuring:samurai"],
-                            "requirements": [
-                                { "type": "achievement_completion", "id": "adventuring:samurai_weapon_mastery" }
-                            ],
-                            "tiers": [
-                                {
-                                    "name": "Samurai's Katana",
-                                    "base": [
-                                        { "id": "adventuring:hitpoints", "amount": 25 },
-                                        { "id": "adventuring:strength", "amount": 55 },
-                                        { "id": "adventuring:agility", "amount": 30 }
-                                    ],
-                                    "scaling": [
-                                        { "id": "adventuring:hitpoints", "amount": 2.2 },
-                                        { "id": "adventuring:strength", "amount": 5 },
-                                        { "id": "adventuring:agility", "amount": 2.7 }
-                                    ],
-                                    "materials": [
-                                        { "id": "adventuring:currency", "qty": 12000 },
-                                        { "id": "adventuring:pristine_salvage", "qty": 25 }
-                                    ]
-                                },
-                                {
-                                    "name": "Blade of Honor",
-                                    "base": [
-                                        { "id": "adventuring:hitpoints", "amount": 42 },
-                                        { "id": "adventuring:strength", "amount": 92 },
-                                        { "id": "adventuring:agility", "amount": 50 }
-                                    ],
-                                    "scaling": [
-                                        { "id": "adventuring:hitpoints", "amount": 3.7 },
-                                        { "id": "adventuring:strength", "amount": 8.2 },
-                                        { "id": "adventuring:agility", "amount": 4.5 }
-                                    ],
-                                    "effects": [
-                                        {
-                                            "trigger": "passive",
-                                            "type": "crit_chance",
-                                            "amount": 0.12
-                                        }
-                                    ],
-                                    "materials": [
-                                        { "id": "adventuring:currency", "qty": 60000 },
-                                        { "id": "adventuring:mythic_salvage", "qty": 18 }
-                                    ]
-                                },
-                                {
-                                    "name": "Masamune",
-                                    "base": [
-                                        { "id": "adventuring:hitpoints", "amount": 68 },
-                                        { "id": "adventuring:strength", "amount": 150 },
-                                        { "id": "adventuring:agility", "amount": 82 }
-                                    ],
-                                    "scaling": [
-                                        { "id": "adventuring:hitpoints", "amount": 6 },
-                                        { "id": "adventuring:strength", "amount": 13.5 },
-                                        { "id": "adventuring:agility", "amount": 7.2 }
-                                    ],
-                                    "effects": [
-                                        {
-                                            "trigger": "passive",
-                                            "type": "crit_chance",
-                                            "amount": 0.18
-                                        },
-                                        {
-                                            "trigger": "crit",
-                                            "type": "debuff",
-                                            "id": "adventuring:bleed",
-                                            "target": "target",
-                                            "stacks": 4
-                                        }
-                                    ],
-                                    "materials": [
-                                        { "id": "adventuring:currency", "qty": 180000 },
-                                        { "id": "adventuring:mythic_salvage", "qty": 55 },
-                                        { "id": "adventuring:chaos_core", "qty": 1 }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "druids_focus",
-                            "name": "Druid's Focus",
-                            "media": "melvor:assets/media/bank/staff_of_earth.png#shade=green",
-                            "type": "adventuring:staff",
-                            "isJobWeapon": true,"itemCategory": "adventuring:jobweapons",
-                            "allowedJobs": ["adventuring:druid"],
-                            "requirements": [
-                                { "type": "achievement_completion", "id": "adventuring:druid_weapon_mastery" }
-                            ],
-                            "tiers": [
-                                {
-                                    "name": "Druid's Focus",
-                                    "base": [
-                                        { "id": "adventuring:hitpoints", "amount": 35 },
-                                        { "id": "adventuring:magic", "amount": 40 },
-                                        { "id": "adventuring:prayer", "amount": 35 }
-                                    ],
-                                    "scaling": [
-                                        { "id": "adventuring:hitpoints", "amount": 3.2 },
-                                        { "id": "adventuring:magic", "amount": 3.6 },
-                                        { "id": "adventuring:prayer", "amount": 3.2 }
-                                    ],
-                                    "materials": [
-                                        { "id": "adventuring:currency", "qty": 12000 },
-                                        { "id": "adventuring:pristine_salvage", "qty": 25 }
-                                    ]
-                                },
-                                {
-                                    "name": "Staff of the Wild",
-                                    "base": [
-                                        { "id": "adventuring:hitpoints", "amount": 58 },
-                                        { "id": "adventuring:magic", "amount": 67 },
-                                        { "id": "adventuring:prayer", "amount": 58 }
-                                    ],
-                                    "scaling": [
-                                        { "id": "adventuring:hitpoints", "amount": 5.3 },
-                                        { "id": "adventuring:magic", "amount": 6 },
-                                        { "id": "adventuring:prayer", "amount": 5.3 }
-                                    ],
-                                    "effects": [
-                                        {
-                                            "trigger": "round_start",
-                                            "type": "heal_flat",
-                                            "target": "all",
-                                            "party": "ally",
-                                            "amount": 5,
-                                            "scaling": 0.5
-                                        }
-                                    ],
-                                    "materials": [
-                                        { "id": "adventuring:currency", "qty": 60000 },
-                                        { "id": "adventuring:mythic_salvage", "qty": 18 }
-                                    ]
-                                },
-                                {
-                                    "name": "Staff of the World Tree",
-                                    "base": [
-                                        { "id": "adventuring:hitpoints", "amount": 95 },
-                                        { "id": "adventuring:magic", "amount": 110 },
-                                        { "id": "adventuring:prayer", "amount": 95 }
-                                    ],
-                                    "scaling": [
-                                        { "id": "adventuring:hitpoints", "amount": 8.5 },
-                                        { "id": "adventuring:magic", "amount": 9.5 },
-                                        { "id": "adventuring:prayer", "amount": 8.5 }
-                                    ],
-                                    "effects": [
-                                        {
-                                            "trigger": "round_start",
-                                            "type": "heal_flat",
-                                            "target": "all",
-                                            "party": "ally",
-                                            "amount": 10,
-                                            "scaling": 1
-                                        },
-                                        {
-                                            "trigger": "passive",
-                                            "type": "healing_bonus",
-                                            "amount": 0.25
-                                        }
-                                    ],
-                                    "materials": [
-                                        { "id": "adventuring:currency", "qty": 180000 },
-                                        { "id": "adventuring:mythic_salvage", "qty": 55 },
-                                        { "id": "adventuring:chaos_core", "qty": 1 }
-                                    ]
-                                }
-                            ]
-                        }
-                    ]
-                }
-            }
-        ]
-    }
+	"$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+	"namespace": "adventuring",
+	"data": {
+		"skillData": [
+			{
+				"skillID": "adventuring:Adventuring",
+				"data": {
+					"baseItems": [
+						{
+							"id": "assassins_blade",
+							"name": "Assassin's Blade",
+							"media": "melvor:assets/media/bank/weapon_dagger_dragon.png#shade=black",
+							"type": "adventuring:dagger",
+							"isJobWeapon": true,
+							"itemCategory": "adventuring:jobweapons",
+							"allowedJobs": [
+								"adventuring:assassin"
+							],
+							"requirements": [
+								{
+									"type": "achievement_completion",
+									"id": "adventuring:assassin_weapon_mastery"
+								}
+							],
+							"tiers": [
+								{
+									"name": "Assassin's Blade",
+									"materials": [
+										{
+											"id": "adventuring:currency",
+											"qty": 12000
+										},
+										{
+											"id": "adventuring:pristine_salvage",
+											"qty": 25
+										}
+									],
+									"effects": [
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:strength",
+											"amount": {
+												"base": 5,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:agility",
+											"amount": {
+												"base": 5,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										}
+									]
+								},
+								{
+									"name": "Deathbringer",
+									"effects": [
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:strength",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:agility",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "crit",
+											"type": "damage_flat",
+											"target": "target",
+											"amount": 20,
+											"scaling": 2
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:currency",
+											"qty": 60000
+										},
+										{
+											"id": "adventuring:mythic_salvage",
+											"qty": 18
+										}
+									]
+								},
+								{
+									"name": "Fatesealer",
+									"effects": [
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:strength",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.25
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:agility",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.25
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "crit",
+											"type": "damage_flat",
+											"target": "target",
+											"amount": 40,
+											"scaling": 4
+										},
+										{
+											"trigger": "kill",
+											"type": "buff",
+											"id": "adventuring:invisible",
+											"target": "self",
+											"stacks": 1
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:currency",
+											"qty": 180000
+										},
+										{
+											"id": "adventuring:mythic_salvage",
+											"qty": 55
+										},
+										{
+											"id": "adventuring:chaos_core",
+											"qty": 1
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "bards_lute",
+							"name": "Bard's Lute",
+							"media": "melvor:assets/media/bank/almighty_lute.png",
+							"type": "adventuring:wand",
+							"isJobWeapon": true,
+							"itemCategory": "adventuring:jobweapons",
+							"allowedJobs": [
+								"adventuring:bard"
+							],
+							"requirements": [
+								{
+									"type": "achievement_completion",
+									"id": "adventuring:bard_weapon_mastery"
+								}
+							],
+							"tiers": [
+								{
+									"name": "Bard's Lute",
+									"materials": [
+										{
+											"id": "adventuring:currency",
+											"qty": 12000
+										},
+										{
+											"id": "adventuring:pristine_salvage",
+											"qty": 25
+										}
+									],
+									"effects": [
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:hitpoints",
+											"amount": {
+												"base": 5,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:magic",
+											"amount": {
+												"base": 5,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:agility",
+											"amount": {
+												"base": 5,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										}
+									]
+								},
+								{
+									"name": "Virtuoso's Lute",
+									"effects": [
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:hitpoints",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:magic",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:agility",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "round_start",
+											"type": "buff",
+											"id": "adventuring:might",
+											"target": "all",
+											"party": "ally",
+											"stacks": 1,
+											"chance": 30
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:currency",
+											"qty": 60000
+										},
+										{
+											"id": "adventuring:mythic_salvage",
+											"qty": 18
+										}
+									]
+								},
+								{
+									"name": "Symphony of War",
+									"effects": [
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:hitpoints",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.25
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:magic",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.25
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:agility",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.25
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "round_start",
+											"type": "buff",
+											"id": "adventuring:might",
+											"target": "all",
+											"party": "ally",
+											"stacks": 1,
+											"chance": 50
+										},
+										{
+											"trigger": "encounter_start",
+											"type": "buff",
+											"id": "adventuring:haste",
+											"target": "all",
+											"party": "ally",
+											"stacks": 2
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:currency",
+											"qty": 180000
+										},
+										{
+											"id": "adventuring:mythic_salvage",
+											"qty": 55
+										},
+										{
+											"id": "adventuring:chaos_core",
+											"qty": 1
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "guardians_tower_shield",
+							"name": "Guardian's Tower Shield",
+							"media": "melvor:assets/media/bank/armour_shield_dragon.png#shade=blue",
+							"type": "adventuring:shield",
+							"isJobWeapon": true,
+							"itemCategory": "adventuring:jobweapons",
+							"allowedJobs": [
+								"adventuring:guardian"
+							],
+							"requirements": [
+								{
+									"type": "achievement_completion",
+									"id": "adventuring:guardian_weapon_mastery"
+								}
+							],
+							"tiers": [
+								{
+									"name": "Guardian's Tower Shield",
+									"materials": [
+										{
+											"id": "adventuring:currency",
+											"qty": 12000
+										},
+										{
+											"id": "adventuring:pristine_salvage",
+											"qty": 25
+										}
+									],
+									"effects": [
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:hitpoints",
+											"amount": {
+												"base": 5,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:defence",
+											"amount": {
+												"base": 5,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										}
+									]
+								},
+								{
+									"name": "Bulwark of Ages",
+									"effects": [
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:hitpoints",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:defence",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "damage_reduction",
+											"amount": 0.1
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:currency",
+											"qty": 60000
+										},
+										{
+											"id": "adventuring:mythic_salvage",
+											"qty": 18
+										}
+									]
+								},
+								{
+									"name": "Eternal Bastion",
+									"effects": [
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:hitpoints",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.25
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:defence",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.25
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "damage_reduction",
+											"amount": 0.15
+										},
+										{
+											"trigger": "encounter_start",
+											"type": "buff",
+											"id": "adventuring:barrier",
+											"target": "all",
+											"party": "ally",
+											"stacks": 3
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:currency",
+											"qty": 180000
+										},
+										{
+											"id": "adventuring:mythic_salvage",
+											"qty": 55
+										},
+										{
+											"id": "adventuring:chaos_core",
+											"qty": 1
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "knights_lance",
+							"name": "Knight's Lance",
+							"media": "melvor:assets/media/bank/weapon_2h_dragon.png#shade=silver",
+							"type": "adventuring:polearm",
+							"isJobWeapon": true,
+							"itemCategory": "adventuring:jobweapons",
+							"allowedJobs": [
+								"adventuring:knight"
+							],
+							"requirements": [
+								{
+									"type": "achievement_completion",
+									"id": "adventuring:knight_weapon_mastery"
+								}
+							],
+							"tiers": [
+								{
+									"name": "Knight's Lance",
+									"materials": [
+										{
+											"id": "adventuring:currency",
+											"qty": 12000
+										},
+										{
+											"id": "adventuring:pristine_salvage",
+											"qty": 25
+										}
+									],
+									"effects": [
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:hitpoints",
+											"amount": {
+												"base": 5,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:strength",
+											"amount": {
+												"base": 5,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:defence",
+											"amount": {
+												"base": 5,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										}
+									]
+								},
+								{
+									"name": "Champion's Lance",
+									"effects": [
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:hitpoints",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:strength",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:defence",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "after_damage_received",
+											"type": "damage_flat",
+											"target": "attacker",
+											"amount": 10,
+											"scaling": 1
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:currency",
+											"qty": 60000
+										},
+										{
+											"id": "adventuring:mythic_salvage",
+											"qty": 18
+										}
+									]
+								},
+								{
+									"name": "Lance of the Realm",
+									"effects": [
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:hitpoints",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.25
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:strength",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.25
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:defence",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.25
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "after_damage_received",
+											"type": "damage_flat",
+											"target": "attacker",
+											"amount": 20,
+											"scaling": 2
+										},
+										{
+											"trigger": "passive",
+											"type": "damage_reduction",
+											"amount": 0.08
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:currency",
+											"qty": 180000
+										},
+										{
+											"id": "adventuring:mythic_salvage",
+											"qty": 55
+										},
+										{
+											"id": "adventuring:chaos_core",
+											"qty": 1
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "crusaders_hammer",
+							"name": "Crusader's Hammer",
+							"media": "melvor:assets/media/bank/weapon_2h_ancient.png#shade=white",
+							"type": "adventuring:hammer2h",
+							"isJobWeapon": true,
+							"itemCategory": "adventuring:jobweapons",
+							"allowedJobs": [
+								"adventuring:crusader"
+							],
+							"requirements": [
+								{
+									"type": "achievement_completion",
+									"id": "adventuring:crusader_weapon_mastery"
+								}
+							],
+							"tiers": [
+								{
+									"name": "Crusader's Hammer",
+									"materials": [
+										{
+											"id": "adventuring:currency",
+											"qty": 12000
+										},
+										{
+											"id": "adventuring:pristine_salvage",
+											"qty": 25
+										}
+									],
+									"effects": [
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:hitpoints",
+											"amount": {
+												"base": 5,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:strength",
+											"amount": {
+												"base": 5,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:prayer",
+											"amount": {
+												"base": 5,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										}
+									]
+								},
+								{
+									"name": "Holy Avenger",
+									"effects": [
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:hitpoints",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:strength",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:prayer",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "after_damage_delivered",
+											"type": "debuff",
+											"id": "adventuring:stun",
+											"target": "target",
+											"stacks": 1,
+											"chance": 15
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:currency",
+											"qty": 60000
+										},
+										{
+											"id": "adventuring:mythic_salvage",
+											"qty": 18
+										}
+									]
+								},
+								{
+									"name": "Hammer of Divine Wrath",
+									"effects": [
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:hitpoints",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.25
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:strength",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.25
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:prayer",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.25
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "after_damage_delivered",
+											"type": "debuff",
+											"id": "adventuring:stun",
+											"target": "target",
+											"stacks": 1,
+											"chance": 25
+										},
+										{
+											"trigger": "kill",
+											"type": "heal_flat",
+											"target": "all",
+											"party": "ally",
+											"amount": 15,
+											"scaling": 1.5
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:currency",
+											"qty": 180000
+										},
+										{
+											"id": "adventuring:mythic_salvage",
+											"qty": 55
+										},
+										{
+											"id": "adventuring:chaos_core",
+											"qty": 1
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "slayers_blade",
+							"name": "Slayer's Blade",
+							"media": "melvor:assets/media/bank/weapon_sword_ancient.png#shade=red",
+							"type": "adventuring:sword1h",
+							"isJobWeapon": true,
+							"itemCategory": "adventuring:jobweapons",
+							"allowedJobs": [
+								"adventuring:slayer"
+							],
+							"requirements": [
+								{
+									"type": "achievement_completion",
+									"id": "adventuring:slayer_weapon_mastery"
+								}
+							],
+							"tiers": [
+								{
+									"name": "Slayer's Blade",
+									"materials": [
+										{
+											"id": "adventuring:currency",
+											"qty": 12000
+										},
+										{
+											"id": "adventuring:pristine_salvage",
+											"qty": 25
+										}
+									],
+									"effects": [
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:strength",
+											"amount": {
+												"base": 5,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:ranged",
+											"amount": {
+												"base": 5,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:magic",
+											"amount": {
+												"base": 5,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										}
+									]
+								},
+								{
+									"name": "Executioner's Blade",
+									"effects": [
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:strength",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:ranged",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:magic",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "damage_bonus",
+											"condition": "target_below_50_hp",
+											"amount": 0.2
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:currency",
+											"qty": 60000
+										},
+										{
+											"id": "adventuring:mythic_salvage",
+											"qty": 18
+										}
+									]
+								},
+								{
+									"name": "Blade of Annihilation",
+									"effects": [
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:strength",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.25
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:ranged",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.25
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:magic",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.25
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "damage_bonus",
+											"condition": "target_below_50_hp",
+											"amount": 0.35
+										},
+										{
+											"trigger": "kill",
+											"type": "buff",
+											"id": "adventuring:might",
+											"target": "self",
+											"stacks": 3
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:currency",
+											"qty": 180000
+										},
+										{
+											"id": "adventuring:mythic_salvage",
+											"qty": 55
+										},
+										{
+											"id": "adventuring:chaos_core",
+											"qty": 1
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "samurais_katana",
+							"name": "Samurai's Katana",
+							"media": "melvor:assets/media/bank/weapon_sword_divine.png#shade=red",
+							"type": "adventuring:sword2h",
+							"isJobWeapon": true,
+							"itemCategory": "adventuring:jobweapons",
+							"allowedJobs": [
+								"adventuring:samurai"
+							],
+							"requirements": [
+								{
+									"type": "achievement_completion",
+									"id": "adventuring:samurai_weapon_mastery"
+								}
+							],
+							"tiers": [
+								{
+									"name": "Samurai's Katana",
+									"materials": [
+										{
+											"id": "adventuring:currency",
+											"qty": 12000
+										},
+										{
+											"id": "adventuring:pristine_salvage",
+											"qty": 25
+										}
+									],
+									"effects": [
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:hitpoints",
+											"amount": {
+												"base": 5,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:strength",
+											"amount": {
+												"base": 5,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:agility",
+											"amount": {
+												"base": 5,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										}
+									]
+								},
+								{
+									"name": "Blade of Honor",
+									"effects": [
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:hitpoints",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:strength",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:agility",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "crit_chance",
+											"amount": 0.12
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:currency",
+											"qty": 60000
+										},
+										{
+											"id": "adventuring:mythic_salvage",
+											"qty": 18
+										}
+									]
+								},
+								{
+									"name": "Masamune",
+									"effects": [
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:hitpoints",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.25
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:strength",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.25
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:agility",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.25
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "crit_chance",
+											"amount": 0.18
+										},
+										{
+											"trigger": "crit",
+											"type": "debuff",
+											"id": "adventuring:bleed",
+											"target": "target",
+											"stacks": 4
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:currency",
+											"qty": 180000
+										},
+										{
+											"id": "adventuring:mythic_salvage",
+											"qty": 55
+										},
+										{
+											"id": "adventuring:chaos_core",
+											"qty": 1
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "druids_focus",
+							"name": "Druid's Focus",
+							"media": "melvor:assets/media/bank/staff_of_earth.png#shade=green",
+							"type": "adventuring:staff",
+							"isJobWeapon": true,
+							"itemCategory": "adventuring:jobweapons",
+							"allowedJobs": [
+								"adventuring:druid"
+							],
+							"requirements": [
+								{
+									"type": "achievement_completion",
+									"id": "adventuring:druid_weapon_mastery"
+								}
+							],
+							"tiers": [
+								{
+									"name": "Druid's Focus",
+									"materials": [
+										{
+											"id": "adventuring:currency",
+											"qty": 12000
+										},
+										{
+											"id": "adventuring:pristine_salvage",
+											"qty": 25
+										}
+									],
+									"effects": [
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:hitpoints",
+											"amount": {
+												"base": 5,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:magic",
+											"amount": {
+												"base": 5,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:prayer",
+											"amount": {
+												"base": 5,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										}
+									]
+								},
+								{
+									"name": "Staff of the Wild",
+									"effects": [
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:hitpoints",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:magic",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:prayer",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.1
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "round_start",
+											"type": "heal_flat",
+											"target": "all",
+											"party": "ally",
+											"amount": 5,
+											"scaling": 0.5
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:currency",
+											"qty": 60000
+										},
+										{
+											"id": "adventuring:mythic_salvage",
+											"qty": 18
+										}
+									]
+								},
+								{
+									"name": "Staff of the World Tree",
+									"effects": [
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:hitpoints",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.25
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:magic",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.25
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "passive",
+											"type": "stat_flat",
+											"stat": "adventuring:prayer",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "level",
+														"amount": 1.25
+													}
+												]
+											},
+											"scaleFrom": "equipment"
+										},
+										{
+											"trigger": "round_start",
+											"type": "heal_flat",
+											"target": "all",
+											"party": "ally",
+											"amount": 10,
+											"scaling": 1
+										},
+										{
+											"trigger": "passive",
+											"type": "healing_bonus",
+											"amount": 0.25
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:currency",
+											"qty": 180000
+										},
+										{
+											"id": "adventuring:mythic_salvage",
+											"qty": 55
+										},
+										{
+											"id": "adventuring:chaos_core",
+											"qty": 1
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
+		]
+	}
 }

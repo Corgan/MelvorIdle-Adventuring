@@ -1,237 +1,210 @@
 {
-    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
-    "namespace": "adventuring",
-    "data": {
-        "skillData": [
-            {
-                "skillID": "adventuring:Adventuring",
-                "data": {
-                    "jobs": [
-                        {
-                            "id": "shadowdancer",
-                            "tier": 5,
-                            "name": "Shadowdancer",
-                            "isMilestoneReward": true,
-                            "media": "melvor:assets/media/skills/thieving/thieving.png#tint=purple",
-                            "scaling": [
-                                { "id": "adventuring:hitpoints", "amount": 1.0 },
-                                { "id": "adventuring:defence", "amount": 0.5 },
-                                { "id": "adventuring:agility", "amount": 2.0 },
-                                { "id": "adventuring:strength", "amount": 0.8 },
-                                { "id": "adventuring:ranged", "amount": 1.2 },
-                                { "id": "adventuring:magic", "amount": 1.0 },
-                                { "id": "adventuring:prayer", "amount": 0.3 }
-                            ],
-                            "maxLevel": 20,
-                            "requirements": [
-                                { "type": "job_level", "job": "adventuring:thief", "level": 12 },
-                                { "type": "job_level", "job": "adventuring:wizard", "level": 8 }
-                            ],
-                            "allowedItems": [
-                                "adventuring:cowl",
-                                "adventuring:vest",
-                                "adventuring:chaps",
-                                "adventuring:vambraces",
-                                "adventuring:boots",
-                                "adventuring:amulet",
-                                "adventuring:ring",
-                                "adventuring:cape",
-                                "adventuring:dagger",
-                                "adventuring:wand"
-                            ]
-                        }
-                    ],
-                    "generators": [
-                        {
-                            "id": "shadow_strike",
-                            "name": "Shadow Strike",
-                            "requirements": [
-                                { "type": "current_job_level", "job": "adventuring:shadowdancer", "level": 1 }
-                            ],
-                            "energy": 6,
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 18,
-                                                "scaling": [
-                                                    { "id": "adventuring:agility", "amount": 0.95 }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                },
-                                {
-                                    "target": "self",
-                                    "party": "ally",
-                                    "effects": [
-                                        { "type": "buff", "id": "adventuring:haste", "stacks": { "base": 2 } }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "phantom_blade",
-                            "name": "Phantom Blade",
-                            "requirements": [
-                                { "type": "current_job_level", "job": "adventuring:shadowdancer", "level": 5 }
-                            ],
-                            "energy": 5,
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 12,
-                                                "scaling": [
-                                                    { "id": "adventuring:agility", "amount": 0.28 },
-                                                    { "id": "adventuring:magic", "amount": 0.28 }
-                                                ]
-                                            }
-                                        },
-                                        { "type": "debuff", "id": "adventuring:blind", "stacks": { "base": 2 } }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "fade",
-                            "name": "Fade",
-                            "requirements": [
-                                { "type": "current_job_level", "job": "adventuring:shadowdancer", "level": 10 }
-                            ],
-                            "energy": 5,
-                            "hits": [
-                                {
-                                    "target": "self",
-                                    "party": "ally",
-                                    "effects": [
-                                        { "type": "buff", "id": "adventuring:evasion", "stacks": { "base": 5 } },
-                                        { "type": "buff", "id": "adventuring:stealth", "stacks": { "base": 3 } }
-                                    ]
-                                }
-                            ]
-                        }
-                    ],
-                    "spenders": [
-                        {
-                            "id": "shadow_dance",
-                            "name": "Shadow Dance",
-                            "requirements": [
-                                { "type": "current_job_level", "job": "adventuring:shadowdancer", "level": 3 }
-                            ],
-                            "cost": 14,
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 20,
-                                                "scaling": [
-                                                    { "id": "adventuring:agility", "amount": 1.1 }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                },
-                                {
-                                    "target": "random",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 20,
-                                                "scaling": [
-                                                    { "id": "adventuring:agility", "amount": 1.1 }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                },
-                                {
-                                    "target": "self",
-                                    "party": "ally",
-                                    "effects": [
-                                        { "type": "buff", "id": "adventuring:haste", "stacks": { "base": 4 } }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "umbral_burst",
-                            "name": "Umbral Burst",
-                            "requirements": [
-                                { "type": "current_job_level", "job": "adventuring:shadowdancer", "level": 8 }
-                            ],
-                            "cost": 18,
-                            "hits": [
-                                {
-                                    "target": "all",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 14,
-                                                "scaling": [
-                                                    { "id": "adventuring:agility", "amount": 0.3 },
-                                                    { "id": "adventuring:magic", "amount": 0.3 }
-                                                ]
-                                            }
-                                        },
-                                        { "type": "debuff", "id": "adventuring:blind", "stacks": { "base": 4 } }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "phantom_strike",
-                            "name": "Phantom Strike",
-                            "requirements": [
-                                { "type": "current_job_level", "job": "adventuring:shadowdancer", "level": 15 }
-                            ],
-                            "cost": 35,
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 40,
-                                                "scaling": [
-                                                    { "id": "adventuring:agility", "amount": 1.0 },
-                                                    { "id": "adventuring:magic", "amount": 1.0 }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                },
-                                {
-                                    "target": "self",
-                                    "party": "ally",
-                                    "effects": [
-                                        { "type": "buff", "id": "adventuring:evasion", "stacks": { "base": 8 } },
-                                        { "type": "buff", "id": "adventuring:haste", "stacks": { "base": 6 } }
-                                    ]
-                                }
-                            ]
-                        }
-                    ]
-                }
-            }
-        ]
-    }
+	"$schema": "../job_schema.json",
+	"namespace": "adventuring",
+	"packages": {
+		"combat_jobs": {
+			"jobs": {
+				"shadowdancer": {
+					"name": "Shadowdancer",
+					"tier": 5,
+					"maxLevel": 20,
+					"media": "assets/jobs/shadowdancer.png",
+					"requirements": [
+						{ "type": "job_level", "job": "adventuring:rogue", "level": 25 },
+						{ "type": "job_level", "job": "adventuring:wizard", "level": 20 }
+					],
+					"abilities": [
+						{
+							"id": "shadow_strike",
+							"name": "Shadow Strike",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "A swift shadow-infused strike that speeds you up.",
+							"energy": 25,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:shadowdancer", "level": 1 }],
+							"hits": [
+								{ "target": "front", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "amount": { "base": 9, "scaling": [{ "id": "adventuring:agility", "amount": 0.95 }] } }
+								] },
+								{ "target": "self", "effects": [
+									{ "type": "buff", "id": "adventuring:haste", "stacks": 2 }
+								] }
+							]
+						},
+						{
+							"id": "shadow_dance",
+							"name": "Shadow Dance",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "A deadly dance through the shadows striking multiple foes.",
+							"cost": 140,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:shadowdancer", "level": 1 }],
+							"hits": [
+								{ "target": "front", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "amount": { "base": 10, "scaling": [{ "id": "adventuring:agility", "amount": 1.1 }] } }
+								] },
+								{ "target": "random", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "amount": { "base": 10, "scaling": [{ "id": "adventuring:agility", "amount": 1.1 }] } }
+								] },
+								{ "target": "self", "effects": [
+									{ "type": "buff", "id": "adventuring:haste", "stacks": 4 }
+								] }
+							]
+						},
+						{
+							"id": "phantom_blade",
+							"name": "Phantom Blade",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "A spectral blade that blinds enemies.",
+							"energy": 25,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:shadowdancer", "level": 3 }],
+							"hits": [{ "target": "front", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 6, "scaling": [{ "id": "adventuring:agility", "amount": 0.28 }, { "id": "adventuring:magic", "amount": 0.28 }] } },
+								{ "type": "debuff", "id": "adventuring:blind", "stacks": 2 }
+							] }]
+						},
+						{
+							"id": "umbral_burst",
+							"name": "Umbral Burst",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "A burst of shadow energy blinds all enemies.",
+							"cost": 145,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:shadowdancer", "level": 5 }],
+							"hits": [{ "target": "all", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 7, "scaling": [{ "id": "adventuring:agility", "amount": 0.3 }, { "id": "adventuring:magic", "amount": 0.3 }] } },
+								{ "type": "debuff", "id": "adventuring:blind", "stacks": 4 }
+							] }]
+						},
+						{
+							"id": "shadow_veil",
+							"name": "Shadow Veil",
+							"type": "passive",
+							"media": "assets/abilities/passive.png",
+							"description": "A veil of shadows grants evasion at battle start.",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:shadowdancer", "level": 7 }],
+							"effects": [
+								{ "trigger": "encounter_start", "type": "buff", "target": "self", "id": "adventuring:evasion", "stacks": { "base": 4, "scaling": [{ "id": "adventuring:agility", "amount": 0.1 }] } },
+								{ "trigger": "encounter_start", "type": "buff", "target": "self", "id": "adventuring:stealth", "stacks": 3 }
+							]
+						},
+						{
+							"id": "fade",
+							"name": "Fade",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "Fades into the shadows becoming nearly untouchable.",
+							"energy": 30,
+							"requirements": [{ "type": "job_level", "job": "adventuring:shadowdancer", "level": 10 }],
+							"hits": [{ "target": "self", "effects": [
+								{ "type": "buff", "id": "adventuring:evasion", "stacks": { "base": 5, "scaling": [{ "id": "adventuring:agility", "amount": 0.15 }] } },
+								{ "type": "buff", "id": "adventuring:stealth", "stacks": 3 }
+							] }]
+						},
+						{
+							"id": "dance_of_shadows",
+							"name": "Dance of Shadows",
+							"type": "passive",
+							"media": "assets/abilities/passive.png",
+							"description": "Dodging attacks enhances your shadow powers.",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:shadowdancer", "level": 12 }],
+							"effects": [
+								{ "trigger": "dodge", "type": "buff", "target": "self", "id": "adventuring:stealth", "stacks": 2 },
+								{ "trigger": "dodge", "type": "buff", "target": "self", "id": "adventuring:haste", "stacks": 2 }
+							]
+						},
+						{
+							"id": "phantom_strike",
+							"name": "Phantom Strike",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "A devastating phantom strike with massive self-buffs.",
+							"cost": 180,
+							"requirements": [{ "type": "job_level", "job": "adventuring:shadowdancer", "level": 15 }],
+							"hits": [
+								{ "target": "front", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "amount": { "base": 20, "scaling": [{ "id": "adventuring:agility", "amount": 1.0 }, { "id": "adventuring:magic", "amount": 1.0 }] } }
+								] },
+								{ "target": "self", "effects": [
+									{ "type": "buff", "id": "adventuring:evasion", "stacks": { "base": 8, "scaling": [{ "id": "adventuring:agility", "amount": 0.2 }] } },
+									{ "type": "buff", "id": "adventuring:haste", "stacks": 6 }
+								] }
+							]
+						},
+						{
+							"id": "ethereal_slash",
+							"name": "Ethereal Slash",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "An ethereal blade slash that cuts through defenses.",
+							"energy": 35,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:shadowdancer", "level": 17 }],
+							"hits": [{ "target": "front", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 18, "scaling": [{ "id": "adventuring:agility", "amount": 0.7 }, { "id": "adventuring:magic", "amount": 0.5 }] } },
+								{ "type": "debuff", "id": "adventuring:blind", "stacks": 3 }
+							] }]
+						},
+						{
+							"id": "shadows_embrace",
+							"name": "Shadow's Embrace",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "The shadows embrace and strike your enemies.",
+							"cost": 175,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:shadowdancer", "level": 18 }],
+							"hits": [{ "target": "random", "party": "enemy", "repeat": 3, "delay": 100, "effects": [
+								{ "type": "damage_flat", "amount": { "base": 12, "scaling": [{ "id": "adventuring:agility", "amount": 0.5 }, { "id": "adventuring:magic", "amount": 0.4 }] } },
+								{ "type": "debuff", "id": "adventuring:blind", "stacks": 2 }
+							] }]
+						},
+						{
+							"id": "master_of_shadows",
+							"name": "Master of Shadows",
+							"type": "passive",
+							"media": "assets/abilities/passive.png",
+							"description": "Your mastery of shadows grants constant benefits.",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:shadowdancer", "level": 19 }],
+							"effects": [
+								{ "trigger": "round_start", "type": "buff", "target": "self", "id": "adventuring:stealth", "stacks": 2 },
+								{ "trigger": "round_start", "type": "buff", "target": "self", "id": "adventuring:haste", "stacks": 1 }
+							]
+						},
+						{
+							"id": "umbral_annihilation",
+							"name": "Umbral Annihilation",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "Unleashes annihilating shadow energy on all enemies.",
+							"energy": 40,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:shadowdancer", "level": 20 }],
+							"hits": [{ "target": "all", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 20, "scaling": [{ "id": "adventuring:agility", "amount": 0.8 }, { "id": "adventuring:magic", "amount": 0.6 }] } },
+								{ "type": "debuff", "id": "adventuring:blind", "stacks": 5 }
+							] }]
+						},
+						{
+							"id": "shadow_lord",
+							"name": "Shadow Lord",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "The ultimate shadowdancer technique - become the Shadow Lord.",
+							"cost": 250,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:shadowdancer", "level": 20 }],
+							"hits": [
+								{ "target": "all", "party": "enemy", "repeat": 8, "delay": 60, "effects": [
+									{ "type": "damage_flat", "amount": { "base": 10, "scaling": [{ "id": "adventuring:agility", "amount": 0.4 }, { "id": "adventuring:magic", "amount": 0.3 }] } },
+									{ "type": "damage_flat", "amount": { "base": 0, "scaling": [{ "id": "adventuring:stealth", "scaleFrom": "buff", "scaleTarget": "caster", "amount": 3, "consume": true }] } }
+								] },
+								{ "target": "self", "effects": [
+									{ "type": "buff", "id": "adventuring:haste", "stacks": { "base": 8, "scaling": [{ "id": "adventuring:agility", "amount": 0.2 }] } },
+									{ "type": "buff", "id": "adventuring:evasion", "stacks": { "base": 10, "scaling": [{ "id": "adventuring:agility", "amount": 0.3 }] } }
+								] }
+							]
+						}
+					]
+				}
+			}
+		}
+	}
 }

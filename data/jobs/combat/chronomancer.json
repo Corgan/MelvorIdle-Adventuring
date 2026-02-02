@@ -1,347 +1,224 @@
 {
-    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
-    "namespace": "adventuring",
-    "data": {
-        "skillData": [
-            {
-                "skillID": "adventuring:Adventuring",
-                "data": {
-                    "jobs": [
-                        {
-                            "id": "chronomancer",
-                            "tier": 5,
-                            "name": "Chronomancer",
-                            "media": "melvor:assets/media/skills/magic/magic.png#tint=cyan",
-                            "requirements": [
-                                {
-                                    "type": "job_level",
-                                    "job": "adventuring:wizard",
-                                    "level": 15
-                                },
-                                {
-                                    "type": "job_level",
-                                    "job": "adventuring:thief",
-                                    "level": 10
-                                }
-                            ],
-                            "isMilestoneReward": true,
-                            "allowedItems": [
-                                "adventuring:hat",
-                                "adventuring:robes",
-                                "adventuring:bottoms",
-                                "adventuring:mitts",
-                                "adventuring:slippers",
-                                "adventuring:amulet",
-                                "adventuring:ring",
-                                "adventuring:cape",
-                                "adventuring:staff",
-                                "adventuring:spellbook"
-                            ],
-                            "scaling": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 0.7
-                                },
-                                {
-                                    "id": "adventuring:defence",
-                                    "amount": 0.25
-                                },
-                                {
-                                    "id": "adventuring:agility",
-                                    "amount": 1.8
-                                },
-                                {
-                                    "id": "adventuring:magic",
-                                    "amount": 2.2
-                                }
-                            ]
-                        }
-                    ],
-                    "generators": [
-                        {
-                            "id": "temporal_bolt",
-                            "name": "Temporal Bolt",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:chronomancer",
-                                    "level": 1
-                                }
-                            ],
-                            "energy": 25,
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 13,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.35
-                                                    },
-                                                    {
-                                                        "id": "adventuring:agility",
-                                                        "amount": 0.15
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "slow_time",
-                            "name": "Slow Time",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:chronomancer",
-                                    "level": 8
-                                }
-                            ],
-                            "energy": 28,
-                            "hits": [
-                                {
-                                    "target": "all",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "debuff",
-                                            "id": "adventuring:slow",
-                                            "stacks": {
-                                                "base": 3,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.05
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                },
-                                {
-                                    "target": "self",
-                                    "party": "ally",
-                                    "effects": [
-                                        {
-                                            "type": "buff",
-                                            "id": "adventuring:haste",
-                                            "stacks": {
-                                                "base": 2,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:agility",
-                                                        "amount": 0.04
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "age_wither",
-                            "name": "Age & Wither",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:chronomancer",
-                                    "level": 15
-                                }
-                            ],
-                            "energy": 30,
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 16,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.4
-                                                    }
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            "type": "debuff",
-                                            "id": "adventuring:weaken",
-                                            "stacks": {
-                                                "base": 4,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.06
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ],
-                    "spenders": [
-                        {
-                            "id": "time_stop",
-                            "name": "Time Stop",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:chronomancer",
-                                    "level": 1
-                                }
-                            ],
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "debuff",
-                                            "id": "adventuring:stun",
-                                            "stacks": {
-                                                "base": 2,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.05
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ],
-                            "cost": 80
-                        },
-                        {
-                            "id": "rewind",
-                            "name": "Rewind",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:chronomancer",
-                                    "level": 12
-                                }
-                            ],
-                            "hits": [
-                                {
-                                    "target": "self",
-                                    "party": "ally",
-                                    "effects": [
-                                        {
-                                            "type": "heal_flat",
-                                            "amount": {
-                                                "base": 35,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.6
-                                                    }
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            "type": "buff",
-                                            "id": "adventuring:barrier",
-                                            "stacks": {
-                                                "base": 5,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:agility",
-                                                        "amount": 0.1
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ],
-                            "cost": 100
-                        },
-                        {
-                            "id": "temporal_rift",
-                            "name": "Temporal Rift",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:chronomancer",
-                                    "level": 20
-                                }
-                            ],
-                            "hits": [
-                                {
-                                    "target": "all",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 28,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.6
-                                                    },
-                                                    {
-                                                        "id": "adventuring:agility",
-                                                        "amount": 0.3
-                                                    }
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            "type": "debuff",
-                                            "id": "adventuring:slow",
-                                            "stacks": {
-                                                "base": 4,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.05
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                },
-                                {
-                                    "target": "all",
-                                    "party": "ally",
-                                    "effects": [
-                                        {
-                                            "type": "buff",
-                                            "id": "adventuring:haste",
-                                            "stacks": {
-                                                "base": 4,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:agility",
-                                                        "amount": 0.08
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ],
-                            "cost": 100
-                        }
-                    ]
-                }
-            }
-        ]
-    }
+	"$schema": "../job_schema.json",
+	"namespace": "adventuring",
+	"packages": {
+		"combat_jobs": {
+			"jobs": {
+				"chronomancer": {
+					"name": "Chronomancer",
+					"tier": 5,
+					"media": "assets/jobs/chronomancer.png",
+					"requirements": [
+						{ "type": "job_level", "job": "adventuring:elementalist", "level": 30 },
+						{ "type": "job_level", "job": "adventuring:rogue", "level": 20 }
+					],
+					"abilities": [
+						{
+							"id": "temporal_bolt",
+							"name": "Temporal Bolt",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "A bolt of temporal energy that chills the target.",
+							"energy": 25,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:chronomancer", "level": 1 }],
+							"hits": [{ "target": "front", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 8, "scaling": [
+									{ "id": "adventuring:magic", "amount": 0.4 },
+									{ "id": "adventuring:agility", "amount": 0.2 }
+								] } },
+								{ "type": "debuff", "id": "adventuring:chill", "stacks": 2 }
+							] }]
+						},
+						{
+							"id": "time_stop",
+							"name": "Time Stop",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "Freezes time around a target, stunning them.",
+							"cost": 140,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:chronomancer", "level": 1 }],
+							"hits": [
+								{ "target": "front", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "amount": { "base": 16, "scaling": [{ "id": "adventuring:magic", "amount": 0.6 }] } },
+									{ "type": "debuff", "id": "adventuring:stun", "stacks": { "base": 3, "scaling": [{ "id": "adventuring:magic", "amount": 0.1 }] } }
+								] },
+								{ "target": "self", "effects": [
+									{ "type": "buff", "id": "adventuring:haste", "stacks": 3 }
+								] }
+							]
+						},
+						{
+							"id": "slow_time",
+							"name": "Slow Time",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "Slows time for enemies while accelerating yourself.",
+							"energy": 25,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:chronomancer", "level": 10 }],
+							"hits": [
+								{ "target": "all", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "amount": { "base": 6, "scaling": [{ "id": "adventuring:magic", "amount": 0.3 }] } },
+									{ "type": "debuff", "id": "adventuring:chill", "stacks": { "base": 3, "scaling": [{ "id": "adventuring:magic", "amount": 0.1 }] } }
+								] },
+								{ "target": "self", "effects": [
+									{ "type": "buff", "id": "adventuring:haste", "stacks": 2 }
+								] }
+							]
+						},
+						{
+							"id": "rewind",
+							"name": "Rewind",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "Rewinds your own timeline to restore health.",
+							"cost": 145,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:chronomancer", "level": 15 }],
+							"hits": [{ "target": "self", "effects": [
+								{ "type": "heal_flat", "amount": { "base": 18, "scaling": [{ "id": "adventuring:magic", "amount": 0.6 }] } },
+								{ "type": "buff", "id": "adventuring:barrier", "stacks": { "base": 5, "scaling": [{ "id": "adventuring:magic", "amount": 0.15 }] } },
+								{ "type": "buff", "id": "adventuring:regen", "stacks": 3 }
+							] }]
+						},
+						{
+							"id": "temporal_attunement",
+							"name": "Temporal Attunement",
+							"type": "passive",
+							"media": "assets/abilities/passive.png",
+							"description": "Your attunement to time affects all combatants at battle start.",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:chronomancer", "level": 20 }],
+							"effects": [
+								{ "trigger": "encounter_start", "type": "buff", "target": "all", "party": "ally", "id": "adventuring:haste", "stacks": { "base": 4, "scaling": [{ "id": "adventuring:agility", "amount": 0.15 }] } },
+								{ "trigger": "encounter_start", "type": "debuff", "target": "all", "party": "enemy", "id": "adventuring:chill", "stacks": 3 }
+							]
+						},
+						{
+							"id": "age_and_wither",
+							"name": "Age & Wither",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "Ages all enemies, weakening them.",
+							"energy": 30,
+							"requirements": [{ "type": "job_level", "job": "adventuring:chronomancer", "level": 25 }],
+							"hits": [{ "target": "all", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 8, "scaling": [{ "id": "adventuring:magic", "amount": 0.35 }] } },
+								{ "type": "debuff", "id": "adventuring:weaken", "stacks": { "base": 4, "scaling": [{ "id": "adventuring:magic", "amount": 0.1 }] } },
+								{ "type": "debuff", "id": "adventuring:chill", "stacks": 2 }
+							] }]
+						},
+						{
+							"id": "time_dilation",
+							"name": "Time Dilation",
+							"type": "passive",
+							"media": "assets/abilities/passive.png",
+							"description": "Dilates time each round, speeding allies and slowing enemies.",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:chronomancer", "level": 40 }],
+							"effects": [
+								{ "trigger": "round_start", "type": "buff", "target": "self", "id": "adventuring:haste", "stacks": 2 },
+								{ "trigger": "round_start", "type": "debuff", "target": "front", "party": "enemy", "id": "adventuring:chill", "stacks": 1 }
+							]
+						},
+						{
+							"id": "temporal_rift",
+							"name": "Temporal Rift",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "Opens a rift in time that damages all enemies and speeds all allies.",
+							"cost": 175,
+							"requirements": [{ "type": "job_level", "job": "adventuring:chronomancer", "level": 50 }],
+							"hits": [
+								{ "target": "all", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "amount": { "base": 18, "scaling": [
+										{ "id": "adventuring:magic", "amount": 0.7 },
+										{ "id": "adventuring:agility", "amount": 0.4 }
+									] } },
+									{ "type": "debuff", "id": "adventuring:chill", "stacks": 4 }
+								] },
+								{ "target": "all", "party": "ally", "effects": [
+									{ "type": "buff", "id": "adventuring:haste", "stacks": { "base": 4, "scaling": [{ "id": "adventuring:agility", "amount": 0.15 }] } }
+								] }
+							]
+						},
+						{
+							"id": "accelerate",
+							"name": "Accelerate",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "Accelerates yourself to extreme speeds.",
+							"energy": 35,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:chronomancer", "level": 60 }],
+							"hits": [
+								{ "target": "front", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "amount": { "base": 14, "scaling": [{ "id": "adventuring:magic", "amount": 0.5 }] } }
+								] },
+								{ "target": "self", "effects": [
+									{ "type": "buff", "id": "adventuring:haste", "stacks": { "base": 5, "scaling": [{ "id": "adventuring:agility", "amount": 0.15 }] } },
+									{ "type": "buff", "id": "adventuring:focus", "stacks": 3 }
+								] }
+							]
+						},
+						{
+							"id": "temporal_prison",
+							"name": "Temporal Prison",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "Traps the target in a temporal prison.",
+							"cost": 170,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:chronomancer", "level": 70 }],
+							"hits": [{ "target": "front", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 22, "scaling": [{ "id": "adventuring:magic", "amount": 0.8 }] } },
+								{ "type": "debuff", "id": "adventuring:stun", "stacks": { "base": 5, "scaling": [{ "id": "adventuring:magic", "amount": 0.15 }] } },
+								{ "type": "debuff", "id": "adventuring:chill", "stacks": 5 }
+							] }]
+						},
+						{
+							"id": "chrono_shift",
+							"name": "Chrono Shift",
+							"type": "passive",
+							"media": "assets/abilities/passive.png",
+							"description": "Your attacks occasionally freeze targets in time.",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:chronomancer", "level": 80 }],
+							"effects": [
+								{ "trigger": "after_damage_delivered", "type": "debuff", "target": "target", "id": "adventuring:stun", "stacks": 1, "condition": { "type": "chance", "value": 50 } }
+							]
+						},
+						{
+							"id": "time_crush",
+							"name": "Time Crush",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "Crushes all enemies with temporal force.",
+							"energy": 40,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:chronomancer", "level": 90 }],
+							"hits": [{ "target": "all", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 14, "scaling": [{ "id": "adventuring:magic", "amount": 0.6 }] } },
+								{ "type": "debuff", "id": "adventuring:chill", "stacks": 5 },
+								{ "type": "debuff", "id": "adventuring:weaken", "stacks": 4 }
+							] }]
+						},
+						{
+							"id": "temporal_annihilation",
+							"name": "Temporal Annihilation",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "Shatters the timeline, consuming frozen time for devastating damage.",
+							"cost": 240,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:chronomancer", "level": 99 }],
+							"hits": [
+								{ "target": "all", "party": "enemy", "delay": 150, "repeat": 3, "effects": [
+									{ "type": "damage_flat", "amount": { "base": 20, "scaling": [
+										{ "id": "adventuring:magic", "amount": 0.8 },
+										{ "id": "adventuring:chill", "scaleFrom": "debuff", "scaleTarget": "target", "amount": 5, "consume": true }
+									] } }
+								] },
+								{ "target": "all", "party": "ally", "effects": [
+									{ "type": "buff", "id": "adventuring:haste", "stacks": { "base": 8, "scaling": [{ "id": "adventuring:agility", "amount": 0.3 }] } },
+									{ "type": "buff", "id": "adventuring:focus", "stacks": 5 }
+								] }
+							]
+						}
+					]
+				}
+			}
+		}
+	}
 }

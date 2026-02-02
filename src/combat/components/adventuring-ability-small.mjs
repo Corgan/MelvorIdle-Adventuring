@@ -1,6 +1,6 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { AdventuringTooltipElement } = await loadModule('src/core/adventuring-tooltip-element.mjs');
+const { AdventuringTooltipElement } = await loadModule('src/core/components/adventuring-tooltip-element.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
 const { AdventuringGrimoireRowElement } = await loadModule('src/ui/components/adventuring-grimoire-row.mjs');
 const { AdventuringEmptyStateElement } = await loadModule('src/ui/components/adventuring-empty-state.mjs');

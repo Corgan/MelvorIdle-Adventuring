@@ -25,16 +25,27 @@ export class AdventuringStatBreakdownTooltipElement extends HTMLElement {
     }
 
     /**
-     * Attach click handlers for collapsible sections
+     * Attach click handlers for collapsible sections and auto-collapse deep items
      */
     _attachCollapseHandlers() {
         const toggles = this._container.querySelectorAll('[data-collapse-toggle]');
         toggles.forEach(toggle => {
+            const targetId = toggle.getAttribute('data-collapse-toggle');
+            const target = this._container.querySelector(`[data-collapse-id="${targetId}"]`);
+            const icon = toggle.querySelector('i.fa');
+            const depth = parseInt(toggle.getAttribute('data-depth') || '0', 10);
+            
+            // Auto-collapse items at depth >= 1 (second level and below)
+            if (depth >= 1 && target) {
+                target.style.display = 'none';
+                if (icon) {
+                    icon.classList.remove('fa-chevron-down');
+                    icon.classList.add('fa-chevron-right');
+                }
+            }
+            
             toggle.addEventListener('click', (e) => {
                 e.preventDefault();
-                const targetId = toggle.getAttribute('data-collapse-toggle');
-                const target = this._container.querySelector(`[data-collapse-id="${targetId}"]`);
-                const icon = toggle.querySelector('i.fa');
                 
                 if (target) {
                     const isHidden = target.style.display === 'none';
@@ -109,10 +120,10 @@ export class AdventuringStatBreakdownTooltipElement extends HTMLElement {
      * @param {number} prePercentValue - The stat value before percent bonuses (for calculating actual percent contribution)
      */
     _buildSourceRow(contrib, colorClass = '', showBorder = true, prePercentValue = 0) {
-        let iconHtml = '';
-        if (contrib.icon) {
-            iconHtml = `<img class="skill-icon-xxs mr-2" src="${contrib.icon}">`;
-        }
+        // Always reserve space for icon (use transparent placeholder if none)
+        const iconHtml = contrib.icon 
+            ? `<img class="skill-icon-xxs mr-2" src="${contrib.icon}">`
+            : `<span class="skill-icon-xxs mr-2" style="display: inline-block;"></span>`;
 
         const valueDisplay = this._formatContribution(contrib, prePercentValue);
         const hasSubs = contrib.subContributions && contrib.subContributions.length > 0;
@@ -122,41 +133,33 @@ export class AdventuringStatBreakdownTooltipElement extends HTMLElement {
         
         let html = `<div class="py-1 mb-1" style="${borderStyle}">`;
         
-        // Parent row - if it has subs, make it clickable to collapse/expand
+        // Always include chevron space for alignment - use invisible placeholder if no subs
+        const chevronHtml = hasSubs 
+            ? `<i class="fa fa-chevron-down fa-fw mr-1" style="font-size: 0.7em;"></i>`
+            : `<i class="fa fa-fw mr-1" style="font-size: 0.7em; visibility: hidden;"></i>`;
+        
         if (hasSubs) {
             const collapseId = `collapse-${this._collapseIdCounter++}`;
             html += `
-                <div class="d-flex justify-content-between align-items-center" style="cursor: pointer;" data-collapse-toggle="${collapseId}">
+                <div class="d-flex justify-content-between align-items-center" style="cursor: pointer;" data-collapse-toggle="${collapseId}" data-depth="0">
                     <span class="text-muted">
-                        <i class="fa fa-chevron-down fa-fw mr-1" style="font-size: 0.7em;"></i>${iconHtml}${contrib.source}
+                        ${chevronHtml}${iconHtml}${contrib.source}
                     </span>
                     <span class="${colorClass} font-w600 ml-3">${valueDisplay}</span>
                 </div>
             `;
             
-            // Sub-contributions container (collapsible)
+            // Sub-contributions container (collapsible) - supports recursive nesting
             html += `<div data-collapse-id="${collapseId}">`;
             for (const sub of contrib.subContributions) {
-                let subIcon = '';
-                if (sub.icon) {
-                    subIcon = `<img class="skill-icon-xxs mr-1" src="${sub.icon}">`;
-                }
-                const subValue = this._formatContribution(sub, prePercentValue);
-                // Level-capped items show with gold/warning text
-                const nameClass = sub.isLevelCapped ? 'text-warning' : 'text-muted';
-                html += `
-                    <div class="d-flex justify-content-between align-items-center pl-3 pt-1" style="opacity: 0.8; font-size: 0.9em;">
-                        <span class="${nameClass}">${subIcon}${sub.source}</span>
-                        <span class="${colorClass} ml-3">${subValue}</span>
-                    </div>
-                `;
+                html += this._buildSubContribution(sub, colorClass, prePercentValue, 1, contrib.icon);
             }
             html += `</div>`;
         } else {
-            // No subs - simple row
+            // No subs - simple row but still with chevron placeholder for alignment
             html += `
                 <div class="d-flex justify-content-between align-items-center">
-                    <span class="text-muted">${iconHtml}${contrib.source}</span>
+                    <span class="text-muted">${chevronHtml}${iconHtml}${contrib.source}</span>
                     <span class="${colorClass} font-w600 ml-3">${valueDisplay}</span>
                 </div>
             `;
@@ -167,8 +170,70 @@ export class AdventuringStatBreakdownTooltipElement extends HTMLElement {
     }
 
     /**
+     * Build HTML for a sub-contribution (supports recursive nesting)
+     * @param {StatContribution} sub - The sub-contribution
+     * @param {string} colorClass - CSS class for value coloring
+     * @param {number} prePercentValue - Value before percent bonuses
+     * @param {number} depth - Nesting depth (1 = first level sub, 2 = nested sub, etc.)
+     * @param {string} parentIcon - Parent's icon URL (to hide duplicates)
+     */
+    _buildSubContribution(sub, colorClass, prePercentValue, depth = 1, parentIcon = null) {
+        // Types where we hide duplicate icons (sub-items that are breakdowns of the same source)
+        const hideDuplicateIconTypes = ['itemBase', 'itemLevel', 'itemMastery', 'itemMasterful', 'jobScaling', 'jobMastery'];
+        const shouldHideDuplicate = hideDuplicateIconTypes.includes(sub.sourceType) && sub.icon === parentIcon;
+        
+        // Show icon unless it's a breakdown type with matching parent icon
+        const showIcon = sub.icon && !shouldHideDuplicate;
+        const subIcon = showIcon
+            ? `<img class="skill-icon-xxs mr-1" src="${sub.icon}">`
+            : `<span class="skill-icon-xxs mr-1" style="display: inline-block;"></span>`;
+        const subValue = this._formatContribution(sub, prePercentValue);
+        const nameClass = sub.isLevelCapped ? 'text-warning' : 'text-muted';
+        const paddingLeft = depth * 1; // rem units
+        const opacity = Math.max(0.6, 1 - depth * 0.15);
+        const fontSize = Math.max(0.75, 1 - depth * 0.1);
+        
+        const hasNestedSubs = sub.subContributions && sub.subContributions.length > 0;
+        
+        // Always include chevron space for alignment - use invisible placeholder if no nested subs
+        const chevronHtml = hasNestedSubs
+            ? `<i class="fa fa-chevron-down fa-fw mr-1" style="font-size: 0.7em;"></i>`
+            : `<i class="fa fa-fw mr-1" style="font-size: 0.7em; visibility: hidden;"></i>`;
+        
+        let html = '';
+        
+        if (hasNestedSubs) {
+            // This sub has its own children - make it collapsible
+            const collapseId = `collapse-${this._collapseIdCounter++}`;
+            html += `
+                <div class="d-flex justify-content-between align-items-center pt-1" style="padding-left: ${paddingLeft}rem; opacity: ${opacity}; font-size: ${fontSize}em; cursor: pointer;" data-collapse-toggle="${collapseId}" data-depth="${depth}">
+                    <span class="${nameClass}">
+                        ${chevronHtml}${subIcon}${sub.source}
+                    </span>
+                    <span class="${colorClass} ml-3">${subValue}</span>
+                </div>
+            `;
+            html += `<div data-collapse-id="${collapseId}">`;
+            for (const nested of sub.subContributions) {
+                html += this._buildSubContribution(nested, colorClass, prePercentValue, depth + 1, sub.icon);
+            }
+            html += `</div>`;
+        } else {
+            // Leaf sub-contribution - still include chevron placeholder for alignment
+            html += `
+                <div class="d-flex justify-content-between align-items-center pt-1" style="padding-left: ${paddingLeft}rem; opacity: ${opacity}; font-size: ${fontSize}em;">
+                    <span class="${nameClass}">${chevronHtml}${subIcon}${sub.source}</span>
+                    <span class="${colorClass} ml-3">${subValue}</span>
+                </div>
+            `;
+        }
+        
+        return html;
+    }
+
+    /**
      * Format a contribution's value for display
-     * For parent contributions with sub-contributions, shows total flat only
+     * For parent contributions with sub-contributions, shows totals
      * For percent-only contributions, calculates and shows actual value
      * @param {StatContribution} contrib - The contribution
      * @param {number} prePercentValue - Value before percent bonuses for calculating actual contribution
@@ -176,14 +241,24 @@ export class AdventuringStatBreakdownTooltipElement extends HTMLElement {
     _formatContribution(contrib, prePercentValue = 0) {
         const parts = [];
         
-        // If this has sub-contributions, show the sum of sub flat values
+        // If this has sub-contributions, show the totals
         if (contrib.subContributions && contrib.subContributions.length > 0) {
             const totalFlat = contrib.totalFlat;
+            const totalPercent = contrib.totalPercent;
+            
             if (totalFlat !== 0) {
                 const sign = totalFlat > 0 ? '+' : '';
                 parts.push(`${sign}${totalFlat}`);
             }
-            // Don't show percent for parent - percent effects are handled by effectCache separately
+            
+            if (totalPercent !== 0) {
+                // Calculate actual value from percent for parent totals
+                const actualValue = prePercentValue * totalPercent / 100;
+                const sign = actualValue >= 0 ? '+' : '';
+                const displayValue = Number.isInteger(actualValue) ? actualValue : actualValue.toFixed(1);
+                const percentSign = totalPercent > 0 ? '+' : '';
+                parts.push(`${sign}${displayValue} (${percentSign}${totalPercent}%)`);
+            }
         } else {
             // Direct contribution (no subs)
             if (contrib.flat !== 0) {

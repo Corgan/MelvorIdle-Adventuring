@@ -2,7 +2,7 @@ const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringPage } = await loadModule('src/ui/adventuring-page.mjs');
 const { AdventuringWorkOrder } = await loadModule('src/town/adventuring-work-order.mjs');
-const { formatRequirements } = await loadModule('src/core/adventuring-utils.mjs');
+const { formatRequirements } = await loadModule('src/core/utils/requirements-checker.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
 
 await loadModule('src/town/components/adventuring-workshop.mjs');

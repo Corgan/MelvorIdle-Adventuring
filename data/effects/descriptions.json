@@ -1,0 +1,399 @@
+{
+    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+    "namespace": "adventuring",
+    "data": {
+        "skillData": [
+            {
+                "skillID": "adventuring:Adventuring",
+                "data": {
+                    "layouts": {
+                        "default": "{effect}{?target| to {target}}{?condition| {condition}}{?trigger| {trigger}}"
+                    },
+                    "effectDescriptions": [
+                        {
+                            "type": "stat_flat",
+                            "template": "{signedValue} {stat}{?perStack| per stack}"
+                        },
+                        {
+                            "type": "stat_percent",
+                            "template": "{signedValue}% {stat}{?perStack| per stack}"
+                        },
+                        {
+                            "type": "damage_flat",
+                            "template": "Deal {value} damage{?perStack| per stack}"
+                        },
+                        {
+                            "type": "heal_flat",
+                            "template": "Heal{?target| {target} for} {value} HP{?perStack| per stack}",
+                            "layout": "{effect}{?trigger| {trigger}}"
+                        },
+                        {
+                            "type": "heal_percent",
+                            "template": "Restore {percent}% HP"
+                        },
+                        {
+                            "type": "lifesteal",
+                            "template": "Heal for {percent}% of damage dealt{?perStack| per stack}"
+                        },
+                        {
+                            "type": "damage_modifier_flat",
+                            "template": "{signedValue} Damage{?perStack| per stack}"
+                        },
+                        {
+                            "type": "damage_modifier_percent",
+                            "template": "{signedValue}% Damage{?perStack| per stack}"
+                        },
+                        {
+                            "type": "buff",
+                            "template": "Apply {stacks} {aura}",
+                            "when": {
+                                "random && count>1": "Apply {count} random buffs ({stacks} stack{pluralStacks} each)",
+                                "random": "Apply a random buff ({stacks} stack{pluralStacks})"
+                            }
+                        },
+                        {
+                            "type": "debuff",
+                            "template": "Apply {stacks} {aura}",
+                            "when": {
+                                "random && count>1": "Apply {count} random debuffs ({stacks} stack{pluralStacks} each)",
+                                "random": "Apply a random debuff ({stacks} stack{pluralStacks})"
+                            }
+                        },
+                        {
+                            "type": "cleanse",
+                            "template": "Cleanse debuffs",
+                            "when": {
+                                "id": "Remove {aura}"
+                            }
+                        },
+                        {
+                            "type": "energy",
+                            "template": "{signedValue} Energy"
+                        },
+                        {
+                            "type": "xp_percent",
+                            "template": "{signedValue}% XP",
+                            "when": {
+                                "category": "{signedValue}% {category} XP"
+                            }
+                        },
+                        {
+                            "type": "loot_percent",
+                            "template": "{signedValue}% Loot"
+                        },
+                        {
+                            "type": "revive",
+                            "template": "Revive{?target| {target}} with {value}% HP",
+                            "layout": "{effect}{?trigger| {trigger}}"
+                        },
+                        {
+                            "type": "work",
+                            "template": "Work in town job building"
+                        },
+                        {
+                            "type": "teleport",
+                            "template": "Teleport to a random tile"
+                        },
+                        {
+                            "type": "loot",
+                            "template": "Contains random loot"
+                        },
+                        {
+                            "type": "xp",
+                            "template": "Grant {value} Job XP"
+                        },
+                        {
+                            "type": "damage_percent",
+                            "template": "Deal {value}% HP damage"
+                        },
+                        {
+                            "type": "damage_bonus",
+                            "template": "+{percent}% damage"
+                        },
+                        {
+                            "type": "damage_reduction",
+                            "template": "{percent}% damage reduction"
+                        },
+                        {
+                            "type": "immune",
+                            "template": "Immune to debuffs",
+                            "when": {
+                                "id": "Immune to {aura}"
+                            }
+                        },
+                        {
+                            "type": "crit_chance",
+                            "template": "+{percent}% critical chance"
+                        },
+                        {
+                            "type": "crit_damage",
+                            "template": "+{percent}% critical damage"
+                        },
+                        {
+                            "type": "cost_reduction",
+                            "template": "-{percent}% ability cost"
+                        },
+                        {
+                            "type": "healing_bonus",
+                            "template": "+{percent}% healing done"
+                        },
+                        {
+                            "type": "healing_received",
+                            "template": "+{percent}% healing received"
+                        },
+                        {
+                            "type": "reflect",
+                            "template": "Reflect {percent}% damage taken{?perStack| per stack}"
+                        },
+                        {
+                            "type": "execute",
+                            "template": "Execute enemies below {threshold}% HP",
+                            "layout": "{effect}{?trigger| {trigger}}"
+                        },
+                        {
+                            "type": "all_stat_percent",
+                            "template": "+{value}% all stats",
+                            "when": {
+                                "party=enemy": "+{value}% enemy stats",
+                                "party=hero": "+{value}% party stats"
+                            }
+                        },
+                        {
+                            "type": "dispel",
+                            "template": "Remove {count} buff{pluralCount}",
+                            "when": {
+                                "id": "Remove {aura}",
+                                "count=all": "Remove all buffs"
+                            }
+                        },
+                        {
+                            "type": "unlock",
+                            "template": "Unlock {unlockType}",
+                            "when": {
+                                "unlockType=auto_run": "Unlock Auto-Run",
+                                "unlockType=area_drops_reveal": "Reveal Area Drops",
+                                "unlockType=drop_table_reveal": "Reveal Monster Drops",
+                                "unlockType=difficulty": "Unlock {difficulty} Mode",
+                                "unlockType=mastery_aura": "Unlock Mastery Aura",
+                                "unlockType=multi_job_assignment": "Unlock Multi-Job Assignment",
+                                "unlockType=mastered_variant": "Unlock Mastered Variant"
+                            }
+                        },
+                        {
+                            "type": "job_stats_percent",
+                            "template": "+{value}% Job Stats"
+                        },
+                        {
+                            "type": "drop_rate_percent",
+                            "template": "+{value}% Drop Rate"
+                        },
+                        {
+                            "type": "drop_quantity_percent",
+                            "template": "+{value}% Drop Quantity"
+                        },
+                        {
+                            "type": "currency_drop_percent",
+                            "template": "+{value}% Currency Drops"
+                        },
+                        {
+                            "type": "explore_speed_percent",
+                            "template": "+{value}% Explore Speed"
+                        },
+                        {
+                            "type": "spawn_rate_percent",
+                            "template": "{signedValue}% {spawnType} Spawn Rate"
+                        },
+                        {
+                            "type": "ability_learn_chance_percent",
+                            "template": "+{value}% Ability Learn Chance"
+                        },
+                        {
+                            "type": "equipment_xp_percent",
+                            "template": "+{value}% Equipment XP"
+                        },
+                        {
+                            "type": "upgrade_cost_percent",
+                            "template": "{signedValue}% Upgrade Cost"
+                        },
+                        {
+                            "type": "equipment_stats_percent",
+                            "template": "+{value}% Equipment Stats"
+                        },
+                        {
+                            "type": "category_xp_percent",
+                            "template": "+{value}% Category Mastery XP"
+                        },
+                        {
+                            "type": "remove",
+                            "template": "Remove aura"
+                        },
+                        {
+                            "type": "remove_stacks",
+                            "template": "Remove {count} stack{pluralCount}"
+                        },
+                        {
+                            "type": "consume_charge",
+                            "template": "Consume {count} charge{pluralCount}"
+                        },
+                        {
+                            "type": "absorb",
+                            "template": "Absorb {value} damage per stack"
+                        },
+                        {
+                            "type": "skip",
+                            "template": "Skip turn",
+                            "when": {
+                                "condition.type=chance": "{chance}% chance to skip turn"
+                            }
+                        },
+                        {
+                            "type": "dodge",
+                            "template": "Dodge attack",
+                            "when": {
+                                "amount": "+{value}% dodge chance",
+                                "condition.type=chance": "{chance}% chance to dodge",
+                                "condition.type=hp_below": "Dodge attacks when HP below {threshold}%"
+                            }
+                        },
+                        {
+                            "type": "miss",
+                            "template": "Attack misses",
+                            "when": {
+                                "condition.type=chance": "{chance}% chance to miss"
+                            }
+                        },
+                        {
+                            "type": "confuse",
+                            "template": "Hit ally instead",
+                            "when": {
+                                "condition.type=chance": "{chance}% chance to hit ally instead"
+                            }
+                        },
+                        {
+                            "type": "untargetable",
+                            "template": "Cannot be targeted"
+                        },
+                        {
+                            "type": "evade",
+                            "template": "Evade next attack"
+                        },
+                        {
+                            "type": "force_target",
+                            "template": "Force enemies to target this character",
+                            "layout": "{effect}{?trigger| {trigger}}"
+                        },
+                        {
+                            "type": "prevent_ability",
+                            "template": "Cannot use spenders"
+                        },
+                        {
+                            "type": "prevent_debuff",
+                            "template": "Immune to next debuff"
+                        },
+                        {
+                            "type": "prevent_lethal",
+                            "template": "Cannot be killed"
+                        },
+                        {
+                            "type": "prevent_death",
+                            "template": "Survive lethal damage once",
+                            "when": {
+                                "amount>0": "Survive lethal damage and heal {value}% HP"
+                            }
+                        },
+                        {
+                            "type": "reduce_damage_percent",
+                            "template": "{value}% damage reduction{?perStack| per stack}"
+                        },
+                        {
+                            "type": "reduce_heal_percent",
+                            "template": "-{value}% healing received{?perStack| per stack}"
+                        },
+                        {
+                            "type": "double_cast",
+                            "template": "{chance}% chance to cast spells twice"
+                        }
+                    ],
+                    "triggers": {
+                        "passive": "",
+                        "on_use": "",
+                        "use": "",
+                        "turn_start": "at turn start",
+                        "turn_end": "at turn end",
+                        "round_start": "at round start",
+                        "round_end": "at round end",
+                        "before_damage_received": "before taking damage",
+                        "after_damage_received": "when hit",
+                        "before_damage_delivered": "before dealing damage",
+                        "after_damage_delivered": "after dealing damage",
+                        "miss": "on miss",
+                        "crit": "on critical hit",
+                        "kill": "on kill",
+                        "death": "on death",
+                        "stacks_depleted": "when stacks reach 0",
+                        "removed": "when removed",
+                        "encounter_start": "at encounter start",
+                        "encounter_end": "at encounter end",
+                        "floor_start": "at floor start",
+                        "floor_end": "at floor end",
+                        "dungeon_start": "at dungeon start",
+                        "dungeon_end": "at dungeon end",
+                        "enemy_spawn": "when enemy spawns",
+                        "ability": "when ability is used",
+                        "party_wipe": "when party wipes",
+                        "ally_death": "when an ally dies",
+                        "heal": "when healing",
+                        "generator": "when using a generator",
+                        "spender": "when using a spender",
+                        "dodge": "when dodging",
+                        "debuff_applied": "when debuffed",
+                        "spell_cast": "when casting a spell",
+                        "spell_hit": "when a spell hits",
+                        "fatal_hit": "on fatal hit",
+                        "before_death": "before death",
+                        "before_ability_cast": "before using an ability",
+                        "before_heal_delivered": "before healing",
+                        "after_heal_received": "after being healed",
+                        "after_heal_delivered": "after healing",
+                        "before_hit_delivered": "before hitting",
+                        "before_hit_received": "before being hit",
+                        "after_hit_delivered": "after hitting",
+                        "after_hit_received": "after being hit"
+                    },
+                    "targets": {
+                        "self": "",
+                        "attacker": "attacker",
+                        "target": "target",
+                        "hit_target": "target",
+                        "heal_target": "target",
+                        "all": { "enemy": "all enemies", "hero": "all allies" },
+                        "front": { "enemy": "front enemy", "hero": "front ally" },
+                        "back": { "enemy": "back enemy", "hero": "back ally" },
+                        "center": { "enemy": "center enemy", "hero": "center ally" },
+                        "random": { "enemy": "random enemy", "hero": "random ally" },
+                        "lowest": { "enemy": "lowest HP enemy", "hero": "lowest HP ally" },
+                        "dead": { "enemy": "dead enemy", "hero": "dead ally" }
+                    },
+                    "conditions": {
+                        "hp_below": "when below {threshold}% HP",
+                        "hp_above": "when above {threshold}% HP",
+                        "missing_hp": "when missing {min}+ HP",
+                        "has_buff": "while has {aura}",
+                        "has_debuff": "while has {aura}",
+                        "buff_stacks": "with {min}+ {aura} stacks",
+                        "enemy_hp_below": "vs enemies below {threshold}% HP",
+                        "enemy_hp_above": "vs enemies above {threshold}% HP",
+                        "chance": "({value}% chance)",
+                        "is_injured": "when injured",
+                        "is_full_hp": "at full HP",
+                        "any_ally_injured": "if any ally is injured",
+                        "all_allies_alive": "if all allies are alive",
+                        "hp_crossed_below": "when dropping below {threshold}% HP",
+                        "hp_crossed_above": "when rising above {threshold}% HP",
+                        "is_solo": "while adventuring solo"
+                    }
+                }
+            }
+        ]
+    }
+}

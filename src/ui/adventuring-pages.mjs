@@ -24,6 +24,7 @@ export class AdventuringPages {
     }
 
     go(page) {
+        if(loadingOfflineProgress) return;
         if(page instanceof AdventuringPage && page !== this.current) {
             this.pages.forEach(p => {
                 if(p !== page) {

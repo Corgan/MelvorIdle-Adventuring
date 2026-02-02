@@ -1,11 +1,14 @@
 const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringMasteryAction } = await loadModule('src/core/adventuring-mastery-action.mjs');
-const { AdventuringStats } = await loadModule('src/core/adventuring-stats.mjs');
+const { AdventuringStats } = await loadModule('src/core/stats/adventuring-stats.mjs');
 const { AdventuringJobElement } = await loadModule('src/progression/components/adventuring-job.mjs');
 const { AdventuringJobSummaryElement } = await loadModule('src/progression/components/adventuring-job-summary.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
-const { addMasteryXPWithBonus, RequirementsChecker, AdventuringMasteryRenderQueue, getLockedMedia, UNKNOWN_MEDIA } = await loadModule('src/core/adventuring-utils.mjs');
+const { RequirementsChecker } = await loadModule('src/core/utils/requirements-checker.mjs');
+const { addMasteryXPWithBonus, getLockedMedia, UNKNOWN_MEDIA, filterEffects } = await loadModule('src/core/utils/adventuring-utils.mjs');
+const { AdventuringMasteryRenderQueue } = await loadModule('src/core/utils/render-queues.mjs');
+const { AdventuringScalableEffect } = await loadModule('src/combat/adventuring-scalable-effect.mjs');
 
 export class AdventuringJob extends AdventuringMasteryAction {
     constructor(namespace, data, manager, game) {
@@ -21,8 +24,12 @@ export class AdventuringJob extends AdventuringMasteryAction {
         this._media = data.media;
 
         this.requirements = data.requirements || [];
-        this._scaling = data.scaling;
-        this.scaling = new AdventuringStats(this.manager, this.game);
+
+        // Order position for sorting (processed by manager._buildAllSortOrders)
+        this.orderPosition = data.orderPosition || null;
+        this.sortOrder = 9999;
+
+        this._effects = data.effects;
 
         this.stats = new AdventuringStats(this.manager, this.game);
 
@@ -64,8 +71,12 @@ export class AdventuringJob extends AdventuringMasteryAction {
     }
 
     get unlocked() {
+        // Fast path: once unlocked, always unlocked
+        if (this._unlockedCached) return true;
         if (this._reqChecker === undefined) return true;
-        return this._reqChecker.check();
+        const result = this._reqChecker.check();
+        if (result) this._unlockedCached = true;
+        return result;
     }
 
     detectTierFromRequirements(requirements) {
@@ -98,39 +109,111 @@ export class AdventuringJob extends AdventuringMasteryAction {
         this.renderQueue.mastery = true;
     }
 
+    /**
+     * Get per-level stat scaling for this job (for UI display).
+     * Returns Map of stat -> scaling amount per level.
+     */
+    getStatScaling() {
+        const scaling = new Map();
+        if (!this.statEffects) return scaling;
+        
+        for (const effect of this.statEffects) {
+            if (!effect.amount?.propertyScaling) continue;
+            const levelScale = effect.amount.propertyScaling.get('level');
+            if (levelScale !== undefined) {
+                const stat = this.manager.stats.getObjectByID(effect.stat);
+                if (stat) scaling.set(stat, levelScale);
+            }
+        }
+        return scaling;
+    }
+
     calculateStats() {
         this.stats.reset();
 
         const statBonus = this.manager.party.getJobStatBonus(this);
 
-        this.scaling.forEach((value, stat) => {
-            const baseValue = Math.floor(this.level * value);
-            this.stats.set(stat, Math.floor(baseValue * (1 + statBonus)));
-        });
+        // Calculate stats from statEffects using the effect system
+        if (this.statEffects) {
+            const context = { combatJob: this };
+            for (const effect of this.statEffects) {
+                const stat = this.manager.stats.getObjectByID(effect.stat);
+                if (!stat) continue;
+                
+                const baseValue = effect.getAmount(null, null, context);
+                this.stats.set(stat, Math.floor(baseValue * (1 + statBonus)));
+            }
+        }
     }
 
     /**
-     * Get all passive effects for this job that the character can use.
+     * Get all effects from this job (stats + passives) for effectCache.
      * @param {Object} character - The character using this job
-     * @returns {Array} Array of flat effects with source metadata
+     * @param {string} jobType - 'combatJob' or 'passiveJob'
+     * @param {Object} filters - Optional filters (trigger, type, etc.)
+     * @returns {Array} Array of effect objects with getAmount methods
      */
-    getPassiveEffects(character) {
+    getEffects(character, jobType = 'combatJob', filters = {}) {
         const results = [];
-        const passives = this.manager.getPassivesForJob(this);
+        const job = this;
 
+        // 1. Stat effects from job data (scale with level)
+        if (this.statEffects && this.statEffects.length > 0) {
+            for (const effect of this.statEffects) {
+                // Base scaling effect (from level)
+                const scalingEffect = {
+                    trigger: 'passive',
+                    type: 'stat_flat',
+                    stat: effect.stat,
+                    sourcePath: [
+                        { type: jobType, name: `${this.name} (Lv.${this.level})`, ref: this },
+                        { type: 'jobScaling', name: 'Level Scaling', ref: this }
+                    ],
+                    getAmount: (source, displayMode, context) => {
+                        const jobForScaling = context?.[jobType] || job;
+                        return effect.getAmount(source, displayMode, { 
+                            ...context, 
+                            [jobType]: jobForScaling 
+                        });
+                    }
+                };
+                results.push(scalingEffect);
+                
+                // Mastery bonus effect (separate line if there's a mastery bonus)
+                if (job._cachedMasteryBonus > 0) {
+                    const masteryEffect = {
+                        trigger: 'passive',
+                        type: 'stat_flat',
+                        stat: effect.stat,
+                        sourcePath: [
+                            { type: jobType, name: `${this.name} (Lv.${this.level})`, ref: this },
+                            { type: 'jobMastery', name: 'Mastery', ref: this }
+                        ],
+                        getAmount: (source, displayMode, context) => {
+                            const jobForScaling = context?.[jobType] || job;
+                            const baseAmount = effect.getAmount(source, displayMode, { 
+                                ...context, 
+                                [jobType]: jobForScaling 
+                            });
+                            return Math.floor(baseAmount * job._cachedMasteryBonus);
+                        }
+                    };
+                    results.push(masteryEffect);
+                }
+            }
+        }
+
+        // 2. Passive effects from job passives (unlocked abilities)
+        const passives = this.manager.getPassivesForJob(this);
         for (const passive of passives) {
             if (!passive.canEquip(character)) continue;
             if (!passive.effects) continue;
             
             for (const effect of passive.effects) {
-                // Create effect object that preserves methods from the original effect
                 const effectObj = {
                     ...effect,
-                    source: passive,
-                    sourceName: `${this.name} (${passive.name})`,
-                    sourceType: 'jobPassive'
+                    sourcePath: [{ type: 'jobPassive', name: `${this.name} (${passive.name})`, ref: passive }]
                 };
-                // Preserve getAmount and getStacks methods if they exist
                 if (typeof effect.getAmount === 'function') {
                     effectObj.getAmount = effect.getAmount.bind(effect);
                 }
@@ -141,27 +224,27 @@ export class AdventuringJob extends AdventuringMasteryAction {
             }
         }
 
-        return results;
-    }
-
-    /**
-     * Get job passive effects for a trigger type.
-     * @param {Object} character - The character using this job
-     * @param {string} triggerType - The trigger type to filter by
-     * @returns {Array} Array of flat effects with source metadata
-     */
-    getPassivesForTrigger(character, triggerType) {
-        return this.getPassiveEffects(character).filter(e => e.trigger === triggerType);
+        // Apply filters
+        return filterEffects(results, filters);
     }
 
     postDataRegistration() {
         this._reqChecker = new RequirementsChecker(this.manager, this.requirements);
 
-        if(this._scaling !== undefined) {
-            this._scaling.forEach(({ id, amount }) => {
-                this.scaling.set(id, amount);
-            });
-            delete this._scaling;
+        // Convert stat effects from data
+        this.statEffects = [];
+        
+        if (this._effects !== undefined) {
+            for (const effectData of this._effects) {
+                if (effectData.trigger === 'passive' && effectData.type === 'stat_flat') {
+                    // Create scalable effect - data must include scaleFrom
+                    const effect = new AdventuringScalableEffect(this.manager, this.game, effectData);
+                    effect.postDataRegistration();
+                    effect.sourceJob = this;
+                    this.statEffects.push(effect);
+                }
+            }
+            delete this._effects;
         }
         if(this._allowedItems !== undefined) {
             this.allowedItems = [];
@@ -171,6 +254,14 @@ export class AdventuringJob extends AdventuringMasteryAction {
             });
             delete this._allowedItems;
         }
+    }
+
+    /**
+     * Update cached mastery bonus for this job.
+     * Called before stat calculations to avoid circular dependency.
+     */
+    updateCachedMasteryBonus() {
+        this._cachedMasteryBonus = this.manager.party?.getJobStatBonus(this) || 0;
     }
 
     addXP(xp) {

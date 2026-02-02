@@ -465,7 +465,6 @@ export class SlayerTaskGenerator {
             'totalHealing': 'total_healing',
             'debuffsApplied': 'debuffs_applied',
             'buffsApplied': 'buffs_applied',
-            'totalCurrencyEarned': 'total_currency_earned',
             'floorsExplored': 'floors_explored',
             'specialTilesFound': 'special_tiles_found'
         };

@@ -3,7 +3,10 @@ const { loadModule } = mod.getContext(import.meta);
 const { AdventuringHero } = await loadModule('src/entities/adventuring-hero.mjs');
 const { AdventuringEnemy } = await loadModule('src/entities/adventuring-enemy.mjs');
 const { AdventuringPartyElement } = await loadModule('src/entities/components/adventuring-party.mjs');
-const { evaluateCondition, buildEffectContext, createEffect, EffectLimitTracker, EffectCache, defaultEffectProcessor } = await loadModule('src/core/adventuring-utils.mjs');
+const { EffectLimitTracker } = await loadModule('src/core/effects/effect-limit-tracker.mjs');
+const { EffectCache } = await loadModule('src/core/effects/effect-cache.mjs');
+const { evaluateCondition } = await loadModule('src/core/effects/condition-evaluator.mjs');
+const { buildEffectContext, createEffect, defaultEffectProcessor } = await loadModule('src/core/utils/adventuring-utils.mjs');
 
 class AdventuringParty {
     constructor(manager, game) {
@@ -45,15 +48,19 @@ class AdventuringParty {
         );
 
         // Party-scoped equipment effects from all heroes
-        this.effectCache.registerSource('heroEquipment', () => {
+        this.effectCache.registerSource('equipment', () => {
             const effects = [];
             for (const hero of this.all) {
-                if (!hero.equipment) continue;
+                // Skip heroes without equipment, dead heroes, or heroes without a job assigned
+                if (!hero.equipment || hero.isDead || !hero.combatJob) continue;
                 const equipmentEffects = hero.equipment.getEffects({ scope: 'party' });
                 for (const effect of equipmentEffects) {
+                    // Prepend hero context to sourcePath
+                    const heroPathEntry = { type: 'hero', name: hero.name, ref: hero };
+                    const originalPath = effect.sourcePath || [];
                     effects.push({
                         ...effect,
-                        sourceName: `${hero.name}'s ${effect.sourceName}`
+                        sourcePath: [heroPathEntry, ...originalPath]
                     });
                 }
             }
@@ -67,6 +74,22 @@ class AdventuringParty {
 
         // Mastery completion effects (for passive bonuses)
         this.effectCache.registerSource('mastery', () => this.getMasteryCompletionEffects());
+
+        // Effects from enemies that target heroes (party: 'ally' from enemy perspective)
+        this.effectCache.registerSource('enemies', () => {
+            const effects = [];
+            const enemyParty = this.manager.encounter?.party;
+            if (!enemyParty) return effects;
+            
+            for (const enemy of enemyParty.all) {
+                if (!enemy.base || enemy.dead) continue;
+                const enemyEffects = enemy.effectCache?.getEffects({ party: 'ally' }) || [];
+                for (const effect of enemyEffects) {
+                    effects.push(effect);
+                }
+            }
+            return effects;
+        });
     }
 
     // ========== Mastery Completion Effects ==========
@@ -104,9 +127,7 @@ class AdventuringParty {
                         if (effectData.type === 'category_xp_percent') {
                             effects.push(createEffect(
                                 { ...effectData, category: categoryId },
-                                action,
-                                `${action.name} Mastery`,
-                                'mastery'
+                                [{ type: 'mastery', name: `${action.name} Mastery`, ref: action }]
                             ));
                         }
                     }
@@ -269,9 +290,9 @@ class AdventuringParty {
                 hero.invalidateEffects(source);
             }
         });
-        // Invalidate dungeon's party_enemy_effects since it depends on consumables/tavern/equipment
-        if (this.manager.dungeon?.effectCache) {
-            this.manager.dungeon.effectCache.invalidate('party_enemy_effects');
+        // Invalidate encounter's 'heroes' source since it depends on hero effects
+        if (this.manager.encounter?.effectCache) {
+            this.manager.encounter.invalidateEffects('heroes');
         }
     }
 
@@ -338,7 +359,21 @@ class AdventuringParty {
         this.all.forEach(member => member.setLocked(locked));
     }
 
+    /**
+     * Fire a trigger via the conductor.
+     * @param {string} type - The trigger type
+     * @param {object} context - Additional context (source will be set to this party)
+     */
     trigger(type, context = {}) {
+        this.manager.conductor.trigger(type, { ...context, source: this });
+    }
+
+    /**
+     * Handler called by conductor when this party should process a trigger.
+     * @param {string} type - The trigger type
+     * @param {object} context - Full context from conductor
+     */
+    _handleTrigger(type, context) {
         const partyContext = buildEffectContext(null, {
             ...context,
             party: this.all,
@@ -350,17 +385,6 @@ class AdventuringParty {
             limitTracker: this.effectLimitTracker,
             effectModifier: (effect) => ({ ...effect, party: 'ally' })
         });
-
-        // Trigger achievements with combat context
-        if (this.manager.achievementManager && this.manager.combatTracker) {
-            const achievementContext = {
-                ...partyContext,
-                source: this,
-                triggerType: type,
-                ...this.manager.combatTracker.getContext()
-            };
-            this.manager.achievementManager.trigger(type, achievementContext);
-        }
     }
 
 
@@ -383,6 +407,9 @@ class AdventuringParty {
     onLoad() {
         this.initEffectCache();
         this.all.forEach(member => member.onLoad());
+        
+        // Register this party as an entity with the conductor
+        this.manager.conductor.registerEntity(this, (type, context) => this._handleTrigger(type, context));
     }
 
     render() {
@@ -391,6 +418,7 @@ class AdventuringParty {
         this.front.render();
     }
 
+    // Required by base class contract - no additional registration needed
     postDataRegistration() {
 
     }
@@ -464,6 +492,12 @@ class AdventuringHeroParty extends AdventuringParty {
      */
     awardJobXP(xp, { aliveOnly = false } = {}) {
         const members = aliveOnly ? this.combatAlive : this.all;
+        
+        // Track XP for analysis (enemy kill XP)
+        if (globalThis.xpTracker) {
+            globalThis.xpTracker.enemyKill += xp * members.filter(m => m.combatJob?.isMilestoneReward).length;
+        }
+        
         members.forEach(member => {
             if (member.combatJob?.isMilestoneReward) {
                 member.combatJob.addXP(xp);

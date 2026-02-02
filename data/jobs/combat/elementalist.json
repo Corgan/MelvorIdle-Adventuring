@@ -1,447 +1,206 @@
 {
-    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
-    "namespace": "adventuring",
-    "data": {
-        "skillData": [
-            {
-                "skillID": "adventuring:Adventuring",
-                "data": {
-                    "jobs": [
-                        {
-                            "id": "elementalist",
-                            "tier": 2,
-                            "name": "Elementalist",
-                            "media": "melvor:assets/media/skills/magic/magic.png#tint=orange",
-                            "requirements": [
-                                {
-                                    "type": "job_level",
-                                    "job": "adventuring:wizard",
-                                    "level": 15
-                                }
-                            ],
-                            "isMilestoneReward": true,
-                            "allowedItems": [
-                                "adventuring:hat",
-                                "adventuring:robes",
-                                "adventuring:bottoms",
-                                "adventuring:mitts",
-                                "adventuring:slippers",
-                                "adventuring:amulet",
-                                "adventuring:ring",
-                                "adventuring:cape",
-                                "adventuring:staff",
-                                "adventuring:wand",
-                                "adventuring:spellbook"
-                            ],
-                            "scaling": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 0.75
-                                },
-                                {
-                                    "id": "adventuring:defence",
-                                    "amount": 0.25
-                                },
-                                {
-                                    "id": "adventuring:agility",
-                                    "amount": 0.75
-                                },
-                                {
-                                    "id": "adventuring:magic",
-                                    "amount": 2
-                                }
-                            ]
-                        }
-                    ],
-                    "generators": [
-                        {
-                            "id": "fire_bolt",
-                            "name": "Fire Bolt",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:elementalist",
-                                    "level": 1
-                                }
-                            ],
-                            "energy": 22,
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 10,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.25
-                                                    }
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            "type": "debuff",
-                                            "id": "adventuring:burn",
-                                            "stacks": {
-                                                "base": 2,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.05
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "ice_shard",
-                            "name": "Ice Shard",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:elementalist",
-                                    "level": 10
-                                }
-                            ],
-                            "energy": 22,
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 10,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.25
-                                                    }
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            "type": "debuff",
-                                            "id": "adventuring:chill",
-                                            "stacks": {
-                                                "base": 2,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.05
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ],
-                    "spenders": [
-                        {
-                            "id": "blizzard",
-                            "name": "Blizzard",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:elementalist",
-                                    "level": 1
-                                }
-                            ],
-                            "cost": 130,
-                            "hits": [
-                                {
-                                    "target": "all",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 12,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.35
-                                                    }
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            "type": "debuff",
-                                            "id": "adventuring:chill",
-                                            "stacks": {
-                                                "base": 3,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.1
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "inferno",
-                            "name": "Inferno",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:elementalist",
-                                    "level": 15
-                                }
-                            ],
-                            "cost": 130,
-                            "hits": [
-                                {
-                                    "target": "all",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 12,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.35
-                                                    }
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            "type": "debuff",
-                                            "id": "adventuring:burn",
-                                            "stacks": {
-                                                "base": 3,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.1
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "elemental_storm",
-                            "name": "Elemental Storm",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:elementalist",
-                                    "level": 25
-                                }
-                            ],
-                            "cost": 200,
-                            "hits": [
-                                {
-                                    "target": "all",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 20,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.6
-                                                    }
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            "type": "debuff",
-                                            "id": "adventuring:burn",
-                                            "stacks": {
-                                                "base": 2,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.05
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                },
-                                {
-                                    "target": "all",
-                                    "party": "enemy",
-                                    "delay": 200,
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 20,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.6
-                                                    }
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            "type": "debuff",
-                                            "id": "adventuring:chill",
-                                            "stacks": {
-                                                "base": 2,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.05
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "elemental_surge",
-                            "name": "Elemental Surge",
-                            "requirements": [
-                                {
-                                    "type": "job_level",
-                                    "job": "adventuring:elementalist",
-                                    "level": 20
-                                }
-                            ],
-                            "cost": 120,
-                            "hits": [
-                                {
-                                    "target": "all",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 18,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.35
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                },
-                                {
-                                    "target": "self",
-                                    "party": "ally",
-                                    "effects": [
-                                        {
-                                            "type": "buff",
-                                            "id": "adventuring:arcane_power",
-                                            "stacks": {
-                                                "base": 2,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.05
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ],
-                    "passives": [
-                        {
-                            "id": "elemental_attunement",
-                            "name": "Elemental Attunement",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:elementalist",
-                                    "level": 20
-                                }
-                            ],
-                            "effects": [
-                                {
-                                    "trigger": "encounter_start",
-                                    "type": "buff",
-                                    "target": "self",
-                                    "id": "adventuring:arcane_power",
-                                    "stacks": {
-                                        "base": 3,
-                                        "scaling": [
-                                            {
-                                                "id": "adventuring:magic",
-                                                "amount": 0.1
-                                            }
-                                        ]
-                                    }
-                                }
-                            ]
-                        },
-                        {
-                            "id": "elemental_mastery",
-                            "name": "Elemental Mastery",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:elementalist",
-                                    "level": 30
-                                }
-                            ],
-                            "effects": [
-                                {
-                                    "trigger": "round_start",
-                                    "type": "debuff",
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "id": "adventuring:burn",
-                                    "stacks": {
-                                        "base": 1,
-                                        "scaling": [
-                                            {
-                                                "id": "adventuring:magic",
-                                                "amount": 0.05
-                                            }
-                                        ]
-                                    }
-                                },
-                                {
-                                    "trigger": "round_start",
-                                    "type": "debuff",
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "id": "adventuring:shock",
-                                    "stacks": {
-                                        "base": 1,
-                                        "scaling": [
-                                            {
-                                                "id": "adventuring:magic",
-                                                "amount": 0.05
-                                            }
-                                        ]
-                                    }
-                                }
-                            ]
-                        }
-                    ]
-                }
-            }
-        ]
-    }
+	"$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+	"namespace": "adventuring",
+	"data": {
+		"skillData": [
+			{
+				"skillID": "adventuring:Adventuring",
+				"data": {
+					"jobs": [
+						{
+							"id": "elementalist",
+							"tier": 2,
+							"archetypes": ["dps"],
+							"name": "Elementalist",
+							"media": "melvor:assets/media/skills/magic/magic.png#tint=orange",
+							"requirements": [{ "type": "job_level", "job": "adventuring:wizard", "level": 15 }],
+							"isMilestoneReward": true,
+							"allowedItems": ["adventuring:hat","adventuring:robes","adventuring:bottoms","adventuring:mitts","adventuring:slippers","adventuring:amulet","adventuring:ring","adventuring:cape","adventuring:staff","adventuring:wand","adventuring:spellbook"],
+							"effects": [
+								{ "trigger": "passive", "type": "stat_flat", "stat": "adventuring:hitpoints", "amount": { "scaling": [{ "id": "level", "amount": 5 }] }, "scaleFrom": "combatJob" },
+								{ "trigger": "passive", "type": "stat_flat", "stat": "adventuring:defence", "amount": { "scaling": [{ "id": "level", "amount": 0.75 }] }, "scaleFrom": "combatJob" },
+								{ "trigger": "passive", "type": "stat_flat", "stat": "adventuring:agility", "amount": { "scaling": [{ "id": "level", "amount": 1 }] }, "scaleFrom": "combatJob" },
+								{ "trigger": "passive", "type": "stat_flat", "stat": "adventuring:magic", "amount": { "scaling": [{ "id": "level", "amount": 3.625 }] }, "scaleFrom": "combatJob" }
+							]
+						}
+					],
+					"generators": [
+						{
+							"id": "fire_bolt",
+							"name": "Fire Bolt",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:elementalist", "level": 1 }],
+							"energy": 20,
+							"hits": [{ "target": "front", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 6, "scaling": [{ "id": "adventuring:magic", "amount": 0.3 }] } },
+								{ "type": "debuff", "id": "adventuring:burn", "stacks": { "base": 2, "scaling": [{ "id": "adventuring:magic", "amount": 0.08 }] } }
+							] }]
+						},
+						{
+							"id": "ice_shard",
+							"name": "Ice Shard",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:elementalist", "level": 10 }],
+							"energy": 20,
+							"hits": [{ "target": "front", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 6, "scaling": [{ "id": "adventuring:magic", "amount": 0.3 }] } },
+								{ "type": "debuff", "id": "adventuring:chill", "stacks": { "base": 2, "scaling": [{ "id": "adventuring:magic", "amount": 0.08 }] } }
+							] }]
+						},
+						{
+							"id": "prismatic_barrage",
+							"name": "Prismatic Barrage",
+							"requirements": [{ "type": "job_level", "job": "adventuring:elementalist", "level": 25 }],
+							"energy": 25,
+							"hits": [{ "target": "all", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 5, "scaling": [{ "id": "adventuring:magic", "amount": 0.25 }] } },
+								{ "type": "debuff", "id": "adventuring:burn", "stacks": 1 },
+								{ "type": "debuff", "id": "adventuring:chill", "stacks": 1 }
+							] }]
+						},
+						{
+							"id": "arc_lightning",
+							"name": "Arc Lightning",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:elementalist", "level": 60 }],
+							"energy": 30,
+							"hits": [
+								{ "target": "front", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "amount": { "base": 12, "scaling": [{ "id": "adventuring:magic", "amount": 0.45 }] } },
+									{ "type": "debuff", "id": "adventuring:shock", "stacks": 3 }
+								] },
+								{ "target": "back", "party": "enemy", "delay": 100, "effects": [
+									{ "type": "damage_flat", "amount": { "base": 8, "scaling": [{ "id": "adventuring:magic", "amount": 0.3 }] } },
+									{ "type": "debuff", "id": "adventuring:shock", "stacks": 2 }
+								] }
+							]
+						},
+						{
+							"id": "elementalists_fury",
+							"name": "Elementalist's Fury",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:elementalist", "level": 90 }],
+							"energy": 35,
+							"hits": [{ "target": "all", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 15, "scaling": [{ "id": "adventuring:magic", "amount": 0.6 }] } },
+								{ "type": "debuff", "id": "adventuring:burn", "stacks": 2 },
+								{ "type": "debuff", "id": "adventuring:chill", "stacks": 2 },
+								{ "type": "debuff", "id": "adventuring:shock", "stacks": 2 }
+							] }]
+						}
+					],
+					"spenders": [
+						{
+							"id": "blizzard",
+							"name": "Blizzard",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:elementalist", "level": 1 }],
+							"cost": 100,
+							"hits": [{ "target": "all", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 8, "scaling": [{ "id": "adventuring:magic", "amount": 0.4 }] } },
+								{ "type": "debuff", "id": "adventuring:chill", "stacks": { "base": 3, "scaling": [{ "id": "adventuring:magic", "amount": 0.1 }] } }
+							] }]
+						},
+						{
+							"id": "inferno",
+							"name": "Inferno",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:elementalist", "level": 15 }],
+							"cost": 120,
+							"hits": [{ "target": "all", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 10, "scaling": [{ "id": "adventuring:magic", "amount": 0.45 }] } },
+								{ "type": "debuff", "id": "adventuring:burn", "stacks": { "base": 4, "scaling": [{ "id": "adventuring:magic", "amount": 0.1 }] } }
+							] }]
+						},
+						{
+							"id": "elemental_storm",
+							"name": "Elemental Storm",
+							"requirements": [{ "type": "job_level", "job": "adventuring:elementalist", "level": 50 }],
+							"cost": 130,
+							"hits": [
+								{ "target": "all", "party": "enemy", "delay": 0, "effects": [
+									{ "type": "damage_flat", "amount": { "base": 8, "scaling": [{ "id": "adventuring:magic", "amount": 0.35 }] } },
+									{ "type": "debuff", "id": "adventuring:burn", "stacks": 2 }
+								] },
+								{ "target": "all", "party": "enemy", "delay": 150, "effects": [
+									{ "type": "damage_flat", "amount": { "base": 8, "scaling": [{ "id": "adventuring:magic", "amount": 0.35 }] } },
+									{ "type": "debuff", "id": "adventuring:chill", "stacks": 2 }
+								] },
+								{ "target": "all", "party": "enemy", "delay": 300, "effects": [
+									{ "type": "damage_flat", "amount": { "base": 8, "scaling": [{ "id": "adventuring:magic", "amount": 0.35 }] } },
+									{ "type": "debuff", "id": "adventuring:shock", "stacks": 2 }
+								] }
+							]
+						},
+						{
+							"id": "elemental_annihilation",
+							"name": "Elemental Annihilation",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:elementalist", "level": 70 }],
+							"cost": 140,
+							"hits": [{ "target": "front", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 20, "scaling": [
+									{ "id": "adventuring:magic", "amount": 0.7 },
+									{ "id": "adventuring:burn", "scaleFrom": "debuff", "scaleTarget": "target", "amount": 4, "consume": true },
+									{ "id": "adventuring:chill", "scaleFrom": "debuff", "scaleTarget": "target", "amount": 4, "consume": true },
+									{ "id": "adventuring:shock", "scaleFrom": "debuff", "scaleTarget": "target", "amount": 4, "consume": true }
+								] } }
+							] }]
+						},
+						{
+							"id": "convergence",
+							"name": "Convergence",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:elementalist", "level": 99 }],
+							"cost": 170,
+							"hits": [
+								{ "target": "all", "party": "enemy", "delay": 0, "effects": [
+									{ "type": "damage_flat", "amount": { "base": 18, "scaling": [
+										{ "id": "adventuring:magic", "amount": 0.6 },
+										{ "id": "adventuring:burn", "scaleFrom": "debuff", "scaleTarget": "target", "amount": 5, "consume": false }
+									] } },
+									{ "type": "debuff", "id": "adventuring:shock", "stacks": 3 }
+								] },
+								{ "target": "all", "party": "enemy", "delay": 150, "effects": [
+									{ "type": "damage_flat", "amount": { "base": 18, "scaling": [
+										{ "id": "adventuring:magic", "amount": 0.6 },
+										{ "id": "adventuring:chill", "scaleFrom": "debuff", "scaleTarget": "target", "amount": 5, "consume": false }
+									] } },
+									{ "type": "debuff", "id": "adventuring:burn", "stacks": 3 }
+								] },
+								{ "target": "all", "party": "enemy", "delay": 300, "effects": [
+									{ "type": "damage_flat", "amount": { "base": 18, "scaling": [
+										{ "id": "adventuring:magic", "amount": 0.6 },
+										{ "id": "adventuring:shock", "scaleFrom": "debuff", "scaleTarget": "target", "amount": 5, "consume": true },
+										{ "id": "adventuring:burn", "scaleFrom": "debuff", "scaleTarget": "target", "amount": 5, "consume": true },
+										{ "id": "adventuring:chill", "scaleFrom": "debuff", "scaleTarget": "target", "amount": 5, "consume": true }
+									] } }
+								] }
+							]
+						}
+					],
+					"passives": [
+						{
+							"id": "elemental_attunement",
+							"name": "Elemental Attunement",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:elementalist", "level": 20 }],
+							"effects": [
+								{ "trigger": "encounter_start", "type": "buff", "target": "self", "id": "adventuring:arcane_power", "stacks": { "base": 3, "scaling": [{ "id": "adventuring:magic", "amount": 0.15 }] } }
+							]
+						},
+						{
+							"id": "reactive_elements",
+							"name": "Reactive Elements",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:elementalist", "level": 40 }],
+							"effects": [
+								{ "trigger": "after_damage_received", "type": "debuff", "target": "attacker", "id": "adventuring:burn", "stacks": 2 },
+								{ "trigger": "after_damage_received", "type": "debuff", "target": "attacker", "id": "adventuring:chill", "stacks": 2 }
+							]
+						},
+						{
+							"id": "elemental_supremacy",
+							"name": "Elemental Supremacy",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:elementalist", "level": 80 }],
+							"effects": [
+								{ "trigger": "crit", "type": "debuff", "target": "all", "party": "enemy", "id": "adventuring:burn", "stacks": 2 },
+								{ "trigger": "crit", "type": "debuff", "target": "all", "party": "enemy", "id": "adventuring:shock", "stacks": 2 }
+							]
+						}
+					]
+				}
+			}
+		]
+	}
 }

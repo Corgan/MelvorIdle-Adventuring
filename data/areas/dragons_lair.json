@@ -1,681 +1,682 @@
 {
-    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
-    "namespace": "adventuring",
-    "data": {
-        "skillData": [
-            {
-                "skillID": "adventuring:Adventuring",
-                "data": {
-                    "passives": [
-                        {
-                            "id": "dragon_scales",
-                            "name": "Dragon Scales",
-                            "effects": [
-                                {
-                                    "trigger": "encounter_start",
-                                    "type": "immune",
-                                    "duration": 1
-                                }
-                            ]
-                        },
-                        {
-                            "id": "fire_aura",
-                            "name": "Fire Aura",
-                            "effects": [
-                                {
-                                    "trigger": "turn_start",
-                                    "type": "damage_flat",
-                                    "target": "all",
-                                    "party": "enemy",
-                                    "amount": {
-                                        "base": 5,
-                                        "scaling": [
-                                            {
-                                                "id": "adventuring:magic",
-                                                "amount": 0.1
-                                            }
-                                        ]
-                                    },
-                                    "stacks": {
-                                        "base": 1,
-                                        "scaling": []
-                                    }
-                                }
-                            ]
-                        },
-                        {
-                            "id": "draconic_summons",
-                            "name": "Draconic Fury",
-                            "effects": [
-                                {
-                                    "trigger": "encounter_start",
-                                    "type": "debuff",
-                                    "target": "all",
-                                    "party": "enemy",
-                                    "id": "adventuring:burn",
-                                    "stacks": {
-                                        "base": 3,
-                                        "scaling": []
-                                    }
-                                }
-                            ]
-                        }
-                    ],
-                    "areas": [
-                        {
-                            "id": "dragons_lair",
-                            "name": "Dragon's Lair",
-                            "media": "melvor:assets/media/monsters/dragon_red.png",
-                            "requirements": [
-                                {
-                                    "type": "skill_level",
-                                    "level": 45
-                                }
-                            ],
-                            "height": 7,
-                            "width": 6,
-                            "floors": [
-                                {
-                                    "monsters": [
-                                        {
-                                            "id": "adventuring:green_dragon",
-                                            "weight": 100
-                                        }
-                                    ],
-                                    "exit": [
-                                        "adventuring:green_dragon",
-                                        "adventuring:green_dragon",
-                                        "adventuring:green_dragon"
-                                    ]
-                                },
-                                {
-                                    "monsters": [
-                                        {
-                                            "id": "adventuring:green_dragon",
-                                            "weight": 70
-                                        },
-                                        {
-                                            "id": "adventuring:blue_dragon",
-                                            "weight": 30
-                                        }
-                                    ],
-                                    "exit": [
-                                        "adventuring:green_dragon",
-                                        "adventuring:green_dragon",
-                                        "adventuring:blue_dragon"
-                                    ]
-                                },
-                                {
-                                    "monsters": [
-                                        {
-                                            "id": "adventuring:green_dragon",
-                                            "weight": 50
-                                        },
-                                        {
-                                            "id": "adventuring:blue_dragon",
-                                            "weight": 50
-                                        }
-                                    ],
-                                    "exit": [
-                                        "adventuring:green_dragon",
-                                        "adventuring:blue_dragon",
-                                        "adventuring:blue_dragon"
-                                    ]
-                                },
-                                {
-                                    "monsters": [
-                                        {
-                                            "id": "adventuring:blue_dragon",
-                                            "weight": 70
-                                        },
-                                        {
-                                            "id": "adventuring:red_dragon",
-                                            "weight": 30
-                                        }
-                                    ],
-                                    "exit": [
-                                        "adventuring:blue_dragon",
-                                        "adventuring:blue_dragon",
-                                        "adventuring:red_dragon"
-                                    ]
-                                },
-                                {
-                                    "monsters": [
-                                        {
-                                            "id": "adventuring:blue_dragon",
-                                            "weight": 50
-                                        },
-                                        {
-                                            "id": "adventuring:red_dragon",
-                                            "weight": 50
-                                        }
-                                    ],
-                                    "exit": [
-                                        "adventuring:blue_dragon",
-                                        "adventuring:red_dragon",
-                                        "adventuring:red_dragon"
-                                    ]
-                                },
-                                {
-                                    "monsters": [
-                                        {
-                                            "id": "adventuring:red_dragon",
-                                            "weight": 70
-                                        },
-                                        {
-                                            "id": "adventuring:blue_dragon",
-                                            "weight": 30
-                                        }
-                                    ],
-                                    "exit": [
-                                        "adventuring:red_dragon",
-                                        "adventuring:red_dragon",
-                                        "adventuring:red_dragon"
-                                    ]
-                                },
-                                {
-                                    "monsters": [
-                                        {
-                                            "id": "adventuring:red_dragon",
-                                            "weight": 80
-                                        },
-                                        {
-                                            "id": "adventuring:blue_dragon",
-                                            "weight": 20
-                                        }
-                                    ],
-                                    "exit": [
-                                        "adventuring:blue_dragon",
-                                        "adventuring:red_dragon",
-                                        "adventuring:red_dragon"
-                                    ]
-                                },
-                                {
-                                    "monsters": [
-                                        {
-                                            "id": "adventuring:red_dragon",
-                                            "weight": 100
-                                        }
-                                    ],
-                                    "exit": [
-                                        "adventuring:red_dragon",
-                                        "adventuring:red_dragon",
-                                        "adventuring:red_dragon"
-                                    ]
-                                }
-                            ]
-                        }
-                    ],
-                    "monsters": [
-                        {
-                            "id": "green_dragon",
-                            "name": "Green Dragon",
-                            "media": "melvor:assets/media/monsters/dragon_green.png",
-                            "tags": [
-                                "dragon"
-                            ],
-                            "xp": 8,
-                            "stats": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 35
-                                },
-                                {
-                                    "id": "adventuring:defence",
-                                    "amount": 14
-                                },
-                                {
-                                    "id": "adventuring:agility",
-                                    "amount": 32
-                                },
-                                {
-                                    "id": "adventuring:strength",
-                                    "amount": 16
-                                },
-                                {
-                                    "id": "adventuring:ranged",
-                                    "amount": 30
-                                },
-                                {
-                                    "id": "adventuring:magic",
-                                    "amount": 35
-                                },
-                                {
-                                    "id": "adventuring:prayer",
-                                    "amount": 25
-                                }
-                            ],
-                            "generator": "adventuring:poison_breath",
-                            "spender": "adventuring:tail_swipe",
-                            "passives": [],
-                            "loot": [
-                                {
-                                    "id": "adventuring:currency",
-                                    "qty": 35,
-                                    "type": "currency"
-                                },
-                                {
-                                    "id": "adventuring:parts",
-                                    "qty": 12,
-                                    "type": "salvage"
-                                },
-                                {
-                                    "id": "adventuring:dragon_scale",
-                                    "qty": 1,
-                                    "type": "materials",
-                                    "chance": 0.2
-                                },
-                                {
-                                    "type": "equipment_pool",
-                                    "pool": "adventuring:tier3_dragons_lair",
-                                    "chance": 0.15
-                                }
-                            ]
-                        },
-                        {
-                            "id": "blue_dragon",
-                            "name": "Blue Dragon",
-                            "media": "melvor:assets/media/monsters/dragon_blue.png",
-                            "tags": [
-                                "dragon"
-                            ],
-                            "xp": 9,
-                            "stats": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 40
-                                },
-                                {
-                                    "id": "adventuring:defence",
-                                    "amount": 16
-                                },
-                                {
-                                    "id": "adventuring:agility",
-                                    "amount": 35
-                                },
-                                {
-                                    "id": "adventuring:strength",
-                                    "amount": 18
-                                },
-                                {
-                                    "id": "adventuring:ranged",
-                                    "amount": 35
-                                },
-                                {
-                                    "id": "adventuring:magic",
-                                    "amount": 42
-                                },
-                                {
-                                    "id": "adventuring:prayer",
-                                    "amount": 28
-                                }
-                            ],
-                            "generator": "adventuring:lightning_breath",
-                            "spender": "adventuring:wing_buffet",
-                            "passives": [],
-                            "loot": [
-                                {
-                                    "id": "adventuring:currency",
-                                    "qty": 42,
-                                    "type": "currency"
-                                },
-                                {
-                                    "id": "adventuring:parts",
-                                    "qty": 14,
-                                    "type": "salvage"
-                                },
-                                {
-                                    "id": "adventuring:dragon_scale",
-                                    "qty": 1,
-                                    "type": "materials",
-                                    "chance": 0.25
-                                },
-                                {
-                                    "type": "equipment_pool",
-                                    "pool": "adventuring:tier3_dragons_lair",
-                                    "chance": 0.15
-                                }
-                            ]
-                        },
-                        {
-                            "id": "red_dragon",
-                            "name": "Red Dragon",
-                            "media": "melvor:assets/media/monsters/dragon_red.png",
-                            "tags": [
-                                "boss",
-                                "dragon"
-                            ],
-                            "xp": 11,
-                            "isBoss": true,
-                            "enrageThreshold": 30,
-                            "enrageBuff": {
-                                "damage": 0.5,
-                                "speed": 0.2
-                            },
-                            "phases": [
-                                {
-                                    "name": "Ancient Terror"
-                                },
-                                {
-                                    "name": "Firestorm",
-                                    "hpThreshold": 50,
-                                    "generator": "adventuring:fire_breath",
-                                    "spender": "adventuring:dragon_breath",
-                                    "statBuffs": [
-                                        {
-                                            "id": "adventuring:magic",
-                                            "amount": 0.35
-                                        }
-                                    ]
-                                }
-                            ],
-                            "passives": [
-                                "adventuring:dragon_scales",
-                                "adventuring:fire_aura",
-                                "adventuring:draconic_summons"
-                            ],
-                            "stats": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 45
-                                },
-                                {
-                                    "id": "adventuring:defence",
-                                    "amount": 22
-                                },
-                                {
-                                    "id": "adventuring:agility",
-                                    "amount": 38
-                                },
-                                {
-                                    "id": "adventuring:strength",
-                                    "amount": 22
-                                },
-                                {
-                                    "id": "adventuring:ranged",
-                                    "amount": 40
-                                },
-                                {
-                                    "id": "adventuring:magic",
-                                    "amount": 48
-                                },
-                                {
-                                    "id": "adventuring:prayer",
-                                    "amount": 32
-                                }
-                            ],
-                            "generator": "adventuring:fire_breath",
-                            "spender": "adventuring:dragon_inferno",
-                            "loot": [
-                                {
-                                    "id": "adventuring:currency",
-                                    "qty": 50,
-                                    "type": "currency"
-                                },
-                                {
-                                    "id": "adventuring:parts",
-                                    "qty": 16,
-                                    "type": "salvage"
-                                },
-                                {
-                                    "type": "salvage",
-                                    "id": "adventuring:pristine_salvage",
-                                    "qty": 2
-                                },
-                                {
-                                    "id": "adventuring:big_parts",
-                                    "qty": 4,
-                                    "type": "salvage"
-                                },
-                                {
-                                    "id": "adventuring:dragon_scale",
-                                    "qty": 2,
-                                    "type": "materials",
-                                    "chance": 0.35
-                                },
-                                {
-                                    "type": "equipment_pool",
-                                    "pool": "adventuring:tier3_dragons_lair",
-                                    "chance": 0.15
-                                }
-                            ]
-                        }
-                    ],
-                    "generators": [
-                        {
-                            "id": "poison_breath",
-                            "name": "Poison Breath",
-                            "requirements": [],
-                            "isEnemy": true,
-                            "energy": 50,
-                            "hits": [
-                                {
-                                    "target": "all",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 8,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.4
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "lightning_breath",
-                            "name": "Lightning Breath",
-                            "requirements": [],
-                            "isEnemy": true,
-                            "energy": 55,
-                            "hits": [
-                                {
-                                    "target": "random",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 15,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.45
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "fire_breath",
-                            "name": "Fire Breath",
-                            "requirements": [],
-                            "isEnemy": true,
-                            "energy": 55,
-                            "hits": [
-                                {
-                                    "target": "all",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 10,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.4
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ],
-                    "spenders": [
-                        {
-                            "id": "dragon_inferno",
-                            "name": "Dragon Inferno",
-                            "requirements": [],
-                            "isEnemy": true,
-                            "cost": 100,
-                            "hits": [
-                                {
-                                    "target": "all",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 30,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.45
-                                                    }
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            "type": "debuff",
-                                            "id": "adventuring:burn",
-                                            "stacks": 3
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "whelp_rend",
-                            "name": "Whelp Rend",
-                            "requirements": [],
-                            "isEnemy": true,
-                            "cost": 50,
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 12,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:strength",
-                                                        "amount": 0.4
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "tail_swipe",
-                            "name": "Tail Swipe",
-                            "requirements": [],
-                            "isEnemy": true,
-                            "cost": 90,
-                            "hits": [
-                                {
-                                    "target": "all",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 20,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:strength",
-                                                        "amount": 0.4
-                                                    },
-                                                    {
-                                                        "id": "adventuring:agility",
-                                                        "amount": 0.35
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "wing_buffet",
-                            "name": "Wing Buffet",
-                            "requirements": [],
-                            "isEnemy": true,
-                            "cost": 95,
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 35,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:strength",
-                                                        "amount": 0.45
-                                                    },
-                                                    {
-                                                        "id": "adventuring:agility",
-                                                        "amount": 0.35
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "dragon_breath",
-                            "name": "Dragon Breath",
-                            "requirements": [],
-                            "isEnemy": true,
-                            "cost": 100,
-                            "hits": [
-                                {
-                                    "target": "all",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 30,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.45
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ]
-                }
-            }
-        ]
-    }
+	"$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+	"namespace": "adventuring",
+	"data": {
+		"skillData": [
+			{
+				"skillID": "adventuring:Adventuring",
+				"data": {
+					"passives": [
+						{
+							"id": "dragon_scales",
+							"name": "Dragon Scales",
+							"effects": [
+								{
+									"trigger": "encounter_start",
+									"type": "immune",
+									"duration": 1
+								}
+							]
+						},
+						{
+							"id": "fire_aura",
+							"name": "Fire Aura",
+							"effects": [
+								{
+									"trigger": "turn_start",
+									"type": "damage_flat",
+									"target": "all",
+									"party": "enemy",
+									"amount": {
+										"base": 5,
+										"scaling": [
+											{
+												"id": "adventuring:magic",
+												"amount": 0.1
+											}
+										]
+									},
+									"stacks": {
+										"base": 1,
+										"scaling": []
+									}
+								}
+							]
+						},
+						{
+							"id": "draconic_summons",
+							"name": "Draconic Fury",
+							"effects": [
+								{
+									"trigger": "encounter_start",
+									"type": "debuff",
+									"target": "all",
+									"party": "enemy",
+									"id": "adventuring:burn",
+									"stacks": {
+										"base": 3,
+										"scaling": []
+									}
+								}
+							]
+						}
+					],
+					"areas": [
+						{
+							"id": "dragons_lair",
+							"name": "Dragon's Lair",
+							"media": "melvor:assets/media/monsters/dragon_red.png",
+							"requirements": [
+								{
+									"type": "area_cleared",
+									"area": "adventuring:golbin_fortress"
+								}
+							],
+							"height": 7,
+							"width": 6,
+							"floors": [
+								{
+									"monsters": [
+										{
+											"id": "adventuring:green_dragon",
+											"weight": 100
+										}
+									],
+									"exit": [
+										"adventuring:green_dragon",
+										"adventuring:green_dragon",
+										"adventuring:green_dragon"
+									]
+								},
+								{
+									"monsters": [
+										{
+											"id": "adventuring:green_dragon",
+											"weight": 70
+										},
+										{
+											"id": "adventuring:blue_dragon",
+											"weight": 30
+										}
+									],
+									"exit": [
+										"adventuring:green_dragon",
+										"adventuring:green_dragon",
+										"adventuring:blue_dragon"
+									]
+								},
+								{
+									"monsters": [
+										{
+											"id": "adventuring:green_dragon",
+											"weight": 50
+										},
+										{
+											"id": "adventuring:blue_dragon",
+											"weight": 50
+										}
+									],
+									"exit": [
+										"adventuring:green_dragon",
+										"adventuring:blue_dragon",
+										"adventuring:blue_dragon"
+									]
+								},
+								{
+									"monsters": [
+										{
+											"id": "adventuring:blue_dragon",
+											"weight": 70
+										},
+										{
+											"id": "adventuring:red_dragon",
+											"weight": 30
+										}
+									],
+									"exit": [
+										"adventuring:blue_dragon",
+										"adventuring:blue_dragon",
+										"adventuring:red_dragon"
+									]
+								},
+								{
+									"monsters": [
+										{
+											"id": "adventuring:blue_dragon",
+											"weight": 50
+										},
+										{
+											"id": "adventuring:red_dragon",
+											"weight": 50
+										}
+									],
+									"exit": [
+										"adventuring:blue_dragon",
+										"adventuring:red_dragon",
+										"adventuring:red_dragon"
+									]
+								},
+								{
+									"monsters": [
+										{
+											"id": "adventuring:red_dragon",
+											"weight": 70
+										},
+										{
+											"id": "adventuring:blue_dragon",
+											"weight": 30
+										}
+									],
+									"exit": [
+										"adventuring:red_dragon",
+										"adventuring:red_dragon",
+										"adventuring:red_dragon"
+									]
+								},
+								{
+									"monsters": [
+										{
+											"id": "adventuring:red_dragon",
+											"weight": 80
+										},
+										{
+											"id": "adventuring:blue_dragon",
+											"weight": 20
+										}
+									],
+									"exit": [
+										"adventuring:blue_dragon",
+										"adventuring:red_dragon",
+										"adventuring:red_dragon"
+									]
+								},
+								{
+									"monsters": [
+										{
+											"id": "adventuring:red_dragon",
+											"weight": 100
+										}
+									],
+									"exit": [
+										"adventuring:red_dragon",
+										"adventuring:red_dragon",
+										"adventuring:red_dragon"
+									]
+								}
+							],
+							"tier": 4
+						}
+					],
+					"monsters": [
+						{
+							"id": "green_dragon",
+							"name": "Green Dragon",
+							"media": "melvor:assets/media/monsters/dragon_green.png",
+							"tags": [
+								"dragon"
+							],
+							"xp": 14,
+							"stats": [
+								{
+									"id": "adventuring:hitpoints",
+									"amount": 30
+								},
+								{
+									"id": "adventuring:defence",
+									"amount": 55
+								},
+								{
+									"id": "adventuring:agility",
+									"amount": 44
+								},
+								{
+									"id": "adventuring:strength",
+									"amount": 185
+								},
+								{
+									"id": "adventuring:magic",
+									"amount": 185
+								},
+								{
+									"id": "adventuring:ranged",
+									"amount": 28
+								},
+								{
+									"id": "adventuring:prayer",
+									"amount": 55
+								}
+							],
+							"generator": "adventuring:poison_breath",
+							"spender": "adventuring:tail_swipe",
+							"passives": [],
+							"loot": [
+								{
+									"id": "adventuring:currency",
+									"qty": 35,
+									"type": "currency"
+								},
+								{
+									"id": "adventuring:parts",
+									"qty": 12,
+									"type": "salvage"
+								},
+								{
+									"id": "adventuring:dragon_scale",
+									"qty": 1,
+									"type": "materials",
+									"chance": 0.2
+								},
+								{
+									"type": "equipment_pool",
+									"pool": "adventuring:tier3_dragons_lair",
+									"chance": 0.15
+								}
+							]
+						},
+						{
+							"id": "blue_dragon",
+							"name": "Blue Dragon",
+							"media": "melvor:assets/media/monsters/dragon_blue.png",
+							"tags": [
+								"dragon"
+							],
+							"xp": 14,
+							"stats": [
+								{
+									"id": "adventuring:hitpoints",
+									"amount": 40
+								},
+								{
+									"id": "adventuring:defence",
+									"amount": 75
+								},
+								{
+									"id": "adventuring:agility",
+									"amount": 60
+								},
+								{
+									"id": "adventuring:strength",
+									"amount": 250
+								},
+								{
+									"id": "adventuring:magic",
+									"amount": 250
+								},
+								{
+									"id": "adventuring:ranged",
+									"amount": 38
+								},
+								{
+									"id": "adventuring:prayer",
+									"amount": 75
+								}
+							],
+							"generator": "adventuring:lightning_breath",
+							"spender": "adventuring:wing_buffet",
+							"passives": [],
+							"loot": [
+								{
+									"id": "adventuring:currency",
+									"qty": 42,
+									"type": "currency"
+								},
+								{
+									"id": "adventuring:parts",
+									"qty": 14,
+									"type": "salvage"
+								},
+								{
+									"id": "adventuring:dragon_scale",
+									"qty": 1,
+									"type": "materials",
+									"chance": 0.25
+								},
+								{
+									"type": "equipment_pool",
+									"pool": "adventuring:tier3_dragons_lair",
+									"chance": 0.15
+								}
+							]
+						},
+						{
+							"id": "red_dragon",
+							"name": "Red Dragon",
+							"media": "melvor:assets/media/monsters/dragon_red.png",
+							"tags": [
+								"boss",
+								"dragon"
+							],
+							"xp": 42,
+							"isBoss": true,
+							"enrageThreshold": 30,
+							"enrageBuff": {
+								"damage": 0.5,
+								"speed": 0.2
+							},
+							"phases": [
+								{
+									"name": "Ancient Terror"
+								},
+								{
+									"name": "Firestorm",
+									"hpThreshold": 50,
+									"generator": "adventuring:fire_breath",
+									"spender": "adventuring:dragon_breath",
+									"statBuffs": [
+										{
+											"id": "adventuring:magic",
+											"amount": 0.35
+										}
+									]
+								}
+							],
+							"passives": [
+								"adventuring:dragon_scales",
+								"adventuring:fire_aura",
+								"adventuring:draconic_summons"
+							],
+							"stats": [
+								{
+									"id": "adventuring:hitpoints",
+									"amount": 166
+								},
+								{
+									"id": "adventuring:defence",
+									"amount": 101
+								},
+								{
+									"id": "adventuring:agility",
+									"amount": 80
+								},
+								{
+									"id": "adventuring:strength",
+									"amount": 51
+								},
+								{
+									"id": "adventuring:magic",
+									"amount": 670
+								},
+								{
+									"id": "adventuring:ranged",
+									"amount": 51
+								},
+								{
+									"id": "adventuring:prayer",
+									"amount": 101
+								}
+							],
+							"generator": "adventuring:fire_breath",
+							"spender": "adventuring:dragon_inferno",
+							"loot": [
+								{
+									"id": "adventuring:currency",
+									"qty": 50,
+									"type": "currency"
+								},
+								{
+									"id": "adventuring:parts",
+									"qty": 16,
+									"type": "salvage"
+								},
+								{
+									"type": "salvage",
+									"id": "adventuring:pristine_salvage",
+									"qty": 2
+								},
+								{
+									"id": "adventuring:big_parts",
+									"qty": 4,
+									"type": "salvage"
+								},
+								{
+									"id": "adventuring:dragon_scale",
+									"qty": 2,
+									"type": "materials",
+									"chance": 0.35
+								},
+								{
+									"type": "equipment_pool",
+									"pool": "adventuring:tier3_dragons_lair",
+									"chance": 0.15
+								}
+							]
+						}
+					],
+					"generators": [
+						{
+							"id": "poison_breath",
+							"name": "Poison Breath",
+							"requirements": [],
+							"isEnemy": true,
+							"energy": 50,
+							"hits": [
+								{
+									"target": "all",
+									"party": "enemy",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"amount": {
+												"base": 4,
+												"scaling": [
+													{
+														"id": "adventuring:magic",
+														"amount": 0.4
+													}
+												]
+											}
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "lightning_breath",
+							"name": "Lightning Breath",
+							"requirements": [],
+							"isEnemy": true,
+							"energy": 55,
+							"hits": [
+								{
+									"target": "random",
+									"party": "enemy",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"amount": {
+												"base": 8,
+												"scaling": [
+													{
+														"id": "adventuring:magic",
+														"amount": 0.45
+													}
+												]
+											}
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "fire_breath",
+							"name": "Fire Breath",
+							"requirements": [],
+							"isEnemy": true,
+							"energy": 55,
+							"hits": [
+								{
+									"target": "all",
+									"party": "enemy",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"amount": {
+												"base": 5,
+												"scaling": [
+													{
+														"id": "adventuring:magic",
+														"amount": 0.4
+													}
+												]
+											}
+										}
+									]
+								}
+							]
+						}
+					],
+					"spenders": [
+						{
+							"id": "dragon_inferno",
+							"name": "Dragon Inferno",
+							"requirements": [],
+							"isEnemy": true,
+							"cost": 100,
+							"hits": [
+								{
+									"target": "all",
+									"party": "enemy",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"amount": {
+												"base": 15,
+												"scaling": [
+													{
+														"id": "adventuring:magic",
+														"amount": 0.45
+													}
+												]
+											}
+										},
+										{
+											"type": "debuff",
+											"id": "adventuring:burn",
+											"stacks": 3
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "whelp_rend",
+							"name": "Whelp Rend",
+							"requirements": [],
+							"isEnemy": true,
+							"cost": 50,
+							"hits": [
+								{
+									"target": "front",
+									"party": "enemy",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "adventuring:strength",
+														"amount": 0.4
+													}
+												]
+											}
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "tail_swipe",
+							"name": "Tail Swipe",
+							"requirements": [],
+							"isEnemy": true,
+							"cost": 90,
+							"hits": [
+								{
+									"target": "all",
+									"party": "enemy",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"amount": {
+												"base": 10,
+												"scaling": [
+													{
+														"id": "adventuring:strength",
+														"amount": 0.4
+													},
+													{
+														"id": "adventuring:agility",
+														"amount": 0.35
+													}
+												]
+											}
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "wing_buffet",
+							"name": "Wing Buffet",
+							"requirements": [],
+							"isEnemy": true,
+							"cost": 95,
+							"hits": [
+								{
+									"target": "front",
+									"party": "enemy",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"amount": {
+												"base": 18,
+												"scaling": [
+													{
+														"id": "adventuring:strength",
+														"amount": 0.45
+													},
+													{
+														"id": "adventuring:agility",
+														"amount": 0.35
+													}
+												]
+											}
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "dragon_breath",
+							"name": "Dragon Breath",
+							"requirements": [],
+							"isEnemy": true,
+							"cost": 100,
+							"hits": [
+								{
+									"target": "all",
+									"party": "enemy",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"amount": {
+												"base": 15,
+												"scaling": [
+													{
+														"id": "adventuring:magic",
+														"amount": 0.45
+													}
+												]
+											}
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
+		]
+	}
 }

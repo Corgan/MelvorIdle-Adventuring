@@ -1,388 +1,223 @@
 {
-    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
-    "namespace": "adventuring",
-    "data": {
-        "skillData": [{
-            "skillID": "adventuring:Adventuring",
-            "data": {
-                "jobs": [
-                    {
-                        "id": "highpriest",
-                        "tier": 4,
-                        "name": "High Priest",
-                        "media": "melvor:assets/media/skills/prayer/prayer.png#tint=green",
-                        "requirements": [
-                            { "type": "job_level", "job": "adventuring:templar", "level": 25 },
-                            { "type": "job_level", "job": "adventuring:inquisitor", "level": 20 },
-                            { "type": "area_mastery", "area": "adventuring:dragons_peak", "level": 50 }
-                        ],
-                        "isMilestoneReward": true,
-                        "allowedItems": [
-                            "adventuring:hat",
-                            "adventuring:robes",
-                            "adventuring:bottoms",
-                            "adventuring:mitts",
-                            "adventuring:slippers",
-                            "adventuring:amulet",
-                            "adventuring:ring",
-                            "adventuring:cape",
-                            "adventuring:staff",
-                            "adventuring:mace",
-                            "adventuring:spellbook"
-                        ],
-                        "scaling": [
-                            { "id": "adventuring:hitpoints", "amount": 1.5 },
-                            { "id": "adventuring:defence", "amount": 0.75 },
-                            { "id": "adventuring:agility", "amount": 0.5 },
-                            { "id": "adventuring:prayer", "amount": 4.0 },
-                            { "id": "adventuring:magic", "amount": 0.5 }
-                        ]
-                    }
-                ],
-                "generators": [
-                    {
-                        "id": "divine_light",
-                        "name": "Divine Light",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:highpriest", "level": 1 }
-                        ],
-                        "energy": 30,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "ally",
-                                "effects": [
-                                    {
-                                        "type": "heal_flat",
-                                        "amount": {
-                                            "base": 15,
-                                            "scaling": [
-                                                { "id": "adventuring:prayer", "amount": 0.4 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "holy_radiance",
-                        "name": "Holy Radiance",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:highpriest", "level": 20 }
-                        ],
-                        "energy": 35,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "ally",
-                                "effects": [
-                                    {
-                                        "type": "heal_flat",
-                                        "amount": {
-                                            "base": 12,
-                                            "scaling": [
-                                                { "id": "adventuring:prayer", "amount": 0.35 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:divine_favor",
-                                        "stacks": {
-                                            "base": 2,
-                                            "scaling": [
-                                                { "id": "adventuring:prayer", "amount": 0.1 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ],
-                "spenders": [
-                    {
-                        "id": "prayer_of_mending",
-                        "name": "Prayer of Mending",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:highpriest", "level": 10 }
-                        ],
-                        "cost": 150,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "ally",
-                                "effects": [
-                                    {
-                                        "type": "heal_flat",
-                                        "amount": {
-                                            "base": 25,
-                                            "scaling": [
-                                                { "id": "adventuring:prayer", "amount": 0.65 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:regen",
-                                        "stacks": {
-                                            "base": 4,
-                                            "scaling": [
-                                                { "id": "adventuring:prayer", "amount": 0.15 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "divine_sanctuary",
-                        "name": "Divine Sanctuary",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:highpriest", "level": 15 }
-                        ],
-                        "cost": 160,
-                        "hits": [
-                            {
-                                "target": "lowest",
-                                "party": "ally",
-                                "effects": [
-                                    {
-                                        "type": "heal_flat",
-                                        "amount": {
-                                            "base": 40,
-                                            "scaling": [
-                                                { "id": "adventuring:prayer", "amount": 1.0 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:divine_favor",
-                                        "stacks": {
-                                            "base": 3,
-                                            "scaling": [
-                                                { "id": "adventuring:prayer", "amount": 0.15 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:regen",
-                                        "stacks": {
-                                            "base": 3,
-                                            "scaling": [
-                                                { "id": "adventuring:prayer", "amount": 0.15 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:barrier",
-                                        "stacks": {
-                                            "base": 3,
-                                            "scaling": [
-                                                { "id": "adventuring:prayer", "amount": 0.15 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "divine_grace",
-                        "name": "Divine Grace",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:highpriest", "level": 20 }
-                        ],
-                        "cost": 180,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "ally",
-                                "delay": 150,
-                                "repeat": 2,
-                                "effects": [
-                                    {
-                                        "type": "heal_flat",
-                                        "amount": {
-                                            "base": 18,
-                                            "scaling": [
-                                                { "id": "adventuring:prayer", "amount": 0.5 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:divine_favor",
-                                        "stacks": {
-                                            "base": 2,
-                                            "scaling": [
-                                                { "id": "adventuring:prayer", "amount": 0.1 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "mass_resurrection",
-                        "name": "Mass Resurrection",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:highpriest", "level": 25 }
-                        ],
-                        "cost": 250,
-                        "hits": [
-                            {
-                                "target": "dead",
-                                "party": "ally",
-                                "effects": [
-                                    {
-                                        "type": "revive",
-                                        "amount": {
-                                            "base": 50,
-                                            "scaling": [
-                                                { "id": "adventuring:prayer", "amount": 2.0 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "divine_miracle",
-                        "name": "Divine Miracle",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:highpriest", "level": 40 }
-                        ],
-                        "cost": 300,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "ally",
-                                "effects": [
-                                    {
-                                        "type": "heal_flat",
-                                        "amount": {
-                                            "base": 100,
-                                            "scaling": [
-                                                { "id": "adventuring:prayer", "amount": 5.0 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:divine_favor",
-                                        "stacks": {
-                                            "base": 5,
-                                            "scaling": [
-                                                { "id": "adventuring:prayer", "amount": 0.25 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:regen",
-                                        "stacks": {
-                                            "base": 5,
-                                            "scaling": [
-                                                { "id": "adventuring:prayer", "amount": 0.2 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:barrier",
-                                        "stacks": {
-                                            "base": 5,
-                                            "scaling": [
-                                                { "id": "adventuring:prayer", "amount": 0.3 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ],
-                "passives": [
-                    {
-                        "id": "divine_presence",
-                        "name": "Divine Presence",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:highpriest", "level": 30 }
-                        ],
-                        "effects": [
-                            {
-                                "trigger": "encounter_start",
-                                "type": "buff",
-                                "target": "all",
-                                "party": "ally",
-                                "id": "adventuring:divine_favor",
-                                "stacks": {
-                                    "base": 4,
-                                    "scaling": [
-                                        { "id": "adventuring:prayer", "amount": 0.2 }
-                                    ]
-                                }
-                            },
-                            {
-                                "trigger": "encounter_start",
-                                "type": "buff",
-                                "target": "all",
-                                "party": "ally",
-                                "id": "adventuring:regen",
-                                "stacks": {
-                                    "base": 4,
-                                    "scaling": [
-                                        { "id": "adventuring:prayer", "amount": 0.2 }
-                                    ]
-                                }
-                            }
-                        ]
-                    },
-                    {
-                        "id": "divine_aura",
-                        "name": "Divine Aura",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:highpriest", "level": 25 }
-                        ],
-                        "effects": [
-                            {
-                                "trigger": "encounter_start",
-                                "type": "buff",
-                                "target": "all",
-                                "party": "ally",
-                                "id": "adventuring:barrier",
-                                "stacks": {
-                                    "base": 4,
-                                    "scaling": [
-                                        { "id": "adventuring:prayer", "amount": 0.2 }
-                                    ]
-                                }
-                            },
-                            {
-                                "trigger": "encounter_start",
-                                "type": "debuff",
-                                "target": "all",
-                                "party": "enemy",
-                                "id": "adventuring:weaken",
-                                "stacks": {
-                                    "base": 2,
-                                    "scaling": [
-                                        { "id": "adventuring:prayer", "amount": 0.1 }
-                                    ]
-                                }
-                            }
-                        ]
-                    }
-                ]
-            }
-        }]
-    }
+	"$schema": "../job_schema.json",
+	"namespace": "adventuring",
+	"packages": {
+		"combat_jobs": {
+			"jobs": {
+				"highpriest": {
+					"name": "High Priest",
+					"tier": 4,
+					"media": "assets/jobs/highpriest.png",
+					"requirements": [
+						{ "type": "job_level", "job": "adventuring:templar", "level": 25 },
+						{ "type": "job_level", "job": "adventuring:inquisitor", "level": 20 }
+					],
+					"abilities": [
+						{
+							"id": "holy_smite",
+							"name": "Holy Smite",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "Smites an enemy with holy power while healing yourself.",
+							"energy": 25,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:highpriest", "level": 1 }],
+							"hits": [
+								{ "target": "front", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "amount": { "base": 6, "scaling": [{ "id": "adventuring:prayer", "amount": 0.35 }] } },
+									{ "type": "debuff", "id": "adventuring:atonement", "stacks": { "base": 2, "scaling": [{ "id": "adventuring:prayer", "amount": 0.08 }] } }
+								] },
+								{ "target": "self", "effects": [
+									{ "type": "heal_flat", "amount": { "base": 2, "scaling": [{ "id": "adventuring:prayer", "amount": 0.1 }] } }
+								] }
+							]
+						},
+						{
+							"id": "prayer_of_mending",
+							"name": "Prayer of Mending",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "A prayer that heals and regenerates the entire party.",
+							"cost": 140,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:highpriest", "level": 1 }],
+							"hits": [{ "target": "all", "party": "ally", "effects": [
+								{ "type": "heal_flat", "amount": { "base": 12, "scaling": [{ "id": "adventuring:prayer", "amount": 0.6 }] } },
+								{ "type": "buff", "id": "adventuring:regen", "stacks": { "base": 3, "scaling": [{ "id": "adventuring:prayer", "amount": 0.15 }] } }
+							] }]
+						},
+						{
+							"id": "divine_light",
+							"name": "Divine Light",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "Divine light heals and blesses the party.",
+							"energy": 30,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:highpriest", "level": 10 }],
+							"hits": [{ "target": "all", "party": "ally", "effects": [
+								{ "type": "heal_flat", "amount": { "base": 8, "scaling": [{ "id": "adventuring:prayer", "amount": 0.45 }] } },
+								{ "type": "buff", "id": "adventuring:divine_favor", "stacks": { "base": 2, "scaling": [{ "id": "adventuring:prayer", "amount": 0.1 }] } }
+							] }]
+						},
+						{
+							"id": "divine_sanctuary",
+							"name": "Divine Sanctuary",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "Creates a sanctuary of healing for the weakest ally.",
+							"cost": 160,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:highpriest", "level": 15 }],
+							"hits": [{ "target": "lowest", "party": "ally", "effects": [
+								{ "type": "heal_flat", "amount": { "base": 25, "scaling": [{ "id": "adventuring:prayer", "amount": 1.2 }] } },
+								{ "type": "buff", "id": "adventuring:divine_favor", "stacks": { "base": 4, "scaling": [{ "id": "adventuring:prayer", "amount": 0.2 }] } },
+								{ "type": "buff", "id": "adventuring:regen", "stacks": { "base": 4, "scaling": [{ "id": "adventuring:prayer", "amount": 0.15 }] } },
+								{ "type": "buff", "id": "adventuring:barrier", "stacks": { "base": 4, "scaling": [{ "id": "adventuring:prayer", "amount": 0.2 }] } }
+							] }]
+						},
+						{
+							"id": "divine_aura",
+							"name": "Divine Aura",
+							"type": "passive",
+							"media": "assets/abilities/passive.png",
+							"description": "A divine aura protects and blesses allies at battle start.",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:highpriest", "level": 20 }],
+							"effects": [
+								{ "trigger": "encounter_start", "type": "buff", "target": "all", "party": "ally", "id": "adventuring:barrier", "stacks": { "base": 5, "scaling": [{ "id": "adventuring:prayer", "amount": 0.25 }] } },
+								{ "trigger": "encounter_start", "type": "buff", "target": "all", "party": "ally", "id": "adventuring:divine_favor", "stacks": { "base": 3, "scaling": [{ "id": "adventuring:prayer", "amount": 0.15 }] } }
+							]
+						},
+						{
+							"id": "holy_nova",
+							"name": "Holy Nova",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "A nova of holy energy damages enemies and heals allies.",
+							"energy": 30,
+							"requirements": [{ "type": "job_level", "job": "adventuring:highpriest", "level": 25 }],
+							"hits": [
+								{ "target": "all", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "amount": { "base": 6, "scaling": [{ "id": "adventuring:prayer", "amount": 0.35 }] } },
+									{ "type": "debuff", "id": "adventuring:atonement", "stacks": 2 }
+								] },
+								{ "target": "all", "party": "ally", "effects": [
+									{ "type": "heal_flat", "amount": { "base": 5, "scaling": [{ "id": "adventuring:prayer", "amount": 0.25 }] } }
+								] }
+							]
+						},
+						{
+							"id": "watchful_guardian",
+							"name": "Watchful Guardian",
+							"type": "passive",
+							"media": "assets/abilities/passive.png",
+							"description": "Guardian spirits heal the weakest ally each round.",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:highpriest", "level": 40 }],
+							"effects": [
+								{ "trigger": "round_start", "type": "heal_flat", "target": "lowest", "party": "ally", "amount": { "base": 6, "scaling": [{ "id": "adventuring:prayer", "amount": 0.25 }] } }
+							]
+						},
+						{
+							"id": "divine_grace",
+							"name": "Divine Grace",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "Waves of divine grace heal and bless the party.",
+							"cost": 170,
+							"requirements": [{ "type": "job_level", "job": "adventuring:highpriest", "level": 50 }],
+							"hits": [{ "target": "all", "party": "ally", "delay": 150, "repeat": 2, "effects": [
+								{ "type": "heal_flat", "amount": { "base": 12, "scaling": [{ "id": "adventuring:prayer", "amount": 0.6 }] } },
+								{ "type": "buff", "id": "adventuring:divine_favor", "stacks": { "base": 2, "scaling": [{ "id": "adventuring:prayer", "amount": 0.1 }] } }
+							] }]
+						},
+						{
+							"id": "purifying_light",
+							"name": "Purifying Light",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "Purifying light consumes atonement for massive damage and heals allies.",
+							"energy": 35,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:highpriest", "level": 60 }],
+							"hits": [
+								{ "target": "front", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "amount": { "base": 15, "scaling": [
+										{ "id": "adventuring:prayer", "amount": 0.7 },
+										{ "id": "adventuring:atonement", "scaleFrom": "debuff", "scaleTarget": "target", "amount": 4, "consume": true }
+									] } }
+								] },
+								{ "target": "all", "party": "ally", "effects": [
+									{ "type": "heal_flat", "amount": { "base": 6, "scaling": [{ "id": "adventuring:prayer", "amount": 0.3 }] } }
+								] }
+							]
+						},
+						{
+							"id": "mass_resurrection",
+							"name": "Mass Resurrection",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "Resurrects fallen allies and heals the living.",
+							"cost": 200,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:highpriest", "level": 70 }],
+							"hits": [
+								{ "target": "dead", "party": "ally", "effects": [
+									{ "type": "revive", "amount": { "base": 50, "scaling": [{ "id": "adventuring:prayer", "amount": 2.0 }] } },
+									{ "type": "buff", "id": "adventuring:divine_favor", "stacks": 4 },
+									{ "type": "buff", "id": "adventuring:barrier", "stacks": { "base": 4, "scaling": [{ "id": "adventuring:prayer", "amount": 0.2 }] } }
+								] },
+								{ "target": "all", "party": "ally", "effects": [
+									{ "type": "heal_flat", "amount": { "base": 10, "scaling": [{ "id": "adventuring:prayer", "amount": 0.5 }] } }
+								] }
+							]
+						},
+						{
+							"id": "guardian_spirit",
+							"name": "Guardian Spirit",
+							"type": "passive",
+							"media": "assets/abilities/passive.png",
+							"description": "Guardian spirits automatically revive the first ally to fall.",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:highpriest", "level": 80 }],
+							"effects": [
+								{ "trigger": "ally_death", "type": "revive", "target": "dead", "party": "ally", "amount": { "base": 25, "scaling": [{ "id": "adventuring:prayer", "amount": 0.8 }] }, "limit": "combat" }
+							]
+						},
+						{
+							"id": "wrath_of_heaven",
+							"name": "Wrath of Heaven",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "Heaven's wrath punishes enemies and blesses allies.",
+							"energy": 40,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:highpriest", "level": 90 }],
+							"hits": [
+								{ "target": "all", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "amount": { "base": 14, "scaling": [{ "id": "adventuring:prayer", "amount": 0.7 }] } },
+									{ "type": "debuff", "id": "adventuring:atonement", "stacks": 3 }
+								] },
+								{ "target": "all", "party": "ally", "effects": [
+									{ "type": "buff", "id": "adventuring:divine_favor", "stacks": 3 }
+								] }
+							]
+						},
+						{
+							"id": "divine_miracle",
+							"name": "Divine Miracle",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "The ultimate miracle - full restoration and resurrection.",
+							"cost": 250,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:highpriest", "level": 99 }],
+							"hits": [
+								{ "target": "dead", "party": "ally", "effects": [
+									{ "type": "revive", "amount": { "base": 100, "scaling": [{ "id": "adventuring:prayer", "amount": 3.0 }] } },
+									{ "type": "buff", "id": "adventuring:divine_favor", "stacks": 6 }
+								] },
+								{ "target": "all", "party": "ally", "effects": [
+									{ "type": "heal_flat", "amount": { "base": 50, "scaling": [{ "id": "adventuring:prayer", "amount": 2.5 }] } },
+									{ "type": "buff", "id": "adventuring:divine_favor", "stacks": { "base": 6, "scaling": [{ "id": "adventuring:prayer", "amount": 0.3 }] } },
+									{ "type": "buff", "id": "adventuring:regen", "stacks": { "base": 5, "scaling": [{ "id": "adventuring:prayer", "amount": 0.25 }] } },
+									{ "type": "buff", "id": "adventuring:barrier", "stacks": { "base": 6, "scaling": [{ "id": "adventuring:prayer", "amount": 0.35 }] } }
+								] }
+							]
+						}
+					]
+				}
+			}
+		}
+	}
 }

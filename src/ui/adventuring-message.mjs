@@ -89,7 +89,7 @@ export class AdventuringMessage {
 
     /**
      * Check if this message passes the given filters
-     * @param {Object} filters - { categories: Set, slots: Set, showAllSlots: boolean }
+     * @param {Object} filters - { categories: Set, slots: Set, showAllSlots: boolean, showEnemyOnly: boolean }
      * @returns {boolean}
      */
     passesFilters(filters) {
@@ -98,16 +98,25 @@ export class AdventuringMessage {
             return false;
         }
         
-        // Slot filter (if slot filtering is enabled and this message involves a hero)
+        // Slot filter (if slot filtering is enabled)
         if (filters.slots && !filters.showAllSlots) {
             const sourceSlot = this._getSlot(this.source);
             const targetSlot = this._getSlot(this.target);
             
-            // If message involves any hero, at least one must be in enabled slots
-            if (sourceSlot >= 0 || targetSlot >= 0) {
-                const sourceOk = sourceSlot < 0 || filters.slots.has(sourceSlot);
-                const targetOk = targetSlot < 0 || filters.slots.has(targetSlot);
-                if (!sourceOk && !targetOk) {
+            const sourceIsHero = sourceSlot >= 0;
+            const targetIsHero = targetSlot >= 0;
+            
+            if (sourceIsHero || targetIsHero) {
+                // At least one hero is involved - require at least one enabled hero
+                const sourceIsEnabledHero = sourceIsHero && filters.slots.has(sourceSlot);
+                const targetIsEnabledHero = targetIsHero && filters.slots.has(targetSlot);
+                
+                if (!sourceIsEnabledHero && !targetIsEnabledHero) {
+                    return false;
+                }
+            } else {
+                // No heroes involved (enemy-only message)
+                if (filters.showEnemyOnly === false) {
                     return false;
                 }
             }

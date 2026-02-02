@@ -1,248 +1,239 @@
 {
-    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
-    "namespace": "adventuring",
-    "data": {
-        "skillData": [
-            {
-                "skillID": "adventuring:Adventuring",
-                "data": {
-                    "jobs": [
-                        {
-                            "id": "avatar",
-                            "tier": 5,
-                            "name": "Avatar",
-                            "isMilestoneReward": true,
-                            "media": "melvor:assets/media/skills/combat/combat.png#tint=rainbow",
-                            "scaling": [
-                                { "id": "adventuring:hitpoints", "amount": 1.4 },
-                                { "id": "adventuring:defence", "amount": 1.2 },
-                                { "id": "adventuring:agility", "amount": 0.8 },
-                                { "id": "adventuring:strength", "amount": 1.0 },
-                                { "id": "adventuring:ranged", "amount": 0.8 },
-                                { "id": "adventuring:magic", "amount": 1.0 },
-                                { "id": "adventuring:prayer", "amount": 0.8 }
-                            ],
-                            "maxLevel": 30,
-                            "requirements": [
-                                { "type": "job_level", "job": "adventuring:spellblade", "level": 18 },
-                                { "type": "job_level", "job": "adventuring:warden", "level": 18 },
-                                { "type": "job_level", "job": "adventuring:shaman", "level": 15 }
-                            ],
-                            "allowedItems": [
-                                "adventuring:helm",
-                                "adventuring:platebody",
-                                "adventuring:platelegs",
-                                "adventuring:gauntlets",
-                                "adventuring:sabatons",
-                                "adventuring:amulet",
-                                "adventuring:ring",
-                                "adventuring:cape",
-                                "adventuring:fists",
-                                "adventuring:staff",
-                                "adventuring:shield"
-                            ]
-                        }
-                    ],
-                    "generators": [
-                        {
-                            "id": "avatars_wrath",
-                            "name": "Avatar's Wrath",
-                            "requirements": [
-                                { "type": "current_job_level", "job": "adventuring:avatar", "level": 1 }
-                            ],
-                            "energy": 8,
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 15,
-                                                "scaling": [
-                                                    { "id": "adventuring:strength", "amount": 0.35 },
-                                                    { "id": "adventuring:magic", "amount": 0.35 }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                },
-                                {
-                                    "target": "random",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 15,
-                                                "scaling": [
-                                                    { "id": "adventuring:strength", "amount": 0.35 },
-                                                    { "id": "adventuring:magic", "amount": 0.35 }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                },
-                                {
-                                    "target": "self",
-                                    "party": "ally",
-                                    "effects": [
-                                        { "type": "buff", "id": "adventuring:might", "stacks": { "base": 3 } },
-                                        { "type": "buff", "id": "adventuring:focus", "stacks": { "base": 2 } }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "divine_aegis",
-                            "name": "Divine Aegis",
-                            "requirements": [
-                                { "type": "current_job_level", "job": "adventuring:avatar", "level": 5 }
-                            ],
-                            "energy": 7,
-                            "hits": [
-                                {
-                                    "target": "all",
-                                    "party": "ally",
-                                    "effects": [
-                                        { "type": "buff", "id": "adventuring:barrier", "stacks": { "base": 5 } },
-                                        { "type": "buff", "id": "adventuring:fortify", "stacks": { "base": 3 } }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "spirit_call",
-                            "name": "Spirit Call",
-                            "requirements": [
-                                { "type": "current_job_level", "job": "adventuring:avatar", "level": 10 }
-                            ],
-                            "energy": 6,
-                            "hits": [
-                                {
-                                    "target": "all",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 12,
-                                                "scaling": [
-                                                    { "id": "adventuring:prayer", "amount": 0.85 }
-                                                ]
-                                            }
-                                        },
-                                        { "type": "debuff", "id": "adventuring:weaken", "stacks": { "base": 3 } }
-                                    ]
-                                }
-                            ]
-                        }
-                    ],
-                    "spenders": [
-                        {
-                            "id": "primal_tempest",
-                            "name": "Primal Tempest",
-                            "requirements": [
-                                { "type": "current_job_level", "job": "adventuring:avatar", "level": 3 }
-                            ],
-                            "cost": 20,
-                            "hits": [
-                                {
-                                    "target": "all",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 20,
-                                                "scaling": [
-                                                    { "id": "adventuring:magic", "amount": 0.42 },
-                                                    { "id": "adventuring:prayer", "amount": 0.42 }
-                                                ]
-                                            }
-                                        },
-                                        { "type": "debuff", "id": "adventuring:chill", "stacks": { "base": 4 } },
-                                        { "type": "debuff", "id": "adventuring:burn", "stacks": { "base": 4 } }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "avatars_blessing",
-                            "name": "Avatar's Blessing",
-                            "requirements": [
-                                { "type": "current_job_level", "job": "adventuring:avatar", "level": 12 }
-                            ],
-                            "cost": 25,
-                            "hits": [
-                                {
-                                    "target": "all",
-                                    "party": "ally",
-                                    "effects": [
-                                        {
-                                            "type": "heal_flat",
-                                            "amount": {
-                                                "base": 45,
-                                                "scaling": [
-                                                    { "id": "adventuring:prayer", "amount": 0.45 }
-                                                ]
-                                            }
-                                        },
-                                        { "type": "buff", "id": "adventuring:might", "stacks": { "base": 6 } },
-                                        { "type": "buff", "id": "adventuring:barrier", "stacks": { "base": 8 } }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "transcendence",
-                            "name": "Transcendence",
-                            "requirements": [
-                                { "type": "current_job_level", "job": "adventuring:avatar", "level": 25 }
-                            ],
-                            "cost": 50,
-                            "hits": [
-                                {
-                                    "target": "all",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 30,
-                                                "scaling": [
-                                                    { "id": "adventuring:strength", "amount": 0.33 },
-                                                    { "id": "adventuring:magic", "amount": 0.33 },
-                                                    { "id": "adventuring:prayer", "amount": 0.33 }
-                                                ]
-                                            }
-                                        },
-                                        { "type": "debuff", "id": "adventuring:shred", "stacks": { "base": 15 } }
-                                    ]
-                                },
-                                {
-                                    "target": "all",
-                                    "party": "ally",
-                                    "effects": [
-                                        {
-                                            "type": "heal_flat",
-                                            "amount": {
-                                                "base": 60,
-                                                "scaling": [
-                                                    { "id": "adventuring:prayer", "amount": 0.6 }
-                                                ]
-                                            }
-                                        },
-                                        { "type": "buff", "id": "adventuring:might", "stacks": { "base": 12 } },
-                                        { "type": "buff", "id": "adventuring:barrier", "stacks": { "base": 20 } }
-                                    ]
-                                }
-                            ]
-                        }
-                    ]
-                }
-            }
-        ]
-    }
+	"$schema": "../job_schema.json",
+	"namespace": "adventuring",
+	"packages": {
+		"combat_jobs": {
+			"jobs": {
+				"avatar": {
+					"name": "Avatar",
+					"tier": 5,
+					"media": "assets/jobs/avatar.png",
+					"requirements": [
+						{ "type": "job_level", "job": "adventuring:spellblade", "level": 25 },
+						{ "type": "job_level", "job": "adventuring:warden", "level": 25 },
+						{ "type": "job_level", "job": "adventuring:shaman", "level": 20 }
+					],
+					"abilities": [
+						{
+							"id": "avatars_wrath",
+							"name": "Avatar's Wrath",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "Strikes with divine fury, empowering yourself.",
+							"energy": 25,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:avatar", "level": 1 }],
+							"hits": [
+								{ "target": "front", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "amount": { "base": 8, "scaling": [
+										{ "id": "adventuring:strength", "amount": 0.3 },
+										{ "id": "adventuring:magic", "amount": 0.3 }
+									] } }
+								] },
+								{ "target": "self", "effects": [
+									{ "type": "buff", "id": "adventuring:might", "stacks": 3 },
+									{ "type": "buff", "id": "adventuring:focus", "stacks": 2 }
+								] }
+							]
+						},
+						{
+							"id": "primal_tempest",
+							"name": "Primal Tempest",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "Unleashes a storm of primal energy on all enemies.",
+							"cost": 150,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:avatar", "level": 1 }],
+							"hits": [{ "target": "all", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 12, "scaling": [
+									{ "id": "adventuring:magic", "amount": 0.4 },
+									{ "id": "adventuring:prayer", "amount": 0.4 }
+								] } },
+								{ "type": "debuff", "id": "adventuring:burn", "stacks": 3 },
+								{ "type": "debuff", "id": "adventuring:chill", "stacks": 3 }
+							] }]
+						},
+						{
+							"id": "spirit_call",
+							"name": "Spirit Call",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "Calls upon spirits to weaken all enemies.",
+							"energy": 25,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:avatar", "level": 10 }],
+							"hits": [{ "target": "all", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 6, "scaling": [{ "id": "adventuring:prayer", "amount": 0.35 }] } },
+								{ "type": "debuff", "id": "adventuring:weaken", "stacks": { "base": 3, "scaling": [{ "id": "adventuring:prayer", "amount": 0.1 }] } }
+							] }]
+						},
+						{
+							"id": "avatars_blessing",
+							"name": "Avatar's Blessing",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "Blesses all allies with healing and protection.",
+							"cost": 155,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:avatar", "level": 15 }],
+							"hits": [{ "target": "all", "party": "ally", "effects": [
+								{ "type": "heal_flat", "amount": { "base": 18, "scaling": [{ "id": "adventuring:prayer", "amount": 0.6 }] } },
+								{ "type": "buff", "id": "adventuring:might", "stacks": { "base": 4, "scaling": [{ "id": "adventuring:strength", "amount": 0.1 }] } },
+								{ "type": "buff", "id": "adventuring:barrier", "stacks": { "base": 5, "scaling": [{ "id": "adventuring:prayer", "amount": 0.15 }] } }
+							] }]
+						},
+						{
+							"id": "divine_presence",
+							"name": "Divine Presence",
+							"type": "passive",
+							"media": "assets/abilities/passive.png",
+							"description": "Your presence empowers the party at the start of combat.",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:avatar", "level": 20 }],
+							"effects": [
+								{ "trigger": "encounter_start", "type": "buff", "target": "self", "id": "adventuring:might", "stacks": { "base": 5, "scaling": [{ "id": "adventuring:strength", "amount": 0.2 }] } },
+								{ "trigger": "encounter_start", "type": "buff", "target": "self", "id": "adventuring:focus", "stacks": 4 },
+								{ "trigger": "encounter_start", "type": "buff", "target": "all", "party": "ally", "id": "adventuring:barrier", "stacks": { "base": 3, "scaling": [{ "id": "adventuring:prayer", "amount": 0.1 }] } }
+							]
+						},
+						{
+							"id": "divine_aegis",
+							"name": "Divine Aegis",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "Damages enemies while protecting all allies.",
+							"energy": 30,
+							"requirements": [{ "type": "job_level", "job": "adventuring:avatar", "level": 25 }],
+							"hits": [
+								{ "target": "all", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "amount": { "base": 8, "scaling": [{ "id": "adventuring:magic", "amount": 0.35 }] } }
+								] },
+								{ "target": "all", "party": "ally", "effects": [
+									{ "type": "buff", "id": "adventuring:barrier", "stacks": { "base": 4, "scaling": [{ "id": "adventuring:prayer", "amount": 0.15 }] } },
+									{ "type": "buff", "id": "adventuring:fortify", "stacks": 3 }
+								] }
+							]
+						},
+						{
+							"id": "primal_bond",
+							"name": "Primal Bond",
+							"type": "passive",
+							"media": "assets/abilities/passive.png",
+							"description": "Your primal bond heals you when you deal damage.",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:avatar", "level": 40 }],
+							"effects": [
+								{ "trigger": "after_damage_delivered", "type": "heal_flat", "target": "self", "amount": { "base": 3, "scaling": [{ "id": "adventuring:prayer", "amount": 0.1 }] } }
+							]
+						},
+						{
+							"id": "elemental_ascension",
+							"name": "Elemental Ascension",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "Ascends to unleash all elements upon enemies.",
+							"cost": 180,
+							"requirements": [{ "type": "job_level", "job": "adventuring:avatar", "level": 50 }],
+							"hits": [{ "target": "all", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 20, "scaling": [
+									{ "id": "adventuring:strength", "amount": 0.4 },
+									{ "id": "adventuring:magic", "amount": 0.5 },
+									{ "id": "adventuring:prayer", "amount": 0.3 }
+								] } },
+								{ "type": "debuff", "id": "adventuring:burn", "stacks": 4 },
+								{ "type": "debuff", "id": "adventuring:chill", "stacks": 4 },
+								{ "type": "debuff", "id": "adventuring:shock", "stacks": 4 }
+							] }]
+						},
+						{
+							"id": "avatar_strike",
+							"name": "Avatar Strike",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "A devastating strike that shreds defenses.",
+							"energy": 35,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:avatar", "level": 60 }],
+							"hits": [
+								{ "target": "front", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "amount": { "base": 18, "scaling": [
+										{ "id": "adventuring:strength", "amount": 0.5 },
+										{ "id": "adventuring:magic", "amount": 0.5 }
+									] } },
+									{ "type": "debuff", "id": "adventuring:shred", "stacks": 3 }
+								] },
+								{ "target": "self", "effects": [
+									{ "type": "buff", "id": "adventuring:might", "stacks": 3 }
+								] }
+							]
+						},
+						{
+							"id": "transcendent_blessing",
+							"name": "Transcendent Blessing",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "Bestows transcendent blessings upon all allies.",
+							"cost": 175,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:avatar", "level": 70 }],
+							"hits": [{ "target": "all", "party": "ally", "effects": [
+								{ "type": "heal_flat", "amount": { "base": 25, "scaling": [{ "id": "adventuring:prayer", "amount": 0.9 }] } },
+								{ "type": "buff", "id": "adventuring:regen", "stacks": { "base": 5, "scaling": [{ "id": "adventuring:prayer", "amount": 0.15 }] } },
+								{ "type": "buff", "id": "adventuring:fortify", "stacks": { "base": 4, "scaling": [{ "id": "adventuring:prayer", "amount": 0.1 }] } },
+								{ "type": "buff", "id": "adventuring:barrier", "stacks": { "base": 5, "scaling": [{ "id": "adventuring:prayer", "amount": 0.2 }] } }
+							] }]
+						},
+						{
+							"id": "cosmic_unity",
+							"name": "Cosmic Unity",
+							"type": "passive",
+							"media": "assets/abilities/passive.png",
+							"description": "Your cosmic unity sustains and empowers you each round.",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:avatar", "level": 80 }],
+							"effects": [
+								{ "trigger": "round_start", "type": "heal_flat", "target": "all", "party": "ally", "amount": { "base": 4, "scaling": [{ "id": "adventuring:prayer", "amount": 0.12 }] } },
+								{ "trigger": "round_start", "type": "buff", "target": "self", "id": "adventuring:might", "stacks": 2 }
+							]
+						},
+						{
+							"id": "world_crusher",
+							"name": "World Crusher",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "Crushes the world with devastating power.",
+							"energy": 40,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:avatar", "level": 90 }],
+							"hits": [{ "target": "all", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 15, "scaling": [
+									{ "id": "adventuring:strength", "amount": 0.5 },
+									{ "id": "adventuring:magic", "amount": 0.5 }
+								] } },
+								{ "type": "debuff", "id": "adventuring:weaken", "stacks": 4 },
+								{ "type": "debuff", "id": "adventuring:vulnerable", "stacks": 4 }
+							] }]
+						},
+						{
+							"id": "transcendence",
+							"name": "Transcendence",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "Achieves transcendence - the ultimate expression of the Avatar's power.",
+							"cost": 250,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:avatar", "level": 99 }],
+							"hits": [
+								{ "target": "all", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "amount": { "base": 30, "scaling": [
+										{ "id": "adventuring:strength", "amount": 0.8 },
+										{ "id": "adventuring:magic", "amount": 0.8 },
+										{ "id": "adventuring:prayer", "amount": 0.6 }
+									] } },
+									{ "type": "debuff", "id": "adventuring:shred", "stacks": 10 }
+								] },
+								{ "target": "all", "party": "ally", "effects": [
+									{ "type": "heal_flat", "amount": { "base": 35, "scaling": [{ "id": "adventuring:prayer", "amount": 1.2 }] } },
+									{ "type": "buff", "id": "adventuring:might", "stacks": { "base": 8, "scaling": [{ "id": "adventuring:strength", "amount": 0.3 }] } },
+									{ "type": "buff", "id": "adventuring:barrier", "stacks": { "base": 10, "scaling": [{ "id": "adventuring:prayer", "amount": 0.3 }] } },
+									{ "type": "buff", "id": "adventuring:regen", "stacks": 6 },
+									{ "type": "buff", "id": "adventuring:fortify", "stacks": 5 }
+								] }
+							]
+						}
+					]
+				}
+			}
+		}
+	}
 }

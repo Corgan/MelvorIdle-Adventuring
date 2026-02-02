@@ -1,9 +1,13 @@
 const { loadModule } = mod.getContext(import.meta);
 
-const { AdventuringCard } = await loadModule('src/progression/adventuring-card.mjs');
-const { AdventuringStats } = await loadModule('src/core/adventuring-stats.mjs');
+const { AdventuringCard } = await loadModule('src/ui/adventuring-card.mjs');
+const { AdventuringStats } = await loadModule('src/core/stats/adventuring-stats.mjs');
 const { AdventuringAuras } = await loadModule('src/combat/adventuring-auras.mjs');
-const { createEffect, EffectCache, defaultEffectProcessor, SimpleEffectInstance, evaluateCondition, buildEffectContext, StatCalculator, EffectLimitTracker, awardCombatXP } = await loadModule('src/core/adventuring-utils.mjs');
+const { StatCalculator } = await loadModule('src/core/stats/stat-calculator.mjs');
+const { EffectLimitTracker } = await loadModule('src/core/effects/effect-limit-tracker.mjs');
+const { EffectCache } = await loadModule('src/core/effects/effect-cache.mjs');
+const { evaluateCondition } = await loadModule('src/core/effects/condition-evaluator.mjs');
+const { createEffect, defaultEffectProcessor, SimpleEffectInstance, buildEffectContext, awardCombatXP } = await loadModule('src/core/utils/adventuring-utils.mjs');
 
 const { AdventuringCharacterElement } = await loadModule('src/core/components/adventuring-character.mjs');
 
@@ -59,6 +63,7 @@ class AdventuringCharacter {
         this.stats.component.mount(this.component.stats);
     }
 
+    // Required by base class contract - no additional registration needed
     postDataRegistration() {
 
     }
@@ -80,6 +85,9 @@ class AdventuringCharacter {
         this.auras.onLoad();
 
         this.initEffectCache();
+        
+        // Register this character as an entity with the conductor
+        this.manager.conductor.registerEntity(this, (type, context) => this._handleTrigger(type, context));
     }
 
     initEffectCache() {
@@ -89,7 +97,13 @@ class AdventuringCharacter {
     }
 
     get maxHitpoints() {
-        let max = 10 * this.stats.get("adventuring:hitpoints");
+        // Use getEffectiveStat to include all stat sources (base, job effects, equipment, buffs)
+        const hitpointsStat = this.manager?.stats?.getObjectByID("adventuring:hitpoints");
+        if (!hitpointsStat) {
+            // Fallback for cases where manager isn't ready
+            return 10 * (this.stats.get("adventuring:hitpoints") || 0);
+        }
+        let max = 10 * this.getEffectiveStat(hitpointsStat);
         return max;
     }
 
@@ -198,33 +212,39 @@ class AdventuringCharacter {
         this.renderQueue.energy = true;
     }
 
+    /**
+     * Fire a trigger via the conductor.
+     * @param {string} type - The trigger type
+     * @param {object} extra - Additional context (source will be set to this character)
+     * @returns {object} The built context
+     */
     trigger(type, extra={}) {
         const context = buildEffectContext(this, extra);
+        this.manager.conductor.trigger(type, { ...context, source: this });
+        return context;
+    }
 
+    /**
+     * Handler called by conductor when this character should process a trigger.
+     * @param {string} type - The trigger type
+     * @param {object} context - Full context from conductor
+     */
+    _handleTrigger(type, context) {
+        // Dead characters don't trigger effects
+        if (this.isDead) return;
+        
         this.effectCache.processTrigger(type, context, {
             host: this,
             limitTracker: this.effectLimitTracker
         });
-
-        // Trigger achievements with combat context
-        if (this.manager.achievementManager && this.manager.combatTracker) {
-            const achievementContext = {
-                ...context,
-                source: this,
-                triggerType: type,
-                ...this.manager.combatTracker.getContext()
-            };
-            this.manager.achievementManager.trigger(type, achievementContext);
-        }
-
-        return context;
     }
 
     applyEffect(effect, builtEffect, character) {
-        if(effect.type === "damage" || effect.type === "damage_flat")
-            this.damage(builtEffect, character);
+        let effectiveAmount = 0;
+        if(effect.type === "damage" || effect.type === "damage_flat" || effect.type === "damage_percent_current")
+            effectiveAmount = this.damage(builtEffect, character) || 0;
         if(effect.type === "heal" || effect.type === "heal_flat")
-            this.heal(builtEffect, character);
+            effectiveAmount = this.heal(builtEffect, character) || 0;
         if(effect.type === "revive")
             this.revive(builtEffect, character);
         if(effect.type === "buff") {
@@ -235,15 +255,16 @@ class AdventuringCharacter {
             const auraId = effect.id;
             if(auraId) this.debuff(auraId, builtEffect, character);
         }
+        return effectiveAmount;
     }
 
     buff(id, builtEffect, character) {
         if(this.dead)
             return;
         this.auras.add(id, builtEffect, character);
-        // Track buff application for slayer tasks (only track for heroes, not enemies)
-        if (this.isHero && this.manager.achievementManager) {
-            this.manager.achievementManager.recordBuffApplied();
+        // Fire buff_applied trigger (only for heroes, not enemies)
+        if (this.isHero) {
+            this.manager.conductor.trigger('buff_applied', { target: this, buffId: id });
         }
     }
 
@@ -257,9 +278,9 @@ class AdventuringCharacter {
         }
 
         this.auras.add(id, builtEffect, character);
-        // Track debuff application for slayer tasks (only track debuffs on enemies)
-        if (!this.isHero && this.manager.achievementManager) {
-            this.manager.achievementManager.recordDebuffApplied();
+        // Fire debuff_applied trigger (only for debuffs on enemies, not heroes)
+        if (!this.isHero) {
+            this.manager.conductor.trigger('debuff_applied', { target: this, debuffId: id });
         }
     }
 
@@ -281,17 +302,26 @@ class AdventuringCharacter {
         return this.effectCache.getConditionalBonus(effectType, context);
     }
 
+    /**
+     * Get stat bonuses from all effect sources.
+     * Builds context for scalable effects (job level, equipment upgrade level, etc.)
+     * @param {string} statId - The stat ID to get bonuses for
+     * @returns {{ flat: number, percent: number }} Combined stat bonuses
+     */
     getStatBonus(statId) {
-        const charBonus = this.effectCache.getStatBonus(statId);
+        // Build context for scalable effects
+        const context = {
+            character: this,
+            combatJob: this.combatJob,
+            passiveJob: this.passiveJob,
+            manager: this.manager
+        };
+        
+        // Hero's effectCache already includes party effects via the 'party' source
+        // so we don't need to query party.effectCache separately (that would double-count)
+        const charBonus = this.effectCache.getStatBonus(statId, context);
         let flat = charBonus.flat || 0;
         let percent = charBonus.percent || 0;
-        
-        // Include party-wide effects for heroes
-        if (this.isHero && this.party?.effectCache) {
-            const partyBonus = this.party.effectCache.getStatBonus(statId);
-            flat += partyBonus.flat || 0;
-            percent += partyBonus.percent || 0;
-        }
         
         return { flat, percent };
     }
@@ -310,11 +340,9 @@ class AdventuringCharacter {
         if(typeof stat === "string")
             stat = this.manager.stats.getObjectByID(stat);
 
+        // Hero's effectCache already includes party effects via the 'party' source
+        // so we don't need to query party.effectCache separately (that would double-count)
         let allStatBonus = this.getPassiveBonus('all_stat_bonus');
-        // Include party-wide all_stat_bonus for heroes
-        if (this.isHero && this.party?.effectCache) {
-            allStatBonus += this.party.getPassiveBonus('all_stat_bonus');
-        }
 
         return StatCalculator.calculate(
             this.stats.get(stat),
@@ -325,40 +353,18 @@ class AdventuringCharacter {
 
     damage({ amount }, character) {
         if(this.dead)
-            return;
+            return 0;
+
+        // Cap XP-eligible damage to actual HP remaining (no XP from overkill)
+        const effectiveDamage = Math.min(amount, this.hitpoints);
 
         this.hitpoints -= amount;
 
         if(isNaN(this.hitpoints))
             this.hitpoints = 0;
 
-        // Record to CombatTracker
-        if(this.manager.combatTracker && amount > 0) {
-            // If this character is an enemy being damaged by a hero, record damage dealt
-            if(character && character.isHero && !this.isHero) {
-                this.manager.combatTracker.encounter.recordDamageDealt(amount, this);
-            }
-            // If this character is a hero taking damage, record damage taken
-            if(this.isHero && character && !character.isHero) {
-                this.manager.combatTracker.encounter.recordDamageTaken(amount, character);
-            }
-        }
-
-        if(character && character.isHero && !this.isHero && this.manager.achievements) {
-            const stats = this.manager.achievementManager.stats;
-            if(stats) {
-                stats.totalDamage = (stats.totalDamage || 0) + amount;
-            }
-        }
-
-        if(character && character.isHero && !this.isHero && amount > 0) {
-            awardCombatXP(character, Math.floor(amount / 2), this.manager);
-        }
-
-        const isCharacterEnemy = character && !character.isHero;
-        if(this.isHero && isCharacterEnemy && amount > 0 && !this.dead) {
-            awardCombatXP(this, Math.floor(amount / 2), this.manager);
-        }
+        // Note: CombatTracker now listens to after_damage_delivered/received triggers
+        // XP is now awarded in effect-processor.mjs at /250 rate for damage dealt and taken
 
         if(!loadingOfflineProgress) {
             this.component.splash.add({
@@ -387,7 +393,7 @@ class AdventuringCharacter {
                         source: this
                     });
                     this.renderQueue.hitpoints = true;
-                    return;
+                    return effectiveDamage;
                 }
 
                 this.dead = true;
@@ -416,11 +422,12 @@ class AdventuringCharacter {
 
         }
         this.renderQueue.hitpoints = true;
+        return effectiveDamage;
     }
 
     heal({ amount }, character) {
         if(this.dead || this.hitpoints === this.maxHitpoints)
-            return;
+            return 0;
 
         const actualHeal = Math.min(amount, this.maxHitpoints - this.hitpoints);
         this.hitpoints += actualHeal;
@@ -428,25 +435,8 @@ class AdventuringCharacter {
         if(isNaN(this.hitpoints))
             this.hitpoints = 0;
 
-        // Record to CombatTracker
-        if(this.manager.combatTracker && this.isHero && actualHeal > 0) {
-            this.manager.combatTracker.encounter.recordHealing(actualHeal);
-        }
-
-        if(this.isHero && this.manager.achievements && actualHeal > 0) {
-            const stats = this.manager.achievementManager.stats;
-            if(stats) {
-                stats.totalHealing = (stats.totalHealing || 0) + actualHeal;
-            }
-        }
-
-        if(character && character.isHero && actualHeal > 0) {
-            awardCombatXP(character, Math.floor(actualHeal / 2), this.manager);
-        }
-
-        if(this.isHero && character && character.isHero && actualHeal > 0) {
-            awardCombatXP(this, Math.floor(actualHeal / 2), this.manager);
-        }
+        // Note: CombatTracker now listens to after_heal_delivered trigger
+        // XP is now awarded in effect-processor.mjs at /250 rate for healing done and received
 
         if(!loadingOfflineProgress) {
             this.component.splash.add({
@@ -460,6 +450,7 @@ class AdventuringCharacter {
             this.hitpoints = this.maxHitpoints;
 
         this.renderQueue.hitpoints = true;
+        return actualHeal;
     }
 
     revive({ amount=100 }, character) {
@@ -620,6 +611,7 @@ class AdventuringCharacter {
         this.renderQueue.spender = false;
     }
 
+    // Required by base class contract - no additional registration needed
     postDataRegistration() {
 
     }

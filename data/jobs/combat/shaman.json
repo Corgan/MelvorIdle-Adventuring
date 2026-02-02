@@ -1,214 +1,212 @@
 {
-    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
-    "namespace": "adventuring",
-    "data": {
-        "skillData": [
-            {
-                "skillID": "adventuring:Adventuring",
-                "data": {
-                    "jobs": [
-                        {
-                            "id": "shaman",
-                            "tier": 5,
-                            "name": "Shaman",
-                            "isMilestoneReward": true,
-                            "media": "melvor:assets/media/skills/herblore/herblore.png#tint=green",
-                            "scaling": [
-                                { "id": "adventuring:hitpoints", "amount": 1.4 },
-                                { "id": "adventuring:defence", "amount": 0.6 },
-                                { "id": "adventuring:agility", "amount": 0.8 },
-                                { "id": "adventuring:strength", "amount": 0.4 },
-                                { "id": "adventuring:ranged", "amount": 0.3 },
-                                { "id": "adventuring:magic", "amount": 1.4 },
-                                { "id": "adventuring:prayer", "amount": 1.6 }
-                            ],
-                            "maxLevel": 20,
-                            "requirements": [
-                                { "type": "job_level", "job": "adventuring:cleric", "level": 12 },
-                                { "type": "job_level", "job": "adventuring:wizard", "level": 10 }
-                            ],
-                            "allowedItems": [
-                                "adventuring:hat",
-                                "adventuring:robes",
-                                "adventuring:bottoms",
-                                "adventuring:mitts",
-                                "adventuring:slippers",
-                                "adventuring:amulet",
-                                "adventuring:ring",
-                                "adventuring:cape",
-                                "adventuring:staff",
-                                "adventuring:wand",
-                                "adventuring:spellbook"
-                            ]
-                        }
-                    ],
-                    "generators": [
-                        {
-                            "id": "spirit_bolt",
-                            "name": "Spirit Bolt",
-                            "requirements": [
-                                { "type": "current_job_level", "job": "adventuring:shaman", "level": 1 }
-                            ],
-                            "energy": 6,
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 18,
-                                                "scaling": [
-                                                    { "id": "adventuring:magic", "amount": 1.0 }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "totemic_strike",
-                            "name": "Totemic Strike",
-                            "requirements": [
-                                { "type": "current_job_level", "job": "adventuring:shaman", "level": 5 }
-                            ],
-                            "energy": 5,
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 16,
-                                                "scaling": [
-                                                    { "id": "adventuring:prayer", "amount": 0.9 }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                },
-                                {
-                                    "target": "self",
-                                    "party": "ally",
-                                    "effects": [
-                                        { "type": "buff", "id": "adventuring:barrier", "stacks": { "base": 3 } }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "ancestral_whisper",
-                            "name": "Ancestral Whisper",
-                            "requirements": [
-                                { "type": "current_job_level", "job": "adventuring:shaman", "level": 10 }
-                            ],
-                            "energy": 6,
-                            "hits": [
-                                {
-                                    "target": "lowest",
-                                    "party": "ally",
-                                    "effects": [
-                                        { "type": "buff", "id": "adventuring:fortify", "stacks": { "base": 4 } },
-                                        { "type": "buff", "id": "adventuring:focus", "stacks": { "base": 2 } }
-                                    ]
-                                }
-                            ]
-                        }
-                    ],
-                    "spenders": [
-                        {
-                            "id": "spirit_storm",
-                            "name": "Spirit Storm",
-                            "requirements": [
-                                { "type": "current_job_level", "job": "adventuring:shaman", "level": 3 }
-                            ],
-                            "cost": 12,
-                            "hits": [
-                                {
-                                    "target": "all",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 14,
-                                                "scaling": [
-                                                    { "id": "adventuring:magic", "amount": 0.8 }
-                                                ]
-                                            }
-                                        },
-                                        { "type": "debuff", "id": "adventuring:chill", "stacks": { "base": 3 } }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "ancestral_blessing",
-                            "name": "Ancestral Blessing",
-                            "requirements": [
-                                { "type": "current_job_level", "job": "adventuring:shaman", "level": 8 }
-                            ],
-                            "cost": 16,
-                            "hits": [
-                                {
-                                    "target": "all",
-                                    "party": "ally",
-                                    "effects": [
-                                        {
-                                            "type": "heal_flat",
-                                            "amount": {
-                                                "base": 35,
-                                                "scaling": [
-                                                    { "id": "adventuring:prayer", "amount": 0.3 }
-                                                ]
-                                            }
-                                        },
-                                        { "type": "buff", "id": "adventuring:barrier", "stacks": { "base": 5 } }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "wrath_of_spirits",
-                            "name": "Wrath of Spirits",
-                            "requirements": [
-                                { "type": "current_job_level", "job": "adventuring:shaman", "level": 15 }
-                            ],
-                            "cost": 30,
-                            "hits": [
-                                {
-                                    "target": "all",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 22,
-                                                "scaling": [
-                                                    { "id": "adventuring:magic", "amount": 0.45 },
-                                                    { "id": "adventuring:prayer", "amount": 0.45 }
-                                                ]
-                                            }
-                                        },
-                                        { "type": "debuff", "id": "adventuring:shred", "stacks": { "base": 8 } }
-                                    ]
-                                },
-                                {
-                                    "target": "all",
-                                    "party": "ally",
-                                    "effects": [
-                                        { "type": "buff", "id": "adventuring:might", "stacks": { "base": 4 } }
-                                    ]
-                                }
-                            ]
-                        }
-                    ]
-                }
-            }
-        ]
-    }
+	"$schema": "../job_schema.json",
+	"namespace": "adventuring",
+	"packages": {
+		"combat_jobs": {
+			"jobs": {
+				"shaman": {
+					"name": "Shaman",
+					"tier": 5,
+					"maxLevel": 20,
+					"media": "assets/jobs/shaman.png",
+					"requirements": [
+						{ "type": "job_level", "job": "adventuring:druid", "level": 25 },
+						{ "type": "job_level", "job": "adventuring:warlock", "level": 20 }
+					],
+					"abilities": [
+						{
+							"id": "spirit_bolt",
+							"name": "Spirit Bolt",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "A bolt of spirit energy strikes the enemy.",
+							"energy": 25,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:shaman", "level": 1 }],
+							"hits": [{ "target": "front", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 9, "scaling": [{ "id": "adventuring:magic", "amount": 1.0 }] } }
+							] }]
+						},
+						{
+							"id": "spirit_storm",
+							"name": "Spirit Storm",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "A storm of spirit energy chills all enemies.",
+							"cost": 140,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:shaman", "level": 1 }],
+							"hits": [{ "target": "all", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 7, "scaling": [{ "id": "adventuring:magic", "amount": 0.8 }] } },
+								{ "type": "debuff", "id": "adventuring:chill", "stacks": 3 }
+							] }]
+						},
+						{
+							"id": "totemic_strike",
+							"name": "Totemic Strike",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "A totemic strike that grants protective barriers.",
+							"energy": 25,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:shaman", "level": 3 }],
+							"hits": [
+								{ "target": "front", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "amount": { "base": 8, "scaling": [{ "id": "adventuring:prayer", "amount": 0.9 }] } }
+								] },
+								{ "target": "self", "effects": [
+									{ "type": "buff", "id": "adventuring:barrier", "stacks": { "base": 3, "scaling": [{ "id": "adventuring:prayer", "amount": 0.1 }] } }
+								] }
+							]
+						},
+						{
+							"id": "ancestral_blessing",
+							"name": "Ancestral Blessing",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "Ancestral spirits bless all allies with healing and protection.",
+							"cost": 145,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:shaman", "level": 5 }],
+							"hits": [{ "target": "all", "party": "ally", "effects": [
+								{ "type": "heal_flat", "amount": { "base": 18, "scaling": [{ "id": "adventuring:prayer", "amount": 0.3 }] } },
+								{ "type": "buff", "id": "adventuring:barrier", "stacks": { "base": 5, "scaling": [{ "id": "adventuring:prayer", "amount": 0.12 }] } }
+							] }]
+						},
+						{
+							"id": "spirit_ward",
+							"name": "Spirit Ward",
+							"type": "passive",
+							"media": "assets/abilities/passive.png",
+							"description": "Protective spirits ward you and your allies at battle start.",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:shaman", "level": 7 }],
+							"effects": [
+								{ "trigger": "encounter_start", "type": "buff", "target": "self", "id": "adventuring:barrier", "stacks": { "base": 4, "scaling": [{ "id": "adventuring:prayer", "amount": 0.1 }] } },
+								{ "trigger": "encounter_start", "type": "buff", "target": "all", "party": "ally", "id": "adventuring:fortify", "stacks": 3 }
+							]
+						},
+						{
+							"id": "ancestral_whisper",
+							"name": "Ancestral Whisper",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "Ancestral spirits whisper fortifying words to the weakest ally.",
+							"energy": 30,
+							"requirements": [{ "type": "job_level", "job": "adventuring:shaman", "level": 10 }],
+							"hits": [{ "target": "lowest", "party": "ally", "effects": [
+								{ "type": "buff", "id": "adventuring:fortify", "stacks": { "base": 4, "scaling": [{ "id": "adventuring:prayer", "amount": 0.1 }] } },
+								{ "type": "buff", "id": "adventuring:focus", "stacks": 2 }
+							] }]
+						},
+						{
+							"id": "totem_resonance",
+							"name": "Totem Resonance",
+							"type": "passive",
+							"media": "assets/abilities/passive.png",
+							"description": "Your healing resonates with totemic power to shield allies.",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:shaman", "level": 12 }],
+							"effects": [
+								{ "trigger": "after_heal_delivered", "type": "buff", "target": "all", "party": "ally", "id": "adventuring:barrier", "stacks": 1 }
+							]
+						},
+						{
+							"id": "wrath_of_spirits",
+							"name": "Wrath of Spirits",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "The spirits unleash their wrath on all enemies.",
+							"cost": 180,
+							"requirements": [{ "type": "job_level", "job": "adventuring:shaman", "level": 15 }],
+							"hits": [
+								{ "target": "all", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "amount": { "base": 11, "scaling": [{ "id": "adventuring:magic", "amount": 0.45 }, { "id": "adventuring:prayer", "amount": 0.45 }] } },
+									{ "type": "debuff", "id": "adventuring:shred", "stacks": 8 }
+								] },
+								{ "target": "all", "party": "ally", "effects": [
+									{ "type": "buff", "id": "adventuring:might", "stacks": 4 }
+								] }
+							]
+						},
+						{
+							"id": "spirit_channel",
+							"name": "Spirit Channel",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "Channels spirit energy for damage and empowerment.",
+							"energy": 35,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:shaman", "level": 17 }],
+							"hits": [
+								{ "target": "front", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "amount": { "base": 15, "scaling": [{ "id": "adventuring:magic", "amount": 0.6 }] } }
+								] },
+								{ "target": "self", "effects": [
+									{ "type": "buff", "id": "adventuring:arcane_power", "stacks": { "base": 4, "scaling": [{ "id": "adventuring:magic", "amount": 0.1 }] } }
+								] }
+							]
+						},
+						{
+							"id": "ancestral_fury",
+							"name": "Ancestral Fury",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "Ancestral spirits unleash their fury on all enemies.",
+							"cost": 175,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:shaman", "level": 18 }],
+							"hits": [{ "target": "all", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 18, "scaling": [{ "id": "adventuring:magic", "amount": 0.7 }, { "id": "adventuring:prayer", "amount": 0.5 }] } },
+								{ "type": "debuff", "id": "adventuring:chill", "stacks": 4 }
+							] }]
+						},
+						{
+							"id": "ancestral_guardian",
+							"name": "Ancestral Guardian",
+							"type": "passive",
+							"media": "assets/abilities/passive.png",
+							"description": "An ancestral guardian heals the weakest ally each round.",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:shaman", "level": 19 }],
+							"effects": [
+								{ "trigger": "round_start", "type": "heal_flat", "target": "lowest", "party": "ally", "amount": { "base": 5, "scaling": [{ "id": "adventuring:prayer", "amount": 0.15 }] } }
+							]
+						},
+						{
+							"id": "spiritual_awakening",
+							"name": "Spiritual Awakening",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "Awakens powerful spirits to damage enemies and empower allies.",
+							"energy": 40,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:shaman", "level": 20 }],
+							"hits": [
+								{ "target": "all", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "amount": { "base": 12, "scaling": [{ "id": "adventuring:magic", "amount": 0.5 }] } }
+								] },
+								{ "target": "all", "party": "ally", "effects": [
+									{ "type": "buff", "id": "adventuring:might", "stacks": { "base": 4, "scaling": [{ "id": "adventuring:prayer", "amount": 0.1 }] } },
+									{ "type": "buff", "id": "adventuring:fortify", "stacks": { "base": 4, "scaling": [{ "id": "adventuring:prayer", "amount": 0.1 }] } }
+								] }
+							]
+						},
+						{
+							"id": "wrath_of_ancestors",
+							"name": "Wrath of Ancestors",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "The ultimate shaman technique - summons all ancestral spirits.",
+							"cost": 250,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:shaman", "level": 20 }],
+							"hits": [
+								{ "target": "all", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "amount": { "base": 25, "scaling": [{ "id": "adventuring:magic", "amount": 0.9 }, { "id": "adventuring:prayer", "amount": 0.7 }] } },
+									{ "type": "debuff", "id": "adventuring:shred", "stacks": { "base": 10, "scaling": [{ "id": "adventuring:magic", "amount": 0.25 }] } },
+									{ "type": "debuff", "id": "adventuring:chill", "stacks": 5 }
+								] },
+								{ "target": "all", "party": "ally", "effects": [
+									{ "type": "heal_flat", "amount": { "base": 25, "scaling": [{ "id": "adventuring:prayer", "amount": 0.8 }] } },
+									{ "type": "buff", "id": "adventuring:might", "stacks": { "base": 6, "scaling": [{ "id": "adventuring:prayer", "amount": 0.15 }] } },
+									{ "type": "buff", "id": "adventuring:fortify", "stacks": { "base": 6, "scaling": [{ "id": "adventuring:prayer", "amount": 0.15 }] } },
+									{ "type": "buff", "id": "adventuring:barrier", "stacks": { "base": 8, "scaling": [{ "id": "adventuring:prayer", "amount": 0.2 }] } }
+								] }
+							]
+						}
+					]
+				}
+			}
+		}
+	}
 }

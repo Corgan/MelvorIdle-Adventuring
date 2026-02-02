@@ -46,8 +46,7 @@ export class AdventuringWorkOrder {
         let { output, outputType, count } = this.product.create(this.tier);
         this.workshop.store(output, count, outputType);
 
-        // Record production for achievement tracking
-        // Find the job from the product requirements
+        // Find the job from the product requirements for achievement tracking
         const jobReq = this.product.getRequirements(this.tier).find(r => 
             r.type === 'current_job_level' || r.type === 'job_level'
         );
@@ -56,7 +55,15 @@ export class AdventuringWorkOrder {
             const fullJobId = jobReq.job.includes(':') ? jobReq.job : `adventuring:${jobReq.job}`;
             job = this.manager.jobs.getObjectByID(fullJobId);
         }
-        this.manager.achievementManager.recordProduction(outputType, count, job);
+        
+        // Fire item_produced trigger for each item produced
+        for (let i = 0; i < count; i++) {
+            this.manager.conductor.trigger('item_produced', {
+                job,
+                itemType: outputType,
+                item: output
+            });
+        }
 
         this.completed += 1;
         this.renderQueue.update = true;

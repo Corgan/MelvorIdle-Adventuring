@@ -1,754 +1,755 @@
 {
-    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
-    "namespace": "adventuring",
-    "data": {
-        "skillData": [
-            {
-                "skillID": "adventuring:Adventuring",
-                "data": {
-                    "passives": [
-                        {
-                            "id": "tidal_surge",
-                            "name": "Tidal Surge",
-                            "effects": [
-                                {
-                                    "trigger": "turn_start",
-                                    "type": "debuff",
-                                    "id": "adventuring:weaken",
-                                    "target": "random",
-                                    "targetParty": "enemy",
-                                    "stacks": {
-                                        "base": 1,
-                                        "scaling": []
-                                    }
-                                }
-                            ]
-                        }
-                    ],
-                    "areas": [
-                        {
-                            "id": "underwater_ruins",
-                            "name": "Underwater Ruins",
-                            "media": "melvor:assets/media/monsters/tentacle.png",
-                            "requirements": [
-                                {
-                                    "type": "skill_level",
-                                    "level": 48
-                                }
-                            ],
-                            "height": 9,
-                            "width": 7,
-                            "floors": [
-                                {
-                                    "monsters": [
-                                        {
-                                            "id": "adventuring:giant_crab",
-                                            "weight": 100
-                                        }
-                                    ],
-                                    "exit": [
-                                        "adventuring:giant_crab",
-                                        "adventuring:giant_crab",
-                                        "adventuring:giant_crab"
-                                    ]
-                                },
-                                {
-                                    "monsters": [
-                                        {
-                                            "id": "adventuring:giant_crab",
-                                            "weight": 60
-                                        },
-                                        {
-                                            "id": "adventuring:tentacle",
-                                            "weight": 40
-                                        }
-                                    ],
-                                    "exit": [
-                                        "adventuring:giant_crab",
-                                        "adventuring:giant_crab",
-                                        "adventuring:tentacle"
-                                    ]
-                                },
-                                {
-                                    "monsters": [
-                                        {
-                                            "id": "adventuring:giant_crab",
-                                            "weight": 30
-                                        },
-                                        {
-                                            "id": "adventuring:tentacle",
-                                            "weight": 50
-                                        },
-                                        {
-                                            "id": "adventuring:wet_monster",
-                                            "weight": 20
-                                        }
-                                    ],
-                                    "exit": [
-                                        "adventuring:tentacle",
-                                        "adventuring:tentacle",
-                                        "adventuring:wet_monster"
-                                    ]
-                                },
-                                {
-                                    "monsters": [
-                                        {
-                                            "id": "adventuring:tentacle",
-                                            "weight": 40
-                                        },
-                                        {
-                                            "id": "adventuring:wet_monster",
-                                            "weight": 60
-                                        }
-                                    ],
-                                    "exit": [
-                                        "adventuring:tentacle",
-                                        "adventuring:wet_monster",
-                                        "adventuring:wet_monster"
-                                    ]
-                                },
-                                {
-                                    "monsters": [
-                                        {
-                                            "id": "adventuring:wet_monster",
-                                            "weight": 50
-                                        },
-                                        {
-                                            "id": "adventuring:moist_monster",
-                                            "weight": 50
-                                        }
-                                    ],
-                                    "exit": [
-                                        "adventuring:wet_monster",
-                                        "adventuring:wet_monster",
-                                        "adventuring:moist_monster"
-                                    ]
-                                },
-                                {
-                                    "monsters": [
-                                        {
-                                            "id": "adventuring:wet_monster",
-                                            "weight": 30
-                                        },
-                                        {
-                                            "id": "adventuring:moist_monster",
-                                            "weight": 70
-                                        }
-                                    ],
-                                    "exit": [
-                                        "adventuring:moist_monster",
-                                        "adventuring:moist_monster",
-                                        "adventuring:moist_monster"
-                                    ]
-                                },
-                                {
-                                    "monsters": [
-                                        {
-                                            "id": "adventuring:moist_monster",
-                                            "weight": 100
-                                        }
-                                    ],
-                                    "exit": [
-                                        "adventuring:moist_monster",
-                                        "adventuring:moist_monster",
-                                        "adventuring:moist_monster"
-                                    ]
-                                },
-                                {
-                                    "monsters": [
-                                        {
-                                            "id": "adventuring:moist_monster",
-                                            "weight": 100
-                                        }
-                                    ],
-                                    "exit": [
-                                        "adventuring:moist_monster",
-                                        "adventuring:moist_monster",
-                                        "adventuring:sea_serpent"
-                                    ]
-                                }
-                            ]
-                        }
-                    ],
-                    "monsters": [
-                        {
-                            "id": "giant_crab",
-                            "name": "Giant Crab",
-                            "media": "melvor:assets/media/monsters/large_crab.png",
-                            "tags": [
-                                "aquatic",
-                                "beast"
-                            ],
-                            "xp": 6,
-                            "stats": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 38
-                                },
-                                {
-                                    "id": "adventuring:defence",
-                                    "amount": 15
-                                },
-                                {
-                                    "id": "adventuring:agility",
-                                    "amount": 22
-                                },
-                                {
-                                    "id": "adventuring:strength",
-                                    "amount": 16
-                                },
-                                {
-                                    "id": "adventuring:ranged",
-                                    "amount": 20
-                                },
-                                {
-                                    "id": "adventuring:magic",
-                                    "amount": 22
-                                },
-                                {
-                                    "id": "adventuring:prayer",
-                                    "amount": 25
-                                }
-                            ],
-                            "generator": "adventuring:claw_pinch",
-                            "spender": "adventuring:shell_slam",
-                            "passives": [],
-                            "loot": [
-                                {
-                                    "id": "adventuring:currency",
-                                    "qty": 38,
-                                    "type": "currency"
-                                },
-                                {
-                                    "id": "adventuring:parts",
-                                    "qty": 12,
-                                    "type": "salvage"
-                                },
-                                {
-                                    "id": "adventuring:sea_scale",
-                                    "qty": 1,
-                                    "type": "materials",
-                                    "chance": 0.25
-                                },
-                                {
-                                    "type": "equipment_pool",
-                                    "pool": "adventuring:tier3_underwater_ruins",
-                                    "chance": 0.03
-                                }
-                            ]
-                        },
-                        {
-                            "id": "tentacle",
-                            "name": "Tentacle",
-                            "media": "melvor:assets/media/monsters/tentacle.png",
-                            "tags": [
-                                "aquatic"
-                            ],
-                            "xp": 8,
-                            "stats": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 32
-                                },
-                                {
-                                    "id": "adventuring:defence",
-                                    "amount": 14
-                                },
-                                {
-                                    "id": "adventuring:agility",
-                                    "amount": 35
-                                },
-                                {
-                                    "id": "adventuring:strength",
-                                    "amount": 17
-                                },
-                                {
-                                    "id": "adventuring:ranged",
-                                    "amount": 28
-                                },
-                                {
-                                    "id": "adventuring:magic",
-                                    "amount": 32
-                                },
-                                {
-                                    "id": "adventuring:prayer",
-                                    "amount": 28
-                                }
-                            ],
-                            "generator": "adventuring:kraken_whip",
-                            "spender": "adventuring:constrict",
-                            "passives": [],
-                            "loot": [
-                                {
-                                    "id": "adventuring:currency",
-                                    "qty": 42,
-                                    "type": "currency"
-                                },
-                                {
-                                    "id": "adventuring:parts",
-                                    "qty": 14,
-                                    "type": "salvage"
-                                },
-                                {
-                                    "id": "adventuring:sea_scale",
-                                    "qty": 1,
-                                    "type": "materials",
-                                    "chance": 0.28
-                                },
-                                {
-                                    "type": "equipment_pool",
-                                    "pool": "adventuring:tier3_underwater_ruins",
-                                    "chance": 0.03
-                                }
-                            ]
-                        },
-                        {
-                            "id": "wet_monster",
-                            "name": "Wet Monster",
-                            "media": "melvor:assets/media/monsters/m12.png",
-                            "tags": [
-                                "aquatic",
-                                "elemental"
-                            ],
-                            "xp": 8,
-                            "stats": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 38
-                                },
-                                {
-                                    "id": "adventuring:defence",
-                                    "amount": 16
-                                },
-                                {
-                                    "id": "adventuring:agility",
-                                    "amount": 30
-                                },
-                                {
-                                    "id": "adventuring:strength",
-                                    "amount": 18
-                                },
-                                {
-                                    "id": "adventuring:ranged",
-                                    "amount": 30
-                                },
-                                {
-                                    "id": "adventuring:magic",
-                                    "amount": 36
-                                },
-                                {
-                                    "id": "adventuring:prayer",
-                                    "amount": 32
-                                }
-                            ],
-                            "generator": "adventuring:water_jet",
-                            "spender": "adventuring:ocean_crash",
-                            "passives": [
-                                "adventuring:tidal_surge"
-                            ],
-                            "loot": [
-                                {
-                                    "id": "adventuring:currency",
-                                    "qty": 48,
-                                    "type": "currency"
-                                },
-                                {
-                                    "id": "adventuring:parts",
-                                    "qty": 15,
-                                    "type": "salvage"
-                                },
-                                {
-                                    "id": "adventuring:sea_scale",
-                                    "qty": 2,
-                                    "type": "materials",
-                                    "chance": 0.32
-                                },
-                                {
-                                    "type": "equipment_pool",
-                                    "pool": "adventuring:tier3_underwater_ruins",
-                                    "chance": 0.03
-                                }
-                            ]
-                        },
-                        {
-                            "id": "moist_monster",
-                            "name": "Moist Monster",
-                            "media": "melvor:assets/media/monsters/m13.png",
-                            "tags": [
-                                "aquatic",
-                                "elemental"
-                            ],
-                            "xp": 9,
-                            "stats": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 42
-                                },
-                                {
-                                    "id": "adventuring:defence",
-                                    "amount": 18
-                                },
-                                {
-                                    "id": "adventuring:agility",
-                                    "amount": 32
-                                },
-                                {
-                                    "id": "adventuring:strength",
-                                    "amount": 20
-                                },
-                                {
-                                    "id": "adventuring:ranged",
-                                    "amount": 32
-                                },
-                                {
-                                    "id": "adventuring:magic",
-                                    "amount": 40
-                                },
-                                {
-                                    "id": "adventuring:prayer",
-                                    "amount": 35
-                                }
-                            ],
-                            "generator": "adventuring:water_jet",
-                            "spender": "adventuring:tsunami",
-                            "passives": [
-                                "adventuring:tidal_surge"
-                            ],
-                            "loot": [
-                                {
-                                    "id": "adventuring:currency",
-                                    "qty": 55,
-                                    "type": "currency"
-                                },
-                                {
-                                    "id": "adventuring:parts",
-                                    "qty": 16,
-                                    "type": "salvage"
-                                },
-                                {
-                                    "id": "adventuring:sea_scale",
-                                    "qty": 2,
-                                    "type": "materials",
-                                    "chance": 0.35
-                                },
-                                {
-                                    "type": "equipment_pool",
-                                    "pool": "adventuring:tier3_underwater_ruins",
-                                    "chance": 0.03
-                                }
-                            ]
-                        },
-                        {
-                            "id": "sea_serpent",
-                            "name": "Sea Serpent",
-                            "media": "melvor:assets/media/monsters/tentacle.png",
-                            "tags": [
-                                "aquatic",
-                                "beast",
-                                "boss"
-                            ],
-                            "isBoss": true,
-                            "xp": 21,
-                            "stats": [
-                                {
-                                    "id": "adventuring:hitpoints",
-                                    "amount": 55
-                                },
-                                {
-                                    "id": "adventuring:defence",
-                                    "amount": 20
-                                },
-                                {
-                                    "id": "adventuring:agility",
-                                    "amount": 38
-                                },
-                                {
-                                    "id": "adventuring:strength",
-                                    "amount": 22
-                                },
-                                {
-                                    "id": "adventuring:ranged",
-                                    "amount": 38
-                                },
-                                {
-                                    "id": "adventuring:magic",
-                                    "amount": 52
-                                },
-                                {
-                                    "id": "adventuring:prayer",
-                                    "amount": 38
-                                }
-                            ],
-                            "generator": "adventuring:serpent_bite",
-                            "spender": "adventuring:tsunami",
-                            "passives": [
-                                "adventuring:tidal_surge"
-                            ],
-                            "loot": [
-                                {
-                                    "id": "adventuring:currency",
-                                    "qty": 130,
-                                    "type": "currency"
-                                },
-                                {
-                                    "id": "adventuring:parts",
-                                    "qty": 28,
-                                    "type": "salvage"
-                                },
-                                {
-                                    "type": "salvage",
-                                    "id": "adventuring:pristine_salvage",
-                                    "qty": 2
-                                },
-                                {
-                                    "id": "adventuring:big_parts",
-                                    "qty": 10,
-                                    "type": "salvage"
-                                },
-                                {
-                                    "id": "adventuring:sea_scale",
-                                    "qty": 5,
-                                    "type": "materials",
-                                    "chance": 0.55
-                                },
-                                {
-                                    "type": "equipment_pool",
-                                    "pool": "adventuring:tier3_underwater_ruins",
-                                    "chance": 0.15
-                                }
-                            ]
-                        }
-                    ],
-                    "generators": [
-                        {
-                            "id": "claw_pinch",
-                            "name": "Claw Pinch",
-                            "requirements": [],
-                            "isEnemy": true,
-                            "energy": 50,
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 10,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:strength",
-                                                        "amount": 0.4
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "kraken_whip",
-                            "name": "Kraken Whip",
-                            "requirements": [],
-                            "isEnemy": true,
-                            "energy": 55,
-                            "hits": [
-                                {
-                                    "target": "random",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 11,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:agility",
-                                                        "amount": 0.4
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "water_jet",
-                            "name": "Water Jet",
-                            "requirements": [],
-                            "isEnemy": true,
-                            "energy": 55,
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 12,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.45
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "serpent_bite",
-                            "name": "Serpent Bite",
-                            "requirements": [],
-                            "isEnemy": true,
-                            "energy": 60,
-                            "hits": [
-                                {
-                                    "target": "all",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 10,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:strength",
-                                                        "amount": 0.4
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ],
-                    "spenders": [
-                        {
-                            "id": "shell_slam",
-                            "name": "Shell Slam",
-                            "requirements": [],
-                            "isEnemy": true,
-                            "cost": 100,
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 22,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:defence",
-                                                        "amount": 0.45
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "constrict",
-                            "name": "Constrict",
-                            "requirements": [],
-                            "isEnemy": true,
-                            "cost": 100,
-                            "hits": [
-                                {
-                                    "target": "front",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 18,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:strength",
-                                                        "amount": 0.4
-                                                    }
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            "type": "debuff",
-                                            "id": "adventuring:weaken",
-                                            "stacks": {
-                                                "base": 2,
-                                                "scaling": []
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "ocean_crash",
-                            "name": "Ocean Crash",
-                            "requirements": [],
-                            "isEnemy": true,
-                            "cost": 100,
-                            "hits": [
-                                {
-                                    "target": "all",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 15,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.35
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "tsunami",
-                            "name": "Tsunami",
-                            "requirements": [],
-                            "isEnemy": true,
-                            "cost": 100,
-                            "hits": [
-                                {
-                                    "target": "all",
-                                    "party": "enemy",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "amount": {
-                                                "base": 20,
-                                                "scaling": [
-                                                    {
-                                                        "id": "adventuring:magic",
-                                                        "amount": 0.38
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ]
-                }
-            }
-        ]
-    }
+	"$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+	"namespace": "adventuring",
+	"data": {
+		"skillData": [
+			{
+				"skillID": "adventuring:Adventuring",
+				"data": {
+					"passives": [
+						{
+							"id": "tidal_surge",
+							"name": "Tidal Surge",
+							"effects": [
+								{
+									"trigger": "turn_start",
+									"type": "debuff",
+									"id": "adventuring:weaken",
+									"target": "random",
+									"targetParty": "enemy",
+									"stacks": {
+										"base": 1,
+										"scaling": []
+									}
+								}
+							]
+						}
+					],
+					"areas": [
+						{
+							"id": "underwater_ruins",
+							"name": "Underwater Ruins",
+							"media": "melvor:assets/media/monsters/tentacle.png",
+							"requirements": [
+								{
+									"type": "area_cleared",
+									"area": "adventuring:dragons_lair"
+								}
+							],
+							"height": 9,
+							"width": 7,
+							"floors": [
+								{
+									"monsters": [
+										{
+											"id": "adventuring:giant_crab",
+											"weight": 100
+										}
+									],
+									"exit": [
+										"adventuring:giant_crab",
+										"adventuring:giant_crab",
+										"adventuring:giant_crab"
+									]
+								},
+								{
+									"monsters": [
+										{
+											"id": "adventuring:giant_crab",
+											"weight": 60
+										},
+										{
+											"id": "adventuring:tentacle",
+											"weight": 40
+										}
+									],
+									"exit": [
+										"adventuring:giant_crab",
+										"adventuring:giant_crab",
+										"adventuring:tentacle"
+									]
+								},
+								{
+									"monsters": [
+										{
+											"id": "adventuring:giant_crab",
+											"weight": 30
+										},
+										{
+											"id": "adventuring:tentacle",
+											"weight": 50
+										},
+										{
+											"id": "adventuring:wet_monster",
+											"weight": 20
+										}
+									],
+									"exit": [
+										"adventuring:tentacle",
+										"adventuring:tentacle",
+										"adventuring:wet_monster"
+									]
+								},
+								{
+									"monsters": [
+										{
+											"id": "adventuring:tentacle",
+											"weight": 40
+										},
+										{
+											"id": "adventuring:wet_monster",
+											"weight": 60
+										}
+									],
+									"exit": [
+										"adventuring:tentacle",
+										"adventuring:wet_monster",
+										"adventuring:wet_monster"
+									]
+								},
+								{
+									"monsters": [
+										{
+											"id": "adventuring:wet_monster",
+											"weight": 50
+										},
+										{
+											"id": "adventuring:moist_monster",
+											"weight": 50
+										}
+									],
+									"exit": [
+										"adventuring:wet_monster",
+										"adventuring:wet_monster",
+										"adventuring:moist_monster"
+									]
+								},
+								{
+									"monsters": [
+										{
+											"id": "adventuring:wet_monster",
+											"weight": 30
+										},
+										{
+											"id": "adventuring:moist_monster",
+											"weight": 70
+										}
+									],
+									"exit": [
+										"adventuring:moist_monster",
+										"adventuring:moist_monster",
+										"adventuring:moist_monster"
+									]
+								},
+								{
+									"monsters": [
+										{
+											"id": "adventuring:moist_monster",
+											"weight": 100
+										}
+									],
+									"exit": [
+										"adventuring:moist_monster",
+										"adventuring:moist_monster",
+										"adventuring:moist_monster"
+									]
+								},
+								{
+									"monsters": [
+										{
+											"id": "adventuring:moist_monster",
+											"weight": 100
+										}
+									],
+									"exit": [
+										"adventuring:moist_monster",
+										"adventuring:moist_monster",
+										"adventuring:sea_serpent"
+									]
+								}
+							],
+							"tier": 4
+						}
+					],
+					"monsters": [
+						{
+							"id": "giant_crab",
+							"name": "Giant Crab",
+							"media": "melvor:assets/media/monsters/large_crab.png",
+							"tags": [
+								"aquatic",
+								"beast"
+							],
+							"xp": 15,
+							"stats": [
+								{
+									"id": "adventuring:hitpoints",
+									"amount": 30
+								},
+								{
+									"id": "adventuring:defence",
+									"amount": 55
+								},
+								{
+									"id": "adventuring:agility",
+									"amount": 44
+								},
+								{
+									"id": "adventuring:strength",
+									"amount": 369
+								},
+								{
+									"id": "adventuring:magic",
+									"amount": 28
+								},
+								{
+									"id": "adventuring:ranged",
+									"amount": 28
+								},
+								{
+									"id": "adventuring:prayer",
+									"amount": 55
+								}
+							],
+							"generator": "adventuring:claw_pinch",
+							"spender": "adventuring:shell_slam",
+							"passives": [],
+							"loot": [
+								{
+									"id": "adventuring:currency",
+									"qty": 38,
+									"type": "currency"
+								},
+								{
+									"id": "adventuring:parts",
+									"qty": 12,
+									"type": "salvage"
+								},
+								{
+									"id": "adventuring:sea_scale",
+									"qty": 1,
+									"type": "materials",
+									"chance": 0.25
+								},
+								{
+									"type": "equipment_pool",
+									"pool": "adventuring:tier3_underwater_ruins",
+									"chance": 0.03
+								}
+							]
+						},
+						{
+							"id": "tentacle",
+							"name": "Tentacle",
+							"media": "melvor:assets/media/monsters/tentacle.png",
+							"tags": [
+								"aquatic"
+							],
+							"xp": 15,
+							"stats": [
+								{
+									"id": "adventuring:hitpoints",
+									"amount": 33
+								},
+								{
+									"id": "adventuring:defence",
+									"amount": 62
+								},
+								{
+									"id": "adventuring:agility",
+									"amount": 49
+								},
+								{
+									"id": "adventuring:strength",
+									"amount": 412
+								},
+								{
+									"id": "adventuring:magic",
+									"amount": 31
+								},
+								{
+									"id": "adventuring:ranged",
+									"amount": 31
+								},
+								{
+									"id": "adventuring:prayer",
+									"amount": 62
+								}
+							],
+							"generator": "adventuring:kraken_whip",
+							"spender": "adventuring:constrict",
+							"passives": [],
+							"loot": [
+								{
+									"id": "adventuring:currency",
+									"qty": 42,
+									"type": "currency"
+								},
+								{
+									"id": "adventuring:parts",
+									"qty": 14,
+									"type": "salvage"
+								},
+								{
+									"id": "adventuring:sea_scale",
+									"qty": 1,
+									"type": "materials",
+									"chance": 0.28
+								},
+								{
+									"type": "equipment_pool",
+									"pool": "adventuring:tier3_underwater_ruins",
+									"chance": 0.03
+								}
+							]
+						},
+						{
+							"id": "wet_monster",
+							"name": "Wet Monster",
+							"media": "melvor:assets/media/monsters/m12.png",
+							"tags": [
+								"aquatic",
+								"elemental"
+							],
+							"xp": 15,
+							"stats": [
+								{
+									"id": "adventuring:hitpoints",
+									"amount": 37
+								},
+								{
+									"id": "adventuring:defence",
+									"amount": 68
+								},
+								{
+									"id": "adventuring:agility",
+									"amount": 55
+								},
+								{
+									"id": "adventuring:strength",
+									"amount": 34
+								},
+								{
+									"id": "adventuring:magic",
+									"amount": 456
+								},
+								{
+									"id": "adventuring:ranged",
+									"amount": 34
+								},
+								{
+									"id": "adventuring:prayer",
+									"amount": 68
+								}
+							],
+							"generator": "adventuring:water_jet",
+							"spender": "adventuring:ocean_crash",
+							"passives": [
+								"adventuring:tidal_surge"
+							],
+							"loot": [
+								{
+									"id": "adventuring:currency",
+									"qty": 48,
+									"type": "currency"
+								},
+								{
+									"id": "adventuring:parts",
+									"qty": 15,
+									"type": "salvage"
+								},
+								{
+									"id": "adventuring:sea_scale",
+									"qty": 2,
+									"type": "materials",
+									"chance": 0.32
+								},
+								{
+									"type": "equipment_pool",
+									"pool": "adventuring:tier3_underwater_ruins",
+									"chance": 0.03
+								}
+							]
+						},
+						{
+							"id": "moist_monster",
+							"name": "Moist Monster",
+							"media": "melvor:assets/media/monsters/m13.png",
+							"tags": [
+								"aquatic",
+								"elemental"
+							],
+							"xp": 15,
+							"stats": [
+								{
+									"id": "adventuring:hitpoints",
+									"amount": 40
+								},
+								{
+									"id": "adventuring:defence",
+									"amount": 75
+								},
+								{
+									"id": "adventuring:agility",
+									"amount": 60
+								},
+								{
+									"id": "adventuring:strength",
+									"amount": 38
+								},
+								{
+									"id": "adventuring:magic",
+									"amount": 499
+								},
+								{
+									"id": "adventuring:ranged",
+									"amount": 38
+								},
+								{
+									"id": "adventuring:prayer",
+									"amount": 75
+								}
+							],
+							"generator": "adventuring:water_jet",
+							"spender": "adventuring:tsunami",
+							"passives": [
+								"adventuring:tidal_surge"
+							],
+							"loot": [
+								{
+									"id": "adventuring:currency",
+									"qty": 55,
+									"type": "currency"
+								},
+								{
+									"id": "adventuring:parts",
+									"qty": 16,
+									"type": "salvage"
+								},
+								{
+									"id": "adventuring:sea_scale",
+									"qty": 2,
+									"type": "materials",
+									"chance": 0.35
+								},
+								{
+									"type": "equipment_pool",
+									"pool": "adventuring:tier3_underwater_ruins",
+									"chance": 0.03
+								}
+							]
+						},
+						{
+							"id": "sea_serpent",
+							"name": "Sea Serpent",
+							"media": "melvor:assets/media/monsters/tentacle.png",
+							"tags": [
+								"aquatic",
+								"beast",
+								"boss"
+							],
+							"isBoss": true,
+							"xp": 45,
+							"stats": [
+								{
+									"id": "adventuring:hitpoints",
+									"amount": 166
+								},
+								{
+									"id": "adventuring:defence",
+									"amount": 101
+								},
+								{
+									"id": "adventuring:agility",
+									"amount": 80
+								},
+								{
+									"id": "adventuring:strength",
+									"amount": 335
+								},
+								{
+									"id": "adventuring:magic",
+									"amount": 335
+								},
+								{
+									"id": "adventuring:ranged",
+									"amount": 51
+								},
+								{
+									"id": "adventuring:prayer",
+									"amount": 101
+								}
+							],
+							"generator": "adventuring:serpent_bite",
+							"spender": "adventuring:tsunami",
+							"passives": [
+								"adventuring:tidal_surge"
+							],
+							"loot": [
+								{
+									"id": "adventuring:currency",
+									"qty": 130,
+									"type": "currency"
+								},
+								{
+									"id": "adventuring:parts",
+									"qty": 28,
+									"type": "salvage"
+								},
+								{
+									"type": "salvage",
+									"id": "adventuring:pristine_salvage",
+									"qty": 2
+								},
+								{
+									"id": "adventuring:big_parts",
+									"qty": 10,
+									"type": "salvage"
+								},
+								{
+									"id": "adventuring:sea_scale",
+									"qty": 5,
+									"type": "materials",
+									"chance": 0.55
+								},
+								{
+									"type": "equipment_pool",
+									"pool": "adventuring:tier3_underwater_ruins",
+									"chance": 0.15
+								}
+							]
+						}
+					],
+					"generators": [
+						{
+							"id": "claw_pinch",
+							"name": "Claw Pinch",
+							"requirements": [],
+							"isEnemy": true,
+							"energy": 50,
+							"hits": [
+								{
+									"target": "front",
+									"party": "enemy",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"amount": {
+												"base": 5,
+												"scaling": [
+													{
+														"id": "adventuring:strength",
+														"amount": 0.4
+													}
+												]
+											}
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "kraken_whip",
+							"name": "Kraken Whip",
+							"requirements": [],
+							"isEnemy": true,
+							"energy": 55,
+							"hits": [
+								{
+									"target": "random",
+									"party": "enemy",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "adventuring:agility",
+														"amount": 0.4
+													}
+												]
+											}
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "water_jet",
+							"name": "Water Jet",
+							"requirements": [],
+							"isEnemy": true,
+							"energy": 55,
+							"hits": [
+								{
+									"target": "front",
+									"party": "enemy",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"amount": {
+												"base": 6,
+												"scaling": [
+													{
+														"id": "adventuring:magic",
+														"amount": 0.45
+													}
+												]
+											}
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "serpent_bite",
+							"name": "Serpent Bite",
+							"requirements": [],
+							"isEnemy": true,
+							"energy": 60,
+							"hits": [
+								{
+									"target": "all",
+									"party": "enemy",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"amount": {
+												"base": 5,
+												"scaling": [
+													{
+														"id": "adventuring:strength",
+														"amount": 0.4
+													}
+												]
+											}
+										}
+									]
+								}
+							]
+						}
+					],
+					"spenders": [
+						{
+							"id": "shell_slam",
+							"name": "Shell Slam",
+							"requirements": [],
+							"isEnemy": true,
+							"cost": 100,
+							"hits": [
+								{
+									"target": "front",
+									"party": "enemy",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"amount": {
+												"base": 11,
+												"scaling": [
+													{
+														"id": "adventuring:defence",
+														"amount": 0.45
+													}
+												]
+											}
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "constrict",
+							"name": "Constrict",
+							"requirements": [],
+							"isEnemy": true,
+							"cost": 100,
+							"hits": [
+								{
+									"target": "front",
+									"party": "enemy",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"amount": {
+												"base": 9,
+												"scaling": [
+													{
+														"id": "adventuring:strength",
+														"amount": 0.4
+													}
+												]
+											}
+										},
+										{
+											"type": "debuff",
+											"id": "adventuring:weaken",
+											"stacks": {
+												"base": 2,
+												"scaling": []
+											}
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "ocean_crash",
+							"name": "Ocean Crash",
+							"requirements": [],
+							"isEnemy": true,
+							"cost": 100,
+							"hits": [
+								{
+									"target": "all",
+									"party": "enemy",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"amount": {
+												"base": 8,
+												"scaling": [
+													{
+														"id": "adventuring:magic",
+														"amount": 0.35
+													}
+												]
+											}
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "tsunami",
+							"name": "Tsunami",
+							"requirements": [],
+							"isEnemy": true,
+							"cost": 100,
+							"hits": [
+								{
+									"target": "all",
+									"party": "enemy",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"amount": {
+												"base": 10,
+												"scaling": [
+													{
+														"id": "adventuring:magic",
+														"amount": 0.38
+													}
+												]
+											}
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
+		]
+	}
 }

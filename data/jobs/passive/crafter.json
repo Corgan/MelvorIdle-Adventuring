@@ -1,2342 +1,2353 @@
 {
-    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
-    "namespace": "adventuring",
-    "data": {
-        "skillData": [
-            {
-                "skillID": "adventuring:Adventuring",
-                "data": {
-                    "stats": [
-                        {
-                            "id": "crafting",
-                            "name": "Crafting",
-                            "media": "melvor:assets/media/skills/crafting/crafting.png#shade=red"
-                        }
-                    ],
-                    "jobs": [
-                        {
-                            "id": "crafter",
-                            "name": "Crafter",
-                            "media": "melvor:assets/media/skills/crafting/crafting.png#shade=red",
-                            "requirements": [
-                                {
-                                    "type": "skill_level",
-                                    "level": 5
-                                }
-                            ],
-                            "isMilestoneReward": true,
-                            "isPassive": true,
-                            "scaling": [
-                                {
-                                    "id": "adventuring:crafting",
-                                    "amount": 1
-                                }
-                            ]
-                        }
-                    ],
-                    "materials": [
-                        {
-                            "id": "crude_hide",
-                            "name": "Crude Hide",
-                            "media": "melvor:assets/media/skills/crafting/crafting.png#shade=red",
-                            "category": "adventuring:salvage"
-                        },
-                        {
-                            "id": "refined_hide",
-                            "name": "Refined Hide",
-                            "media": "melvor:assets/media/bank/leather.png#shade=yellow",
-                            "tier": 2,
-                            "category": "adventuring:salvage",
-                            "requirements": [
-                                {
-                                    "type": "job_level",
-                                    "job": "adventuring:crafter",
-                                    "level": 25
-                                }
-                            ]
-                        },
-                        {
-                            "id": "immaculate_hide",
-                            "name": "Immaculate Hide",
-                            "media": "melvor:assets/media/bank/dragonhide_green.png#shade=yellow",
-                            "tier": 3,
-                            "category": "adventuring:salvage",
-                            "requirements": [
-                                {
-                                    "type": "job_level",
-                                    "job": "adventuring:crafter",
-                                    "level": 50
-                                }
-                            ]
-                        },
-                        {
-                            "id": "transcendent_hide",
-                            "name": "Transcendent Hide",
-                            "media": "melvor:assets/media/bank/dragonhide_elder.png",
-                            "tier": 4,
-                            "category": "adventuring:salvage",
-                            "requirements": [
-                                {
-                                    "type": "job_level",
-                                    "job": "adventuring:crafter",
-                                    "level": 75
-                                }
-                            ]
-                        },
-                        {
-                            "id": "artisan_thread",
-                            "name": "Artisan Thread",
-                            "media": "melvor:assets/media/skills/crafting/crafting.png#shade=orange",
-                            "category": "adventuring:special"
-                        }
-                    ],
-                    "buildings": [
-                        {
-                            "id": "workshop",
-                            "type": "workshop",
-                            "name": "Workshop",
-                            "description": "Craft leather armor and jewelry. Crafters create a variety of useful equipment.",
-                            "media": "melvor:assets/media/skills/township/Carpenters_Workshop.png",
-                            "requirements": [],
-                            "idle": [
-                                "Stitching leather",
-                                "Polishing gems"
-                            ],
-                            "actions": [
-                                "adventuring:work"
-                            ],
-                            "products": [
-                                "adventuring:leather",
-                                "adventuring:green_dhide",
-                                "adventuring:blue_dhide",
-                                "adventuring:red_dhide",
-                                "adventuring:black_dhide",
-                                "adventuring:craft_artisan_thread",
-                                "adventuring:convert_crude_to_refined_hide",
-                                "adventuring:convert_refined_to_immaculate_hide",
-                                "adventuring:convert_immaculate_to_transcendent_hide",
-                                "adventuring:convert_transcendent_to_immaculate_hide",
-                                "adventuring:convert_immaculate_to_refined_hide",
-                                "adventuring:convert_refined_to_crude_hide",
-                                "adventuring:craft_crafted_armor",
-                                "adventuring:craft_sharpened_blade",
-                                "adventuring:craft_victorious_garb",
-                                "adventuring:craft_trophy_hunter",
-                                "adventuring:craft_piercing_strikes",
-                                "adventuring:craft_spiked_shield",
-                                "adventuring:craft_sturdy_plate",
-                                "adventuring:craft_masterwork_vest"
-                            ]
-                        }
-                    ],
-                    "products": [
-                        {
-                            "id": "leather",
-                            "item": "melvorD:Leather",
-                            "outputType": "item",
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 1
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_hide",
-                                            "count": 1
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "count": 3,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 25
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_hide",
-                                            "count": 1
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "count": 8,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 50
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_hide",
-                                            "count": 1
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "count": 20,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 75
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_hide",
-                                            "count": 1
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "green_dhide",
-                            "item": "melvorD:Green_Dragonhide",
-                            "outputType": "item",
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 1
-                                        },
-                                        {
-                                            "type": "melvor_skill_level",
-                                            "skill": "melvorD:Crafting",
-                                            "level": 57
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_hide",
-                                            "count": 1
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "count": 3,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 25
-                                        },
-                                        {
-                                            "type": "melvor_skill_level",
-                                            "skill": "melvorD:Crafting",
-                                            "level": 57
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_hide",
-                                            "count": 1
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "count": 8,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 50
-                                        },
-                                        {
-                                            "type": "melvor_skill_level",
-                                            "skill": "melvorD:Crafting",
-                                            "level": 57
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_hide",
-                                            "count": 1
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "count": 20,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 75
-                                        },
-                                        {
-                                            "type": "melvor_skill_level",
-                                            "skill": "melvorD:Crafting",
-                                            "level": 57
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_hide",
-                                            "count": 1
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "blue_dhide",
-                            "item": "melvorD:Blue_Dragonhide",
-                            "outputType": "item",
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 1
-                                        },
-                                        {
-                                            "type": "melvor_skill_level",
-                                            "skill": "melvorD:Crafting",
-                                            "level": 66
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_hide",
-                                            "count": 1
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "count": 3,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 25
-                                        },
-                                        {
-                                            "type": "melvor_skill_level",
-                                            "skill": "melvorD:Crafting",
-                                            "level": 66
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_hide",
-                                            "count": 1
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "count": 8,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 50
-                                        },
-                                        {
-                                            "type": "melvor_skill_level",
-                                            "skill": "melvorD:Crafting",
-                                            "level": 66
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_hide",
-                                            "count": 1
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "count": 20,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 75
-                                        },
-                                        {
-                                            "type": "melvor_skill_level",
-                                            "skill": "melvorD:Crafting",
-                                            "level": 66
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_hide",
-                                            "count": 1
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "red_dhide",
-                            "item": "melvorD:Red_Dragonhide",
-                            "outputType": "item",
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 1
-                                        },
-                                        {
-                                            "type": "melvor_skill_level",
-                                            "skill": "melvorD:Crafting",
-                                            "level": 77
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_hide",
-                                            "count": 1
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "count": 3,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 25
-                                        },
-                                        {
-                                            "type": "melvor_skill_level",
-                                            "skill": "melvorD:Crafting",
-                                            "level": 77
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_hide",
-                                            "count": 1
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "count": 8,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 50
-                                        },
-                                        {
-                                            "type": "melvor_skill_level",
-                                            "skill": "melvorD:Crafting",
-                                            "level": 77
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_hide",
-                                            "count": 1
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "count": 20,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 75
-                                        },
-                                        {
-                                            "type": "melvor_skill_level",
-                                            "skill": "melvorD:Crafting",
-                                            "level": 77
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_hide",
-                                            "count": 1
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "black_dhide",
-                            "item": "melvorD:Black_Dragonhide",
-                            "outputType": "item",
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 1
-                                        },
-                                        {
-                                            "type": "melvor_skill_level",
-                                            "skill": "melvorD:Crafting",
-                                            "level": 84
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_hide",
-                                            "count": 1
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "count": 3,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 25
-                                        },
-                                        {
-                                            "type": "melvor_skill_level",
-                                            "skill": "melvorD:Crafting",
-                                            "level": 84
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_hide",
-                                            "count": 1
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "count": 8,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 50
-                                        },
-                                        {
-                                            "type": "melvor_skill_level",
-                                            "skill": "melvorD:Crafting",
-                                            "level": 84
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_hide",
-                                            "count": 1
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "count": 20,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 75
-                                        },
-                                        {
-                                            "type": "melvor_skill_level",
-                                            "skill": "melvorD:Crafting",
-                                            "level": 84
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_hide",
-                                            "count": 1
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "craft_artisan_thread",
-                            "material": "adventuring:artisan_thread",
-                            "outputType": "material",
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "count": 2,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 1
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "count": 4,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 25
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "count": 6,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 50
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "count": 8,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 75
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "convert_crude_to_refined_hide",
-                            "outputType": "conversion",
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "material": "adventuring:refined_hide",
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 25
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_hide",
-                                            "count": 5
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "convert_refined_to_immaculate_hide",
-                            "outputType": "conversion",
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "material": "adventuring:immaculate_hide",
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 50
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_hide",
-                                            "count": 5
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "convert_immaculate_to_transcendent_hide",
-                            "outputType": "conversion",
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "material": "adventuring:transcendent_hide",
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 75
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_hide",
-                                            "count": 5
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "convert_transcendent_to_immaculate_hide",
-                            "outputType": "conversion",
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "material": "adventuring:immaculate_hide",
-                                    "count": 3,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 75
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_hide",
-                                            "count": 1
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "convert_immaculate_to_refined_hide",
-                            "outputType": "conversion",
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "material": "adventuring:refined_hide",
-                                    "count": 3,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 50
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_hide",
-                                            "count": 1
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "convert_refined_to_crude_hide",
-                            "outputType": "conversion",
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "material": "adventuring:crude_hide",
-                                    "count": 3,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 25
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_hide",
-                                            "count": 1
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "craft_crafted_armor",
-                            "consumable": "adventuring:crafted_armor",
-                            "outputType": "consumable",
-                            "count": 1,
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 1
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 25
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 50
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 75
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "craft_sharpened_blade",
-                            "consumable": "adventuring:sharpened_blade",
-                            "outputType": "consumable",
-                            "count": 1,
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 1
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 25
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 50
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 75
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "craft_victorious_garb",
-                            "consumable": "adventuring:victorious_garb",
-                            "outputType": "consumable",
-                            "count": 1,
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 1
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 25
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 50
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 75
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "craft_trophy_hunter",
-                            "consumable": "adventuring:trophy_hunter",
-                            "outputType": "consumable",
-                            "count": 1,
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 1
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 25
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 50
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 75
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "craft_piercing_strikes",
-                            "consumable": "adventuring:piercing_strikes",
-                            "outputType": "consumable",
-                            "count": 1,
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 1
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 25
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 50
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 75
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "craft_spiked_shield",
-                            "consumable": "adventuring:spiked_shield",
-                            "outputType": "consumable",
-                            "count": 1,
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 1
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 25
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 50
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 75
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "craft_sturdy_plate",
-                            "consumable": "adventuring:sturdy_plate",
-                            "outputType": "consumable",
-                            "count": 1,
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 1
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 25
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 50
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 75
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "craft_masterwork_vest",
-                            "consumable": "adventuring:masterwork_vest",
-                            "outputType": "consumable",
-                            "count": 1,
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 1
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_hide",
-                                            "count": 5
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 25
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_hide",
-                                            "count": 5
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 50
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_hide",
-                                            "count": 5
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:crafter",
-                                            "level": 75
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_hide",
-                                            "count": 5
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ],
-                    "tiles": [
-                        {
-                            "id": "crafting_scraps",
-                            "name": "Crafting Scraps",
-                            "media": "melvor:assets/media/skills/crafting/crafting.png#shade=red",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:crafter",
-                                    "level": 1
-                                }
-                            ],
-                            "weight": 10,
-                            "floor_max": 1,
-                            "dungeon_max": 1,
-                            "effects": [
-                                {
-                                    "type": "xp",
-                                    "amount": 30,
-                                    "job": "adventuring:crafter"
-                                },
-                                {
-                                    "type": "loot",
-                                    "pool": [
-                                        {
-                                            "id": "adventuring:crude_hide",
-                                            "qty": 1,
-                                            "weight": 100
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "artisan_cache",
-                            "name": "Artisan Cache",
-                            "media": "melvor:assets/media/skills/crafting/crafting.png#shade=red",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:crafter",
-                                    "level": 25
-                                }
-                            ],
-                            "weight": 8,
-                            "floor_max": 1,
-                            "dungeon_max": 2,
-                            "effects": [
-                                {
-                                    "type": "xp",
-                                    "amount": 75,
-                                    "job": "adventuring:crafter"
-                                },
-                                {
-                                    "type": "loot",
-                                    "pool": [
-                                        {
-                                            "id": "adventuring:crude_hide",
-                                            "qty": 2,
-                                            "weight": 60
-                                        },
-                                        {
-                                            "id": "adventuring:refined_hide",
-                                            "qty": 1,
-                                            "weight": 40
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "master_workshop",
-                            "name": "Master Workshop",
-                            "media": "melvor:assets/media/skills/crafting/crafting.png#shade=red",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:crafter",
-                                    "level": 50
-                                }
-                            ],
-                            "weight": 5,
-                            "floor_max": 1,
-                            "dungeon_max": 2,
-                            "effects": [
-                                {
-                                    "type": "xp",
-                                    "amount": 150,
-                                    "job": "adventuring:crafter"
-                                },
-                                {
-                                    "type": "loot",
-                                    "pool": [
-                                        {
-                                            "id": "adventuring:crude_hide",
-                                            "qty": 1,
-                                            "weight": 30
-                                        },
-                                        {
-                                            "id": "adventuring:refined_hide",
-                                            "qty": 1,
-                                            "weight": 45
-                                        },
-                                        {
-                                            "id": "adventuring:immaculate_hide",
-                                            "qty": 1,
-                                            "weight": 25
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "legendary_atelier",
-                            "name": "Legendary Atelier",
-                            "media": "melvor:assets/media/skills/crafting/crafting.png#shade=red",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:crafter",
-                                    "level": 75
-                                }
-                            ],
-                            "weight": 3,
-                            "floor_max": 1,
-                            "dungeon_max": 2,
-                            "effects": [
-                                {
-                                    "type": "xp",
-                                    "amount": 300,
-                                    "job": "adventuring:crafter"
-                                },
-                                {
-                                    "type": "loot",
-                                    "pool": [
-                                        {
-                                            "id": "adventuring:crude_hide",
-                                            "qty": 1,
-                                            "weight": 15
-                                        },
-                                        {
-                                            "id": "adventuring:refined_hide",
-                                            "qty": 1,
-                                            "weight": 30
-                                        },
-                                        {
-                                            "id": "adventuring:immaculate_hide",
-                                            "qty": 1,
-                                            "weight": 35
-                                        },
-                                        {
-                                            "id": "adventuring:transcendent_hide",
-                                            "qty": 1,
-                                            "weight": 20
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ],
-                    "consumableTypes": [
-                        {
-                            "id": "crafted_armor",
-                            "name": "Crafted Armor",
-                            "media": "melvor:assets/media/bank/potion_crafting_i.png#shade=red",
-                            "type": "armor",
-                            "sourceJob": "adventuring:crafter",
-                            "maxCharges": 3,
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "nameSuffix": "I",
-                                    "media": "melvor:assets/media/bank/potion_crafting_i.png#shade=red",
-                                    "flavorText": "Well-crafted armor reduces incoming damage.",
-                                    "effects": [
-                                        {
-                                            "type": "reduce_damage_percent",
-                                            "trigger": "before_damage_received",
-                                            "amount": 8,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "nameSuffix": "II",
-                                    "media": "melvor:assets/media/bank/potion_crafting_i.png#shade=red",
-                                    "flavorText": "Well-crafted armor reduces incoming damage.",
-                                    "effects": [
-                                        {
-                                            "type": "reduce_damage_percent",
-                                            "trigger": "before_damage_received",
-                                            "amount": 12,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "nameSuffix": "III",
-                                    "media": "melvor:assets/media/bank/potion_crafting_i.png#shade=red",
-                                    "flavorText": "Well-crafted armor reduces incoming damage.",
-                                    "effects": [
-                                        {
-                                            "type": "reduce_damage_percent",
-                                            "trigger": "before_damage_received",
-                                            "amount": 18,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "nameSuffix": "IV",
-                                    "media": "melvor:assets/media/bank/potion_crafting_i.png#shade=red",
-                                    "flavorText": "Well-crafted armor reduces incoming damage.",
-                                    "effects": [
-                                        {
-                                            "type": "reduce_damage_percent",
-                                            "trigger": "before_damage_received",
-                                            "amount": 25,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "sharpened_blade",
-                            "name": "Sharpened Blade",
-                            "media": "melvor:assets/media/bank/potion_crafting_i.png#shade=green",
-                            "type": "armor",
-                            "sourceJob": "adventuring:crafter",
-                            "maxCharges": 3,
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "nameSuffix": "I",
-                                    "media": "melvor:assets/media/bank/potion_crafting_i.png#shade=green",
-                                    "flavorText": "A finely crafted blade that deals extra damage on crits.",
-                                    "effects": [
-                                        {
-                                            "type": "damage_modifier_flat",
-                                            "trigger": "crit",
-                                            "amount": 8,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "nameSuffix": "II",
-                                    "media": "melvor:assets/media/bank/potion_crafting_i.png#shade=green",
-                                    "flavorText": "A finely crafted blade that deals extra damage on crits.",
-                                    "effects": [
-                                        {
-                                            "type": "damage_modifier_flat",
-                                            "trigger": "crit",
-                                            "amount": 14,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "nameSuffix": "III",
-                                    "media": "melvor:assets/media/bank/potion_crafting_i.png#shade=green",
-                                    "flavorText": "A finely crafted blade that deals extra damage on crits.",
-                                    "effects": [
-                                        {
-                                            "type": "damage_modifier_flat",
-                                            "trigger": "crit",
-                                            "amount": 22,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "nameSuffix": "IV",
-                                    "media": "melvor:assets/media/bank/potion_crafting_i.png#shade=green",
-                                    "flavorText": "A finely crafted blade that deals extra damage on crits.",
-                                    "effects": [
-                                        {
-                                            "type": "damage_modifier_flat",
-                                            "trigger": "crit",
-                                            "amount": 35,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "victorious_garb",
-                            "name": "Victorious Garb",
-                            "media": "melvor:assets/media/bank/potion_crafting_i.png#shade=pink",
-                            "type": "armor",
-                            "sourceJob": "adventuring:crafter",
-                            "maxCharges": 3,
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "nameSuffix": "I",
-                                    "media": "melvor:assets/media/bank/potion_crafting_i.png#shade=pink",
-                                    "flavorText": "Garb that fortifies you after each kill.",
-                                    "effects": [
-                                        {
-                                            "type": "buff",
-                                            "trigger": "kill",
-                                            "id": "fortify",
-                                            "stacks": 1,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "nameSuffix": "II",
-                                    "media": "melvor:assets/media/bank/potion_crafting_i.png#shade=pink",
-                                    "flavorText": "Garb that fortifies you after each kill.",
-                                    "effects": [
-                                        {
-                                            "type": "buff",
-                                            "trigger": "kill",
-                                            "id": "fortify",
-                                            "stacks": 2,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "nameSuffix": "III",
-                                    "media": "melvor:assets/media/bank/potion_crafting_i.png#shade=pink",
-                                    "flavorText": "Garb that fortifies you after each kill.",
-                                    "effects": [
-                                        {
-                                            "type": "buff",
-                                            "trigger": "kill",
-                                            "id": "fortify",
-                                            "stacks": 3,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "nameSuffix": "IV",
-                                    "media": "melvor:assets/media/bank/potion_crafting_i.png#shade=pink",
-                                    "flavorText": "Garb that fortifies you after each kill.",
-                                    "effects": [
-                                        {
-                                            "type": "buff",
-                                            "trigger": "kill",
-                                            "id": "fortify",
-                                            "stacks": 4,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "trophy_hunter",
-                            "name": "Trophy Hunter",
-                            "media": "melvor:assets/media/bank/potion_crafting_i.png#shade=purple",
-                            "type": "armor",
-                            "sourceJob": "adventuring:crafter",
-                            "maxCharges": 3,
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "nameSuffix": "I",
-                                    "media": "melvor:assets/media/bank/potion_crafting_i.png#shade=purple",
-                                    "flavorText": "Crafted gear that heals a percentage on kills.",
-                                    "effects": [
-                                        {
-                                            "type": "heal_percent",
-                                            "trigger": "kill",
-                                            "amount": 3,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "nameSuffix": "II",
-                                    "media": "melvor:assets/media/bank/potion_crafting_i.png#shade=purple",
-                                    "flavorText": "Crafted gear that heals a percentage on kills.",
-                                    "effects": [
-                                        {
-                                            "type": "heal_percent",
-                                            "trigger": "kill",
-                                            "amount": 5,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "nameSuffix": "III",
-                                    "media": "melvor:assets/media/bank/potion_crafting_i.png#shade=purple",
-                                    "flavorText": "Crafted gear that heals a percentage on kills.",
-                                    "effects": [
-                                        {
-                                            "type": "heal_percent",
-                                            "trigger": "kill",
-                                            "amount": 7,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "nameSuffix": "IV",
-                                    "media": "melvor:assets/media/bank/potion_crafting_i.png#shade=purple",
-                                    "flavorText": "Crafted gear that heals a percentage on kills.",
-                                    "effects": [
-                                        {
-                                            "type": "heal_percent",
-                                            "trigger": "kill",
-                                            "amount": 10,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "piercing_strikes",
-                            "name": "Piercing Strikes",
-                            "media": "melvor:assets/media/bank/potion_crafting_i.png#shade=yellow",
-                            "type": "armor",
-                            "sourceJob": "adventuring:crafter",
-                            "maxCharges": 3,
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "nameSuffix": "I",
-                                    "media": "melvor:assets/media/bank/potion_crafting_i.png#shade=yellow",
-                                    "flavorText": "Expose enemy weaknesses after dealing damage.",
-                                    "effects": [
-                                        {
-                                            "type": "debuff",
-                                            "trigger": "after_damage_delivered",
-                                            "id": "vulnerability",
-                                            "stacks": 1,
-                                            "target": "enemy"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "nameSuffix": "II",
-                                    "media": "melvor:assets/media/bank/potion_crafting_i.png#shade=yellow",
-                                    "flavorText": "Expose enemy weaknesses after dealing damage.",
-                                    "effects": [
-                                        {
-                                            "type": "debuff",
-                                            "trigger": "after_damage_delivered",
-                                            "id": "vulnerability",
-                                            "stacks": 2,
-                                            "target": "enemy"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "nameSuffix": "III",
-                                    "media": "melvor:assets/media/bank/potion_crafting_i.png#shade=yellow",
-                                    "flavorText": "Expose enemy weaknesses after dealing damage.",
-                                    "effects": [
-                                        {
-                                            "type": "debuff",
-                                            "trigger": "after_damage_delivered",
-                                            "id": "vulnerability",
-                                            "stacks": 3,
-                                            "target": "enemy"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "nameSuffix": "IV",
-                                    "media": "melvor:assets/media/bank/potion_crafting_i.png#shade=yellow",
-                                    "flavorText": "Expose enemy weaknesses after dealing damage.",
-                                    "effects": [
-                                        {
-                                            "type": "debuff",
-                                            "trigger": "after_damage_delivered",
-                                            "id": "vulnerability",
-                                            "stacks": 4,
-                                            "target": "enemy"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "spiked_shield",
-                            "name": "Spiked Shield",
-                            "media": "melvor:assets/media/bank/potion_crafting_i.png#shade=cyan",
-                            "type": "armor",
-                            "sourceJob": "adventuring:crafter",
-                            "maxCharges": 3,
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "nameSuffix": "I",
-                                    "media": "melvor:assets/media/bank/potion_crafting_i.png#shade=cyan",
-                                    "flavorText": "A shield that has a chance to reflect damage when hit.",
-                                    "effects": [
-                                        {
-                                            "type": "reflect",
-                                            "trigger": "after_damage_received",
-                                            "condition": {
-                                                "type": "chance",
-                                                "value": 20
-                                            },
-                                            "amount": 15,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "nameSuffix": "II",
-                                    "media": "melvor:assets/media/bank/potion_crafting_i.png#shade=cyan",
-                                    "flavorText": "A shield that has a chance to reflect damage when hit.",
-                                    "effects": [
-                                        {
-                                            "type": "reflect",
-                                            "trigger": "after_damage_received",
-                                            "condition": {
-                                                "type": "chance",
-                                                "value": 25
-                                            },
-                                            "amount": 22,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "nameSuffix": "III",
-                                    "media": "melvor:assets/media/bank/potion_crafting_i.png#shade=cyan",
-                                    "flavorText": "A shield that has a chance to reflect damage when hit.",
-                                    "effects": [
-                                        {
-                                            "type": "reflect",
-                                            "trigger": "after_damage_received",
-                                            "condition": {
-                                                "type": "chance",
-                                                "value": 30
-                                            },
-                                            "amount": 32,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "nameSuffix": "IV",
-                                    "media": "melvor:assets/media/bank/potion_crafting_i.png#shade=cyan",
-                                    "flavorText": "A shield that has a chance to reflect damage when hit.",
-                                    "effects": [
-                                        {
-                                            "type": "reflect",
-                                            "trigger": "after_damage_received",
-                                            "condition": {
-                                                "type": "chance",
-                                                "value": 35
-                                            },
-                                            "amount": 45,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "sturdy_plate",
-                            "name": "Sturdy Plate",
-                            "media": "melvor:assets/media/bank/potion_crafting_i.png#shade=blue",
-                            "type": "armor",
-                            "sourceJob": "adventuring:crafter",
-                            "maxCharges": 3,
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "nameSuffix": "I",
-                                    "media": "melvor:assets/media/bank/potion_crafting_i.png#shade=blue",
-                                    "flavorText": "Sturdy armor that blocks damage when healthy.",
-                                    "effects": [
-                                        {
-                                            "type": "absorb",
-                                            "trigger": "before_damage_received",
-                                            "condition": {
-                                                "type": "hp_above",
-                                                "threshold": 60
-                                            },
-                                            "amount": 5,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "nameSuffix": "II",
-                                    "media": "melvor:assets/media/bank/potion_crafting_i.png#shade=blue",
-                                    "flavorText": "Sturdy armor that blocks damage when healthy.",
-                                    "effects": [
-                                        {
-                                            "type": "absorb",
-                                            "trigger": "before_damage_received",
-                                            "condition": {
-                                                "type": "hp_above",
-                                                "threshold": 60
-                                            },
-                                            "amount": 8,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "nameSuffix": "III",
-                                    "media": "melvor:assets/media/bank/potion_crafting_i.png#shade=blue",
-                                    "flavorText": "Sturdy armor that blocks damage when healthy.",
-                                    "effects": [
-                                        {
-                                            "type": "absorb",
-                                            "trigger": "before_damage_received",
-                                            "condition": {
-                                                "type": "hp_above",
-                                                "threshold": 60
-                                            },
-                                            "amount": 12,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "nameSuffix": "IV",
-                                    "media": "melvor:assets/media/bank/potion_crafting_i.png#shade=blue",
-                                    "flavorText": "Sturdy armor that blocks damage when healthy.",
-                                    "effects": [
-                                        {
-                                            "type": "absorb",
-                                            "trigger": "before_damage_received",
-                                            "condition": {
-                                                "type": "hp_above",
-                                                "threshold": 60
-                                            },
-                                            "amount": 18,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_hide",
-                                            "count": 3
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "masterwork_vest",
-                            "name": "Masterwork Vest",
-                            "media": "melvor:assets/media/bank/potion_crafting_i.png#shade=orange",
-                            "type": "armor",
-                            "sourceJob": "adventuring:crafter",
-                            "maxCharges": 1,
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "nameSuffix": "I",
-                                    "media": "melvor:assets/media/bank/potion_crafting_i.png#shade=orange",
-                                    "flavorText": "A masterfully crafted vest that prevents death.",
-                                    "effects": [
-                                        {
-                                            "type": "prevent_death",
-                                            "trigger": "before_death",
-                                            "amount": 15,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_hide",
-                                            "count": 5
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "nameSuffix": "II",
-                                    "media": "melvor:assets/media/bank/potion_crafting_i.png#shade=orange",
-                                    "flavorText": "A masterfully crafted vest that prevents death.",
-                                    "effects": [
-                                        {
-                                            "type": "prevent_death",
-                                            "trigger": "before_death",
-                                            "amount": 22,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_hide",
-                                            "count": 5
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "nameSuffix": "III",
-                                    "media": "melvor:assets/media/bank/potion_crafting_i.png#shade=orange",
-                                    "flavorText": "A masterfully crafted vest that prevents death.",
-                                    "effects": [
-                                        {
-                                            "type": "prevent_death",
-                                            "trigger": "before_death",
-                                            "amount": 30,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_hide",
-                                            "count": 5
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "nameSuffix": "IV",
-                                    "media": "melvor:assets/media/bank/potion_crafting_i.png#shade=orange",
-                                    "flavorText": "A masterfully crafted vest that prevents death.",
-                                    "effects": [
-                                        {
-                                            "type": "prevent_death",
-                                            "trigger": "before_death",
-                                            "amount": 40,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_hide",
-                                            "count": 5
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ]
-                }
-            }
-        ]
-    }
+	"$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+	"namespace": "adventuring",
+	"data": {
+		"skillData": [
+			{
+				"skillID": "adventuring:Adventuring",
+				"data": {
+					"stats": [
+						{
+							"id": "crafting",
+							"name": "Crafting",
+							"media": "melvor:assets/media/skills/crafting/crafting.png#shade=red"
+						}
+					],
+					"jobs": [
+						{
+							"id": "crafter",
+							"archetypes": ["town"],
+							"name": "Crafter",
+							"media": "melvor:assets/media/skills/crafting/crafting.png#shade=red",
+							"requirements": [
+								{
+									"type": "skill_level",
+									"level": 5
+								}
+							],
+							"isMilestoneReward": true,
+							"isPassive": true,
+							"effects": [
+								{
+									"trigger": "passive",
+									"type": "stat_flat",
+									"stat": "adventuring:crafting",
+									"amount": {
+										"scaling": [
+											{
+												"id": "level",
+												"amount": 0.5
+											}
+										]
+									},
+									"scaleFrom": "passiveJob"
+								}
+							]
+						}
+					],
+					"materials": [
+						{
+							"id": "crude_hide",
+							"name": "Crude Hide",
+							"media": "melvor:assets/media/skills/crafting/crafting.png#shade=red",
+							"category": "adventuring:salvage"
+						},
+						{
+							"id": "refined_hide",
+							"name": "Refined Hide",
+							"media": "melvor:assets/media/bank/leather.png#shade=yellow",
+							"tier": 2,
+							"category": "adventuring:salvage",
+							"requirements": [
+								{
+									"type": "job_level",
+									"job": "adventuring:crafter",
+									"level": 25
+								}
+							]
+						},
+						{
+							"id": "immaculate_hide",
+							"name": "Immaculate Hide",
+							"media": "melvor:assets/media/bank/dragonhide_green.png#shade=yellow",
+							"tier": 3,
+							"category": "adventuring:salvage",
+							"requirements": [
+								{
+									"type": "job_level",
+									"job": "adventuring:crafter",
+									"level": 50
+								}
+							]
+						},
+						{
+							"id": "transcendent_hide",
+							"name": "Transcendent Hide",
+							"media": "melvor:assets/media/bank/dragonhide_elder.png",
+							"tier": 4,
+							"category": "adventuring:salvage",
+							"requirements": [
+								{
+									"type": "job_level",
+									"job": "adventuring:crafter",
+									"level": 75
+								}
+							]
+						},
+						{
+							"id": "artisan_thread",
+							"name": "Artisan Thread",
+							"media": "melvor:assets/media/skills/crafting/crafting.png#shade=orange",
+							"category": "adventuring:special"
+						}
+					],
+					"buildings": [
+						{
+							"id": "workshop",
+							"type": "workshop",
+							"name": "Workshop",
+							"description": "Craft leather armor and jewelry. Crafters create a variety of useful equipment.",
+							"media": "melvor:assets/media/skills/township/Carpenters_Workshop.png",
+							"requirements": [],
+							"idle": [
+								"Stitching leather",
+								"Polishing gems"
+							],
+							"actions": [
+								"adventuring:work"
+							],
+							"products": [
+								"adventuring:leather",
+								"adventuring:green_dhide",
+								"adventuring:blue_dhide",
+								"adventuring:red_dhide",
+								"adventuring:black_dhide",
+								"adventuring:craft_artisan_thread",
+								"adventuring:convert_crude_to_refined_hide",
+								"adventuring:convert_refined_to_immaculate_hide",
+								"adventuring:convert_immaculate_to_transcendent_hide",
+								"adventuring:convert_transcendent_to_immaculate_hide",
+								"adventuring:convert_immaculate_to_refined_hide",
+								"adventuring:convert_refined_to_crude_hide",
+								"adventuring:craft_crafted_armor",
+								"adventuring:craft_sharpened_blade",
+								"adventuring:craft_victorious_garb",
+								"adventuring:craft_trophy_hunter",
+								"adventuring:craft_piercing_strikes",
+								"adventuring:craft_spiked_shield",
+								"adventuring:craft_sturdy_plate",
+								"adventuring:craft_masterwork_vest"
+							]
+						}
+					],
+					"products": [
+						{
+							"id": "leather",
+							"item": "melvorD:Leather",
+							"outputType": "item",
+							"tiers": [
+								{
+									"tier": 1,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 1
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_hide",
+											"count": 1
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"count": 3,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 25
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_hide",
+											"count": 1
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"count": 8,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 50
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_hide",
+											"count": 1
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"count": 20,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 75
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_hide",
+											"count": 1
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "green_dhide",
+							"item": "melvorD:Green_Dragonhide",
+							"outputType": "item",
+							"tiers": [
+								{
+									"tier": 1,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 1
+										},
+										{
+											"type": "melvor_skill_level",
+											"skill": "melvorD:Crafting",
+											"level": 57
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_hide",
+											"count": 1
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"count": 3,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 25
+										},
+										{
+											"type": "melvor_skill_level",
+											"skill": "melvorD:Crafting",
+											"level": 57
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_hide",
+											"count": 1
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"count": 8,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 50
+										},
+										{
+											"type": "melvor_skill_level",
+											"skill": "melvorD:Crafting",
+											"level": 57
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_hide",
+											"count": 1
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"count": 20,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 75
+										},
+										{
+											"type": "melvor_skill_level",
+											"skill": "melvorD:Crafting",
+											"level": 57
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_hide",
+											"count": 1
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "blue_dhide",
+							"item": "melvorD:Blue_Dragonhide",
+							"outputType": "item",
+							"tiers": [
+								{
+									"tier": 1,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 1
+										},
+										{
+											"type": "melvor_skill_level",
+											"skill": "melvorD:Crafting",
+											"level": 66
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_hide",
+											"count": 1
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"count": 3,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 25
+										},
+										{
+											"type": "melvor_skill_level",
+											"skill": "melvorD:Crafting",
+											"level": 66
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_hide",
+											"count": 1
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"count": 8,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 50
+										},
+										{
+											"type": "melvor_skill_level",
+											"skill": "melvorD:Crafting",
+											"level": 66
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_hide",
+											"count": 1
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"count": 20,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 75
+										},
+										{
+											"type": "melvor_skill_level",
+											"skill": "melvorD:Crafting",
+											"level": 66
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_hide",
+											"count": 1
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "red_dhide",
+							"item": "melvorD:Red_Dragonhide",
+							"outputType": "item",
+							"tiers": [
+								{
+									"tier": 1,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 1
+										},
+										{
+											"type": "melvor_skill_level",
+											"skill": "melvorD:Crafting",
+											"level": 77
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_hide",
+											"count": 1
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"count": 3,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 25
+										},
+										{
+											"type": "melvor_skill_level",
+											"skill": "melvorD:Crafting",
+											"level": 77
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_hide",
+											"count": 1
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"count": 8,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 50
+										},
+										{
+											"type": "melvor_skill_level",
+											"skill": "melvorD:Crafting",
+											"level": 77
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_hide",
+											"count": 1
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"count": 20,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 75
+										},
+										{
+											"type": "melvor_skill_level",
+											"skill": "melvorD:Crafting",
+											"level": 77
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_hide",
+											"count": 1
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "black_dhide",
+							"item": "melvorD:Black_Dragonhide",
+							"outputType": "item",
+							"tiers": [
+								{
+									"tier": 1,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 1
+										},
+										{
+											"type": "melvor_skill_level",
+											"skill": "melvorD:Crafting",
+											"level": 84
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_hide",
+											"count": 1
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"count": 3,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 25
+										},
+										{
+											"type": "melvor_skill_level",
+											"skill": "melvorD:Crafting",
+											"level": 84
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_hide",
+											"count": 1
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"count": 8,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 50
+										},
+										{
+											"type": "melvor_skill_level",
+											"skill": "melvorD:Crafting",
+											"level": 84
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_hide",
+											"count": 1
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"count": 20,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 75
+										},
+										{
+											"type": "melvor_skill_level",
+											"skill": "melvorD:Crafting",
+											"level": 84
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_hide",
+											"count": 1
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "craft_artisan_thread",
+							"material": "adventuring:artisan_thread",
+							"outputType": "material",
+							"tiers": [
+								{
+									"tier": 1,
+									"count": 2,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 1
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_hide",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"count": 4,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 25
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_hide",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"count": 6,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 50
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_hide",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"count": 8,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 75
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_hide",
+											"count": 3
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "convert_crude_to_refined_hide",
+							"outputType": "conversion",
+							"tiers": [
+								{
+									"tier": 1,
+									"material": "adventuring:refined_hide",
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 25
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_hide",
+											"count": 5
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "convert_refined_to_immaculate_hide",
+							"outputType": "conversion",
+							"tiers": [
+								{
+									"tier": 1,
+									"material": "adventuring:immaculate_hide",
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 50
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_hide",
+											"count": 5
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "convert_immaculate_to_transcendent_hide",
+							"outputType": "conversion",
+							"tiers": [
+								{
+									"tier": 1,
+									"material": "adventuring:transcendent_hide",
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 75
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_hide",
+											"count": 5
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "convert_transcendent_to_immaculate_hide",
+							"outputType": "conversion",
+							"tiers": [
+								{
+									"tier": 1,
+									"material": "adventuring:immaculate_hide",
+									"count": 3,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 75
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_hide",
+											"count": 1
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "convert_immaculate_to_refined_hide",
+							"outputType": "conversion",
+							"tiers": [
+								{
+									"tier": 1,
+									"material": "adventuring:refined_hide",
+									"count": 3,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 50
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_hide",
+											"count": 1
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "convert_refined_to_crude_hide",
+							"outputType": "conversion",
+							"tiers": [
+								{
+									"tier": 1,
+									"material": "adventuring:crude_hide",
+									"count": 3,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 25
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_hide",
+											"count": 1
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "craft_crafted_armor",
+							"consumable": "adventuring:crafted_armor",
+							"outputType": "consumable",
+							"count": 1,
+							"tiers": [
+								{
+									"tier": 1,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 1
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_hide",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 25
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_hide",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 50
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_hide",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 75
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_hide",
+											"count": 3
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "craft_sharpened_blade",
+							"consumable": "adventuring:sharpened_blade",
+							"outputType": "consumable",
+							"count": 1,
+							"tiers": [
+								{
+									"tier": 1,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 1
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_hide",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 25
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_hide",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 50
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_hide",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 75
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_hide",
+											"count": 3
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "craft_victorious_garb",
+							"consumable": "adventuring:victorious_garb",
+							"outputType": "consumable",
+							"count": 1,
+							"tiers": [
+								{
+									"tier": 1,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 1
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_hide",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 25
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_hide",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 50
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_hide",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 75
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_hide",
+											"count": 3
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "craft_trophy_hunter",
+							"consumable": "adventuring:trophy_hunter",
+							"outputType": "consumable",
+							"count": 1,
+							"tiers": [
+								{
+									"tier": 1,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 1
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_hide",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 25
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_hide",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 50
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_hide",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 75
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_hide",
+											"count": 3
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "craft_piercing_strikes",
+							"consumable": "adventuring:piercing_strikes",
+							"outputType": "consumable",
+							"count": 1,
+							"tiers": [
+								{
+									"tier": 1,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 1
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_hide",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 25
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_hide",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 50
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_hide",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 75
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_hide",
+											"count": 3
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "craft_spiked_shield",
+							"consumable": "adventuring:spiked_shield",
+							"outputType": "consumable",
+							"count": 1,
+							"tiers": [
+								{
+									"tier": 1,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 1
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_hide",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 25
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_hide",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 50
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_hide",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 75
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_hide",
+											"count": 3
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "craft_sturdy_plate",
+							"consumable": "adventuring:sturdy_plate",
+							"outputType": "consumable",
+							"count": 1,
+							"tiers": [
+								{
+									"tier": 1,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 1
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_hide",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 25
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_hide",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 50
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_hide",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 75
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_hide",
+											"count": 3
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "craft_masterwork_vest",
+							"consumable": "adventuring:masterwork_vest",
+							"outputType": "consumable",
+							"count": 1,
+							"tiers": [
+								{
+									"tier": 1,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 1
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_hide",
+											"count": 5
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 25
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_hide",
+											"count": 5
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 50
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_hide",
+											"count": 5
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:crafter",
+											"level": 75
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_hide",
+											"count": 5
+										}
+									]
+								}
+							]
+						}
+					],
+					"tiles": [
+						{
+							"id": "crafting_scraps",
+							"name": "Crafting Scraps",
+							"media": "melvor:assets/media/skills/crafting/crafting.png#shade=red",
+							"requirements": [
+								{
+									"type": "current_job_level",
+									"job": "adventuring:crafter",
+									"level": 1
+								}
+							],
+							"weight": 10,
+							"floor_max": 1,
+							"dungeon_max": 1,
+							"effects": [
+								{
+									"type": "xp",
+									"amount": 30,
+									"job": "adventuring:crafter"
+								},
+								{
+									"type": "loot",
+									"pool": [
+										{
+											"id": "adventuring:crude_hide",
+											"qty": 1,
+											"weight": 100
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "artisan_cache",
+							"name": "Artisan Cache",
+							"media": "melvor:assets/media/skills/crafting/crafting.png#shade=red",
+							"requirements": [
+								{
+									"type": "current_job_level",
+									"job": "adventuring:crafter",
+									"level": 25
+								}
+							],
+							"weight": 8,
+							"floor_max": 1,
+							"dungeon_max": 2,
+							"effects": [
+								{
+									"type": "xp",
+									"amount": 75,
+									"job": "adventuring:crafter"
+								},
+								{
+									"type": "loot",
+									"pool": [
+										{
+											"id": "adventuring:crude_hide",
+											"qty": 2,
+											"weight": 60
+										},
+										{
+											"id": "adventuring:refined_hide",
+											"qty": 1,
+											"weight": 40
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "master_workshop",
+							"name": "Master Workshop",
+							"media": "melvor:assets/media/skills/crafting/crafting.png#shade=red",
+							"requirements": [
+								{
+									"type": "current_job_level",
+									"job": "adventuring:crafter",
+									"level": 50
+								}
+							],
+							"weight": 5,
+							"floor_max": 1,
+							"dungeon_max": 2,
+							"effects": [
+								{
+									"type": "xp",
+									"amount": 150,
+									"job": "adventuring:crafter"
+								},
+								{
+									"type": "loot",
+									"pool": [
+										{
+											"id": "adventuring:crude_hide",
+											"qty": 1,
+											"weight": 30
+										},
+										{
+											"id": "adventuring:refined_hide",
+											"qty": 1,
+											"weight": 45
+										},
+										{
+											"id": "adventuring:immaculate_hide",
+											"qty": 1,
+											"weight": 25
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "legendary_atelier",
+							"name": "Legendary Atelier",
+							"media": "melvor:assets/media/skills/crafting/crafting.png#shade=red",
+							"requirements": [
+								{
+									"type": "current_job_level",
+									"job": "adventuring:crafter",
+									"level": 75
+								}
+							],
+							"weight": 3,
+							"floor_max": 1,
+							"dungeon_max": 2,
+							"effects": [
+								{
+									"type": "xp",
+									"amount": 300,
+									"job": "adventuring:crafter"
+								},
+								{
+									"type": "loot",
+									"pool": [
+										{
+											"id": "adventuring:crude_hide",
+											"qty": 1,
+											"weight": 15
+										},
+										{
+											"id": "adventuring:refined_hide",
+											"qty": 1,
+											"weight": 30
+										},
+										{
+											"id": "adventuring:immaculate_hide",
+											"qty": 1,
+											"weight": 35
+										},
+										{
+											"id": "adventuring:transcendent_hide",
+											"qty": 1,
+											"weight": 20
+										}
+									]
+								}
+							]
+						}
+					],
+					"consumableTypes": [
+						{
+							"id": "crafted_armor",
+							"name": "Crafted Armor",
+							"media": "melvor:assets/media/bank/potion_crafting_i.png#shade=red",
+							"type": "armor",
+							"sourceJob": "adventuring:crafter",
+							"maxCharges": 3,
+							"tiers": [
+								{
+									"tier": 1,
+									"nameSuffix": "I",
+									"media": "melvor:assets/media/bank/potion_crafting_i.png#shade=red",
+									"flavorText": "Well-crafted armor reduces incoming damage.",
+									"effects": [
+										{
+											"type": "reduce_damage_percent",
+											"trigger": "before_damage_received",
+											"amount": 8,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_hide",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"nameSuffix": "II",
+									"media": "melvor:assets/media/bank/potion_crafting_i.png#shade=red",
+									"flavorText": "Well-crafted armor reduces incoming damage.",
+									"effects": [
+										{
+											"type": "reduce_damage_percent",
+											"trigger": "before_damage_received",
+											"amount": 12,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_hide",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"nameSuffix": "III",
+									"media": "melvor:assets/media/bank/potion_crafting_i.png#shade=red",
+									"flavorText": "Well-crafted armor reduces incoming damage.",
+									"effects": [
+										{
+											"type": "reduce_damage_percent",
+											"trigger": "before_damage_received",
+											"amount": 18,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_hide",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"nameSuffix": "IV",
+									"media": "melvor:assets/media/bank/potion_crafting_i.png#shade=red",
+									"flavorText": "Well-crafted armor reduces incoming damage.",
+									"effects": [
+										{
+											"type": "reduce_damage_percent",
+											"trigger": "before_damage_received",
+											"amount": 25,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_hide",
+											"count": 3
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "sharpened_blade",
+							"name": "Sharpened Blade",
+							"media": "melvor:assets/media/bank/potion_crafting_i.png#shade=green",
+							"type": "armor",
+							"sourceJob": "adventuring:crafter",
+							"maxCharges": 3,
+							"tiers": [
+								{
+									"tier": 1,
+									"nameSuffix": "I",
+									"media": "melvor:assets/media/bank/potion_crafting_i.png#shade=green",
+									"flavorText": "A finely crafted blade that deals extra damage on crits.",
+									"effects": [
+										{
+											"type": "damage_modifier_flat",
+											"trigger": "crit",
+											"amount": 8,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_hide",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"nameSuffix": "II",
+									"media": "melvor:assets/media/bank/potion_crafting_i.png#shade=green",
+									"flavorText": "A finely crafted blade that deals extra damage on crits.",
+									"effects": [
+										{
+											"type": "damage_modifier_flat",
+											"trigger": "crit",
+											"amount": 14,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_hide",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"nameSuffix": "III",
+									"media": "melvor:assets/media/bank/potion_crafting_i.png#shade=green",
+									"flavorText": "A finely crafted blade that deals extra damage on crits.",
+									"effects": [
+										{
+											"type": "damage_modifier_flat",
+											"trigger": "crit",
+											"amount": 22,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_hide",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"nameSuffix": "IV",
+									"media": "melvor:assets/media/bank/potion_crafting_i.png#shade=green",
+									"flavorText": "A finely crafted blade that deals extra damage on crits.",
+									"effects": [
+										{
+											"type": "damage_modifier_flat",
+											"trigger": "crit",
+											"amount": 35,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_hide",
+											"count": 3
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "victorious_garb",
+							"name": "Victorious Garb",
+							"media": "melvor:assets/media/bank/potion_crafting_i.png#shade=pink",
+							"type": "armor",
+							"sourceJob": "adventuring:crafter",
+							"maxCharges": 3,
+							"tiers": [
+								{
+									"tier": 1,
+									"nameSuffix": "I",
+									"media": "melvor:assets/media/bank/potion_crafting_i.png#shade=pink",
+									"flavorText": "Garb that fortifies you after each kill.",
+									"effects": [
+										{
+											"type": "buff",
+											"trigger": "kill",
+											"id": "fortify",
+											"stacks": 1,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_hide",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"nameSuffix": "II",
+									"media": "melvor:assets/media/bank/potion_crafting_i.png#shade=pink",
+									"flavorText": "Garb that fortifies you after each kill.",
+									"effects": [
+										{
+											"type": "buff",
+											"trigger": "kill",
+											"id": "fortify",
+											"stacks": 2,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_hide",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"nameSuffix": "III",
+									"media": "melvor:assets/media/bank/potion_crafting_i.png#shade=pink",
+									"flavorText": "Garb that fortifies you after each kill.",
+									"effects": [
+										{
+											"type": "buff",
+											"trigger": "kill",
+											"id": "fortify",
+											"stacks": 3,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_hide",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"nameSuffix": "IV",
+									"media": "melvor:assets/media/bank/potion_crafting_i.png#shade=pink",
+									"flavorText": "Garb that fortifies you after each kill.",
+									"effects": [
+										{
+											"type": "buff",
+											"trigger": "kill",
+											"id": "fortify",
+											"stacks": 4,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_hide",
+											"count": 3
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "trophy_hunter",
+							"name": "Trophy Hunter",
+							"media": "melvor:assets/media/bank/potion_crafting_i.png#shade=purple",
+							"type": "armor",
+							"sourceJob": "adventuring:crafter",
+							"maxCharges": 3,
+							"tiers": [
+								{
+									"tier": 1,
+									"nameSuffix": "I",
+									"media": "melvor:assets/media/bank/potion_crafting_i.png#shade=purple",
+									"flavorText": "Crafted gear that heals a percentage on kills.",
+									"effects": [
+										{
+											"type": "heal_percent",
+											"trigger": "kill",
+											"amount": 3,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_hide",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"nameSuffix": "II",
+									"media": "melvor:assets/media/bank/potion_crafting_i.png#shade=purple",
+									"flavorText": "Crafted gear that heals a percentage on kills.",
+									"effects": [
+										{
+											"type": "heal_percent",
+											"trigger": "kill",
+											"amount": 5,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_hide",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"nameSuffix": "III",
+									"media": "melvor:assets/media/bank/potion_crafting_i.png#shade=purple",
+									"flavorText": "Crafted gear that heals a percentage on kills.",
+									"effects": [
+										{
+											"type": "heal_percent",
+											"trigger": "kill",
+											"amount": 7,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_hide",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"nameSuffix": "IV",
+									"media": "melvor:assets/media/bank/potion_crafting_i.png#shade=purple",
+									"flavorText": "Crafted gear that heals a percentage on kills.",
+									"effects": [
+										{
+											"type": "heal_percent",
+											"trigger": "kill",
+											"amount": 10,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_hide",
+											"count": 3
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "piercing_strikes",
+							"name": "Piercing Strikes",
+							"media": "melvor:assets/media/bank/potion_crafting_i.png#shade=yellow",
+							"type": "armor",
+							"sourceJob": "adventuring:crafter",
+							"maxCharges": 3,
+							"tiers": [
+								{
+									"tier": 1,
+									"nameSuffix": "I",
+									"media": "melvor:assets/media/bank/potion_crafting_i.png#shade=yellow",
+									"flavorText": "Expose enemy weaknesses after dealing damage.",
+									"effects": [
+										{
+											"type": "debuff",
+											"trigger": "after_damage_delivered",
+											"id": "vulnerability",
+											"stacks": 1,
+											"target": "enemy"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_hide",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"nameSuffix": "II",
+									"media": "melvor:assets/media/bank/potion_crafting_i.png#shade=yellow",
+									"flavorText": "Expose enemy weaknesses after dealing damage.",
+									"effects": [
+										{
+											"type": "debuff",
+											"trigger": "after_damage_delivered",
+											"id": "vulnerability",
+											"stacks": 2,
+											"target": "enemy"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_hide",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"nameSuffix": "III",
+									"media": "melvor:assets/media/bank/potion_crafting_i.png#shade=yellow",
+									"flavorText": "Expose enemy weaknesses after dealing damage.",
+									"effects": [
+										{
+											"type": "debuff",
+											"trigger": "after_damage_delivered",
+											"id": "vulnerability",
+											"stacks": 3,
+											"target": "enemy"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_hide",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"nameSuffix": "IV",
+									"media": "melvor:assets/media/bank/potion_crafting_i.png#shade=yellow",
+									"flavorText": "Expose enemy weaknesses after dealing damage.",
+									"effects": [
+										{
+											"type": "debuff",
+											"trigger": "after_damage_delivered",
+											"id": "vulnerability",
+											"stacks": 4,
+											"target": "enemy"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_hide",
+											"count": 3
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "spiked_shield",
+							"name": "Spiked Shield",
+							"media": "melvor:assets/media/bank/potion_crafting_i.png#shade=cyan",
+							"type": "armor",
+							"sourceJob": "adventuring:crafter",
+							"maxCharges": 3,
+							"tiers": [
+								{
+									"tier": 1,
+									"nameSuffix": "I",
+									"media": "melvor:assets/media/bank/potion_crafting_i.png#shade=cyan",
+									"flavorText": "A shield that has a chance to reflect damage when hit.",
+									"effects": [
+										{
+											"type": "reflect",
+											"trigger": "after_damage_received",
+											"condition": {
+												"type": "chance",
+												"value": 20
+											},
+											"amount": 15,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_hide",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"nameSuffix": "II",
+									"media": "melvor:assets/media/bank/potion_crafting_i.png#shade=cyan",
+									"flavorText": "A shield that has a chance to reflect damage when hit.",
+									"effects": [
+										{
+											"type": "reflect",
+											"trigger": "after_damage_received",
+											"condition": {
+												"type": "chance",
+												"value": 25
+											},
+											"amount": 22,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_hide",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"nameSuffix": "III",
+									"media": "melvor:assets/media/bank/potion_crafting_i.png#shade=cyan",
+									"flavorText": "A shield that has a chance to reflect damage when hit.",
+									"effects": [
+										{
+											"type": "reflect",
+											"trigger": "after_damage_received",
+											"condition": {
+												"type": "chance",
+												"value": 30
+											},
+											"amount": 32,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_hide",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"nameSuffix": "IV",
+									"media": "melvor:assets/media/bank/potion_crafting_i.png#shade=cyan",
+									"flavorText": "A shield that has a chance to reflect damage when hit.",
+									"effects": [
+										{
+											"type": "reflect",
+											"trigger": "after_damage_received",
+											"condition": {
+												"type": "chance",
+												"value": 35
+											},
+											"amount": 45,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_hide",
+											"count": 3
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "sturdy_plate",
+							"name": "Sturdy Plate",
+							"media": "melvor:assets/media/bank/potion_crafting_i.png#shade=blue",
+							"type": "armor",
+							"sourceJob": "adventuring:crafter",
+							"maxCharges": 3,
+							"tiers": [
+								{
+									"tier": 1,
+									"nameSuffix": "I",
+									"media": "melvor:assets/media/bank/potion_crafting_i.png#shade=blue",
+									"flavorText": "Sturdy armor that blocks damage when healthy.",
+									"effects": [
+										{
+											"type": "absorb",
+											"trigger": "before_damage_received",
+											"condition": {
+												"type": "hp_above",
+												"threshold": 60
+											},
+											"amount": 5,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_hide",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"nameSuffix": "II",
+									"media": "melvor:assets/media/bank/potion_crafting_i.png#shade=blue",
+									"flavorText": "Sturdy armor that blocks damage when healthy.",
+									"effects": [
+										{
+											"type": "absorb",
+											"trigger": "before_damage_received",
+											"condition": {
+												"type": "hp_above",
+												"threshold": 60
+											},
+											"amount": 8,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_hide",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"nameSuffix": "III",
+									"media": "melvor:assets/media/bank/potion_crafting_i.png#shade=blue",
+									"flavorText": "Sturdy armor that blocks damage when healthy.",
+									"effects": [
+										{
+											"type": "absorb",
+											"trigger": "before_damage_received",
+											"condition": {
+												"type": "hp_above",
+												"threshold": 60
+											},
+											"amount": 12,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_hide",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"nameSuffix": "IV",
+									"media": "melvor:assets/media/bank/potion_crafting_i.png#shade=blue",
+									"flavorText": "Sturdy armor that blocks damage when healthy.",
+									"effects": [
+										{
+											"type": "absorb",
+											"trigger": "before_damage_received",
+											"condition": {
+												"type": "hp_above",
+												"threshold": 60
+											},
+											"amount": 18,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_hide",
+											"count": 3
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "masterwork_vest",
+							"name": "Masterwork Vest",
+							"media": "melvor:assets/media/bank/potion_crafting_i.png#shade=orange",
+							"type": "armor",
+							"sourceJob": "adventuring:crafter",
+							"maxCharges": 1,
+							"tiers": [
+								{
+									"tier": 1,
+									"nameSuffix": "I",
+									"media": "melvor:assets/media/bank/potion_crafting_i.png#shade=orange",
+									"flavorText": "A masterfully crafted vest that prevents death.",
+									"effects": [
+										{
+											"type": "prevent_death",
+											"trigger": "before_death",
+											"amount": 15,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_hide",
+											"count": 5
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"nameSuffix": "II",
+									"media": "melvor:assets/media/bank/potion_crafting_i.png#shade=orange",
+									"flavorText": "A masterfully crafted vest that prevents death.",
+									"effects": [
+										{
+											"type": "prevent_death",
+											"trigger": "before_death",
+											"amount": 22,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_hide",
+											"count": 5
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"nameSuffix": "III",
+									"media": "melvor:assets/media/bank/potion_crafting_i.png#shade=orange",
+									"flavorText": "A masterfully crafted vest that prevents death.",
+									"effects": [
+										{
+											"type": "prevent_death",
+											"trigger": "before_death",
+											"amount": 30,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_hide",
+											"count": 5
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"nameSuffix": "IV",
+									"media": "melvor:assets/media/bank/potion_crafting_i.png#shade=orange",
+									"flavorText": "A masterfully crafted vest that prevents death.",
+									"effects": [
+										{
+											"type": "prevent_death",
+											"trigger": "before_death",
+											"amount": 40,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_hide",
+											"count": 5
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
+		]
+	}
 }

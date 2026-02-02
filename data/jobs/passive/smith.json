@@ -1,2538 +1,2549 @@
 {
-    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
-    "namespace": "adventuring",
-    "data": {
-        "skillData": [
-            {
-                "skillID": "adventuring:Adventuring",
-                "data": {
-                    "stats": [
-                        {
-                            "id": "smithing",
-                            "name": "Smithing",
-                            "media": "melvor:assets/media/skills/smithing/smithing.png#shade=red"
-                        }
-                    ],
-                    "jobs": [
-                        {
-                            "id": "smith",
-                            "name": "Smith",
-                            "media": "melvor:assets/media/skills/smithing/smithing.png#shade=red",
-                            "requirements": [
-                                {
-                                    "type": "skill_level",
-                                    "level": 5
-                                }
-                            ],
-                            "isMilestoneReward": true,
-                            "isPassive": true,
-                            "scaling": [
-                                {
-                                    "id": "adventuring:smithing",
-                                    "amount": 1
-                                }
-                            ]
-                        }
-                    ],
-                    "materials": [
-                        {
-                            "id": "crude_slag",
-                            "name": "Crude Slag",
-                            "media": "melvor:assets/media/skills/smithing/smithing.png#shade=red",
-                            "category": "adventuring:salvage"
-                        },
-                        {
-                            "id": "refined_slag",
-                            "name": "Refined Slag",
-                            "media": "melvor:assets/media/bank/bronze_bar.png",
-                            "tier": 2,
-                            "category": "adventuring:salvage",
-                            "requirements": [
-                                {
-                                    "type": "job_level",
-                                    "job": "adventuring:smith",
-                                    "level": 25
-                                }
-                            ]
-                        },
-                        {
-                            "id": "immaculate_slag",
-                            "name": "Immaculate Slag",
-                            "media": "melvor:assets/media/bank/mithril_bar.png",
-                            "tier": 3,
-                            "category": "adventuring:salvage",
-                            "requirements": [
-                                {
-                                    "type": "job_level",
-                                    "job": "adventuring:smith",
-                                    "level": 50
-                                }
-                            ]
-                        },
-                        {
-                            "id": "transcendent_slag",
-                            "name": "Transcendent Slag",
-                            "media": "melvor:assets/media/bank/dragonite_bar.png#shade=yellow",
-                            "tier": 4,
-                            "category": "adventuring:salvage",
-                            "requirements": [
-                                {
-                                    "type": "job_level",
-                                    "job": "adventuring:smith",
-                                    "level": 75
-                                }
-                            ]
-                        },
-                        {
-                            "id": "forge_ember",
-                            "name": "Forge Ember",
-                            "media": "melvor:assets/media/skills/smithing/smithing.png#shade=orange",
-                            "category": "adventuring:special"
-                        }
-                    ],
-                    "buildings": [
-                        {
-                            "id": "forge",
-                            "type": "workshop",
-                            "name": "Forge",
-                            "description": "Smelt ores into bars and craft metal equipment. Smiths create weapons and armor.",
-                            "media": "melvor:assets/media/skills/township/Blacksmiths_Forge.png",
-                            "requirements": [],
-                            "idle": [
-                                "Hammering away",
-                                "Stoking the fire"
-                            ],
-                            "actions": [
-                                "adventuring:work"
-                            ],
-                            "products": [
-                                "adventuring:bronze_bar",
-                                "adventuring:iron_bar",
-                                "adventuring:steel_bar",
-                                "adventuring:mithril_bar",
-                                "adventuring:adamantite_bar",
-                                "adventuring:runite_bar",
-                                "adventuring:dragonite_bar",
-                                "adventuring:craft_forge_ember",
-                                "adventuring:convert_crude_to_refined_slag",
-                                "adventuring:convert_refined_to_immaculate_slag",
-                                "adventuring:convert_immaculate_to_transcendent_slag",
-                                "adventuring:convert_transcendent_to_immaculate_slag",
-                                "adventuring:convert_immaculate_to_refined_slag",
-                                "adventuring:convert_refined_to_crude_slag",
-                                "adventuring:craft_steel_resolve",
-                                "adventuring:craft_reinforced_shield",
-                                "adventuring:craft_weapon_blessing",
-                                "adventuring:craft_weapon_proc",
-                                "adventuring:craft_serrated_edge",
-                                "adventuring:craft_battle_rage",
-                                "adventuring:craft_armor_plates",
-                                "adventuring:craft_iron_resolve"
-                            ]
-                        }
-                    ],
-                    "products": [
-                        {
-                            "id": "bronze_bar",
-                            "item": "melvorD:Bronze_Bar",
-                            "outputType": "item",
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 1
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_slag",
-                                            "count": 1
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "count": 3,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 25
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_slag",
-                                            "count": 1
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "count": 8,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 50
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_slag",
-                                            "count": 1
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "count": 20,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 75
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_slag",
-                                            "count": 1
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "iron_bar",
-                            "item": "melvorD:Iron_Bar",
-                            "outputType": "item",
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 1
-                                        },
-                                        {
-                                            "type": "melvor_skill_level",
-                                            "skill": "melvorD:Smithing",
-                                            "level": 15
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_slag",
-                                            "count": 1
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "count": 3,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 25
-                                        },
-                                        {
-                                            "type": "melvor_skill_level",
-                                            "skill": "melvorD:Smithing",
-                                            "level": 15
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_slag",
-                                            "count": 1
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "count": 8,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 50
-                                        },
-                                        {
-                                            "type": "melvor_skill_level",
-                                            "skill": "melvorD:Smithing",
-                                            "level": 15
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_slag",
-                                            "count": 1
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "count": 20,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 75
-                                        },
-                                        {
-                                            "type": "melvor_skill_level",
-                                            "skill": "melvorD:Smithing",
-                                            "level": 15
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_slag",
-                                            "count": 1
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "steel_bar",
-                            "item": "melvorD:Steel_Bar",
-                            "outputType": "item",
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 1
-                                        },
-                                        {
-                                            "type": "melvor_skill_level",
-                                            "skill": "melvorD:Smithing",
-                                            "level": 30
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_slag",
-                                            "count": 1
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "count": 3,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 25
-                                        },
-                                        {
-                                            "type": "melvor_skill_level",
-                                            "skill": "melvorD:Smithing",
-                                            "level": 30
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_slag",
-                                            "count": 1
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "count": 8,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 50
-                                        },
-                                        {
-                                            "type": "melvor_skill_level",
-                                            "skill": "melvorD:Smithing",
-                                            "level": 30
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_slag",
-                                            "count": 1
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "count": 20,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 75
-                                        },
-                                        {
-                                            "type": "melvor_skill_level",
-                                            "skill": "melvorD:Smithing",
-                                            "level": 30
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_slag",
-                                            "count": 1
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "mithril_bar",
-                            "item": "melvorD:Mithril_Bar",
-                            "outputType": "item",
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 1
-                                        },
-                                        {
-                                            "type": "melvor_skill_level",
-                                            "skill": "melvorD:Smithing",
-                                            "level": 50
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_slag",
-                                            "count": 1
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "count": 3,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 25
-                                        },
-                                        {
-                                            "type": "melvor_skill_level",
-                                            "skill": "melvorD:Smithing",
-                                            "level": 50
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_slag",
-                                            "count": 1
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "count": 8,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 50
-                                        },
-                                        {
-                                            "type": "melvor_skill_level",
-                                            "skill": "melvorD:Smithing",
-                                            "level": 50
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_slag",
-                                            "count": 1
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "count": 20,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 75
-                                        },
-                                        {
-                                            "type": "melvor_skill_level",
-                                            "skill": "melvorD:Smithing",
-                                            "level": 50
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_slag",
-                                            "count": 1
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "adamantite_bar",
-                            "item": "melvorD:Adamantite_Bar",
-                            "outputType": "item",
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 1
-                                        },
-                                        {
-                                            "type": "melvor_skill_level",
-                                            "skill": "melvorD:Smithing",
-                                            "level": 70
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_slag",
-                                            "count": 1
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "count": 3,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 25
-                                        },
-                                        {
-                                            "type": "melvor_skill_level",
-                                            "skill": "melvorD:Smithing",
-                                            "level": 70
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_slag",
-                                            "count": 1
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "count": 8,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 50
-                                        },
-                                        {
-                                            "type": "melvor_skill_level",
-                                            "skill": "melvorD:Smithing",
-                                            "level": 70
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_slag",
-                                            "count": 1
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "count": 20,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 75
-                                        },
-                                        {
-                                            "type": "melvor_skill_level",
-                                            "skill": "melvorD:Smithing",
-                                            "level": 70
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_slag",
-                                            "count": 1
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "runite_bar",
-                            "item": "melvorD:Runite_Bar",
-                            "outputType": "item",
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 1
-                                        },
-                                        {
-                                            "type": "melvor_skill_level",
-                                            "skill": "melvorD:Smithing",
-                                            "level": 85
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_slag",
-                                            "count": 1
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "count": 3,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 25
-                                        },
-                                        {
-                                            "type": "melvor_skill_level",
-                                            "skill": "melvorD:Smithing",
-                                            "level": 85
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_slag",
-                                            "count": 1
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "count": 8,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 50
-                                        },
-                                        {
-                                            "type": "melvor_skill_level",
-                                            "skill": "melvorD:Smithing",
-                                            "level": 85
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_slag",
-                                            "count": 1
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "count": 20,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 75
-                                        },
-                                        {
-                                            "type": "melvor_skill_level",
-                                            "skill": "melvorD:Smithing",
-                                            "level": 85
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_slag",
-                                            "count": 1
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "dragonite_bar",
-                            "item": "melvorD:Dragonite_Bar",
-                            "outputType": "item",
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 1
-                                        },
-                                        {
-                                            "type": "melvor_skill_level",
-                                            "skill": "melvorD:Smithing",
-                                            "level": 99
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_slag",
-                                            "count": 1
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "count": 3,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 25
-                                        },
-                                        {
-                                            "type": "melvor_skill_level",
-                                            "skill": "melvorD:Smithing",
-                                            "level": 99
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_slag",
-                                            "count": 1
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "count": 8,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 50
-                                        },
-                                        {
-                                            "type": "melvor_skill_level",
-                                            "skill": "melvorD:Smithing",
-                                            "level": 99
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_slag",
-                                            "count": 1
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "count": 20,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 75
-                                        },
-                                        {
-                                            "type": "melvor_skill_level",
-                                            "skill": "melvorD:Smithing",
-                                            "level": 99
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_slag",
-                                            "count": 1
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "craft_forge_ember",
-                            "material": "adventuring:forge_ember",
-                            "outputType": "material",
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "count": 2,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 1
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_slag",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "count": 4,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 25
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_slag",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "count": 6,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 50
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_slag",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "count": 8,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 75
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_slag",
-                                            "count": 3
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "convert_crude_to_refined_slag",
-                            "outputType": "conversion",
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "material": "adventuring:refined_slag",
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 25
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_slag",
-                                            "count": 5
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "convert_refined_to_immaculate_slag",
-                            "outputType": "conversion",
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "material": "adventuring:immaculate_slag",
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 50
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_slag",
-                                            "count": 5
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "convert_immaculate_to_transcendent_slag",
-                            "outputType": "conversion",
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "material": "adventuring:transcendent_slag",
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 75
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_slag",
-                                            "count": 5
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "convert_transcendent_to_immaculate_slag",
-                            "outputType": "conversion",
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "material": "adventuring:immaculate_slag",
-                                    "count": 3,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 75
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_slag",
-                                            "count": 1
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "convert_immaculate_to_refined_slag",
-                            "outputType": "conversion",
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "material": "adventuring:refined_slag",
-                                    "count": 3,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 50
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_slag",
-                                            "count": 1
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "convert_refined_to_crude_slag",
-                            "outputType": "conversion",
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "material": "adventuring:crude_slag",
-                                    "count": 3,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 25
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_slag",
-                                            "count": 1
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "craft_steel_resolve",
-                            "consumable": "adventuring:steel_resolve",
-                            "outputType": "consumable",
-                            "count": 1,
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 1
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_slag",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 25
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_slag",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 50
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_slag",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 75
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_slag",
-                                            "count": 3
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "craft_reinforced_shield",
-                            "consumable": "adventuring:reinforced_shield",
-                            "outputType": "consumable",
-                            "count": 1,
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 1
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_slag",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 25
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_slag",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 50
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_slag",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 75
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_slag",
-                                            "count": 3
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "craft_weapon_blessing",
-                            "consumable": "adventuring:weapon_blessing",
-                            "outputType": "consumable",
-                            "count": 1,
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 1
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_slag",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 25
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_slag",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 50
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_slag",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 75
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_slag",
-                                            "count": 3
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "craft_weapon_proc",
-                            "consumable": "adventuring:weapon_proc",
-                            "outputType": "consumable",
-                            "count": 1,
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 1
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_slag",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 25
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_slag",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 50
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_slag",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 75
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_slag",
-                                            "count": 3
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "craft_serrated_edge",
-                            "consumable": "adventuring:serrated_edge",
-                            "outputType": "consumable",
-                            "count": 1,
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 1
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_slag",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 25
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_slag",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 50
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_slag",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 75
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_slag",
-                                            "count": 3
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "craft_battle_rage",
-                            "consumable": "adventuring:battle_rage",
-                            "outputType": "consumable",
-                            "count": 1,
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 1
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_slag",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 25
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_slag",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 50
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_slag",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 75
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_slag",
-                                            "count": 3
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "craft_armor_plates",
-                            "consumable": "adventuring:armor_plates",
-                            "outputType": "consumable",
-                            "count": 1,
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 1
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_slag",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 25
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_slag",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 50
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_slag",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 75
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_slag",
-                                            "count": 3
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "craft_iron_resolve",
-                            "consumable": "adventuring:iron_resolve",
-                            "outputType": "consumable",
-                            "count": 1,
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 1
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_slag",
-                                            "count": 5
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 25
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_slag",
-                                            "count": 5
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 50
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_slag",
-                                            "count": 5
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "count": 1,
-                                    "requirements": [
-                                        {
-                                            "type": "current_job_level",
-                                            "job": "adventuring:smith",
-                                            "level": 75
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_slag",
-                                            "count": 5
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ],
-                    "tiles": [
-                        {
-                            "id": "abandoned_anvil",
-                            "name": "Abandoned Anvil",
-                            "media": "melvor:assets/media/skills/smithing/smithing.png#shade=red",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:smith",
-                                    "level": 1
-                                }
-                            ],
-                            "weight": 10,
-                            "floor_max": 1,
-                            "dungeon_max": 1,
-                            "effects": [
-                                {
-                                    "type": "xp",
-                                    "amount": 30,
-                                    "job": "adventuring:smith"
-                                },
-                                {
-                                    "type": "loot",
-                                    "pool": [
-                                        {
-                                            "id": "adventuring:crude_slag",
-                                            "qty": 1,
-                                            "weight": 100
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "rusted_forge",
-                            "name": "Rusted Forge",
-                            "media": "melvor:assets/media/skills/smithing/smithing.png#shade=red",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:smith",
-                                    "level": 25
-                                }
-                            ],
-                            "weight": 8,
-                            "floor_max": 1,
-                            "dungeon_max": 2,
-                            "effects": [
-                                {
-                                    "type": "xp",
-                                    "amount": 75,
-                                    "job": "adventuring:smith"
-                                },
-                                {
-                                    "type": "loot",
-                                    "pool": [
-                                        {
-                                            "id": "adventuring:crude_slag",
-                                            "qty": 2,
-                                            "weight": 60
-                                        },
-                                        {
-                                            "id": "adventuring:refined_slag",
-                                            "qty": 1,
-                                            "weight": 40
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "master_smithy",
-                            "name": "Master Smithy",
-                            "media": "melvor:assets/media/skills/smithing/smithing.png#shade=red",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:smith",
-                                    "level": 50
-                                }
-                            ],
-                            "weight": 5,
-                            "floor_max": 1,
-                            "dungeon_max": 2,
-                            "effects": [
-                                {
-                                    "type": "xp",
-                                    "amount": 150,
-                                    "job": "adventuring:smith"
-                                },
-                                {
-                                    "type": "loot",
-                                    "pool": [
-                                        {
-                                            "id": "adventuring:crude_slag",
-                                            "qty": 1,
-                                            "weight": 30
-                                        },
-                                        {
-                                            "id": "adventuring:refined_slag",
-                                            "qty": 1,
-                                            "weight": 45
-                                        },
-                                        {
-                                            "id": "adventuring:immaculate_slag",
-                                            "qty": 1,
-                                            "weight": 25
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "legendary_foundry",
-                            "name": "Legendary Foundry",
-                            "media": "melvor:assets/media/skills/smithing/smithing.png#shade=red",
-                            "requirements": [
-                                {
-                                    "type": "current_job_level",
-                                    "job": "adventuring:smith",
-                                    "level": 75
-                                }
-                            ],
-                            "weight": 3,
-                            "floor_max": 1,
-                            "dungeon_max": 2,
-                            "effects": [
-                                {
-                                    "type": "xp",
-                                    "amount": 300,
-                                    "job": "adventuring:smith"
-                                },
-                                {
-                                    "type": "loot",
-                                    "pool": [
-                                        {
-                                            "id": "adventuring:crude_slag",
-                                            "qty": 1,
-                                            "weight": 15
-                                        },
-                                        {
-                                            "id": "adventuring:refined_slag",
-                                            "qty": 1,
-                                            "weight": 30
-                                        },
-                                        {
-                                            "id": "adventuring:immaculate_slag",
-                                            "qty": 1,
-                                            "weight": 35
-                                        },
-                                        {
-                                            "id": "adventuring:transcendent_slag",
-                                            "qty": 1,
-                                            "weight": 20
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ],
-                    "consumableTypes": [
-                        {
-                            "id": "steel_resolve",
-                            "name": "Steel Resolve",
-                            "media": "melvor:assets/media/bank/potion_smithing_i.png#shade=blue",
-                            "type": "tool",
-                            "sourceJob": "adventuring:smith",
-                            "maxCharges": 3,
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "nameSuffix": "I",
-                                    "media": "melvor:assets/media/bank/potion_smithing_i.png#shade=blue",
-                                    "flavorText": "Slaying enemies fortifies your defenses.",
-                                    "effects": [
-                                        {
-                                            "type": "buff",
-                                            "trigger": "kill",
-                                            "id": "fortify",
-                                            "stacks": 1,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_bar",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "nameSuffix": "II",
-                                    "media": "melvor:assets/media/bank/potion_smithing_i.png#shade=blue",
-                                    "flavorText": "Slaying enemies provides stronger fortification.",
-                                    "effects": [
-                                        {
-                                            "type": "buff",
-                                            "trigger": "kill",
-                                            "id": "fortify",
-                                            "stacks": 2,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_bar",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "nameSuffix": "III",
-                                    "media": "melvor:assets/media/bank/potion_smithing_i.png#shade=blue",
-                                    "flavorText": "Slaying enemies grants exceptional fortitude.",
-                                    "effects": [
-                                        {
-                                            "type": "buff",
-                                            "trigger": "kill",
-                                            "id": "fortify",
-                                            "stacks": 3,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_bar",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "nameSuffix": "IV",
-                                    "media": "melvor:assets/media/bank/potion_smithing_i.png#shade=blue",
-                                    "flavorText": "Slaying enemies makes you unbreakable.",
-                                    "effects": [
-                                        {
-                                            "type": "buff",
-                                            "trigger": "kill",
-                                            "id": "fortify",
-                                            "stacks": 4,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_bar",
-                                            "count": 3
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "reinforced_shield",
-                            "name": "Reinforced Shield",
-                            "media": "melvor:assets/media/bank/potion_smithing_i.png#shade=green",
-                            "type": "tool",
-                            "sourceJob": "adventuring:smith",
-                            "maxCharges": 3,
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "nameSuffix": "I",
-                                    "media": "melvor:assets/media/bank/potion_smithing_i.png#shade=green",
-                                    "flavorText": "Strengthens defenses when health is critical.",
-                                    "effects": [
-                                        {
-                                            "type": "reduce_damage_percent",
-                                            "trigger": "before_damage_received",
-                                            "condition": {
-                                                "type": "hp_below",
-                                                "threshold": 50
-                                            },
-                                            "amount": 30,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_bar",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "nameSuffix": "II",
-                                    "media": "melvor:assets/media/bank/potion_smithing_i.png#shade=green",
-                                    "flavorText": "Refined reinforcement provides better protection.",
-                                    "effects": [
-                                        {
-                                            "type": "reduce_damage_percent",
-                                            "trigger": "before_damage_received",
-                                            "condition": {
-                                                "type": "hp_below",
-                                                "threshold": 50
-                                            },
-                                            "amount": 40,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_bar",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "nameSuffix": "III",
-                                    "media": "melvor:assets/media/bank/potion_smithing_i.png#shade=green",
-                                    "flavorText": "Immaculate reinforcement offers superior defense.",
-                                    "effects": [
-                                        {
-                                            "type": "reduce_damage_percent",
-                                            "trigger": "before_damage_received",
-                                            "condition": {
-                                                "type": "hp_below",
-                                                "threshold": 50
-                                            },
-                                            "amount": 55,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_bar",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "nameSuffix": "IV",
-                                    "media": "melvor:assets/media/bank/potion_smithing_i.png#shade=green",
-                                    "flavorText": "Transcendent reinforcement is nearly invincible.",
-                                    "effects": [
-                                        {
-                                            "type": "reduce_damage_percent",
-                                            "trigger": "before_damage_received",
-                                            "condition": {
-                                                "type": "hp_below",
-                                                "threshold": 50
-                                            },
-                                            "amount": 70,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_bar",
-                                            "count": 3
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "weapon_blessing",
-                            "name": "Weapon Blessing",
-                            "media": "melvor:assets/media/bank/potion_smithing_i.png#shade=purple",
-                            "type": "tool",
-                            "sourceJob": "adventuring:smith",
-                            "maxCharges": 3,
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "nameSuffix": "I",
-                                    "media": "melvor:assets/media/bank/potion_smithing_i.png#shade=purple",
-                                    "flavorText": "Slaying enemies empowers your weapons.",
-                                    "effects": [
-                                        {
-                                            "type": "damage_modifier_flat",
-                                            "trigger": "kill",
-                                            "amount": 8,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_bar",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "nameSuffix": "II",
-                                    "media": "melvor:assets/media/bank/potion_smithing_i.png#shade=purple",
-                                    "flavorText": "Slaying enemies grants greater power.",
-                                    "effects": [
-                                        {
-                                            "type": "damage_modifier_flat",
-                                            "trigger": "kill",
-                                            "amount": 14,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_bar",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "nameSuffix": "III",
-                                    "media": "melvor:assets/media/bank/potion_smithing_i.png#shade=purple",
-                                    "flavorText": "Slaying enemies empowers devastatingly.",
-                                    "effects": [
-                                        {
-                                            "type": "damage_modifier_flat",
-                                            "trigger": "kill",
-                                            "amount": 22,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_bar",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "nameSuffix": "IV",
-                                    "media": "melvor:assets/media/bank/potion_smithing_i.png#shade=purple",
-                                    "flavorText": "Slaying enemies maximizes weapon power.",
-                                    "effects": [
-                                        {
-                                            "type": "damage_modifier_flat",
-                                            "trigger": "kill",
-                                            "amount": 35,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_bar",
-                                            "count": 3
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "weapon_proc",
-                            "name": "Weapon Proc",
-                            "media": "melvor:assets/media/bank/potion_smithing_i.png#shade=pink",
-                            "type": "oil",
-                            "sourceJob": "adventuring:smith",
-                            "maxCharges": 3,
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "nameSuffix": "I",
-                                    "media": "melvor:assets/media/bank/potion_smithing_i.png#shade=pink",
-                                    "flavorText": "Weapons occasionally deal bonus damage.",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "trigger": "after_damage_delivered",
-                                            "condition": {
-                                                "type": "chance",
-                                                "value": 25
-                                            },
-                                            "amount": 12,
-                                            "target": "enemy"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_bar",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "nameSuffix": "II",
-                                    "media": "melvor:assets/media/bank/potion_smithing_i.png#shade=pink",
-                                    "flavorText": "Refined weapon procs deal more damage.",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "trigger": "after_damage_delivered",
-                                            "condition": {
-                                                "type": "chance",
-                                                "value": 28
-                                            },
-                                            "amount": 20,
-                                            "target": "enemy"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_bar",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "nameSuffix": "III",
-                                    "media": "melvor:assets/media/bank/potion_smithing_i.png#shade=pink",
-                                    "flavorText": "Immaculate weapon procs devastate enemies.",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "trigger": "after_damage_delivered",
-                                            "condition": {
-                                                "type": "chance",
-                                                "value": 32
-                                            },
-                                            "amount": 32,
-                                            "target": "enemy"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_bar",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "nameSuffix": "IV",
-                                    "media": "melvor:assets/media/bank/potion_smithing_i.png#shade=pink",
-                                    "flavorText": "Transcendent weapon procs annihilate foes.",
-                                    "effects": [
-                                        {
-                                            "type": "damage_flat",
-                                            "trigger": "after_damage_delivered",
-                                            "condition": {
-                                                "type": "chance",
-                                                "value": 35
-                                            },
-                                            "amount": 50,
-                                            "target": "enemy"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_bar",
-                                            "count": 3
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "serrated_edge",
-                            "name": "Serrated Edge",
-                            "media": "melvor:assets/media/bank/potion_smithing_i.png#shade=cyan",
-                            "type": "oil",
-                            "sourceJob": "adventuring:smith",
-                            "maxCharges": 3,
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "nameSuffix": "I",
-                                    "media": "melvor:assets/media/bank/potion_smithing_i.png#shade=cyan",
-                                    "flavorText": "Critical strikes cause bleeding wounds.",
-                                    "effects": [
-                                        {
-                                            "type": "debuff",
-                                            "trigger": "crit",
-                                            "id": "bleed",
-                                            "stacks": 1,
-                                            "target": "enemy"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_bar",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "nameSuffix": "II",
-                                    "media": "melvor:assets/media/bank/potion_smithing_i.png#shade=cyan",
-                                    "flavorText": "Refined edges cause deeper wounds.",
-                                    "effects": [
-                                        {
-                                            "type": "debuff",
-                                            "trigger": "crit",
-                                            "id": "bleed",
-                                            "stacks": 2,
-                                            "target": "enemy"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_bar",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "nameSuffix": "III",
-                                    "media": "melvor:assets/media/bank/potion_smithing_i.png#shade=cyan",
-                                    "flavorText": "Immaculate serrations cause severe bleeding.",
-                                    "effects": [
-                                        {
-                                            "type": "debuff",
-                                            "trigger": "crit",
-                                            "id": "bleed",
-                                            "stacks": 3,
-                                            "target": "enemy"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_bar",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "nameSuffix": "IV",
-                                    "media": "melvor:assets/media/bank/potion_smithing_i.png#shade=cyan",
-                                    "flavorText": "Transcendent serrations cause fatal bleeding.",
-                                    "effects": [
-                                        {
-                                            "type": "debuff",
-                                            "trigger": "crit",
-                                            "id": "bleed",
-                                            "stacks": 4,
-                                            "target": "enemy"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_bar",
-                                            "count": 3
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "battle_rage",
-                            "name": "Battle Rage",
-                            "media": "melvor:assets/media/bank/potion_smithing_i.png#shade=orange",
-                            "type": "tool",
-                            "sourceJob": "adventuring:smith",
-                            "maxCharges": 3,
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "nameSuffix": "I",
-                                    "media": "melvor:assets/media/bank/potion_smithing_i.png#shade=orange",
-                                    "flavorText": "Killing enemies triggers berserker rage.",
-                                    "effects": [
-                                        {
-                                            "type": "buff",
-                                            "trigger": "kill",
-                                            "id": "berserk",
-                                            "stacks": 1,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_bar",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "nameSuffix": "II",
-                                    "media": "melvor:assets/media/bank/potion_smithing_i.png#shade=orange",
-                                    "flavorText": "Refined rage builds faster.",
-                                    "effects": [
-                                        {
-                                            "type": "buff",
-                                            "trigger": "kill",
-                                            "id": "berserk",
-                                            "stacks": 2,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_bar",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "nameSuffix": "III",
-                                    "media": "melvor:assets/media/bank/potion_smithing_i.png#shade=orange",
-                                    "flavorText": "Immaculate rage is devastating.",
-                                    "effects": [
-                                        {
-                                            "type": "buff",
-                                            "trigger": "kill",
-                                            "id": "berserk",
-                                            "stacks": 3,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_bar",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "nameSuffix": "IV",
-                                    "media": "melvor:assets/media/bank/potion_smithing_i.png#shade=orange",
-                                    "flavorText": "Transcendent rage is unstoppable.",
-                                    "effects": [
-                                        {
-                                            "type": "buff",
-                                            "trigger": "kill",
-                                            "id": "berserk",
-                                            "stacks": 4,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_bar",
-                                            "count": 3
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "armor_plates",
-                            "name": "Armor Plates",
-                            "media": "melvor:assets/media/bank/potion_smithing_i.png#shade=red",
-                            "type": "tool",
-                            "sourceJob": "adventuring:smith",
-                            "maxCharges": 3,
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "nameSuffix": "I",
-                                    "media": "melvor:assets/media/bank/potion_smithing_i.png#shade=red",
-                                    "flavorText": "Armor blocks flat damage from each hit.",
-                                    "effects": [
-                                        {
-                                            "type": "absorb",
-                                            "trigger": "before_damage_received",
-                                            "amount": 5,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_bar",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "nameSuffix": "II",
-                                    "media": "melvor:assets/media/bank/potion_smithing_i.png#shade=red",
-                                    "flavorText": "Refined plates block more damage from each hit.",
-                                    "effects": [
-                                        {
-                                            "type": "absorb",
-                                            "trigger": "before_damage_received",
-                                            "amount": 8,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_bar",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "nameSuffix": "III",
-                                    "media": "melvor:assets/media/bank/potion_smithing_i.png#shade=red",
-                                    "flavorText": "Immaculate plates offer superior blocking on each hit.",
-                                    "effects": [
-                                        {
-                                            "type": "absorb",
-                                            "trigger": "before_damage_received",
-                                            "amount": 12,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_bar",
-                                            "count": 3
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "nameSuffix": "IV",
-                                    "media": "melvor:assets/media/bank/potion_smithing_i.png#shade=red",
-                                    "flavorText": "Transcendent plates block tremendous damage from each hit.",
-                                    "effects": [
-                                        {
-                                            "type": "absorb",
-                                            "trigger": "before_damage_received",
-                                            "amount": 18,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_bar",
-                                            "count": 3
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "iron_resolve",
-                            "name": "Iron Resolve",
-                            "media": "melvor:assets/media/bank/potion_smithing_i.png#shade=yellow",
-                            "type": "tool",
-                            "sourceJob": "adventuring:smith",
-                            "maxCharges": 1,
-                            "tiers": [
-                                {
-                                    "tier": 1,
-                                    "nameSuffix": "I",
-                                    "media": "melvor:assets/media/bank/potion_smithing_i.png#shade=yellow",
-                                    "flavorText": "Metal willpower prevents death.",
-                                    "effects": [
-                                        {
-                                            "type": "prevent_death",
-                                            "trigger": "before_death",
-                                            "heal_percent": 15,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:crude_bar",
-                                            "count": 5
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 2,
-                                    "nameSuffix": "II",
-                                    "media": "melvor:assets/media/bank/potion_smithing_i.png#shade=yellow",
-                                    "flavorText": "Refined metal willpower saves you.",
-                                    "effects": [
-                                        {
-                                            "type": "prevent_death",
-                                            "trigger": "before_death",
-                                            "heal_percent": 25,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:refined_bar",
-                                            "count": 5
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 3,
-                                    "nameSuffix": "III",
-                                    "media": "melvor:assets/media/bank/potion_smithing_i.png#shade=yellow",
-                                    "flavorText": "Immaculate metal grants multiple saves.",
-                                    "effects": [
-                                        {
-                                            "type": "prevent_death",
-                                            "trigger": "before_death",
-                                            "heal_percent": 35,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:immaculate_bar",
-                                            "count": 5
-                                        }
-                                    ]
-                                },
-                                {
-                                    "tier": 4,
-                                    "nameSuffix": "IV",
-                                    "media": "melvor:assets/media/bank/potion_smithing_i.png#shade=yellow",
-                                    "flavorText": "Transcendent metal denies death itself.",
-                                    "effects": [
-                                        {
-                                            "type": "prevent_death",
-                                            "trigger": "before_death",
-                                            "heal_percent": 50,
-                                            "target": "self"
-                                        }
-                                    ],
-                                    "materials": [
-                                        {
-                                            "id": "adventuring:transcendent_bar",
-                                            "count": 5
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ]
-                }
-            }
-        ]
-    }
+	"$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
+	"namespace": "adventuring",
+	"data": {
+		"skillData": [
+			{
+				"skillID": "adventuring:Adventuring",
+				"data": {
+					"stats": [
+						{
+							"id": "smithing",
+							"name": "Smithing",
+							"media": "melvor:assets/media/skills/smithing/smithing.png#shade=red"
+						}
+					],
+					"jobs": [
+						{
+							"id": "smith",
+							"archetypes": ["town"],
+							"name": "Smith",
+							"media": "melvor:assets/media/skills/smithing/smithing.png#shade=red",
+							"requirements": [
+								{
+									"type": "skill_level",
+									"level": 5
+								}
+							],
+							"isMilestoneReward": true,
+							"isPassive": true,
+							"effects": [
+								{
+									"trigger": "passive",
+									"type": "stat_flat",
+									"stat": "adventuring:smithing",
+									"amount": {
+										"scaling": [
+											{
+												"id": "level",
+												"amount": 0.5
+											}
+										]
+									},
+									"scaleFrom": "passiveJob"
+								}
+							]
+						}
+					],
+					"materials": [
+						{
+							"id": "crude_slag",
+							"name": "Crude Slag",
+							"media": "melvor:assets/media/skills/smithing/smithing.png#shade=red",
+							"category": "adventuring:salvage"
+						},
+						{
+							"id": "refined_slag",
+							"name": "Refined Slag",
+							"media": "melvor:assets/media/bank/bronze_bar.png",
+							"tier": 2,
+							"category": "adventuring:salvage",
+							"requirements": [
+								{
+									"type": "job_level",
+									"job": "adventuring:smith",
+									"level": 25
+								}
+							]
+						},
+						{
+							"id": "immaculate_slag",
+							"name": "Immaculate Slag",
+							"media": "melvor:assets/media/bank/mithril_bar.png",
+							"tier": 3,
+							"category": "adventuring:salvage",
+							"requirements": [
+								{
+									"type": "job_level",
+									"job": "adventuring:smith",
+									"level": 50
+								}
+							]
+						},
+						{
+							"id": "transcendent_slag",
+							"name": "Transcendent Slag",
+							"media": "melvor:assets/media/bank/dragonite_bar.png#shade=yellow",
+							"tier": 4,
+							"category": "adventuring:salvage",
+							"requirements": [
+								{
+									"type": "job_level",
+									"job": "adventuring:smith",
+									"level": 75
+								}
+							]
+						},
+						{
+							"id": "forge_ember",
+							"name": "Forge Ember",
+							"media": "melvor:assets/media/skills/smithing/smithing.png#shade=orange",
+							"category": "adventuring:special"
+						}
+					],
+					"buildings": [
+						{
+							"id": "forge",
+							"type": "workshop",
+							"name": "Forge",
+							"description": "Smelt ores into bars and craft metal equipment. Smiths create weapons and armor.",
+							"media": "melvor:assets/media/skills/township/Blacksmiths_Forge.png",
+							"requirements": [],
+							"idle": [
+								"Hammering away",
+								"Stoking the fire"
+							],
+							"actions": [
+								"adventuring:work"
+							],
+							"products": [
+								"adventuring:bronze_bar",
+								"adventuring:iron_bar",
+								"adventuring:steel_bar",
+								"adventuring:mithril_bar",
+								"adventuring:adamantite_bar",
+								"adventuring:runite_bar",
+								"adventuring:dragonite_bar",
+								"adventuring:craft_forge_ember",
+								"adventuring:convert_crude_to_refined_slag",
+								"adventuring:convert_refined_to_immaculate_slag",
+								"adventuring:convert_immaculate_to_transcendent_slag",
+								"adventuring:convert_transcendent_to_immaculate_slag",
+								"adventuring:convert_immaculate_to_refined_slag",
+								"adventuring:convert_refined_to_crude_slag",
+								"adventuring:craft_steel_resolve",
+								"adventuring:craft_reinforced_shield",
+								"adventuring:craft_weapon_blessing",
+								"adventuring:craft_weapon_proc",
+								"adventuring:craft_serrated_edge",
+								"adventuring:craft_battle_rage",
+								"adventuring:craft_armor_plates",
+								"adventuring:craft_iron_resolve"
+							]
+						}
+					],
+					"products": [
+						{
+							"id": "bronze_bar",
+							"item": "melvorD:Bronze_Bar",
+							"outputType": "item",
+							"tiers": [
+								{
+									"tier": 1,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 1
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_slag",
+											"count": 1
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"count": 3,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 25
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_slag",
+											"count": 1
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"count": 8,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 50
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_slag",
+											"count": 1
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"count": 20,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 75
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_slag",
+											"count": 1
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "iron_bar",
+							"item": "melvorD:Iron_Bar",
+							"outputType": "item",
+							"tiers": [
+								{
+									"tier": 1,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 1
+										},
+										{
+											"type": "melvor_skill_level",
+											"skill": "melvorD:Smithing",
+											"level": 15
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_slag",
+											"count": 1
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"count": 3,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 25
+										},
+										{
+											"type": "melvor_skill_level",
+											"skill": "melvorD:Smithing",
+											"level": 15
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_slag",
+											"count": 1
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"count": 8,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 50
+										},
+										{
+											"type": "melvor_skill_level",
+											"skill": "melvorD:Smithing",
+											"level": 15
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_slag",
+											"count": 1
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"count": 20,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 75
+										},
+										{
+											"type": "melvor_skill_level",
+											"skill": "melvorD:Smithing",
+											"level": 15
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_slag",
+											"count": 1
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "steel_bar",
+							"item": "melvorD:Steel_Bar",
+							"outputType": "item",
+							"tiers": [
+								{
+									"tier": 1,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 1
+										},
+										{
+											"type": "melvor_skill_level",
+											"skill": "melvorD:Smithing",
+											"level": 30
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_slag",
+											"count": 1
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"count": 3,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 25
+										},
+										{
+											"type": "melvor_skill_level",
+											"skill": "melvorD:Smithing",
+											"level": 30
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_slag",
+											"count": 1
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"count": 8,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 50
+										},
+										{
+											"type": "melvor_skill_level",
+											"skill": "melvorD:Smithing",
+											"level": 30
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_slag",
+											"count": 1
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"count": 20,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 75
+										},
+										{
+											"type": "melvor_skill_level",
+											"skill": "melvorD:Smithing",
+											"level": 30
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_slag",
+											"count": 1
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "mithril_bar",
+							"item": "melvorD:Mithril_Bar",
+							"outputType": "item",
+							"tiers": [
+								{
+									"tier": 1,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 1
+										},
+										{
+											"type": "melvor_skill_level",
+											"skill": "melvorD:Smithing",
+											"level": 50
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_slag",
+											"count": 1
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"count": 3,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 25
+										},
+										{
+											"type": "melvor_skill_level",
+											"skill": "melvorD:Smithing",
+											"level": 50
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_slag",
+											"count": 1
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"count": 8,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 50
+										},
+										{
+											"type": "melvor_skill_level",
+											"skill": "melvorD:Smithing",
+											"level": 50
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_slag",
+											"count": 1
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"count": 20,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 75
+										},
+										{
+											"type": "melvor_skill_level",
+											"skill": "melvorD:Smithing",
+											"level": 50
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_slag",
+											"count": 1
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "adamantite_bar",
+							"item": "melvorD:Adamantite_Bar",
+							"outputType": "item",
+							"tiers": [
+								{
+									"tier": 1,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 1
+										},
+										{
+											"type": "melvor_skill_level",
+											"skill": "melvorD:Smithing",
+											"level": 70
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_slag",
+											"count": 1
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"count": 3,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 25
+										},
+										{
+											"type": "melvor_skill_level",
+											"skill": "melvorD:Smithing",
+											"level": 70
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_slag",
+											"count": 1
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"count": 8,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 50
+										},
+										{
+											"type": "melvor_skill_level",
+											"skill": "melvorD:Smithing",
+											"level": 70
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_slag",
+											"count": 1
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"count": 20,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 75
+										},
+										{
+											"type": "melvor_skill_level",
+											"skill": "melvorD:Smithing",
+											"level": 70
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_slag",
+											"count": 1
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "runite_bar",
+							"item": "melvorD:Runite_Bar",
+							"outputType": "item",
+							"tiers": [
+								{
+									"tier": 1,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 1
+										},
+										{
+											"type": "melvor_skill_level",
+											"skill": "melvorD:Smithing",
+											"level": 85
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_slag",
+											"count": 1
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"count": 3,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 25
+										},
+										{
+											"type": "melvor_skill_level",
+											"skill": "melvorD:Smithing",
+											"level": 85
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_slag",
+											"count": 1
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"count": 8,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 50
+										},
+										{
+											"type": "melvor_skill_level",
+											"skill": "melvorD:Smithing",
+											"level": 85
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_slag",
+											"count": 1
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"count": 20,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 75
+										},
+										{
+											"type": "melvor_skill_level",
+											"skill": "melvorD:Smithing",
+											"level": 85
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_slag",
+											"count": 1
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "dragonite_bar",
+							"item": "melvorD:Dragonite_Bar",
+							"outputType": "item",
+							"tiers": [
+								{
+									"tier": 1,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 1
+										},
+										{
+											"type": "melvor_skill_level",
+											"skill": "melvorD:Smithing",
+											"level": 99
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_slag",
+											"count": 1
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"count": 3,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 25
+										},
+										{
+											"type": "melvor_skill_level",
+											"skill": "melvorD:Smithing",
+											"level": 99
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_slag",
+											"count": 1
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"count": 8,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 50
+										},
+										{
+											"type": "melvor_skill_level",
+											"skill": "melvorD:Smithing",
+											"level": 99
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_slag",
+											"count": 1
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"count": 20,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 75
+										},
+										{
+											"type": "melvor_skill_level",
+											"skill": "melvorD:Smithing",
+											"level": 99
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_slag",
+											"count": 1
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "craft_forge_ember",
+							"material": "adventuring:forge_ember",
+							"outputType": "material",
+							"tiers": [
+								{
+									"tier": 1,
+									"count": 2,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 1
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_slag",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"count": 4,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 25
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_slag",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"count": 6,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 50
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_slag",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"count": 8,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 75
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_slag",
+											"count": 3
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "convert_crude_to_refined_slag",
+							"outputType": "conversion",
+							"tiers": [
+								{
+									"tier": 1,
+									"material": "adventuring:refined_slag",
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 25
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_slag",
+											"count": 5
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "convert_refined_to_immaculate_slag",
+							"outputType": "conversion",
+							"tiers": [
+								{
+									"tier": 1,
+									"material": "adventuring:immaculate_slag",
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 50
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_slag",
+											"count": 5
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "convert_immaculate_to_transcendent_slag",
+							"outputType": "conversion",
+							"tiers": [
+								{
+									"tier": 1,
+									"material": "adventuring:transcendent_slag",
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 75
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_slag",
+											"count": 5
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "convert_transcendent_to_immaculate_slag",
+							"outputType": "conversion",
+							"tiers": [
+								{
+									"tier": 1,
+									"material": "adventuring:immaculate_slag",
+									"count": 3,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 75
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_slag",
+											"count": 1
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "convert_immaculate_to_refined_slag",
+							"outputType": "conversion",
+							"tiers": [
+								{
+									"tier": 1,
+									"material": "adventuring:refined_slag",
+									"count": 3,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 50
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_slag",
+											"count": 1
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "convert_refined_to_crude_slag",
+							"outputType": "conversion",
+							"tiers": [
+								{
+									"tier": 1,
+									"material": "adventuring:crude_slag",
+									"count": 3,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 25
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_slag",
+											"count": 1
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "craft_steel_resolve",
+							"consumable": "adventuring:steel_resolve",
+							"outputType": "consumable",
+							"count": 1,
+							"tiers": [
+								{
+									"tier": 1,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 1
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_slag",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 25
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_slag",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 50
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_slag",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 75
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_slag",
+											"count": 3
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "craft_reinforced_shield",
+							"consumable": "adventuring:reinforced_shield",
+							"outputType": "consumable",
+							"count": 1,
+							"tiers": [
+								{
+									"tier": 1,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 1
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_slag",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 25
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_slag",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 50
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_slag",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 75
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_slag",
+											"count": 3
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "craft_weapon_blessing",
+							"consumable": "adventuring:weapon_blessing",
+							"outputType": "consumable",
+							"count": 1,
+							"tiers": [
+								{
+									"tier": 1,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 1
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_slag",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 25
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_slag",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 50
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_slag",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 75
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_slag",
+											"count": 3
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "craft_weapon_proc",
+							"consumable": "adventuring:weapon_proc",
+							"outputType": "consumable",
+							"count": 1,
+							"tiers": [
+								{
+									"tier": 1,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 1
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_slag",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 25
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_slag",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 50
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_slag",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 75
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_slag",
+											"count": 3
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "craft_serrated_edge",
+							"consumable": "adventuring:serrated_edge",
+							"outputType": "consumable",
+							"count": 1,
+							"tiers": [
+								{
+									"tier": 1,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 1
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_slag",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 25
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_slag",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 50
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_slag",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 75
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_slag",
+											"count": 3
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "craft_battle_rage",
+							"consumable": "adventuring:battle_rage",
+							"outputType": "consumable",
+							"count": 1,
+							"tiers": [
+								{
+									"tier": 1,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 1
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_slag",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 25
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_slag",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 50
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_slag",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 75
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_slag",
+											"count": 3
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "craft_armor_plates",
+							"consumable": "adventuring:armor_plates",
+							"outputType": "consumable",
+							"count": 1,
+							"tiers": [
+								{
+									"tier": 1,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 1
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_slag",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 25
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_slag",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 50
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_slag",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 75
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_slag",
+											"count": 3
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "craft_iron_resolve",
+							"consumable": "adventuring:iron_resolve",
+							"outputType": "consumable",
+							"count": 1,
+							"tiers": [
+								{
+									"tier": 1,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 1
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_slag",
+											"count": 5
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 25
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_slag",
+											"count": 5
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 50
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_slag",
+											"count": 5
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"count": 1,
+									"requirements": [
+										{
+											"type": "current_job_level",
+											"job": "adventuring:smith",
+											"level": 75
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_slag",
+											"count": 5
+										}
+									]
+								}
+							]
+						}
+					],
+					"tiles": [
+						{
+							"id": "abandoned_anvil",
+							"name": "Abandoned Anvil",
+							"media": "melvor:assets/media/skills/smithing/smithing.png#shade=red",
+							"requirements": [
+								{
+									"type": "current_job_level",
+									"job": "adventuring:smith",
+									"level": 1
+								}
+							],
+							"weight": 10,
+							"floor_max": 1,
+							"dungeon_max": 1,
+							"effects": [
+								{
+									"type": "xp",
+									"amount": 30,
+									"job": "adventuring:smith"
+								},
+								{
+									"type": "loot",
+									"pool": [
+										{
+											"id": "adventuring:crude_slag",
+											"qty": 1,
+											"weight": 100
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "rusted_forge",
+							"name": "Rusted Forge",
+							"media": "melvor:assets/media/skills/smithing/smithing.png#shade=red",
+							"requirements": [
+								{
+									"type": "current_job_level",
+									"job": "adventuring:smith",
+									"level": 25
+								}
+							],
+							"weight": 8,
+							"floor_max": 1,
+							"dungeon_max": 2,
+							"effects": [
+								{
+									"type": "xp",
+									"amount": 75,
+									"job": "adventuring:smith"
+								},
+								{
+									"type": "loot",
+									"pool": [
+										{
+											"id": "adventuring:crude_slag",
+											"qty": 2,
+											"weight": 60
+										},
+										{
+											"id": "adventuring:refined_slag",
+											"qty": 1,
+											"weight": 40
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "master_smithy",
+							"name": "Master Smithy",
+							"media": "melvor:assets/media/skills/smithing/smithing.png#shade=red",
+							"requirements": [
+								{
+									"type": "current_job_level",
+									"job": "adventuring:smith",
+									"level": 50
+								}
+							],
+							"weight": 5,
+							"floor_max": 1,
+							"dungeon_max": 2,
+							"effects": [
+								{
+									"type": "xp",
+									"amount": 150,
+									"job": "adventuring:smith"
+								},
+								{
+									"type": "loot",
+									"pool": [
+										{
+											"id": "adventuring:crude_slag",
+											"qty": 1,
+											"weight": 30
+										},
+										{
+											"id": "adventuring:refined_slag",
+											"qty": 1,
+											"weight": 45
+										},
+										{
+											"id": "adventuring:immaculate_slag",
+											"qty": 1,
+											"weight": 25
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "legendary_foundry",
+							"name": "Legendary Foundry",
+							"media": "melvor:assets/media/skills/smithing/smithing.png#shade=red",
+							"requirements": [
+								{
+									"type": "current_job_level",
+									"job": "adventuring:smith",
+									"level": 75
+								}
+							],
+							"weight": 3,
+							"floor_max": 1,
+							"dungeon_max": 2,
+							"effects": [
+								{
+									"type": "xp",
+									"amount": 300,
+									"job": "adventuring:smith"
+								},
+								{
+									"type": "loot",
+									"pool": [
+										{
+											"id": "adventuring:crude_slag",
+											"qty": 1,
+											"weight": 15
+										},
+										{
+											"id": "adventuring:refined_slag",
+											"qty": 1,
+											"weight": 30
+										},
+										{
+											"id": "adventuring:immaculate_slag",
+											"qty": 1,
+											"weight": 35
+										},
+										{
+											"id": "adventuring:transcendent_slag",
+											"qty": 1,
+											"weight": 20
+										}
+									]
+								}
+							]
+						}
+					],
+					"consumableTypes": [
+						{
+							"id": "steel_resolve",
+							"name": "Steel Resolve",
+							"media": "melvor:assets/media/bank/potion_smithing_i.png#shade=blue",
+							"type": "tool",
+							"sourceJob": "adventuring:smith",
+							"maxCharges": 3,
+							"tiers": [
+								{
+									"tier": 1,
+									"nameSuffix": "I",
+									"media": "melvor:assets/media/bank/potion_smithing_i.png#shade=blue",
+									"flavorText": "Slaying enemies fortifies your defenses.",
+									"effects": [
+										{
+											"type": "buff",
+											"trigger": "kill",
+											"id": "fortify",
+											"stacks": 1,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_bar",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"nameSuffix": "II",
+									"media": "melvor:assets/media/bank/potion_smithing_i.png#shade=blue",
+									"flavorText": "Slaying enemies provides stronger fortification.",
+									"effects": [
+										{
+											"type": "buff",
+											"trigger": "kill",
+											"id": "fortify",
+											"stacks": 2,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_bar",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"nameSuffix": "III",
+									"media": "melvor:assets/media/bank/potion_smithing_i.png#shade=blue",
+									"flavorText": "Slaying enemies grants exceptional fortitude.",
+									"effects": [
+										{
+											"type": "buff",
+											"trigger": "kill",
+											"id": "fortify",
+											"stacks": 3,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_bar",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"nameSuffix": "IV",
+									"media": "melvor:assets/media/bank/potion_smithing_i.png#shade=blue",
+									"flavorText": "Slaying enemies makes you unbreakable.",
+									"effects": [
+										{
+											"type": "buff",
+											"trigger": "kill",
+											"id": "fortify",
+											"stacks": 4,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_bar",
+											"count": 3
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "reinforced_shield",
+							"name": "Reinforced Shield",
+							"media": "melvor:assets/media/bank/potion_smithing_i.png#shade=green",
+							"type": "tool",
+							"sourceJob": "adventuring:smith",
+							"maxCharges": 3,
+							"tiers": [
+								{
+									"tier": 1,
+									"nameSuffix": "I",
+									"media": "melvor:assets/media/bank/potion_smithing_i.png#shade=green",
+									"flavorText": "Strengthens defenses when health is critical.",
+									"effects": [
+										{
+											"type": "reduce_damage_percent",
+											"trigger": "before_damage_received",
+											"condition": {
+												"type": "hp_below",
+												"threshold": 50
+											},
+											"amount": 30,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_bar",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"nameSuffix": "II",
+									"media": "melvor:assets/media/bank/potion_smithing_i.png#shade=green",
+									"flavorText": "Refined reinforcement provides better protection.",
+									"effects": [
+										{
+											"type": "reduce_damage_percent",
+											"trigger": "before_damage_received",
+											"condition": {
+												"type": "hp_below",
+												"threshold": 50
+											},
+											"amount": 40,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_bar",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"nameSuffix": "III",
+									"media": "melvor:assets/media/bank/potion_smithing_i.png#shade=green",
+									"flavorText": "Immaculate reinforcement offers superior defense.",
+									"effects": [
+										{
+											"type": "reduce_damage_percent",
+											"trigger": "before_damage_received",
+											"condition": {
+												"type": "hp_below",
+												"threshold": 50
+											},
+											"amount": 55,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_bar",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"nameSuffix": "IV",
+									"media": "melvor:assets/media/bank/potion_smithing_i.png#shade=green",
+									"flavorText": "Transcendent reinforcement is nearly invincible.",
+									"effects": [
+										{
+											"type": "reduce_damage_percent",
+											"trigger": "before_damage_received",
+											"condition": {
+												"type": "hp_below",
+												"threshold": 50
+											},
+											"amount": 70,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_bar",
+											"count": 3
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "weapon_blessing",
+							"name": "Weapon Blessing",
+							"media": "melvor:assets/media/bank/potion_smithing_i.png#shade=purple",
+							"type": "tool",
+							"sourceJob": "adventuring:smith",
+							"maxCharges": 3,
+							"tiers": [
+								{
+									"tier": 1,
+									"nameSuffix": "I",
+									"media": "melvor:assets/media/bank/potion_smithing_i.png#shade=purple",
+									"flavorText": "Slaying enemies empowers your weapons.",
+									"effects": [
+										{
+											"type": "damage_modifier_flat",
+											"trigger": "kill",
+											"amount": 8,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_bar",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"nameSuffix": "II",
+									"media": "melvor:assets/media/bank/potion_smithing_i.png#shade=purple",
+									"flavorText": "Slaying enemies grants greater power.",
+									"effects": [
+										{
+											"type": "damage_modifier_flat",
+											"trigger": "kill",
+											"amount": 14,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_bar",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"nameSuffix": "III",
+									"media": "melvor:assets/media/bank/potion_smithing_i.png#shade=purple",
+									"flavorText": "Slaying enemies empowers devastatingly.",
+									"effects": [
+										{
+											"type": "damage_modifier_flat",
+											"trigger": "kill",
+											"amount": 22,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_bar",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"nameSuffix": "IV",
+									"media": "melvor:assets/media/bank/potion_smithing_i.png#shade=purple",
+									"flavorText": "Slaying enemies maximizes weapon power.",
+									"effects": [
+										{
+											"type": "damage_modifier_flat",
+											"trigger": "kill",
+											"amount": 35,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_bar",
+											"count": 3
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "weapon_proc",
+							"name": "Weapon Proc",
+							"media": "melvor:assets/media/bank/potion_smithing_i.png#shade=pink",
+							"type": "oil",
+							"sourceJob": "adventuring:smith",
+							"maxCharges": 3,
+							"tiers": [
+								{
+									"tier": 1,
+									"nameSuffix": "I",
+									"media": "melvor:assets/media/bank/potion_smithing_i.png#shade=pink",
+									"flavorText": "Weapons occasionally deal bonus damage.",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"trigger": "after_damage_delivered",
+											"condition": {
+												"type": "chance",
+												"value": 25
+											},
+											"amount": 12,
+											"target": "enemy"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_bar",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"nameSuffix": "II",
+									"media": "melvor:assets/media/bank/potion_smithing_i.png#shade=pink",
+									"flavorText": "Refined weapon procs deal more damage.",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"trigger": "after_damage_delivered",
+											"condition": {
+												"type": "chance",
+												"value": 28
+											},
+											"amount": 20,
+											"target": "enemy"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_bar",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"nameSuffix": "III",
+									"media": "melvor:assets/media/bank/potion_smithing_i.png#shade=pink",
+									"flavorText": "Immaculate weapon procs devastate enemies.",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"trigger": "after_damage_delivered",
+											"condition": {
+												"type": "chance",
+												"value": 32
+											},
+											"amount": 32,
+											"target": "enemy"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_bar",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"nameSuffix": "IV",
+									"media": "melvor:assets/media/bank/potion_smithing_i.png#shade=pink",
+									"flavorText": "Transcendent weapon procs annihilate foes.",
+									"effects": [
+										{
+											"type": "damage_flat",
+											"trigger": "after_damage_delivered",
+											"condition": {
+												"type": "chance",
+												"value": 35
+											},
+											"amount": 50,
+											"target": "enemy"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_bar",
+											"count": 3
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "serrated_edge",
+							"name": "Serrated Edge",
+							"media": "melvor:assets/media/bank/potion_smithing_i.png#shade=cyan",
+							"type": "oil",
+							"sourceJob": "adventuring:smith",
+							"maxCharges": 3,
+							"tiers": [
+								{
+									"tier": 1,
+									"nameSuffix": "I",
+									"media": "melvor:assets/media/bank/potion_smithing_i.png#shade=cyan",
+									"flavorText": "Critical strikes cause bleeding wounds.",
+									"effects": [
+										{
+											"type": "debuff",
+											"trigger": "crit",
+											"id": "bleed",
+											"stacks": 1,
+											"target": "enemy"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_bar",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"nameSuffix": "II",
+									"media": "melvor:assets/media/bank/potion_smithing_i.png#shade=cyan",
+									"flavorText": "Refined edges cause deeper wounds.",
+									"effects": [
+										{
+											"type": "debuff",
+											"trigger": "crit",
+											"id": "bleed",
+											"stacks": 2,
+											"target": "enemy"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_bar",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"nameSuffix": "III",
+									"media": "melvor:assets/media/bank/potion_smithing_i.png#shade=cyan",
+									"flavorText": "Immaculate serrations cause severe bleeding.",
+									"effects": [
+										{
+											"type": "debuff",
+											"trigger": "crit",
+											"id": "bleed",
+											"stacks": 3,
+											"target": "enemy"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_bar",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"nameSuffix": "IV",
+									"media": "melvor:assets/media/bank/potion_smithing_i.png#shade=cyan",
+									"flavorText": "Transcendent serrations cause fatal bleeding.",
+									"effects": [
+										{
+											"type": "debuff",
+											"trigger": "crit",
+											"id": "bleed",
+											"stacks": 4,
+											"target": "enemy"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_bar",
+											"count": 3
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "battle_rage",
+							"name": "Battle Rage",
+							"media": "melvor:assets/media/bank/potion_smithing_i.png#shade=orange",
+							"type": "tool",
+							"sourceJob": "adventuring:smith",
+							"maxCharges": 3,
+							"tiers": [
+								{
+									"tier": 1,
+									"nameSuffix": "I",
+									"media": "melvor:assets/media/bank/potion_smithing_i.png#shade=orange",
+									"flavorText": "Killing enemies triggers berserker rage.",
+									"effects": [
+										{
+											"type": "buff",
+											"trigger": "kill",
+											"id": "berserk",
+											"stacks": 1,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_bar",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"nameSuffix": "II",
+									"media": "melvor:assets/media/bank/potion_smithing_i.png#shade=orange",
+									"flavorText": "Refined rage builds faster.",
+									"effects": [
+										{
+											"type": "buff",
+											"trigger": "kill",
+											"id": "berserk",
+											"stacks": 2,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_bar",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"nameSuffix": "III",
+									"media": "melvor:assets/media/bank/potion_smithing_i.png#shade=orange",
+									"flavorText": "Immaculate rage is devastating.",
+									"effects": [
+										{
+											"type": "buff",
+											"trigger": "kill",
+											"id": "berserk",
+											"stacks": 3,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_bar",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"nameSuffix": "IV",
+									"media": "melvor:assets/media/bank/potion_smithing_i.png#shade=orange",
+									"flavorText": "Transcendent rage is unstoppable.",
+									"effects": [
+										{
+											"type": "buff",
+											"trigger": "kill",
+											"id": "berserk",
+											"stacks": 4,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_bar",
+											"count": 3
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "armor_plates",
+							"name": "Armor Plates",
+							"media": "melvor:assets/media/bank/potion_smithing_i.png#shade=red",
+							"type": "tool",
+							"sourceJob": "adventuring:smith",
+							"maxCharges": 3,
+							"tiers": [
+								{
+									"tier": 1,
+									"nameSuffix": "I",
+									"media": "melvor:assets/media/bank/potion_smithing_i.png#shade=red",
+									"flavorText": "Armor blocks flat damage from each hit.",
+									"effects": [
+										{
+											"type": "absorb",
+											"trigger": "before_damage_received",
+											"amount": 5,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_bar",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"nameSuffix": "II",
+									"media": "melvor:assets/media/bank/potion_smithing_i.png#shade=red",
+									"flavorText": "Refined plates block more damage from each hit.",
+									"effects": [
+										{
+											"type": "absorb",
+											"trigger": "before_damage_received",
+											"amount": 8,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_bar",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"nameSuffix": "III",
+									"media": "melvor:assets/media/bank/potion_smithing_i.png#shade=red",
+									"flavorText": "Immaculate plates offer superior blocking on each hit.",
+									"effects": [
+										{
+											"type": "absorb",
+											"trigger": "before_damage_received",
+											"amount": 12,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_bar",
+											"count": 3
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"nameSuffix": "IV",
+									"media": "melvor:assets/media/bank/potion_smithing_i.png#shade=red",
+									"flavorText": "Transcendent plates block tremendous damage from each hit.",
+									"effects": [
+										{
+											"type": "absorb",
+											"trigger": "before_damage_received",
+											"amount": 18,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_bar",
+											"count": 3
+										}
+									]
+								}
+							]
+						},
+						{
+							"id": "iron_resolve",
+							"name": "Iron Resolve",
+							"media": "melvor:assets/media/bank/potion_smithing_i.png#shade=yellow",
+							"type": "tool",
+							"sourceJob": "adventuring:smith",
+							"maxCharges": 1,
+							"tiers": [
+								{
+									"tier": 1,
+									"nameSuffix": "I",
+									"media": "melvor:assets/media/bank/potion_smithing_i.png#shade=yellow",
+									"flavorText": "Metal willpower prevents death.",
+									"effects": [
+										{
+											"type": "prevent_death",
+											"trigger": "before_death",
+											"heal_percent": 15,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:crude_bar",
+											"count": 5
+										}
+									]
+								},
+								{
+									"tier": 2,
+									"nameSuffix": "II",
+									"media": "melvor:assets/media/bank/potion_smithing_i.png#shade=yellow",
+									"flavorText": "Refined metal willpower saves you.",
+									"effects": [
+										{
+											"type": "prevent_death",
+											"trigger": "before_death",
+											"heal_percent": 25,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:refined_bar",
+											"count": 5
+										}
+									]
+								},
+								{
+									"tier": 3,
+									"nameSuffix": "III",
+									"media": "melvor:assets/media/bank/potion_smithing_i.png#shade=yellow",
+									"flavorText": "Immaculate metal grants multiple saves.",
+									"effects": [
+										{
+											"type": "prevent_death",
+											"trigger": "before_death",
+											"heal_percent": 35,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:immaculate_bar",
+											"count": 5
+										}
+									]
+								},
+								{
+									"tier": 4,
+									"nameSuffix": "IV",
+									"media": "melvor:assets/media/bank/potion_smithing_i.png#shade=yellow",
+									"flavorText": "Transcendent metal denies death itself.",
+									"effects": [
+										{
+											"type": "prevent_death",
+											"trigger": "before_death",
+											"heal_percent": 50,
+											"target": "self"
+										}
+									],
+									"materials": [
+										{
+											"id": "adventuring:transcendent_bar",
+											"count": 5
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
+		]
+	}
 }

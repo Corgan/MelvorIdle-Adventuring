@@ -1,391 +1,213 @@
 {
-    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
-    "namespace": "adventuring",
-    "data": {
-        "skillData": [{
-            "skillID": "adventuring:Adventuring",
-            "data": {
-                "jobs": [
-                    {
-                        "id": "archmage",
-                        "tier": 4,
-                        "name": "Archmage",
-                        "media": "melvor:assets/media/skills/magic/magic.png#tint=yellow",
-                        "requirements": [
-                            { "type": "job_level", "job": "adventuring:battlemage", "level": 25 },
-                            { "type": "job_level", "job": "adventuring:inquisitor", "level": 20 },
-                            { "type": "area_mastery", "area": "adventuring:hall_of_wizards", "level": 50 }
-                        ],
-                        "isMilestoneReward": true,
-                        "allowedItems": [
-                            "adventuring:hat",
-                            "adventuring:robes",
-                            "adventuring:bottoms",
-                            "adventuring:mitts",
-                            "adventuring:slippers",
-                            "adventuring:amulet",
-                            "adventuring:ring",
-                            "adventuring:cape",
-                            "adventuring:staff",
-                            "adventuring:wand",
-                            "adventuring:spellbook"
-                        ],
-                        "scaling": [
-                            { "id": "adventuring:hitpoints", "amount": 1.0 },
-                            { "id": "adventuring:defence", "amount": 0.5 },
-                            { "id": "adventuring:agility", "amount": 0.75 },
-                            { "id": "adventuring:magic", "amount": 3.5 },
-                            { "id": "adventuring:prayer", "amount": 0.5 }
-                        ]
-                    }
-                ],
-                "generators": [
-                    {
-                        "id": "arcane_barrage",
-                        "name": "Arcane Barrage",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:archmage", "level": 1 }
-                        ],
-                        "energy": 30,
-                        "hits": [
-                            {
-                                "target": "random",
-                                "party": "enemy",
-                                "delay": 100,
-                                "repeat": 3,
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 12,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "amount": 0.35 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "primal_surge",
-                        "name": "Primal Surge",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:archmage", "level": 20 }
-                        ],
-                        "energy": 35,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 25,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "amount": 0.7 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:burn",
-                                        "stacks": {
-                                            "base": 3,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "amount": 0.1 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:chill",
-                                        "stacks": {
-                                            "base": 3,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "amount": 0.1 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ],
-                "spenders": [
-                    {
-                        "id": "arcane_storm",
-                        "name": "Arcane Storm",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:archmage", "level": 10 }
-                        ],
-                        "cost": 160,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "enemy",
-                                "delay": 150,
-                                "repeat": 2,
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 20,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "amount": 0.6 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "prismatic_bolt",
-                        "name": "Prismatic Bolt",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:archmage", "level": 15 }
-                        ],
-                        "cost": 150,
-                        "hits": [
-                            {
-                                "target": "lowest",
-                                "party": "enemy",
-                                "delay": 100,
-                                "repeat": 3,
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 18,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "amount": 0.5 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:shock",
-                                        "stacks": {
-                                            "base": 2,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "amount": 0.1 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "elemental_nova",
-                        "name": "Elemental Nova",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:archmage", "level": 20 }
-                        ],
-                        "cost": 165,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 25,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "amount": 0.7 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:burn",
-                                        "stacks": {
-                                            "base": 2,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "amount": 0.1 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:chill",
-                                        "stacks": {
-                                            "base": 2,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "amount": 0.1 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:shock",
-                                        "stacks": {
-                                            "base": 2,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "amount": 0.1 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "arcane_empowerment",
-                        "name": "Arcane Empowerment",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:archmage", "level": 25 }
-                        ],
-                        "cost": 150,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "ally",
-                                "effects": [
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:arcane_power",
-                                        "stacks": {
-                                            "base": 5,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "amount": 0.25 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "arcane_apocalypse",
-                        "name": "Arcane Apocalypse",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:archmage", "level": 40 }
-                        ],
-                        "cost": 250,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 60,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "amount": 2.0 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:burn",
-                                        "stacks": {
-                                            "base": 4,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "amount": 0.15 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:chill",
-                                        "stacks": {
-                                            "base": 4,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "amount": 0.15 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:curse",
-                                        "stacks": {
-                                            "base": 4,
-                                            "scaling": [
-                                                { "id": "adventuring:magic", "amount": 0.15 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ],
-                "passives": [
-                    {
-                        "id": "arcane_mastery",
-                        "name": "Arcane Mastery",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:archmage", "level": 30 }
-                        ],
-                        "effects": [
-                            {
-                                "trigger": "encounter_start",
-                                "type": "buff",
-                                "target": "self",
-                                "id": "adventuring:arcane_power",
-                                "stacks": {
-                                    "base": 6,
-                                    "scaling": [
-                                        { "id": "adventuring:magic", "amount": 0.3 }
-                                    ]
-                                }
-                            },
-                            {
-                                "trigger": "encounter_start",
-                                "type": "buff",
-                                "target": "self",
-                                "id": "adventuring:barrier",
-                                "stacks": {
-                                    "base": 8,
-                                    "scaling": [
-                                        { "id": "adventuring:magic", "amount": 0.5 }
-                                    ]
-                                }
-                            }
-                        ]
-                    },
-                    {
-                        "id": "ley_line_connection",
-                        "name": "Ley Line Connection",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:archmage", "level": 25 }
-                        ],
-                        "effects": [
-                            {
-                                "trigger": "encounter_start",
-                                "type": "buff",
-                                "target": "all",
-                                "party": "ally",
-                                "id": "adventuring:arcane_power",
-                                "stacks": {
-                                    "base": 3,
-                                    "scaling": [
-                                        { "id": "adventuring:magic", "amount": 0.15 }
-                                    ]
-                                }
-                            },
-                            {
-                                "trigger": "encounter_start",
-                                "type": "debuff",
-                                "target": "all",
-                                "party": "enemy",
-                                "id": "adventuring:vulnerability",
-                                "stacks": {
-                                    "base": 2,
-                                    "scaling": [
-                                        { "id": "adventuring:magic", "amount": 0.1 }
-                                    ]
-                                }
-                            }
-                        ]
-                    }
-                ]
-            }
-        }]
-    }
+	"$schema": "../job_schema.json",
+	"namespace": "adventuring",
+	"packages": {
+		"combat_jobs": {
+			"jobs": {
+				"archmage": {
+					"name": "Archmage",
+					"tier": 4,
+					"media": "assets/jobs/archmage.png",
+					"requirements": [
+						{ "type": "job_level", "job": "adventuring:battlemage", "level": 25 },
+						{ "type": "job_level", "job": "adventuring:inquisitor", "level": 20 }
+					],
+					"abilities": [
+						{
+							"id": "arcane_barrage",
+							"name": "Arcane Barrage",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "A barrage of arcane bolts striking random enemies.",
+							"energy": 30,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:archmage", "level": 1 }],
+							"hits": [{ "target": "random", "party": "enemy", "delay": 100, "repeat": 3, "effects": [
+								{ "type": "damage_flat", "amount": { "base": 6, "scaling": [{ "id": "adventuring:magic", "amount": 0.35 }] } }
+							] }]
+						},
+						{
+							"id": "arcane_storm",
+							"name": "Arcane Storm",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "A storm of arcane energy damages all enemies.",
+							"cost": 150,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:archmage", "level": 1 }],
+							"hits": [{ "target": "all", "party": "enemy", "delay": 150, "repeat": 2, "effects": [
+								{ "type": "damage_flat", "amount": { "base": 10, "scaling": [{ "id": "adventuring:magic", "amount": 0.6 }] } }
+							] }]
+						},
+						{
+							"id": "primal_surge",
+							"name": "Primal Surge",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "A surge of primal magic inflicts burning and chilling wounds.",
+							"energy": 30,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:archmage", "level": 10 }],
+							"hits": [{ "target": "front", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 12, "scaling": [{ "id": "adventuring:magic", "amount": 0.6 }] } },
+								{ "type": "debuff", "id": "adventuring:burn", "stacks": { "base": 3, "scaling": [{ "id": "adventuring:magic", "amount": 0.1 }] } },
+								{ "type": "debuff", "id": "adventuring:chill", "stacks": { "base": 3, "scaling": [{ "id": "adventuring:magic", "amount": 0.1 }] } }
+							] }]
+						},
+						{
+							"id": "prismatic_bolt",
+							"name": "Prismatic Bolt",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "Prismatic energy strikes the weakest enemy repeatedly.",
+							"cost": 150,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:archmage", "level": 15 }],
+							"hits": [{ "target": "lowest", "party": "enemy", "delay": 100, "repeat": 3, "effects": [
+								{ "type": "damage_flat", "amount": { "base": 9, "scaling": [{ "id": "adventuring:magic", "amount": 0.5 }] } },
+								{ "type": "debuff", "id": "adventuring:shock", "stacks": { "base": 2, "scaling": [{ "id": "adventuring:magic", "amount": 0.1 }] } }
+							] }]
+						},
+						{
+							"id": "ley_line_connection",
+							"name": "Ley Line Connection",
+							"type": "passive",
+							"media": "assets/abilities/passive.png",
+							"description": "Connection to ley lines empowers allies and weakens foes.",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:archmage", "level": 20 }],
+							"effects": [
+								{ "trigger": "encounter_start", "type": "buff", "target": "all", "party": "ally", "id": "adventuring:arcane_power", "stacks": { "base": 4, "scaling": [{ "id": "adventuring:magic", "amount": 0.2 }] } },
+								{ "trigger": "encounter_start", "type": "debuff", "target": "all", "party": "enemy", "id": "adventuring:vulnerable", "stacks": { "base": 3, "scaling": [{ "id": "adventuring:magic", "amount": 0.1 }] } }
+							]
+						},
+						{
+							"id": "arcane_torrent",
+							"name": "Arcane Torrent",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "A torrent of arcane energy shocks all enemies.",
+							"energy": 30,
+							"requirements": [{ "type": "job_level", "job": "adventuring:archmage", "level": 25 }],
+							"hits": [{ "target": "all", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 8, "scaling": [{ "id": "adventuring:magic", "amount": 0.45 }] } },
+								{ "type": "debuff", "id": "adventuring:shock", "stacks": { "base": 2, "scaling": [{ "id": "adventuring:magic", "amount": 0.1 }] } }
+							] }]
+						},
+						{
+							"id": "arcane_supremacy",
+							"name": "Arcane Supremacy",
+							"type": "passive",
+							"media": "assets/abilities/passive.png",
+							"description": "Critical hits unleash additional arcane power.",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:archmage", "level": 40 }],
+							"effects": [
+								{ "trigger": "crit", "type": "buff", "target": "self", "id": "adventuring:arcane_power", "stacks": { "base": 3, "scaling": [{ "id": "adventuring:magic", "amount": 0.15 }] } },
+								{ "trigger": "crit", "type": "debuff", "target": "all", "party": "enemy", "id": "adventuring:shock", "stacks": 2 }
+							]
+						},
+						{
+							"id": "elemental_nova",
+							"name": "Elemental Nova",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "An explosion of all elements devastates enemies.",
+							"cost": 170,
+							"requirements": [{ "type": "job_level", "job": "adventuring:archmage", "level": 50 }],
+							"hits": [{ "target": "all", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 15, "scaling": [{ "id": "adventuring:magic", "amount": 0.8 }] } },
+								{ "type": "debuff", "id": "adventuring:burn", "stacks": { "base": 3, "scaling": [{ "id": "adventuring:magic", "amount": 0.1 }] } },
+								{ "type": "debuff", "id": "adventuring:chill", "stacks": { "base": 3, "scaling": [{ "id": "adventuring:magic", "amount": 0.1 }] } },
+								{ "type": "debuff", "id": "adventuring:shock", "stacks": { "base": 3, "scaling": [{ "id": "adventuring:magic", "amount": 0.1 }] } }
+							] }]
+						},
+						{
+							"id": "reality_warp",
+							"name": "Reality Warp",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "Warps reality to deal massive damage amplified by arcane power.",
+							"energy": 35,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:archmage", "level": 60 }],
+							"hits": [{ "target": "front", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 20, "scaling": [
+									{ "id": "adventuring:magic", "amount": 0.9 },
+									{ "id": "adventuring:arcane_power", "scaleFrom": "buff", "scaleTarget": "caster", "amount": 3, "consume": false }
+								] } },
+								{ "type": "debuff", "id": "adventuring:vulnerable", "stacks": { "base": 4, "scaling": [{ "id": "adventuring:magic", "amount": 0.15 }] } }
+							] }]
+						},
+						{
+							"id": "arcane_empowerment",
+							"name": "Arcane Empowerment",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "Empowers the entire party with arcane energy.",
+							"cost": 180,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:archmage", "level": 70 }],
+							"hits": [{ "target": "all", "party": "ally", "effects": [
+								{ "type": "buff", "id": "adventuring:arcane_power", "stacks": { "base": 6, "scaling": [{ "id": "adventuring:magic", "amount": 0.3 }] } },
+								{ "type": "buff", "id": "adventuring:haste", "stacks": { "base": 3, "scaling": [{ "id": "adventuring:magic", "amount": 0.1 }] } }
+							] }]
+						},
+						{
+							"id": "spell_weaver",
+							"name": "Spell Weaver",
+							"type": "passive",
+							"media": "assets/abilities/passive.png",
+							"description": "Each spell cast strengthens the archmage's power.",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:archmage", "level": 80 }],
+							"effects": [
+								{ "trigger": "after_damage_delivered", "type": "buff", "target": "self", "id": "adventuring:arcane_power", "stacks": 1 }
+							]
+						},
+						{
+							"id": "dimensional_rift",
+							"name": "Dimensional Rift",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "Opens a rift that devastates enemies with all elements.",
+							"energy": 40,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:archmage", "level": 90 }],
+							"hits": [{ "target": "all", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 18, "scaling": [{ "id": "adventuring:magic", "amount": 0.9 }] } },
+								{ "type": "debuff", "id": "adventuring:burn", "stacks": 3 },
+								{ "type": "debuff", "id": "adventuring:chill", "stacks": 3 },
+								{ "type": "debuff", "id": "adventuring:shock", "stacks": 3 },
+								{ "type": "debuff", "id": "adventuring:vulnerable", "stacks": 3 }
+							] }]
+						},
+						{
+							"id": "arcane_apocalypse",
+							"name": "Arcane Apocalypse",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "The ultimate arcane spell - annihilates enemies in three devastating waves.",
+							"cost": 220,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:archmage", "level": 99 }],
+							"hits": [
+								{ "target": "all", "party": "enemy", "delay": 0, "effects": [
+									{ "type": "damage_flat", "amount": { "base": 25, "scaling": [
+										{ "id": "adventuring:magic", "amount": 1.2 },
+										{ "id": "adventuring:burn", "scaleFrom": "debuff", "scaleTarget": "target", "amount": 5, "consume": false }
+									] } },
+									{ "type": "debuff", "id": "adventuring:shock", "stacks": 4 }
+								] },
+								{ "target": "all", "party": "enemy", "delay": 200, "effects": [
+									{ "type": "damage_flat", "amount": { "base": 25, "scaling": [
+										{ "id": "adventuring:magic", "amount": 1.2 },
+										{ "id": "adventuring:chill", "scaleFrom": "debuff", "scaleTarget": "target", "amount": 5, "consume": false }
+									] } },
+									{ "type": "debuff", "id": "adventuring:burn", "stacks": 4 }
+								] },
+								{ "target": "all", "party": "enemy", "delay": 400, "effects": [
+									{ "type": "damage_flat", "amount": { "base": 30, "scaling": [
+										{ "id": "adventuring:magic", "amount": 1.5 },
+										{ "id": "adventuring:burn", "scaleFrom": "debuff", "scaleTarget": "target", "amount": 5, "consume": true },
+										{ "id": "adventuring:chill", "scaleFrom": "debuff", "scaleTarget": "target", "amount": 5, "consume": true },
+										{ "id": "adventuring:shock", "scaleFrom": "debuff", "scaleTarget": "target", "amount": 5, "consume": true }
+									] } }
+								] }
+							]
+						}
+					]
+				}
+			}
+		}
+	}
 }

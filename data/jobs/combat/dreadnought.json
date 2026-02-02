@@ -1,420 +1,236 @@
 {
-    "$schema": "https://www.melvoridle.com/assets/schema/gameData.json",
-    "namespace": "adventuring",
-    "data": {
-        "skillData": [{
-            "skillID": "adventuring:Adventuring",
-            "data": {
-                "jobs": [
-                    {
-                        "id": "dreadnought",
-                        "tier": 4,
-                        "name": "Dreadnought",
-                        "media": "melvor:assets/media/skills/defence/defence.png#tint=red",
-                        "requirements": [
-                            { "type": "job_level", "job": "adventuring:templar", "level": 25 },
-                            { "type": "job_level", "job": "adventuring:warlord", "level": 20 },
-                            { "type": "area_mastery", "area": "adventuring:frozen_wastes", "level": 50 }
-                        ],
-                        "isMilestoneReward": true,
-                        "allowedItems": [
-                            "adventuring:helm",
-                            "adventuring:platebody",
-                            "adventuring:platelegs",
-                            "adventuring:gauntlets",
-                            "adventuring:sabatons",
-                            "adventuring:amulet",
-                            "adventuring:ring",
-                            "adventuring:cape",
-                            "adventuring:shield",
-                            "adventuring:sword1h",
-                            "adventuring:mace",
-                            "adventuring:axe"
-                        ],
-                        "scaling": [
-                            { "id": "adventuring:hitpoints", "amount": 3.0 },
-                            { "id": "adventuring:defence", "amount": 2.5 },
-                            { "id": "adventuring:agility", "amount": 0.25 },
-                            { "id": "adventuring:strength", "amount": 1.0 },
-                            { "id": "adventuring:prayer", "amount": 0.75 }
-                        ]
-                    }
-                ],
-                "generators": [
-                    {
-                        "id": "crushing_blow",
-                        "name": "Crushing Blow",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:dreadnought", "level": 1 }
-                        ],
-                        "energy": 25,
-                        "hits": [
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 15,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "amount": 0.25 },
-                                                { "id": "adventuring:defence", "amount": 0.2 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:weaken",
-                                        "stacks": {
-                                            "base": 3,
-                                            "scaling": [
-                                                { "id": "adventuring:defence", "amount": 0.1 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "armored_bulwark",
-                        "name": "Armored Bulwark",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:dreadnought", "level": 20 }
-                        ],
-                        "energy": 30,
-                        "hits": [
-                            {
-                                "target": "self",
-                                "party": "ally",
-                                "effects": [
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:block",
-                                        "stacks": {
-                                            "base": 6,
-                                            "scaling": [
-                                                { "id": "adventuring:defence", "amount": 0.5 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:thorns",
-                                        "stacks": {
-                                            "base": 4,
-                                            "scaling": [
-                                                { "id": "adventuring:defence", "amount": 0.25 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ],
-                "spenders": [
-                    {
-                        "id": "impenetrable_defense",
-                        "name": "Impenetrable Defense",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:dreadnought", "level": 10 }
-                        ],
-                        "cost": 160,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "ally",
-                                "effects": [
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:block",
-                                        "stacks": {
-                                            "base": 5,
-                                            "scaling": [
-                                                { "id": "adventuring:defence", "amount": 0.4 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:barrier",
-                                        "stacks": {
-                                            "base": 4,
-                                            "scaling": [
-                                                { "id": "adventuring:defence", "amount": 0.25 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "fortress_wall",
-                        "name": "Fortress Wall",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:dreadnought", "level": 15 }
-                        ],
-                        "cost": 155,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "ally",
-                                "effects": [
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:block",
-                                        "stacks": {
-                                            "base": 4,
-                                            "scaling": [
-                                                { "id": "adventuring:defence", "amount": 0.3 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:barrier",
-                                        "stacks": {
-                                            "base": 3,
-                                            "scaling": [
-                                                { "id": "adventuring:defence", "amount": 0.2 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            },
-                            {
-                                "target": "front",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:weaken",
-                                        "stacks": {
-                                            "base": 4,
-                                            "scaling": [
-                                                { "id": "adventuring:defence", "amount": 0.15 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "bulwark_slam",
-                        "name": "Bulwark Slam",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:dreadnought", "level": 20 }
-                        ],
-                        "cost": 175,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 20,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "amount": 0.4 },
-                                                { "id": "adventuring:defence", "amount": 0.4 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:stun",
-                                        "stacks": {
-                                            "base": 1,
-                                            "scaling": []
-                                        }
-                                    }
-                                ]
-                            },
-                            {
-                                "target": "self",
-                                "party": "ally",
-                                "effects": [
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:block",
-                                        "stacks": {
-                                            "base": 5,
-                                            "scaling": [
-                                                { "id": "adventuring:defence", "amount": 0.35 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "fortress_stance",
-                        "name": "Fortress Stance",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:dreadnought", "level": 25 }
-                        ],
-                        "cost": 140,
-                        "hits": [
-                            {
-                                "target": "self",
-                                "party": "ally",
-                                "effects": [
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:block",
-                                        "stacks": {
-                                            "base": 12,
-                                            "scaling": [
-                                                { "id": "adventuring:defence", "amount": 1.0 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:thorns",
-                                        "stacks": {
-                                            "base": 6,
-                                            "scaling": [
-                                                { "id": "adventuring:defence", "amount": 0.4 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "buff",
-                                        "id": "adventuring:regen",
-                                        "stacks": {
-                                            "base": 4,
-                                            "scaling": [
-                                                { "id": "adventuring:prayer", "amount": 0.2 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "unstoppable_force",
-                        "name": "Unstoppable Force",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:dreadnought", "level": 40 }
-                        ],
-                        "cost": 200,
-                        "hits": [
-                            {
-                                "target": "all",
-                                "party": "enemy",
-                                "effects": [
-                                    {
-                                        "type": "damage_flat",
-                                        "amount": {
-                                            "base": 40,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "amount": 0.8 },
-                                                { "id": "adventuring:defence", "amount": 0.6 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:weaken",
-                                        "stacks": {
-                                            "base": 4,
-                                            "scaling": [
-                                                { "id": "adventuring:defence", "amount": 0.15 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "debuff",
-                                        "id": "adventuring:fear",
-                                        "stacks": {
-                                            "base": 3,
-                                            "scaling": [
-                                                { "id": "adventuring:strength", "amount": 0.1 }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ],
-                "passives": [
-                    {
-                        "id": "unbreakable",
-                        "name": "Unbreakable",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:dreadnought", "level": 30 }
-                        ],
-                        "effects": [
-                            {
-                                "trigger": "encounter_start",
-                                "type": "buff",
-                                "target": "self",
-                                "id": "adventuring:block",
-                                "stacks": {
-                                    "base": 10,
-                                    "scaling": [
-                                        { "id": "adventuring:defence", "amount": 0.75 }
-                                    ]
-                                }
-                            },
-                            {
-                                "trigger": "encounter_start",
-                                "type": "buff",
-                                "target": "self",
-                                "id": "adventuring:barrier",
-                                "stacks": {
-                                    "base": 8,
-                                    "scaling": [
-                                        { "id": "adventuring:defence", "amount": 0.5 }
-                                    ]
-                                }
-                            }
-                        ]
-                    },
-                    {
-                        "id": "iron_resolve",
-                        "name": "Iron Resolve",
-                        "requirements": [
-                            { "type": "current_job_level", "job": "adventuring:dreadnought", "level": 25 }
-                        ],
-                        "effects": [
-                            {
-                                "trigger": "encounter_start",
-                                "type": "buff",
-                                "target": "self",
-                                "id": "adventuring:thorns",
-                                "stacks": {
-                                    "base": 5,
-                                    "scaling": [
-                                        { "id": "adventuring:defence", "amount": 0.3 }
-                                    ]
-                                }
-                            },
-                            {
-                                "trigger": "encounter_start",
-                                "type": "buff",
-                                "target": "self",
-                                "id": "adventuring:regen",
-                                "stacks": {
-                                    "base": 4,
-                                    "scaling": [
-                                        { "id": "adventuring:prayer", "amount": 0.2 }
-                                    ]
-                                }
-                            }
-                        ]
-                    }
-                ]
-            }
-        }]
-    }
+	"$schema": "../job_schema.json",
+	"namespace": "adventuring",
+	"packages": {
+		"combat_jobs": {
+			"jobs": {
+				"dreadnought": {
+					"name": "Dreadnought",
+					"tier": 4,
+					"media": "assets/jobs/dreadnought.png",
+					"requirements": [
+						{ "type": "job_level", "job": "adventuring:templar", "level": 25 },
+						{ "type": "job_level", "job": "adventuring:warlord", "level": 20 }
+					],
+					"abilities": [
+						{
+							"id": "dreadnought_slam",
+							"name": "Dreadnought Slam",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "A crushing slam that weakens enemies.",
+							"energy": 30,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:dreadnought", "level": 1 }],
+							"hits": [{ "target": "front", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 8, "scaling": [
+									{ "id": "adventuring:strength", "amount": 0.25 },
+									{ "id": "adventuring:defence", "amount": 0.3 }
+								] } },
+								{ "type": "debuff", "id": "adventuring:weaken", "stacks": { "base": 3, "scaling": [{ "id": "adventuring:defence", "amount": 0.1 }] } }
+							] }]
+						},
+						{
+							"id": "impenetrable_defense",
+							"name": "Impenetrable Defense",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "Grants powerful defensive buffs to the entire party.",
+							"cost": 150,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:dreadnought", "level": 1 }],
+							"hits": [{ "target": "all", "party": "ally", "effects": [
+								{ "type": "buff", "id": "adventuring:block", "stacks": { "base": 5, "scaling": [{ "id": "adventuring:defence", "amount": 0.4 }] } },
+								{ "type": "buff", "id": "adventuring:barrier", "stacks": { "base": 4, "scaling": [{ "id": "adventuring:defence", "amount": 0.25 }] } }
+							] }]
+						},
+						{
+							"id": "armored_strike",
+							"name": "Armored Strike",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "A strike that builds defensive momentum.",
+							"energy": 30,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:dreadnought", "level": 10 }],
+							"hits": [
+								{ "target": "front", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "amount": { "base": 10, "scaling": [
+										{ "id": "adventuring:strength", "amount": 0.3 },
+										{ "id": "adventuring:defence", "amount": 0.4 }
+									] } }
+								] },
+								{ "target": "self", "effects": [
+									{ "type": "buff", "id": "adventuring:block", "stacks": { "base": 3, "scaling": [{ "id": "adventuring:defence", "amount": 0.2 }] } }
+								] }
+							]
+						},
+						{
+							"id": "fortress_wall",
+							"name": "Fortress Wall",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "Creates a fortress of protection while weakening foes.",
+							"cost": 155,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:dreadnought", "level": 15 }],
+							"hits": [
+								{ "target": "all", "party": "ally", "effects": [
+									{ "type": "buff", "id": "adventuring:block", "stacks": { "base": 4, "scaling": [{ "id": "adventuring:defence", "amount": 0.3 }] } },
+									{ "type": "buff", "id": "adventuring:barrier", "stacks": { "base": 3, "scaling": [{ "id": "adventuring:defence", "amount": 0.2 }] } }
+								] },
+								{ "target": "front", "party": "enemy", "effects": [
+									{ "type": "debuff", "id": "adventuring:weaken", "stacks": { "base": 4, "scaling": [{ "id": "adventuring:defence", "amount": 0.15 }] } }
+								] }
+							]
+						},
+						{
+							"id": "iron_bulwark",
+							"name": "Iron Bulwark",
+							"type": "passive",
+							"media": "assets/abilities/passive.png",
+							"description": "The dreadnought's armor reflects damage and absorbs blows.",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:dreadnought", "level": 20 }],
+							"effects": [
+								{ "trigger": "encounter_start", "type": "buff", "target": "self", "id": "adventuring:thorns", "stacks": { "base": 6, "scaling": [{ "id": "adventuring:defence", "amount": 0.4 }] } },
+								{ "trigger": "encounter_start", "type": "buff", "target": "self", "id": "adventuring:barrier", "stacks": { "base": 6, "scaling": [{ "id": "adventuring:defence", "amount": 0.35 }] } }
+							]
+						},
+						{
+							"id": "bulwark_slam",
+							"name": "Bulwark Slam",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "A stunning slam that damages all enemies.",
+							"energy": 30,
+							"requirements": [{ "type": "job_level", "job": "adventuring:dreadnought", "level": 25 }],
+							"hits": [
+								{ "target": "all", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "amount": { "base": 8, "scaling": [
+										{ "id": "adventuring:strength", "amount": 0.35 },
+										{ "id": "adventuring:defence", "amount": 0.4 }
+									] } },
+									{ "type": "debuff", "id": "adventuring:stun", "stacks": 1 }
+								] },
+								{ "target": "self", "effects": [
+									{ "type": "buff", "id": "adventuring:block", "stacks": 3 }
+								] }
+							]
+						},
+						{
+							"id": "stalwart_defense",
+							"name": "Stalwart Defense",
+							"type": "passive",
+							"media": "assets/abilities/passive.png",
+							"description": "Taking damage strengthens the dreadnought's defenses.",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:dreadnought", "level": 40 }],
+							"effects": [
+								{ "trigger": "after_damage_received", "type": "buff", "target": "self", "id": "adventuring:block", "stacks": { "base": 2, "scaling": [{ "id": "adventuring:defence", "amount": 0.1 }] } },
+								{ "trigger": "after_damage_received", "type": "buff", "target": "self", "id": "adventuring:thorns", "stacks": { "base": 2, "scaling": [{ "id": "adventuring:defence", "amount": 0.1 }] } }
+							]
+						},
+						{
+							"id": "fortress_stance",
+							"name": "Fortress Stance",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "Fortifies the entire party with unstoppable defenses.",
+							"cost": 160,
+							"requirements": [{ "type": "job_level", "job": "adventuring:dreadnought", "level": 50 }],
+							"hits": [{ "target": "all", "party": "ally", "effects": [
+								{ "type": "buff", "id": "adventuring:block", "stacks": { "base": 8, "scaling": [{ "id": "adventuring:defence", "amount": 0.6 }] } },
+								{ "type": "buff", "id": "adventuring:thorns", "stacks": { "base": 5, "scaling": [{ "id": "adventuring:defence", "amount": 0.3 }] } },
+								{ "type": "buff", "id": "adventuring:barrier", "stacks": { "base": 5, "scaling": [{ "id": "adventuring:defence", "amount": 0.35 }] } }
+							] }]
+						},
+						{
+							"id": "crushing_advance",
+							"name": "Crushing Advance",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "Advances crushing enemies, consuming block for massive damage.",
+							"energy": 35,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:dreadnought", "level": 60 }],
+							"hits": [{ "target": "front", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 18, "scaling": [
+									{ "id": "adventuring:strength", "amount": 0.5 },
+									{ "id": "adventuring:defence", "amount": 0.6 },
+									{ "id": "adventuring:block", "scaleFrom": "buff", "scaleTarget": "caster", "amount": 2, "consume": true }
+								] } },
+								{ "type": "debuff", "id": "adventuring:weaken", "stacks": 3 }
+							] }]
+						},
+						{
+							"id": "unstoppable_force",
+							"name": "Unstoppable Force",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "An unstoppable assault that devastates and terrifies enemies.",
+							"cost": 180,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:dreadnought", "level": 70 }],
+							"hits": [{ "target": "all", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 18, "scaling": [
+									{ "id": "adventuring:strength", "amount": 0.7 },
+									{ "id": "adventuring:defence", "amount": 0.7 }
+								] } },
+								{ "type": "debuff", "id": "adventuring:weaken", "stacks": { "base": 4, "scaling": [{ "id": "adventuring:defence", "amount": 0.15 }] } },
+								{ "type": "debuff", "id": "adventuring:fear", "stacks": { "base": 3, "scaling": [{ "id": "adventuring:strength", "amount": 0.1 }] } }
+							] }]
+						},
+						{
+							"id": "immovable_object",
+							"name": "Immovable Object",
+							"type": "passive",
+							"media": "assets/abilities/passive.png",
+							"description": "Cannot be moved - survives death once and shields allies.",
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:dreadnought", "level": 80 }],
+							"effects": [
+								{ "trigger": "before_death", "type": "prevent_death", "amount": 30, "limit": "combat" },
+								{ "trigger": "before_death", "type": "buff", "target": "all", "party": "ally", "id": "adventuring:barrier", "stacks": { "base": 6, "scaling": [{ "id": "adventuring:defence", "amount": 0.3 }] }, "limit": "combat" },
+								{ "trigger": "before_death", "type": "buff", "target": "all", "party": "ally", "id": "adventuring:block", "stacks": 5, "limit": "combat" }
+							]
+						},
+						{
+							"id": "dreadnought_crush",
+							"name": "Dreadnought Crush",
+							"type": "generator",
+							"media": "assets/abilities/generator.png",
+							"description": "Crushes all enemies with overwhelming force.",
+							"energy": 40,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:dreadnought", "level": 90 }],
+							"hits": [{ "target": "all", "party": "enemy", "effects": [
+								{ "type": "damage_flat", "amount": { "base": 16, "scaling": [
+									{ "id": "adventuring:strength", "amount": 0.6 },
+									{ "id": "adventuring:defence", "amount": 0.7 }
+								] } },
+								{ "type": "debuff", "id": "adventuring:weaken", "stacks": 4 },
+								{ "type": "debuff", "id": "adventuring:stun", "stacks": 1 }
+							] }]
+						},
+						{
+							"id": "absolute_defense",
+							"name": "Absolute Defense",
+							"type": "spender",
+							"media": "assets/abilities/spender.png",
+							"description": "The ultimate defense - empowers allies and crushes foes.",
+							"cost": 200,
+							"requirements": [{ "type": "current_job_level", "job": "adventuring:dreadnought", "level": 99 }],
+							"hits": [
+								{ "target": "all", "party": "ally", "effects": [
+									{ "type": "buff", "id": "adventuring:block", "stacks": { "base": 15, "scaling": [{ "id": "adventuring:defence", "amount": 1.0 }] } },
+									{ "type": "buff", "id": "adventuring:barrier", "stacks": { "base": 10, "scaling": [{ "id": "adventuring:defence", "amount": 0.6 }] } },
+									{ "type": "buff", "id": "adventuring:thorns", "stacks": { "base": 8, "scaling": [{ "id": "adventuring:defence", "amount": 0.4 }] } }
+								] },
+								{ "target": "all", "party": "enemy", "effects": [
+									{ "type": "damage_flat", "amount": { "base": 25, "scaling": [
+										{ "id": "adventuring:strength", "amount": 0.8 },
+										{ "id": "adventuring:defence", "amount": 1.0 },
+										{ "id": "adventuring:block", "scaleFrom": "buff", "scaleTarget": "caster", "amount": 3, "consume": true }
+									] } },
+									{ "type": "debuff", "id": "adventuring:weaken", "stacks": 5 },
+									{ "type": "debuff", "id": "adventuring:fear", "stacks": 4 }
+								] }
+							]
+						}
+					]
+				}
+			}
+		}
+	}
 }

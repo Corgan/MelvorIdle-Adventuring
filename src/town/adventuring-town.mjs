@@ -1,7 +1,7 @@
 const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringPage } = await loadModule('src/ui/adventuring-page.mjs');
-const { AdventuringCard } = await loadModule('src/progression/adventuring-card.mjs');
+const { AdventuringCard } = await loadModule('src/ui/adventuring-card.mjs');
 
 const { AdventuringTownElement } = await loadModule('src/town/components/adventuring-town.mjs');
 
@@ -14,6 +14,12 @@ export class AdventuringTown extends AdventuringPage {
         this.buildings = new Set();
         this.characterAction = new Map();
         this.cards = new Map();
+
+        // Tick town heroes (combatJob = none) during dungeon runs
+        // - On tile exploration (while not in combat)
+        // - On round end (during combat)
+        // This keeps their progress rate similar to when everyone is in town
+        this.manager.conductor.listen(['tile_explored', 'round_end'], () => this._tickTownHeroes());
     }
 
     get name() {
@@ -44,8 +50,11 @@ export class AdventuringTown extends AdventuringPage {
         this.manager.party.forEach(character => this.runAction(character));
     }
 
-    /** Tick only heroes staying in town (combatJob = none) during dungeon runs */
-    tickTownHeroes() {
+    /**
+     * @private Called via conductor turn_end event.
+     * Tick only heroes staying in town (combatJob = none) during dungeon runs.
+     */
+    _tickTownHeroes() {
         this.manager.party.townParty.forEach(character => this.runAction(character));
     }
 

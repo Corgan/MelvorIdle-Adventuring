@@ -1,7 +1,7 @@
 const { loadModule } = mod.getContext(import.meta);
 
 const { AdventuringPage } = await loadModule('src/ui/adventuring-page.mjs');
-const { AdventuringStats } = await loadModule('src/core/adventuring-stats.mjs');
+const { AdventuringStats } = await loadModule('src/core/stats/adventuring-stats.mjs');
 const { TooltipBuilder } = await loadModule('src/ui/adventuring-tooltip.mjs');
 
 await loadModule('src/items/adventuring-equipment.mjs');
@@ -128,15 +128,17 @@ export class AdventuringArmory extends AdventuringPage {
                 setGroups.get(setName).push(item);
             });
 
-            // Sort sets by first item's tier/order, then render
+            // Sort sets by sortOrder (from equipmentSetOrder), then render
             const sortedSets = [...setGroups.entries()].sort((a, b) => {
                 // "Uniques" always last
                 if(a[0] === 'Uniques') return 1;
                 if(b[0] === 'Uniques') return -1;
-                // Sort by first item's id (which includes tier info)
-                const aFirst = a[1][0];
-                const bFirst = b[1][0];
-                return (aFirst?.id || '').localeCompare(bFirst?.id || '');
+                // Sort by equipment set's sortOrder
+                const aSet = a[1][0]?.set;
+                const bSet = b[1][0]?.set;
+                const aOrder = aSet?.sortOrder ?? 9999;
+                const bOrder = bSet?.sortOrder ?? 9999;
+                return aOrder - bOrder;
             });
 
             sortedSets.forEach(([setName, items]) => {
@@ -252,77 +254,39 @@ export class AdventuringArmory extends AdventuringPage {
         this.unlocked.set(item, true);
         this.droppedItems.set(item, true); // Also mark as discovered
 
-        if (this.upgradeLevels.get(item) < 1) {
+        if (this.upgradeLevels.get(item) === undefined || this.upgradeLevels.get(item) < 1) {
             this.upgradeLevels.set(item, 1);
-        }
-        
-        // Record equipment crafted/unlocked for achievements
-        if (wasLocked) {
-            this.manager.achievementManager.recordEquipmentCrafted();
         }
         
         item.renderQueue.updateAll();
         this.renderQueue.details = true;
     }
 
-    markDropped(item, notify = true, rarity = null) {
+    markDropped(item, notify = true) {
         if (this.droppedItems.get(item) === true) return; // Already dropped
 
         this.droppedItems.set(item, true);
         item.renderQueue.updateAll();
 
-        // Fire equipment_collected trigger for achievements
+        // Fire equipment_collected trigger
         const totalCollected = [...this.droppedItems.values()].filter(v => v).length;
-        this.manager.achievementManager.trigger('equipment_collected', {
+        this.manager.conductor.trigger('equipment_collected', {
             item: item,
             itemId: item.id,
             itemName: item.name,
             slot: item.slot,
-            rarity: rarity || item.rarity || 'common',
             tier: item.tier,
             totalCollected: totalCollected
         });
 
         if (notify) {
-
-            const itemRarity = rarity || item.rarity || 'common';
-            const message = this.getDropMessage(item.name, itemRarity);
-            const logType = this.getLogTypeForRarity(itemRarity);
-            this.manager.log.add(message, {
-                type: logType,
+            this.manager.log.add(`Found ${item.name}!`, {
+                type: 'info',
                 category: 'loot_items'
             });
         }
 
         this.checkUnlocked();
-    }
-
-    getDropMessage(name, rarity) {
-        switch(rarity) {
-            case 'legendary':
-                return `★★★ LEGENDARY: ${name}! ★★★`;
-            case 'epic':
-                return `★★ Epic Drop: ${name}! ★★`;
-            case 'rare':
-                return `★ Rare: ${name}!`;
-            case 'uncommon':
-                return `Found ${name}!`;
-            default:
-                return `Found ${name}!`;
-        }
-    }
-
-    getLogTypeForRarity(rarity) {
-        switch(rarity) {
-            case 'legendary':
-                return 'legendary';
-            case 'epic':
-                return 'epic';
-            case 'rare':
-                return 'rare';
-            default:
-                return 'info';
-        }
     }
 
     preCraftItem(itemId) {
@@ -387,7 +351,7 @@ export class AdventuringArmory extends AdventuringPage {
                 this.manager.stash.remove(material, item.getCost(material));
             }
 
-            const tieredMats = item.getUpgradeTierMaterials();
+            const tieredMats = item.upgradeTierMaterials;
             for (const material of tieredMats) {
                 const cost = item.getUpgradeTierCost(material);
                 this.manager.stash.remove(material, cost);
@@ -395,8 +359,8 @@ export class AdventuringArmory extends AdventuringPage {
 
             this.upgradeLevels.set(item, this.upgradeLevels.get(item) + 1);
             
-            // Record achievement stat
-            this.manager.achievementManager.recordEquipmentUpgrade();
+            // Fire equipment_upgraded trigger
+            this.manager.conductor.trigger('equipment_upgraded', { item });
             
             item.renderQueue.updateAll();
             if(item.currentSlot !== undefined) {
@@ -407,7 +371,7 @@ export class AdventuringArmory extends AdventuringPage {
                     character.invalidateEffects('equipment');
                 }
                 if(this.manager.party?.effectCache) {
-                    this.manager.party.invalidateEffects('heroEquipment');
+                    this.manager.party.invalidateEffects('equipment');
                 }
                 // Recalculate character stats since item stats changed
                 if(character) {
@@ -608,7 +572,7 @@ export class AdventuringArmory extends AdventuringPage {
             }
 
             // Show upgrade tier materials
-            const upgradeMaterials = this.selectedItem.getUpgradeTierMaterials();
+            const upgradeMaterials = this.selectedItem.upgradeTierMaterials;
             for(let material of upgradeMaterials) {
                 let component = this.materialComponents[componentCount];
                 if(component === undefined) {

@@ -10,11 +10,14 @@ export class AdventuringDetailsPage extends AdventuringPage {
         this.game = game;
         this._getBackPage = getBackPage;
 
-        this.component = createElement(componentTag);
-        this.renderQueue = this.createRenderQueue();
+        this.component = createElement(componentTag);
+
+        this.renderQueue = this.createRenderQueue();
+
         if(this.component.back) {
             this.component.back.onclick = () => this.back();
-        }
+        }
+
         this._entity = null;
     }
 
@@ -48,7 +51,8 @@ export class AdventuringDetailsPage extends AdventuringPage {
         this.onEntityChanged(entity);
     }
 
-    onEntityChanged(entity) {
+    onEntityChanged(entity) {
+
     }
 
     onLoad() {
@@ -63,7 +67,9 @@ export class AdventuringDetailsPage extends AdventuringPage {
         this.manager.party.setAllLocked(true);
     }
 
-    postDataRegistration() {
+    // Required by base class contract - no additional registration needed
+    postDataRegistration() {
+
     }
 
     render() {
